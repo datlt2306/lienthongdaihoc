@@ -54,6 +54,13 @@ function ltdh_override_cpt_rewrite_slugs( $args, $post_type ) {
 		}
 		$args['rewrite']['slug']       = $slug_map[ $post_type ];
 		$args['rewrite']['with_front'] = false;
+
+		// Ensure thumbnail support for all CPTs
+		if ( ! isset( $args['supports'] ) || ! is_array( $args['supports'] ) ) {
+			$args['supports'] = [ 'title', 'editor', 'thumbnail' ];
+		} elseif ( ! in_array( 'thumbnail', $args['supports'], true ) ) {
+			$args['supports'][] = 'thumbnail';
+		}
 	}
 
 	return $args;

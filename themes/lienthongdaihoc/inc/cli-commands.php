@@ -288,7 +288,8 @@ class LTDH_CLI_Commands {
 			}
 		}
 
-		// 4. Seed 4 Guides
+		// 4. Seed 4 Tin tức / Hướng dẫn tuyển sinh (as regular posts)
+		$guide_cat_id = wp_create_category( 'Hướng dẫn tuyển sinh' );
 		$guides_data = [
 			'Học Đại học từ xa là gì?' => 'Tìm hiểu hình thức đào tạo E-learning trực tuyến, xu hướng phát triển giáo dục đại học cho người đi làm.',
 			'Liên thông Cao đẳng lên Đại học cần điều kiện gì?' => 'Điều kiện xét tuyển và miễn giảm tín chỉ đối với sinh viên có bằng tốt nghiệp Trung cấp/Cao đẳng chuyển tiếp.',
@@ -297,17 +298,18 @@ class LTDH_CLI_Commands {
 		];
 
 		foreach ( $guides_data as $title => $content ) {
-			$guide = get_page_by_path( sanitize_title( $title ), OBJECT, 'guide' );
-			if ( ! $guide ) {
+			$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );
+			if ( ! $existing ) {
 				$post_id = wp_insert_post( [
 					'post_title'   => $title,
 					'post_name'    => sanitize_title( $title ),
 					'post_status'  => 'publish',
-					'post_type'    => 'guide',
+					'post_type'    => 'post',
 					'post_content' => $content,
 				] );
 				if ( ! is_wp_error( $post_id ) ) {
-					WP_CLI::success( "Đã tạo Hướng dẫn: $title" );
+					wp_set_post_categories( $post_id, [ $guide_cat_id ] );
+					WP_CLI::success( "Đã tạo Bài viết: $title" );
 				}
 			}
 		}

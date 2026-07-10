@@ -54,6 +54,13 @@
 			transform: translateY(0);
 			pointer-events: auto;
 		}
+
+		/* Breadcrumb styles */
+		.ltdh-breadcrumb { background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+		.ltdh-breadcrumb a { color: #2563EB; text-decoration: none; font-weight: 500; }
+		.ltdh-breadcrumb a:hover { text-decoration: underline; }
+		.ltdh-breadcrumb .separator { margin: 0 0.375rem; color: #94a3b8; }
+		.ltdh-breadcrumb .last { color: #64748b; font-weight: 600; }
 	</style>
 	<?php wp_head(); ?>
 </head>
@@ -85,7 +92,7 @@
 				$is_major     = is_post_type_archive( 'major' ) || is_singular( 'major' );
 				$is_program   = is_singular( 'program' ) || is_post_type_archive( 'program' );
 				$is_training  = is_tax( 'training_type' ) || is_tax( 'campus' );
-				$is_guide     = is_post_type_archive( 'guide' ) || is_singular( 'guide' );
+
 				$is_news      = is_post_type_archive( 'post' ) || is_singular( 'post' ) || is_category();
 
 				$active_cls   = 'text-brand-primary border-brand-primary';
@@ -150,9 +157,7 @@
 						</div>
 						</div>
 					</li>
-					<li>
-						<a href="<?php echo esc_url( home_url( '/huong-dan/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 <?php echo $is_guide ? $active_cls : $default_cls; ?>">Hướng dẫn tuyển sinh</a>
-					</li>
+
 					<li>
 						<a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 <?php echo $is_news ? $active_cls : $default_cls; ?>">Tin tức</a>
 					</li>
@@ -179,7 +184,7 @@
 				<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-brand-primary block">Trang chủ</a></li>
 				<li><a href="<?php echo esc_url( home_url( '/truong/' ) ); ?>" class="hover:text-brand-primary block">Trường liên kết</a></li>
 				<li><a href="<?php echo esc_url( home_url( '/nganh/' ) ); ?>" class="hover:text-brand-primary block">Ngành học</a></li>
-				<li><a href="<?php echo esc_url( home_url( '/huong-dan/' ) ); ?>" class="hover:text-brand-primary block">Hướng dẫn tuyển sinh</a></li>
+
 				<li><a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>" class="hover:text-brand-primary block">Tin tức</a></li>
 			</ul>
 			<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>" class="block w-full text-center bg-brand-primary text-white py-3 rounded-full font-bold text-sm">
@@ -187,3 +192,7 @@
 			</a>
 		</div>
 	</header>
+
+	<?php if ( ! is_front_page() ) : ?>
+		<?php ltdh_breadcrumb(); ?>
+	<?php endif; ?>

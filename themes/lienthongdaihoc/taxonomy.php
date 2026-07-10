@@ -15,34 +15,9 @@ $term = get_queried_object();
 $taxonomy = $term->taxonomy;
 ?>
 
-<main id="primary" class="site-main py-12 bg-slate-50">
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-		
-		<!-- Breadcrumbs -->
-		<nav class="text-sm text-slate-500 mb-6">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-brand-primary">Trang chủ</a> / 
-			<span><?php echo esc_html( $term->name ); ?></span>
-		</nav>
-
-		<header class="mb-10">
-			<span class="inline-block bg-blue-50 text-[#2563EB] text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
-				<?php 
-				if ( $taxonomy === 'training_type' ) {
-					echo 'Hệ đào tạo';
-				} elseif ( $taxonomy === 'campus' ) {
-					echo 'Cơ sở đào tạo';
-				} else {
-					echo 'Khu vực tuyển sinh';
-				}
-				?>
-			</span>
-			<h1 class="text-3xl font-black text-slate-900">
-				Danh sách: <?php echo esc_html( $term->name ); ?>
-			</h1>
-			<?php if ( $term->description ) : ?>
-				<p class="text-slate-500 text-sm mt-2 max-w-2xl"><?php echo esc_html( $term->description ); ?></p>
-			<?php endif; ?>
-		</header>
+<main id="primary" class="site-main bg-slate-50">
+	<?php get_template_part( 'template-parts/banner' ); ?>
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
 		<!-- Dynamic Grid Output based on Taxonomy target -->
 		<?php if ( $taxonomy === 'region' ) : ?>

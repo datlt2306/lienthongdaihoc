@@ -20,11 +20,25 @@ function ltdh_theme_setup() {
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'html5', [ 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script' ] );
 	
+	// Rank Math breadcrumbs
+	add_theme_support( 'rank-math-breadcrumbs' );
+
 	// Register navigation menus
 	register_nav_menus( [
 		'primary-menu' => 'Header Navigation Menu',
 		'footer-menu'  => 'Footer Navigation Menu',
 	] );
+}
+
+/**
+ * Output Rank Math breadcrumb with consistent styling
+ */
+function ltdh_breadcrumb() {
+	if ( function_exists( 'rank_math_the_breadcrumbs' ) ) {
+		echo '<div class="ltdh-breadcrumb max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-sm text-slate-400">';
+		rank_math_the_breadcrumbs();
+		echo '</div>';
+	}
 }
 
 // Enqueue styles and scripts

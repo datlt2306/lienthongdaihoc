@@ -398,4 +398,43 @@ function ltdh_register_acf_field_groups() {
 		'instruction_placement' => 'label',
 		'active'                => true,
 	] );
+
+	// ----------------------------------------------------
+	// Page Banner Field Group
+	// ----------------------------------------------------
+	acf_add_local_field_group( [
+		'key'    => 'group_page_banner',
+		'title'  => 'Banner trang',
+		'fields' => [
+			[
+				'key'           => 'field_page_banner_image',
+				'label'         => 'Ảnh banner',
+				'name'          => 'page_banner',
+				'type'          => 'image',
+				'return_format' => 'url',
+				'preview_size'  => 'large',
+				'library'       => 'all',
+				'instructions'  => 'Kích thước đề nghị: 1920x400px',
+			],
+			[
+				'key'   => 'field_page_banner_subtitle',
+				'label' => 'Mô tả ngắn banner',
+				'name'  => 'page_banner_subtitle',
+				'type'  => 'text',
+			],
+		],
+		'location' => [
+			[
+				[
+					'param'    => 'post_type',
+					'operator' => '==',
+					'value'    => 'page',
+				],
+			],
+		],
+		'menu_order' => 0,
+		'position'   => 'acf_after_title',
+		'style'      => 'default',
+		'active'     => true,
+	] );
 }

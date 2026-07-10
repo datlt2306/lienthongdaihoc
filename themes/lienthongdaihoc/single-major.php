@@ -24,8 +24,9 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 $hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
 ?>
 
-<main id="primary" class="site-main py-8 bg-slate-50">
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<main id="primary" class="site-main bg-slate-50">
+	<?php get_template_part( 'template-parts/banner' ); ?>
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		
 		<!-- HERO SECTION -->
 		<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-8">

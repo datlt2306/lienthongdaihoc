@@ -51,15 +51,9 @@ if ( ! empty( $selected_type ) ) {
 $query = new WP_Query( $args );
 ?>
 
-<main id="primary" class="site-main py-12 bg-slate-50">
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-		
-		<!-- Breadcrumbs -->
-		<nav class="text-sm text-slate-500 mb-6">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-brand-primary">Trang chủ</a> / <span>Tìm chương trình học</span>
-		</nav>
-
-		<h1 class="text-3xl font-black text-slate-900 mb-8">TÌM KIẾM CHƯƠNG TRÌNH ĐÀO TẠO</h1>
+<main id="primary" class="site-main bg-slate-50">
+	<?php get_template_part( 'template-parts/banner' ); ?>
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
 		<!-- Filter Panel -->
 		<section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
