@@ -17,7 +17,6 @@ $address    = get_field( 'address', $school_id );
 $hotline    = get_field( 'hotline', $school_id ) ?: get_field( 'global_hotline', 'options' );
 $adm_info   = get_field( 'admission_info', $school_id );
 $contact    = get_field( 'contact_info', $school_id );
-$logo_id    = get_field( 'logo', $school_id );
 
 // Retrieve pre-calculated list of programs offered by this school
 $offered_program_ids = get_post_meta( $school_id, '_offered_programs', true );
@@ -32,13 +31,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		<!-- HERO SECTION -->
 		<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
 			<div class="flex flex-col md:flex-row gap-6 items-center md:items-start text-center md:text-left">
-				<?php 
-				if ( $logo_id ) :
-					echo wp_get_attachment_image( $logo_id, 'medium', false, [ 'class' => 'h-24 w-24 object-contain rounded-xl border border-slate-100 p-2 bg-white' ] );
-				else :
-				?>
-					<div class="h-24 w-24 bg-slate-100 flex items-center justify-center rounded-xl font-display font-extrabold text-brand-primary text-2xl">UNI</div>
-				<?php endif; ?>
+				<?php ltdh_render_school_thumbnail( $school_id, 'medium', 'h-24 w-24 object-cover shrink-0 rounded-xl border border-slate-100 bg-white' ); ?>
 				
 				<div class="flex-1 space-y-2">
 					<h1 class="text-2xl md:text-4xl font-black text-slate-900 leading-tight"><?php the_title(); ?></h1>

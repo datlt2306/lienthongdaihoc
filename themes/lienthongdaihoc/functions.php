@@ -87,6 +87,46 @@ function ltdh_clear_transients_on_save( $post_id ) {
 	delete_transient( 'ltdh_featured_schools' );
 }
 
+/**
+ * Resolve school image attachment ID (ACF logo → featured image).
+ */
+function ltdh_get_school_image_id( $school_id ) {
+	$logo_id = get_field( 'logo', $school_id );
+	if ( $logo_id ) {
+		return (int) $logo_id;
+	}
+
+	if ( has_post_thumbnail( $school_id ) ) {
+		return (int) get_post_thumbnail_id( $school_id );
+	}
+
+	return 0;
+}
+
+/**
+ * Render school thumbnail with UNI fallback.
+ */
+function ltdh_render_school_thumbnail( $school_id, $size = 'thumbnail', $classes = 'h-14 w-14 object-cover border border-slate-100 bg-white rounded-lg' ) {
+	$image_id = ltdh_get_school_image_id( $school_id );
+
+	if ( $image_id ) {
+		echo wp_get_attachment_image( $image_id, $size, false, [
+			'class'   => $classes,
+			'loading' => 'lazy',
+			'alt'     => sprintf( 'Logo %s', get_the_title( $school_id ) ),
+		] );
+		return;
+	}
+
+	$fallback_classes = preg_replace( '/\bobject-(cover|contain)\b/', '', $classes );
+	$fallback_classes = trim( preg_replace( '/\s+/', ' ', $fallback_classes ) );
+
+	printf(
+		'<div class="%s bg-blue-50 text-[#2563EB] font-display font-black text-sm flex items-center justify-center" aria-hidden="true">UNI</div>',
+		esc_attr( $fallback_classes )
+	);
+}
+
 // ----------------------------------------------------
 // 3. Module Loader
 // ----------------------------------------------------

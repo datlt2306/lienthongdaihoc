@@ -224,7 +224,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				$mock_schools = [
 					[ 'title' => 'ĐẠI HỌC BÁCH KHOA HÀ NỘI', 'en' => 'Hanoi University of Science and Technology', 'rating' => '4.8', 'reviews' => '288', 'target' => '3.000', 'img' => 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=250' ],
 					[ 'title' => 'ĐẠI HỌC KINH TẾ QUỐC DÂN', 'en' => 'National Economics University', 'rating' => '4.7', 'reviews' => '210', 'target' => '2.500', 'img' => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=250' ],
-					[ 'title' => 'ĐẠI HỌC NGOẠI THƯƠNG', 'en' => 'Foreign Trade University', 'rating' => '4.9', 'reviews' => '189', 'target' => '3.800', 'img' => 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=250' ],
+					[ 'title' => 'ĐẠI HỌC NGOẠI THƯƠNG', 'en' => 'Foreign Trade University', 'rating' => '4.9', 'reviews' => '189', 'target' => '3.800', 'img' => 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=250' ],
 					[ 'title' => 'HỌC VIỆN TÀI CHÍNH', 'en' => 'Academy of Finance', 'rating' => '4.8', 'reviews' => '150', 'target' => '2.800', 'img' => 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&q=80&w=250' ],
 					[ 'title' => 'ĐẠI HỌC CÔNG NGHỆ - ĐHQGHN', 'en' => 'VNU University of Engineering and Technology', 'rating' => '4.7', 'reviews' => '240', 'target' => '2.400', 'img' => 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?auto=format&fit=crop&q=80&w=250' ],
 				];
@@ -237,11 +237,14 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					while ( $schools_query->have_posts() ) : $schools_query->the_post();
 						$school_id = get_the_ID();
 						$address = get_field( 'address', $school_id );
-						$logo_id = get_field( 'logo', $school_id );
 						$m_school = $mock_schools[$index % 5];
+						$image_id  = ltdh_get_school_image_id( $school_id );
+						$thumb_url = $image_id
+							? wp_get_attachment_image_url( $image_id, 'medium' )
+							: $m_school['img'];
 				?>
 						<div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-							<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $m_school['img'] ); ?>');"></div>
+							<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
 							<div class="p-4 flex-1 flex flex-col justify-between">
 								<div>
 									<h4 class="font-extrabold text-slate-800 text-sm md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2"><?php the_title(); ?></h4>

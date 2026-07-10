@@ -170,7 +170,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
 						while ( $schools_query->have_posts() ) : $schools_query->the_post();
 						?>
 							<a href="<?php the_permalink(); ?>" class="block p-4 border border-slate-100 rounded-xl hover:border-brand-primary hover:shadow-sm transition-all bg-white flex items-center gap-3">
-								<div class="h-10 w-10 bg-brand-primary/10 rounded-lg flex items-center justify-center font-display font-bold text-brand-primary text-sm shrink-0">UNI</div>
+								<?php ltdh_render_school_thumbnail( get_the_ID(), 'thumbnail', 'h-10 w-10 object-cover shrink-0 rounded-lg border border-slate-100 bg-white' ); ?>
 								<div>
 									<h4 class="font-bold text-slate-800 text-sm"><?php the_title(); ?></h4>
 									<span class="text-[10px] text-slate-400 block truncate max-w-[200px]"><?php echo esc_html( get_field( 'address' ) ?: 'Xem bản đồ' ); ?></span>

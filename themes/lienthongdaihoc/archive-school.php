@@ -21,17 +21,12 @@ get_header();
 			if ( have_posts() ) :
 				while ( have_posts() ) : the_post();
 					$school_id = get_the_ID();
-					$logo_id = get_field( 'logo', $school_id );
 					$address = get_field( 'address', $school_id ) ?: 'Địa chỉ đang cập nhật';
 			?>
 					<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 						<div>
 							<div class="flex items-center gap-4 mb-4">
-								<?php if ( $logo_id ) : ?>
-									<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-14 w-14 object-contain border border-slate-100 p-1 bg-white rounded-lg' ] ); ?>
-								<?php else : ?>
-									<div class="h-14 w-14 bg-blue-50 text-[#2563EB] font-display font-black text-sm flex items-center justify-center rounded-lg">UNI</div>
-								<?php endif; ?>
+								<?php ltdh_render_school_thumbnail( $school_id, 'thumbnail', 'h-14 w-14 object-cover shrink-0 border border-slate-100 bg-white rounded-lg' ); ?>
 								<div>
 									<h3 class="font-extrabold text-slate-800 text-base hover:text-brand-primary leading-snug">
 										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>

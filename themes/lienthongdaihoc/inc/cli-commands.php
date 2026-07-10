@@ -154,11 +154,41 @@ class LTDH_CLI_Commands {
 
 		// 1. Seed 5 Schools
 		$schools_data = [
-			'Đại học Bách Khoa Hà Nội' => [ 'web' => 'https://hust.edu.vn', 'addr' => 'Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', 'phone' => '024 3869 6056', 'region' => 'mien-bac' ],
-			'Đại học Kinh tế Quốc dân' => [ 'web' => 'https://neu.edu.vn', 'addr' => '207 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội', 'phone' => '024 3628 0280', 'region' => 'mien-bac' ],
-			'Đại học Ngoại thương' => [ 'web' => 'https://ftu.edu.vn', 'addr' => '91 Chùa Láng, Láng Thượng, Đống Đa, Hà Nội', 'phone' => '024 3259 5158', 'region' => 'mien-bac' ],
-			'Học viện Tài chính' => [ 'web' => 'https://hvtc.edu.vn', 'addr' => 'Số 58 Lê Văn Hiến, Đức Thắng, Bắc Từ Liêm, Hà Nội', 'phone' => '024 3838 9326', 'region' => 'mien-bac' ],
-			'Đại học Công nghệ - ĐHQGHN' => [ 'web' => 'https://uet.vnu.edu.vn', 'addr' => '144 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội', 'phone' => '024 3754 7461', 'region' => 'mien-bac' ]
+			'Đại học Bách Khoa Hà Nội' => [
+				'web'   => 'https://hust.edu.vn',
+				'addr'  => 'Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội',
+				'phone' => '024 3869 6056',
+				'region'=> 'mien-bac',
+				'img'   => 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=400',
+			],
+			'Đại học Kinh tế Quốc dân' => [
+				'web'   => 'https://neu.edu.vn',
+				'addr'  => '207 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội',
+				'phone' => '024 3628 0280',
+				'region'=> 'mien-bac',
+				'img'   => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=400',
+			],
+			'Đại học Ngoại thương' => [
+				'web'   => 'https://ftu.edu.vn',
+				'addr'  => '91 Chùa Láng, Láng Thượng, Đống Đa, Hà Nội',
+				'phone' => '024 3259 5158',
+				'region'=> 'mien-bac',
+				'img'   => 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=400',
+			],
+			'Học viện Tài chính' => [
+				'web'   => 'https://hvtc.edu.vn',
+				'addr'  => 'Số 58 Lê Văn Hiến, Đức Thắng, Bắc Từ Liêm, Hà Nội',
+				'phone' => '024 3838 9326',
+				'region'=> 'mien-bac',
+				'img'   => 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&q=80&w=400',
+			],
+			'Đại học Công nghệ - ĐHQGHN' => [
+				'web'   => 'https://uet.vnu.edu.vn',
+				'addr'  => '144 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội',
+				'phone' => '024 3754 7461',
+				'region'=> 'mien-bac',
+				'img'   => 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?auto=format&fit=crop&q=80&w=400',
+			],
 		];
 
 		$school_ids = [];
@@ -177,10 +207,12 @@ class LTDH_CLI_Commands {
 					update_post_meta( $post_id, 'address', $meta['addr'] );
 					update_post_meta( $post_id, 'hotline', $meta['phone'] );
 					wp_set_object_terms( $post_id, $meta['region'], 'region' );
+					$this->maybe_set_school_thumbnail( $post_id, $title, $meta['img'] );
 					$school_ids[] = $post_id;
 					WP_CLI::success( "Đã tạo Trường: $title" );
 				}
 			} else {
+				$this->maybe_set_school_thumbnail( $school->ID, $title, $meta['img'] );
 				$school_ids[] = $school->ID;
 				WP_CLI::line( "Trường đã tồn tại: $title" );
 			}
@@ -315,6 +347,57 @@ class LTDH_CLI_Commands {
 		}
 
 		WP_CLI::success( 'Đồng bộ hóa gieo seeder hoàn tất!' );
+	}
+
+	/**
+	 * Attach featured image to a school when logo/thumbnail is missing.
+	 */
+	private function maybe_set_school_thumbnail( $school_id, $title, $image_url ) {
+		if ( function_exists( 'ltdh_get_school_image_id' ) && ltdh_get_school_image_id( $school_id ) ) {
+			return;
+		}
+
+		if ( has_post_thumbnail( $school_id ) || get_field( 'logo', $school_id ) ) {
+			return;
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$attachment_id = $this->sideload_image_from_url( $image_url, $school_id, $title );
+
+		if ( is_wp_error( $attachment_id ) ) {
+			WP_CLI::warning( sprintf( 'Không thể tải ảnh thumbnail cho %s: %s', $title, $attachment_id->get_error_message() ) );
+			return;
+		}
+
+		set_post_thumbnail( $school_id, (int) $attachment_id );
+		update_field( 'logo', (int) $attachment_id, $school_id );
+		WP_CLI::line( sprintf( 'Đã gán thumbnail cho: %s', $title ) );
+	}
+
+	/**
+	 * Sideload remote image when URL has no file extension (e.g. Unsplash).
+	 */
+	private function sideload_image_from_url( $image_url, $post_id, $title ) {
+		$tmp_file = download_url( esc_url_raw( $image_url ) );
+		if ( is_wp_error( $tmp_file ) ) {
+			return $tmp_file;
+		}
+
+		$file_array = [
+			'name'     => sanitize_file_name( sanitize_title( $title ) ) . '.jpg',
+			'tmp_name' => $tmp_file,
+		];
+
+		$attachment_id = media_handle_sideload( $file_array, $post_id, $title );
+
+		if ( is_wp_error( $attachment_id ) ) {
+			@unlink( $tmp_file );
+		}
+
+		return $attachment_id;
 	}
 
 	/**

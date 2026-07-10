@@ -108,12 +108,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Thông tin trường đào tạo</h2>
 						<div class="flex flex-col sm:flex-row gap-4 items-start mb-4">
-							<?php 
-							$logo_id = get_field( 'logo', $school_id );
-							if ( $logo_id ) :
-								echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-16 w-16 object-contain rounded-lg border border-slate-100 p-1 bg-white' ] );
-							endif;
-							?>
+							<?php ltdh_render_school_thumbnail( $school_id, 'thumbnail', 'h-16 w-16 object-cover shrink-0 rounded-lg border border-slate-100 bg-white' ); ?>
 							<div>
 								<h3 class="font-bold text-lg text-slate-900"><?php echo esc_html( $school_title ); ?></h3>
 								<p class="text-sm text-slate-500 mt-1">Website: <a href="<?php echo esc_url( get_field( 'website', $school_id ) ); ?>" target="_blank" class="text-brand-primary"><?php echo esc_html( get_field( 'website', $school_id ) ); ?></a></p>
