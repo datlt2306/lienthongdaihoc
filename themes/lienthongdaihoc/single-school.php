@@ -156,11 +156,10 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 									</div>
 
 									<div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-										<a href="<?php the_permalink(); ?>" class="text-xs text-brand-primary font-bold hover:underline">Chi tiết</a>
 										<?php if ( $status === 'tam-ngung' ) : ?>
 											<span class="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
 										<?php else : ?>
-											<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-[#1E40AF] transition-all">Đăng ký học</a>
+											<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-[#1E40AF] transition-all">Chi tiết</a>
 										<?php endif; ?>
 									</div>
 								</div>

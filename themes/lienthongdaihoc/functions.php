@@ -508,40 +508,11 @@ function ltdh_dynamic_menu_submenu_injection( $sorted_menu_items, $args ) {
 
 		// Only inject if the item does not already have children manually configured
 		if ( $title === 'trường liên kết' ) {
-			$item->classes[] = 'menu-item-has-children';
-			
-			$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => 10, 'post_status' => 'publish' ] );
-			foreach ( $schools as $s ) {
-				$max_db_id++;
-				$sub_item = new stdClass();
-				$sub_item->ID = $max_db_id;
-				$sub_item->db_id = $max_db_id;
-				$sub_item->title = $s->post_title;
-				$sub_item->url = get_permalink( $s->ID );
-				$sub_item->menu_item_parent = $item->ID;
-				$sub_item->classes = [ 'menu-item', 'menu-item-type-post_type', 'menu-item-object-school' ];
-				$sub_item->type = 'post_type';
-				$sub_item->object = 'school';
-				$sub_item->object_id = $s->ID;
-				$sub_item->post_parent = 0;
-				$sub_item->post_title = $s->post_title;
-				$sub_item->post_status = 'publish';
-				$sub_item->post_type = 'nav_menu_item';
-				$sub_item->menu_order = 0;
-				$sub_item->target = '';
-				$sub_item->attr_title = '';
-				$sub_item->description = '';
-				$sub_item->xfn = '';
-				$sub_item->current = false;
-				$sub_item->current_item_parent = false;
-				$sub_item->current_item_ancestor = false;
-				
-				$new_items[] = $sub_item;
-			}
+			// No dropdown
 		} elseif ( $title === 'ngành học' ) {
 			$item->classes[] = 'menu-item-has-children';
 			
-			$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => 10, 'post_status' => 'publish' ] );
+			$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => -1, 'post_status' => 'publish' ] );
 			foreach ( $majors as $m ) {
 				$max_db_id++;
 				$sub_item = new stdClass();
@@ -618,3 +589,36 @@ function ltdh_dynamic_menu_submenu_injection( $sorted_menu_items, $args ) {
 }
 
 
+
+/**
+ * Customize queries for specific post types
+ */
+add_action( 'pre_get_posts', 'ltdh_customize_archive_queries' );
+function ltdh_customize_archive_queries( $query ) {
+	if ( ! is_admin() && $query->is_main_query() ) {
+		if ( $query->is_post_type_archive( 'school' ) ) {
+			$query->set( 'posts_per_page', -1 );
+		}
+	}
+}
+
+/**
+ * Enable WebP upload support
+ */
+add_filter( 'upload_mimes', 'ltdh_enable_webp_upload' );
+function ltdh_enable_webp_upload( $mimes ) {
+	$mimes['webp'] = 'image/webp';
+	return $mimes;
+}
+
+add_filter( 'wp_check_filetype_and_ext', 'ltdh_allow_webp_upload_check', 10, 4 );
+function ltdh_allow_webp_upload_check( $data, $file, $filename, $mimes ) {
+	$filetype = wp_check_filetype( $filename, $mimes );
+	$ext      = $filetype['ext'];
+	$type     = $filetype['type'];
+	if ( 'webp' === $ext ) {
+		$data['ext']  = 'webp';
+		$data['type'] = 'image/webp';
+	}
+	return $data;
+}

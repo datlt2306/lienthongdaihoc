@@ -323,6 +323,19 @@
                 "library": "all"
             },
             {
+                "key": "field_school_code",
+                "label": "Mã trường / Viết tắt",
+                "name": "school_code",
+                "type": "text",
+                "placeholder": "Ví dụ: NEU, TMU, PTIT..."
+            },
+            {
+                "key": "field_school_english_name",
+                "label": "Tên tiếng Anh",
+                "name": "english_name",
+                "type": "text"
+            },
+            {
                 "key": "field_school_website",
                 "label": "Website chính thức",
                 "name": "website",
