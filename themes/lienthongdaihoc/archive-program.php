@@ -12,30 +12,61 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 // Fetch filter values from URL GET params
-$selected_school = isset( $_GET['truong_filter'] ) ? sanitize_text_field( $_GET['truong_filter'] ) : '';
-$selected_major  = isset( $_GET['nganh_filter'] ) ? sanitize_text_field( $_GET['nganh_filter'] ) : '';
-$selected_type   = isset( $_GET['he_filter'] ) ? sanitize_text_field( $_GET['he_filter'] ) : '';
+$selected_school = isset( $_GET['truong'] ) ? sanitize_text_field( $_GET['truong'] ) : '';
+$selected_major  = isset( $_GET['nganh'] ) ? sanitize_text_field( $_GET['nganh'] ) : '';
+$selected_type   = isset( $_GET['he'] ) ? sanitize_text_field( $_GET['he'] ) : '';
+$selected_search = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
 
 $args = [
 	'post_type'      => 'program',
 	'posts_per_page' => 12,
 	'post_status'    => 'publish',
-	'meta_query'     => [ 'relation' => 'AND' ],
+	'meta_query'     => [
+		'relation' => 'AND',
+		[
+			'relation' => 'OR',
+			[
+				'key'     => 'admission_status',
+				'value'   => 'tam-ngung',
+				'compare' => '!=',
+			],
+			[
+				'key'     => 'admission_status',
+				'compare' => 'NOT EXISTS',
+			],
+		]
+	],
 	'tax_query'      => [ 'relation' => 'AND' ],
 ];
 
+if ( ! empty( $selected_search ) ) {
+	$args['s'] = $selected_search;
+}
+
 if ( ! empty( $selected_school ) ) {
+	if ( ! is_numeric( $selected_school ) ) {
+		$school_post = get_page_by_path( $selected_school, OBJECT, 'school' );
+		$school_id = $school_post ? $school_post->ID : 0;
+	} else {
+		$school_id = intval( $selected_school );
+	}
 	$args['meta_query'][] = [
 		'key'     => 'school_relationship',
-		'value'   => $selected_school,
+		'value'   => $school_id,
 		'compare' => '=',
 	];
 }
 
 if ( ! empty( $selected_major ) ) {
+	if ( ! is_numeric( $selected_major ) ) {
+		$major_post = get_page_by_path( $selected_major, OBJECT, 'major' );
+		$major_id = $major_post ? $major_post->ID : 0;
+	} else {
+		$major_id = intval( $selected_major );
+	}
 	$args['meta_query'][] = [
 		'key'     => 'major_relationship',
-		'value'   => $selected_major,
+		'value'   => $major_id,
 		'compare' => '=',
 	];
 }
@@ -48,6 +79,7 @@ if ( ! empty( $selected_type ) ) {
 	];
 }
 
+$args = apply_filters( 'pre_get_posts_args_ltdh', $args );
 $query = new WP_Query( $args );
 ?>
 
@@ -57,16 +89,21 @@ $query = new WP_Query( $args );
 
 		<!-- Filter Panel -->
 		<section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-			<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+			<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+				<div>
+					<label class="block text-sm font-bold text-slate-700 mb-1">Từ khóa tìm kiếm</label>
+					<input type="text" name="s" value="<?php echo esc_attr( $selected_search ); ?>" placeholder="Tìm tên chương trình..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-base focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium" />
+				</div>
+
 				<div>
 					<label class="block text-sm font-bold text-slate-700 mb-1">Trường đại học</label>
-					<select name="truong_filter" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
+					<select name="truong" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
 						<option value="">-- Chọn trường học --</option>
 						<?php
 						$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => -1 ] );
 						foreach ( $schools as $s ) {
-							$selected = ( $selected_school == $s->ID ) ? 'selected' : '';
-							echo '<option value="' . esc_attr( $s->ID ) . '" ' . $selected . '>' . esc_html( $s->post_title ) . '</option>';
+							$selected = ( $selected_school == $s->post_name ) ? 'selected' : '';
+							echo '<option value="' . esc_attr( $s->post_name ) . '" ' . $selected . '>' . esc_html( $s->post_title ) . '</option>';
 						}
 						?>
 					</select>
@@ -74,13 +111,13 @@ $query = new WP_Query( $args );
 				
 				<div>
 					<label class="block text-sm font-bold text-slate-700 mb-1">Ngành đào tạo</label>
-					<select name="nganh_filter" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
+					<select name="nganh" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
 						<option value="">-- Chọn ngành học --</option>
 						<?php
 						$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => -1 ] );
 						foreach ( $majors as $m ) {
-							$selected = ( $selected_major == $m->ID ) ? 'selected' : '';
-							echo '<option value="' . esc_attr( $m->ID ) . '" ' . $selected . '>' . esc_html( $m->post_title ) . '</option>';
+							$selected = ( $selected_major == $m->post_name ) ? 'selected' : '';
+							echo '<option value="' . esc_attr( $m->post_name ) . '" ' . $selected . '>' . esc_html( $m->post_title ) . '</option>';
 						}
 						?>
 					</select>
@@ -88,7 +125,7 @@ $query = new WP_Query( $args );
 
 				<div>
 					<label class="block text-sm font-bold text-slate-700 mb-1">Hệ đào tạo</label>
-					<select name="he_filter" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
+					<select name="he" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
 						<option value="">-- Chọn hệ học --</option>
 						<?php
 						$types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
@@ -100,14 +137,19 @@ $query = new WP_Query( $args );
 					</select>
 				</div>
 
-				<button type="submit" class="w-full bg-[#2563EB] text-white py-3 rounded-xl font-bold hover:bg-[#1E40AF] transition-all text-base">
-					LỌC KẾT QUẢ
-				</button>
+				<div class="flex gap-2 w-full">
+					<button type="submit" class="flex-1 bg-[#2563EB] text-white py-3 rounded-xl font-bold hover:bg-[#1E40AF] transition-all text-sm uppercase tracking-wider">
+						TÌM KIẾM
+					</button>
+					<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-all text-sm uppercase text-center flex items-center justify-center shrink-0" title="Reset bộ lọc">
+						🔄
+					</a>
+				</div>
 			</form>
 		</section>
 
 		<!-- Programs Grid Output -->
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+		<div id="program-results-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
 			<?php
 			if ( $query->have_posts() ) :
 				while ( $query->have_posts() ) : $query->the_post();
@@ -115,37 +157,49 @@ $query = new WP_Query( $args );
 					$school_rel_id = get_field( 'school_relationship', $prog_id );
 					$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Đại học liên kết';
 			?>
-					<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-						<?php
-						$status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
-						$groups = get_post_meta( $prog_id, 'admission_groups', true );
-						?>
-						<div>
-							<div class="flex items-center flex-wrap gap-2 mb-1.5">
-								<span class="text-sm text-slate-400 font-semibold uppercase"><?php echo esc_html( $school_name ); ?></span>
-								<?php if ( $status === 'tam-ngung' ) : ?>
-									<span class="bg-rose-50 text-rose-700 border border-rose-100 text-[10px] font-bold px-2 py-0.5 rounded">Tạm ngưng tuyển</span>
-								<?php else : ?>
-									<span class="bg-blue-50 text-brand-primary border border-blue-100 text-[10px] font-bold px-2 py-0.5 rounded">Đang tuyển</span>
-								<?php endif; ?>
+					<?php
+					$major_rel_id = get_field( 'major_relationship', $prog_id );
+					$major_thumb = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium' ) : '';
+					if ( ! $major_thumb ) {
+						$major_thumb = 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=300';
+					}
+					$types = wp_get_post_terms( $prog_id, 'training_type' );
+					$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : 'Chưa xác định';
+					?>
+					<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+						<div class="h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>');"></div>
+						<div class="p-6 flex-1 flex flex-col justify-between">
+							<?php
+							$status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
+							$groups = get_post_meta( $prog_id, 'admission_groups', true );
+							?>
+							<div>
+								<div class="flex items-center flex-wrap gap-2 mb-1.5">
+									<span class="text-sm text-slate-400 font-semibold uppercase"><?php echo esc_html( $school_name ); ?></span>
+								</div>
+								<h3 class="font-extrabold text-slate-800 text-lg hover:text-brand-primary mb-3">
+									<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+								</h3>
+								
+								<?php
+								$learning_details = ltdh_get_program_learning_details( get_the_ID() );
+								?>
+								<div class="space-y-1.5 text-sm text-slate-500 py-3 border-t border-slate-100">
+									<p>Hệ đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
+									<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee' ) ?: 'Liên hệ' ); ?></span></p>
+									<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration' ) ?: '1.5 - 2 năm' ); ?></span></p>
+									<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
+									<p>Hình thức: <span class="font-bold text-slate-700 text-xs"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
+									<?php if ( ! empty( $groups ) ) : ?>
+										<p>Tổ hợp: <span class="font-bold text-slate-700"><?php echo esc_html( $groups ); ?></span></p>
+									<?php endif; ?>
+								</div>
 							</div>
-							<h3 class="font-extrabold text-slate-800 text-lg hover:text-brand-primary mb-3">
-								<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-							</h3>
-							
-							<div class="space-y-1.5 text-sm text-slate-500 py-3 border-t border-slate-100">
-								<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee' ) ?: 'Liên hệ' ); ?></span></p>
-								<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration' ) ?: '1.5 - 2 năm' ); ?></span></p>
-								<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'campus_info' ) ?: 'Cơ sở / Online' ); ?></span></p>
-								<?php if ( ! empty( $groups ) ) : ?>
-									<p>Tổ hợp: <span class="font-bold text-slate-700"><?php echo esc_html( $groups ); ?></span></p>
-								<?php endif; ?>
-							</div>
-						</div>
 
-						<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-							<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
-							<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#1E40AF] transition-all">Đăng ký học</a>
+							<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+								<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
+								<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#1E40AF] transition-all">Đăng ký học</a>
+							</div>
 						</div>
 					</div>
 			<?php

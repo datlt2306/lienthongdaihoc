@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 $school_id  = get_the_ID();
+$school_title = get_the_title( $school_id );
 $website    = get_field( 'website', $school_id );
 $address    = get_field( 'address', $school_id );
 $hotline    = get_field( 'hotline', $school_id ) ?: get_field( 'global_hotline', 'options' );
@@ -65,22 +66,41 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Chương trình tuyển sinh đang mở</h2>
 					
 					<?php
+					$meta_status_filter = [
+						'relation' => 'OR',
+						[
+							'key'     => 'admission_status',
+							'value'   => 'tam-ngung',
+							'compare' => '!=',
+						],
+						[
+							'key'     => 'admission_status',
+							'compare' => 'NOT EXISTS',
+						],
+					];
+
 					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 						$programs_query = new WP_Query( [
 							'post_type' => 'program',
 							'post__in'  => $offered_program_ids,
-							'post_status' => 'publish'
+							'post_status' => 'publish',
+							'meta_query' => [
+								'relation' => 'AND',
+								$meta_status_filter,
+							],
 						] );
 					} else {
 						// Fallback query if meta relationships don't exist yet
 						$programs_query = new WP_Query( [
 							'post_type' => 'program',
 							'meta_query' => [
+								'relation' => 'AND',
 								[
 									'key' => 'school_relationship',
 									'value' => $school_id,
 									'compare' => '='
-								]
+								],
+								$meta_status_filter,
 							],
 							'posts_per_page' => 10
 						] );
@@ -93,16 +113,43 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 							$major_rel_id = get_field( 'major_relationship', $prog_id );
 							$major_name = $major_rel_id ? get_the_title( $major_rel_id ) : 'Mời tư vấn';
 							?>
-							<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-slate-100 rounded-xl hover:border-brand-primary transition-all">
+							<?php
+							$status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
+							$clean_title = get_the_title();
+							if ( $school_title ) {
+								$clean_title = str_replace( ' - ' . $school_title, '', $clean_title );
+								$clean_title = str_replace( ' – ' . $school_title, '', $clean_title );
+							}
+							$types = wp_get_post_terms( $prog_id, 'training_type' );
+							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
+							?>
+							<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-slate-100 rounded-xl hover:border-[#2563EB] transition-all bg-white">
 								<div class="space-y-1">
-									<h4 class="font-bold text-slate-800 text-base hover:text-brand-primary transition-colors">
-										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+									<h4 class="font-bold text-slate-800 text-base hover:text-[#2563EB] transition-colors flex items-center gap-2 flex-wrap">
+										<a href="<?php the_permalink(); ?>"><?php echo esc_html( $clean_title ); ?></a>
+										<?php if ( $type_name ) : ?>
+											<span class="bg-blue-50 text-brand-primary text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider"><?php echo esc_html( $type_name ); ?></span>
+										<?php endif; ?>
 									</h4>
-									<p class="text-sm text-slate-500">Ngành chính: <?php echo esc_html( $major_name ); ?> | Thời gian: <?php echo esc_html( get_field( 'duration' ) ?: '1.5 - 2 năm' ); ?></p>
+									<p class="text-sm text-slate-500">Ngành đào tạo: 
+										<?php if ( $major_rel_id ) : ?>
+											<a href="<?php echo esc_url( get_permalink( $major_rel_id ) ); ?>" class="font-bold text-[#2563EB] hover:underline"><?php echo esc_html( $major_name ); ?></a>
+										<?php else : ?>
+											<span class="font-semibold text-slate-700"><?php echo esc_html( $major_name ); ?></span>
+										<?php endif; ?>
+										| Hệ đào tạo: <span class="font-semibold text-slate-700"><?php echo esc_html( $type_name ?: 'Liên hệ' ); ?></span>
+										| Học phí: <span class="font-semibold text-slate-700"><?php echo esc_html( get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ' ); ?></span>
+									</p>
 								</div>
-								<a href="<?php the_permalink(); ?>" class="mt-3 sm:mt-0 bg-brand-primary/10 text-brand-primary px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-brand-primary hover:text-white transition-all">
-									Chi tiết
-								</a>
+								<?php if ( $status === 'tam-ngung' ) : ?>
+									<a href="<?php the_permalink(); ?>" class="mt-3 sm:mt-0 bg-slate-100 text-slate-500 px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-200 transition-all shrink-0">
+										Chi tiết
+									</a>
+								<?php else : ?>
+									<a href="<?php the_permalink(); ?>" class="mt-3 sm:mt-0 bg-[#2563EB] text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-[#1E40AF] transition-all shrink-0">
+										Chi tiết
+									</a>
+								<?php endif; ?>
 							</div>
 							<?php
 						endwhile;
@@ -122,6 +169,27 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					$distinct_major_ids = [];
 					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 						foreach ( $offered_program_ids as $p_id ) {
+							$m_id = get_field( 'major_relationship', $p_id );
+							if ( $m_id && ! in_array( $m_id, $distinct_major_ids ) ) {
+								$distinct_major_ids[] = $m_id;
+							}
+						}
+					}
+					
+					if ( empty( $distinct_major_ids ) ) {
+						$linked_programs = get_posts( [
+							'post_type'      => 'program',
+							'posts_per_page' => -1,
+							'meta_query'     => [
+								[
+									'key'     => 'school_relationship',
+									'value'   => $school_id,
+									'compare' => '=',
+								],
+							],
+							'fields'         => 'ids',
+						] );
+						foreach ( $linked_programs as $p_id ) {
 							$m_id = get_field( 'major_relationship', $p_id );
 							if ( $m_id && ! in_array( $m_id, $distinct_major_ids ) ) {
 								$distinct_major_ids[] = $m_id;

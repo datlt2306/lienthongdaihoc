@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
+$hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 ?>
 
 <main id="primary" class="site-main py-12 bg-slate-50">

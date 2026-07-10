@@ -52,7 +52,10 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						<?php echo esc_html( get_the_excerpt() ?: 'Chương trình đào tạo chất lượng cao liên kết trực tiếp với trường ' . $school_title . ' nhằm mang đến lộ trình tốt nhất cho sinh viên.' ); ?>
 					</p>
 					
-					<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-t border-slate-100">
+					<?php
+					$learning_details = ltdh_get_program_learning_details( $program_id );
+					?>
+					<div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-4 border-t border-slate-100">
 						<div>
 							<span class="text-sm text-slate-400 block mb-0.5">Học phí chỉ từ</span>
 							<span class="font-display font-bold text-brand-primary text-sm md:text-base"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
@@ -63,7 +66,11 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						</div>
 						<div>
 							<span class="text-sm text-slate-400 block mb-0.5">Cơ sở học</span>
-							<span class="font-display font-bold text-slate-800 text-sm md:text-base"><?php echo esc_html( $campus ?: 'Online / Cơ sở' ); ?></span>
+							<span class="font-display font-bold text-slate-800 text-sm md:text-base"><?php echo esc_html( $learning_details['campus'] ); ?></span>
+						</div>
+						<div>
+							<span class="text-sm text-slate-400 block mb-0.5">Hình thức học</span>
+							<span class="font-display font-bold text-slate-800 text-sm md:text-base"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 						</div>
 						<div>
 							<span class="text-sm text-slate-400 block mb-0.5">Hạn hồ sơ</span>

@@ -40,7 +40,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				<!-- Hero Left Text Column -->
 				<div class="lg:col-span-6 space-y-6 text-center lg:text-left z-10">
 					<div class="inline-flex items-center gap-1 bg-white border border-slate-100 px-3.5 py-2 rounded-full shadow-sm">
-						<span class="text-sm font-serif italic text-[#2563EB] font-bold">Tư vấn</span>
+						<span class="text-sm text-[#2563EB] font-bold">Tư vấn</span>
 					</div>
 					
 					<h1 class="text-3xl sm:text-5xl lg:text-[54px] font-black text-slate-900 leading-tight tracking-tight">
@@ -121,8 +121,68 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		</div>
 	</section>
 
+	<!-- Floating Filter Panel Section -->
+	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20 -mt-12 mb-8">
+		<div class="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100">
+			<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+				<div>
+					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Từ khóa tìm kiếm</label>
+					<input type="text" name="s" placeholder="Tìm tên chương trình..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium" />
+				</div>
+				
+				<div>
+					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Trường đại học</label>
+					<select name="truong_filter" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-transparent">
+						<option value="">-- Chọn trường học --</option>
+						<?php
+						$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => -1 ] );
+						foreach ( $schools as $s ) {
+							echo '<option value="' . esc_attr( $s->ID ) . '">' . esc_html( $s->post_title ) . '</option>';
+						}
+						?>
+					</select>
+				</div>
+				
+				<div>
+					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Ngành đào tạo</label>
+					<select name="nganh_filter" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-transparent">
+						<option value="">-- Chọn ngành học --</option>
+						<?php
+						$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => -1 ] );
+						foreach ( $majors as $m ) {
+							echo '<option value="' . esc_attr( $m->ID ) . '">' . esc_html( $m->post_title ) . '</option>';
+						}
+						?>
+					</select>
+				</div>
+
+				<div>
+					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Hệ đào tạo</label>
+					<select name="he_filter" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-transparent">
+						<option value="">-- Chọn hệ học --</option>
+						<?php
+						$types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
+						foreach ( $types as $t ) {
+							echo '<option value="' . esc_attr( $t->slug ) . '">' . esc_html( $t->name ) . '</option>';
+						}
+						?>
+					</select>
+				</div>
+
+				<div class="flex gap-2 w-full">
+					<button type="submit" class="flex-1 bg-[#2563EB] text-white py-3 rounded-xl font-bold hover:bg-[#1E40AF] transition-all text-xs uppercase tracking-wider">
+						TÌM KIẾM
+					</button>
+					<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-all text-xs uppercase text-center flex items-center justify-center shrink-0" title="Reset bộ lọc">
+						🔄
+					</a>
+				</div>
+			</form>
+		</div>
+	</div>
+
 	<!-- 2. SUB-HERO PROMO SECTION (Liên thông Đại học - Nâng tầm nghề nghiệp ngay) -->
-	<section class="py-16 bg-white border-t border-slate-100">
+	<section class="py-16 bg-white">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 				<!-- Laptop student illustration representation -->
@@ -169,38 +229,48 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</p>
 			</div>
 
-			<!-- Grid representing the slider components -->
+			<!-- Grid representing the dynamic major entries -->
 			<div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-				<!-- Industry Card 1 -->
-				<div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:border-brand-primary hover:bg-white/10 transition-all cursor-pointer group">
-					<div class="h-12 w-12 bg-white/10 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-xl group-hover:scale-110 transition-transform">💻</div>
-					<h4 class="font-bold text-sm md:text-sm text-slate-100">Công nghệ Thông Tin</h4>
-				</div>
-				<!-- Industry Card 2 -->
-				<div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:border-brand-primary hover:bg-white/10 transition-all cursor-pointer group">
-					<div class="h-12 w-12 bg-white/10 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-xl group-hover:scale-110 transition-transform">📊</div>
-					<h4 class="font-bold text-sm md:text-sm text-slate-100">Quản Trị Kinh Doanh</h4>
-				</div>
-				<!-- Industry Card 3 -->
-				<div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:border-brand-primary hover:bg-white/10 transition-all cursor-pointer group">
-					<div class="h-12 w-12 bg-white/10 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-xl group-hover:scale-110 transition-transform">💵</div>
-					<h4 class="font-bold text-sm md:text-sm text-slate-100">Kinh Tế - Tài Chính</h4>
-				</div>
-				<!-- Industry Card 4 -->
-				<div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:border-brand-primary hover:bg-white/10 transition-all cursor-pointer group">
-					<div class="h-12 w-12 bg-white/10 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-xl group-hover:scale-110 transition-transform">🎯</div>
-					<h4 class="font-bold text-sm md:text-sm text-slate-100">Marketing</h4>
-				</div>
-				<!-- Industry Card 5 -->
-				<div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:border-brand-primary hover:bg-white/10 transition-all cursor-pointer group">
-					<div class="h-12 w-12 bg-white/10 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-xl group-hover:scale-110 transition-transform">🔤</div>
-					<h4 class="font-bold text-sm md:text-sm text-slate-100">Ngôn Ngữ Anh</h4>
-				</div>
-				<!-- Industry Card 6 -->
-				<div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:border-brand-primary hover:bg-white/10 transition-all cursor-pointer group">
-					<div class="h-12 w-12 bg-white/10 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-xl group-hover:scale-110 transition-transform">🎨</div>
-					<h4 class="font-bold text-sm md:text-sm text-slate-100">Thiết Kế Đồ Họa</h4>
-				</div>
+				<?php
+				$majors_query = new WP_Query( [
+					'post_type'      => 'major',
+					'posts_per_page' => 12,
+					'post_status'    => 'publish',
+				] );
+				if ( $majors_query->have_posts() ) :
+					while ( $majors_query->have_posts() ) : $majors_query->the_post();
+						$title = get_the_title();
+						$clean_title = trim( preg_replace( '/\s*[\(\-][\s\S]*/', '', $title ) );
+						// Map icons dynamically
+						$icon = '🎓';
+						$lower_title = mb_strtolower( $clean_title, 'UTF-8' );
+						if ( strpos( $lower_title, 'công nghệ thông tin' ) !== false || strpos( $lower_title, 'cntt' ) !== false ) {
+							$icon = '💻';
+						} elseif ( strpos( $lower_title, 'quản trị kinh doanh' ) !== false ) {
+							$icon = '📈';
+						} elseif ( strpos( $lower_title, 'kinh tế' ) !== false || strpos( $lower_title, 'tài chính' ) !== false || strpos( $lower_title, 'kế toán' ) !== false ) {
+							$icon = '💵';
+						} elseif ( strpos( $lower_title, 'marketing' ) !== false ) {
+							$icon = '🎯';
+						} elseif ( strpos( $lower_title, 'ngôn ngữ anh' ) !== false || strpos( $lower_title, 'tiếng anh' ) !== false ) {
+							$icon = '🔤';
+						} elseif ( strpos( $lower_title, 'thương mại' ) !== false ) {
+							$icon = '🏪';
+						} elseif ( strpos( $lower_title, 'thiết kế' ) !== false || strpos( $lower_title, 'đồ họa' ) !== false ) {
+							$icon = '🎨';
+						}
+						?>
+						<a href="<?php the_permalink(); ?>" class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:border-brand-primary hover:bg-white/10 transition-all cursor-pointer group block">
+							<div class="h-12 w-12 bg-white/10 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-xl group-hover:scale-110 transition-transform"><?php echo $icon; ?></div>
+							<h4 class="font-bold text-sm md:text-sm text-slate-100"><?php echo esc_html( $clean_title ); ?></h4>
+						</a>
+						<?php
+					endwhile;
+					wp_reset_postdata();
+				else :
+					echo '<p class="text-sm text-slate-300 col-span-6 text-center">Chưa có ngành học nào.</p>';
+				endif;
+				?>
 			</div>
 		</div>
 	</section>
@@ -213,7 +283,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<span class="text-[#2563EB] text-sm font-bold uppercase tracking-wider block">THÔNG TIN TUYỂN SINH</span>
 					<h2 class="text-2xl md:text-3xl font-black text-slate-900">CÁC TRƯỜNG ĐÀO TẠO TRÊN TOÀN QUỐC</h2>
 				</div>
-				<a href="<?php echo esc_url( home_url( '/truong/' ) ); ?>" class="text-sm text-[#2563EB] font-bold hover:underline mt-4 sm:mt-0 flex items-center gap-1">
+				<a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>" class="text-sm text-[#2563EB] font-bold hover:underline mt-4 sm:mt-0 flex items-center gap-1">
 					Xem tất cả
 					<span>→</span>
 				</a>
@@ -221,42 +291,52 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
 				<?php 
-				$mock_schools = [
-					[ 'title' => 'ĐẠI HỌC BÁCH KHOA HÀ NỘI', 'en' => 'Hanoi University of Science and Technology', 'rating' => '4.8', 'reviews' => '288', 'target' => '3.000', 'img' => 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=250' ],
-					[ 'title' => 'ĐẠI HỌC KINH TẾ QUỐC DÂN', 'en' => 'National Economics University', 'rating' => '4.7', 'reviews' => '210', 'target' => '2.500', 'img' => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=250' ],
-					[ 'title' => 'ĐẠI HỌC NGOẠI THƯƠNG', 'en' => 'Foreign Trade University', 'rating' => '4.9', 'reviews' => '189', 'target' => '3.800', 'img' => 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=250' ],
-					[ 'title' => 'HỌC VIỆN TÀI CHÍNH', 'en' => 'Academy of Finance', 'rating' => '4.8', 'reviews' => '150', 'target' => '2.800', 'img' => 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&q=80&w=250' ],
-					[ 'title' => 'ĐẠI HỌC CÔNG NGHỆ - ĐHQGHN', 'en' => 'VNU University of Engineering and Technology', 'rating' => '4.7', 'reviews' => '240', 'target' => '2.400', 'img' => 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?auto=format&fit=crop&q=80&w=250' ],
-				];
-
-				// Loop to output database query, or fall back to mock schools if empty
-				$query_has_posts = false;
 				if ( $schools_query->have_posts() ) {
-					$query_has_posts = true;
 					$index = 0;
+					$fallback_images = [
+						'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=300',
+						'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=300',
+						'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=300',
+						'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&q=80&w=300',
+						'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?auto=format&fit=crop&q=80&w=300'
+					];
 					while ( $schools_query->have_posts() ) : $schools_query->the_post();
 						$school_id = get_the_ID();
 						$address = get_field( 'address', $school_id );
-						$m_school = $mock_schools[$index % 5];
-						$image_id  = ltdh_get_school_image_id( $school_id );
-						$thumb_url = $image_id
-							? wp_get_attachment_image_url( $image_id, 'medium' )
-							: $m_school['img'];
+						$hotline = get_field( 'hotline', $school_id ) ?: get_field( 'global_hotline', 'options' );
+						$thumb_url = get_the_post_thumbnail_url( $school_id, 'medium' ) ?: $fallback_images[$index % 5];
+						$logo_id = get_field( 'logo', $school_id );
+						$en_name = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
+						$rating  = get_post_meta( $school_id, 'rating', true ) ?: '4.8';
+						$reviews = get_post_meta( $school_id, 'reviews_count', true ) ?: '256';
+						$target  = get_post_meta( $school_id, 'admission_target', true ) ?: '3.000';
 				?>
 						<div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 							<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
-							<div class="p-4 flex-1 flex flex-col justify-between">
-								<div>
-									<h4 class="font-extrabold text-slate-800 text-sm md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2"><?php the_title(); ?></h4>
-									<p class="text-sm text-slate-400 mt-1 font-medium italic line-clamp-1"><?php echo esc_html( $m_school['en'] ); ?></p>
-									<div class="flex items-center gap-1 mt-2 text-sm text-slate-500 font-semibold">
+							
+							<!-- Logo Overlay -->
+							<div class="h-16 w-16 bg-white rounded-full border-4 border-white shadow-md bg-white -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
+								<?php if ( $logo_id ) : ?>
+									<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
+								<?php else : ?>
+									<span class="font-display font-extrabold text-brand-primary text-xs">UNI</span>
+								<?php endif; ?>
+							</div>
+
+							<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
+								<div class="text-center">
+									<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
+									<p class="text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
+									
+									<div class="flex items-center justify-center gap-1 mt-2.5 text-[11px] text-slate-500 font-bold">
 										<span class="text-yellow-400">★</span>
-										<span><?php echo esc_html( $m_school['rating'] ); ?> (<?php echo esc_html( $m_school['reviews'] ); ?> đánh giá)</span>
+										<span><?php echo esc_html( $rating ); ?> (<?php echo esc_html( $reviews ); ?> đánh giá)</span>
 									</div>
+									<p class="text-[11px] text-slate-500 mt-1 font-medium">Chỉ tiêu: <span class="font-bold text-slate-700"><?php echo esc_html( $target ); ?></span></p>
 								</div>
+								
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<span>Chỉ tiêu: <span class="font-bold text-[#2563EB]"><?php echo esc_html( $m_school['target'] ); ?></span></span>
-									<a href="<?php the_permalink(); ?>" class="bg-slate-50 hover:bg-[#2563EB]/10 text-[#2563EB] px-2.5 py-1 rounded font-bold transition-all text-sm uppercase">Chi tiết</a>
+									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-[#2563EB] hover:text-white py-2 rounded-xl font-bold transition-all text-xs uppercase text-[#2563EB]">Chi tiết trường</a>
 								</div>
 							</div>
 						</div>
@@ -264,31 +344,8 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						$index++;
 					endwhile;
 					wp_reset_postdata();
-				}
-
-				if ( ! $query_has_posts ) {
-					// Fallback loops to draw mock schools if not seeded
-					foreach ( $mock_schools as $s ) :
-				?>
-						<div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-							<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $s['img'] ); ?>');"></div>
-							<div class="p-4 flex-1 flex flex-col justify-between">
-								<div>
-									<h4 class="font-extrabold text-slate-800 text-sm md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2"><?php echo esc_html( $s['title'] ); ?></h4>
-									<p class="text-sm text-slate-400 mt-1 font-medium italic line-clamp-1"><?php echo esc_html( $s['en'] ); ?></p>
-									<div class="flex items-center gap-1 mt-2 text-sm text-slate-500 font-semibold">
-										<span class="text-yellow-400">★</span>
-										<span><?php echo esc_html( $s['rating'] ); ?> (<?php echo esc_html( $s['reviews'] ); ?> đánh giá)</span>
-									</div>
-								</div>
-								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<span>Chỉ tiêu: <span class="font-bold text-[#2563EB]"><?php echo esc_html( $s['target'] ); ?></span></span>
-									<span class="bg-slate-50 text-[#2563EB] px-2.5 py-1 rounded font-bold text-sm uppercase">Chi tiết</span>
-								</div>
-							</div>
-						</div>
-				<?php
-					endforeach;
+				} else {
+					echo '<div class="col-span-5 text-center text-slate-500 py-6">Chưa có trường liên kết nào được gieo dữ liệu.</div>';
 				}
 				?>
 			</div>
@@ -383,7 +440,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			<!-- Box Left: BẰNG ĐẠO TẠO CHÍNH QUY -->
 			<div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
 				<div class="flex-1 space-y-4">
-					<span class="bg-[#EFF6FF] text-[#2563EB] text-sm font-black px-3 py-1 rounded-full uppercase tracking-wider inline-block">RẰNG CẤP TƯƠNG ĐƯƠNG</span>
+					<span class="bg-[#EFF6FF] text-[#2563EB] text-sm font-black px-3 py-1 rounded-full uppercase tracking-wider inline-block">BẰNG CẤP TƯƠNG ĐƯƠNG</span>
 					<h3 class="font-extrabold text-xl text-slate-900 leading-tight">BẰNG ĐẠO TẠO CHÍNH QUY</h3>
 					<ul class="space-y-2 text-sm text-slate-600">
 						<li>✔ Học chương trình chuẩn theo quy định của bộ GD&ĐT.</li>
@@ -404,7 +461,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			<!-- Box Right: SUỐT ĐỜI TRÊN TOÀN QUỐC -->
 			<div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
 				<div class="flex-1 space-y-4">
-					<span class="bg-blue-50 text-blue-800 text-sm font-black px-3 py-1 rounded-full uppercase tracking-wider inline-block">RẰNG CÓ GIÁ TRỊ SỬ DỤNG</span>
+					<span class="bg-blue-50 text-blue-800 text-sm font-black px-3 py-1 rounded-full uppercase tracking-wider inline-block">BẰNG CÓ GIÁ TRỊ SỬ DỤNG</span>
 					<h3 class="font-extrabold text-xl text-slate-900 leading-tight">SUỐT ĐỜI TRÊN TOÀN QUỐC</h3>
 					<ul class="space-y-2 text-sm text-slate-600">
 						<li>✔ Bằng đại học sử dụng lâu dài, không giới hạn thời gian.</li>
@@ -570,14 +627,20 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					$news_has_posts = true;
 					$index = 0;
 					while ( $news_query->have_posts() ) : $news_query->the_post();
-						$m_news = $mock_news[$index % 4];
+						$post_id = get_the_ID();
+						$thumb_url = get_the_post_thumbnail_url( $post_id, 'medium' ) ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=250';
+						$categories = get_the_category( $post_id );
+						$category_name = ! empty( $categories ) ? $categories[0]->name : 'Tin tuyển sinh';
 				?>
 						<div class="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
-							<div class="h-32 bg-slate-200 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=250');"></div>
+							<div class="h-36 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
 							<div class="p-4 flex-1 flex flex-col justify-between">
 								<div class="space-y-2">
-									<span class="text-sm text-slate-400 font-semibold block"><?php echo get_the_date( 'd/m/Y' ); ?></span>
-									<h4 class="font-extrabold text-slate-800 text-sm md:text-sm tracking-tight leading-snug line-clamp-2 hover:text-[#2563EB]">
+									<div class="flex items-center justify-between text-xs font-semibold">
+										<span class="bg-blue-50 text-brand-primary px-2 py-0.5 rounded"><?php echo esc_html( $category_name ); ?></span>
+										<span class="text-slate-400"><?php echo get_the_date( 'd/m/Y' ); ?></span>
+									</div>
+									<h4 class="font-extrabold text-slate-800 text-sm md:text-sm tracking-tight leading-snug line-clamp-2 hover:text-[#2563EB] pt-1">
 										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 									</h4>
 									<p class="text-sm text-slate-400 leading-normal line-clamp-2"><?php echo esc_html( wp_strip_all_tags( get_the_excerpt() ) ); ?></p>

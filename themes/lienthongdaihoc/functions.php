@@ -52,12 +52,18 @@ function ltdh_enqueue_assets() {
 	}
 	
 	// Vanilla JS Bundle
+	$script_handle = 'ltdh-fallback-js';
 	if ( file_exists( get_template_directory() . '/assets/js/main.bundle.js' ) ) {
 		wp_enqueue_script( 'ltdh-theme-js', get_template_directory_uri() . '/assets/js/main.bundle.js', [], '1.0.0', true );
+		$script_handle = 'ltdh-theme-js';
 	} else {
 		// Fallback vanilla script for dev
 		wp_enqueue_script( 'ltdh-fallback-js', get_template_directory_uri() . '/assets/js/main.js', [], '1.0.0', true );
 	}
+
+	wp_localize_script( $script_handle, 'ltdh_ajax', [
+		'ajax_url' => admin_url( 'admin-ajax.php' )
+	] );
 }
 
 // ----------------------------------------------------
@@ -138,6 +144,7 @@ $ltdh_modules = [
 	'inc/crm-adapters.php',
 	'inc/seo.php',
 	'inc/cli-commands.php',
+	'inc/search-engine.php',
 ];
 
 foreach ( $ltdh_modules as $module ) {
@@ -146,3 +153,225 @@ foreach ( $ltdh_modules as $module ) {
 		require_once $file_path;
 	}
 }
+
+// ----------------------------------------------------
+// 4. Redirect Empty Taxonomy Base URLs
+// ----------------------------------------------------
+add_action( 'template_redirect', 'ltdh_redirect_taxonomy_base' );
+function ltdh_redirect_taxonomy_base() {
+	if ( is_tax( 'training_type' ) || is_tax( 'campus' ) ) {
+		return;
+	}
+
+	$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+	if ( preg_match( '#^/he-dao-tao/?$#i', $request_path ) || preg_match( '#^/co-so/?$#i', $request_path ) ) {
+		wp_redirect( home_url( '/chuong-trinh/' ), 301 );
+		exit;
+	}
+}
+
+/**
+ * Fallback menu for desktop primary header navigation
+ */
+function ltdh_default_primary_menu() {
+	?>
+	<ul class="nav-primary-menu">
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Trang chủ</a></li>
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>">Trường liên kết</a></li>
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>">Ngành học</a></li>
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>">Tin tức</a></li>
+	</ul>
+	<?php
+}
+
+/**
+ * Fallback menu for mobile navigation
+ */
+function ltdh_default_mobile_menu() {
+	?>
+	<ul class="nav-mobile-menu">
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Trang chủ</a></li>
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>">Trường liên kết</a></li>
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>">Ngành học</a></li>
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>">Tin tức</a></li>
+	</ul>
+	<?php
+}
+
+/**
+ * Fallback menu for footer quick links
+ */
+function ltdh_default_footer_menu() {
+	?>
+	<ul class="space-y-2 text-sm flex flex-col nav-footer-menu">
+		<li><a href="<?php echo esc_url( home_url( '/gioi-thieu/' ) ); ?>">Giới thiệu</a></li>
+		<li><a href="<?php echo esc_url( home_url( '/cau-hoi-thuong-gap/' ) ); ?>">Câu hỏi thường gặp</a></li>
+		<li><a href="<?php echo esc_url( home_url( '/chinh-sach-bao-mat/' ) ); ?>">Chính sách bảo mật</a></li>
+		<li><a href="<?php echo esc_url( home_url( '/lien-he/' ) ); ?>">Liên hệ</a></li>
+	</ul>
+	<?php
+}
+
+/**
+ * Get formatted learning mode and campus text for a program dynamically
+ */
+function ltdh_get_program_learning_details( $program_id ) {
+	// Get campus taxonomy term
+	$campuses = wp_get_post_terms( $program_id, 'campus' );
+	$campus_name = ! empty( $campuses ) && ! is_wp_error( $campuses ) ? $campuses[0]->name : 'Hà Nội';
+
+	// Get training type taxonomy term
+	$types = wp_get_post_terms( $program_id, 'training_type' );
+	$type_slug = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->slug : '';
+
+	$learning_mode = 'Học tập trung';
+	if ( $type_slug === 'tu-xa' ) {
+		$learning_mode = 'Học online 100%';
+	} elseif ( $type_slug === 'vua-hoc-vua-lam' ) {
+		$learning_mode = 'Học tập trung cuối tuần';
+	} elseif ( $type_slug === 'van-bang-2' ) {
+		$learning_mode = 'Học tập trung / Online linh hoạt';
+	}
+
+	return [
+		'campus' => $campus_name,
+		'mode'   => $learning_mode,
+	];
+}
+
+/**
+ * AJAX handler for filtering programs dynamically
+ */
+add_action( 'wp_ajax_ltdh_filter_programs', 'ltdh_ajax_filter_programs' );
+add_action( 'wp_ajax_nopriv_ltdh_filter_programs', 'ltdh_ajax_filter_programs' );
+
+function ltdh_ajax_filter_programs() {
+	// Fetch filter values from POST
+	$selected_school = isset( $_POST['truong'] ) ? sanitize_text_field( $_POST['truong'] ) : '';
+	$selected_major  = isset( $_POST['nganh'] ) ? sanitize_text_field( $_POST['nganh'] ) : '';
+	$selected_type   = isset( $_POST['he'] ) ? sanitize_text_field( $_POST['he'] ) : '';
+	$selected_search = isset( $_POST['s'] ) ? sanitize_text_field( $_POST['s'] ) : '';
+
+	$args = [
+		'post_type'      => 'program',
+		'posts_per_page' => 12,
+		'post_status'    => 'publish',
+		'meta_query'     => [
+			'relation' => 'AND',
+			[
+				'relation' => 'OR',
+				[
+					'key'     => 'admission_status',
+					'value'   => 'tam-ngung',
+					'compare' => '!=',
+				],
+				[
+					'key'     => 'admission_status',
+					'compare' => 'NOT EXISTS',
+				],
+			]
+		],
+		'tax_query'      => [ 'relation' => 'AND' ],
+	];
+
+	if ( ! empty( $selected_search ) ) {
+		$args['s'] = $selected_search;
+	}
+
+	if ( ! empty( $selected_school ) ) {
+		if ( ! is_numeric( $selected_school ) ) {
+			$school_post = get_page_by_path( $selected_school, OBJECT, 'school' );
+			$school_id = $school_post ? $school_post->ID : 0;
+		} else {
+			$school_id = intval( $selected_school );
+		}
+		$args['meta_query'][] = [
+			'key'     => 'school_relationship',
+			'value'   => $school_id,
+			'compare' => '=',
+		];
+	}
+
+	if ( ! empty( $selected_major ) ) {
+		if ( ! is_numeric( $selected_major ) ) {
+			$major_post = get_page_by_path( $selected_major, OBJECT, 'major' );
+			$major_id = $major_post ? $major_post->ID : 0;
+		} else {
+			$major_id = intval( $selected_major );
+		}
+		$args['meta_query'][] = [
+			'key'     => 'major_relationship',
+			'value'   => $major_id,
+			'compare' => '=',
+		];
+	}
+
+	if ( ! empty( $selected_type ) ) {
+		$args['tax_query'][] = [
+			'taxonomy' => 'training_type',
+			'field'    => 'slug',
+			'terms'    => $selected_type,
+		];
+	}
+
+	// Apply synonym/relational search interceptor
+	$args  = apply_filters( 'pre_get_posts_args_ltdh', $args );
+	$query = new WP_Query( $args );
+
+	ob_start();
+	if ( $query->have_posts() ) :
+		while ( $query->have_posts() ) : $query->the_post();
+			$prog_id = get_the_ID();
+			$school_rel_id = get_field( 'school_relationship', $prog_id );
+			$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Đại học liên kết';
+			$major_rel_id = get_field( 'major_relationship', $prog_id );
+			$major_thumb = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium' ) : '';
+			if ( ! $major_thumb ) {
+				$major_thumb = 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=300';
+			}
+			$types = wp_get_post_terms( $prog_id, 'training_type' );
+			$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : 'Chưa xác định';
+			$groups = get_post_meta( $prog_id, 'admission_groups', true );
+			$learning_details = ltdh_get_program_learning_details( $prog_id );
+			?>
+			<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+				<div class="h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>');"></div>
+				<div class="p-6 flex-1 flex flex-col justify-between">
+					<div>
+						<div class="flex items-center flex-wrap gap-2 mb-1.5">
+							<span class="text-sm text-slate-400 font-semibold uppercase"><?php echo esc_html( $school_name ); ?></span>
+						</div>
+						<h3 class="font-extrabold text-slate-800 text-lg hover:text-brand-primary mb-3">
+							<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+						</h3>
+						
+						<div class="space-y-1.5 text-sm text-slate-500 py-3 border-t border-slate-100">
+							<p>Hệ đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
+							<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ' ); ?></span></p>
+							<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
+							<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
+							<p>Hình thức: <span class="font-bold text-slate-700 text-xs"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
+							<?php if ( ! empty( $groups ) ) : ?>
+								<p>Tổ hợp: <span class="font-bold text-slate-700"><?php echo esc_html( $groups ); ?></span></p>
+							<?php endif; ?>
+						</div>
+					</div>
+
+					<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+						<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
+						<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#1E40AF] transition-all">Đăng ký học</a>
+					</div>
+				</div>
+			</div>
+			<?php
+		endwhile;
+		wp_reset_postdata();
+	else :
+		echo '<div class="col-span-3 text-center py-12"><p class="text-slate-500 text-base">Không tìm thấy chương trình học nào khớp với bộ lọc.</p></div>';
+	endif;
+	$html = ob_get_clean();
+
+	wp_send_json_success( [ 'html' => $html ] );
+}
+
+

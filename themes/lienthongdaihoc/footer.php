@@ -53,7 +53,7 @@ $messenger = get_field( 'global_messenger_url', 'options' ) ?: 'https://m.me';
 					'theme_location' => 'footer-menu',
 					'container'      => false,
 					'menu_class'     => 'space-y-2 text-sm flex flex-col',
-					'fallback_cb'    => '__return_false',
+					'fallback_cb'    => 'ltdh_default_footer_menu',
 				] );
 				?>
 			</div>
@@ -81,6 +81,59 @@ $messenger = get_field( 'global_messenger_url', 'options' ) ?: 'https://m.me';
 </div>
 
 <script>
+	<?php
+	$combos_query = new WP_Query( [
+		'post_type'      => 'program',
+		'posts_per_page' => -1,
+		'post_status'    => 'publish',
+	] );
+	$combos = [];
+	if ( $combos_query->have_posts() ) {
+		while ( $combos_query->have_posts() ) {
+			$combos_query->the_post();
+			$pid = get_the_ID();
+			$s_rel = get_field( 'school_relationship', $pid );
+			$m_rel = get_field( 'major_relationship', $pid );
+			
+			$s_id = 0;
+			if ( $s_rel ) {
+				if ( is_numeric( $s_rel ) ) {
+					$s_id = intval( $s_rel );
+				} elseif ( is_object( $s_rel ) && isset( $s_rel->ID ) ) {
+					$s_id = $s_rel->ID;
+				} elseif ( is_array( $s_rel ) && ! empty( $s_rel ) ) {
+					$first = reset( $s_rel );
+					$s_id = is_object( $first ) ? $first->ID : intval( $first );
+				}
+			}
+
+			$m_id = 0;
+			if ( $m_rel ) {
+				if ( is_numeric( $m_rel ) ) {
+					$m_id = intval( $m_rel );
+				} elseif ( is_object( $m_rel ) && isset( $m_rel->ID ) ) {
+					$m_id = $m_rel->ID;
+				} elseif ( is_array( $m_rel ) && ! empty( $m_rel ) ) {
+					$first = reset( $m_rel );
+					$m_id = is_object( $first ) ? $first->ID : intval( $first );
+				}
+			}
+
+			$t_terms = wp_get_post_terms( $pid, 'training_type' );
+			$t_slug = ( ! is_wp_error( $t_terms ) && ! empty( $t_terms ) ) ? $t_terms[0]->slug : '';
+			if ( $s_id && $m_id ) {
+				$combos[] = [
+					'school' => (string) $s_id,
+					'major'  => (string) $m_id,
+					'type'   => (string) $t_slug,
+				];
+			}
+		}
+		wp_reset_postdata();
+	}
+	?>
+	window.ltdh_combinations = <?php echo json_encode( $combos ); ?>;
+
 	// Mobile menu toggler
 	document.addEventListener('DOMContentLoaded', function() {
 		const toggleBtn = document.getElementById('mobile-menu-toggle');

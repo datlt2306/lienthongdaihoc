@@ -21,7 +21,7 @@ $market     = get_field( 'job_market', $major_id );
 $offered_program_ids = get_post_meta( $major_id, '_offered_programs', true );
 
 $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
-$hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
+$hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
@@ -73,22 +73,41 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Chương trình tuyển sinh ngành <?php the_title(); ?></h2>
 					
 					<?php
+					$meta_status_filter = [
+						'relation' => 'OR',
+						[
+							'key'     => 'admission_status',
+							'value'   => 'tam-ngung',
+							'compare' => '!=',
+						],
+						[
+							'key'     => 'admission_status',
+							'compare' => 'NOT EXISTS',
+						],
+					];
+
 					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 						$programs_query = new WP_Query( [
 							'post_type' => 'program',
 							'post__in'  => $offered_program_ids,
-							'post_status' => 'publish'
+							'post_status' => 'publish',
+							'meta_query' => [
+								'relation' => 'AND',
+								$meta_status_filter,
+							],
 						] );
 					} else {
 						// Fallback logic
 						$programs_query = new WP_Query( [
 							'post_type' => 'program',
 							'meta_query' => [
+								'relation' => 'AND',
 								[
 									'key' => 'major_relationship',
 									'value' => $major_id,
 									'compare' => '='
-								]
+								],
+								$meta_status_filter,
 							],
 							'posts_per_page' => 10
 						] );
@@ -101,23 +120,24 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
 							$school_rel_id = get_field( 'school_relationship', $prog_id );
 							$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Mời tư vấn';
 							$status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
+							$types = wp_get_post_terms( $prog_id, 'training_type' );
+							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
 							?>
-							<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-slate-100 rounded-xl hover:border-[#2563EB] transition-all">
+							<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-slate-100 rounded-xl hover:border-[#2563EB] transition-all bg-white">
 								<div class="space-y-1">
 									<h4 class="font-bold text-slate-800 text-base hover:text-[#2563EB] transition-colors flex items-center gap-2 flex-wrap">
 										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-										<?php if ( $status === 'tam-ngung' ) : ?>
-											<span class="bg-rose-100 text-rose-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Tạm ngưng</span>
-										<?php else : ?>
-											<span class="bg-green-100 text-green-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Đang tuyển</span>
+										<?php if ( $type_name ) : ?>
+											<span class="bg-blue-50 text-brand-primary text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider"><?php echo esc_html( $type_name ); ?></span>
 										<?php endif; ?>
 									</h4>
-									<p class="text-sm text-slate-500">Trường đào tạo: 
+									<p class="text-sm text-slate-500">Trường: 
 										<?php if ( $school_rel_id ) : ?>
 											<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>" class="font-bold text-[#2563EB] hover:underline"><?php echo esc_html( $school_name ); ?></a>
 										<?php else : ?>
 											<span class="font-semibold text-slate-700"><?php echo esc_html( $school_name ); ?></span>
 										<?php endif; ?>
+										| Hệ đào tạo: <span class="font-semibold text-slate-700"><?php echo esc_html( $type_name ?: 'Liên hệ' ); ?></span>
 										| Học phí: <span class="font-semibold text-slate-700"><?php echo esc_html( get_field( 'tuition_fee' ) ?: 'Liên hệ' ); ?></span>
 									</p>
 								</div>
@@ -148,6 +168,27 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
 					$distinct_school_ids = [];
 					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 						foreach ( $offered_program_ids as $p_id ) {
+							$s_id = get_field( 'school_relationship', $p_id );
+							if ( $s_id && ! in_array( $s_id, $distinct_school_ids ) ) {
+								$distinct_school_ids[] = $s_id;
+							}
+						}
+					}
+					
+					if ( empty( $distinct_school_ids ) ) {
+						$linked_programs = get_posts( [
+							'post_type'      => 'program',
+							'posts_per_page' => -1,
+							'meta_query'     => [
+								[
+									'key'     => 'major_relationship',
+									'value'   => $major_id,
+									'compare' => '=',
+								],
+							],
+							'fields'         => 'ids',
+						] );
+						foreach ( $linked_programs as $p_id ) {
 							$s_id = get_field( 'school_relationship', $p_id );
 							if ( $s_id && ! in_array( $s_id, $distinct_school_ids ) ) {
 								$distinct_school_ids[] = $s_id;

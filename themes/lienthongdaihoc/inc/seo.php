@@ -128,3 +128,18 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 
 	return $data;
 }
+
+// ----------------------------------------------------
+// 4. Override Breadcrumb Items for School CPT
+// ----------------------------------------------------
+add_filter( 'rank_math/frontend/breadcrumb/items', 'ltdh_seo_override_breadcrumb_items', 10, 2 );
+
+function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
+	foreach ( $crumbs as $key => $crumb ) {
+		$lower_label = mb_strtolower( $crumb[0], 'UTF-8' );
+		if ( $lower_label === 'trường học' || $lower_label === 'truong' || $lower_label === 'truong-lien-ket' || $lower_label === 'schools' || $lower_label === 'school' ) {
+			$crumbs[$key][0] = 'Trường liên kết';
+		}
+	}
+	return $crumbs;
+}

@@ -6,7 +6,7 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 	
 	<!-- Tailwind CDN for rich interactive styles -->
 	<script src="https://cdn.tailwindcss.com"></script>
@@ -25,7 +25,7 @@
 					},
 					fontFamily: {
 						sans: ['"Be Vietnam Pro"', 'sans-serif'],
-						display: ['"Be Vietnam Pro"', 'sans-serif'],
+						display: ['"Open Sans"', 'sans-serif'],
 					}
 				}
 			}
@@ -61,6 +61,107 @@
 		.ltdh-breadcrumb a:hover { text-decoration: underline; }
 		.ltdh-breadcrumb .separator { margin: 0 0.375rem; color: #94a3b8; }
 		.ltdh-breadcrumb .last { color: #64748b; font-weight: 600; }
+
+		/* Dynamic WP Menus styling */
+		.nav-primary-menu {
+			display: flex;
+			align-items: center;
+			gap: 2rem;
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+		.nav-primary-menu li {
+			position: relative;
+		}
+		.nav-primary-menu a {
+			color: #475569;
+			transition: all 0.2s;
+			padding: 0.5rem 0;
+			border-bottom: 2px solid transparent;
+			font-weight: 600;
+			font-size: 0.875rem;
+			display: inline-block;
+		}
+		.nav-primary-menu a:hover,
+		.nav-primary-menu .current-menu-item > a,
+		.nav-primary-menu .current_page_item > a,
+		.nav-primary-menu .current-menu-ancestor > a {
+			color: #2563EB;
+			border-bottom-color: #2563EB;
+		}
+		/* Submenu hover panel */
+		.nav-primary-menu ul.sub-menu {
+			position: absolute;
+			left: 0;
+			top: 100%;
+			background: #ffffff;
+			border: 1px solid #f1f5f9;
+			box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+			border-radius: 0.75rem;
+			min-width: 14rem;
+			padding: 0.5rem 0;
+			margin: 0;
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(10px);
+			transition: all 0.2s ease;
+			z-index: 50;
+		}
+		.nav-primary-menu li:hover > ul.sub-menu {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+		.nav-primary-menu ul.sub-menu li {
+			display: block;
+		}
+		.nav-primary-menu ul.sub-menu a {
+			display: block;
+			padding: 0.5rem 1rem;
+			color: #475569;
+			font-weight: 500;
+			border: none;
+			font-size: 0.875rem;
+		}
+		.nav-primary-menu ul.sub-menu a:hover,
+		.nav-primary-menu ul.sub-menu .current-menu-item > a {
+			background: #f8fafc;
+			color: #2563EB;
+		}
+
+		/* Mobile Nav styling */
+		.nav-mobile-menu {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+			list-style: none;
+			padding: 0;
+			margin: 0 0 1.5rem 0;
+		}
+		.nav-mobile-menu a {
+			display: block;
+			color: #334155;
+			font-weight: 600;
+			transition: all 0.2s;
+		}
+		.nav-mobile-menu a:hover,
+		.nav-mobile-menu .current-menu-item > a,
+		.nav-mobile-menu .current_page_item > a {
+			color: #2563EB;
+		}
+		.nav-mobile-menu ul.sub-menu {
+			list-style: none;
+			padding-left: 1rem;
+			margin-top: 0.5rem;
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+		.nav-mobile-menu ul.sub-menu a {
+			font-weight: 500;
+			color: #64748b;
+		}
 	</style>
 	<?php wp_head(); ?>
 </head>
@@ -85,83 +186,13 @@
 			<!-- Menu System (Matches exact structural requirements) -->
 			<nav id="site-navigation" class="hidden lg:flex items-center gap-8">
 				<?php
-				// Detect active menu context
-				$current_pt   = get_post_type();
-				$is_home      = is_front_page();
-				$is_school    = is_post_type_archive( 'school' ) || is_singular( 'school' );
-				$is_major     = is_post_type_archive( 'major' ) || is_singular( 'major' );
-				$is_program   = is_singular( 'program' ) || is_post_type_archive( 'program' );
-				$is_training  = is_tax( 'training_type' ) || is_tax( 'campus' );
-
-				$is_news      = is_post_type_archive( 'post' ) || is_singular( 'post' ) || is_category();
-
-				$active_cls   = 'text-brand-primary border-brand-primary';
-				$default_cls  = 'text-slate-600 border-transparent';
+				wp_nav_menu( [
+					'theme_location' => 'primary-menu',
+					'container'      => false,
+					'menu_class'     => 'nav-primary-menu',
+					'fallback_cb'    => 'ltdh_default_primary_menu',
+				] );
 				?>
-				<ul class="flex items-center gap-8 font-semibold text-sm">
-					<li>
-						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 <?php echo $is_home ? $active_cls : $default_cls; ?>">Trang chủ</a>
-					</li>
-					<li>
-						<a href="<?php echo esc_url( home_url( '/truong/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 <?php echo $is_school ? $active_cls : $default_cls; ?>">Trường liên kết</a>
-					</li>
-					<li class="relative group">
-						<a href="<?php echo esc_url( home_url( '/nganh/' ) ); ?>" class="hover:text-brand-primary flex items-center gap-1 transition-all py-2 border-b-2 <?php echo ( $is_major || $is_program ) ? $active_cls : $default_cls; ?>">
-							Ngành học
-							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-							</svg>
-						</a>
-						<div class="dropdown-panel absolute left-0 top-full pt-2 z-50">
-						<div class="bg-white shadow-xl rounded-xl border border-slate-100 py-2 w-56">
-							<?php
-							$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => 12, 'post_status' => 'publish' ] );
-							if ( ! empty( $majors ) ) {
-								foreach ( $majors as $m ) {
-									$clean_title = trim( preg_replace( '/\s*[\(\-][\s\S]*/', '', $m->post_title ) );
-									$item_active = ( is_singular( 'major' ) && get_the_ID() === $m->ID ) ? ' bg-blue-50 text-brand-primary' : '';
-									echo '<a href="' . esc_url( get_permalink( $m->ID ) ) . '" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-primary font-medium' . $item_active . '">' . esc_html( $clean_title ) . '</a>';
-								}
-							} else {
-								echo '<a href="#" class="block px-4 py-2 text-sm text-slate-400">Công nghệ thông tin</a>';
-								echo '<a href="#" class="block px-4 py-2 text-sm text-slate-400">Quản trị kinh doanh</a>';
-							}
-							?>
-						</div>
-						</div>
-					</li>
-					<li class="relative group">
-						<a href="#" class="hover:text-brand-primary flex items-center gap-1 transition-all py-2 border-b-2 <?php echo $is_training ? $active_cls : $default_cls; ?>">
-							Hệ đào tạo
-							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-							</svg>
-						</a>
-						<!-- Dropdown Menu for Training Types -->
-						<div class="dropdown-panel absolute left-0 top-full pt-2 z-50">
-						<div class="bg-white shadow-xl rounded-xl border border-slate-100 py-2 w-48">
-							<?php
-							$training_terms = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
-							if ( ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ) {
-								$queried = get_queried_object();
-								foreach ( $training_terms as $term ) {
-									$item_active = ( is_tax( 'training_type' ) && isset( $queried->term_id ) && $queried->term_id === $term->term_id ) ? ' bg-blue-50 text-brand-primary' : '';
-									echo '<a href="' . esc_url( get_term_link( $term ) ) . '" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-primary font-medium' . $item_active . '">' . esc_html( $term->name ) . '</a>';
-								}
-							} else {
-								echo '<a href="#" class="block px-4 py-2 text-sm text-slate-400">Từ xa</a>';
-								echo '<a href="#" class="block px-4 py-2 text-sm text-slate-400">Văn bằng 2</a>';
-								echo '<a href="#" class="block px-4 py-2 text-sm text-slate-400">Liên thông</a>';
-							}
-							?>
-						</div>
-						</div>
-					</li>
-
-					<li>
-						<a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 <?php echo $is_news ? $active_cls : $default_cls; ?>">Tin tức</a>
-					</li>
-				</ul>
 				<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>" class="bg-brand-primary text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-md shadow-brand-primary/20 hover:bg-[#1E40AF] hover:shadow-lg transition-all tracking-wide">
 					ĐĂNG KÝ TƯ VẤN
 				</a>
@@ -180,13 +211,14 @@
 
 		<!-- Mobile Navigation Drawer -->
 		<div id="mobile-menu" class="hidden border-t border-slate-100 bg-white px-6 py-6 lg:hidden shadow-lg">
-			<ul class="flex flex-col gap-4 font-semibold text-slate-700 mb-6">
-				<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-brand-primary block">Trang chủ</a></li>
-				<li><a href="<?php echo esc_url( home_url( '/truong/' ) ); ?>" class="hover:text-brand-primary block">Trường liên kết</a></li>
-				<li><a href="<?php echo esc_url( home_url( '/nganh/' ) ); ?>" class="hover:text-brand-primary block">Ngành học</a></li>
-
-				<li><a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>" class="hover:text-brand-primary block">Tin tức</a></li>
-			</ul>
+			<?php
+			wp_nav_menu( [
+				'theme_location' => 'primary-menu',
+				'container'      => false,
+				'menu_class'     => 'nav-mobile-menu',
+				'fallback_cb'    => 'ltdh_default_mobile_menu',
+			] );
+			?>
 			<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>" class="block w-full text-center bg-brand-primary text-white py-3 rounded-full font-bold text-sm">
 				ĐĂNG KÝ TƯ VẤN
 			</a>

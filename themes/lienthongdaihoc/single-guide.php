@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 $guide_id = get_the_ID();
-$hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
+$hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 ?>
 
