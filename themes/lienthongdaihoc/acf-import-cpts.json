@@ -1,336 +1,1275 @@
 [
-  {
-    "key": "post_type_school",
-    "title": "Trường học",
-    "active": true,
-    "post_type": "school",
-    "label": "Trường học",
-    "singular_label": "Trường học",
-    "description": "University profiles and general info",
-    "public": true,
-    "hierarchical": false,
-    "exclude_from_search": false,
-    "publicly_queryable": true,
-    "show_ui": true,
-    "show_in_menu": true,
-    "show_in_nav_menus": true,
-    "show_in_admin_bar": true,
-    "show_in_rest": true,
-    "menu_position": 20,
-    "menu_icon": "dashicons-bank",
-    "rename_capabilities": false,
-    "singular_capability": "post",
-    "plural_capability": "post",
-    "supports": [
-      "title",
-      "editor",
-      "thumbnail",
-      "excerpt",
-      "revisions"
-    ],
-    "taxonomies": [
-      "region"
-    ],
-    "has_archive": true,
-    "has_archive_slug": "truong",
-    "rewrite": true,
-    "rewrite_slug": "truong",
-    "rewrite_with_front": false,
-    "rewrite_feeds": false,
-    "rewrite_pages": true,
-    "query_var": true,
-    "query_var_name": "",
-    "labels": {
-      "name": "Trường học",
-      "singular_name": "Trường học",
-      "menu_name": "Trường học",
-      "all_items": "Tất cả Trường học",
-      "add_new": "Thêm mới",
-      "add_new_item": "Thêm Trường học mới",
-      "edit_item": "Sửa Trường học",
-      "new_item": "Trường học mới",
-      "view_item": "Xem Trường học",
-      "search_items": "Tìm kiếm Trường học",
-      "not_found": "Không tìm thấy Trường học nào.",
-      "not_found_in_trash": "Không tìm thấy Trường học nào trong Thùng rác."
+    {
+        "key": "post_type_school",
+        "title": "Trường học",
+        "active": true,
+        "post_type": "school",
+        "label": "Trường học",
+        "singular_label": "Trường học",
+        "description": "University profiles and general info",
+        "public": true,
+        "hierarchical": false,
+        "exclude_from_search": false,
+        "publicly_queryable": true,
+        "show_ui": true,
+        "show_in_menu": true,
+        "show_in_nav_menus": true,
+        "show_in_admin_bar": true,
+        "show_in_rest": true,
+        "menu_position": 20,
+        "menu_icon": "dashicons-bank",
+        "rename_capabilities": false,
+        "singular_capability": "post",
+        "plural_capability": "post",
+        "supports": [
+            "title",
+            "editor",
+            "thumbnail",
+            "excerpt",
+            "revisions"
+        ],
+        "taxonomies": [
+            "region"
+        ],
+        "has_archive": true,
+        "has_archive_slug": "truong",
+        "rewrite": true,
+        "rewrite_slug": "truong",
+        "rewrite_with_front": false,
+        "rewrite_feeds": false,
+        "rewrite_pages": true,
+        "query_var": true,
+        "query_var_name": "",
+        "labels": {
+            "name": "Trường học",
+            "singular_name": "Trường học",
+            "menu_name": "Trường học",
+            "all_items": "Tất cả Trường học",
+            "add_new": "Thêm mới",
+            "add_new_item": "Thêm Trường học mới",
+            "edit_item": "Sửa Trường học",
+            "new_item": "Trường học mới",
+            "view_item": "Xem Trường học",
+            "search_items": "Tìm kiếm Trường học",
+            "not_found": "Không tìm thấy Trường học nào.",
+            "not_found_in_trash": "Không tìm thấy Trường học nào trong Thùng rác."
+        }
+    },
+    {
+        "key": "post_type_major",
+        "title": "Ngành học",
+        "active": true,
+        "post_type": "major",
+        "label": "Ngành học",
+        "singular_label": "Ngành học",
+        "description": "Academic majors",
+        "public": true,
+        "hierarchical": false,
+        "exclude_from_search": false,
+        "publicly_queryable": true,
+        "show_ui": true,
+        "show_in_menu": true,
+        "show_in_nav_menus": true,
+        "show_in_admin_bar": true,
+        "show_in_rest": true,
+        "menu_position": 21,
+        "menu_icon": "dashicons-welcome-learn-more",
+        "rename_capabilities": false,
+        "singular_capability": "post",
+        "plural_capability": "post",
+        "supports": [
+            "title",
+            "editor",
+            "thumbnail",
+            "excerpt",
+            "revisions"
+        ],
+        "taxonomies": [],
+        "has_archive": true,
+        "has_archive_slug": "nganh",
+        "rewrite": true,
+        "rewrite_slug": "nganh",
+        "rewrite_with_front": false,
+        "rewrite_feeds": false,
+        "rewrite_pages": true,
+        "query_var": true,
+        "query_var_name": "",
+        "labels": {
+            "name": "Ngành học",
+            "singular_name": "Ngành học",
+            "menu_name": "Ngành học",
+            "all_items": "Tất cả Ngành học",
+            "add_new": "Thêm mới",
+            "add_new_item": "Thêm Ngành học mới",
+            "edit_item": "Sửa Ngành học",
+            "new_item": "Ngành học mới",
+            "view_item": "Xem Ngành học",
+            "search_items": "Tìm kiếm Ngành học",
+            "not_found": "Không tìm thấy Ngành học nào.",
+            "not_found_in_trash": "Không tìm thấy Ngành học nào trong Thùng rác."
+        }
+    },
+    {
+        "key": "post_type_program",
+        "title": "Chương trình đào tạo",
+        "active": true,
+        "post_type": "program",
+        "label": "Chương trình đào tạo",
+        "singular_label": "Chương trình đào tạo",
+        "description": "University admission programs",
+        "public": true,
+        "hierarchical": false,
+        "exclude_from_search": false,
+        "publicly_queryable": true,
+        "show_ui": true,
+        "show_in_menu": true,
+        "show_in_nav_menus": true,
+        "show_in_admin_bar": true,
+        "show_in_rest": true,
+        "menu_position": 22,
+        "menu_icon": "dashicons-clipboard",
+        "rename_capabilities": false,
+        "singular_capability": "post",
+        "plural_capability": "post",
+        "supports": [
+            "title",
+            "editor",
+            "thumbnail",
+            "excerpt",
+            "revisions"
+        ],
+        "taxonomies": [
+            "training_type",
+            "campus"
+        ],
+        "has_archive": true,
+        "has_archive_slug": "chuong-trinh",
+        "rewrite": true,
+        "rewrite_slug": "chuong-trinh",
+        "rewrite_with_front": false,
+        "rewrite_feeds": false,
+        "rewrite_pages": true,
+        "query_var": true,
+        "query_var_name": "",
+        "labels": {
+            "name": "Chương trình đào tạo",
+            "singular_name": "Chương trình đào tạo",
+            "menu_name": "Chương trình",
+            "all_items": "Tất cả Chương trình",
+            "add_new": "Thêm mới",
+            "add_new_item": "Thêm Chương trình mới",
+            "edit_item": "Sửa Chương trình",
+            "new_item": "Chương trình mới",
+            "view_item": "Xem Chương trình",
+            "search_items": "Tìm kiếm Chương trình",
+            "not_found": "Không tìm thấy Chương trình nào.",
+            "not_found_in_trash": "Không tìm thấy Chương trình nào trong Thùng rác."
+        }
+    },
+    {
+        "key": "post_type_guide",
+        "title": "Hướng dẫn tuyển sinh",
+        "active": true,
+        "post_type": "guide",
+        "label": "Hướng dẫn tuyển sinh",
+        "singular_label": "Hướng dẫn tuyển sinh",
+        "description": "Admission guides and resources",
+        "public": true,
+        "hierarchical": false,
+        "exclude_from_search": false,
+        "publicly_queryable": true,
+        "show_ui": true,
+        "show_in_menu": true,
+        "show_in_nav_menus": true,
+        "show_in_admin_bar": true,
+        "show_in_rest": true,
+        "menu_position": 23,
+        "menu_icon": "dashicons-text-page",
+        "rename_capabilities": false,
+        "singular_capability": "post",
+        "plural_capability": "post",
+        "supports": [
+            "title",
+            "editor",
+            "thumbnail",
+            "excerpt",
+            "revisions"
+        ],
+        "taxonomies": [],
+        "has_archive": true,
+        "has_archive_slug": "huong-dan",
+        "rewrite": true,
+        "rewrite_slug": "huong-dan",
+        "rewrite_with_front": false,
+        "rewrite_feeds": false,
+        "rewrite_pages": true,
+        "query_var": true,
+        "query_var_name": "",
+        "labels": {
+            "name": "Hướng dẫn tuyển sinh",
+            "singular_name": "Hướng dẫn tuyển sinh",
+            "menu_name": "Hướng dẫn tuyển sinh",
+            "all_items": "Tất cả Hướng dẫn",
+            "add_new": "Thêm mới",
+            "add_new_item": "Thêm Hướng dẫn mới",
+            "edit_item": "Sửa Hướng dẫn",
+            "new_item": "Hướng dẫn mới",
+            "view_item": "Xem Hướng dẫn",
+            "search_items": "Tìm kiếm Hướng dẫn",
+            "not_found": "Không tìm thấy Hướng dẫn nào.",
+            "not_found_in_trash": "Không tìm thấy Hướng dẫn nào trong Thùng rác."
+        }
+    },
+    {
+        "key": "taxonomy_training_type",
+        "title": "Hệ đào tạo",
+        "active": true,
+        "taxonomy": "training_type",
+        "object_type": [
+            "program"
+        ],
+        "label": "Hệ đào tạo",
+        "singular_label": "Hệ đào tạo",
+        "description": "Training methods like Online, Distance Learning, etc.",
+        "public": true,
+        "publicly_queryable": true,
+        "hierarchical": true,
+        "show_ui": true,
+        "show_in_menu": true,
+        "show_in_nav_menus": true,
+        "show_in_rest": true,
+        "show_admin_column": true,
+        "rewrite": true,
+        "rewrite_slug": "he-dao-tao",
+        "rewrite_with_front": false,
+        "rewrite_hierarchical": false,
+        "query_var": true,
+        "query_var_name": "",
+        "labels": {
+            "name": "Hệ đào tạo",
+            "singular_name": "Hệ đào tạo",
+            "menu_name": "Hệ đào tạo",
+            "all_items": "Tất cả Hệ đào tạo",
+            "edit_item": "Sửa Hệ đào tạo",
+            "view_item": "Xem Hệ đào tạo",
+            "update_item": "Cập nhật Hệ đào tạo",
+            "add_new_item": "Thêm mới Hệ đào tạo",
+            "new_item_name": "Tên Hệ đào tạo mới",
+            "parent_item": "Hệ đào tạo cha",
+            "parent_item_colon": "Hệ đào tạo cha:"
+        }
+    },
+    {
+        "key": "taxonomy_campus",
+        "title": "Cơ sở đào tạo",
+        "active": true,
+        "taxonomy": "campus",
+        "object_type": [
+            "program"
+        ],
+        "label": "Cơ sở đào tạo",
+        "singular_label": "Cơ sở đào tạo",
+        "description": "Campuses locations",
+        "public": true,
+        "publicly_queryable": true,
+        "hierarchical": true,
+        "show_ui": true,
+        "show_in_menu": true,
+        "show_in_nav_menus": true,
+        "show_in_rest": true,
+        "show_admin_column": true,
+        "rewrite": true,
+        "rewrite_slug": "co-so",
+        "rewrite_with_front": false,
+        "rewrite_hierarchical": false,
+        "query_var": true,
+        "query_var_name": "",
+        "labels": {
+            "name": "Cơ sở đào tạo",
+            "singular_name": "Cơ sở đào tạo",
+            "menu_name": "Cơ sở đào tạo",
+            "all_items": "Tất cả Cơ sở",
+            "edit_item": "Sửa Cơ sở",
+            "view_item": "Xem Cơ sở",
+            "update_item": "Cập nhật Cơ sở",
+            "add_new_item": "Thêm mới Cơ sở",
+            "new_item_name": "Tên Cơ sở mới"
+        }
+    },
+    {
+        "key": "taxonomy_region",
+        "title": "Khu vực",
+        "active": true,
+        "taxonomy": "region",
+        "object_type": [
+            "school"
+        ],
+        "label": "Khu vực",
+        "singular_label": "Khu vực",
+        "description": "Geographical regions",
+        "public": true,
+        "publicly_queryable": true,
+        "hierarchical": true,
+        "show_ui": true,
+        "show_in_menu": true,
+        "show_in_nav_menus": true,
+        "show_in_rest": true,
+        "show_admin_column": true,
+        "rewrite": true,
+        "rewrite_slug": "khu-vuc",
+        "rewrite_with_front": false,
+        "rewrite_hierarchical": false,
+        "query_var": true,
+        "query_var_name": "",
+        "labels": {
+            "name": "Khu vực",
+            "singular_name": "Khu vực",
+            "menu_name": "Khu vực",
+            "all_items": "Tất cả Khu vực",
+            "edit_item": "Sửa Khu vực",
+            "view_item": "Xem Khu vực",
+            "update_item": "Cập nhật Khu vực",
+            "add_new_item": "Thêm mới Khu vực",
+            "new_item_name": "Tên Khu vực mới"
+        }
+    },
+    {
+        "key": "ui_options_page_ltdh_settings",
+        "title": "Cấu hình Hệ thống",
+        "menu_order": 0,
+        "active": true,
+        "page_title": "Cấu hình Hệ thống",
+        "menu_slug": "ltdh-settings",
+        "parent_slug": "",
+        "advanced_configuration": true,
+        "icon_url": "",
+        "menu_title": "Cấu hình LTDH",
+        "position": null,
+        "redirect": false,
+        "description": "",
+        "update_button": "Update",
+        "updated_message": "Options Updated",
+        "capability": "manage_options",
+        "data_storage": "options",
+        "post_id": "",
+        "autoload": false
+    },
+    {
+        "key": "group_school_details",
+        "title": "Thông tin Trường học",
+        "fields": [
+            {
+                "key": "field_school_logo",
+                "label": "Logo Trường",
+                "name": "logo",
+                "type": "image",
+                "return_format": "id",
+                "preview_size": "thumbnail",
+                "library": "all"
+            },
+            {
+                "key": "field_school_website",
+                "label": "Website chính thức",
+                "name": "website",
+                "type": "url"
+            },
+            {
+                "key": "field_school_address",
+                "label": "Địa chỉ trụ sở",
+                "name": "address",
+                "type": "text"
+            },
+            {
+                "key": "field_school_hotline",
+                "label": "Hotline tuyển sinh",
+                "name": "hotline",
+                "type": "text"
+            },
+            {
+                "key": "field_school_admission_info",
+                "label": "Thông tin tuyển sinh chung",
+                "name": "admission_info",
+                "type": "wysiwyg",
+                "toolbar": "full",
+                "media_upload": 1
+            },
+            {
+                "key": "field_school_contact_info",
+                "label": "Thông tin liên hệ chi tiết",
+                "name": "contact_info",
+                "type": "wysiwyg",
+                "toolbar": "full",
+                "media_upload": 1
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "school"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
+        "key": "group_major_details",
+        "title": "Thông tin Ngành học",
+        "fields": [
+            {
+                "key": "field_major_code",
+                "label": "Mã ngành",
+                "name": "major_code",
+                "type": "text"
+            },
+            {
+                "key": "field_major_opportunities",
+                "label": "Cơ hội nghề nghiệp",
+                "name": "career_opportunities",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_major_salary",
+                "label": "Thông tin mức lương",
+                "name": "salary_info",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_major_job_market",
+                "label": "Nhu cầu thị trường lao động",
+                "name": "job_market",
+                "type": "wysiwyg"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "major"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
+        "key": "group_program_details",
+        "title": "Thông tin Chương trình tuyển sinh",
+        "fields": [
+            {
+                "key": "field_program_school",
+                "label": "Trường đào tạo (Liên kết)",
+                "name": "school_relationship",
+                "type": "post_object",
+                "post_type": [
+                    "school"
+                ],
+                "allow_null": 0,
+                "multiple": 0,
+                "return_format": "id",
+                "ui": 1
+            },
+            {
+                "key": "field_program_major",
+                "label": "Ngành đào tạo (Liên kết)",
+                "name": "major_relationship",
+                "type": "post_object",
+                "post_type": [
+                    "major"
+                ],
+                "allow_null": 0,
+                "multiple": 0,
+                "return_format": "id",
+                "ui": 1
+            },
+            {
+                "key": "field_program_tuition",
+                "label": "Học phí",
+                "name": "tuition_fee",
+                "type": "text",
+                "placeholder": "Ví dụ: 450,000đ / tín chỉ hoặc 15,000,000đ / học kỳ"
+            },
+            {
+                "key": "field_program_duration",
+                "label": "Thời gian đào tạo",
+                "name": "duration",
+                "type": "text",
+                "placeholder": "Ví dụ: 1.5 - 2 năm"
+            },
+            {
+                "key": "field_program_campus",
+                "label": "Địa điểm học tập / Cơ sở",
+                "name": "campus_info",
+                "type": "text",
+                "placeholder": "Hà Nội, Hồ Chí Minh, Học trực tuyến (Online)..."
+            },
+            {
+                "key": "field_program_requirements",
+                "label": "Điều kiện xét tuyển",
+                "name": "admission_requirements",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_documents",
+                "label": "Hồ sơ xét tuyển cần thiết",
+                "name": "required_documents",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_period",
+                "label": "Hạn nhận hồ sơ / Thời gian khai giảng",
+                "name": "enrollment_period",
+                "type": "text",
+                "placeholder": "Ví dụ: Đợt 1 đến hết 30/11/2026"
+            },
+            {
+                "key": "field_program_hotline",
+                "label": "Hotline riêng chương trình (Nếu có)",
+                "name": "hotline_override",
+                "type": "text",
+                "placeholder": "Bỏ trống để dùng Hotline chung của trường"
+            },
+            {
+                "key": "field_program_benefits",
+                "label": "Quyền lợi / Ưu điểm chương trình",
+                "name": "program_benefits",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_opportunities",
+                "label": "Cơ hội việc làm sau tốt nghiệp",
+                "name": "career_opportunities",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_why_choose",
+                "label": "Tại sao nên học chương trình này?",
+                "name": "why_choose_us",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_faq",
+                "label": "Câu hỏi thường gặp (FAQs)",
+                "name": "faq",
+                "type": "repeater",
+                "layout": "row",
+                "button_label": "Thêm câu hỏi",
+                "sub_fields": [
+                    {
+                        "key": "field_program_faq_question",
+                        "label": "Câu hỏi",
+                        "name": "question",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_program_faq_answer",
+                        "label": "Câu trả lời",
+                        "name": "answer",
+                        "type": "textarea",
+                        "rows": 3
+                    }
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "program"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
+        "key": "group_homepage_content",
+        "title": "Nội dung Trang chủ",
+        "fields": [
+            {
+                "key": "field_home_notice",
+                "label": "Hướng dẫn",
+                "name": "home_notice",
+                "type": "message",
+                "message": "Nhập nội dung cho trang chủ tại đây. Nếu để trống, giao diện sẽ dùng nội dung mặc định đang có.",
+                "new_lines": "wpautop",
+                "esc_html": 0
+            },
+            {
+                "key": "field_home_tab_hero",
+                "label": "Hero",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_hero_badge",
+                "label": "Nhãn nhỏ",
+                "name": "home_hero_badge",
+                "type": "text"
+            },
+            {
+                "key": "field_home_hero_title",
+                "label": "Tiêu đề hero",
+                "name": "home_hero_title",
+                "type": "textarea",
+                "rows": 3,
+                "instructions": "Có thể xuống dòng để giữ bố cục nổi bật."
+            },
+            {
+                "key": "field_home_hero_highlight",
+                "label": "Nhãn nhấn mạnh",
+                "name": "home_hero_highlight",
+                "type": "text"
+            },
+            {
+                "key": "field_home_hero_badges",
+                "label": "Các điểm nổi bật",
+                "name": "home_hero_badges",
+                "type": "repeater",
+                "layout": "row",
+                "button_label": "Thêm điểm nổi bật",
+                "sub_fields": [
+                    {
+                        "key": "field_home_hero_badges_icon",
+                        "label": "Icon / Emoji",
+                        "name": "icon",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_hero_badges_title",
+                        "label": "Tiêu đề",
+                        "name": "title",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_hero_badges_desc",
+                        "label": "Mô tả",
+                        "name": "description",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "key": "field_home_hero_primary_label",
+                "label": "Nhãn nút chính",
+                "name": "home_hero_primary_label",
+                "type": "text"
+            },
+            {
+                "key": "field_home_hero_primary_url",
+                "label": "Link nút chính",
+                "name": "home_hero_primary_url",
+                "type": "url"
+            },
+            {
+                "key": "field_home_hero_image",
+                "label": "Ảnh hero",
+                "name": "home_hero_image",
+                "type": "image",
+                "return_format": "id",
+                "preview_size": "large",
+                "library": "all"
+            },
+            {
+                "key": "field_home_hero_partner_title",
+                "label": "Tiêu đề badge nổi",
+                "name": "home_hero_partner_title",
+                "type": "text"
+            },
+            {
+                "key": "field_home_hero_partner_desc",
+                "label": "Mô tả badge nổi",
+                "name": "home_hero_partner_desc",
+                "type": "text"
+            },
+            {
+                "key": "field_home_tab_promo",
+                "label": "Giới thiệu",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_promo_image",
+                "label": "Ảnh giới thiệu",
+                "name": "home_promo_image",
+                "type": "image",
+                "return_format": "id",
+                "preview_size": "large",
+                "library": "all"
+            },
+            {
+                "key": "field_home_promo_badge",
+                "label": "Nhãn giới thiệu",
+                "name": "home_promo_badge",
+                "type": "text"
+            },
+            {
+                "key": "field_home_promo_title",
+                "label": "Tiêu đề giới thiệu",
+                "name": "home_promo_title",
+                "type": "text"
+            },
+            {
+                "key": "field_home_promo_desc",
+                "label": "Mô tả giới thiệu",
+                "name": "home_promo_desc",
+                "type": "textarea",
+                "rows": 4
+            },
+            {
+                "key": "field_home_promo_primary_label",
+                "label": "Nhãn nút giới thiệu 1",
+                "name": "home_promo_primary_label",
+                "type": "text"
+            },
+            {
+                "key": "field_home_promo_primary_url",
+                "label": "Link nút giới thiệu 1",
+                "name": "home_promo_primary_url",
+                "type": "url"
+            },
+            {
+                "key": "field_home_promo_secondary_label",
+                "label": "Nhãn nút giới thiệu 2",
+                "name": "home_promo_secondary_label",
+                "type": "text"
+            },
+            {
+                "key": "field_home_promo_secondary_url",
+                "label": "Link nút giới thiệu 2",
+                "name": "home_promo_secondary_url",
+                "type": "url"
+            },
+            {
+                "key": "field_home_tab_majors",
+                "label": "Ngành nổi bật",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_majors_title",
+                "label": "Tiêu đề ngành nổi bật",
+                "name": "home_majors_title",
+                "type": "text"
+            },
+            {
+                "key": "field_home_majors_desc",
+                "label": "Mô tả ngành nổi bật",
+                "name": "home_majors_desc",
+                "type": "textarea",
+                "rows": 3
+            },
+            {
+                "key": "field_home_featured_majors",
+                "label": "Danh sách ngành nổi bật",
+                "name": "home_featured_majors",
+                "type": "repeater",
+                "layout": "table",
+                "button_label": "Thêm ngành",
+                "sub_fields": [
+                    {
+                        "key": "field_home_featured_majors_icon",
+                        "label": "Icon / Emoji",
+                        "name": "icon",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_featured_majors_title",
+                        "label": "Tên ngành",
+                        "name": "title",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "key": "field_home_tab_schools",
+                "label": "Khối trường",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_schools_badge",
+                "label": "Nhãn khối trường",
+                "name": "home_schools_badge",
+                "type": "text"
+            },
+            {
+                "key": "field_home_schools_title",
+                "label": "Tiêu đề khối trường",
+                "name": "home_schools_title",
+                "type": "text"
+            },
+            {
+                "key": "field_home_schools_link_label",
+                "label": "Nhãn nút xem tất cả trường",
+                "name": "home_schools_link_label",
+                "type": "text"
+            },
+            {
+                "key": "field_home_tab_reasons",
+                "label": "Lý do chọn",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_reasons_title",
+                "label": "Tiêu đề lý do chọn",
+                "name": "home_reasons_title",
+                "type": "text"
+            },
+            {
+                "key": "field_home_reasons_desc",
+                "label": "Mô tả lý do chọn",
+                "name": "home_reasons_desc",
+                "type": "textarea",
+                "rows": 3
+            },
+            {
+                "key": "field_home_reasons_items",
+                "label": "Danh sách lý do chọn",
+                "name": "home_reasons_items",
+                "type": "repeater",
+                "layout": "row",
+                "button_label": "Thêm lý do",
+                "sub_fields": [
+                    {
+                        "key": "field_home_reasons_items_icon",
+                        "label": "Icon / Emoji",
+                        "name": "icon",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_reasons_items_title",
+                        "label": "Tiêu đề",
+                        "name": "title",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_reasons_items_desc",
+                        "label": "Mô tả",
+                        "name": "description",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "key": "field_home_tab_stats",
+                "label": "Số liệu",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_stats_badge",
+                "label": "Nhãn khối số liệu",
+                "name": "home_stats_badge",
+                "type": "text"
+            },
+            {
+                "key": "field_home_stats_title",
+                "label": "Tiêu đề khối số liệu",
+                "name": "home_stats_title",
+                "type": "textarea",
+                "rows": 3
+            },
+            {
+                "key": "field_home_stats_items",
+                "label": "Các chỉ số",
+                "name": "home_stats_items",
+                "type": "repeater",
+                "layout": "table",
+                "button_label": "Thêm chỉ số",
+                "sub_fields": [
+                    {
+                        "key": "field_home_stats_items_value",
+                        "label": "Giá trị",
+                        "name": "value",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_stats_items_label",
+                        "label": "Mô tả",
+                        "name": "label",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "key": "field_home_stats_image",
+                "label": "Ảnh khối số liệu",
+                "name": "home_stats_image",
+                "type": "image",
+                "return_format": "id",
+                "preview_size": "large",
+                "library": "all"
+            },
+            {
+                "key": "field_home_tab_certificates",
+                "label": "Giá trị bằng cấp",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_certificates",
+                "label": "Các hộp nội dung bằng cấp",
+                "name": "home_certificates",
+                "type": "repeater",
+                "layout": "block",
+                "button_label": "Thêm hộp nội dung",
+                "sub_fields": [
+                    {
+                        "key": "field_home_certificates_badge",
+                        "label": "Nhãn nhỏ",
+                        "name": "badge",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_certificates_title",
+                        "label": "Tiêu đề",
+                        "name": "title",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_certificates_items",
+                        "label": "Danh sách ý chính",
+                        "name": "items",
+                        "type": "textarea",
+                        "rows": 5,
+                        "instructions": "Mỗi dòng là một ý."
+                    },
+                    {
+                        "key": "field_home_certificates_button_label",
+                        "label": "Nhãn nút",
+                        "name": "button_label",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_certificates_button_url",
+                        "label": "Link nút",
+                        "name": "button_url",
+                        "type": "url"
+                    },
+                    {
+                        "key": "field_home_certificates_icon",
+                        "label": "Icon / Emoji lớn",
+                        "name": "icon",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_certificates_label",
+                        "label": "Nhãn nhỏ bên phải",
+                        "name": "label",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "key": "field_home_tab_segments",
+                "label": "Đối tượng phù hợp",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_segments_title",
+                "label": "Tiêu đề đối tượng phù hợp",
+                "name": "home_segments_title",
+                "type": "text"
+            },
+            {
+                "key": "field_home_segments_desc",
+                "label": "Mô tả đối tượng phù hợp",
+                "name": "home_segments_desc",
+                "type": "textarea",
+                "rows": 3
+            },
+            {
+                "key": "field_home_segments_items",
+                "label": "Danh sách đối tượng",
+                "name": "home_segments_items",
+                "type": "repeater",
+                "layout": "block",
+                "button_label": "Thêm đối tượng",
+                "sub_fields": [
+                    {
+                        "key": "field_home_segments_items_image",
+                        "label": "Ảnh",
+                        "name": "image",
+                        "type": "image",
+                        "return_format": "id",
+                        "preview_size": "medium",
+                        "library": "all"
+                    },
+                    {
+                        "key": "field_home_segments_items_title",
+                        "label": "Tiêu đề",
+                        "name": "title",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_home_segments_items_desc",
+                        "label": "Mô tả",
+                        "name": "description",
+                        "type": "textarea",
+                        "rows": 3
+                    }
+                ]
+            },
+            {
+                "key": "field_home_tab_register",
+                "label": "Form tư vấn",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_register_image",
+                "label": "Ảnh khối tư vấn",
+                "name": "home_register_image",
+                "type": "image",
+                "return_format": "id",
+                "preview_size": "large",
+                "library": "all"
+            },
+            {
+                "key": "field_home_register_title",
+                "label": "Tiêu đề form tư vấn",
+                "name": "home_register_title",
+                "type": "text"
+            },
+            {
+                "key": "field_home_register_desc",
+                "label": "Mô tả form tư vấn",
+                "name": "home_register_desc",
+                "type": "textarea",
+                "rows": 3
+            },
+            {
+                "key": "field_home_register_form_shortcode",
+                "label": "Shortcode form",
+                "name": "home_register_form_shortcode",
+                "type": "text",
+                "instructions": "Ví dụ: [contact-form-7 id=\"consultation-form\" title=\"Form Tư vấn\"]"
+            },
+            {
+                "key": "field_home_tab_news",
+                "label": "Tin tức",
+                "type": "tab",
+                "placement": "top"
+            },
+            {
+                "key": "field_home_news_badge",
+                "label": "Nhãn khối tin tức",
+                "name": "home_news_badge",
+                "type": "text"
+            },
+            {
+                "key": "field_home_news_title",
+                "label": "Tiêu đề khối tin tức",
+                "name": "home_news_title",
+                "type": "text"
+            },
+            {
+                "key": "field_home_news_link_label",
+                "label": "Nhãn nút xem tất cả tin",
+                "name": "home_news_link_label",
+                "type": "text"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "page_type",
+                    "operator": "==",
+                    "value": "front_page"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
+        "key": "group_ltdh_global_settings",
+        "title": "Thông tin Liên hệ & Tích hợp CRM",
+        "fields": [
+            {
+                "key": "field_global_hotline",
+                "label": "Hotline tư vấn chung",
+                "name": "global_hotline",
+                "type": "text"
+            },
+            {
+                "key": "field_global_zalo",
+                "label": "Đường dẫn Zalo OA / Zalo cá nhân",
+                "name": "global_zalo_url",
+                "type": "url"
+            },
+            {
+                "key": "field_global_messenger",
+                "label": "Đường dẫn Facebook Messenger",
+                "name": "global_messenger_url",
+                "type": "url"
+            },
+            {
+                "key": "field_tab_crm",
+                "label": "Tích hợp CRM",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_crm_type",
+                "label": "Hệ thống CRM mặc định",
+                "name": "default_crm_type",
+                "type": "select",
+                "choices": {
+                    "onschool": "OnSchool Platform",
+                    "aum": "AUM CRM",
+                    "internal": "Chỉ lưu trữ nội bộ"
+                },
+                "default_value": "internal"
+            },
+            {
+                "key": "field_onschool_endpoint",
+                "label": "OnSchool API Endpoint",
+                "name": "onschool_endpoint",
+                "type": "url",
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_crm_type",
+                            "operator": "==",
+                            "value": "onschool"
+                        }
+                    ]
+                ]
+            },
+            {
+                "key": "field_onschool_token",
+                "label": "OnSchool Auth Token",
+                "name": "onschool_token",
+                "type": "password",
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_crm_type",
+                            "operator": "==",
+                            "value": "onschool"
+                        }
+                    ]
+                ]
+            },
+            {
+                "key": "field_aum_endpoint",
+                "label": "AUM API Endpoint",
+                "name": "aum_endpoint",
+                "type": "url",
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_crm_type",
+                            "operator": "==",
+                            "value": "aum"
+                        }
+                    ]
+                ]
+            },
+            {
+                "key": "field_aum_token",
+                "label": "AUM Auth Token",
+                "name": "aum_token",
+                "type": "password",
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_crm_type",
+                            "operator": "==",
+                            "value": "aum"
+                        }
+                    ]
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "ltdh-settings"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
+    },
+    {
+        "key": "group_page_banner",
+        "title": "Banner trang",
+        "fields": [
+            {
+                "key": "field_page_banner_image",
+                "label": "Ảnh banner",
+                "name": "page_banner",
+                "type": "image",
+                "return_format": "url",
+                "preview_size": "large",
+                "library": "all",
+                "instructions": "Kích thước đề nghị: 1920x400px"
+            },
+            {
+                "key": "field_page_banner_subtitle",
+                "label": "Mô tả ngắn banner",
+                "name": "page_banner_subtitle",
+                "type": "text"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "acf_after_title",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0
     }
-  },
-  {
-    "key": "post_type_major",
-    "title": "Ngành học",
-    "active": true,
-    "post_type": "major",
-    "label": "Ngành học",
-    "singular_label": "Ngành học",
-    "description": "Academic majors",
-    "public": true,
-    "hierarchical": false,
-    "exclude_from_search": false,
-    "publicly_queryable": true,
-    "show_ui": true,
-    "show_in_menu": true,
-    "show_in_nav_menus": true,
-    "show_in_admin_bar": true,
-    "show_in_rest": true,
-    "menu_position": 21,
-    "menu_icon": "dashicons-welcome-learn-more",
-    "rename_capabilities": false,
-    "singular_capability": "post",
-    "plural_capability": "post",
-    "supports": [
-      "title",
-      "editor",
-      "thumbnail",
-      "excerpt",
-      "revisions"
-    ],
-    "taxonomies": [],
-    "has_archive": true,
-    "has_archive_slug": "nganh",
-    "rewrite": true,
-    "rewrite_slug": "nganh",
-    "rewrite_with_front": false,
-    "rewrite_feeds": false,
-    "rewrite_pages": true,
-    "query_var": true,
-    "query_var_name": "",
-    "labels": {
-      "name": "Ngành học",
-      "singular_name": "Ngành học",
-      "menu_name": "Ngành học",
-      "all_items": "Tất cả Ngành học",
-      "add_new": "Thêm mới",
-      "add_new_item": "Thêm Ngành học mới",
-      "edit_item": "Sửa Ngành học",
-      "new_item": "Ngành học mới",
-      "view_item": "Xem Ngành học",
-      "search_items": "Tìm kiếm Ngành học",
-      "not_found": "Không tìm thấy Ngành học nào.",
-      "not_found_in_trash": "Không tìm thấy Ngành học nào trong Thùng rác."
-    }
-  },
-  {
-    "key": "post_type_program",
-    "title": "Chương trình đào tạo",
-    "active": true,
-    "post_type": "program",
-    "label": "Chương trình đào tạo",
-    "singular_label": "Chương trình đào tạo",
-    "description": "University admission programs",
-    "public": true,
-    "hierarchical": false,
-    "exclude_from_search": false,
-    "publicly_queryable": true,
-    "show_ui": true,
-    "show_in_menu": true,
-    "show_in_nav_menus": true,
-    "show_in_admin_bar": true,
-    "show_in_rest": true,
-    "menu_position": 22,
-    "menu_icon": "dashicons-clipboard",
-    "rename_capabilities": false,
-    "singular_capability": "post",
-    "plural_capability": "post",
-    "supports": [
-      "title",
-      "editor",
-      "thumbnail",
-      "excerpt",
-      "revisions"
-    ],
-    "taxonomies": [
-      "training_type",
-      "campus"
-    ],
-    "has_archive": true,
-    "has_archive_slug": "chuong-trinh",
-    "rewrite": true,
-    "rewrite_slug": "chuong-trinh",
-    "rewrite_with_front": false,
-    "rewrite_feeds": false,
-    "rewrite_pages": true,
-    "query_var": true,
-    "query_var_name": "",
-    "labels": {
-      "name": "Chương trình đào tạo",
-      "singular_name": "Chương trình đào tạo",
-      "menu_name": "Chương trình",
-      "all_items": "Tất cả Chương trình",
-      "add_new": "Thêm mới",
-      "add_new_item": "Thêm Chương trình mới",
-      "edit_item": "Sửa Chương trình",
-      "new_item": "Chương trình mới",
-      "view_item": "Xem Chương trình",
-      "search_items": "Tìm kiếm Chương trình",
-      "not_found": "Không tìm thấy Chương trình nào.",
-      "not_found_in_trash": "Không tìm thấy Chương trình nào trong Thùng rác."
-    }
-  },
-  {
-    "key": "post_type_guide",
-    "title": "Hướng dẫn tuyển sinh",
-    "active": true,
-    "post_type": "guide",
-    "label": "Hướng dẫn tuyển sinh",
-    "singular_label": "Hướng dẫn tuyển sinh",
-    "description": "Admission guides and resources",
-    "public": true,
-    "hierarchical": false,
-    "exclude_from_search": false,
-    "publicly_queryable": true,
-    "show_ui": true,
-    "show_in_menu": true,
-    "show_in_nav_menus": true,
-    "show_in_admin_bar": true,
-    "show_in_rest": true,
-    "menu_position": 23,
-    "menu_icon": "dashicons-text-page",
-    "rename_capabilities": false,
-    "singular_capability": "post",
-    "plural_capability": "post",
-    "supports": [
-      "title",
-      "editor",
-      "thumbnail",
-      "excerpt",
-      "revisions"
-    ],
-    "taxonomies": [],
-    "has_archive": true,
-    "has_archive_slug": "huong-dan",
-    "rewrite": true,
-    "rewrite_slug": "huong-dan",
-    "rewrite_with_front": false,
-    "rewrite_feeds": false,
-    "rewrite_pages": true,
-    "query_var": true,
-    "query_var_name": "",
-    "labels": {
-      "name": "Hướng dẫn tuyển sinh",
-      "singular_name": "Hướng dẫn tuyển sinh",
-      "menu_name": "Hướng dẫn tuyển sinh",
-      "all_items": "Tất cả Hướng dẫn",
-      "add_new": "Thêm mới",
-      "add_new_item": "Thêm Hướng dẫn mới",
-      "edit_item": "Sửa Hướng dẫn",
-      "new_item": "Hướng dẫn mới",
-      "view_item": "Xem Hướng dẫn",
-      "search_items": "Tìm kiếm Hướng dẫn",
-      "not_found": "Không tìm thấy Hướng dẫn nào.",
-      "not_found_in_trash": "Không tìm thấy Hướng dẫn nào trong Thùng rác."
-    }
-  },
-  {
-    "key": "taxonomy_training_type",
-    "title": "Hệ đào tạo",
-    "active": true,
-    "taxonomy": "training_type",
-    "object_type": [
-      "program"
-    ],
-    "label": "Hệ đào tạo",
-    "singular_label": "Hệ đào tạo",
-    "description": "Training methods like Online, Distance Learning, etc.",
-    "public": true,
-    "publicly_queryable": true,
-    "hierarchical": true,
-    "show_ui": true,
-    "show_in_menu": true,
-    "show_in_nav_menus": true,
-    "show_in_rest": true,
-    "show_admin_column": true,
-    "rewrite": true,
-    "rewrite_slug": "he-dao-tao",
-    "rewrite_with_front": false,
-    "rewrite_hierarchical": false,
-    "query_var": true,
-    "query_var_name": "",
-    "labels": {
-      "name": "Hệ đào tạo",
-      "singular_name": "Hệ đào tạo",
-      "menu_name": "Hệ đào tạo",
-      "all_items": "Tất cả Hệ đào tạo",
-      "edit_item": "Sửa Hệ đào tạo",
-      "view_item": "Xem Hệ đào tạo",
-      "update_item": "Cập nhật Hệ đào tạo",
-      "add_new_item": "Thêm mới Hệ đào tạo",
-      "new_item_name": "Tên Hệ đào tạo mới",
-      "parent_item": "Hệ đào tạo cha",
-      "parent_item_colon": "Hệ đào tạo cha:"
-    }
-  },
-  {
-    "key": "taxonomy_campus",
-    "title": "Cơ sở đào tạo",
-    "active": true,
-    "taxonomy": "campus",
-    "object_type": [
-      "program"
-    ],
-    "label": "Cơ sở đào tạo",
-    "singular_label": "Cơ sở đào tạo",
-    "description": "Campuses locations",
-    "public": true,
-    "publicly_queryable": true,
-    "hierarchical": true,
-    "show_ui": true,
-    "show_in_menu": true,
-    "show_in_nav_menus": true,
-    "show_in_rest": true,
-    "show_admin_column": true,
-    "rewrite": true,
-    "rewrite_slug": "co-so",
-    "rewrite_with_front": false,
-    "rewrite_hierarchical": false,
-    "query_var": true,
-    "query_var_name": "",
-    "labels": {
-      "name": "Cơ sở đào tạo",
-      "singular_name": "Cơ sở đào tạo",
-      "menu_name": "Cơ sở đào tạo",
-      "all_items": "Tất cả Cơ sở",
-      "edit_item": "Sửa Cơ sở",
-      "view_item": "Xem Cơ sở",
-      "update_item": "Cập nhật Cơ sở",
-      "add_new_item": "Thêm mới Cơ sở",
-      "new_item_name": "Tên Cơ sở mới"
-    }
-  },
-  {
-    "key": "taxonomy_region",
-    "title": "Khu vực",
-    "active": true,
-    "taxonomy": "region",
-    "object_type": [
-      "school"
-    ],
-    "label": "Khu vực",
-    "singular_label": "Khu vực",
-    "description": "Geographical regions",
-    "public": true,
-    "publicly_queryable": true,
-    "hierarchical": true,
-    "show_ui": true,
-    "show_in_menu": true,
-    "show_in_nav_menus": true,
-    "show_in_rest": true,
-    "show_admin_column": true,
-    "rewrite": true,
-    "rewrite_slug": "khu-vuc",
-    "rewrite_with_front": false,
-    "rewrite_hierarchical": false,
-    "query_var": true,
-    "query_var_name": "",
-    "labels": {
-      "name": "Khu vực",
-      "singular_name": "Khu vực",
-      "menu_name": "Khu vực",
-      "all_items": "Tất cả Khu vực",
-      "edit_item": "Sửa Khu vực",
-      "view_item": "Xem Khu vực",
-      "update_item": "Cập nhật Khu vực",
-      "add_new_item": "Thêm mới Khu vực",
-      "new_item_name": "Tên Khu vực mới"
-    }
-  }
 ]
