@@ -41,6 +41,20 @@
 			}
 		}
 	</style>
+	<style>
+		/* Dropdown animation */
+		.dropdown-panel {
+			opacity: 0;
+			transform: translateY(-8px);
+			pointer-events: none;
+			transition: opacity 0.2s ease, transform 0.2s ease;
+		}
+		.group:hover .dropdown-panel {
+			opacity: 1;
+			transform: translateY(0);
+			pointer-events: auto;
+		}
+	</style>
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -60,29 +74,46 @@
 				</a>
 			</div>
 
+
 			<!-- Menu System (Matches exact structural requirements) -->
 			<nav id="site-navigation" class="hidden lg:flex items-center gap-8">
-				<ul class="flex items-center gap-8 font-semibold text-sm text-slate-600">
+				<?php
+				// Detect active menu context
+				$current_pt   = get_post_type();
+				$is_home      = is_front_page();
+				$is_school    = is_post_type_archive( 'school' ) || is_singular( 'school' );
+				$is_major     = is_post_type_archive( 'major' ) || is_singular( 'major' );
+				$is_program   = is_singular( 'program' ) || is_post_type_archive( 'program' );
+				$is_training  = is_tax( 'training_type' ) || is_tax( 'campus' );
+				$is_guide     = is_post_type_archive( 'guide' ) || is_singular( 'guide' );
+				$is_news      = is_post_type_archive( 'post' ) || is_singular( 'post' ) || is_category();
+
+				$active_cls   = 'text-brand-primary border-brand-primary';
+				$default_cls  = 'text-slate-600 border-transparent';
+				?>
+				<ul class="flex items-center gap-8 font-semibold text-sm">
 					<li>
-						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 border-transparent hover:border-brand-primary">Trang chủ</a>
+						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 <?php echo $is_home ? $active_cls : $default_cls; ?>">Trang chủ</a>
 					</li>
 					<li>
-						<a href="<?php echo esc_url( home_url( '/truong/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 border-transparent hover:border-brand-primary">Trường liên kết</a>
+						<a href="<?php echo esc_url( home_url( '/truong/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 <?php echo $is_school ? $active_cls : $default_cls; ?>">Trường liên kết</a>
 					</li>
 					<li class="relative group">
-						<a href="<?php echo esc_url( home_url( '/nganh/' ) ); ?>" class="hover:text-brand-primary flex items-center gap-1 transition-all py-2">
+						<a href="<?php echo esc_url( home_url( '/nganh/' ) ); ?>" class="hover:text-brand-primary flex items-center gap-1 transition-all py-2 border-b-2 <?php echo ( $is_major || $is_program ) ? $active_cls : $default_cls; ?>">
 							Ngành học
 							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
 							</svg>
 						</a>
-						<div class="absolute left-0 top-full hidden group-hover:block bg-white shadow-xl rounded-xl border border-slate-100 py-2 w-56 mt-1 z-50">
+						<div class="dropdown-panel absolute left-0 top-full pt-2 z-50">
+						<div class="bg-white shadow-xl rounded-xl border border-slate-100 py-2 w-56">
 							<?php
 							$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => 12, 'post_status' => 'publish' ] );
 							if ( ! empty( $majors ) ) {
 								foreach ( $majors as $m ) {
 									$clean_title = trim( preg_replace( '/\s*[\(\-][\s\S]*/', '', $m->post_title ) );
-									echo '<a href="' . esc_url( get_permalink( $m->ID ) ) . '" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-primary font-medium">' . esc_html( $clean_title ) . '</a>';
+									$item_active = ( is_singular( 'major' ) && get_the_ID() === $m->ID ) ? ' bg-blue-50 text-brand-primary' : '';
+									echo '<a href="' . esc_url( get_permalink( $m->ID ) ) . '" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-primary font-medium' . $item_active . '">' . esc_html( $clean_title ) . '</a>';
 								}
 							} else {
 								echo '<a href="#" class="block px-4 py-2 text-sm text-slate-400">Công nghệ thông tin</a>';
@@ -90,21 +121,25 @@
 							}
 							?>
 						</div>
+						</div>
 					</li>
 					<li class="relative group">
-						<a href="#" class="hover:text-brand-primary flex items-center gap-1 transition-all py-2">
+						<a href="#" class="hover:text-brand-primary flex items-center gap-1 transition-all py-2 border-b-2 <?php echo $is_training ? $active_cls : $default_cls; ?>">
 							Hệ đào tạo
 							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
 							</svg>
 						</a>
 						<!-- Dropdown Menu for Training Types -->
-						<div class="absolute left-0 top-full hidden group-hover:block bg-white shadow-xl rounded-xl border border-slate-100 py-2 w-48 mt-1 z-50">
+						<div class="dropdown-panel absolute left-0 top-full pt-2 z-50">
+						<div class="bg-white shadow-xl rounded-xl border border-slate-100 py-2 w-48">
 							<?php
 							$training_terms = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
 							if ( ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ) {
+								$queried = get_queried_object();
 								foreach ( $training_terms as $term ) {
-									echo '<a href="' . esc_url( get_term_link( $term ) ) . '" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-primary font-medium">' . esc_html( $term->name ) . '</a>';
+									$item_active = ( is_tax( 'training_type' ) && isset( $queried->term_id ) && $queried->term_id === $term->term_id ) ? ' bg-blue-50 text-brand-primary' : '';
+									echo '<a href="' . esc_url( get_term_link( $term ) ) . '" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-primary font-medium' . $item_active . '">' . esc_html( $term->name ) . '</a>';
 								}
 							} else {
 								echo '<a href="#" class="block px-4 py-2 text-sm text-slate-400">Từ xa</a>';
@@ -113,12 +148,13 @@
 							}
 							?>
 						</div>
+						</div>
 					</li>
 					<li>
-						<a href="<?php echo esc_url( home_url( '/huong-dan/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 border-transparent hover:border-brand-primary">Hướng dẫn tuyển sinh</a>
+						<a href="<?php echo esc_url( home_url( '/huong-dan/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 <?php echo $is_guide ? $active_cls : $default_cls; ?>">Hướng dẫn tuyển sinh</a>
 					</li>
 					<li>
-						<a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 border-transparent hover:border-brand-primary">Tin tức</a>
+						<a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 <?php echo $is_news ? $active_cls : $default_cls; ?>">Tin tức</a>
 					</li>
 				</ul>
 				<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>" class="bg-brand-primary text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-md shadow-brand-primary/20 hover:bg-[#1E40AF] hover:shadow-lg transition-all tracking-wide">
