@@ -88,16 +88,16 @@ $query = new WP_Query( $args );
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
 		<!-- Filter Panel -->
-		<section class="bg-white p-6 rounded shadow-sm border border-slate-200 mb-8">
+		<section class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 mb-8">
 			<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 				<div>
 					<label class="block text-sm font-bold text-slate-700 mb-1">Từ khóa tìm kiếm</label>
-					<input type="text" name="s" value="<?php echo esc_attr( $selected_search ); ?>" placeholder="Tìm tên chương trình..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-base focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium" />
+					<input type="text" name="s" value="<?php echo esc_attr( $selected_search ); ?>" placeholder="Tìm tên chương trình..." class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-base focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium" />
 				</div>
 
 				<div>
 					<label class="block text-sm font-bold text-slate-700 mb-1">Trường đại học</label>
-					<select name="truong" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
+					<select name="truong" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
 						<option value="">-- Chọn trường học --</option>
 						<?php
 						$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => -1 ] );
@@ -111,7 +111,7 @@ $query = new WP_Query( $args );
 				
 				<div>
 					<label class="block text-sm font-bold text-slate-700 mb-1">Ngành đào tạo</label>
-					<select name="nganh" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
+					<select name="nganh" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
 						<option value="">-- Chọn ngành học --</option>
 						<?php
 						$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => -1 ] );
@@ -125,7 +125,7 @@ $query = new WP_Query( $args );
 
 				<div>
 					<label class="block text-sm font-bold text-slate-700 mb-1">Hệ đào tạo</label>
-					<select name="he" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
+					<select name="he" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-base focus:border-brand-primary focus:outline-none">
 						<option value="">-- Chọn hệ học --</option>
 						<?php
 						$types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
@@ -157,7 +157,7 @@ $query = new WP_Query( $args );
 					$types = wp_get_post_terms( $prog_id, 'training_type' );
 					$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : 'Chưa xác định';
 					?>
-					<div class="bg-white border border-slate-200 rounded overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+					<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
 						 data-compare-btn data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 						 data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 						 data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"

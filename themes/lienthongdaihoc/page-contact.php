@@ -22,7 +22,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 		<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 			<!-- Contact Information Columns -->
 			<div class="lg:col-span-5 space-y-6">
-				<div class="bg-white rounded p-6 shadow-sm border border-slate-200 space-y-6">
+				<div class="bg-white rounded-lg p-6 shadow-sm border border-slate-200 space-y-6">
 					<h3 class="font-bold text-xl text-slate-800 pb-3 border-b border-slate-100">VĂN PHÒNG TUYỂN SINH</h3>
 					
 					<div class="flex items-start gap-4">
@@ -53,7 +53,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 
 			<!-- Contact Form Column -->
 			<div class="lg:col-span-7">
-				<div class="bg-white rounded p-6 md:p-8 shadow-sm border border-slate-200">
+				<div class="bg-white rounded-lg p-6 md:p-8 shadow-sm border border-slate-200">
 					<h3 class="font-bold text-xl text-slate-800 mb-4">GỬI YÊU CẦU CHO CHÚNG TÔI</h3>
 					
 					<?php 

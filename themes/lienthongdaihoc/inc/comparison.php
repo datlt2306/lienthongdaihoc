@@ -139,7 +139,13 @@ function ltdh_compare_resolve_program( $program_id ) {
 	$training_type  = ( ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ) ? $training_terms[0]->name : '';
 
 	$campus_terms = wp_get_post_terms( $program_id, 'campus' );
-	$campus_name  = ( ! is_wp_error( $campus_terms ) && ! empty( $campus_terms ) ) ? $campus_terms[0]->name : '';
+	$campus_names = [];
+	if ( ! is_wp_error( $campus_terms ) && ! empty( $campus_terms ) ) {
+		foreach ( $campus_terms as $term ) {
+			$campus_names[] = $term->name;
+		}
+	}
+	$campus_name = ! empty( $campus_names ) ? implode( ', ', $campus_names ) : '';
 
 	$learning_details = ltdh_get_program_learning_details( $program_id );
 
@@ -181,7 +187,7 @@ function ltdh_compare_resolve_program( $program_id ) {
 		] : null,
 		'training_type'         => $training_type,
 		'campus'                => $campus_name,
-		'campus_info'           => get_field( 'campus_info', $program_id ) ?: $campus_name,
+		'campus_info'           => $campus_name,
 		'learning_mode'         => $learning_details['mode'],
 		'tuition_fee'           => $tuition_str,
 		'tuition_numeric'       => ltdh_compare_parse_tuition( $tuition_str ),
@@ -434,7 +440,7 @@ function ltdh_compare_is_best( $highlights, $attribute, $item_id ) {
  * Get best badge HTML.
  */
 function ltdh_compare_badge( $label ) {
-	return '<span class="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded ml-1.5 whitespace-nowrap">🏆 ' . esc_html( $label ) . '</span>';
+	return '<span class="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-lg ml-1.5 whitespace-nowrap">🏆 ' . esc_html( $label ) . '</span>';
 }
 
 // ----------------------------------------------------

@@ -27,7 +27,7 @@ get_header();
 						$thumb = get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg';
 					}
 			?>
-					<div class="bg-white border border-slate-200 rounded overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+					<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 						<div class="h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb ); ?>');"></div>
 						<div class="p-6 flex-1 flex flex-col justify-between">
 							<div>

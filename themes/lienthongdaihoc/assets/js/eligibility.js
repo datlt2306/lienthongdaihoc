@@ -12,7 +12,7 @@
 	// State
 	// ----------------------------------------------------
 	var currentStep = 1;
-	var totalSteps = 9;
+	var totalSteps = 8;
 	var form = {};
 	var results = null;
 
@@ -21,7 +21,6 @@
 	// ----------------------------------------------------
 	document.addEventListener('DOMContentLoaded', function () {
 		initWizard();
-		initSearchDropdowns();
 		initNavigation();
 		initResultsActions();
 	});
@@ -63,74 +62,6 @@
 			});
 		}
 	}
-
-	// ----------------------------------------------------
-	// Search Dropdowns
-	// ----------------------------------------------------
-	function initSearchDropdowns() {
-		initSearchDropdown('elig-major-search', 'major_id', 'elig-major-dropdown');
-		initSearchDropdown('elig-desired-search', 'desired_major', 'elig-desired-dropdown');
-	}
-
-	function initSearchDropdown(inputId, fieldName, dropdownId) {
-		var input = document.getElementById(inputId);
-		var dropdown = document.getElementById(dropdownId);
-		if (!input || !dropdown) return;
-
-		var items = dropdown.querySelectorAll('.elig-dropdown-item');
-
-		input.addEventListener('input', function () {
-			var query = this.value.toLowerCase().trim();
-			var hasVisible = false;
-
-			for (var i = 0; i < items.length; i++) {
-				var title = items[i].getAttribute('data-title').toLowerCase();
-				if (!query || title.indexOf(query) !== -1) {
-					items[i].style.display = '';
-					hasVisible = true;
-				} else {
-					items[i].style.display = 'none';
-				}
-			}
-
-			dropdown.style.display = hasVisible ? '' : 'none';
-
-			// Clear selection if typing
-			if (query) {
-				var hidden = input.parentElement.querySelector('input[type="hidden"]');
-				if (hidden) hidden.value = '';
-				form[fieldName] = 0;
-			}
-		});
-
-		input.addEventListener('focus', function () {
-			if (items.length > 0) {
-				dropdown.style.display = '';
-			}
-		});
-
-		// Item click
-		for (var i = 0; i < items.length; i++) {
-			items[i].addEventListener('click', function () {
-				var id = this.getAttribute('data-id');
-				var title = this.getAttribute('data-title');
-				input.value = title;
-				var hidden = input.parentElement.querySelector('input[type="hidden"]');
-				if (hidden) hidden.value = id;
-				form[fieldName] = parseInt(id, 10);
-				dropdown.style.display = 'none';
-			});
-		}
-
-		// Close dropdown on outside click
-		document.addEventListener('click', function (e) {
-			if (!input.parentElement.contains(e.target)) {
-				dropdown.style.display = 'none';
-			}
-		});
-	}
-
-	// ----------------------------------------------------
 	// Navigation
 	// ----------------------------------------------------
 	function initNavigation() {
@@ -146,15 +77,53 @@
 
 		if (nextBtn) {
 			nextBtn.addEventListener('click', function () {
-				goToStep(currentStep + 1);
+				if (validateCurrentStep()) {
+					goToStep(currentStep + 1);
+				}
 			});
 		}
 
 		if (submitBtn) {
 			submitBtn.addEventListener('click', function () {
-				submitCheck();
+				if (validateCurrentStep()) {
+					submitCheck();
+				}
 			});
 		}
+	}
+
+	function validateCurrentStep() {
+		if (currentStep === 1) {
+			if (!form.education) {
+				alert('Vui lòng chọn trình độ học vấn hiện tại.');
+				return false;
+			}
+		}
+		if (currentStep === 3) {
+			if (!form.graduation) {
+				alert('Vui lòng chọn năm sinh.');
+				return false;
+			}
+		}
+		if (currentStep === 4) {
+			if (!form.desired_major) {
+				alert('Vui lòng chọn ngành học mong muốn.');
+				return false;
+			}
+		}
+		if (currentStep === 5) {
+			if (!form.training_type) {
+				alert('Vui lòng chọn hệ đào tạo.');
+				return false;
+			}
+		}
+		if (currentStep === 6) {
+			if (!form.campus) {
+				alert('Vui lòng chọn cơ sở học.');
+				return false;
+			}
+		}
+		return true;
 	}
 
 	function goToStep(step) {

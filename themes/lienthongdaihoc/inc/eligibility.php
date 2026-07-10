@@ -312,17 +312,11 @@ function ltdh_elig_run_check( $input ) {
 
 		// H03: Campus availability
 		if ( ! $hard_fail && ! empty( $input['campus'] ) && $input['campus'] !== 'online' ) {
-			$prog_campuses = get_field( 'elig_campuses', $program_id );
-			$prog_campuses = is_array( $prog_campuses ) ? $prog_campuses : [];
-			$program_campus_taxes = wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'slugs' ] );
-			$all_campuses = array_unique( array_merge( $prog_campuses, $program_campus_taxes ) );
+			$all_campuses = wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'slugs' ] );
 
-			// Also check campus_info text field
-			$campus_info = get_post_meta( $program_id, 'campus_info', true ) ?: '';
-
-			if ( ! in_array( $input['campus'], $all_campuses, true ) && stripos( $campus_info, $input['campus'] ) === false ) {
+			if ( ! in_array( $input['campus'], $all_campuses, true ) ) {
 				// Check if online is available (online works everywhere)
-				if ( ! in_array( 'online', $all_campuses, true ) && stripos( $campus_info, 'online' ) === false ) {
+				if ( ! in_array( 'online', $all_campuses, true ) ) {
 					$hard_fail = true;
 					$fail_reason = 'Chương trình chưa có tại ' . ltdh_elig_get_campus_label( $input['campus'] );
 				}
@@ -354,24 +348,51 @@ function ltdh_elig_run_check( $input ) {
 		$breakdown = [];
 
 		// S01: Major match
-		$prog_major_id = intval( get_post_meta( $program_id, 'major_relationship', true ) );
+		$prog_major_id = get_field( 'major_relationship', $program_id );
+		if ( is_array( $prog_major_id ) ) {
+			$prog_major_id = ! empty( $prog_major_id ) ? $prog_major_id[0] : 0;
+		}
+		if ( is_object( $prog_major_id ) ) {
+			$prog_major_id = $prog_major_id->ID;
+		}
+		$prog_major_id = intval( $prog_major_id );
 		$prog_major_slug = $prog_major_id ? get_post_field( 'post_name', $prog_major_id ) : '';
 
 		if ( $input['desired_major'] && $prog_major_id ) {
-			if ( $input['desired_major'] == $prog_major_id ) {
+			if ( (int) $input['desired_major'] === $prog_major_id ) {
 				$score += $weights['major_match'];
 				$breakdown['major'] = [ 'score' => $weights['major_match'], 'label' => 'Ngành trùng khớp' ];
-			} elseif ( isset( $major_rels[ $user_major_slug ] ) && in_array( $prog_major_slug, $major_rels[ $user_major_slug ], true ) ) {
-				$score += $weights['major_related'];
-				$breakdown['major'] = [ 'score' => $weights['major_related'], 'label' => 'Ngành liên quan' ];
 			} else {
-				$breakdown['major'] = [ 'score' => 0, 'label' => 'Ngành khác' ];
+				$related_ids = get_field( 'major_related', $input['desired_major'] );
+				if ( ! is_array( $related_ids ) ) {
+					$related_ids = $related_ids ? [ $related_ids ] : [];
+				}
+				if ( $input['major_id'] ) {
+					$current_related = get_field( 'major_related', $input['major_id'] );
+					if ( is_array( $current_related ) ) {
+						$related_ids = array_merge( $related_ids, $current_related );
+					} elseif ( $current_related ) {
+						$related_ids[] = $current_related;
+					}
+				}
+				$related_ids = array_map( 'intval', $related_ids );
+
+				if ( in_array( $prog_major_id, $related_ids, true ) ) {
+					$score += $weights['major_related'];
+					$breakdown['major'] = [ 'score' => $weights['major_related'], 'label' => 'Ngành liên quan' ];
+				} elseif ( isset( $major_rels[ $user_major_slug ] ) && in_array( $prog_major_slug, $major_rels[ $user_major_slug ], true ) ) {
+					$score += $weights['major_related'];
+					$breakdown['major'] = [ 'score' => $weights['major_related'], 'label' => 'Ngành liên quan' ];
+				} else {
+					$breakdown['major'] = [ 'score' => 0, 'label' => 'Ngành khác' ];
+				}
 			}
 		}
 
-		// S02: Graduation recency
+		// S02: Graduation recency (estimated from Birth Year + 18)
 		if ( $input['graduation'] ) {
-			$years_since = date( 'Y' ) - $input['graduation'];
+			$estimated_graduation = $input['graduation'] + 18;
+			$years_since = date( 'Y' ) - $estimated_graduation;
 			if ( $years_since <= 3 ) {
 				$pts = $weights['graduation_recent'];
 				$breakdown['graduation'] = [ 'score' => $pts, 'label' => 'Tốt nghiệp gần đây' ];
@@ -415,16 +436,12 @@ function ltdh_elig_run_check( $input ) {
 
 		// S04: Campus match
 		if ( $input['campus'] ) {
-			$prog_campuses2 = get_field( 'elig_campuses', $program_id );
-			$prog_campuses2 = is_array( $prog_campuses2 ) ? $prog_campuses2 : [];
-			$campus_taxes = wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'slugs' ] );
-			$campus_info2 = get_post_meta( $program_id, 'campus_info', true ) ?: '';
-			$all_campuses2 = array_unique( array_merge( $prog_campuses2, (array) $campus_taxes ) );
+			$all_campuses2 = wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'slugs' ] );
 
-			if ( in_array( $input['campus'], $all_campuses2, true ) || stripos( $campus_info2, $input['campus'] ) !== false ) {
+			if ( in_array( $input['campus'], $all_campuses2, true ) ) {
 				$score += $weights['campus_match'];
 				$breakdown['campus'] = [ 'score' => $weights['campus_match'], 'label' => 'Cơ sở phù hợp' ];
-			} elseif ( in_array( 'online', $all_campuses2, true ) || stripos( $campus_info2, 'online' ) !== false ) {
+			} elseif ( in_array( 'online', $all_campuses2, true ) ) {
 				$pts = (int) ( $weights['campus_match'] * 0.5 );
 				$score += $pts;
 				$breakdown['campus'] = [ 'score' => $pts, 'label' => 'Có Online' ];
@@ -442,7 +459,14 @@ function ltdh_elig_run_check( $input ) {
 		$score = min( $score, 100 );
 
 		// Get school data
-		$school_id = intval( get_post_meta( $program_id, 'school_relationship', true ) );
+		$school_id = get_field( 'school_relationship', $program_id );
+		if ( is_array( $school_id ) ) {
+			$school_id = ! empty( $school_id ) ? $school_id[0] : 0;
+		}
+		if ( is_object( $school_id ) ) {
+			$school_id = $school_id->ID;
+		}
+		$school_id = intval( $school_id );
 		$school_logo_id = $school_id ? ltdh_get_school_image_id( $school_id ) : 0;
 
 		$eligible[] = [
@@ -462,7 +486,7 @@ function ltdh_elig_run_check( $input ) {
 			'tuition_fee'  => get_post_meta( $program_id, 'tuition_fee', true ) ?: '',
 			'duration'     => get_post_meta( $program_id, 'duration', true ) ?: '',
 			'schedule'     => $schedule,
-			'campus_info'  => get_post_meta( $program_id, 'campus_info', true ) ?: '',
+			'campus_info'  => implode( ', ', wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'names' ] ) ) ?: '—',
 		];
 	}
 

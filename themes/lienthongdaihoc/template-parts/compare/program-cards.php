@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // Item cards at top
 ?>
 <!-- Item Headers -->
-<div class="bg-white rounded shadow-sm border border-slate-100 p-4">
+<div class="bg-white rounded-lg shadow-sm border border-slate-100 p-4">
 	<div class="grid grid-cols-<?php echo min( count( $items ), 3 ); ?> gap-3">
 		<?php foreach ( $items as $item ) :
 			$school_name = $item['school'] ? $item['school']['title'] : '';
@@ -60,7 +60,7 @@ $sections = [
 
 foreach ( $sections as $section_name => $attrs ) :
 ?>
-<div class="bg-white rounded shadow-sm border border-slate-100 overflow-hidden">
+<div class="bg-white rounded-lg shadow-sm border border-slate-100 overflow-hidden">
 	<div class="bg-brand-primary/5 px-4 py-2 border-b border-brand-primary/10">
 		<h3 class="text-xs font-bold text-brand-primary uppercase tracking-wider"><?php echo esc_html( $section_name ); ?></h3>
 	</div>
@@ -86,7 +86,7 @@ foreach ( $sections as $section_name => $attrs ) :
 			?>
 			<div class="flex items-start gap-2 <?php echo $is_best ? 'bg-emerald-50 -mx-1 px-1 py-1 rounded-lg' : ''; ?>">
 				<img src="<?php echo esc_url( $item['thumbnail'] ); ?>"
-					 class="h-6 w-6 rounded object-cover shrink-0 mt-0.5"
+					 class="h-6 w-6 rounded-lg object-cover shrink-0 mt-0.5"
 					 alt="">
 				<div class="text-sm text-slate-600 min-w-0 flex-1">
 					<?php echo $value; ?>

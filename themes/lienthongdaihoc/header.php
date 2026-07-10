@@ -210,14 +210,14 @@
 					'fallback_cb'    => 'ltdh_default_primary_menu',
 				] );
 				?>
-				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-primary text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-md shadow-brand-primary/20 hover:bg-[#1E40AF] hover:shadow-lg transition-all tracking-wide">
+				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-primary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-md shadow-brand-primary/20 hover:bg-[#1E40AF] hover:shadow-lg transition-all tracking-wide">
 					TƯ VẤN NGAY
 				</a>
 			</nav>
 
 			<!-- Mobile Toggle -->
 			<div class="flex lg:hidden items-center">
-				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-primary text-white px-4 py-2 rounded-full text-sm font-bold mr-3">Tư vấn</a>
+				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-primary text-white px-4 py-2 rounded-lg text-sm font-bold mr-3">Tư vấn</a>
 				<button id="mobile-menu-toggle" class="text-slate-600 hover:text-brand-primary focus:outline-none">
 					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -236,7 +236,7 @@
 				'fallback_cb'    => 'ltdh_default_mobile_menu',
 			] );
 			?>
-			<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="block w-full text-center bg-brand-primary text-white py-3 rounded-full font-bold text-sm">
+			<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="block w-full text-center bg-brand-primary text-white py-3 rounded-lg font-bold text-sm">
 				TƯ VẤN NGAY
 			</a>
 		</div>

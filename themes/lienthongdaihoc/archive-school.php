@@ -37,11 +37,11 @@ get_header();
 					$rating  = get_post_meta( $school_id, 'rating', true ) ?: '4.8';
 					$reviews = get_post_meta( $school_id, 'reviews_count', true ) ?: '256';
 			?>
-			<div class="bg-white border border-slate-100 rounded overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+			<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 						<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
 						
 						<!-- Logo Overlay -->
-						<div class="h-16 w-16 bg-white rounded-full border-4 border-white shadow-md bg-white -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
+						<div class="h-16 w-16 bg-white rounded-lg border-4 border-white shadow-md bg-white -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
 							<?php if ( $logo_id ) : ?>
 								<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
 							<?php else : ?>
@@ -61,7 +61,7 @@ get_header();
 							</div>
 							
 						<div class="mt-4 pt-3 border-t border-slate-100">
-							<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-[#2563EB] hover:text-white py-2 rounded-xl font-bold transition-all text-xs uppercase text-[#2563EB]">Chi tiết trường</a>
+							<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-[#2563EB] hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-[#2563EB]">Chi tiết trường</a>
 						</div>
 						</div>
 					</div>

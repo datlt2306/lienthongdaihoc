@@ -29,8 +29,8 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 			<!-- Main Column -->
 			<div class="lg:col-span-2 space-y-6">
-				<article class="bg-white rounded shadow-sm border border-slate-200 p-6 md:p-8">
-					<span class="inline-block bg-blue-50 text-[#2563EB] text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4">Cẩm nang tuyển sinh</span>
+				<article class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 md:p-8">
+					<span class="inline-block bg-blue-50 text-[#2563EB] text-sm font-bold px-3 py-1 rounded-lg uppercase tracking-wider mb-4">Cẩm nang tuyển sinh</span>
 					<h1 class="text-2xl md:text-4xl font-black text-slate-900 leading-tight mb-4"><?php the_title(); ?></h1>
 					
 					<div class="flex items-center gap-4 text-sm text-slate-400 pb-4 border-b border-slate-100 mb-6">
@@ -48,7 +48,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				<div class="sticky top-24 space-y-6">
 					
 					<!-- Sidebar register widget -->
-					<section class="bg-white rounded shadow-sm border border-slate-200 p-6">
+					<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
 						<h3 class="text-lg font-bold text-slate-900 mb-2">Nhận thêm thông tin chi tiết</h3>
 						<p class="text-sm text-slate-500 mb-4">Để lại câu hỏi của bạn. Ban tuyển sinh đại học liên kết sẽ giải đáp nhanh chóng sau 15 phút.</p>
 						
@@ -77,7 +77,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</section>
 
 					<!-- Zalo / Call Card -->
-					<div class="bg-blue-50 border border-blue-100 rounded p-6 text-center">
+					<div class="bg-blue-50 border border-blue-100 rounded-lg p-6 text-center">
 						<span class="text-sm text-[#2563EB] font-bold uppercase tracking-wider block mb-1">Tổng đài hỗ trợ</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $hotline ); ?></h4>
 						<div class="flex gap-2">

@@ -15,8 +15,8 @@ get_header();
 <main id="primary" class="site-main py-12 bg-slate-50">
 	<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 		
-		<article class="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-200 space-y-6">
-			<span class="inline-block bg-blue-50 text-[#2563EB] text-sm font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
+		<article class="bg-white rounded-xl p-8 md:p-12 shadow-sm border border-slate-200 space-y-6">
+			<span class="inline-block bg-blue-50 text-[#2563EB] text-sm font-bold px-3.5 py-1 rounded-lg uppercase tracking-wider">
 				Về chúng tôi
 			</span>
 			<h1 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">CỔNG THÔNG TIN TUYỂN SINH LIÊN THÔNG ĐẠI HỌC</h1>
@@ -28,11 +28,11 @@ get_header();
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
-				<div class="bg-slate-50 p-6 rounded border border-slate-100">
+				<div class="bg-slate-50 p-6 rounded-lg border border-slate-100">
 					<h3 class="font-bold text-slate-800 text-lg mb-2">Giá trị cốt lõi</h3>
 					<p class="text-sm text-slate-500">Đặt chất lượng thông tin lên hàng đầu. Đảm bảo tính chính quy, minh bạch của dữ liệu tuyển sinh từ các trường.</p>
 				</div>
-				<div class="bg-slate-50 p-6 rounded border border-slate-100">
+				<div class="bg-slate-50 p-6 rounded-lg border border-slate-100">
 					<h3 class="font-bold text-slate-800 text-lg mb-2">Tầm nhìn chiến lược</h3>
 					<p class="text-sm text-slate-500">Mở rộng liên kết với hơn 50+ trường đại học chính quy, hỗ trợ giải đáp lộ trình học cho hàng chục ngàn học viên mỗi năm.</p>
 				</div>

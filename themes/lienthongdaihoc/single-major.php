@@ -29,10 +29,10 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		
 		<!-- HERO SECTION -->
-		<section class="bg-white rounded shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
+		<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
 			<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
 				<div class="space-y-2">
-					<span class="inline-block bg-teal-50 text-brand-primary text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+					<span class="inline-block bg-teal-50 text-brand-primary text-sm font-bold px-3 py-1 rounded-lg uppercase tracking-wider">
 						Thông tin Ngành học
 					</span>
 					<h1 class="text-2xl md:text-4xl font-black text-slate-900 leading-tight">
@@ -53,7 +53,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 			<div class="lg:col-span-2 space-y-8">
 				
 				<!-- OVERVIEW -->
-				<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan về ngành</h2>
 					<div class="prose prose-slate max-w-none text-slate-600 text-sm md:text-base">
 						<?php the_content(); ?>
@@ -62,7 +62,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 
 				<!-- CAREER OPPORTUNITIES -->
 				<?php if ( $career ) : ?>
-					<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Cơ hội nghề nghiệp & Định hướng</h2>
 						<div class="prose prose-slate max-w-none text-slate-600 text-sm">
 							<?php echo wp_kses_post( $career ); ?>
@@ -71,7 +71,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 				<?php endif; ?>
 
 				<!-- PROGRAMS FOR THIS MAJOR -->
-				<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Chương trình tuyển sinh ngành <?php the_title(); ?></h2>
 					
 					<?php
@@ -116,42 +116,55 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					}
 
 					if ( $programs_query->have_posts() ) :
-						echo '<div class="space-y-4">';
+						echo '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
 						while ( $programs_query->have_posts() ) : $programs_query->the_post();
 							$prog_id = get_the_ID();
 							$school_rel_id = get_field( 'school_relationship', $prog_id );
 							$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Mời tư vấn';
+							$school_thumb = $school_rel_id ? get_the_post_thumbnail_url( $school_rel_id, 'medium' ) : '';
+							if ( ! $school_thumb ) {
+								$school_thumb = 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=300';
+							}
 							$status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
 							$types = wp_get_post_terms( $prog_id, 'training_type' );
 							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
+							$tuition_fee = get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ';
+							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
 							?>
-							<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-slate-100 rounded-xl hover:border-[#2563EB] transition-all bg-white">
-								<div class="space-y-1">
-									<h4 class="font-bold text-slate-800 text-base hover:text-[#2563EB] transition-colors flex items-center gap-2 flex-wrap">
-										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-										<?php if ( $type_name ) : ?>
-											<span class="bg-blue-50 text-brand-primary text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider"><?php echo esc_html( $type_name ); ?></span>
-										<?php endif; ?>
-									</h4>
-									<p class="text-sm text-slate-500">Trường: 
-										<?php if ( $school_rel_id ) : ?>
-											<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>" class="font-bold text-[#2563EB] hover:underline"><?php echo esc_html( $school_name ); ?></a>
+							<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+								<div class="h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');"></div>
+								<div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+									<div>
+										<div class="flex items-center flex-wrap gap-2 mb-2">
+											<?php if ( $type_name ) : ?>
+												<span class="bg-orange-50 text-orange-600 text-[10px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider"><?php echo esc_html( $type_name ); ?></span>
+											<?php endif; ?>
+										</div>
+										<h4 class="font-extrabold text-slate-800 text-sm hover:text-[#2563EB] transition-colors leading-snug">
+											<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+										</h4>
+										
+										<div class="mt-3 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
+											<p>Trường: 
+												<?php if ( $school_rel_id ) : ?>
+													<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>" class="font-bold text-[#2563EB] hover:underline"><?php echo esc_html( $school_name ); ?></a>
+												<?php else : ?>
+													<span class="font-semibold text-slate-700"><?php echo esc_html( $school_name ); ?></span>
+												<?php endif; ?>
+											</p>
+											<p>Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $duration ); ?></span></p>
+											<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $tuition_fee ); ?></span></p>
+										</div>
+									</div>
+
+									<div class="pt-2 border-t border-slate-100 flex items-center">
+										<?php if ( $status === 'tam-ngung' ) : ?>
+											<span class="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
 										<?php else : ?>
-											<span class="font-semibold text-slate-700"><?php echo esc_html( $school_name ); ?></span>
+											<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-[#1E40AF] transition-all">Chi tiết</a>
 										<?php endif; ?>
-										| Hệ đào tạo: <span class="font-semibold text-slate-700"><?php echo esc_html( $type_name ?: 'Liên hệ' ); ?></span>
-										| Học phí: <span class="font-semibold text-slate-700"><?php echo esc_html( get_field( 'tuition_fee' ) ?: 'Liên hệ' ); ?></span>
-									</p>
+									</div>
 								</div>
-								<?php if ( $status === 'tam-ngung' ) : ?>
-									<a href="<?php the_permalink(); ?>" class="mt-3 sm:mt-0 bg-slate-100 text-slate-500 px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-200 transition-all">
-										Chi tiết
-									</a>
-								<?php else : ?>
-									<a href="<?php the_permalink(); ?>" class="mt-3 sm:mt-0 bg-[#2563EB] text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-[#1E40AF] transition-all">
-										Chi tiết
-									</a>
-								<?php endif; ?>
 							</div>
 							<?php
 						endwhile;
@@ -164,7 +177,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 				</section>
 
 				<!-- SCHOOLS OFFERING THIS MAJOR -->
-				<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Các trường đào tạo ngành này</h2>
 					<?php
 					$distinct_school_ids = [];
@@ -212,7 +225,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 						echo '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">';
 						while ( $schools_query->have_posts() ) : $schools_query->the_post();
 						?>
-							<a href="<?php the_permalink(); ?>" class="block p-4 border border-slate-100 rounded-xl hover:border-brand-primary hover:shadow-sm transition-all bg-white flex items-center gap-3">
+							<a href="<?php the_permalink(); ?>" class="block p-4 border border-slate-100 rounded-lg hover:border-brand-primary hover:shadow-sm transition-all bg-white flex items-center gap-3">
 								<?php ltdh_render_school_thumbnail( get_the_ID(), 'thumbnail', 'h-10 w-10 object-cover shrink-0 rounded-lg border border-slate-100 bg-white' ); ?>
 								<div>
 									<h4 class="font-bold text-slate-800 text-sm"><?php the_title(); ?></h4>
@@ -236,7 +249,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 				<div class="sticky top-24 space-y-6">
 					
 					<!-- CONSULTATION FORM -->
-					<section id="register" class="bg-white rounded shadow-sm border border-slate-100 p-6">
+					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 						<h3 class="text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn ngành <?php the_title(); ?></h3>
 						<p class="text-sm text-slate-500 mb-4">Để lại thông tin, ban tuyển sinh sẽ gửi danh sách trường đào tạo phù hợp nhất với học lực và thời gian của bạn.</p>
 						
@@ -266,7 +279,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					</section>
 
 					<!-- CONTACT INFO CARD -->
-					<div class="bg-brand-primary/5 border border-brand-primary/10 rounded p-6 text-center">
+					<div class="bg-brand-primary/5 border border-brand-primary/10 rounded-lg p-6 text-center">
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Ban hướng nghiệp</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $hotline ); ?></h4>
 						<div class="flex gap-2">

@@ -10,7 +10,7 @@ $count = count( $items );
 $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220px]' );
 ?>
 
-<div class="bg-white rounded shadow-sm border border-slate-100 overflow-hidden">
+<div class="bg-white rounded-lg shadow-sm border border-slate-100 overflow-hidden">
 	<table class="w-full border-collapse min-w-[600px]">
 		<!-- Header Row: Thumbnails + Titles -->
 		<thead>
@@ -29,7 +29,7 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 						<?php if ( $item['school'] && $item['school']['logo'] ) : ?>
 							<img src="<?php echo esc_url( $item['school']['logo'] ); ?>"
 								 alt="<?php echo esc_attr( $school_name ); ?>"
-								 class="h-8 w-8 object-cover rounded-full border border-slate-200 -mt-4 relative z-10">
+								 class="h-8 w-8 object-cover rounded-lg border border-slate-200 -mt-4 relative z-10">
 						<?php endif; ?>
 						<div>
 							<a href="<?php echo esc_url( $item['permalink'] ); ?>" class="font-bold text-slate-900 text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">

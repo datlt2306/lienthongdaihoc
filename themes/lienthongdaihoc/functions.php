@@ -432,7 +432,7 @@ function ltdh_ajax_filter_programs() {
 			$groups = get_post_meta( $prog_id, 'admission_groups', true );
 			$learning_details = ltdh_get_program_learning_details( $prog_id );
 			?>
-			<div class="bg-white border border-slate-200 rounded overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+			<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
 				 data-compare-btn data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 				 data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 				 data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"

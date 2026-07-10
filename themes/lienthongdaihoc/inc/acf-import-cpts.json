@@ -480,13 +480,6 @@
                 "placeholder": "Ví dụ: 1.5 - 2 năm"
             },
             {
-                "key": "field_program_campus",
-                "label": "Địa điểm học tập / Cơ sở",
-                "name": "campus_info",
-                "type": "text",
-                "placeholder": "Hà Nội, Hồ Chí Minh, Học trực tuyến (Online)..."
-            },
-            {
                 "key": "field_program_requirements",
                 "label": "Điều kiện xét tuyển",
                 "name": "admission_requirements",
@@ -516,12 +509,6 @@
                 "key": "field_program_benefits",
                 "label": "Quyền lợi / Ưu điểm chương trình",
                 "name": "program_benefits",
-                "type": "wysiwyg"
-            },
-            {
-                "key": "field_program_opportunities",
-                "label": "Cơ hội việc làm sau tốt nghiệp",
-                "name": "career_opportunities",
                 "type": "wysiwyg"
             },
             {

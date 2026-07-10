@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div class="flex items-center gap-1.5 shrink-0">
 					<span class="text-lg">📊</span>
 					<span class="text-sm font-bold text-slate-800">So sánh</span>
-					<span class="ltdh-tray-count text-xs font-bold bg-brand-primary text-white px-1.5 py-0.5 rounded-full">0/4</span>
+					<span class="ltdh-tray-count text-xs font-bold bg-brand-primary text-white px-1.5 py-0.5 rounded-lg">0/4</span>
 				</div>
 				<div class="ltdh-tray-items flex items-center gap-2 overflow-x-auto min-w-0"></div>
 			</div>
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					Xóa tất cả
 				</button>
 				<a href="#"
-				   class="ltdh-tray-link inline-flex items-center gap-1.5 bg-brand-primary text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md shadow-brand-primary/20 hover:bg-teal-700 transition-all opacity-50 pointer-events-none">
+				   class="ltdh-tray-link inline-flex items-center gap-1.5 bg-brand-primary text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-md shadow-brand-primary/20 hover:bg-teal-700 transition-all opacity-50 pointer-events-none">
 					So sánh ngay →
 				</a>
 			</div>

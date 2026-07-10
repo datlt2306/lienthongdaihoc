@@ -36,9 +36,9 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 		<p class="text-slate-500 text-sm mb-8"><?php echo esc_html( $seo_desc ); ?></p>
 
 		<?php if ( count( $items ) < 2 ) : ?>
-			<div class="bg-white rounded p-12 text-center shadow-sm border border-slate-100">
+			<div class="bg-white rounded-lg p-12 text-center shadow-sm border border-slate-100">
 				<p class="text-slate-500 text-lg mb-4">Vui lòng chọn ít nhất 2 chương trình để so sánh.</p>
-				<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="inline-flex items-center gap-2 bg-brand-primary text-white font-bold px-6 py-3 rounded-xl hover:bg-teal-700 transition-all">
+				<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="inline-flex items-center gap-2 bg-brand-primary text-white font-bold px-6 py-3 rounded-lg hover:bg-teal-700 transition-all">
 					Xem danh sách chương trình →
 				</a>
 			</div>
@@ -60,7 +60,7 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 			</div>
 
 			<!-- SEO Content Section -->
-			<section class="mt-12 bg-white rounded shadow-sm border border-slate-100 p-6">
+			<section class="mt-12 bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 				<h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">
 					Thông tin so sánh chi tiết
 				</h2>
@@ -82,14 +82,14 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 			</section>
 
 			<!-- FAQ Section -->
-			<section class="mt-8 bg-white rounded shadow-sm border border-slate-100 p-6">
+			<section class="mt-8 bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 				<h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">
 					Câu hỏi thường gặp khi so sánh chương trình
 				</h2>
 				<div class="space-y-4">
 					<div class="border-b border-slate-100 pb-4">
 						<h4 class="font-semibold text-slate-800 text-sm mb-1.5 flex items-start gap-2">
-							<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded font-black">Q</span>
+							<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
 							<span>Làm sao để chọn chương trình phù hợp?</span>
 						</h4>
 						<p class="text-slate-600 text-sm pl-7 leading-relaxed">
@@ -98,7 +98,7 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 					</div>
 					<div class="border-b border-slate-100 pb-4">
 						<h4 class="font-semibold text-slate-800 text-sm mb-1.5 flex items-start gap-2">
-							<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded font-black">Q</span>
+							<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
 							<span>Bằng cấp từ các chương trình này có giá trị không?</span>
 						</h4>
 						<p class="text-slate-600 text-sm pl-7 leading-relaxed">
@@ -107,7 +107,7 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 					</div>
 					<div class="border-b border-slate-100 pb-4">
 						<h4 class="font-semibold text-slate-800 text-sm mb-1.5 flex items-start gap-2">
-							<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded font-black">Q</span>
+							<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
 							<span>Tôi có thể vừa học vừa làm được không?</span>
 						</h4>
 						<p class="text-slate-600 text-sm pl-7 leading-relaxed">

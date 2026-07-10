@@ -28,7 +28,7 @@ get_header();
 			if ( have_posts() ) :
 				while ( have_posts() ) : the_post();
 			?>
-					<article class="bg-white border border-slate-200 rounded p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+					<article class="bg-white border border-slate-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 						<div>
 							<span class="text-sm text-slate-400 block mb-2"><?php echo get_the_date( 'd/m/Y' ); ?></span>
 							<h3 class="font-extrabold text-slate-800 text-lg hover:text-brand-primary mb-3">
