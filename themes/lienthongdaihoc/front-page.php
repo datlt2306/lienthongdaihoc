@@ -332,7 +332,6 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 										<span class="text-yellow-400">★</span>
 										<span><?php echo esc_html( $rating ); ?> (<?php echo esc_html( $reviews ); ?> đánh giá)</span>
 									</div>
-									<p class="text-[11px] text-slate-500 mt-1 font-medium">Chỉ tiêu: <span class="font-bold text-slate-700"><?php echo esc_html( $target ); ?></span></p>
 								</div>
 								
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">

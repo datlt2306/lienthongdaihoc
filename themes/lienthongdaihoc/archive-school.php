@@ -36,7 +36,6 @@ get_header();
 					$en_name = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
 					$rating  = get_post_meta( $school_id, 'rating', true ) ?: '4.8';
 					$reviews = get_post_meta( $school_id, 'reviews_count', true ) ?: '256';
-					$target  = get_post_meta( $school_id, 'admission_target', true ) ?: '3.000';
 			?>
 					<div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 						<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
@@ -59,7 +58,6 @@ get_header();
 									<span class="text-yellow-400">★</span>
 									<span><?php echo esc_html( $rating ); ?> (<?php echo esc_html( $reviews ); ?> đánh giá)</span>
 								</div>
-								<p class="text-[11px] text-slate-500 mt-1 font-medium">Chỉ tiêu: <span class="font-bold text-slate-700"><?php echo esc_html( $target ); ?></span></p>
 							</div>
 							
 							<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
