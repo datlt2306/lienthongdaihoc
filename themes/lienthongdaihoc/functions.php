@@ -510,36 +510,7 @@ function ltdh_dynamic_menu_submenu_injection( $sorted_menu_items, $args ) {
 		if ( $title === 'trường liên kết' ) {
 			// No dropdown
 		} elseif ( $title === 'ngành học' ) {
-			$item->classes[] = 'menu-item-has-children';
-			
-			$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => -1, 'post_status' => 'publish' ] );
-			foreach ( $majors as $m ) {
-				$max_db_id++;
-				$sub_item = new stdClass();
-				$sub_item->ID = $max_db_id;
-				$sub_item->db_id = $max_db_id;
-				$sub_item->title = $m->post_title;
-				$sub_item->url = get_permalink( $m->ID );
-				$sub_item->menu_item_parent = $item->ID;
-				$sub_item->classes = [ 'menu-item', 'menu-item-type-post_type', 'menu-item-object-major' ];
-				$sub_item->type = 'post_type';
-				$sub_item->object = 'major';
-				$sub_item->object_id = $m->ID;
-				$sub_item->post_parent = 0;
-				$sub_item->post_title = $m->post_title;
-				$sub_item->post_status = 'publish';
-				$sub_item->post_type = 'nav_menu_item';
-				$sub_item->menu_order = 0;
-				$sub_item->target = '';
-				$sub_item->attr_title = '';
-				$sub_item->description = '';
-				$sub_item->xfn = '';
-				$sub_item->current = false;
-				$sub_item->current_item_parent = false;
-				$sub_item->current_item_ancestor = false;
-				
-				$new_items[] = $sub_item;
-			}
+			// No dropdown
 		} elseif ( $title === 'hệ đào tạo' ) {
 			// Remove any existing manual children of 'Hệ đào tạo'
 			$filtered_items = [];
@@ -596,8 +567,25 @@ function ltdh_dynamic_menu_submenu_injection( $sorted_menu_items, $args ) {
 add_action( 'pre_get_posts', 'ltdh_customize_archive_queries' );
 function ltdh_customize_archive_queries( $query ) {
 	if ( ! is_admin() && $query->is_main_query() ) {
-		if ( $query->is_post_type_archive( 'school' ) ) {
-			$query->set( 'posts_per_page', -1 );
+		if ( $query->is_post_type_archive( 'school' ) || $query->is_post_type_archive( 'major' ) ) {
+			$limit = isset( $_GET['limit'] ) ? intval( $_GET['limit'] ) : -1;
+			$valid_limits = [ 10, 20, 30, 50, 100, -1 ];
+			if ( in_array( $limit, $valid_limits, true ) ) {
+				$query->set( 'posts_per_page', $limit );
+			} else {
+				$query->set( 'posts_per_page', -1 );
+			}
+		}
+		if ( $query->is_post_type_archive( 'major' ) ) {
+			if ( ! empty( $_GET['nhom_nganh'] ) ) {
+				$query->set( 'tax_query', [
+					[
+						'taxonomy' => 'major_cat',
+						'field'    => 'slug',
+						'terms'    => sanitize_text_field( $_GET['nhom_nganh'] ),
+					]
+				] );
+			}
 		}
 	}
 }

@@ -280,6 +280,43 @@
         }
     },
     {
+        "key": "taxonomy_major_cat",
+        "title": "Nhóm ngành",
+        "active": true,
+        "taxonomy": "major_cat",
+        "object_type": [
+            "major"
+        ],
+        "label": "Nhóm ngành",
+        "singular_label": "Nhóm ngành",
+        "description": "Categories for majors",
+        "public": true,
+        "publicly_queryable": true,
+        "hierarchical": true,
+        "show_ui": true,
+        "show_in_menu": true,
+        "show_in_nav_menus": true,
+        "show_in_rest": true,
+        "show_admin_column": true,
+        "rewrite": true,
+        "rewrite_slug": "nhom-nganh",
+        "rewrite_with_front": false,
+        "rewrite_hierarchical": false,
+        "query_var": true,
+        "query_var_name": "",
+        "labels": {
+            "name": "Nhóm ngành",
+            "singular_name": "Nhóm ngành",
+            "menu_name": "Nhóm ngành",
+            "all_items": "Tất cả Nhóm ngành",
+            "edit_item": "Sửa Nhóm ngành",
+            "view_item": "Xem Nhóm ngành",
+            "update_item": "Cập nhật Nhóm ngành",
+            "add_new_item": "Thêm mới Nhóm ngành",
+            "new_item_name": "Tên Nhóm ngành mới"
+        }
+    },
+    {
         "key": "ui_options_page_ltdh_settings",
         "title": "Cấu hình Hệ thống",
         "menu_order": 0,

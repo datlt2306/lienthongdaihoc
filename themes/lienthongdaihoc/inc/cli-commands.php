@@ -137,6 +137,21 @@ class LTDH_CLI_Commands {
 		}
 		WP_CLI::success( 'Đã gieo mẫu taxonomy: Khu vực' );
 
+		// 4. Nhóm ngành (major_cat)
+		$major_cats = [
+			'Kinh tế - Quản lý'    => 'kinh-te-quan-ly',
+			'Kỹ thuật - Công nghệ' => 'ky-thuat-cong-nghe',
+			'Ngôn ngữ - Nhân văn'  => 'ngon-ngu-nhan-van',
+			'Nông lâm - Môi trường'=> 'nong-lam-moi-truong',
+			'Xã hội - Dịch vụ'     => 'xa-hoi-dich-vu',
+		];
+		foreach ( $major_cats as $name => $slug ) {
+			if ( ! term_exists( $slug, 'major_cat' ) ) {
+				wp_insert_term( $name, 'major_cat', [ 'slug' => $slug ] );
+			}
+		}
+		WP_CLI::success( 'Đã gieo mẫu taxonomy: Nhóm ngành' );
+
 		WP_CLI::success( 'Hoàn thành việc tạo danh mục.' );
 	}
 
@@ -334,6 +349,21 @@ class LTDH_CLI_Commands {
 				if ( ! $major_id ) {
 					continue;
 				}
+
+				// Determine Nhóm ngành category
+				$cat_slug = 'xa-hoi-dich-vu'; // Fallback
+				$m_lower = mb_strtolower( $m_name, 'UTF-8' );
+				if ( str_contains( $m_lower, 'kinh tế' ) || str_contains( $m_lower, 'quản trị' ) || str_contains( $m_lower, 'kế toán' ) || str_contains( $m_lower, 'thương mại' ) || str_contains( $m_lower, 'marketing' ) || str_contains( $m_lower, 'tài chính' ) || str_contains( $m_lower, 'bất động sản' ) || str_contains( $m_lower, 'quản lý công nghiệp' ) ) {
+					$cat_slug = 'kinh-te-quan-ly';
+				} elseif ( str_contains( $m_lower, 'công nghệ thông tin' ) || str_contains( $m_lower, 'điện tử' ) || str_contains( $m_lower, 'xây dựng' ) || str_contains( $m_lower, 'máy tính' ) || str_contains( $m_lower, 'tin học' ) || str_contains( $m_lower, 'viễn thông' ) || str_contains( $m_lower, 'cntt' ) ) {
+					$cat_slug = 'ky-thuat-cong-nghe';
+				} elseif ( str_contains( $m_lower, 'ngôn ngữ' ) || str_contains( $m_lower, 'tiếng anh' ) || str_contains( $m_lower, 'tiếng trung' ) || str_contains( $m_lower, 'nhân văn' ) ) {
+					$cat_slug = 'ngon-ngu-nhan-van';
+				} elseif ( str_contains( $m_lower, 'nông nghiệp' ) || str_contains( $m_lower, 'thực phẩm' ) || str_contains( $m_lower, 'môi trường' ) || str_contains( $m_lower, 'đất đai' ) || str_contains( $m_lower, 'thú y' ) || str_contains( $m_lower, 'sinh học' ) || str_contains( $m_lower, 'nông lâm' ) ) {
+					$cat_slug = 'nong-lam-moi-truong';
+				}
+
+				wp_set_object_terms( $major_id, $cat_slug, 'major_cat' );
 
 				$major_title = get_the_title( $major_id );
 				$major_code = get_post_meta( $major_id, 'major_code', true );
