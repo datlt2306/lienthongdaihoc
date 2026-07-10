@@ -27,7 +27,7 @@ if ( is_page() ) {
 } elseif ( is_singular( 'school' ) ) {
 	$banner_title    = get_the_title();
 	$banner_subtitle = 'Thông tin chi tiết về trường đào tạo liên kết';
-	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
+	$banner_image    = get_field( 'school_banner' ) ?: get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'major' ) ) {
 	$banner_title    = 'Ngành ' . get_the_title();
 	$banner_subtitle = 'Tìm hiểu chương trình đào tạo, cơ hội nghề nghiệp và thông tin tuyển sinh';
@@ -35,8 +35,16 @@ if ( is_page() ) {
 } elseif ( is_singular( 'program' ) ) {
 	$banner_title    = get_the_title();
 	$school_id       = get_field( 'school_relationship' );
+	if ( is_array( $school_id ) ) {
+		$school_id = ! empty( $school_id ) ? $school_id[0] : 0;
+	}
+	if ( is_object( $school_id ) ) {
+		$school_id = $school_id->ID;
+	}
+	$school_id = intval( $school_id );
+
 	$banner_subtitle = $school_id ? get_the_title( $school_id ) : 'Chương trình đào tạo chất lượng cao';
-	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
+	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: ( $school_id ? get_field( 'school_banner', $school_id ) : '' ) ?: '';
 } elseif ( is_post_type_archive( 'school' ) ) {
 	$banner_title    = 'Trường Đại học Liên kết';
 	$banner_subtitle = 'Hệ thống các trường đại học uy tín hàng đầu Việt Nam';

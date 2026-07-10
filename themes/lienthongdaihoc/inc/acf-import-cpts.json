@@ -314,6 +314,15 @@
                 "library": "all"
             },
             {
+                "key": "field_school_banner",
+                "label": "Banner Trường",
+                "name": "school_banner",
+                "type": "image",
+                "return_format": "url",
+                "preview_size": "medium",
+                "library": "all"
+            },
+            {
                 "key": "field_school_website",
                 "label": "Website chính thức",
                 "name": "website",

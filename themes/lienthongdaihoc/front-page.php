@@ -433,7 +433,79 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		</div>
 	</section>
 
-	<!-- 7. DOUBLE CERTIFICATE VALUE PROPOSITION -->
+	<!-- 7. STUDENT TESTIMONIALS ("ĐÁNH GIÁ CỦA HỌC VIÊN") -->
+	<section class="py-16 bg-white">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
+				<span class="text-[#2563EB] text-sm font-bold uppercase tracking-wider block">CẢM NHẬN HỌC VIÊN</span>
+				<h2 class="text-2xl md:text-3xl font-black text-slate-900">ĐÁNH GIÁ CỦA HỌC VIÊN</h2>
+				<p class="text-slate-500 text-sm">Hàng ngàn học viên đã tin tưởng và đồng hành cùng chúng tôi trên hành trình chinh phục tấm bằng đại học.</p>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				<!-- Testimonial 1 -->
+				<div class="bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
+					<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
+					<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"Mình đã học Văn bằng 2 CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi."</p>
+					<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
+						<div class="h-10 w-10 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-bold text-sm">NH</div>
+						<div>
+							<p class="font-bold text-sm text-slate-800">Nguyễn Hương</p>
+							<p class="text-xs text-slate-400">VB2 Công nghệ thông tin</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Testimonial 2 -->
+				<div class="bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
+					<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
+					<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy."</p>
+					<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
+						<div class="h-10 w-10 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-bold text-sm">TM</div>
+						<div>
+							<p class="font-bold text-sm text-slate-800">Trần Minh</p>
+							<p class="text-xs text-slate-400">Đại học Từ xa - Quản trị kinh doanh</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Testimonial 3 -->
+				<div class="bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
+					<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
+					<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận."</p>
+					<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
+						<div class="h-10 w-10 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-bold text-sm">LP</div>
+						<div>
+							<p class="font-bold text-sm text-slate-800">Lê Phương</p>
+							<p class="text-xs text-slate-400">Liên thông Đại học - Kế toán</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Stats Row -->
+			<div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+				<div class="text-center p-4 bg-blue-50 rounded-lg">
+					<span class="block font-display font-black text-2xl md:text-3xl text-[#2563EB]">1.200+</span>
+					<span class="text-sm text-slate-600 font-semibold">Học viên tin tưởng</span>
+				</div>
+				<div class="text-center p-4 bg-blue-50 rounded-lg">
+					<span class="block font-display font-black text-2xl md:text-3xl text-[#2563EB]">98%</span>
+					<span class="text-sm text-slate-600 font-semibold">Tỷ lệ hài lòng</span>
+				</div>
+				<div class="text-center p-4 bg-blue-50 rounded-lg">
+					<span class="block font-display font-black text-2xl md:text-3xl text-[#2563EB]">4.9/5</span>
+					<span class="text-sm text-slate-600 font-semibold">Đánh giá trung bình</span>
+				</div>
+				<div class="text-center p-4 bg-blue-50 rounded-lg">
+					<span class="block font-display font-black text-2xl md:text-3xl text-[#2563EB]">500+</span>
+					<span class="text-sm text-slate-600 font-semibold">Lượt đánh giá 5 sao</span>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- 8. DOUBLE CERTIFICATE VALUE PROPOSITION -->
 	<section class="py-16 bg-white">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
 			<!-- Box Left: BẰNG ĐẠO TẠO CHÍNH QUY -->
@@ -480,7 +552,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		</div>
 	</section>
 
-	<!-- 8. SEGMENTS SECTION ("CHƯƠNG TRÌNH PHÙ HỢP VỚI BẠN") -->
+	<!-- 9. SEGMENTS SECTION ("CHƯƠNG TRÌNH PHÙ HỢP VỚI BẠN") -->
 	<section class="py-16 bg-slate-50 border-y border-slate-100">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="text-center max-w-2xl mx-auto mb-12">
@@ -533,7 +605,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		</div>
 	</section>
 
-	<!-- 9. DYNAMIC CONSULTATION FORM SECTION ("ĐĂNG KÝ NHẬN TƯ VẤN MIỄN PHÍ") -->
+	<!-- 10. DYNAMIC CONSULTATION FORM SECTION ("ĐĂNG KÝ NHẬN TƯ VẤN MIỄN PHÍ") -->
 	<section id="register-section" class="py-16 bg-white">
 		<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 border border-slate-100 shadow-xl rounded-xl p-6 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-gradient-to-tr from-[#EFF6FF]/35 to-white">
 			<!-- Graduate photo column -->
@@ -598,7 +670,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		</div>
 	</section>
 
-	<!-- 10. NEWS RECENT SECTION ("TIN TỨC MỚI NHẤT") -->
+	<!-- 11. NEWS RECENT SECTION ("TIN TỨC MỚI NHẤT") -->
 	<section class="py-16 bg-slate-50 border-t border-slate-100">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex justify-between items-end mb-12">
