@@ -69,8 +69,27 @@
 					<li>
 						<a href="<?php echo esc_url( home_url( '/truong/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 border-transparent hover:border-brand-primary">Trường liên kết</a>
 					</li>
-					<li>
-						<a href="<?php echo esc_url( home_url( '/nganh/' ) ); ?>" class="hover:text-brand-primary transition-all py-2 border-b-2 border-transparent hover:border-brand-primary">Ngành học</a>
+					<li class="relative group">
+						<a href="<?php echo esc_url( home_url( '/nganh/' ) ); ?>" class="hover:text-brand-primary flex items-center gap-1 transition-all py-2">
+							Ngành học
+							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+							</svg>
+						</a>
+						<div class="absolute left-0 top-full hidden group-hover:block bg-white shadow-xl rounded-xl border border-slate-100 py-2 w-56 mt-1 z-50">
+							<?php
+							$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => 12, 'post_status' => 'publish' ] );
+							if ( ! empty( $majors ) ) {
+								foreach ( $majors as $m ) {
+									$clean_title = trim( preg_replace( '/\s*[\(\-][\s\S]*/', '', $m->post_title ) );
+									echo '<a href="' . esc_url( get_permalink( $m->ID ) ) . '" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-primary font-medium">' . esc_html( $clean_title ) . '</a>';
+								}
+							} else {
+								echo '<a href="#" class="block px-4 py-2 text-sm text-slate-400">Công nghệ thông tin</a>';
+								echo '<a href="#" class="block px-4 py-2 text-sm text-slate-400">Quản trị kinh doanh</a>';
+							}
+							?>
+						</div>
 					</li>
 					<li class="relative group">
 						<a href="#" class="hover:text-brand-primary flex items-center gap-1 transition-all py-2">

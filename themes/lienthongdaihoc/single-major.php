@@ -67,31 +67,6 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
 					</section>
 				<?php endif; ?>
 
-				<!-- SALARY INFORMATION & JOB MARKET -->
-				<?php if ( $salary || $market ) : ?>
-					<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Mức lương & Nhu cầu thị trường</h2>
-						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-							<?php if ( $salary ) : ?>
-								<div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-									<h3 class="font-bold text-slate-800 mb-2">Thống kê mức lương</h3>
-									<div class="prose prose-slate text-slate-600 text-sm">
-										<?php echo wp_kses_post( $salary ); ?>
-									</div>
-								</div>
-							<?php endif; ?>
-							<?php if ( $market ) : ?>
-								<div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-									<h3 class="font-bold text-slate-800 mb-2">Nhu cầu việc làm</h3>
-									<div class="prose prose-slate text-slate-600 text-sm">
-										<?php echo wp_kses_post( $market ); ?>
-									</div>
-								</div>
-							<?php endif; ?>
-						</div>
-					</section>
-				<?php endif; ?>
-
 				<!-- PROGRAMS FOR THIS MAJOR -->
 				<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Chương trình tuyển sinh ngành <?php the_title(); ?></h2>
@@ -124,17 +99,36 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
 							$prog_id = get_the_ID();
 							$school_rel_id = get_field( 'school_relationship', $prog_id );
 							$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Mời tư vấn';
+							$status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
 							?>
-							<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-slate-100 rounded-xl hover:border-brand-primary transition-all">
+							<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-slate-100 rounded-xl hover:border-[#2563EB] transition-all">
 								<div class="space-y-1">
-									<h4 class="font-bold text-slate-800 text-base hover:text-brand-primary transition-colors">
+									<h4 class="font-bold text-slate-800 text-base hover:text-[#2563EB] transition-colors flex items-center gap-2 flex-wrap">
 										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+										<?php if ( $status === 'tam-ngung' ) : ?>
+											<span class="bg-rose-100 text-rose-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Tạm ngưng</span>
+										<?php else : ?>
+											<span class="bg-green-100 text-green-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Đang tuyển</span>
+										<?php endif; ?>
 									</h4>
-									<p class="text-sm text-slate-500">Trường đào tạo: <span class="font-semibold"><?php echo esc_html( $school_name ); ?></span> | Học phí: <?php echo esc_html( get_field( 'tuition_fee' ) ?: 'Liên hệ' ); ?></p>
+									<p class="text-sm text-slate-500">Trường đào tạo: 
+										<?php if ( $school_rel_id ) : ?>
+											<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>" class="font-bold text-[#2563EB] hover:underline"><?php echo esc_html( $school_name ); ?></a>
+										<?php else : ?>
+											<span class="font-semibold text-slate-700"><?php echo esc_html( $school_name ); ?></span>
+										<?php endif; ?>
+										| Học phí: <span class="font-semibold text-slate-700"><?php echo esc_html( get_field( 'tuition_fee' ) ?: 'Liên hệ' ); ?></span>
+									</p>
 								</div>
-								<a href="<?php the_permalink(); ?>" class="mt-3 sm:mt-0 bg-brand-primary text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-teal-700 transition-all">
-									Xem lớp học
-								</a>
+								<?php if ( $status === 'tam-ngung' ) : ?>
+									<a href="<?php the_permalink(); ?>" class="mt-3 sm:mt-0 bg-slate-100 text-slate-500 px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-200 transition-all">
+										Chi tiết
+									</a>
+								<?php else : ?>
+									<a href="<?php the_permalink(); ?>" class="mt-3 sm:mt-0 bg-[#2563EB] text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-[#1E40AF] transition-all">
+										Chi tiết
+									</a>
+								<?php endif; ?>
 							</div>
 							<?php
 						endwhile;
