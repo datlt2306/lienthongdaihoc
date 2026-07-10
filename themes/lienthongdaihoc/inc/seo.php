@@ -143,3 +143,82 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 	}
 	return $crumbs;
 }
+
+// ----------------------------------------------------
+// 5. Dynamic Title & Description for Comparison Pages
+// ----------------------------------------------------
+add_filter( 'rank_math/frontend/title', 'ltdh_seo_compare_title' );
+add_filter( 'rank_math/frontend/description', 'ltdh_seo_compare_description' );
+
+function ltdh_seo_compare_title( $title ) {
+	$type = get_query_var( 'ltdh_compare' );
+	if ( ! $type ) {
+		return $title;
+	}
+
+	$items = ltdh_compare_get_items();
+	if ( count( $items ) < 2 ) {
+		return $title;
+	}
+
+	$names = array_map( function( $item ) { return $item['title']; }, $items );
+	$type_labels = [ 'program' => 'chương trình', 'school' => 'trường' ];
+	$type_label  = $type_labels[ $type ] ?? 'chương trình';
+
+	return sprintf( 'So sánh %s %s | LTDH', implode( ' vs ', $names ), $type_label );
+}
+
+function ltdh_seo_compare_description( $desc ) {
+	$type = get_query_var( 'ltdh_compare' );
+	if ( ! $type ) {
+		return $desc;
+	}
+
+	$items = ltdh_compare_get_items();
+	if ( count( $items ) < 2 ) {
+		return $desc;
+	}
+
+	$names = array_map( function( $item ) { return $item['title']; }, $items );
+	return sprintf(
+		'So sánh chi tiết %s. Xem học phí, thời gian đào tạo, điều kiện tuyển sinh và cơ hội việc làm.',
+		implode( ', ', $names )
+	);
+}
+
+// ----------------------------------------------------
+// 6. JSON-LD Schema for Comparison Pages
+// ----------------------------------------------------
+add_filter( 'rank_math/json_ld', 'ltdh_seo_compare_schema', 99, 2 );
+
+function ltdh_seo_compare_schema( $data, $json_ld ) {
+	$type = get_query_var( 'ltdh_compare' );
+	if ( ! $type || $type !== 'program' ) {
+		return $data;
+	}
+
+	$items = ltdh_compare_get_items();
+	if ( count( $items ) < 2 ) {
+		return $data;
+	}
+
+	// Add Course schema for each compared program
+	foreach ( $items as $index => $item ) {
+		$school_name = $item['school'] ? $item['school']['title'] : 'Liên kết';
+		$school_url  = $item['school'] && $item['school']['website'] ? $item['school']['website'] : home_url( '/' );
+
+		$data[ 'ltdh_compare_course_' . $index ] = [
+			'@context'    => 'https://schema.org',
+			'@type'       => 'Course',
+			'name'        => $item['title'],
+			'description' => $item['excerpt'] ?: 'Chương trình đào tạo đại học.',
+			'provider'    => [
+				'@type' => 'CollegeOrUniversity',
+				'name'  => $school_name,
+				'url'   => $school_url,
+			],
+		];
+	}
+
+	return $data;
+}

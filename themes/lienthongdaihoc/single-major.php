@@ -29,7 +29,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		
 		<!-- HERO SECTION -->
-		<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
+		<section class="bg-white rounded shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
 			<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
 				<div class="space-y-2">
 					<span class="inline-block bg-teal-50 text-brand-primary text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider">
@@ -40,9 +40,11 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					</h1>
 					<p class="text-slate-500 text-sm font-medium">Mã ngành: <?php echo esc_html( $major_code ?: 'Đang cập nhật' ); ?></p>
 				</div>
-				<a href="#register" class="w-full md:w-auto bg-brand-primary text-white text-center px-6 py-2.5 rounded-lg font-bold shadow-md hover:bg-teal-700 transition-all text-sm">
-					Tư Vấn Hướng Nghiệp
-				</a>
+				<div class="flex flex-col gap-2 w-full md:w-auto">
+					<a href="#register" class="w-full md:w-auto bg-brand-primary text-white text-center px-6 py-2.5 rounded-lg font-bold shadow-md hover:bg-teal-700 transition-all text-sm">
+						Tư Vấn Hướng Nghiệp
+					</a>
+				</div>
 			</div>
 		</section>
 
@@ -51,7 +53,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 			<div class="lg:col-span-2 space-y-8">
 				
 				<!-- OVERVIEW -->
-				<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+				<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan về ngành</h2>
 					<div class="prose prose-slate max-w-none text-slate-600 text-sm md:text-base">
 						<?php the_content(); ?>
@@ -60,7 +62,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 
 				<!-- CAREER OPPORTUNITIES -->
 				<?php if ( $career ) : ?>
-					<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+					<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Cơ hội nghề nghiệp & Định hướng</h2>
 						<div class="prose prose-slate max-w-none text-slate-600 text-sm">
 							<?php echo wp_kses_post( $career ); ?>
@@ -69,7 +71,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 				<?php endif; ?>
 
 				<!-- PROGRAMS FOR THIS MAJOR -->
-				<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+				<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Chương trình tuyển sinh ngành <?php the_title(); ?></h2>
 					
 					<?php
@@ -162,7 +164,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 				</section>
 
 				<!-- SCHOOLS OFFERING THIS MAJOR -->
-				<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+				<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Các trường đào tạo ngành này</h2>
 					<?php
 					$distinct_school_ids = [];
@@ -234,7 +236,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 				<div class="sticky top-24 space-y-6">
 					
 					<!-- CONSULTATION FORM -->
-					<section id="register" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+					<section id="register" class="bg-white rounded shadow-sm border border-slate-100 p-6">
 						<h3 class="text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn ngành <?php the_title(); ?></h3>
 						<p class="text-sm text-slate-500 mb-4">Để lại thông tin, ban tuyển sinh sẽ gửi danh sách trường đào tạo phù hợp nhất với học lực và thời gian của bạn.</p>
 						
@@ -264,7 +266,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					</section>
 
 					<!-- CONTACT INFO CARD -->
-					<div class="bg-brand-primary/5 border border-brand-primary/10 rounded-2xl p-6 text-center">
+					<div class="bg-brand-primary/5 border border-brand-primary/10 rounded p-6 text-center">
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Ban hướng nghiệp</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $hotline ); ?></h4>
 						<div class="flex gap-2">

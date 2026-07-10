@@ -150,6 +150,11 @@
 		.nav-mobile-menu .current_page_item > a {
 			color: #2563EB;
 		}
+		.nav-mobile-menu .menu-item-has-children > a::after {
+			content: ' ▾';
+			font-size: 0.75rem;
+			margin-left: 0.25rem;
+		}
 		.nav-mobile-menu ul.sub-menu {
 			list-style: none;
 			padding-left: 1rem;
@@ -161,6 +166,18 @@
 		.nav-mobile-menu ul.sub-menu a {
 			font-weight: 500;
 			color: #64748b;
+		}
+		
+		/* Arrow styling for desktop */
+		.nav-primary-menu .menu-item-has-children > a::after {
+			content: ' ▾';
+			font-size: 0.75rem;
+			margin-left: 0.25rem;
+			display: inline-block;
+			transition: transform 0.2s;
+		}
+		.nav-primary-menu .menu-item-has-children:hover > a::after {
+			transform: rotate(180deg);
 		}
 	</style>
 	<?php wp_head(); ?>
@@ -193,14 +210,14 @@
 					'fallback_cb'    => 'ltdh_default_primary_menu',
 				] );
 				?>
-				<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>" class="bg-brand-primary text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-md shadow-brand-primary/20 hover:bg-[#1E40AF] hover:shadow-lg transition-all tracking-wide">
-					ĐĂNG KÝ TƯ VẤN
+				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-primary text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-md shadow-brand-primary/20 hover:bg-[#1E40AF] hover:shadow-lg transition-all tracking-wide">
+					TƯ VẤN NGAY
 				</a>
 			</nav>
 
 			<!-- Mobile Toggle -->
 			<div class="flex lg:hidden items-center">
-				<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>" class="bg-brand-primary text-white px-4 py-2 rounded-full text-sm font-bold mr-3">Tư vấn</a>
+				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-primary text-white px-4 py-2 rounded-full text-sm font-bold mr-3">Tư vấn</a>
 				<button id="mobile-menu-toggle" class="text-slate-600 hover:text-brand-primary focus:outline-none">
 					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -219,8 +236,8 @@
 				'fallback_cb'    => 'ltdh_default_mobile_menu',
 			] );
 			?>
-			<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>" class="block w-full text-center bg-brand-primary text-white py-3 rounded-full font-bold text-sm">
-				ĐĂNG KÝ TƯ VẤN
+			<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="block w-full text-center bg-brand-primary text-white py-3 rounded-full font-bold text-sm">
+				TƯ VẤN NGAY
 			</a>
 		</div>
 	</header>

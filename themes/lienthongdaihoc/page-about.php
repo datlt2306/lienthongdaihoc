@@ -28,11 +28,11 @@ get_header();
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
-				<div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+				<div class="bg-slate-50 p-6 rounded border border-slate-100">
 					<h3 class="font-bold text-slate-800 text-lg mb-2">Giá trị cốt lõi</h3>
 					<p class="text-sm text-slate-500">Đặt chất lượng thông tin lên hàng đầu. Đảm bảo tính chính quy, minh bạch của dữ liệu tuyển sinh từ các trường.</p>
 				</div>
-				<div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+				<div class="bg-slate-50 p-6 rounded border border-slate-100">
 					<h3 class="font-bold text-slate-800 text-lg mb-2">Tầm nhìn chiến lược</h3>
 					<p class="text-sm text-slate-500">Mở rộng liên kết với hơn 50+ trường đại học chính quy, hỗ trợ giải đáp lộ trình học cho hàng chục ngàn học viên mỗi năm.</p>
 				</div>

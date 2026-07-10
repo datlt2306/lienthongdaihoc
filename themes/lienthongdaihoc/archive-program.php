@@ -88,8 +88,8 @@ $query = new WP_Query( $args );
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
 		<!-- Filter Panel -->
-		<section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-			<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+		<section class="bg-white p-6 rounded shadow-sm border border-slate-200 mb-8">
+			<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 				<div>
 					<label class="block text-sm font-bold text-slate-700 mb-1">Từ khóa tìm kiếm</label>
 					<input type="text" name="s" value="<?php echo esc_attr( $selected_search ); ?>" placeholder="Tìm tên chương trình..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-base focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium" />
@@ -136,15 +136,6 @@ $query = new WP_Query( $args );
 						?>
 					</select>
 				</div>
-
-				<div class="flex gap-2 w-full">
-					<button type="submit" class="flex-1 bg-[#2563EB] text-white py-3 rounded-xl font-bold hover:bg-[#1E40AF] transition-all text-sm uppercase tracking-wider">
-						TÌM KIẾM
-					</button>
-					<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-all text-sm uppercase text-center flex items-center justify-center shrink-0" title="Reset bộ lọc">
-						🔄
-					</a>
-				</div>
 			</form>
 		</section>
 
@@ -166,7 +157,11 @@ $query = new WP_Query( $args );
 					$types = wp_get_post_terms( $prog_id, 'training_type' );
 					$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : 'Chưa xác định';
 					?>
-					<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+					<div class="bg-white border border-slate-200 rounded overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+						 data-compare-btn data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
+						 data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
+						 data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
+						 data-compare-thumb="<?php echo esc_url( $major_thumb ); ?>">
 						<div class="h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>');"></div>
 						<div class="p-6 flex-1 flex flex-col justify-between">
 							<?php
@@ -197,7 +192,15 @@ $query = new WP_Query( $args );
 							</div>
 
 							<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-								<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
+								<div class="flex items-center gap-2">
+									<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
+									<button type="button" class="ltdh-compare-toggle text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg px-2.5 py-1 transition-all"
+											data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
+											data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
+											data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>">
+										So sánh
+									</button>
+								</div>
 								<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#1E40AF] transition-all">Đăng ký học</a>
 							</div>
 						</div>

@@ -108,7 +108,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						</div>
 
 						<!-- Floating Badges like in Image -->
-						<div class="absolute bottom-10 left-0 bg-white p-3 rounded-2xl shadow-lg border border-slate-100 flex items-center gap-3 animate-bounce">
+						<div class="absolute bottom-10 left-0 bg-white p-3 rounded shadow-lg border border-slate-100 flex items-center gap-3 animate-bounce">
 							<span class="text-2xl">🎓</span>
 							<div class="leading-none text-left">
 								<span class="block text-sm font-black text-slate-800">50+ Đối tác</span>
@@ -188,7 +188,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				<!-- Laptop student illustration representation -->
 				<div class="lg:col-span-5 flex justify-center">
 					<div class="relative w-full max-w-sm aspect-video sm:aspect-square bg-slate-50 border border-slate-100 rounded-3xl p-4 shadow-inner overflow-hidden">
-						<div class="w-full h-full bg-cover bg-center rounded-2xl" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=500');"></div>
+						<div class="w-full h-full bg-cover bg-center rounded" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=500');"></div>
 					</div>
 				</div>
 
@@ -311,7 +311,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						$reviews = get_post_meta( $school_id, 'reviews_count', true ) ?: '256';
 						$target  = get_post_meta( $school_id, 'admission_target', true ) ?: '3.000';
 				?>
-						<div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+						<div class="bg-white border border-slate-100 rounded overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 							<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
 							
 							<!-- Logo Overlay -->
@@ -360,27 +360,27 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-				<div class="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 text-center shadow-sm">
+				<div class="bg-slate-50/50 border border-slate-100 rounded p-6 text-center shadow-sm">
 					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-full mx-auto mb-3 text-lg">👥</div>
 					<h4 class="font-bold text-sm text-slate-800 mb-1">Đội ngũ chuyên gia</h4>
 					<p class="text-sm text-slate-500">Giàu kinh nghiệm, nhiệt tình và tận tâm tư vấn.</p>
 				</div>
-				<div class="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 text-center shadow-sm">
+				<div class="bg-slate-50/50 border border-slate-100 rounded p-6 text-center shadow-sm">
 					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-full mx-auto mb-3 text-lg">📞</div>
 					<h4 class="font-bold text-sm text-slate-800 mb-1">Tư vấn 1:1 miễn phí</h4>
 					<p class="text-sm text-slate-500">Lắng nghe và thấu hiểu nhu cầu của từng học viên.</p>
 				</div>
-				<div class="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 text-center shadow-sm">
+				<div class="bg-slate-50/50 border border-slate-100 rounded p-6 text-center shadow-sm">
 					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-full mx-auto mb-3 text-lg">📈</div>
 					<h4 class="font-bold text-sm text-slate-800 mb-1">Lộ trình cá nhân hóa</h4>
 					<p class="text-sm text-slate-500">Phù hợp tối đa với năng lực và mục tiêu sự nghiệp.</p>
 				</div>
-				<div class="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 text-center shadow-sm">
+				<div class="bg-slate-50/50 border border-slate-100 rounded p-6 text-center shadow-sm">
 					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-full mx-auto mb-3 text-lg">🛡</div>
 					<h4 class="font-bold text-sm text-slate-800 mb-1">Hỗ trợ toàn diện</h4>
 					<p class="text-sm text-slate-500">Từ định hướng chọn trường đến hoàn thiện hồ sơ.</p>
 				</div>
-				<div class="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 text-center shadow-sm">
+				<div class="bg-slate-50/50 border border-slate-100 rounded p-6 text-center shadow-sm">
 					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-full mx-auto mb-3 text-lg">🎯</div>
 					<h4 class="font-bold text-sm text-slate-800 mb-1">Tỷ lệ thành công cao</h4>
 					<p class="text-sm text-slate-500">Hàng ngàn học viên đã và đang đạt được tấm bằng mơ ước.</p>
@@ -425,7 +425,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				
 				<!-- Graduate image representation placeholder -->
 				<div class="lg:col-span-5 hidden lg:block">
-					<div class="relative w-full max-w-sm aspect-[4/3] rounded-2xl overflow-hidden border-4 border-white/10 shadow-2xl">
+					<div class="relative w-full max-w-sm aspect-[4/3] rounded overflow-hidden border-4 border-white/10 shadow-2xl">
 						<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=400');"></div>
 					</div>
 				</div>
@@ -437,7 +437,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	<section class="py-16 bg-white">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
 			<!-- Box Left: BẰNG ĐẠO TẠO CHÍNH QUY -->
-			<div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
+			<div class="bg-slate-50 border border-slate-100 rounded p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
 				<div class="flex-1 space-y-4">
 					<span class="bg-[#EFF6FF] text-[#2563EB] text-sm font-black px-3 py-1 rounded-full uppercase tracking-wider inline-block">BẰNG CẤP TƯƠNG ĐƯƠNG</span>
 					<h3 class="font-extrabold text-xl text-slate-900 leading-tight">BẰNG ĐẠO TẠO CHÍNH QUY</h3>
@@ -458,7 +458,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			</div>
 
 			<!-- Box Right: SUỐT ĐỜI TRÊN TOÀN QUỐC -->
-			<div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
+			<div class="bg-slate-50 border border-slate-100 rounded p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
 				<div class="flex-1 space-y-4">
 					<span class="bg-blue-50 text-blue-800 text-sm font-black px-3 py-1 rounded-full uppercase tracking-wider inline-block">BẰNG CÓ GIÁ TRỊ SỬ DỤNG</span>
 					<h3 class="font-extrabold text-xl text-slate-900 leading-tight">SUỐT ĐỜI TRÊN TOÀN QUỐC</h3>
@@ -490,7 +490,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 			<div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
 				<!-- Segment 1 -->
-				<div class="bg-white border border-slate-100 rounded-2xl p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-xl overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-extrabold text-slate-800 text-sm">Cho người đi làm</h4>
@@ -498,7 +498,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</div>
 				</div>
 				<!-- Segment 2 -->
-				<div class="bg-white border border-slate-100 rounded-2xl p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-xl overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-extrabold text-slate-800 text-sm">Cho học sinh lớp 12</h4>
@@ -506,7 +506,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</div>
 				</div>
 				<!-- Segment 3 -->
-				<div class="bg-white border border-slate-100 rounded-2xl p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-xl overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-extrabold text-slate-800 text-sm">Cho người muốn liên thông</h4>
@@ -514,7 +514,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</div>
 				</div>
 				<!-- Segment 4 -->
-				<div class="bg-white border border-slate-100 rounded-2xl p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-xl overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-extrabold text-slate-800 text-sm">Cho người muốn chuyển ngành</h4>
@@ -522,7 +522,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</div>
 				</div>
 				<!-- Segment 5 -->
-				<div class="bg-white border border-slate-100 rounded-2xl p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-xl overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-extrabold text-slate-800 text-sm">Cho người học văn bằng 2</h4>
@@ -538,7 +538,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 border border-slate-100 shadow-xl rounded-3xl p-6 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-gradient-to-tr from-[#EFF6FF]/35 to-white">
 			<!-- Graduate photo column -->
 			<div class="lg:col-span-5 hidden lg:block">
-				<div class="h-[400px] w-full rounded-2xl overflow-hidden bg-slate-200 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=500');"></div>
+				<div class="h-[400px] w-full rounded overflow-hidden bg-slate-200 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=500');"></div>
 			</div>
 
 			<!-- Registration form column -->
@@ -631,7 +631,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						$categories = get_the_category( $post_id );
 						$category_name = ! empty( $categories ) ? $categories[0]->name : 'Tin tuyển sinh';
 				?>
-						<div class="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
+						<div class="bg-white border border-slate-100 rounded overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
 							<div class="h-36 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
 							<div class="p-4 flex-1 flex flex-col justify-between">
 								<div class="space-y-2">
@@ -656,7 +656,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				if ( ! $news_has_posts ) {
 					foreach ( $mock_news as $n ) :
 				?>
-						<div class="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
+						<div class="bg-white border border-slate-100 rounded overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
 							<div class="h-32 bg-slate-200 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=250');"></div>
 							<div class="p-4 flex-1 flex flex-col justify-between">
 								<div class="space-y-2">

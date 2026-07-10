@@ -27,7 +27,7 @@ get_header();
 						$thumb = get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg';
 					}
 			?>
-					<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+					<div class="bg-white border border-slate-200 rounded overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 						<div class="h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb ); ?>');"></div>
 						<div class="p-6 flex-1 flex flex-col justify-between">
 							<div>
@@ -38,9 +38,9 @@ get_header();
 								<p class="text-sm text-slate-500 line-clamp-3 mb-6"><?php the_excerpt(); ?></p>
 							</div>
 
-							<div class="border-t border-slate-100 pt-4 mt-auto">
-								<a href="<?php the_permalink(); ?>" class="text-[#2563EB] font-bold text-sm hover:underline block text-right">Tìm hiểu cơ hội việc làm →</a>
-							</div>
+						<div class="border-t border-slate-100 pt-4 mt-auto flex justify-between items-center">
+							<a href="<?php the_permalink(); ?>" class="text-[#2563EB] font-bold text-sm hover:underline">Tìm hiểu →</a>
+						</div>
 						</div>
 					</div>
 			<?php

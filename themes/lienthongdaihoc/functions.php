@@ -62,8 +62,23 @@ function ltdh_enqueue_assets() {
 	}
 
 	wp_localize_script( $script_handle, 'ltdh_ajax', [
-		'ajax_url' => admin_url( 'admin-ajax.php' )
+		'ajax_url'      => admin_url( 'admin-ajax.php' ),
+		'compare_nonce' => wp_create_nonce( 'ltdh_compare_nonce' ),
 	] );
+
+	// Compare JS
+	wp_enqueue_script( 'ltdh-compare-js', get_template_directory_uri() . '/assets/js/compare.js', [], '1.0.0', true );
+}
+
+/**
+ * Output the floating compare tray on all frontend pages.
+ */
+add_action( 'wp_footer', 'ltdh_compare_output_tray' );
+function ltdh_compare_output_tray() {
+	if ( is_admin() ) {
+		return;
+	}
+	get_template_part( 'template-parts/compare/tray' );
 }
 
 // ----------------------------------------------------
@@ -145,6 +160,9 @@ $ltdh_modules = [
 	'inc/seo.php',
 	'inc/cli-commands.php',
 	'inc/search-engine.php',
+	'inc/comparison.php',
+	'inc/eligibility.php',
+	'inc/eligibility-rules.php',
 ];
 
 foreach ( $ltdh_modules as $module ) {
@@ -170,16 +188,60 @@ function ltdh_redirect_taxonomy_base() {
 	}
 }
 
+// ----------------------------------------------------
+// 5. Flush Rewrite Rules on Theme Activation
+// ----------------------------------------------------
+add_action( 'after_switch_theme', 'ltdh_flush_rewrite_rules' );
+function ltdh_flush_rewrite_rules() {
+	flush_rewrite_rules();
+}
+
 /**
  * Fallback menu for desktop primary header navigation
  */
 function ltdh_default_primary_menu() {
+	$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => 5 ] );
+	$majors  = get_posts( [ 'post_type' => 'major', 'numberposts' => 5 ] );
+	$types   = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
 	?>
 	<ul class="nav-primary-menu">
 		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Trang chủ</a></li>
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>">Trường liên kết</a></li>
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>">Ngành học</a></li>
+		
+		<li class="menu-item menu-item-has-children">
+			<a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>">Trường liên kết</a>
+			<?php if ( ! empty( $schools ) ) : ?>
+				<ul class="sub-menu">
+					<?php foreach ( $schools as $s ) : ?>
+						<li class="menu-item"><a href="<?php echo esc_url( get_permalink( $s->ID ) ); ?>"><?php echo esc_html( $s->post_title ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</li>
+
+		<li class="menu-item menu-item-has-children">
+			<a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>">Ngành học</a>
+			<?php if ( ! empty( $majors ) ) : ?>
+				<ul class="sub-menu">
+					<?php foreach ( $majors as $m ) : ?>
+						<li class="menu-item"><a href="<?php echo esc_url( get_permalink( $m->ID ) ); ?>"><?php echo esc_html( $m->post_title ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</li>
+
+		<li class="menu-item menu-item-has-children">
+			<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>">Hệ đào tạo</a>
+			<?php if ( ! empty( $types ) && ! is_wp_error( $types ) ) : ?>
+				<ul class="sub-menu">
+					<?php foreach ( $types as $t ) : ?>
+						<li class="menu-item"><a href="<?php echo esc_url( home_url( '/chuong-trinh/?he=' . $t->slug ) ); ?>"><?php echo esc_html( $t->name ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</li>
+
 		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>">Tin tức</a></li>
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>">Kiểm tra điều kiện</a></li>
 	</ul>
 	<?php
 }
@@ -188,12 +250,48 @@ function ltdh_default_primary_menu() {
  * Fallback menu for mobile navigation
  */
 function ltdh_default_mobile_menu() {
+	$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => 5 ] );
+	$majors  = get_posts( [ 'post_type' => 'major', 'numberposts' => 5 ] );
+	$types   = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
 	?>
 	<ul class="nav-mobile-menu">
 		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Trang chủ</a></li>
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>">Trường liên kết</a></li>
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>">Ngành học</a></li>
+		
+		<li class="menu-item menu-item-has-children">
+			<a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>">Trường liên kết</a>
+			<?php if ( ! empty( $schools ) ) : ?>
+				<ul class="sub-menu">
+					<?php foreach ( $schools as $s ) : ?>
+						<li class="menu-item"><a href="<?php echo esc_url( get_permalink( $s->ID ) ); ?>"><?php echo esc_html( $s->post_title ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</li>
+
+		<li class="menu-item menu-item-has-children">
+			<a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>">Ngành học</a>
+			<?php if ( ! empty( $majors ) ) : ?>
+				<ul class="sub-menu">
+					<?php foreach ( $majors as $m ) : ?>
+						<li class="menu-item"><a href="<?php echo esc_url( get_permalink( $m->ID ) ); ?>"><?php echo esc_html( $m->post_title ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</li>
+
+		<li class="menu-item menu-item-has-children">
+			<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>">Hệ đào tạo</a>
+			<?php if ( ! empty( $types ) && ! is_wp_error( $types ) ) : ?>
+				<ul class="sub-menu">
+					<?php foreach ( $types as $t ) : ?>
+						<li class="menu-item"><a href="<?php echo esc_url( home_url( '/chuong-trinh/?he=' . $t->slug ) ); ?>"><?php echo esc_html( $t->name ); ?></a></li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</li>
+
 		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>">Tin tức</a></li>
+		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>">Kiểm tra điều kiện</a></li>
 	</ul>
 	<?php
 }
@@ -334,7 +432,11 @@ function ltdh_ajax_filter_programs() {
 			$groups = get_post_meta( $prog_id, 'admission_groups', true );
 			$learning_details = ltdh_get_program_learning_details( $prog_id );
 			?>
-			<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+			<div class="bg-white border border-slate-200 rounded overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+				 data-compare-btn data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
+				 data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
+				 data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
+				 data-compare-thumb="<?php echo esc_url( $major_thumb ); ?>">
 				<div class="h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>');"></div>
 				<div class="p-6 flex-1 flex flex-col justify-between">
 					<div>
@@ -358,7 +460,15 @@ function ltdh_ajax_filter_programs() {
 					</div>
 
 					<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-						<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
+						<div class="flex items-center gap-2">
+							<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
+							<button type="button" class="ltdh-compare-toggle text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg px-2.5 py-1 transition-all"
+									data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
+									data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
+									data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>">
+								So sánh
+							</button>
+						</div>
 						<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#1E40AF] transition-all">Đăng ký học</a>
 					</div>
 				</div>
@@ -372,6 +482,139 @@ function ltdh_ajax_filter_programs() {
 	$html = ob_get_clean();
 
 	wp_send_json_success( [ 'html' => $html ] );
+}
+
+/**
+ * Dynamically inject submenus for Trường liên kết, Ngành học, and Hệ đào tạo
+ * into the WordPress primary menu, even if it is configured via the WP Admin Menu UI.
+ */
+add_filter( 'wp_nav_menu_objects', 'ltdh_dynamic_menu_submenu_injection', 10, 2 );
+function ltdh_dynamic_menu_submenu_injection( $sorted_menu_items, $args ) {
+	if ( ! in_array( $args->theme_location, [ 'primary-menu' ], true ) ) {
+		return $sorted_menu_items;
+	}
+
+	$new_items = [];
+	$max_db_id = 0;
+	foreach ( $sorted_menu_items as $item ) {
+		if ( $item->ID > $max_db_id ) {
+			$max_db_id = $item->ID;
+		}
+	}
+
+	foreach ( $sorted_menu_items as $item ) {
+		$new_items[] = $item;
+		$title = mb_strtolower( trim( $item->title ), 'UTF-8' );
+
+		// Only inject if the item does not already have children manually configured
+		if ( $title === 'trường liên kết' ) {
+			$item->classes[] = 'menu-item-has-children';
+			
+			$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => 10, 'post_status' => 'publish' ] );
+			foreach ( $schools as $s ) {
+				$max_db_id++;
+				$sub_item = new stdClass();
+				$sub_item->ID = $max_db_id;
+				$sub_item->db_id = $max_db_id;
+				$sub_item->title = $s->post_title;
+				$sub_item->url = get_permalink( $s->ID );
+				$sub_item->menu_item_parent = $item->ID;
+				$sub_item->classes = [ 'menu-item', 'menu-item-type-post_type', 'menu-item-object-school' ];
+				$sub_item->type = 'post_type';
+				$sub_item->object = 'school';
+				$sub_item->object_id = $s->ID;
+				$sub_item->post_parent = 0;
+				$sub_item->post_title = $s->post_title;
+				$sub_item->post_status = 'publish';
+				$sub_item->post_type = 'nav_menu_item';
+				$sub_item->menu_order = 0;
+				$sub_item->target = '';
+				$sub_item->attr_title = '';
+				$sub_item->description = '';
+				$sub_item->xfn = '';
+				$sub_item->current = false;
+				$sub_item->current_item_parent = false;
+				$sub_item->current_item_ancestor = false;
+				
+				$new_items[] = $sub_item;
+			}
+		} elseif ( $title === 'ngành học' ) {
+			$item->classes[] = 'menu-item-has-children';
+			
+			$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => 10, 'post_status' => 'publish' ] );
+			foreach ( $majors as $m ) {
+				$max_db_id++;
+				$sub_item = new stdClass();
+				$sub_item->ID = $max_db_id;
+				$sub_item->db_id = $max_db_id;
+				$sub_item->title = $m->post_title;
+				$sub_item->url = get_permalink( $m->ID );
+				$sub_item->menu_item_parent = $item->ID;
+				$sub_item->classes = [ 'menu-item', 'menu-item-type-post_type', 'menu-item-object-major' ];
+				$sub_item->type = 'post_type';
+				$sub_item->object = 'major';
+				$sub_item->object_id = $m->ID;
+				$sub_item->post_parent = 0;
+				$sub_item->post_title = $m->post_title;
+				$sub_item->post_status = 'publish';
+				$sub_item->post_type = 'nav_menu_item';
+				$sub_item->menu_order = 0;
+				$sub_item->target = '';
+				$sub_item->attr_title = '';
+				$sub_item->description = '';
+				$sub_item->xfn = '';
+				$sub_item->current = false;
+				$sub_item->current_item_parent = false;
+				$sub_item->current_item_ancestor = false;
+				
+				$new_items[] = $sub_item;
+			}
+		} elseif ( $title === 'hệ đào tạo' ) {
+			// Remove any existing manual children of 'Hệ đào tạo'
+			$filtered_items = [];
+			foreach ( $new_items as $k => $ni ) {
+				if ( (int) $ni->menu_item_parent === (int) $item->ID ) {
+					continue;
+				}
+				$filtered_items[] = $ni;
+			}
+			$new_items = $filtered_items;
+
+			$item->classes[] = 'menu-item-has-children';
+			$types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
+			if ( ! is_wp_error( $types ) ) {
+				foreach ( $types as $t ) {
+					$max_db_id++;
+					$sub_item = new stdClass();
+					$sub_item->ID = $max_db_id;
+					$sub_item->db_id = $max_db_id;
+					$sub_item->title = $t->name;
+					$sub_item->url = home_url( '/chuong-trinh/?he=' . $t->slug );
+					$sub_item->menu_item_parent = $item->ID;
+					$sub_item->classes = [ 'menu-item', 'menu-item-type-taxonomy', 'menu-item-object-training_type' ];
+					$sub_item->type = 'taxonomy';
+					$sub_item->object = 'training_type';
+					$sub_item->object_id = $t->term_id;
+					$sub_item->post_parent = 0;
+					$sub_item->post_title = $t->name;
+					$sub_item->post_status = 'publish';
+					$sub_item->post_type = 'nav_menu_item';
+					$sub_item->menu_order = 0;
+					$sub_item->target = '';
+					$sub_item->attr_title = '';
+					$sub_item->description = '';
+					$sub_item->xfn = '';
+					$sub_item->current = false;
+					$sub_item->current_item_parent = false;
+					$sub_item->current_item_ancestor = false;
+					
+					$new_items[] = $sub_item;
+				}
+			}
+		}
+	}
+	
+	return $new_items;
 }
 
 

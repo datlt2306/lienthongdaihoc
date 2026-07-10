@@ -309,147 +309,258 @@ class LTDH_CLI_Commands {
 			}
 		}
 
-		// 3. Seed Programs (Ensure every school has programs across various majors)
-		$training_slugs = ['van-bang-2', 'tu-xa'];
+		// 3. Seed Programs with differentiated data for meaningful comparison
+		$program_templates = [
+			// [school_offset => [programs with varied data]]
+			// Each school gets unique program characteristics
+		];
+
+		// Define unique program variants for each major x school combination
+		// Keys must be substrings of the school title for matching
+		$variants = [
+			// Ngôn ngữ Anh variants
+			7220201 => [
+				'Bách Khoa' => [
+					'tuition' => '650.000đ / tín chỉ', 'duration' => '2.5 năm',
+					'schedule' => 'Thứ 7 & CN hàng tuần', 'target' => 'Sinh viên năm 3, người đi làm muốn nâng cao trình độ',
+					'degree' => 'Cử nhân Ngôn ngữ Anh', 'diploma' => 'Đào tạo theo chuẩn B2 CEFR, có giá trị quốc tế',
+					'advantages' => 'Chương trình tích hợp chứng chỉ IELTS, có thực tập tại doanh nghiệp nước ngoài',
+					'disadvantages' => 'Học phí cao hơn so với các trường khác, lịch học cố định cuối tuần',
+				],
+				'Kinh tế' => [
+					'tuition' => '580.000đ / tín chỉ', 'duration' => '2 năm',
+					'schedule' => 'Tối thứ 2, 4, 6', 'target' => 'Người đi làm, văn bằng 2',
+					'degree' => 'Cử nhân Ngôn ngữ Anh', 'diploma' => 'Bằng chính quy, có giá trị toàn quốc',
+					'advantages' => 'Học phí hợp lý, lịch học linh hoạt cho người đi làm',
+					'disadvantages' => 'Không có chứng chỉ quốc tế đi kèm, số lượng lớp hạn chế',
+				],
+				'Ngoại thương' => [
+					'tuition' => '720.000đ / tín chỉ', 'duration' => '3 năm',
+					'schedule' => 'Buổi tối thứ 3, 5, 7', 'target' => 'Sinh viên mới tốt nghiệp THPT',
+					'degree' => 'Cử nhân Ngôn ngữ Anh Thương mại', 'diploma' => 'Bằng có giá trị quốc tế, được công nhận bởi British Council',
+					'advantages' => 'Chương trình song ngữ, cơ hội du học semester tại Anh',
+					'disadvantages' => 'Học phí cao, yêu cầu đầu vào điểm chuẩn cao',
+				],
+			],
+			// Kế toán variants
+			7340301 => [
+				'Bách Khoa' => [
+					'tuition' => '550.000đ / tín chỉ', 'duration' => '2 năm',
+					'schedule' => 'Thứ 7 hàng tuần', 'target' => 'Người có bằng Cao đẳng muốn liên thông',
+					'degree' => 'Cử nhân Kế toán', 'diploma' => 'Bằng chính quy, được Bộ GD&ĐT công nhận',
+					'advantages' => 'Miễn giảm 30% tín chỉ cho người liên thông, học phí thấp',
+					'disadvantages' => 'Chỉ học 1 ngày/tuần, tiến độ chậm',
+				],
+				'Tài chính' => [
+					'tuition' => '620.000đ / tín chỉ', 'duration' => '2.5 năm',
+					'schedule' => 'Tối thứ 2, 4', 'target' => 'Kế toán viên muốn nâng cao chứng chỉ',
+					'degree' => 'Cử nhân Kế toán', 'diploma' => 'Bằng có giá trị quốc tế, được ACCA công nhận',
+					'advantages' => 'Được miễn 4 môn thi chứng chỉ ACCA, networking với chuyên gia tài chính',
+					'disadvantages' => 'Học phí cao hơn, lịch học yêu cầu cam kết đều đặn',
+				],
+				'Công nghệ' => [
+					'tuition' => '480.000đ / tín chỉ', 'duration' => '1.5 năm',
+					'schedule' => 'Online + thực hành cuối tháng', 'target' => 'Người đi làm bận rộn',
+					'degree' => 'Cử nhân Kế toán', 'diploma' => 'Bằng chính quy, được Bộ GD&ĐT công nhận',
+					'advantages' => 'Hình thức học linh hoạt nhất, học phí thấp nhất thị trường',
+					'disadvantages' => 'Ít cơ hội giao lưu, thực hành hạn chế',
+				],
+			],
+			// Quản trị kinh doanh variants
+			7340101 => [
+				'Kinh tế' => [
+					'tuition' => '680.000đ / tín chỉ', 'duration' => '3 năm',
+					'schedule' => 'Buổi tối thứ 2, 4, 6', 'target' => 'Quản lý cấp trung, giám đốc bộ phận',
+					'degree' => 'Cử nhân Quản trị Kinh doanh', 'diploma' => 'Bằng quốc tế, được AACSB công nhận',
+					'advantages' => 'Chương trình MBA pathway, networking CEO级别',
+					'disadvantages' => 'Học phí cao, yêu cầu kinh nghiệm làm việc',
+				],
+				'Ngoại thương' => [
+					'tuition' => '750.000đ / tín chỉ', 'duration' => '2.5 năm',
+					'schedule' => 'Thứ 7 & CN sáng', 'target' => 'Sinh viên mới tốt nghiệp, người muốn chuyển ngành',
+					'degree' => 'Cử nhân Quản trị Kinh doanh Quốc tế', 'diploma' => 'Double degree với đối tác quốc tế',
+					'advantages' => 'Cơ hội thực tập tại tập đoàn đa quốc gia, bằng double degree',
+					'disadvantages' => 'Học phí rất cao, chương trình nặng',
+				],
+				'Giao thông' => [
+					'tuition' => '420.000đ / tín chỉ', 'duration' => '2 năm',
+					'schedule' => 'Online + practical workshop cuối tháng', 'target' => 'Người đi làm muốn có bằng đại học',
+					'degree' => 'Cử nhân Quản trị Kinh doanh', 'diploma' => 'Bằng chính quy, được Bộ GD&ĐT công nhận',
+					'advantages' => 'Học phí thấp nhất, hình thức học linh hoạt nhất',
+					'disadvantages' => 'Không có networking cao cấp, brand知名度 thấp hơn',
+				],
+			],
+			// Marketing variants
+			7340115 => [
+				'Công nghệ' => [
+					'tuition' => '600.000đ / tín chỉ', 'duration' => '2 năm',
+					'schedule' => 'Tối thứ 3, 5', 'target' => 'Content Creator, Social Media Manager',
+					'degree' => 'Cử nhân Marketing Số', 'diploma' => 'Bảng bổ sung kỹ năng số hóa',
+					'advantages' => 'Được đào tạo thực chiến với công cụ AI, Google Ads certified',
+					'disadvantages' => 'Chương trình mới, chưa có nhiều cựu sinh viên',
+				],
+				'Ngoại thương' => [
+					'tuition' => '700.000đ / tín chỉ', 'duration' => '2.5 năm',
+					'schedule' => 'Buổi tối thứ 2, 4, 6', 'target' => 'Marketing Manager, Brand Manager',
+					'degree' => 'Cử nhân Marketing Quốc tế', 'diploma' => 'Bằng có giá trị quốc tế, được CIM công nhận',
+					'advantages' => 'Case study quốc tế, cơ hội du học ngắn hạn',
+					'disadvantages' => 'Học phí cao, yêu cầu ngoại ngữ tốt',
+				],
+				'Tài chính' => [
+					'tuition' => '520.000đ / tín chỉ', 'duration' => '2 năm',
+					'schedule' => 'Thứ 7 cả ngày', 'target' => 'Người mới bắt đầu chuyển sang Marketing',
+					'degree' => 'Cử nhân Marketing', 'diploma' => 'Bằng chính quy, được Bộ GD&ĐT công nhận',
+					'advantages' => 'Học phí hợp lý, chương trình thực tế',
+					'disadvantages' => 'Ít cơ hội thực tập tại agency lớn',
+				],
+			],
+			// Kinh doanh thương mại variants
+			7340121 => [
+				'Kinh tế' => [
+					'tuition' => '580.000đ / tín chỉ', 'duration' => '2.5 năm',
+					'schedule' => 'Tối thứ 2, 4', 'target' => 'Nhân viên kinh doanh muốn thăng tiến',
+					'degree' => 'Cử nhân Kinh doanh Thương mại', 'diploma' => 'Bằng chính quy, được Bộ GD&ĐT công nhận',
+					'advantages' => 'Chương trình cập nhật xu hướng thương mại điện tử',
+					'disadvantages' => 'Hình thức học truyền thống, ít ứng dụng công nghệ',
+				],
+				'Giao thông' => [
+					'tuition' => '450.000đ / tín chỉ', 'duration' => '2 năm',
+					'schedule' => 'Online + thực hành', 'target' => 'Người đi làm, chủ doanh nghiệp nhỏ',
+					'degree' => 'Cử nhân Kinh doanh Thương mại', 'diploma' => 'Bằng chính quy, được Bộ GD&ĐT công nhận',
+					'advantages' => 'Học phí thấp, áp dụng ngay vào công việc',
+					'disadvantages' => 'Ít cơ hội giao lưu, networking hạn chế',
+				],
+			],
+		];
+
+		// Seed programs with unique data per major x school
 		$campus_slugs   = ['ha-noi', 'ho-chi-minh', 'online'];
+		$training_slugs = ['van-bang-2', 'tu-xa', 'chinh-quy'];
 
 		$program_index = 0;
 		foreach ( $school_ids as $school_id ) {
 			$school_title = get_the_title( $school_id );
-
-			// Special seeding for Đại học Giao thông vận tải
-			if ( $school_title === 'Đại học Giao thông vận tải' ) {
-				$utc_programs = [
-					[ 'major_offset' => 0, 't_slug' => 'chinh-quy', 't_name' => 'Chính quy' ],
-					[ 'major_offset' => 1, 't_slug' => 'tu-xa', 't_name' => 'Từ xa' ],
-					[ 'major_offset' => 2, 't_slug' => 'vua-hoc-vua-lam', 't_name' => 'Vừa học vừa làm' ],
-				];
-				foreach ( $utc_programs as $up ) {
-					$major_id = $major_ids[ $up['major_offset'] % count( $major_ids ) ];
-					$major_title  = get_the_title( $major_id );
-					$program_title = "Cử nhân $major_title";
-
-					$existing = get_posts( [
-						'post_type'  => 'program',
-						'title'      => $program_title,
-						'meta_query' => [
-							[
-								'key'     => 'school_relationship',
-								'value'   => $school_id,
-								'compare' => '=',
-							],
-						],
-						'tax_query'  => [
-							[
-								'taxonomy' => 'training_type',
-								'field'    => 'slug',
-								'terms'    => $up['t_slug'],
-							],
-						],
-						'posts_per_page' => 1,
-					] );
-
-					if ( empty( $existing ) ) {
-						$post_id = wp_insert_post( [
-							'post_title'   => $program_title,
-							'post_name'    => sanitize_title( $program_title . '-' . $up['t_slug'] . '-' . $school_title ),
-							'post_status'  => 'publish',
-							'post_type'    => 'program',
-							'post_content' => "Chương trình đào tạo Cử nhân ngành $major_title hệ {$up['t_name']} của $school_title. Lộ trình học tối ưu và có giá trị sử dụng rộng rãi.",
-						] );
-						if ( ! is_wp_error( $post_id ) ) {
-							update_post_meta( $post_id, 'school_relationship', $school_id );
-							update_post_meta( $post_id, 'major_relationship', $major_id );
-							update_post_meta( $post_id, 'tuition_fee', '480.000đ / tín chỉ' );
-							update_post_meta( $post_id, 'duration', '2 - 4 năm' );
-							update_post_meta( $post_id, 'campus_info', 'Hà Nội' );
-							wp_set_object_terms( $post_id, $up['t_slug'], 'training_type' );
-							wp_set_object_terms( $post_id, 'ha-noi', 'campus' );
-							WP_CLI::success( "Đã tạo Chương trình UTC: $program_title ({$up['t_name']})" );
-						}
-					}
-				}
-				continue;
-			}
+			$school_short = str_replace( ['Đại học ', 'Học viện '], '', $school_title );
 
 			// Each school gets 3 programs with different majors
 			for ( $j = 0; $j < 3; $j++ ) {
-				$major_id = $major_ids[ ( $program_index + $j ) % count( $major_ids ) ];
-				$major_title  = get_the_title( $major_id );
-				
+				$major_id = $major_ids[ $program_index % count( $major_ids ) ];
+				$major_title = get_the_title( $major_id );
+				$major_code = get_post_meta( $major_id, 'major_code', true );
+
+				// Get variant data for this major x school combination
+				// Match by checking if school title contains the variant key
+				$variant = null;
+				if ( isset( $variants[ $major_code ] ) ) {
+					foreach ( $variants[ $major_code ] as $key => $v ) {
+						if ( mb_stripos( $school_title, $key ) !== false ) {
+							$variant = $v;
+							break;
+						}
+					}
+				}
+
+				if ( ! $variant ) {
+					// Fallback: random-ish but still unique
+					$base_tuition = 400000 + ( $program_index * 50000 );
+					$variant = [
+						'tuition' => number_format( $base_tuition ) . 'đ / tín chỉ',
+						'duration' => ( 1.5 + ( $j * 0.5 ) ) . ' năm',
+						'schedule' => 'Lịch học linh hoạt',
+						'target' => 'Người đi làm, văn bằng 2',
+						'degree' => 'Cử nhân',
+						'diploma' => 'Bằng chính quy, được Bộ GD&ĐT công nhận',
+						'advantages' => 'Chi phí hợp lý, lịch học linh hoạt',
+						'disadvantages' => 'Chưa có đánh giá chi tiết',
+					];
+				}
+
 				$t_slug = $training_slugs[ $program_index % count( $training_slugs ) ];
 				$c_slug = $campus_slugs[ $program_index % count( $campus_slugs ) ];
-				
-				$t_name = ( $t_slug == 'tu-xa' ) ? 'Từ xa' : 'Văn bằng 2';
+				$t_names = [ 'van-bang-2' => 'Văn bằng 2', 'tu-xa' => 'Từ xa', 'chinh-quy' => 'Chính quy' ];
+				$t_name = $t_names[ $t_slug ];
+
 				$program_title = "Cử nhân $major_title";
+				$enrollment = $j === 0 ? 'Đợt 1 đến hết 30/06/2026' : ( $j === 1 ? 'Đợt 2 đến hết 30/09/2026' : 'Tuyển sinh quanh năm' );
 
 				$existing = get_posts( [
 					'post_type'  => 'program',
 					'title'      => $program_title,
 					'meta_query' => [
-						[
-							'key'     => 'school_relationship',
-							'value'   => $school_id,
-							'compare' => '=',
-						],
+						[ 'key' => 'school_relationship', 'value' => $school_id, 'compare' => '=' ],
 					],
 					'tax_query'  => [
-						[
-							'taxonomy' => 'training_type',
-							'field'    => 'slug',
-							'terms'    => $t_slug,
-						],
+						[ 'taxonomy' => 'training_type', 'field' => 'slug', 'terms' => $t_slug ],
 					],
 					'posts_per_page' => 1,
 				] );
 
-				if ( empty( $existing ) ) {
-					$post_id = wp_insert_post( [
-						'post_title'   => $program_title,
-						'post_name'    => sanitize_title( $program_title . '-' . $t_slug . '-' . $school_title ),
-						'post_status'  => 'publish',
-						'post_type'    => 'program',
-						'post_content' => "Chương trình đào tạo Cử nhân ngành $major_title hệ $t_name của $school_title. Đào tạo linh động trực tuyến hoặc trực tiếp, lộ trình tối ưu cho người vừa học vừa làm.",
-					] );
-					if ( ! is_wp_error( $post_id ) ) {
-						// Link relationships (Matches ACF keys)
-						update_post_meta( $post_id, 'school_relationship', $school_id );
-						update_post_meta( $post_id, 'major_relationship', $major_id );
-						
-						// Set program details
-						update_post_meta( $post_id, 'tuition_fee', '450.000đ / tín chỉ' );
-						update_post_meta( $post_id, 'duration', '1.5 - 2 năm' );
-						update_post_meta( $post_id, 'campus_info', 'Hà Nội & Online' );
-						update_post_meta( $post_id, 'admission_requirements', 'Xét tuyển hồ sơ văn bằng đã có (THPT, Trung cấp, Cao đẳng).' );
-						update_post_meta( $post_id, 'required_documents', 'CCCD, Ảnh 3x4, Phiếu tuyển sinh, Bản sao công chứng Bằng tốt nghiệp.' );
-						update_post_meta( $post_id, 'enrollment_period', 'Đợt 1 đến hết 30/11/2026' );
-						update_post_meta( $post_id, 'program_benefits', 'Tự chọn thời gian học, bằng cấp được bộ GD&ĐT công nhận giá trị.' );
-
-						// Inherit status and groups from parent major
-						$parent_status = get_post_meta( $major_id, 'admission_status', true ) ?: 'tuyen-sinh';
-						$parent_groups = get_post_meta( $major_id, 'admission_groups', true ) ?: 'A00, A01, D01';
-						update_post_meta( $post_id, 'admission_status', $parent_status );
-						update_post_meta( $post_id, 'admission_groups', $parent_groups );
-
-						// Set FAQs repeater manually
-						$faqs = [
-							[ 'question' => 'Có cần phải đến trường học trực tiếp không?', 'answer' => 'Đối với hệ Từ xa, bạn học 100% qua E-Learning và không cần đến trường học hay điểm danh.' ],
-							[ 'question' => 'Bằng tốt nghiệp có giá trị chính quy không?', 'answer' => 'Có. Bằng do Hiệu trưởng trường Đại học cấp và được bộ Giáo dục công nhận, có giá trị học lên Thạc sĩ/Tiến sĩ.' ]
-						];
-						update_post_meta( $post_id, 'faq', $faqs );
-
-						// Assign Taxonomies
-						wp_set_object_terms( $post_id, $t_slug, 'training_type' );
-						wp_set_object_terms( $post_id, $c_slug, 'campus' );
-
-						// Manually trigger bi-directional updates
-						if ( function_exists( 'ltdh_sync_program_relationships' ) ) {
-							ltdh_sync_program_relationships( $post_id );
-						}
-
-						WP_CLI::success( "Đã tạo Chương trình: $program_title" );
-					}
+				if ( ! empty( $existing ) ) {
+					$program_index++;
+					continue;
 				}
+
+				$post_id = wp_insert_post( [
+					'post_title'   => $program_title,
+					'post_name'    => sanitize_title( $program_title . '-' . $t_slug . '-' . $school_title ),
+					'post_status'  => 'publish',
+					'post_type'    => 'program',
+					'post_content' => "Chương trình đào tạo Cử nhân ngành $major_title hệ $t_name của $school_title. " . $variant['advantages'] . ".",
+				] );
+
+				if ( is_wp_error( $post_id ) ) {
+					$program_index++;
+					continue;
+				}
+
+				update_post_meta( $post_id, 'school_relationship', $school_id );
+				update_post_meta( $post_id, 'major_relationship', $major_id );
+				update_post_meta( $post_id, 'tuition_fee', $variant['tuition'] );
+				update_post_meta( $post_id, 'duration', $variant['duration'] );
+				update_post_meta( $post_id, 'campus_info', $c_slug === 'ha-noi' ? 'Hà Nội' : ( $c_slug === 'ho-chi-minh' ? 'TP. Hồ Chí Minh' : 'Online' ) );
+				update_post_meta( $post_id, 'admission_requirements', 'Xét tuyển hồ sơ văn bằng đã có (THPT, Trung cấp, Cao đẳng).' );
+				update_post_meta( $post_id, 'required_documents', 'CCCD, Ảnh 3x4, Phiếu tuyển sinh, Bản sao công chứng Bằng tốt nghiệp.' );
+				update_post_meta( $post_id, 'enrollment_period', $enrollment );
+				update_post_meta( $post_id, 'program_benefits', $variant['advantages'] );
+				update_post_meta( $post_id, 'schedule', $variant['schedule'] );
+				update_post_meta( $post_id, 'target_students', $variant['target'] );
+				update_post_meta( $post_id, 'degree_type', $variant['degree'] );
+				update_post_meta( $post_id, 'diploma_value', $variant['diploma'] );
+				update_post_meta( $post_id, 'disadvantages', $variant['disadvantages'] );
+
+				$parent_status = get_post_meta( $major_id, 'admission_status', true ) ?: 'tuyen-sinh';
+				$parent_groups = get_post_meta( $major_id, 'admission_groups', true ) ?: 'A00, A01, D01';
+				update_post_meta( $post_id, 'admission_status', $parent_status );
+				update_post_meta( $post_id, 'admission_groups', $parent_groups );
+
+				$faqs = [
+					[ 'question' => 'Có cần phải đến trường học trực tiếp không?', 'answer' => $t_slug === 'tu-xa' ? 'Đối với hệ Từ xa, bạn học 100% qua E-Learning và không cần đến trường học hay điểm danh.' : 'Bạn cần đến học trực tiếp theo lịch học.' ],
+					[ 'question' => 'Bằng tốt nghiệp có giá trị chính quy không?', 'answer' => 'Có. Bằng do Hiệu trưởng trường Đại học cấp và được bộ Giáo dục công nhận, có giá trị học lên Thạc sĩ/Tiến sĩ.' ]
+				];
+				update_post_meta( $post_id, 'faq', $faqs );
+
+				// Set eligibility criteria
+				$elig_min_edu = '';
+				if ( $t_slug === 'lien-thong' ) {
+					$elig_min_edu = 'trung-cap';
+				} elseif ( $t_slug === 'van-bang-2' ) {
+					$elig_min_edu = 'dai-hoc';
+				} else {
+					$elig_min_edu = 'thap-phan';
+				}
+				update_post_meta( $post_id, 'elig_min_education', $elig_min_edu );
+				update_post_meta( $post_id, 'elig_training_types', [ $t_slug ] );
+				update_post_meta( $post_id, 'elig_campuses', [ $c_slug ] );
+				update_post_meta( $post_id, 'elig_max_grad_years', $t_slug === 'lien-thong' ? 10 : 99 );
+				update_post_meta( $post_id, 'elig_notes', '' );
+
+				wp_set_object_terms( $post_id, $t_slug, 'training_type' );
+				wp_set_object_terms( $post_id, $c_slug, 'campus' );
+
+				if ( function_exists( 'ltdh_sync_program_relationships' ) ) {
+					ltdh_sync_program_relationships( $post_id );
+				}
+
 				$program_index++;
 			}
 		}

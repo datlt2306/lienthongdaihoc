@@ -346,6 +346,14 @@
                 "type": "wysiwyg",
                 "toolbar": "full",
                 "media_upload": 1
+            },
+            {
+                "key": "field_school_support_services",
+                "label": "Dịch vụ hỗ trợ",
+                "name": "support_services",
+                "type": "wysiwyg",
+                "toolbar": "full",
+                "media_upload": 1
             }
         ],
         "location": [
@@ -393,6 +401,20 @@
                 "label": "Nhu cầu thị trường lao động",
                 "name": "job_market",
                 "type": "wysiwyg"
+            },
+            {
+                "key": "field_major_related",
+                "label": "Ngành liên quan",
+                "name": "major_related",
+                "type": "relationship",
+                "post_type": [
+                    "major"
+                ],
+                "allow_null": 1,
+                "multiple": 1,
+                "return_format": "id",
+                "ui": 1,
+                "instructions": "Các ngành liên quan dùng cho Eligibility Checker scoring"
             }
         ],
         "location": [
@@ -530,6 +552,38 @@
                         "rows": 3
                     }
                 ]
+            },
+            {
+                "key": "field_program_schedule",
+                "label": "Lịch học",
+                "name": "schedule",
+                "type": "text",
+                "placeholder": "Ví dụ: Thứ 7 hàng tuần, 2 buổi/tuần..."
+            },
+            {
+                "key": "field_program_target_students",
+                "label": "Đối tượng tuyển sinh",
+                "name": "target_students",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_degree_type",
+                "label": "Loại bằng",
+                "name": "degree_type",
+                "type": "text",
+                "placeholder": "Ví dụ: Cử nhân, Thạc sĩ..."
+            },
+            {
+                "key": "field_program_diploma_value",
+                "label": "Giá trị bằng cấp",
+                "name": "diploma_value",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_disadvantages",
+                "label": "Nhược điểm",
+                "name": "disadvantages",
+                "type": "wysiwyg"
             }
         ],
         "location": [
@@ -668,6 +722,93 @@
         "instruction_placement": "label",
         "active": true,
         "description": "",
+        "show_in_rest": 0
+    },
+    {
+        "key": "group_program_eligibility",
+        "title": "Điều kiện tuyển sinh",
+        "fields": [
+            {
+                "key": "field_elig_min_education",
+                "label": "Trình độ tối thiểu",
+                "name": "elig_min_education",
+                "type": "select",
+                "choices": {
+                    "thap-phan": "THPT",
+                    "trung-cap": "Trung cấp",
+                    "cao-dang": "Cao đẳng",
+                    "dai-hoc": "Đại học",
+                    "thac-si": "Thạc sĩ"
+                },
+                "allow_null": 1,
+                "placeholder": "Không yêu cầu",
+                "instructions": "Trình độ học vấn tối thiểu để đăng ký chương trình này"
+            },
+            {
+                "key": "field_elig_training_types",
+                "label": "Hệ đào tạo áp dụng",
+                "name": "elig_training_types",
+                "type": "checkbox",
+                "choices": {
+                    "lien-thong": "Liên thông",
+                    "van-bang-2": "Văn bằng 2",
+                    "tu-xa": "Từ xa",
+                    "vua-hoc-vua-lam": "Vừa học vừa làm",
+                    "chinh-quy": "Chính quy"
+                },
+                "allow_null": 1,
+                "instructions": "Hệ đào tạo mà chương trình này áp dụng"
+            },
+            {
+                "key": "field_elig_campuses",
+                "label": "Cơ sở áp dụng",
+                "name": "elig_campuses",
+                "type": "checkbox",
+                "choices": {
+                    "ha-noi": "Hà Nội",
+                    "ho-chi-minh": "TP. Hồ Chí Minh",
+                    "da-nang": "Đà Nẵng",
+                    "thai-nguyen": "Thái Nguyên",
+                    "online": "Online"
+                },
+                "allow_null": 1,
+                "instructions": "Cơ sở mà chương trình này có giảng dạy"
+            },
+            {
+                "key": "field_elig_max_grad_years",
+                "label": "Thời gian tốt nghiệp tối đa (năm)",
+                "name": "elig_max_grad_years",
+                "type": "number",
+                "default_value": 99,
+                "min": 0,
+                "max": 99,
+                "instructions": "Số năm tối đa kể từ khi tốt nghiệp. Để 99 nếu không giới hạn."
+            },
+            {
+                "key": "field_elig_notes",
+                "label": "Ghi chú điều kiện",
+                "name": "elig_notes",
+                "type": "textarea",
+                "rows": 3,
+                "instructions": "Ghi chú thêm về điều kiện tuyển sinh (hiển thị cho người dùng)"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "program"
+                }
+            ]
+        ],
+        "menu_order": 10,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true,
+        "description": "Điều kiện tuyển sinh cho Eligibility Checker",
         "show_in_rest": 0
     },
     {

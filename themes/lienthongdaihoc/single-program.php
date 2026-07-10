@@ -39,7 +39,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		
 		<!-- SECTION 1: HERO -->
-		<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
+		<section class="bg-white rounded shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
 			<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
 				<div class="lg:col-span-8">
 					<span class="inline-block bg-teal-50 text-brand-primary text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">
@@ -82,6 +82,13 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<a href="#register" class="w-full text-center bg-brand-primary text-white py-3 rounded-xl font-bold shadow-md shadow-brand-primary/20 hover:bg-teal-700 transition-all">
 						Đăng Ký Tư Vấn Ngay
 					</a>
+					<button type="button"
+							class="w-full text-center bg-white border-2 border-brand-primary text-brand-primary py-3 rounded-xl font-bold shadow-sm hover:bg-brand-primary/5 transition-all ltdh-compare-single-btn"
+							data-compare-type="program" data-compare-id="<?php echo esc_attr( $program_id ); ?>"
+							data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
+							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>">
+						📊 Thêm vào so sánh
+					</button>
 					<a href="<?php echo esc_url( $global_zalo ); ?>" class="w-full text-center bg-blue-500 text-white py-3 rounded-xl font-bold shadow-md shadow-blue-500/20 hover:bg-blue-600 transition-all">
 						Trao đổi qua Zalo
 					</a>
@@ -95,7 +102,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			<div class="lg:col-span-2 space-y-8">
 				
 				<!-- SECTION 2: PROGRAM OVERVIEW -->
-				<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+				<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan chương trình</h2>
 					<div class="prose prose-slate max-w-none text-slate-600 text-sm md:text-base">
 						<?php the_content(); ?>
@@ -112,7 +119,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 				<!-- SECTION 3: SCHOOL INFORMATION -->
 				<?php if ( $school_id ) : ?>
-					<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+					<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Thông tin trường đào tạo</h2>
 						<div class="flex flex-col sm:flex-row gap-4 items-start mb-4">
 							<?php ltdh_render_school_thumbnail( $school_id, 'thumbnail', 'h-16 w-16 object-cover shrink-0 rounded-lg border border-slate-100 bg-white' ); ?>
@@ -135,7 +142,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 				<!-- SECTION 4: MAJOR INFORMATION -->
 				<?php if ( $major_id ) : ?>
-					<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+					<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Thông tin ngành học</h2>
 						<h3 class="font-bold text-lg text-slate-900 mb-2"><?php echo esc_html( $major_title ); ?> (Mã ngành: <?php echo esc_html( get_field( 'major_code', $major_id ) ); ?>)</h3>
 						<div class="prose prose-slate max-w-none text-sm text-slate-600 mb-4">
@@ -157,7 +164,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 				<!-- SECTION 5: ADMISSION REQUIREMENTS -->
 				<?php if ( $requirements ) : ?>
-					<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+					<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Điều kiện xét tuyển</h2>
 						<div class="prose prose-slate max-w-none text-slate-600 text-sm md:text-base">
 							<?php echo wp_kses_post( $requirements ); ?>
@@ -166,7 +173,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				<?php endif; ?>
 
 				<!-- SECTION 6: TUITION & SECTION 7: DURATION -->
-				<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+				<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Học phí & Thời gian học</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<div class="bg-slate-50 p-4 rounded-xl">
@@ -182,7 +189,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 				<!-- SECTION 8: DOCUMENTS REQUIRED -->
 				<?php if ( $documents ) : ?>
-					<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+					<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Hồ sơ xét tuyển cần thiết</h2>
 						<div class="prose prose-slate max-w-none text-slate-600 text-sm">
 							<?php echo wp_kses_post( $documents ); ?>
@@ -192,7 +199,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 				<!-- SECTION 9: FAQ -->
 				<?php if ( ! empty( $faqs ) ) : ?>
-					<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+					<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Câu hỏi thường gặp</h2>
 						<div class="space-y-4">
 							<?php foreach ( $faqs as $index => $item ) : ?>
@@ -231,7 +238,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 				if ( $related_query->have_posts() ) :
 				?>
-					<section class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+					<section class="bg-white rounded shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Chương trình liên quan</h2>
 						<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 							<?php 
@@ -262,7 +269,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				<div class="sticky top-24 space-y-6">
 					
 					<!-- SECTION 11: CONSULTATION FORM -->
-					<section id="register" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+					<section id="register" class="bg-white rounded shadow-sm border border-slate-100 p-6">
 						<h3 class="text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
 						<p class="text-sm text-slate-500 mb-4">Hãy để lại thông tin, ban tư vấn tuyển sinh sẽ liên hệ và giải đáp lộ trình cụ thể cho bạn trong vòng 15 phút.</p>
 						
@@ -302,7 +309,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</section>
 
 					<!-- SECTION 13: PHONE CTA & SECTION 14: ZALO CTA sidebar cards -->
-					<div class="bg-brand-primary/5 border border-brand-primary/10 rounded-2xl p-6 text-center">
+					<div class="bg-brand-primary/5 border border-brand-primary/10 rounded p-6 text-center">
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Cần hỗ trợ trực tiếp?</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $program_hotline ); ?></h4>
 						<div class="flex gap-2">
