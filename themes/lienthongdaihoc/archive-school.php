@@ -32,7 +32,7 @@ get_header();
 			</div>
 		</div>
 
-		<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+		<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
 			<?php
 			if ( have_posts() ) :
 				$index = 0;
@@ -54,25 +54,25 @@ get_header();
 					$reviews = get_post_meta( $school_id, 'reviews_count', true ) ?: '256';
 			?>
 			<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-						<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
+						<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
 						
 						<!-- Logo Overlay -->
-						<div class="h-16 w-16 bg-white rounded-lg border-4 border-white shadow-md bg-white -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
+						<div class="h-12 w-12 md:h-16 md:w-16 bg-white rounded-lg border-2 md:border-4 border-white shadow-md bg-white -mt-6 md:-mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
 							<?php if ( $logo_id ) : ?>
 								<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
 							<?php else : ?>
-								<span class="font-display font-extrabold text-brand-primary text-xs">UNI</span>
+								<span class="font-display font-extrabold text-brand-primary text-[10px] md:text-xs">UNI</span>
 							<?php endif; ?>
 						</div>
  
-						<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
+						<div class="p-3 pt-1 md:p-4 md:pt-2 flex-1 flex flex-col justify-between">
 							<div class="text-center">
-								<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
-								<p class="text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
+								<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[32px] md:min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
+								<p class="text-[10px] md:text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
 							</div>
 							
-						<div class="mt-4 pt-3 border-t border-slate-100">
-							<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-brand-primary hover:text-white py-3 rounded-lg font-bold transition-all text-sm uppercase text-brand-primary min-h-[44px] flex items-center justify-center">Tìm hiểu thêm</a>
+						<div class="mt-3 md:mt-4 pt-3 border-t border-slate-100">
+							<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-brand-primary hover:text-white py-2.5 md:py-3 rounded-lg font-bold transition-all text-[11px] md:text-sm uppercase text-brand-primary min-h-[44px] flex items-center justify-center">Tìm hiểu thêm</a>
 						</div>
 						</div>
 					</div>

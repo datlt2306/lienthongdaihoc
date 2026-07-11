@@ -77,12 +77,19 @@ $years = range( $current_year - 18, $current_year - 70 );
 		<div class="elig-step" data-step="2">
 			<h2 class="elig-step-title">Chuyên ngành hiện tại</h2>
 			<p class="elig-step-desc">Bạn đang học hoặc đã tốt nghiệp ngành gì?</p>
-			<select name="major_id" class="elig-select">
-				<option value="">-- Chọn chuyên ngành --</option>
-				<?php foreach ( $majors as $m ) : ?>
-					<option value="<?php echo esc_attr( $m->ID ); ?>"><?php echo esc_html( $m->post_title ); ?></option>
-				<?php endforeach; ?>
-			</select>
+			<div class="elig-search-select-container relative" data-search-select>
+				<input type="text" class="elig-search-input" placeholder="Gõ để tìm chuyên ngành..." autocomplete="off">
+				<input type="hidden" name="major_id" class="elig-select elig-search-value">
+				<div class="elig-search-dropdown absolute w-full max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg hidden z-50 mt-1">
+					<div class="p-3 text-xs font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">Danh sách chuyên ngành</div>
+					<div class="elig-search-options">
+						<div class="elig-search-option-item p-3 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-500 border-b border-slate-50" data-value="">-- Chọn chuyên ngành --</div>
+						<?php foreach ( $majors as $m ) : ?>
+							<div class="elig-search-option-item p-3 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-700 border-b border-slate-50 last:border-0" data-value="<?php echo esc_attr( $m->ID ); ?>"><?php echo esc_html( $m->post_title ); ?></div>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div>
 			<p class="elig-step-hint">Bỏ qua nếu chưa có chuyên ngành</p>
 		</div>
 
@@ -102,12 +109,19 @@ $years = range( $current_year - 18, $current_year - 70 );
 		<div class="elig-step" data-step="4">
 			<h2 class="elig-step-title">Ngành mong muốn</h2>
 			<p class="elig-step-desc">Bạn muốn học ngành gì?</p>
-			<select name="desired_major" class="elig-select">
-				<option value="">-- Chọn ngành muốn học --</option>
-				<?php foreach ( $majors as $m ) : ?>
-					<option value="<?php echo esc_attr( $m->ID ); ?>"><?php echo esc_html( $m->post_title ); ?></option>
-				<?php endforeach; ?>
-			</select>
+			<div class="elig-search-select-container relative" data-search-select>
+				<input type="text" class="elig-search-input" placeholder="Gõ để tìm ngành học..." autocomplete="off">
+				<input type="hidden" name="desired_major" class="elig-select elig-search-value">
+				<div class="elig-search-dropdown absolute w-full max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg hidden z-50 mt-1">
+					<div class="p-3 text-xs font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">Danh sách ngành học</div>
+					<div class="elig-search-options">
+						<div class="elig-search-option-item p-3 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-500 border-b border-slate-50" data-value="">-- Chọn ngành học --</div>
+						<?php foreach ( $majors as $m ) : ?>
+							<div class="elig-search-option-item p-3 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-700 border-b border-slate-50 last:border-0" data-value="<?php echo esc_attr( $m->ID ); ?>"><?php echo esc_html( $m->post_title ); ?></div>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<!-- Step 5: Training Type -->

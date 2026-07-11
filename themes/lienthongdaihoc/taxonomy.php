@@ -99,6 +99,7 @@ $taxonomy = $term->taxonomy;
 					}
 					$types = wp_get_post_terms( $prog_id, 'training_type' );
 					$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : 'Chưa xác định';
+					$type_slug = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->slug : '';
 					?>
 				<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
 					 data-compare-btn data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
@@ -140,7 +141,9 @@ $taxonomy = $term->taxonomy;
 									<button type="button" class="ltdh-compare-toggle text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg px-2.5 py-1 transition-all"
 											data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 											data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
-											data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>">
+											data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
+											data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
+											data-compare-nganh="<?php echo esc_attr( $major_rel_id ); ?>">
 										So sánh
 									</button>
 								</div>

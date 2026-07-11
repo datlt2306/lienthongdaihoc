@@ -610,3 +610,29 @@ function ltdh_allow_webp_upload_check( $data, $file, $filename, $mimes ) {
 	}
 	return $data;
 }
+
+/**
+ * Highlight custom menu items that have query parameters (e.g. ?he=tu-xa)
+ */
+add_filter( 'nav_menu_css_class', 'ltdh_highlight_menu_parameters', 10, 2 );
+function ltdh_highlight_menu_parameters( $classes, $item ) {
+	$current_url = home_url( $_SERVER['REQUEST_URI'] );
+	$item_url    = $item->url;
+
+	if ( $item_url && strpos( $item_url, '?' ) !== false ) {
+		$item_parts    = wp_parse_url( $item_url );
+		$current_parts = wp_parse_url( $current_url );
+
+		if ( isset( $item_parts['path'] ) && isset( $current_parts['path'] ) && $item_parts['path'] === $current_parts['path'] ) {
+			if ( isset( $item_parts['query'] ) && isset( $current_parts['query'] ) ) {
+				parse_str( $item_parts['query'], $item_query );
+				parse_str( $current_parts['query'], $current_query );
+
+				if ( isset( $item_query['he'] ) && isset( $current_query['he'] ) && $item_query['he'] === $current_query['he'] ) {
+					$classes[] = 'current-menu-item';
+				}
+			}
+		}
+	}
+	return $classes;
+}

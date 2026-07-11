@@ -322,11 +322,18 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</div>
 
 					<!-- COMPARE BUTTON ONLY -->
+					<?php
+					$types = wp_get_post_terms( $program_id, 'training_type' );
+					$type_slug = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->slug : '';
+					$major_rel_id = get_field( 'major_relationship', $program_id );
+					?>
 					<button type="button"
 							class="w-full text-center bg-white border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold shadow-xs hover:bg-slate-50 transition-all ltdh-compare-single-btn text-sm flex items-center justify-center gap-2 mt-4 min-h-[44px]"
 							data-compare-type="program" data-compare-id="<?php echo esc_attr( $program_id ); ?>"
 							data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
-							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>">
+							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>"
+							data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
+							data-compare-nganh="<?php echo esc_attr( $major_rel_id ); ?>">
 						<span>📊</span> <span>Thêm vào so sánh</span>
 					</button>
 

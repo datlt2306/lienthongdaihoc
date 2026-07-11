@@ -28,13 +28,33 @@
 		} catch (e) { /* silent */ }
 	}
 
-	function addItem(type, id) {
+	function getMetadata() {
+		try {
+			var raw = sessionStorage.getItem('ltdh_compare_metadata');
+			return raw ? JSON.parse(raw) : {};
+		} catch (e) {
+			return {};
+		}
+	}
+
+	function saveMetadata(meta) {
+		try {
+			sessionStorage.setItem('ltdh_compare_metadata', JSON.stringify(meta));
+		} catch (e) { /* silent */ }
+	}
+
+	function addItem(type, id, he, nganh) {
 		var items = getItems();
 		if (!items[type]) items[type] = [];
 		if (items[type].indexOf(id) === -1) {
 			if (items[type].length >= MAX_ITEMS) return false;
 			items[type].push(id);
 			saveItems(items);
+
+			// Save metadata
+			var meta = getMetadata();
+			meta[id] = { he: he || '', nganh: nganh || '' };
+			saveMetadata(meta);
 		}
 		return true;
 	}
@@ -44,6 +64,11 @@
 		if (!items[type]) return;
 		items[type] = items[type].filter(function (i) { return i !== id; });
 		saveItems(items);
+
+		// Remove metadata
+		var meta = getMetadata();
+		delete meta[id];
+		saveMetadata(meta);
 	}
 
 	function getCount(type) {
@@ -60,8 +85,6 @@
 	// 2. Compare Button Toggle
 	// ----------------------------------------------------
 	function initCompareButtons() {
-		// Archive page: .ltdh-compare-toggle buttons
-		// Single page: .ltdh-compare-single-btn buttons
 		var buttons = document.querySelectorAll('.ltdh-compare-toggle, .ltdh-compare-single-btn');
 		buttons.forEach(function (btn) {
 			var type = btn.getAttribute('data-compare-type');
@@ -88,7 +111,31 @@
 						showToast('Chỉ so sánh tối đa ' + MAX_ITEMS + ' mục.', 'warning');
 						return;
 					}
-					addItem(type, id);
+
+					// Validation: Same system (he) and same major (nganh)
+					var btnHe = btn.getAttribute('data-compare-he');
+					var btnNganh = btn.getAttribute('data-compare-nganh');
+					var activeIds = items[type] || [];
+
+					if (activeIds.length > 0 && btnHe && btnNganh) {
+						var meta = getMetadata();
+						for (var idx = 0; idx < activeIds.length; idx++) {
+							var existingId = activeIds[idx];
+							var existingMeta = meta[existingId];
+							if (existingMeta) {
+								if (existingMeta.he && existingMeta.he !== btnHe) {
+									showToast('Chỉ được so sánh các chương trình CÙNG HỆ ĐÀO TẠO.', 'error');
+									return;
+								}
+								if (existingMeta.nganh && existingMeta.nganh !== btnNganh) {
+									showToast('Chỉ được so sánh các chương trình CÙNG NGÀNH HỌC.', 'error');
+									return;
+								}
+							}
+						}
+					}
+
+					addItem(type, id, btnHe, btnNganh);
 					btn.classList.add('is-compared');
 					btn.textContent = '✓ Đã thêm';
 					showToast('Đã thêm vào danh sách so sánh (' + (total + 1) + '/' + MAX_ITEMS + ')', 'success');

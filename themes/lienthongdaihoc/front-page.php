@@ -52,7 +52,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</h1>
 
 					<!-- Mockup Badges Grid (Prevent text wrapping and skewing) -->
-					<div class="flex flex-col md:flex-row gap-4 pt-4 w-full">
+					<div class="hidden md:flex flex-col md:flex-row gap-4 pt-4 w-full">
 						<div class="flex-1 flex items-center gap-3 bg-white px-4 py-3.5 rounded-lg border border-slate-100 shadow-sm">
 							<span class="text-brand-primary bg-blue-50 p-2 rounded-lg shrink-0">✔</span>
 							<div class="text-left leading-tight">
@@ -95,7 +95,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 				
 				<!-- Hero Right Image Column (Stunning mockup layout replica) -->
-				<div class="lg:col-span-6 relative flex justify-center items-center">
+				<div class="lg:col-span-6 relative hidden lg:flex justify-center items-center">
 					<div class="relative w-full max-w-md md:max-w-lg aspect-square">
 						<!-- Mockup Blob Graphic / Frame decoration -->
 						<div class="absolute inset-0 bg-gradient-to-tr from-brand-primary/20 to-[#EFF6FF]/50 rounded-lg blur-2xl -z-10"></div>
@@ -128,53 +128,107 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	</section>
 
 	<!-- Floating Filter Panel Section -->
+	<?php
+	$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => -1 ] );
+	$majors  = get_posts( [ 'post_type' => 'major', 'numberposts' => -1 ] );
+	$types   = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
+	?>
 	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20 -mt-12 mb-8">
 		<div class="bg-white p-6 md:p-8 rounded-xl shadow-xl border border-slate-100">
-			<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-				<div>
+			<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET" class="flex flex-col md:grid md:grid-cols-5 gap-4 md:items-end animate-fade-in">
+				<!-- 1. Keyword search (Always visible) -->
+				<div class="w-full">
 					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Từ khóa tìm kiếm</label>
 					<input type="text" name="s" placeholder="Tìm tên chương trình..." class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[44px]" />
 				</div>
 				
-				<div>
-					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Trường đại học</label>
-					<select name="truong_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-transparent min-h-[44px]">
-						<option value="">-- Chọn trường học --</option>
-						<?php
-						$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => -1 ] );
-						foreach ( $schools as $s ) {
-							echo '<option value="' . esc_attr( $s->ID ) . '">' . esc_html( $s->post_title ) . '</option>';
-						}
-						?>
-					</select>
-				</div>
-				
-				<div>
-					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Ngành đào tạo</label>
-					<select name="nganh_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-transparent min-h-[44px]">
-						<option value="">-- Chọn ngành học --</option>
-						<?php
-						$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => -1 ] );
-						foreach ( $majors as $m ) {
-							echo '<option value="' . esc_attr( $m->ID ) . '">' . esc_html( $m->post_title ) . '</option>';
-						}
-						?>
-					</select>
+				<!-- 2. Mobile Collapsible Advanced Filters -->
+				<details class="md:hidden w-full group">
+					<summary class="text-xs font-bold text-brand-primary cursor-pointer select-none py-2.5 flex items-center justify-between min-h-[44px] list-none [&::-webkit-details-marker]:hidden">
+						<span class="flex items-center gap-2">
+							<span>⚙️</span> <span>Tìm kiếm nâng cao (Trường, Ngành, Hệ)</span>
+						</span>
+						<span class="text-slate-400 group-open:rotate-180 transition-transform">▾</span>
+					</summary>
+					<div class="space-y-4 pt-3 border-t border-slate-100 bg-slate-50/50 p-4 rounded-lg">
+						<div>
+							<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Trường đại học</label>
+							<select name="truong_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px]">
+								<option value="">-- Chọn trường học --</option>
+								<?php
+								foreach ( $schools as $s ) {
+									echo '<option value="' . esc_attr( $s->ID ) . '">' . esc_html( $s->post_title ) . '</option>';
+								}
+								?>
+							</select>
+						</div>
+						
+						<div>
+							<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Ngành đào tạo</label>
+							<select name="nganh_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px]">
+								<option value="">-- Chọn ngành học --</option>
+								<?php
+								foreach ( $majors as $m ) {
+									echo '<option value="' . esc_attr( $m->ID ) . '">' . esc_html( $m->post_title ) . '</option>';
+								}
+								?>
+							</select>
+						</div>
+
+						<div>
+							<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Hệ đào tạo</label>
+							<select name="he_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px]">
+								<option value="">-- Chọn hệ học --</option>
+								<?php
+								foreach ( $types as $t ) {
+									echo '<option value="' . esc_attr( $t->slug ) . '">' . esc_html( $t->name ) . '</option>';
+								}
+								?>
+							</select>
+						</div>
+					</div>
+				</details>
+
+				<!-- 3. Desktop Advanced Filters (Hidden on Mobile) -->
+				<div class="hidden md:grid md:grid-cols-3 md:gap-4 md:col-span-3 items-end">
+					<div>
+						<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Trường đại học</label>
+						<select name="truong_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-transparent min-h-[44px]">
+							<option value="">-- Chọn trường học --</option>
+							<?php
+							foreach ( $schools as $s ) {
+								echo '<option value="' . esc_attr( $s->ID ) . '">' . esc_html( $s->post_title ) . '</option>';
+							}
+							?>
+						</select>
+					</div>
+					
+					<div>
+						<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Ngành đào tạo</label>
+						<select name="nganh_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-transparent min-h-[44px]">
+							<option value="">-- Chọn ngành học --</option>
+							<?php
+							foreach ( $majors as $m ) {
+								echo '<option value="' . esc_attr( $m->ID ) . '">' . esc_html( $m->post_title ) . '</option>';
+							}
+							?>
+						</select>
+					</div>
+
+					<div>
+						<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Hệ đào tạo</label>
+						<select name="he_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-transparent min-h-[44px]">
+							<option value="">-- Chọn hệ học --</option>
+							<?php
+							foreach ( $types as $t ) {
+								echo '<option value="' . esc_attr( $t->slug ) . '">' . esc_html( $t->name ) . '</option>';
+							}
+							?>
+						</select>
+					</div>
 				</div>
 
-				<div>
-					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Hệ đào tạo</label>
-					<select name="he_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-transparent min-h-[44px]">
-						<option value="">-- Chọn hệ học --</option>
-						<?php
-						$types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
-						foreach ( $types as $t ) {
-							echo '<option value="' . esc_attr( $t->slug ) . '">' . esc_html( $t->name ) . '</option>';
-						}
-						?>
-					</select>
-				</div>
-
+				<!-- 4. Action Buttons (Always visible) -->
 				<div class="flex gap-2 w-full">
 					<button type="submit" class="flex-1 bg-brand-accent text-white py-3 rounded-lg font-bold hover:bg-amber-700 transition-all text-xs uppercase tracking-wider min-h-[44px]">
 						TÌM KIẾM
@@ -199,13 +253,13 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 
 				<!-- Right Side Promotion Texts -->
-				<div class="lg:col-span-7 space-y-5">
+				<div class="lg:col-span-7 space-y-4">
 					<span class="inline-block bg-[#EFF6FF] text-[#2563EB] text-sm font-bold px-3.5 py-1 rounded-lg uppercase tracking-wider">
 						LIÊN THÔNG ĐẠI HỌC
 					</span>
-					<h2 class="text-2xl md:text-4xl font-black text-slate-900 leading-tight">
-						NÂNG TẦM NGHỀ NGHIỆP NGAY
-					</h2>
+					<h1 class="text-xl sm:text-2xl md:text-5xl lg:text-6xl font-black font-display text-slate-900 leading-tight">
+						LỰA CHỌN ĐẠI HỌC ĐÚNG ĐẮN<br>NÂNG TẦM NGHỀ NGHIỆP NGAY
+					</h1>
 					<p class="text-slate-500 text-sm md:text-base leading-relaxed">
 						Giúp bạn rút ngắn thời gian - Tiết kiệm chi phí - Mở rộng cơ hội việc làm với chương trình Liên thông Đại học uy tín, chất lượng. Lớp học trực tuyến linh động và bằng cấp giá trị được bộ GD&ĐT công nhận.
 					</p>
@@ -224,13 +278,13 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	</section>
 
 	<!-- 3. HOT MAJORS SECTION -->
-	<section class="py-16 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
+	<section class="py-12 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
 		<!-- Decorative Background Dots -->
 		<div class="absolute inset-0 opacity-40 pointer-events-none z-0" style="background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-			<div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
+			<div class="text-center max-w-2xl mx-auto mb-8 space-y-2">
 				<span class="text-[#2563EB] text-xs font-extrabold uppercase tracking-widest block">KHÁM PHÁ NGÀNH HỌC</span>
-				<h2 class="text-2xl md:text-3xl font-black text-slate-900">Các ngành đào tạo hot nhất</h2>
+				<h2 class="text-xl md:text-3xl font-black text-slate-900">Các ngành đào tạo hot nhất</h2>
 				<p class="text-slate-500 text-sm">Hàng trăm ngành đào tạo đa dạng, phù hợp mọi đối tượng và xu hướng thị trường lao động.</p>
 			</div>
 
@@ -311,20 +365,20 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 
 	<!-- 4. NATIONAL SCHOOLS SECTION ("CÁC TRƯỜNG ĐÀO TẠO TRÊN TOÀN QUỐC") -->
-	<section id="program-section" class="py-16 md:py-24 bg-slate-50">
+	<section id="program-section" class="py-12 md:py-16 bg-slate-50">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-12">
+			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8">
 				<div class="space-y-2">
-					<span class="text-[#2563EB] text-sm font-bold uppercase tracking-wider block">THÔNG TIN TUYỂN SINH</span>
-					<h2 class="text-2xl md:text-3xl font-black text-slate-900">CÁC TRƯỜNG ĐÀO TẠO TRÊN TOÀN QUỐC</h2>
+					<span class="text-brand-primary text-sm font-bold uppercase tracking-wider block">THÔNG TIN TUYỂN SINH</span>
+					<h2 class="text-xl md:text-3xl font-black text-slate-900">CÁC TRƯỜNG ĐÀO TẠO TRÊN TOÀN QUỐC</h2>
 				</div>
-				<a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>" class="text-sm text-[#2563EB] font-bold hover:underline mt-4 sm:mt-0 flex items-center gap-1">
+				<a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>" class="text-sm text-brand-primary font-bold hover:underline mt-4 sm:mt-0 flex items-center gap-1">
 					Xem tất cả
 					<span>→</span>
 				</a>
 			</div>
 			
-			<div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+			<div class="flex lg:grid overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory lg:snap-none gap-4 pb-4 lg:pb-0 no-scrollbar lg:grid-cols-5">
 				<?php 
 				if ( $schools_query->have_posts() ) {
 					$index = 0;
@@ -346,11 +400,11 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						$reviews = get_post_meta( $school_id, 'reviews_count', true ) ?: '256';
 						$target  = get_post_meta( $school_id, 'admission_target', true ) ?: '3.000';
 				?>
-						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-							<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
+						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[45vw] sm:w-[250px] lg:w-auto snap-center">
+							<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
 							
 							<!-- Logo Overlay -->
-							<div class="h-16 w-16 bg-white rounded-lg border-4 border-white shadow-md bg-white -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
+							<div class="h-12 w-12 md:h-16 md:w-16 bg-white rounded-lg border-2 md:border-4 border-white shadow-md bg-white -mt-6 md:-mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
 								<?php if ( $logo_id ) : ?>
 									<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
 								<?php else : ?>
@@ -370,7 +424,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 								</div>
 								
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-[#2563EB] hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-[#2563EB]">Tìm hiểu thêm</a>
+									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-brand-primary hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-brand-primary">Tìm hiểu thêm</a>
 								</div>
 							</div>
 						</div>
@@ -387,12 +441,12 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	</section>
 
 	<!-- 5. WHY CHOOSE US ("VÌ SAO CHỌN NEXT PATH / LIÊN THÔNG ĐẠI HỌC?") -->
-	<section class="py-16 bg-white border-t border-slate-100 relative overflow-hidden">
+	<section class="py-12 bg-white border-t border-slate-100 relative overflow-hidden">
 		<!-- Decorative Background Dots -->
 		<div class="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style="background-image: radial-gradient(#2563eb 1.5px, transparent 1.5px); background-size: 32px 32px;"></div>
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-			<div class="text-center max-w-2xl mx-auto mb-12">
-				<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">VÌ SAO CHỌN LIÊN THÔNG ĐẠI HỌC?</h2>
+			<div class="text-center max-w-2xl mx-auto mb-8">
+				<h2 class="text-xl md:text-3xl font-black text-slate-900 mb-2">VÌ SAO CHỌN LIÊN THÔNG ĐẠI HỌC?</h2>
 				<p class="text-slate-500 text-sm md:text-sm">Chúng tôi đồng hành cùng bạn trên hành trình chinh phục tri thức.</p>
 			</div>
 
@@ -422,7 +476,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	</section>
 
 	<!-- 6. STATS NUMBERS BANNER (Blue stats widget from mockup image) -->
-	<section class="py-16 bg-gradient-to-r from-[#0E2038] to-[#1E3A8A] text-white overflow-hidden relative">
+	<section class="py-12 bg-gradient-to-r from-[#0E2038] to-[#1E3A8A] text-white overflow-hidden relative">
 		<div class="absolute right-0 bottom-0 w-96 h-96 bg-[#2563EB]/10 rounded-lg blur-3xl"></div>
 		
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -431,8 +485,8 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<span class="inline-block bg-[#2563EB] text-white text-sm font-black px-3.5 py-1 rounded-lg uppercase tracking-wider">
 						LÝ DO NÊN CHỌN CHÚNG TÔI
 					</span>
-					<h3 class="text-2xl md:text-4xl font-black font-display tracking-tight leading-tight text-white">
-						MỞ RỘNG CƠ HỘI HỌC TẬP & NGHỀ NGHIỆP<br>TỐT NHẤT CHO BẠN
+					<h3 class="text-xl sm:text-2xl md:text-4xl font-black font-display tracking-tight leading-tight text-white">
+						LIÊN THÔNG ĐẠI HỌC - NÂNG TẦM NGHỀ NGHIỆP NGAY<br>TỐT NHẤT CHO BẠN
 					</h3>
 					
 					<div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6">
@@ -466,24 +520,24 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	</section>
 
 	<!-- 7. STUDENT TESTIMONIALS ("ĐÁNH GIÁ CỦA HỌC VIÊN") -->
-	<section class="py-16 bg-white relative overflow-hidden">
+	<section class="py-12 bg-white relative overflow-hidden">
 		<!-- Decorative Background Blurred Blobs -->
-		<div class="absolute -left-16 -top-16 w-64 h-64 bg-[#2563EB]/10 rounded-full blur-3xl pointer-events-none z-0"></div>
-		<div class="absolute -right-16 -bottom-16 w-64 h-64 bg-[#F5BF23]/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+		<div class="absolute -left-16 -top-16 w-64 h-64 bg-brand-primary/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+		<div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-accent/10 rounded-full blur-3xl pointer-events-none z-0"></div>
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-			<div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
-				<span class="text-[#2563EB] text-sm font-bold uppercase tracking-wider block">CẢM NHẬN HỌC VIÊN</span>
-				<h2 class="text-2xl md:text-3xl font-black text-slate-900">ĐÁNH GIÁ CỦA HỌC VIÊN</h2>
+			<div class="text-center max-w-2xl mx-auto mb-8 space-y-3">
+				<span class="text-brand-primary text-sm font-bold uppercase tracking-wider block">CẢM NHẬN HỌC VIÊN</span>
+				<h2 class="text-xl md:text-3xl font-black text-slate-900">ĐÁNH GIÁ CỦA HỌC VIÊN</h2>
 				<p class="text-slate-500 text-sm">Hàng ngàn học viên đã tin tưởng và đồng hành cùng chúng tôi trên hành trình chinh phục tấm bằng đại học.</p>
 			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+			<div class="flex md:grid overflow-x-auto md:overflow-x-visible snap-x snap-mandatory md:snap-none gap-6 pb-4 md:pb-0 no-scrollbar md:grid-cols-3">
 				<!-- Testimonial 1 -->
-				<div class="bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
+				<div class="shrink-0 w-[85vw] md:w-auto snap-center bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
 					<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
 					<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"Mình đã học Văn bằng 2 CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi."</p>
 					<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
-						<div class="h-10 w-10 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-bold text-sm">NH</div>
+						<div class="h-10 w-10 bg-brand-primary text-white rounded-full flex items-center justify-center font-bold text-sm">NH</div>
 						<div>
 							<p class="font-bold text-sm text-slate-800">Nguyễn Hương</p>
 							<p class="text-xs text-slate-400">VB2 Công nghệ thông tin</p>
@@ -492,11 +546,11 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 
 				<!-- Testimonial 2 -->
-				<div class="bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
+				<div class="shrink-0 w-[85vw] md:w-auto snap-center bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
 					<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
 					<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy."</p>
 					<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
-						<div class="h-10 w-10 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-bold text-sm">TM</div>
+						<div class="h-10 w-10 bg-brand-primary text-white rounded-full flex items-center justify-center font-bold text-sm">TM</div>
 						<div>
 							<p class="font-bold text-sm text-slate-800">Trần Minh</p>
 							<p class="text-xs text-slate-400">Đại học Từ xa - Quản trị kinh doanh</p>
@@ -505,11 +559,11 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 
 				<!-- Testimonial 3 -->
-				<div class="bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
+				<div class="shrink-0 w-[85vw] md:w-auto snap-center bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
 					<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
 					<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận."</p>
 					<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
-						<div class="h-10 w-10 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-bold text-sm">LP</div>
+						<div class="h-10 w-10 bg-brand-primary text-white rounded-full flex items-center justify-center font-bold text-sm">LP</div>
 						<div>
 							<p class="font-bold text-sm text-slate-800">Lê Phương</p>
 							<p class="text-xs text-slate-400">Liên thông Đại học - Kế toán</p>
@@ -521,19 +575,19 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			<!-- Stats Row -->
 			<div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
 				<div class="text-center p-4 bg-blue-50 rounded-lg">
-					<span class="block font-display font-black text-2xl md:text-3xl text-[#2563EB]">1.200+</span>
+					<span class="block font-display font-black text-2xl md:text-3xl text-brand-primary">1.200+</span>
 					<span class="text-sm text-slate-600 font-semibold">Học viên tin tưởng</span>
 				</div>
 				<div class="text-center p-4 bg-blue-50 rounded-lg">
-					<span class="block font-display font-black text-2xl md:text-3xl text-[#2563EB]">98%</span>
+					<span class="block font-display font-black text-2xl md:text-3xl text-brand-primary">98%</span>
 					<span class="text-sm text-slate-600 font-semibold">Tỷ lệ hài lòng</span>
 				</div>
 				<div class="text-center p-4 bg-blue-50 rounded-lg">
-					<span class="block font-display font-black text-2xl md:text-3xl text-[#2563EB]">4.9/5</span>
+					<span class="block font-display font-black text-2xl md:text-3xl text-brand-primary">4.9/5</span>
 					<span class="text-sm text-slate-600 font-semibold">Đánh giá trung bình</span>
 				</div>
 				<div class="text-center p-4 bg-blue-50 rounded-lg">
-					<span class="block font-display font-black text-2xl md:text-3xl text-[#2563EB]">500+</span>
+					<span class="block font-display font-black text-2xl md:text-3xl text-brand-primary">500+</span>
 					<span class="text-sm text-slate-600 font-semibold">Lượt đánh giá 5 sao</span>
 				</div>
 			</div>
@@ -541,7 +595,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	</section>
 
 	<!-- 8. DOUBLE CERTIFICATE VALUE PROPOSITION -->
-	<section class="py-16 bg-white">
+	<section class="py-12 bg-white">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
 			<!-- Box Left: BẰNG ĐẠO TẠO CHÍNH QUY -->
 			<div class="bg-slate-50 border border-slate-100 rounded-lg p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
@@ -588,16 +642,16 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	</section>
 
 	<!-- 9. SEGMENTS SECTION ("CHƯƠNG TRÌNH PHÙ HỢP VỚI BẠN") -->
-	<section class="py-16 bg-slate-50 border-y border-slate-100">
+	<section class="py-12 bg-slate-50 border-y border-slate-100">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="text-center max-w-2xl mx-auto mb-12">
-				<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">CHƯƠNG TRÌNH PHÙ HỢP VỚI BẠN</h2>
+			<div class="text-center max-w-2xl mx-auto mb-8">
+				<h2 class="text-xl md:text-3xl font-black text-slate-900 mb-2">NGÀNH HỌC HOT & DỄ XIN VIỆC</h2>
 				<p class="text-slate-500 text-sm md:text-sm">Chúng tôi thiết kế các lộ trình học tối ưu riêng cho từng nhóm đối tượng học viên.</p>
 			</div>
 
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+			<div class="flex md:grid overflow-x-auto md:overflow-x-visible snap-x snap-mandatory md:snap-none gap-6 pb-4 md:pb-0 no-scrollbar md:grid-cols-3">
 				<!-- Segment 1 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-6 hover:border-brand-primary hover:shadow-md transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded-lg p-6 hover:border-brand-primary hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[85vw] md:w-auto snap-center">
 					<div class="space-y-3">
 						<div class="h-36 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=350');"></div>
 						<h4 class="font-extrabold text-slate-800 text-base">Tốt nghiệp Trung cấp / Cao đẳng</h4>
@@ -605,7 +659,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</div>
 				</div>
 				<!-- Segment 2 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-6 hover:border-brand-primary hover:shadow-md transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded-lg p-6 hover:border-brand-primary hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[85vw] md:w-auto snap-center">
 					<div class="space-y-3">
 						<div class="h-36 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=350');"></div>
 						<h4 class="font-extrabold text-slate-800 text-base">Người đi làm bận rộn</h4>
@@ -613,7 +667,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</div>
 				</div>
 				<!-- Segment 3 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-6 hover:border-brand-primary hover:shadow-md transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded-lg p-6 hover:border-brand-primary hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[85vw] md:w-auto snap-center">
 					<div class="space-y-3">
 						<div class="h-36 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=350');"></div>
 						<h4 class="font-extrabold text-slate-800 text-base">Liên thông trái ngành / Chuyển ngành</h4>
@@ -635,7 +689,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			<!-- Registration form column -->
 			<div class="lg:col-span-7 space-y-6">
 				<div>
-					<h2 class="text-2xl md:text-3xl font-black text-slate-900 leading-tight">ĐĂNG KÝ NHẬN TƯ VẤN MIỄN PHÍ</h2>
+					<h2 class="text-xl md:text-3xl font-black text-slate-900 leading-tight">ĐĂNG KÝ NHẬN TƯ VẤN MIỄN PHÍ</h2>
 					<p class="text-slate-500 text-sm mt-1">Để lại thông tin, chuyên gia tư vấn tuyển sinh đại học sẽ liên hệ cho bạn trong vòng 15 phút.</p>
 				</div>
 				
@@ -694,16 +748,16 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex justify-between items-end mb-12">
 				<div class="space-y-2">
-					<span class="text-[#2563EB] text-sm font-bold uppercase tracking-wider block">THÔNG TIN TUYỂN SINH</span>
-					<h2 class="text-2xl md:text-3xl font-black text-slate-900">TIN TỨC MỚI NHẤT</h2>
+					<span class="text-brand-primary text-sm font-bold uppercase tracking-wider block">THÔNG TIN TUYỂN SINH</span>
+					<h2 class="text-xl md:text-3xl font-black text-slate-900">TIN TỨC MỚI NHẤT</h2>
 				</div>
-				<a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>" class="text-sm text-[#2563EB] font-bold hover:underline flex items-center gap-1">
+				<a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>" class="text-sm text-brand-primary font-bold hover:underline flex items-center gap-1">
 					Xem tất cả
 					<span>→</span>
 				</a>
 			</div>
 
-			<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
+			<div class="flex sm:grid overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory sm:snap-none gap-3 sm:gap-6 pb-4 sm:pb-0 no-scrollbar sm:grid-cols-4">
 				<?php 
 				$mock_news = [
 					[ 'title' => 'Tuyển sinh Đại học Từ xa khóa mới nhất', 'date' => '10/07/2026', 'desc' => 'Thông tin chi tiết các ngành đào tạo từ xa hệ Đại học được bộ GD&ĐT công nhận tốt nghiệp chính quy.' ],
@@ -722,7 +776,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						$categories = get_the_category( $post_id );
 						$category_name = ! empty( $categories ) ? $categories[0]->name : 'Tin tuyển sinh';
 				?>
-						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
+						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[45vw] sm:w-auto snap-center">
 							<div class="h-36 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
 							<div class="p-4 flex-1 flex flex-col justify-between">
 								<div class="space-y-2">
@@ -730,12 +784,12 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 										<span class="bg-blue-50 text-brand-primary px-2 py-0.5 rounded-lg"><?php echo esc_html( $category_name ); ?></span>
 										<span class="text-slate-400"><?php echo get_the_date( 'd/m/Y' ); ?></span>
 									</div>
-									<h4 class="font-extrabold text-slate-800 text-sm md:text-sm tracking-tight leading-snug line-clamp-2 hover:text-[#2563EB] pt-1">
+									<h4 class="font-extrabold text-slate-800 text-sm md:text-sm tracking-tight leading-snug line-clamp-2 hover:text-brand-primary pt-1">
 										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 									</h4>
 									<p class="text-sm text-slate-400 leading-normal line-clamp-2"><?php echo esc_html( wp_strip_all_tags( get_the_excerpt() ) ); ?></p>
 								</div>
-								<a href="<?php the_permalink(); ?>" class="mt-4 text-sm text-[#2563EB] font-bold hover:underline block">Chi tiết bài viết</a>
+								<a href="<?php the_permalink(); ?>" class="mt-4 text-sm text-brand-primary font-bold hover:underline block">Chi tiết bài viết</a>
 							</div>
 						</div>
 				<?php 
@@ -747,7 +801,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				if ( ! $news_has_posts ) {
 					foreach ( $mock_news as $n ) :
 				?>
-						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
+						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[45vw] sm:w-auto snap-center">
 							<div class="h-32 bg-slate-200 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=250');"></div>
 							<div class="p-4 flex-1 flex flex-col justify-between">
 								<div class="space-y-2">
