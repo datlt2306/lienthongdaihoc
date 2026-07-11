@@ -232,14 +232,15 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 	<!-- 2. HOT MAJORS SECTION -->
 	<section class="py-12 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-			<div class="text-center max-w-2xl mx-auto mb-8 space-y-2">
+		<div class="max-w-7xl mx-auto relative z-10">
+			<div class="text-center max-w-2xl mx-auto mb-8 space-y-2 px-4">
 				<span class="text-[#2563EB] text-xs font-extrabold uppercase tracking-widest block">KHÁM PHÁ NGÀNH HỌC</span>
 				<h2 class="text-xl md:text-3xl font-black text-slate-900">Các ngành đào tạo hot nhất</h2>
 				<p class="text-slate-500 text-sm">Hàng trăm ngành đào tạo đa dạng, phù hợp mọi đối tượng và xu hướng thị trường lao động.</p>
 			</div>
 
-			<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+			<!-- Mobile: Horizontal scroll | Desktop: Grid -->
+			<div class="flex md:grid md:grid-cols-4 lg:grid-cols-6 gap-3 overflow-x-auto snap-x snap-mandatory px-4 pb-2 md:px-0 md:pb-0 scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
 				<?php
 				$majors_query = new WP_Query( [
 					'post_type'      => 'major',
@@ -289,7 +290,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						$i++;
 					?>
 						<a href="<?php the_permalink(); ?>"
-						   class="group flex flex-col items-center text-center p-4 bg-white border <?php echo $c['border']; ?> rounded-xl <?php echo $c['hover']; ?> hover:shadow-md transition-all">
+						   class="group flex flex-col items-center text-center p-4 bg-white border <?php echo $c['border']; ?> rounded-xl <?php echo $c['hover']; ?> hover:shadow-md transition-all snap-start shrink-0 w-[140px] md:w-auto">
 							<div class="h-12 w-12 <?php echo $c['icon_bg']; ?> <?php echo $c['icon_text']; ?> rounded-xl flex items-center justify-center mb-3 text-xl group-hover:scale-110 transition-transform">
 								<?php echo $icon; ?>
 							</div>
@@ -650,15 +651,16 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 	<!-- 9. SEGMENTS SECTION -->
 	<section class="py-16 bg-slate-50 border-y border-slate-100">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="text-center max-w-2xl mx-auto mb-12">
+		<div class="max-w-7xl mx-auto relative">
+			<div class="text-center max-w-2xl mx-auto mb-12 px-4">
 				<h2 class="text-xl md:text-3xl font-black text-slate-900 mb-2">Chương trình phù hợp với bạn?</h2>
 				<p class="text-slate-500 text-sm">Chúng tôi thiết kế các lộ trình học tối ưu riêng cho từng nhóm đối tượng cụ thể.</p>
 			</div>
 
-			<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+			<!-- Mobile: Horizontal scroll | Desktop: Grid -->
+			<div class="flex md:grid md:grid-cols-5 gap-4 overflow-x-auto snap-x snap-mandatory px-4 pb-2 md:px-0 md:pb-0 scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
 				<!-- Segment 1 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between snap-start shrink-0 w-[200px] md:w-auto">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-bold text-slate-800 text-xs">Cho người đi làm</h4>
@@ -667,7 +669,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 
 				<!-- Segment 2 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between snap-start shrink-0 w-[200px] md:w-auto">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-bold text-slate-800 text-xs">Cho học sinh lớp 12</h4>
@@ -676,7 +678,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 
 				<!-- Segment 3 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between snap-start shrink-0 w-[200px] md:w-auto">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-bold text-slate-800 text-xs">Cho người muốn liên thông</h4>
@@ -685,7 +687,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 
 				<!-- Segment 4 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between snap-start shrink-0 w-[200px] md:w-auto">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-bold text-slate-800 text-xs">Cho người muốn chuyển ngành</h4>
@@ -694,7 +696,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 
 				<!-- Segment 5 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
+				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between snap-start shrink-0 w-[200px] md:w-auto">
 					<div class="space-y-2">
 						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=200');"></div>
 						<h4 class="font-bold text-slate-800 text-xs">Cho người học văn bằng 2</h4>

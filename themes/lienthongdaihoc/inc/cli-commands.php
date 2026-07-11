@@ -490,30 +490,38 @@ class LTDH_CLI_Commands {
 		$cat_news  = wp_create_category( 'Tin tuyển sinh' );
 		$cat_ann   = wp_create_category( 'Thông báo' );
 
+		// Get schools for assignment
+		$all_schools = get_posts( [ 'post_type' => 'school', 'numberposts' => -1, 'post_status' => 'publish' ] );
+		$school_ids = wp_list_pluck( $all_schools, 'ID' );
+
 		$guides_data = [
 			[
 				'title' => 'Học Đại học từ xa là gì?',
 				'desc'  => 'Tìm hiểu hình thức đào tạo E-learning trực tuyến, xu hướng phát triển giáo dục đại học cho người đi làm.',
 				'cat'   => $cat_guide,
-				'img'   => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400'
+				'img'   => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400',
+				'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
 			],
 			[
 				'title' => 'Tuyển sinh Liên thông Cao đẳng lên Đại học năm 2026',
 				'desc'  => 'Xét tuyển hồ sơ và miễn giảm tín chỉ đối với sinh viên có bằng tốt nghiệp Trung cấp/Cao đẳng chuyển tiếp.',
 				'cat'   => $cat_news,
-				'img'   => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=400'
+				'img'   => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=400',
+				'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
 			],
 			[
 				'title' => 'Thông báo tuyển sinh Đại học từ xa đợt 1 năm 2026',
 				'desc'  => 'Thông tin chi tiết các ngành đào tạo tuyển sinh đại học trực tuyến và văn bằng 2 đợt đầu năm.',
 				'cat'   => $cat_ann,
-				'img'   => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=400'
+				'img'   => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=400',
+				'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
 			],
 			[
 				'title' => 'Quy định miễn giảm tín chỉ khi học văn bằng 2',
 				'desc'  => 'Học viên có thể rút ngắn đến 50% thời gian học nếu đối chiếu bảng điểm môn học tương đồng.',
 				'cat'   => $cat_guide,
-				'img'   => 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=400'
+				'img'   => 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=400',
+				'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
 			]
 		];
 
@@ -529,6 +537,11 @@ class LTDH_CLI_Commands {
 				] );
 				if ( ! is_wp_error( $post_id ) ) {
 					wp_set_post_categories( $post_id, [ $g['cat'] ] );
+					
+					// Assign school relationship
+					if ( ! empty( $g['school'] ) ) {
+						update_field( 'school_relationship', $g['school'], $post_id );
+					}
 					
 					// Sideload thumbnail for post
 					require_once ABSPATH . 'wp-admin/includes/media.php';

@@ -103,6 +103,8 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 					foreach ( $feat_cats as $fc ) {
 						if ( $fc->slug !== 'uncategorized' ) { $feat_cat = $fc; break; }
 					}
+					$feat_school_id = get_field( 'school_relationship', $featured_post->ID );
+					$feat_school_name = $feat_school_id ? get_the_title( $feat_school_id ) : '';
 				?>
 				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all group grid grid-cols-1 md:grid-cols-12">
 					<!-- Thumbnail Left -->
@@ -111,6 +113,11 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 							<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('<?php echo esc_url( $feat_thumb ); ?>');"></div>
 						<?php else : ?>
 							<div class="absolute inset-0 bg-gradient-to-tr from-[#0E2038] to-brand-primary flex items-center justify-center text-4xl">📰</div>
+						<?php endif; ?>
+						<?php if ( $feat_school_name ) : ?>
+							<span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#2563EB] text-[10px] font-extrabold px-3 py-1 rounded-full shadow-sm">
+								<?php echo esc_html( $feat_school_name ); ?>
+							</span>
 						<?php endif; ?>
 					</div>
 					
@@ -163,6 +170,9 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 								foreach ( $post_cats as $pc ) {
 									if ( $pc->slug !== 'uncategorized' ) { $post_cat = $pc; break; }
 								}
+								// Get school relationship
+								$school_id = get_field( 'school_relationship', $post_id );
+								$school_name = $school_id ? get_the_title( $school_id ) : '';
 						?>
 							<article class="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
 								<a href="<?php the_permalink(); ?>" class="relative block h-28 md:h-40 bg-slate-100 overflow-hidden shrink-0">
@@ -170,6 +180,11 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 										<div class="w-full h-full bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('<?php echo esc_url( $post_thumb ); ?>');"></div>
 									<?php else : ?>
 										<div class="w-full h-full flex items-center justify-center text-3xl">📰</div>
+									<?php endif; ?>
+									<?php if ( $school_name ) : ?>
+										<span class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[#2563EB] text-[8px] md:text-[9px] font-extrabold px-2 py-0.5 rounded-full shadow-sm line-clamp-1">
+											<?php echo esc_html( $school_name ); ?>
+										</span>
 									<?php endif; ?>
 								</a>
 

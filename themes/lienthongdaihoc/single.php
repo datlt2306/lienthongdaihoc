@@ -56,12 +56,23 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 		<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/70 to-transparent"></div>
 
 		<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-			<!-- Category Badge -->
-			<?php if ( $post_cat ) : ?>
-				<span class="inline-block bg-[#2563EB] text-white text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider mb-4">
-					<?php echo esc_html( $post_cat->name ); ?>
-				</span>
-			<?php endif; ?>
+			<!-- Category & School Badges -->
+			<div class="flex flex-wrap items-center gap-2 mb-4">
+				<?php if ( $post_cat ) : ?>
+					<span class="inline-block bg-[#2563EB] text-white text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider">
+						<?php echo esc_html( $post_cat->name ); ?>
+					</span>
+				<?php endif; ?>
+				<?php
+				$school_id = get_field( 'school_relationship', $post_id );
+				if ( $school_id ) :
+					$school_name = get_the_title( $school_id );
+				?>
+					<span class="inline-block bg-white/20 backdrop-blur-sm text-white text-xs font-extrabold px-3 py-1.5 rounded-full tracking-wider">
+						<?php echo esc_html( $school_name ); ?>
+					</span>
+				<?php endif; ?>
+			</div>
 
 			<h1 class="text-2xl md:text-4xl font-black text-white leading-tight mb-5">
 				<?php the_title(); ?>

@@ -858,6 +858,43 @@
         "show_in_rest": 0
     },
     {
+        "key": "group_post_school",
+        "title": "Trường liên kết",
+        "fields": [
+            {
+                "key": "field_post_school",
+                "label": "Trường liên kết",
+                "name": "school_relationship",
+                "type": "post_object",
+                "post_type": [
+                    "school"
+                ],
+                "allow_null": 1,
+                "multiple": 0,
+                "return_format": "id",
+                "ui": 1,
+                "instructions": "Chọn trường liên quan đến bài viết này (hiển thị dưới dạng badge)"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "side",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true,
+        "description": "Gắn trường liên kết cho bài viết tin tức",
+        "show_in_rest": 0
+    },
+    {
         "key": "group_page_banner",
         "title": "Banner trang",
         "fields": [
