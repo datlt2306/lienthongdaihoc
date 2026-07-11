@@ -21,7 +21,7 @@ $messenger = get_field( 'global_messenger_url', 'options' ) ?: 'https://m.me';
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 font-display font-extrabold text-2xl text-white mb-4">
 					<div class="flex flex-col leading-none">
 						<span class="text-sm font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
-						<span class="text-xl font-extrabold text-[#2563EB]">ĐẠI HỌC</span>
+						<span class="text-xl font-extrabold text-brand-primary">ĐẠI HỌC</span>
 					</div>
 				</a>
 				<p class="text-sm text-slate-400 mb-4 max-w-sm">
@@ -133,17 +133,6 @@ $messenger = get_field( 'global_messenger_url', 'options' ) ?: 'https://m.me';
 	}
 	?>
 	window.ltdh_combinations = <?php echo json_encode( $combos ); ?>;
-
-	// Mobile menu toggler
-	document.addEventListener('DOMContentLoaded', function() {
-		const toggleBtn = document.getElementById('mobile-menu-toggle');
-		const mobileMenu = document.getElementById('mobile-menu');
-		if (toggleBtn && mobileMenu) {
-			toggleBtn.addEventListener('click', function() {
-				mobileMenu.classList.toggle('hidden');
-			});
-		}
-	});
 </script>
 
 <?php wp_footer(); ?>

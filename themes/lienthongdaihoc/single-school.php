@@ -25,6 +25,73 @@ $offered_program_ids = get_post_meta( $school_id, '_offered_programs', true );
 $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 ?>
 
+<style>
+/* Custom styled Admission info & Contact info cards */
+.prose h4 {
+	font-size: 0.95rem;
+	font-weight: 800;
+	color: #1e293b;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 1.5rem;
+	margin-bottom: 0.75rem;
+	padding-left: 0.75rem;
+	border-left: 4px solid #2563eb;
+	display: flex;
+	align-items: center;
+}
+.prose ul {
+	list-style-type: none !important;
+	padding-left: 0 !important;
+	margin-bottom: 1.5rem;
+	border: 1px solid #f1f5f9;
+	border-radius: 8px;
+	overflow: hidden;
+	background-color: #ffffff;
+}
+.prose ul li {
+	padding: 0.75rem 1rem !important;
+	border-bottom: 1px solid #f1f5f9;
+	margin: 0 !important;
+	font-size: 0.875rem;
+	color: #475569;
+	display: flex;
+	flex-direction: column;
+}
+@media (min-width: 640px) {
+	.prose ul li {
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1.5rem;
+	}
+}
+.prose ul li:last-child {
+	border-bottom: none;
+}
+.prose ul li:nth-child(even) {
+	background-color: #f8fafc;
+}
+.prose ul li strong {
+	color: #0f172a;
+	font-weight: 700;
+	min-width: 180px;
+	flex-shrink: 0;
+}
+.bank-info-box {
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+	border: 1px solid #cbd5e1 !important;
+	border-left: 5px solid #2563eb !important;
+	padding: 1.25rem !important;
+	border-radius: 8px !important;
+	color: #334155 !important;
+	font-size: 0.875rem !important;
+	line-height: 1.6 !important;
+	margin-top: 0.75rem !important;
+	box-shadow: inset 0 1px 2px rgba(0,0,0,0.02) !important;
+}
+</style>
+
 <main id="primary" class="site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -43,8 +110,8 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 
 				<div class="flex flex-col gap-2 w-full md:w-auto">
-					<a href="#register" class="bg-brand-primary text-white text-center px-6 py-2.5 rounded-lg font-bold shadow-md hover:bg-teal-700 transition-all text-sm">Đăng Ký Nhận Tư Vấn</a>
-					<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="border border-slate-200 text-slate-700 text-center px-6 py-2.5 rounded-lg font-semibold hover:bg-slate-50 transition-all text-sm">Hotline: <?php echo esc_html( $hotline ); ?></a>
+					<a href="#register" class="bg-brand-primary text-white text-center px-6 py-3 rounded-lg font-bold shadow-md hover:bg-teal-700 transition-all text-sm min-h-[44px] flex items-center justify-center">Đăng Ký Nhận Tư Vấn</a>
+					<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="border border-slate-200 text-slate-700 text-center px-6 py-3 rounded-lg font-semibold hover:bg-slate-50 transition-all text-sm min-h-[44px] flex items-center justify-center">Hotline: <?php echo esc_html( $hotline ); ?></a>
 				</div>
 			</div>
 		</section>
@@ -107,7 +174,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					}
 
 					if ( $programs_query->have_posts() ) :
-						echo '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+						echo '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
 						while ( $programs_query->have_posts() ) : $programs_query->the_post();
 							$prog_id = get_the_ID();
 							$major_rel_id = get_field( 'major_relationship', $prog_id );
@@ -130,22 +197,21 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
 							?>
 							<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-								<div class="h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>');"></div>
+								<div class="relative h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>');">
+									<?php if ( $type_name ) : ?>
+										<span class="absolute top-3 left-3 bg-orange-50 text-orange-600 text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm z-10"><?php echo esc_html( $type_name ); ?></span>
+									<?php endif; ?>
+								</div>
 								<div class="p-5 flex-1 flex flex-col justify-between space-y-4">
 									<div>
-										<div class="flex items-center flex-wrap gap-2 mb-2">
-											<?php if ( $type_name ) : ?>
-												<span class="bg-orange-50 text-orange-600 text-[10px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider"><?php echo esc_html( $type_name ); ?></span>
-											<?php endif; ?>
-										</div>
-										<h4 class="font-extrabold text-slate-800 text-sm hover:text-[#2563EB] transition-colors leading-snug">
+										<h4 class="font-extrabold text-slate-800 text-sm hover:text-brand-primary transition-colors leading-snug">
 											<a href="<?php the_permalink(); ?>"><?php echo esc_html( $clean_title ); ?></a>
 										</h4>
 										
 										<div class="mt-3 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
 											<p>Ngành học: 
 												<?php if ( $major_rel_id ) : ?>
-													<a href="<?php echo esc_url( get_permalink( $major_rel_id ) ); ?>" class="font-bold text-[#2563EB] hover:underline"><?php echo esc_html( $major_name ); ?></a>
+													<a href="<?php echo esc_url( get_permalink( $major_rel_id ) ); ?>" class="font-bold text-brand-primary hover:underline"><?php echo esc_html( $major_name ); ?></a>
 												<?php else : ?>
 													<span class="font-semibold text-slate-700"><?php echo esc_html( $major_name ); ?></span>
 												<?php endif; ?>
@@ -159,7 +225,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 										<?php if ( $status === 'tam-ngung' ) : ?>
 											<span class="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
 										<?php else : ?>
-											<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-[#1E40AF] transition-all">Chi tiết</a>
+											<a href="<?php the_permalink(); ?>#register" class="bg-brand-accent text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-amber-700 shadow-sm shadow-brand-accent/10 transition-all min-h-[44px] flex items-center justify-center">Tìm hiểu</a>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -280,27 +346,27 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 								<div>
 									<label class="block text-sm font-semibold text-slate-600 mb-1">Họ và tên *</label>
-									<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
+									<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
 								</div>
 								<div>
 									<label class="block text-sm font-semibold text-slate-600 mb-1">Số điện thoại *</label>
-									<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
+									<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
 								</div>
 								
-								<button type="submit" class="w-full bg-brand-primary text-white py-2.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-teal-700 transition-all mt-2">
+								<button type="submit" class="w-full bg-brand-primary text-white py-3.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-teal-700 transition-all mt-2 min-h-[44px] flex items-center justify-center">
 									Gửi Thông Tin Đăng Ký
 								</button>
 							</form>
 						<?php endif; ?>
 					</section>
-
+ 
 					<!-- CONTACT INFO CARD -->
 					<div class="bg-slate-950 text-white rounded-lg p-6 text-center shadow-lg">
 						<span class="text-sm text-teal-400 font-bold uppercase tracking-wider block mb-1">Văn phòng tuyển sinh</span>
 						<h4 class="font-display font-black text-2xl mb-4"><?php echo esc_html( $hotline ); ?></h4>
 						<div class="flex gap-2">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-primary text-white py-2 rounded-lg font-semibold text-sm hover:bg-teal-700 transition-all">Gọi Ngay</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white/10 text-white border border-white/20 py-2 rounded-lg font-semibold text-sm hover:bg-white/20 transition-all">Nhận Trò Chuyện</a>
+							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-primary text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-teal-700 transition-all min-h-[44px] flex items-center justify-center">Gọi Ngay</a>
+							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white/10 text-white border border-white/20 py-3.5 rounded-lg font-semibold text-sm hover:bg-white/20 transition-all min-h-[44px] flex items-center justify-center">Nhận Trò Chuyện</a>
 						</div>
 					</div>
 

@@ -24,7 +24,7 @@ $duration        = get_field( 'duration', $program_id );
 $requirements    = get_field( 'admission_requirements', $program_id );
 $documents       = get_field( 'required_documents', $program_id );
 $enrollment      = get_field( 'enrollment_period', $program_id );
-$program_hotline = get_field( 'hotline_override', $program_id ) ?: ( $school_id ? get_field( 'hotline', $school_id ) : '' ) ?: get_field( 'global_hotline', 'options' );
+$program_hotline = get_field( 'hotline_override', $program_id ) ?: ( $school_id ? get_field( 'hotline', $school_id ) : '' ) ?: get_field( 'global_hotline', 'options' ) ?: '0389198653';
 $benefits        = get_field( 'program_benefits', $program_id );
 $opportunities   = get_field( 'career_opportunities', $program_id );
 $why_choose      = get_field( 'why_choose_us', $program_id );
@@ -37,63 +37,6 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	<?php get_template_part( 'template-parts/banner' ); ?>
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		
-		<!-- SECTION 1: HERO -->
-		<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
-			<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-				<div class="lg:col-span-8">
-					<span class="inline-block bg-teal-50 text-brand-primary text-sm font-bold px-3 py-1 rounded-lg uppercase tracking-wider mb-3">
-						<?php echo esc_html( $school_title ); ?>
-					</span>
-					<h1 class="text-2xl md:text-4xl font-black text-slate-900 leading-tight mb-4">
-						<?php the_title(); ?>
-					</h1>
-					<p class="text-slate-600 mb-6 text-base max-w-2xl">
-						<?php echo esc_html( get_the_excerpt() ?: 'Chương trình đào tạo chất lượng cao liên kết trực tiếp với trường ' . $school_title . ' nhằm mang đến lộ trình tốt nhất cho sinh viên.' ); ?>
-					</p>
-					
-					<?php
-					$learning_details = ltdh_get_program_learning_details( $program_id );
-					?>
-					<div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-4 border-t border-slate-100">
-						<div>
-							<span class="text-sm text-slate-400 block mb-0.5">Học phí chỉ từ</span>
-							<span class="font-display font-bold text-brand-primary text-sm md:text-base"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
-						</div>
-						<div>
-							<span class="text-sm text-slate-400 block mb-0.5">Thời gian học</span>
-							<span class="font-display font-bold text-slate-800 text-sm md:text-base"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
-						</div>
-						<div>
-							<span class="text-sm text-slate-400 block mb-0.5">Cơ sở học</span>
-							<span class="font-display font-bold text-slate-800 text-sm md:text-base"><?php echo esc_html( $learning_details['campus'] ); ?></span>
-						</div>
-						<div>
-							<span class="text-sm text-slate-400 block mb-0.5">Hình thức học</span>
-							<span class="font-display font-bold text-slate-800 text-sm md:text-base"><?php echo esc_html( $learning_details['mode'] ); ?></span>
-						</div>
-						<div>
-							<span class="text-sm text-slate-400 block mb-0.5">Hạn hồ sơ</span>
-							<span class="font-display font-bold text-brand-accent text-sm md:text-base"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
-						</div>
-					</div>
-				</div>
-				<div class="lg:col-span-4 flex flex-col gap-3">
-					<a href="#register" class="w-full text-center bg-brand-primary text-white py-3 rounded-lg font-bold shadow-md shadow-brand-primary/20 hover:bg-teal-700 transition-all">
-						Đăng Ký Tư Vấn Ngay
-					</a>
-					<button type="button"
-							class="w-full text-center bg-white border-2 border-brand-primary text-brand-primary py-3 rounded-lg font-bold shadow-sm hover:bg-brand-primary/5 transition-all ltdh-compare-single-btn"
-							data-compare-type="program" data-compare-id="<?php echo esc_attr( $program_id ); ?>"
-							data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
-							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>">
-						📊 Thêm vào so sánh
-					</button>
-					<a href="<?php echo esc_url( $global_zalo ); ?>" class="w-full text-center bg-blue-500 text-white py-3 rounded-lg font-bold shadow-md shadow-blue-500/20 hover:bg-blue-600 transition-all">
-						Trao đổi qua Zalo
-					</a>
-				</div>
-			</div>
-		</section>
 
 		<!-- CONTENT GRID -->
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -107,37 +50,42 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						<?php the_content(); ?>
 					</div>
 					<?php if ( $benefits ) : ?>
-						<div class="mt-6 bg-teal-50/50 p-4 rounded-lg border border-teal-100/50">
+						<div class="mt-6 bg-teal-50/50 p-4 rounded-lg border border-teal-100/50 mb-6">
 							<h3 class="text-teal-800 font-bold text-base mb-2">Quyền lợi nổi bật</h3>
 							<div class="prose prose-teal max-w-none text-slate-600 text-sm">
 								<?php echo wp_kses_post( $benefits ); ?>
 							</div>
 						</div>
 					<?php endif; ?>
+
+					<?php
+					$learning_details = ltdh_get_program_learning_details( $program_id );
+					?>
+					<div class="grid grid-cols-2 md:grid-cols-5 gap-3.5 py-4 border-t border-slate-100">
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí chỉ từ</span>
+							<span class="font-extrabold text-[#2563EB] text-xs md:text-sm leading-snug"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
+						</div>
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
+							<span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
+						</div>
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
+							<span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug"><?php echo esc_html( $learning_details['campus'] ); ?></span>
+						</div>
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
+							<span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
+						</div>
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
+							<span class="font-extrabold text-[#EA580C] text-xs md:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
+						</div>
+					</div>
 				</section>
 
-				<!-- SECTION 3: SCHOOL INFORMATION -->
-				<?php if ( $school_id ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Thông tin trường đào tạo</h2>
-						<div class="flex flex-col sm:flex-row gap-4 items-start mb-4">
-							<?php ltdh_render_school_thumbnail( $school_id, 'thumbnail', 'h-16 w-16 object-cover shrink-0 rounded-lg border border-slate-100 bg-white' ); ?>
-							<div>
-								<h3 class="font-bold text-lg text-slate-900"><?php echo esc_html( $school_title ); ?></h3>
-								<p class="text-sm text-slate-500 mt-1">Website: <a href="<?php echo esc_url( get_field( 'website', $school_id ) ); ?>" target="_blank" class="text-brand-primary"><?php echo esc_html( get_field( 'website', $school_id ) ); ?></a></p>
-								<p class="text-sm text-slate-500">Địa chỉ: <?php echo esc_html( get_field( 'address', $school_id ) ); ?></p>
-							</div>
-						</div>
-						<div class="prose prose-slate max-w-none text-sm text-slate-600">
-							<?php echo wp_kses_post( get_post_field( 'post_content', $school_id ) ); ?>
-						</div>
-						<div class="mt-4 pt-4 border-t border-slate-100">
-							<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="text-brand-primary font-semibold text-sm hover:underline">
-								Xem chi tiết về trường & các chương trình khác →
-							</a>
-						</div>
-					</section>
-				<?php endif; ?>
+
 
 				<!-- SECTION 4: MAJOR INFORMATION -->
 				<?php if ( $major_id ) : ?>
@@ -267,6 +215,62 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			<div class="lg:col-span-1">
 				<div class="sticky top-24 space-y-6">
 					
+					<!-- SCHOOL INFO CARD -->
+					<?php if ( $school_id ) : 
+						$school_logo_id = get_field( 'logo', $school_id );
+						$school_logo_url = $school_logo_id ? wp_get_attachment_image_url( $school_logo_id, 'thumbnail' ) : '';
+						if ( ! $school_logo_url ) {
+							$school_logo_url = get_the_post_thumbnail_url( $school_id, 'thumbnail' ) ?: get_stylesheet_directory_uri() . '/assets/images/logo-placeholder.png';
+						}
+						$school_cover_url = get_the_post_thumbnail_url( $school_id, 'medium' );
+						if ( ! $school_cover_url ) {
+							$school_cover_url = get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg';
+						}
+						$school_address = get_post_meta( $school_id, 'address', true ) ?: get_field( 'address', $school_id ) ?: 'Việt Nam';
+						$school_web = get_field( 'website', $school_id );
+						$school_desc = get_post_field( 'post_excerpt', $school_id ) ?: wp_trim_words( get_post_field( 'post_content', $school_id ), 25 );
+					?>
+						<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+							<!-- Banner Cover -->
+							<div class="h-28 bg-cover bg-center relative" style="background-image: url('<?php echo esc_url( $school_cover_url ); ?>');">
+								<div class="absolute inset-0 bg-blue-900/10"></div>
+							</div>
+							
+							<!-- Overlapping Logo Wrapper -->
+							<div class="relative flex justify-center -mt-10 mb-3">
+								<div class="w-20 h-20 bg-white p-1 rounded-xl shadow-md border border-slate-100 flex items-center justify-center overflow-hidden">
+									<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain">
+								</div>
+							</div>
+							
+							<!-- School Info details -->
+							<div class="px-6 pb-6 text-center">
+								<h4 class="font-extrabold text-slate-800 text-sm leading-snug uppercase tracking-tight mb-2">
+									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="hover:text-[#2563EB] transition-colors"><?php echo esc_html( $school_title ); ?></a>
+								</h4>
+								
+								<?php if ( $school_web ) : ?>
+									<p class="text-xs text-slate-500 mb-2 font-medium">
+										Website: <a href="<?php echo esc_url( $school_web ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#2563EB] hover:underline"><?php echo esc_html( $school_web ); ?></a>
+									</p>
+								<?php endif; ?>
+
+								<div class="flex items-start justify-center gap-2 text-xs text-slate-500 font-medium max-w-xs mx-auto mb-4">
+									<span class="text-[#2563EB] shrink-0 mt-0.5">📍</span>
+									<span class="text-left leading-relaxed">
+										Địa chỉ: <?php echo esc_html( $school_address ); ?>
+										<a href="<?php echo esc_url( 'https://www.google.com/maps/search/?api=1&query=' . urlencode( $school_title . ' ' . $school_address ) ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#2563EB] font-bold hover:underline mt-0.5 inline-block">(Xem bản đồ)</a>
+									</span>
+								</div>
+								<div class="border-t border-slate-100 pt-3">
+									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="text-[#2563EB] font-bold text-xs hover:underline flex items-center justify-center gap-1">
+										<span>Xem chi tiết về trường & các chương trình khác</span> <span>→</span>
+									</a>
+								</div>
+							</div>
+						</div>
+					<?php endif; ?>
+					
 					<!-- SECTION 11: CONSULTATION FORM -->
 					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 						<h3 class="text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
@@ -289,18 +293,18 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 								<div>
 									<label class="block text-sm font-semibold text-slate-600 mb-1">Họ và tên *</label>
-									<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
+									<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
 								</div>
 								<div>
 									<label class="block text-sm font-semibold text-slate-600 mb-1">Số điện thoại *</label>
-									<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
+									<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
 								</div>
 								<div>
 									<label class="block text-sm font-semibold text-slate-600 mb-1">Email (Tùy chọn)</label>
-									<input type="email" name="your-email" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-brand-primary focus:outline-none" placeholder="Địa chỉ email">
+									<input type="email" name="your-email" class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Địa chỉ email">
 								</div>
 								
-								<button type="submit" class="w-full bg-brand-primary text-white py-2.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-teal-700 transition-all mt-2">
+								<button type="submit" class="w-full bg-brand-primary text-white py-3.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-teal-700 transition-all mt-2 min-h-[44px] flex items-center justify-center">
 									Gửi Thông Tin Ngay
 								</button>
 							</form>
@@ -312,10 +316,19 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Cần hỗ trợ trực tiếp?</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $program_hotline ); ?></h4>
 						<div class="flex gap-2">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $program_hotline ) ); ?>" class="flex-1 bg-brand-primary text-white py-2 rounded-lg font-semibold text-sm hover:bg-teal-700 transition-all">Gọi Điện</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-2 rounded-lg font-semibold text-sm hover:bg-brand-primary/5 transition-all">Chat Zalo</a>
+							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $program_hotline ) ); ?>" class="flex-1 bg-brand-primary text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-teal-700 transition-all min-h-[44px] flex items-center justify-center">Gọi Điện</a>
+							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-3.5 rounded-lg font-semibold text-sm hover:bg-brand-primary/5 transition-all min-h-[44px] flex items-center justify-center">Chat Zalo</a>
 						</div>
 					</div>
+
+					<!-- COMPARE BUTTON ONLY -->
+					<button type="button"
+							class="w-full text-center bg-white border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold shadow-xs hover:bg-slate-50 transition-all ltdh-compare-single-btn text-sm flex items-center justify-center gap-2 mt-4 min-h-[44px]"
+							data-compare-type="program" data-compare-id="<?php echo esc_attr( $program_id ); ?>"
+							data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
+							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>">
+						<span>📊</span> <span>Thêm vào so sánh</span>
+					</button>
 
 				</div>
 			</div>
@@ -330,7 +343,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		<span class="text-[10px] text-slate-400 block font-medium uppercase leading-none mb-1">Đăng ký lớp khai giảng</span>
 		<h4 class="font-bold text-slate-800 text-sm truncate leading-none"><?php the_title(); ?></h4>
 	</div>
-	<a href="#register" class="bg-brand-primary text-white px-5 py-2 rounded-lg text-sm font-extrabold shadow-md shadow-brand-primary/20 hover:bg-teal-700 transition-all">
+	<a href="#register" class="bg-brand-primary text-white px-5 py-3 rounded-lg text-sm font-extrabold shadow-md shadow-brand-primary/20 hover:bg-teal-700 transition-all min-h-[44px] flex items-center justify-center">
 		Đăng Ký Học
 	</a>
 </div>

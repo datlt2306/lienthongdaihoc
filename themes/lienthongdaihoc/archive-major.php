@@ -29,11 +29,20 @@ $major_cats = get_terms( [
 			
 			<!-- Sidebar -->
 			<div class="lg:col-span-1">
-				<div class="bg-white border border-slate-200 rounded-lg p-6 sticky top-24 shadow-sm">
-					<h3 class="font-extrabold text-slate-900 text-base mb-4 border-b border-slate-100 pb-3 uppercase tracking-wider">Nhóm ngành</h3>
+				<div class="bg-white border border-slate-200 rounded-lg p-6 sticky top-24 shadow-sm space-y-5">
+
+					<!-- Search Box -->
+					<form action="<?php echo esc_url( get_post_type_archive_link( 'major' ) ); ?>" method="GET" class="relative">
+						<?php if ( $active_cat ) : ?>
+							<input type="hidden" name="nhom_nganh" value="<?php echo esc_attr( $active_cat ); ?>">
+						<?php endif; ?>
+						<input type="text" name="s" value="<?php echo esc_attr( isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '' ); ?>" placeholder="Tìm kiếm ngành học..." class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-[#2563EB] focus:outline-none placeholder-slate-400 min-h-[44px]">
+					</form>
+
+					<h3 class="font-extrabold text-slate-900 text-base border-t border-slate-100 pt-4 uppercase tracking-wider">Nhóm ngành</h3>
 					<ul class="space-y-1">
 						<li>
-							<a href="<?php echo esc_url( remove_query_arg( 'nhom_nganh' ) ); ?>" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold transition-all <?php echo empty( $active_cat ) ? 'bg-[#2563EB] text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?>">
+							<a href="<?php echo esc_url( remove_query_arg( 'nhom_nganh' ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo empty( $active_cat ) ? 'bg-[#2563EB] text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
 								<span>Tất cả các ngành</span>
 								<?php
 								$total_majors = wp_count_posts( 'major' )->publish;
@@ -48,7 +57,7 @@ $major_cats = get_terms( [
 								$term_count = $cat->count;
 								?>
 								<li>
-									<a href="<?php echo esc_url( add_query_arg( 'nhom_nganh', $cat->slug ) ); ?>" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold transition-all <?php echo $is_active ? 'bg-[#2563EB] text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?>">
+									<a href="<?php echo esc_url( add_query_arg( 'nhom_nganh', $cat->slug ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo $is_active ? 'bg-[#2563EB] text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
 										<span><?php echo esc_html( $cat->name ); ?></span>
 										<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $term_count ); ?></span>
 									</a>
@@ -66,7 +75,7 @@ $major_cats = get_terms( [
 					<p class="text-sm font-medium text-slate-500">Danh sách các ngành đào tạo tuyển sinh đại học trực tuyến và liên thông.</p>
 					<div class="flex items-center gap-3">
 						<label for="limit-select" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Số lượng hiển thị:</label>
-						<select id="limit-select" class="rounded-lg border-slate-300 text-xs py-1.5 px-3 bg-white text-slate-700 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary cursor-pointer shadow-sm" onchange="location = this.value;">
+						<select id="limit-select" class="rounded-lg border-slate-300 text-sm py-2.5 px-3 bg-white text-slate-700 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary cursor-pointer shadow-sm min-h-[44px]" onchange="location = this.value;">
 							<option value="<?php echo esc_url( add_query_arg( 'limit', -1 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, -1 ); ?>>Tất cả</option>
 							<option value="<?php echo esc_url( add_query_arg( 'limit', 10 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 10 ); ?>>10</option>
 							<option value="<?php echo esc_url( add_query_arg( 'limit', 20 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 20 ); ?>>20</option>
@@ -77,7 +86,7 @@ $major_cats = get_terms( [
 					</div>
 				</div>
 
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 					<?php
 					if ( have_posts() ) :
 						while ( have_posts() ) : the_post();
@@ -96,11 +105,11 @@ $major_cats = get_terms( [
 											<a href="<?php the_permalink(); ?>">Ngành <?php the_title(); ?></a>
 										</h3>
 										<span class="text-sm text-slate-400 block mb-3 font-semibold uppercase">Mã ngành: <?php echo esc_html( $code ); ?></span>
-										<p class="text-sm text-slate-500 line-clamp-3 mb-6"><?php the_excerpt(); ?></p>
+										<div class="text-sm text-slate-500 line-clamp-3 mb-6"><?php the_excerpt(); ?></div>
 									</div>
 
-									<div class="border-t border-slate-100 pt-4 mt-auto flex justify-between items-center">
-										<a href="<?php the_permalink(); ?>" class="text-[#2563EB] font-bold text-sm hover:underline">Tìm hiểu →</a>
+									<div class="border-t border-slate-100 pt-4 mt-auto">
+										<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-[#2563EB] hover:text-white py-3 rounded-lg font-bold transition-all text-sm uppercase text-[#2563EB] min-h-[44px] flex items-center justify-center">Tìm hiểu thêm</a>
 									</div>
 								</div>
 							</div>

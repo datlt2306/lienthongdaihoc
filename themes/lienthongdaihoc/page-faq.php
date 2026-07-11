@@ -31,7 +31,7 @@ get_header();
 			foreach ( $mock_faqs as $faq ) :
 			?>
 				<details class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden group">
-					<summary class="flex justify-between items-center font-bold text-slate-800 p-5 cursor-pointer list-none hover:bg-slate-50 select-none text-base">
+					<summary class="flex justify-between items-center font-bold text-slate-800 p-5 cursor-pointer list-none hover:bg-slate-50 select-none text-base [&::-webkit-details-marker]:hidden">
 						<span><?php echo esc_html( $faq['q'] ); ?></span>
 						<span class="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
 					</summary>

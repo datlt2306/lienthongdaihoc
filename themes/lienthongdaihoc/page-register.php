@@ -64,7 +64,7 @@ get_header();
 					</div>
 
 					<div class="pt-4 flex flex-col items-center gap-4">
-						<button type="submit" class="w-full bg-[#2563EB] text-white py-3.5 rounded-lg font-bold hover:bg-[#1E40AF] transition-all text-base shadow-md">
+						<button type="submit" class="w-full bg-brand-accent text-white py-3.5 rounded-lg font-bold hover:bg-amber-700 shadow-brand-accent/20 transition-all text-base shadow-md">
 							ĐĂNG KÝ TƯ VẤN NGAY
 						</button>
 						<span class="text-xs text-slate-400 text-center">Cam kết thông tin đăng ký của bạn được bảo mật hoàn toàn 100%.</span>

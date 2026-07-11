@@ -52,8 +52,20 @@ if ( is_page() ) {
 	$banner_title    = 'Ngành Học';
 	$banner_subtitle = 'Khám phá các ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
 } elseif ( is_post_type_archive( 'program' ) ) {
-	$banner_title    = 'Chương Trình Đào Tạo';
-	$banner_subtitle = 'Tìm kiếm chương trình phù hợp với lộ trình học tập của bạn';
+	$selected_he = isset( $_GET['he'] ) ? sanitize_text_field( $_GET['he'] ) : '';
+	if ( $selected_he ) {
+		$he_term = get_term_by( 'slug', $selected_he, 'training_type' );
+		if ( $he_term ) {
+			$banner_title    = 'Hệ ' . $he_term->name;
+			$banner_subtitle = $he_term->description ?: 'Các chương trình đào tạo thuộc hệ ' . $he_term->name;
+		} else {
+			$banner_title    = 'Chương Trình Đào Tạo';
+			$banner_subtitle = 'Tìm kiếm chương trình phù hợp với lộ trình học tập của bạn';
+		}
+	} else {
+		$banner_title    = 'Chương Trình Đào Tạo';
+		$banner_subtitle = 'Tìm kiếm chương trình phù hợp với lộ trình học tập của bạn';
+	}
 } elseif ( is_tax( 'training_type' ) ) {
 	$term = get_queried_object();
 	$banner_title    = 'Hệ đào tạo: ' . $term->name;

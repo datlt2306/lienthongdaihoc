@@ -132,7 +132,7 @@
 			el.innerHTML =
 				(thumb ? '<img src="' + thumb + '" class="h-8 w-8 rounded object-cover" alt="">' : '') +
 				'<span class="font-semibold text-slate-700 truncate max-w-[120px]">' + title + '</span>' +
-				'<button class="ltdh-tray-remove text-slate-400 hover:text-red-500 ml-1 text-lg leading-none" data-type="' + activeType + '" data-id="' + id + '">&times;</button>';
+				'<button class="ltdh-tray-remove text-slate-400 hover:text-red-500 ml-1 text-xl leading-none w-11 h-11 flex items-center justify-center" data-type="' + activeType + '" data-id="' + id + '">&times;</button>';
 			listEl.appendChild(el);
 		});
 

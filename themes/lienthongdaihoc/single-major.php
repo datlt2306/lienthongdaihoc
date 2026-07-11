@@ -41,7 +41,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					<p class="text-slate-500 text-sm font-medium">Mã ngành: <?php echo esc_html( $major_code ?: 'Đang cập nhật' ); ?></p>
 				</div>
 				<div class="flex flex-col gap-2 w-full md:w-auto">
-					<a href="#register" class="w-full md:w-auto bg-brand-primary text-white text-center px-6 py-2.5 rounded-lg font-bold shadow-md hover:bg-teal-700 transition-all text-sm">
+					<a href="#register" class="w-full md:w-auto bg-brand-primary text-white text-center px-6 py-3 rounded-lg font-bold shadow-md hover:bg-teal-700 transition-all text-sm min-h-[44px] flex items-center justify-center">
 						Tư Vấn Hướng Nghiệp
 					</a>
 				</div>
@@ -116,7 +116,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					}
 
 					if ( $programs_query->have_posts() ) :
-						echo '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+						echo '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
 						while ( $programs_query->have_posts() ) : $programs_query->the_post();
 							$prog_id = get_the_ID();
 							$school_rel_id = get_field( 'school_relationship', $prog_id );
@@ -132,14 +132,13 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
 							?>
 							<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-								<div class="h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');"></div>
+								<div class="relative h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');">
+									<?php if ( $type_name ) : ?>
+										<span class="absolute top-3 left-3 bg-orange-50 text-orange-600 text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm z-10"><?php echo esc_html( $type_name ); ?></span>
+									<?php endif; ?>
+								</div>
 								<div class="p-5 flex-1 flex flex-col justify-between space-y-4">
 									<div>
-										<div class="flex items-center flex-wrap gap-2 mb-2">
-											<?php if ( $type_name ) : ?>
-												<span class="bg-orange-50 text-orange-600 text-[10px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider"><?php echo esc_html( $type_name ); ?></span>
-											<?php endif; ?>
-										</div>
 										<h4 class="font-extrabold text-slate-800 text-sm hover:text-[#2563EB] transition-colors leading-snug">
 											<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 										</h4>
@@ -161,7 +160,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 										<?php if ( $status === 'tam-ngung' ) : ?>
 											<span class="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
 										<?php else : ?>
-											<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-[#1E40AF] transition-all">Chi tiết</a>
+											<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-[#1E40AF] transition-all min-h-[44px] flex items-center justify-center">Tìm hiểu</a>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -264,27 +263,27 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 
 								<div>
 									<label class="block text-sm font-semibold text-slate-600 mb-1">Họ và tên *</label>
-									<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
+									<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
 								</div>
 								<div>
 									<label class="block text-sm font-semibold text-slate-600 mb-1">Số điện thoại *</label>
-									<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
+									<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
 								</div>
 								
-								<button type="submit" class="w-full bg-brand-primary text-white py-2.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-teal-700 transition-all mt-2">
+								<button type="submit" class="w-full bg-brand-primary text-white py-3.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-teal-700 transition-all mt-2 min-h-[44px] flex items-center justify-center">
 									Gửi Yêu Cầu Hướng Nghiệp
 								</button>
 							</form>
 						<?php endif; ?>
 					</section>
-
+ 
 					<!-- CONTACT INFO CARD -->
 					<div class="bg-brand-primary/5 border border-brand-primary/10 rounded-lg p-6 text-center">
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Ban hướng nghiệp</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $hotline ); ?></h4>
 						<div class="flex gap-2">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-primary text-white py-2 rounded-lg font-semibold text-sm hover:bg-teal-700 transition-all">Gọi Ngay</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-2 rounded-lg font-semibold text-sm hover:bg-brand-primary/5 transition-all">Zalo OA</a>
+							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-primary text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-teal-700 transition-all min-h-[44px] flex items-center justify-center">Gọi Ngay</a>
+							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-3.5 rounded-lg font-semibold text-sm hover:bg-brand-primary/5 transition-all min-h-[44px] flex items-center justify-center">Zalo OA</a>
 						</div>
 					</div>
 

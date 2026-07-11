@@ -6,7 +6,7 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
 	
 	<!-- Tailwind CDN for rich interactive styles -->
 	<script src="https://cdn.tailwindcss.com"></script>
@@ -16,16 +16,16 @@
 				extend: {
 					colors: {
 						brand: {
-							primary: '#2563EB', // Royal Blue primary
-							secondary: '#0F172A', // Text Slate 900
-							accent: '#60A5FA', // Accent Sky Blue
-							darkBlue: '#1E40AF', // Secondary Deep Indigo
+							primary: '#1E3A8A', // Deep Navy Blue
+							secondary: '#0F172A', // Slate 900
+							accent: '#D97706', // Amber Gold Accent
+							darkBlue: '#1D4ED8', // Slate/Indigo Hover
 							light: '#F8FAFC', // Light Background
 						}
 					},
 					fontFamily: {
 						sans: ['"Be Vietnam Pro"', 'sans-serif'],
-						display: ['"Be Vietnam Pro"', 'sans-serif'],
+						display: ['Poppins', '"Be Vietnam Pro"', 'sans-serif'],
 					}
 				}
 			}
@@ -57,7 +57,7 @@
 
 		/* Breadcrumb styles */
 		.ltdh-breadcrumb { background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
-		.ltdh-breadcrumb a { color: #2563EB; text-decoration: none; font-weight: 500; }
+		.ltdh-breadcrumb a { color: #1E3A8A; text-decoration: none; font-weight: 500; }
 		.ltdh-breadcrumb a:hover { text-decoration: underline; }
 		.ltdh-breadcrumb .separator { margin: 0 0.375rem; color: #94a3b8; }
 		.ltdh-breadcrumb .last { color: #64748b; font-weight: 600; }
@@ -87,8 +87,8 @@
 		.nav-primary-menu .current-menu-item > a,
 		.nav-primary-menu .current_page_item > a,
 		.nav-primary-menu .current-menu-ancestor > a {
-			color: #2563EB;
-			border-bottom-color: #2563EB;
+			color: #1E3A8A;
+			border-bottom-color: #1E3A8A;
 		}
 		/* Submenu hover panel */
 		.nav-primary-menu ul.sub-menu {
@@ -127,7 +127,7 @@
 		.nav-primary-menu ul.sub-menu a:hover,
 		.nav-primary-menu ul.sub-menu .current-menu-item > a {
 			background: #f8fafc;
-			color: #2563EB;
+			color: #1E3A8A;
 		}
 
 		/* Mobile Nav styling */
@@ -148,7 +148,7 @@
 		.nav-mobile-menu a:hover,
 		.nav-mobile-menu .current-menu-item > a,
 		.nav-mobile-menu .current_page_item > a {
-			color: #2563EB;
+			color: #1E3A8A;
 		}
 		.nav-mobile-menu .menu-item-has-children > a::after {
 			content: ' ▾';
@@ -194,7 +194,7 @@
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary">
 					<div class="flex flex-col leading-none">
 						<span class="text-sm font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
-						<span class="text-xl font-extrabold text-[#2563EB]">ĐẠI HỌC</span>
+						<span class="text-xl font-extrabold text-brand-primary">ĐẠI HỌC</span>
 					</div>
 				</a>
 			</div>
@@ -226,21 +226,91 @@
 			</div>
 		</div>
 
-		<!-- Mobile Navigation Drawer -->
-		<div id="mobile-menu" class="hidden border-t border-slate-100 bg-white px-6 py-6 lg:hidden shadow-lg">
-			<?php
-			wp_nav_menu( [
-				'theme_location' => 'primary-menu',
-				'container'      => false,
-				'menu_class'     => 'nav-mobile-menu',
-				'fallback_cb'    => 'ltdh_default_mobile_menu',
-			] );
-			?>
-			<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="block w-full text-center bg-brand-primary text-white py-3 rounded-lg font-bold text-sm">
-				TƯ VẤN NGAY
-			</a>
+		<!-- Mobile Navigation Drawer (Offcanvas style) -->
+		<div id="mobile-menu-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[99] opacity-0 pointer-events-none transition-opacity duration-300"></div>
+		
+		<div id="mobile-menu" class="fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-white z-[100] shadow-2xl translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between p-6">
+			<div>
+				<!-- Header Offcanvas -->
+				<div class="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
+					<div class="site-branding">
+						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary">
+							<div class="flex flex-col leading-none">
+								<span class="text-xs font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
+								<span class="text-lg font-extrabold text-brand-primary">ĐẠI HỌC</span>
+							</div>
+						</a>
+					</div>
+					<button id="mobile-menu-close" class="text-slate-400 hover:text-slate-900 focus:outline-none p-1">
+						<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+
+				<?php
+				wp_nav_menu( [
+					'theme_location' => 'primary-menu',
+					'container'      => false,
+					'menu_class'     => 'nav-mobile-menu',
+					'fallback_cb'    => 'ltdh_default_mobile_menu',
+				] );
+				?>
+			</div>
+			
+			<div class="pt-6 border-t border-slate-100">
+				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="block w-full text-center bg-brand-primary text-white py-3 rounded-lg font-bold text-sm tracking-wide shadow-md shadow-brand-primary/10 hover:bg-[#1E40AF]">
+					TƯ VẤN NGAY
+				</a>
+			</div>
 		</div>
 	</header>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const toggleBtn = document.getElementById('mobile-menu-toggle');
+			const closeBtn = document.getElementById('mobile-menu-close');
+			const menu = document.getElementById('mobile-menu');
+			const overlay = document.getElementById('mobile-menu-overlay');
+
+			function openMenu() {
+				menu.classList.remove('translate-x-full');
+				overlay.classList.remove('opacity-0', 'pointer-events-none');
+				overlay.classList.add('opacity-100');
+				document.body.classList.add('overflow-hidden');
+			}
+
+			function closeMenu() {
+				menu.classList.add('translate-x-full');
+				overlay.classList.remove('opacity-100');
+				overlay.classList.add('opacity-0', 'pointer-events-none');
+				document.body.classList.remove('overflow-hidden');
+			}
+
+			if (toggleBtn && menu && overlay) {
+				toggleBtn.addEventListener('click', function(e) {
+					e.preventDefault();
+					openMenu();
+				});
+			}
+
+			if (closeBtn) {
+				closeBtn.addEventListener('click', closeMenu);
+			}
+
+			if (overlay) {
+				overlay.addEventListener('click', closeMenu);
+			}
+
+			// Smooth scroll to register section from mobile menu
+			const mobileLinks = document.querySelectorAll('#mobile-menu a');
+			mobileLinks.forEach(link => {
+				link.addEventListener('click', function() {
+					closeMenu();
+				});
+			});
+		});
+	</script>
 
 	<?php if ( ! is_front_page() ) : ?>
 		<?php ltdh_breadcrumb(); ?>

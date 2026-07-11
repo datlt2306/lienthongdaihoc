@@ -143,7 +143,7 @@ function ltdh_render_school_thumbnail( $school_id, $size = 'thumbnail', $classes
 	$fallback_classes = trim( preg_replace( '/\s+/', ' ', $fallback_classes ) );
 
 	printf(
-		'<div class="%s bg-blue-50 text-[#2563EB] font-display font-black text-sm flex items-center justify-center" aria-hidden="true">UNI</div>',
+		'<div class="%s bg-blue-50 text-brand-primary font-display font-black text-sm flex items-center justify-center" aria-hidden="true">UNI</div>',
 		esc_attr( $fallback_classes )
 	);
 }
@@ -452,7 +452,7 @@ function ltdh_ajax_filter_programs() {
 							<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ' ); ?></span></p>
 							<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
 							<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
-							<p>Hình thức: <span class="font-bold text-slate-700 text-xs"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
+							<p>Hình thức: <span class=" text-xs"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
 							<?php if ( ! empty( $groups ) ) : ?>
 								<p>Tổ hợp: <span class="font-bold text-slate-700"><?php echo esc_html( $groups ); ?></span></p>
 							<?php endif; ?>
@@ -469,7 +469,7 @@ function ltdh_ajax_filter_programs() {
 								So sánh
 							</button>
 						</div>
-						<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#1E40AF] transition-all">Đăng ký học</a>
+						<a href="<?php the_permalink(); ?>#register" class="bg-brand-accent text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-amber-700 shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
 					</div>
 				</div>
 			</div>

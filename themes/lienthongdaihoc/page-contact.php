@@ -64,18 +64,18 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 						<form action="#" method="POST" class="space-y-4">
 							<div>
 								<label class="block text-sm font-semibold text-slate-600 mb-1">Họ và tên *</label>
-								<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
+								<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
 							</div>
 							<div>
 								<label class="block text-sm font-semibold text-slate-600 mb-1">Số điện thoại *</label>
-								<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên lạc">
+								<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên lạc">
 							</div>
 							<div>
 								<label class="block text-sm font-semibold text-slate-600 mb-1">Tin nhắn của bạn</label>
-								<textarea name="your-message" rows="4" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:border-brand-primary focus:outline-none" placeholder="Nhập tin nhắn..."></textarea>
+								<textarea name="your-message" rows="4" class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Nhập tin nhắn..."></textarea>
 							</div>
 							
-							<button type="submit" class="w-full bg-[#2563EB] text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-[#1E40AF] transition-all">
+							<button type="submit" class="w-full bg-brand-accent text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-amber-700 shadow-brand-accent/20 transition-all">
 								Gửi Liên Hệ
 							</button>
 						</form>

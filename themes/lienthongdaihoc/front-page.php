@@ -33,20 +33,20 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	<!-- 1. HERO SECTION (Matches mockup structure, student photo background, and key badges) -->
 	<section class="relative bg-gradient-to-br from-[#EFF6FF] via-[#F8FAFC] to-[#FFFFFF] overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32">
 		<!-- Decorative Background SVGs -->
-		<div class="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full opacity-10 bg-[radial-gradient(#2563EB_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+		<div class="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full opacity-10 bg-[radial-gradient(var(--tw-gradient-to-r,#1E3A8A)_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
 
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 				<!-- Hero Left Text Column -->
 				<div class="lg:col-span-6 space-y-6 text-center lg:text-left z-10">
 					<div class="inline-flex items-center gap-1 bg-white border border-slate-100 px-3.5 py-2 rounded-lg shadow-sm">
-						<span class="text-sm text-[#2563EB] font-bold">Tư vấn</span>
+						<span class="text-sm text-brand-primary font-bold">Tư vấn tuyển sinh</span>
 					</div>
 					
-					<h1 class="text-3xl sm:text-5xl lg:text-[54px] font-black text-slate-900 leading-tight tracking-tight">
+					<h1 class="text-3xl sm:text-5xl lg:text-[54px] font-black text-slate-900 leading-tight tracking-tight font-display">
 						LỰA CHỌN ĐẠI HỌC<br>
-						<span class="text-[#2563EB]">ĐÚNG ĐẮN</span><br>
-						<span class="bg-[#F5BF23] text-slate-950 px-4 py-1.5 rounded-lg inline-block text-2xl sm:text-3xl font-extrabold mt-2">
+						<span class="text-brand-primary">ĐÚNG ĐẮN</span><br>
+						<span class="bg-brand-accent text-white px-4 py-1.5 rounded-lg inline-block text-2xl sm:text-3xl font-extrabold mt-2">
 							ĐỊNH HƯỚNG TƯƠNG LAI
 						</span>
 					</h1>
@@ -54,41 +54,41 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<!-- Mockup Badges Grid (Prevent text wrapping and skewing) -->
 					<div class="flex flex-col md:flex-row gap-4 pt-4 w-full">
 						<div class="flex-1 flex items-center gap-3 bg-white px-4 py-3.5 rounded-lg border border-slate-100 shadow-sm">
-							<span class="text-[#2563EB] bg-blue-50 p-2 rounded-lg shrink-0">✔</span>
+							<span class="text-brand-primary bg-blue-50 p-2 rounded-lg shrink-0">✔</span>
 							<div class="text-left leading-tight">
-								<span class="block text-base font-bold text-slate-800 whitespace-nowrap">Tư vấn 1:1</span>
-								<span class="text-sm text-slate-500 whitespace-nowrap">Hoàn toàn miễn phí</span>
+								<span class="block text-base font-bold text-slate-800">Tư vấn 1:1</span>
+								<span class="text-sm text-slate-500">Hoàn toàn miễn phí</span>
 							</div>
 						</div>
 						<div class="flex-1 flex items-center gap-3 bg-white px-4 py-3.5 rounded-lg border border-slate-100 shadow-sm">
-							<span class="text-[#2563EB] bg-blue-50 p-2 rounded-lg shrink-0">✔</span>
+							<span class="text-brand-primary bg-blue-50 p-2 rounded-lg shrink-0">✔</span>
 							<div class="text-left leading-tight">
-								<span class="block text-base font-bold text-slate-800 whitespace-nowrap">Lộ trình cá nhân</span>
-								<span class="text-sm text-slate-500 whitespace-nowrap">Phù hợp năng lực</span>
+								<span class="block text-base font-bold text-slate-800">Rút ngắn lộ trình</span>
+								<span class="text-sm text-slate-500">Miễn giảm tín chỉ tối đa</span>
 							</div>
 						</div>
 						<div class="flex-1 flex items-center gap-3 bg-white px-4 py-3.5 rounded-lg border border-slate-100 shadow-sm">
-							<span class="text-[#2563EB] bg-blue-50 p-2 rounded-lg shrink-0">✔</span>
+							<span class="text-brand-primary bg-blue-50 p-2 rounded-lg shrink-0">✔</span>
 							<div class="text-left leading-tight">
-								<span class="block text-base font-bold text-slate-800 whitespace-nowrap">Hỗ trợ toàn diện</span>
-								<span class="text-sm text-slate-500 whitespace-nowrap">Hồ sơ - Học bổng - Visa</span>
+								<span class="block text-base font-bold text-slate-800">Bằng chuẩn Bộ GD&ĐT</span>
+								<span class="text-sm text-slate-500">Tương đương bằng chính quy</span>
 							</div>
 						</div>
 					</div>
 					
 					<!-- Mockup CTAs -->
 					<div class="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
-						<a href="#register-section" class="bg-[#2563EB] text-white text-center px-8 py-4 rounded-lg font-bold hover:bg-[#1E40AF] transition-all flex items-center justify-center gap-2 shadow-md shadow-brand-primary/10">
+						<a href="#register-section" class="bg-brand-accent text-white text-center px-8 py-4 rounded-lg font-bold hover:bg-amber-700 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand-accent/20">
 							LIÊN HỆ NGAY
 							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
 							</svg>
 						</a>
 						<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex items-center justify-center gap-3 bg-white border border-slate-200 px-6 py-4 rounded-lg font-bold text-slate-800 hover:bg-slate-50 transition-all">
-							<span class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg shrink-0">📞</span>
+							<span class="h-10 w-10 bg-blue-50 text-brand-primary flex items-center justify-center rounded-lg shrink-0">📞</span>
 							<div class="text-left leading-tight">
 								<span class="block text-sm text-slate-500 font-medium">Hotline tư vấn</span>
-								<span class="text-base font-extrabold text-[#2563EB]"><?php echo esc_html( $hotline ); ?></span>
+								<span class="text-base font-extrabold text-brand-primary"><?php echo esc_html( $hotline ); ?></span>
 							</div>
 						</a>
 					</div>
@@ -98,7 +98,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				<div class="lg:col-span-6 relative flex justify-center items-center">
 					<div class="relative w-full max-w-md md:max-w-lg aspect-square">
 						<!-- Mockup Blob Graphic / Frame decoration -->
-						<div class="absolute inset-0 bg-gradient-to-tr from-[#2563EB]/20 to-[#EFF6FF]/50 rounded-lg blur-2xl -z-10"></div>
+						<div class="absolute inset-0 bg-gradient-to-tr from-brand-primary/20 to-[#EFF6FF]/50 rounded-lg blur-2xl -z-10"></div>
 						
 						<!-- Circle Photo representation -->
 						<div class="w-full h-full rounded-lg border-4 border-white shadow-xl overflow-hidden relative bg-slate-100 flex items-center justify-center">
@@ -119,6 +119,12 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 			</div>
 		</div>
+		<!-- Wave Separator -->
+		<div class="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-0 pointer-events-none">
+			<svg class="relative block w-full h-[40px] md:h-[80px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
+				<path d="M0,0 C300,100 900,0 1200,100 L1200,120 L0,120 Z" class="fill-white"></path>
+			</svg>
+		</div>
 	</section>
 
 	<!-- Floating Filter Panel Section -->
@@ -127,12 +133,12 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 			<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
 				<div>
 					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Từ khóa tìm kiếm</label>
-					<input type="text" name="s" placeholder="Tìm tên chương trình..." class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium" />
+					<input type="text" name="s" placeholder="Tìm tên chương trình..." class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[44px]" />
 				</div>
 				
 				<div>
 					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Trường đại học</label>
-					<select name="truong_filter" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-transparent">
+					<select name="truong_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-transparent min-h-[44px]">
 						<option value="">-- Chọn trường học --</option>
 						<?php
 						$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => -1 ] );
@@ -145,7 +151,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				
 				<div>
 					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Ngành đào tạo</label>
-					<select name="nganh_filter" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-transparent">
+					<select name="nganh_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-transparent min-h-[44px]">
 						<option value="">-- Chọn ngành học --</option>
 						<?php
 						$majors = get_posts( [ 'post_type' => 'major', 'numberposts' => -1 ] );
@@ -158,7 +164,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 				<div>
 					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Hệ đào tạo</label>
-					<select name="he_filter" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-transparent">
+					<select name="he_filter" class="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:border-brand-primary focus:outline-none bg-transparent min-h-[44px]">
 						<option value="">-- Chọn hệ học --</option>
 						<?php
 						$types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
@@ -170,10 +176,10 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</div>
 
 				<div class="flex gap-2 w-full">
-					<button type="submit" class="flex-1 bg-[#2563EB] text-white py-3 rounded-lg font-bold hover:bg-[#1E40AF] transition-all text-xs uppercase tracking-wider">
+					<button type="submit" class="flex-1 bg-brand-accent text-white py-3 rounded-lg font-bold hover:bg-amber-700 transition-all text-xs uppercase tracking-wider min-h-[44px]">
 						TÌM KIẾM
 					</button>
-					<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-bold transition-all text-xs uppercase text-center flex items-center justify-center shrink-0" title="Reset bộ lọc">
+					<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-bold transition-all text-xs uppercase text-center flex items-center justify-center shrink-0 min-h-[44px]" title="Reset bộ lọc">
 						🔄
 					</a>
 				</div>
@@ -217,63 +223,92 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		</div>
 	</section>
 
-	<!-- 3. HOT MAJORS SECTION ("CÁC NGÀNH ĐÀO TẠO HOT NHẤT" matching the slider elements in mockup) -->
-	<section class="py-16 bg-[#0B2545] text-white relative">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
-				<h2 class="text-2xl md:text-3xl font-black font-display tracking-tight text-white">
-					CÁC NGÀNH ĐÀO TẠO HOT NHẤT
-				</h2>
-				<p class="text-slate-300 text-sm md:text-sm">
-					Đội ngũ chuyên gia giàu kinh nghiệm sẽ giúp bạn chọn ngành học phù hợp với đam mê và xu hướng thị trường lao động.
-				</p>
+	<!-- 3. HOT MAJORS SECTION -->
+	<section class="py-16 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
+		<!-- Decorative Background Dots -->
+		<div class="absolute inset-0 opacity-40 pointer-events-none z-0" style="background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+			<div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
+				<span class="text-[#2563EB] text-xs font-extrabold uppercase tracking-widest block">KHÁM PHÁ NGÀNH HỌC</span>
+				<h2 class="text-2xl md:text-3xl font-black text-slate-900">Các ngành đào tạo hot nhất</h2>
+				<p class="text-slate-500 text-sm">Hàng trăm ngành đào tạo đa dạng, phù hợp mọi đối tượng và xu hướng thị trường lao động.</p>
 			</div>
 
-			<!-- Grid representing the dynamic major entries -->
-			<div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+			<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
 				<?php
 				$majors_query = new WP_Query( [
 					'post_type'      => 'major',
 					'posts_per_page' => 12,
 					'post_status'    => 'publish',
 				] );
+
+				// Color palette cycling for cards
+				$card_colors = [
+					[ 'bg' => 'bg-blue-50',   'icon_bg' => 'bg-blue-100',   'icon_text' => 'text-blue-600',   'border' => 'border-blue-100',   'hover' => 'hover:border-blue-300' ],
+					[ 'bg' => 'bg-violet-50', 'icon_bg' => 'bg-violet-100', 'icon_text' => 'text-violet-600', 'border' => 'border-violet-100', 'hover' => 'hover:border-violet-300' ],
+					[ 'bg' => 'bg-emerald-50','icon_bg' => 'bg-emerald-100','icon_text' => 'text-emerald-600','border' => 'border-emerald-100','hover' => 'hover:border-emerald-300' ],
+					[ 'bg' => 'bg-amber-50',  'icon_bg' => 'bg-amber-100',  'icon_text' => 'text-amber-600',  'border' => 'border-amber-100',  'hover' => 'hover:border-amber-300' ],
+					[ 'bg' => 'bg-rose-50',   'icon_bg' => 'bg-rose-100',   'icon_text' => 'text-rose-600',   'border' => 'border-rose-100',   'hover' => 'hover:border-rose-300' ],
+					[ 'bg' => 'bg-cyan-50',   'icon_bg' => 'bg-cyan-100',   'icon_text' => 'text-cyan-600',   'border' => 'border-cyan-100',   'hover' => 'hover:border-cyan-300' ],
+				];
+
 				if ( $majors_query->have_posts() ) :
+					$i = 0;
 					while ( $majors_query->have_posts() ) : $majors_query->the_post();
-						$title = get_the_title();
+						$title       = get_the_title();
 						$clean_title = trim( preg_replace( '/\s*[\(\-][\s\S]*/', '', $title ) );
-						// Map icons dynamically
-						$icon = '🎓';
 						$lower_title = mb_strtolower( $clean_title, 'UTF-8' );
+						$icon        = '🎓';
 						if ( strpos( $lower_title, 'công nghệ thông tin' ) !== false || strpos( $lower_title, 'cntt' ) !== false ) {
 							$icon = '💻';
-						} elseif ( strpos( $lower_title, 'quản trị kinh doanh' ) !== false ) {
+						} elseif ( strpos( $lower_title, 'quản trị' ) !== false ) {
 							$icon = '📈';
 						} elseif ( strpos( $lower_title, 'kinh tế' ) !== false || strpos( $lower_title, 'tài chính' ) !== false || strpos( $lower_title, 'kế toán' ) !== false ) {
-							$icon = '💵';
+							$icon = '💰';
 						} elseif ( strpos( $lower_title, 'marketing' ) !== false ) {
 							$icon = '🎯';
-						} elseif ( strpos( $lower_title, 'ngôn ngữ anh' ) !== false || strpos( $lower_title, 'tiếng anh' ) !== false ) {
-							$icon = '🔤';
+						} elseif ( strpos( $lower_title, 'ngôn ngữ' ) !== false || strpos( $lower_title, 'tiếng anh' ) !== false ) {
+							$icon = '🌐';
 						} elseif ( strpos( $lower_title, 'thương mại' ) !== false ) {
 							$icon = '🏪';
 						} elseif ( strpos( $lower_title, 'thiết kế' ) !== false || strpos( $lower_title, 'đồ họa' ) !== false ) {
 							$icon = '🎨';
+						} elseif ( strpos( $lower_title, 'luật' ) !== false ) {
+							$icon = '⚖️';
+						} elseif ( strpos( $lower_title, 'xây dựng' ) !== false || strpos( $lower_title, 'kiến trúc' ) !== false ) {
+							$icon = '🏗️';
+						} elseif ( strpos( $lower_title, 'y' ) !== false || strpos( $lower_title, 'dược' ) !== false ) {
+							$icon = '🏥';
 						}
-						?>
-						<a href="<?php the_permalink(); ?>" class="bg-white/5 border border-white/10 rounded-lg p-4 text-center hover:border-brand-primary hover:bg-white/10 transition-all cursor-pointer group block">
-							<div class="h-12 w-12 bg-white/10 text-white rounded-lg flex items-center justify-center mx-auto mb-3 text-xl group-hover:scale-110 transition-transform"><?php echo $icon; ?></div>
-							<h4 class="font-bold text-sm md:text-sm text-slate-100"><?php echo esc_html( $clean_title ); ?></h4>
+						$c = $card_colors[ $i % count( $card_colors ) ];
+						$i++;
+					?>
+						<a href="<?php the_permalink(); ?>"
+						   class="group flex flex-col items-center text-center p-4 bg-white border <?php echo $c['border']; ?> rounded-xl <?php echo $c['hover']; ?> hover:shadow-md transition-all">
+							<div class="h-12 w-12 <?php echo $c['icon_bg']; ?> <?php echo $c['icon_text']; ?> rounded-xl flex items-center justify-center mb-3 text-xl group-hover:scale-110 transition-transform">
+								<?php echo $icon; ?>
+							</div>
+							<h4 class="font-bold text-xs text-slate-700 leading-snug line-clamp-2"><?php echo esc_html( $clean_title ); ?></h4>
 						</a>
-						<?php
+					<?php
 					endwhile;
 					wp_reset_postdata();
 				else :
-					echo '<p class="text-sm text-slate-300 col-span-6 text-center">Chưa có ngành học nào.</p>';
+					echo '<p class="text-sm text-slate-400 col-span-6 text-center">Chưa có ngành học nào.</p>';
 				endif;
 				?>
 			</div>
+
+			<div class="text-center mt-8">
+				<a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>"
+				   class="inline-flex items-center gap-2 text-[#2563EB] font-bold text-sm hover:underline">
+					Xem tất cả ngành học <span>→</span>
+				</a>
+			</div>
 		</div>
 	</section>
+
+
 
 	<!-- 4. NATIONAL SCHOOLS SECTION ("CÁC TRƯỜNG ĐÀO TẠO TRÊN TOÀN QUỐC") -->
 	<section id="program-section" class="py-16 md:py-24 bg-slate-50">
@@ -289,7 +324,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</a>
 			</div>
 			
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+			<div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
 				<?php 
 				if ( $schools_query->have_posts() ) {
 					$index = 0;
@@ -335,7 +370,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 								</div>
 								
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-[#2563EB] hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-[#2563EB]">Chi tiết trường</a>
+									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-[#2563EB] hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-[#2563EB]">Tìm hiểu thêm</a>
 								</div>
 							</div>
 						</div>
@@ -352,38 +387,35 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	</section>
 
 	<!-- 5. WHY CHOOSE US ("VÌ SAO CHỌN NEXT PATH / LIÊN THÔNG ĐẠI HỌC?") -->
-	<section class="py-16 bg-white border-t border-slate-100">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+	<section class="py-16 bg-white border-t border-slate-100 relative overflow-hidden">
+		<!-- Decorative Background Dots -->
+		<div class="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style="background-image: radial-gradient(#2563eb 1.5px, transparent 1.5px); background-size: 32px 32px;"></div>
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 			<div class="text-center max-w-2xl mx-auto mb-12">
 				<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">VÌ SAO CHỌN LIÊN THÔNG ĐẠI HỌC?</h2>
 				<p class="text-slate-500 text-sm md:text-sm">Chúng tôi đồng hành cùng bạn trên hành trình chinh phục tri thức.</p>
 			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+			<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 				<div class="bg-slate-50/50 border border-slate-100 rounded-lg p-6 text-center shadow-sm">
-					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg mx-auto mb-3 text-lg">👥</div>
-					<h4 class="font-bold text-sm text-slate-800 mb-1">Đội ngũ chuyên gia</h4>
-					<p class="text-sm text-slate-500">Giàu kinh nghiệm, nhiệt tình và tận tâm tư vấn.</p>
+					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg mx-auto mb-3 text-lg">📜</div>
+					<h4 class="font-bold text-sm text-slate-800 mb-1">Bằng chuẩn Bộ GD&ĐT</h4>
+					<p class="text-sm text-slate-500">Phôi bằng tương đương chính quy, có giá trị lâu dài và đủ điều kiện thi cao học, xét bậc lương.</p>
 				</div>
 				<div class="bg-slate-50/50 border border-slate-100 rounded-lg p-6 text-center shadow-sm">
-					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg mx-auto mb-3 text-lg">📞</div>
-					<h4 class="font-bold text-sm text-slate-800 mb-1">Tư vấn 1:1 miễn phí</h4>
-					<p class="text-sm text-slate-500">Lắng nghe và thấu hiểu nhu cầu của từng học viên.</p>
+					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg mx-auto mb-3 text-lg">🔗</div>
+					<h4 class="font-bold text-sm text-slate-800 mb-1">Miễn giảm tín chỉ tối đa</h4>
+					<p class="text-sm text-slate-500">Đối chiếu bảng điểm Trung cấp/Cao đẳng cũ để lược bỏ các môn đã học, tiết kiệm thời gian ra trường.</p>
 				</div>
 				<div class="bg-slate-50/50 border border-slate-100 rounded-lg p-6 text-center shadow-sm">
-					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg mx-auto mb-3 text-lg">📈</div>
-					<h4 class="font-bold text-sm text-slate-800 mb-1">Lộ trình cá nhân hóa</h4>
-					<p class="text-sm text-slate-500">Phù hợp tối đa với năng lực và mục tiêu sự nghiệp.</p>
+					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg mx-auto mb-3 text-lg">💻</div>
+					<h4 class="font-bold text-sm text-slate-800 mb-1">Học Online linh hoạt</h4>
+					<p class="text-sm text-slate-500">Học trực tuyến hoàn toàn qua hệ thống E-learning của trường, thi cử tập trung cuối tuần tiện lợi.</p>
 				</div>
 				<div class="bg-slate-50/50 border border-slate-100 rounded-lg p-6 text-center shadow-sm">
-					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg mx-auto mb-3 text-lg">🛡</div>
-					<h4 class="font-bold text-sm text-slate-800 mb-1">Hỗ trợ toàn diện</h4>
-					<p class="text-sm text-slate-500">Từ định hướng chọn trường đến hoàn thiện hồ sơ.</p>
-				</div>
-				<div class="bg-slate-50/50 border border-slate-100 rounded-lg p-6 text-center shadow-sm">
-					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg mx-auto mb-3 text-lg">🎯</div>
-					<h4 class="font-bold text-sm text-slate-800 mb-1">Tỷ lệ thành công cao</h4>
-					<p class="text-sm text-slate-500">Hàng ngàn học viên đã và đang đạt được tấm bằng mơ ước.</p>
+					<div class="h-10 w-10 bg-blue-50 text-[#2563EB] flex items-center justify-center rounded-lg mx-auto mb-3 text-lg">📝</div>
+					<h4 class="font-bold text-sm text-slate-800 mb-1">Hỗ trợ hồ sơ từ A-Z</h4>
+					<p class="text-sm text-slate-500">Tiếp nhận hồ sơ online, công chứng và làm thủ tục nhập học trọn gói nhanh chóng trong 7 ngày.</p>
 				</div>
 			</div>
 		</div>
@@ -413,7 +445,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 							<span class="text-sm text-slate-300 font-semibold block leading-tight">Tỷ lệ hài lòng của học viên</span>
 						</div>
 						<div>
-							<span class="block font-display font-black text-3xl md:text-[40px] text-[#2563EB] leading-none mb-1">150+</span>
+							<span class="block font-display font-black text-3xl md:text-[40px] text-[#2563EB] leading-none mb-1">30+</span>
 							<span class="text-sm text-slate-300 font-semibold block leading-tight">Đối tác trường đại học uy tín</span>
 						</div>
 						<div>
@@ -434,8 +466,11 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 	</section>
 
 	<!-- 7. STUDENT TESTIMONIALS ("ĐÁNH GIÁ CỦA HỌC VIÊN") -->
-	<section class="py-16 bg-white">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+	<section class="py-16 bg-white relative overflow-hidden">
+		<!-- Decorative Background Blurred Blobs -->
+		<div class="absolute -left-16 -top-16 w-64 h-64 bg-[#2563EB]/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+		<div class="absolute -right-16 -bottom-16 w-64 h-64 bg-[#F5BF23]/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 			<div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
 				<span class="text-[#2563EB] text-sm font-bold uppercase tracking-wider block">CẢM NHẬN HỌC VIÊN</span>
 				<h2 class="text-2xl md:text-3xl font-black text-slate-900">ĐÁNH GIÁ CỦA HỌC VIÊN</h2>
@@ -560,45 +595,29 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				<p class="text-slate-500 text-sm md:text-sm">Chúng tôi thiết kế các lộ trình học tối ưu riêng cho từng nhóm đối tượng học viên.</p>
 			</div>
 
-			<div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
 				<!-- Segment 1 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
-					<div class="space-y-2">
-						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=200');"></div>
-						<h4 class="font-extrabold text-slate-800 text-sm">Cho người đi làm</h4>
-						<p class="text-sm text-slate-500 leading-normal">Lịch học linh hoạt, học trực tuyến 100% không làm gián đoạn công việc bận rộn hàng ngày.</p>
+				<div class="bg-white border border-slate-100 rounded-lg p-6 hover:border-brand-primary hover:shadow-md transition-all flex flex-col justify-between">
+					<div class="space-y-3">
+						<div class="h-36 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=350');"></div>
+						<h4 class="font-extrabold text-slate-800 text-base">Tốt nghiệp Trung cấp / Cao đẳng</h4>
+						<p class="text-sm text-slate-500 leading-relaxed">Rút ngắn tối đa thời gian đào tạo nhờ chuyển đổi, miễn giảm tín chỉ. Nhận bằng Đại học nhanh chóng để nâng lương, thăng chức hoặc thi cao học.</p>
 					</div>
 				</div>
 				<!-- Segment 2 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
-					<div class="space-y-2">
-						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=200');"></div>
-						<h4 class="font-extrabold text-slate-800 text-sm">Cho học sinh lớp 12</h4>
-						<p class="text-sm text-slate-500 leading-normal">Định hướng nghề nghiệp sớm, đăng ký lộ trình học liên kết đại học - mở ra tương lai rộng mở.</p>
+				<div class="bg-white border border-slate-100 rounded-lg p-6 hover:border-brand-primary hover:shadow-md transition-all flex flex-col justify-between">
+					<div class="space-y-3">
+						<div class="h-36 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=350');"></div>
+						<h4 class="font-extrabold text-slate-800 text-base">Người đi làm bận rộn</h4>
+						<p class="text-sm text-slate-500 leading-relaxed">Chương trình liên thông trực tuyến (Online E-learning) học mọi lúc mọi nơi. Lịch thi linh hoạt cuối tuần, giúp cân bằng công việc và học tập dễ dàng.</p>
 					</div>
 				</div>
 				<!-- Segment 3 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
-					<div class="space-y-2">
-						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=200');"></div>
-						<h4 class="font-extrabold text-slate-800 text-sm">Cho người muốn liên thông</h4>
-						<p class="text-sm text-slate-500 leading-normal">Từ Trung cấp/Cao đẳng lên Đại học. Rút ngắn thời gian đào tạo và tối ưu hóa chi phí học tập.</p>
-					</div>
-				</div>
-				<!-- Segment 4 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
-					<div class="space-y-2">
-						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=200');"></div>
-						<h4 class="font-extrabold text-slate-800 text-sm">Cho người muốn chuyển ngành</h4>
-						<p class="text-sm text-slate-500 leading-normal">Đón đầu xu hướng chuyển dịch lao động sang các ngành công nghệ, dịch vụ hot nhất hiện nay.</p>
-					</div>
-				</div>
-				<!-- Segment 5 -->
-				<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between">
-					<div class="space-y-2">
-						<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=200');"></div>
-						<h4 class="font-extrabold text-slate-800 text-sm">Cho người học văn bằng 2</h4>
-						<p class="text-sm text-slate-500 leading-normal">Mở rộng kiến thức đa lĩnh vực, gấp đôi cơ hội ứng tuyển và nâng cao giá trị thương hiệu cá nhân.</p>
+				<div class="bg-white border border-slate-100 rounded-lg p-6 hover:border-brand-primary hover:shadow-md transition-all flex flex-col justify-between">
+					<div class="space-y-3">
+						<div class="h-36 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=350');"></div>
+						<h4 class="font-extrabold text-slate-800 text-base">Liên thông trái ngành / Chuyển ngành</h4>
+						<p class="text-sm text-slate-500 leading-relaxed">Đón đầu xu hướng lao động bằng cách liên thông sang ngành nghề mới (CNTT, Kinh tế, Ngoại ngữ). Tối ưu lộ trình học tập, mở rộng cơ hội chuyển đổi việc làm.</p>
 					</div>
 				</div>
 			</div>
@@ -659,7 +678,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						</div>
 						
 						<div class="flex flex-col sm:flex-row items-center gap-4 pt-2">
-							<button type="submit" class="w-full sm:w-auto bg-[#2563EB] text-white px-8 py-3.5 rounded-lg font-bold text-sm hover:bg-[#1E40AF] transition-all shadow-md shadow-brand-primary/20">
+							<button type="submit" class="w-full sm:w-auto bg-brand-accent text-white px-8 py-3.5 rounded-lg font-bold text-sm hover:bg-amber-700 transition-all shadow-md shadow-brand-accent/20">
 								GỬI THÔNG TIN
 							</button>
 							<span class="text-sm text-slate-400 font-medium text-center sm:text-left">Cam kết bảo mật thông tin tuyệt đối và chỉ sử dụng cho mục đích tư vấn tuyển sinh.</span>
@@ -684,7 +703,7 @@ $zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				</a>
 			</div>
 
-			<div class="grid grid-cols-1 sm:grid-cols-4 gap-6">
+			<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
 				<?php 
 				$mock_news = [
 					[ 'title' => 'Tuyển sinh Đại học Từ xa khóa mới nhất', 'date' => '10/07/2026', 'desc' => 'Thông tin chi tiết các ngành đào tạo từ xa hệ Đại học được bộ GD&ĐT công nhận tốt nghiệp chính quy.' ],

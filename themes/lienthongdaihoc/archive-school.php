@@ -21,7 +21,7 @@ get_header();
 			<p class="text-sm font-medium text-slate-500">Hiển thị tất cả các trường đại học liên kết tuyển sinh chính thức.</p>
 			<div class="flex items-center gap-3">
 				<label for="limit-select" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Số lượng hiển thị:</label>
-				<select id="limit-select" class="rounded-lg border-slate-300 text-xs py-1.5 px-3 bg-white text-slate-700 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary cursor-pointer shadow-sm" onchange="location = this.value;">
+				<select id="limit-select" class="rounded-lg border-slate-300 text-sm py-2.5 px-3 bg-white text-slate-700 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary cursor-pointer shadow-sm min-h-[44px]" onchange="location = this.value;">
 					<option value="<?php echo esc_url( add_query_arg( 'limit', -1 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, -1 ); ?>>Tất cả</option>
 					<option value="<?php echo esc_url( add_query_arg( 'limit', 10 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 10 ); ?>>10</option>
 					<option value="<?php echo esc_url( add_query_arg( 'limit', 20 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 20 ); ?>>20</option>
@@ -64,20 +64,15 @@ get_header();
 								<span class="font-display font-extrabold text-brand-primary text-xs">UNI</span>
 							<?php endif; ?>
 						</div>
-
+ 
 						<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
 							<div class="text-center">
-								<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
+								<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
 								<p class="text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
-								
-								<div class="flex items-center justify-center gap-1 mt-2.5 text-[11px] text-slate-500 font-bold">
-									<span class="text-yellow-400">★</span>
-									<span><?php echo esc_html( $rating ); ?> (<?php echo esc_html( $reviews ); ?> đánh giá)</span>
-								</div>
 							</div>
 							
 						<div class="mt-4 pt-3 border-t border-slate-100">
-							<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-[#2563EB] hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-[#2563EB]">Chi tiết trường</a>
+							<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-brand-primary hover:text-white py-3 rounded-lg font-bold transition-all text-sm uppercase text-brand-primary min-h-[44px] flex items-center justify-center">Tìm hiểu thêm</a>
 						</div>
 						</div>
 					</div>

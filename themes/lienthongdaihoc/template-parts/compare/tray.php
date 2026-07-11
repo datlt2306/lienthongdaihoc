@@ -19,13 +19,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</div>
 				<div class="ltdh-tray-items flex items-center gap-2 overflow-x-auto min-w-0"></div>
 			</div>
-			<div class="flex items-center gap-2 shrink-0">
+			<div class="flex items-center gap-3 shrink-0">
 				<button onclick="document.getElementById('ltdh-compare-tray').classList.add('hidden'); sessionStorage.removeItem('<?php echo esc_js( 'ltdh_compare_items' ); ?>');"
-					class="text-xs text-slate-400 hover:text-red-500 font-semibold whitespace-nowrap">
+					class="text-xs text-slate-400 hover:text-red-500 font-semibold whitespace-nowrap min-h-[44px] px-3 flex items-center justify-center">
 					Xóa tất cả
 				</button>
 				<a href="#"
-				   class="ltdh-tray-link inline-flex items-center gap-1.5 bg-brand-primary text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-md shadow-brand-primary/20 hover:bg-teal-700 transition-all opacity-50 pointer-events-none">
+				   class="ltdh-tray-link inline-flex items-center justify-center gap-1.5 bg-brand-primary text-white text-sm font-bold px-5 min-h-[44px] rounded-lg shadow-md shadow-brand-primary/20 hover:bg-teal-700 transition-all opacity-50 pointer-events-none">
 					So sánh ngay →
 				</a>
 			</div>
