@@ -6,7 +6,7 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
 	
 	<!-- Tailwind CDN for rich interactive styles -->
 	<script src="https://cdn.tailwindcss.com"></script>
@@ -25,7 +25,7 @@
 					},
 					fontFamily: {
 						sans: ['"Be Vietnam Pro"', 'sans-serif'],
-						display: ['Poppins', '"Be Vietnam Pro"', 'sans-serif'],
+						display: ['Montserrat', '"Be Vietnam Pro"', 'sans-serif'],
 					}
 				}
 			}
@@ -42,6 +42,13 @@
 		}
 	</style>
 	<style>
+		/* Prevent Montserrat font weights from being too heavy */
+		h1, h2, h3, h4, h5, h6,
+		.font-black,
+		.font-extrabold {
+			font-weight: 700 !important;
+		}
+
 		/* Dropdown animation */
 		.dropdown-panel {
 			opacity: 0;
@@ -178,6 +185,66 @@
 		}
 		.nav-primary-menu .menu-item-has-children:hover > a::after {
 			transform: rotate(180deg);
+		}
+
+		/* Custom Contact Form 7 form styling */
+		.ltdh-cf7-form input[type="text"],
+		.ltdh-cf7-form input[type="tel"],
+		.ltdh-cf7-form input[type="email"],
+		.ltdh-cf7-form select,
+		.ltdh-cf7-form textarea {
+			width: 100% !important;
+			border: 1px solid #cbd5e1 !important;
+			border-radius: 0.5rem !important;
+			padding: 0.625rem 1rem !important;
+			font-size: 0.875rem !important;
+			background-color: #ffffff !important;
+			color: #1e293b !important;
+			transition: border-color 0.2s, box-shadow 0.2s;
+			box-sizing: border-box !important;
+		}
+		.ltdh-cf7-form input[type="text"]:focus,
+		.ltdh-cf7-form input[type="tel"]:focus,
+		.ltdh-cf7-form input[type="email"]:focus,
+		.ltdh-cf7-form select:focus,
+		.ltdh-cf7-form textarea:focus {
+			border-color: #1E3A8A !important;
+			outline: none !important;
+			box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15) !important;
+		}
+		.ltdh-cf7-form input[type="submit"] {
+			width: 100% !important;
+			background-color: #D97706 !important;
+			color: #ffffff !important;
+			padding: 0.875rem 2rem !important;
+			border-radius: 0.5rem !important;
+			font-weight: 700 !important;
+			font-size: 0.875rem !important;
+			cursor: pointer !important;
+			transition: background-color 0.2s, box-shadow 0.2s !important;
+			border: none !important;
+			display: inline-flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			min-height: 44px !important;
+		}
+		@media (min-width: 640px) {
+			.ltdh-cf7-form input[type="submit"] {
+				width: auto !important;
+			}
+		}
+		.ltdh-cf7-form input[type="submit"]:hover {
+			background-color: #B45309 !important;
+		}
+		.ltdh-cf7-form .wpcf7-form-control-wrap {
+			display: block !important;
+			width: 100% !important;
+		}
+		.ltdh-cf7-form br {
+			display: none !important;
+		}
+		.ltdh-cf7-form p {
+			margin-bottom: 0 !important;
 		}
 	</style>
 	<?php wp_head(); ?>

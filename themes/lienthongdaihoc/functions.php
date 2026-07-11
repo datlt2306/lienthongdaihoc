@@ -636,3 +636,27 @@ function ltdh_highlight_menu_parameters( $classes, $item ) {
 	}
 	return $classes;
 }
+
+/**
+ * Dynamically populate Contact Form 7 program selector
+ */
+add_filter( 'wpcf7_form_tag', 'ltdh_cf7_dynamic_programs', 10, 2 );
+function ltdh_cf7_dynamic_programs( $tag, $replace ) {
+	if ( 'current_program_id' === $tag['name'] ) {
+		$programs = get_posts( [ 'post_type' => 'program', 'numberposts' => -1 ] );
+		$tag['raw_values'] = [];
+		$tag['values']     = [];
+		$tag['labels']     = [];
+
+		$tag['raw_values'][] = '';
+		$tag['values'][]     = '';
+		$tag['labels'][]     = '-- Chọn ngành hoặc hệ học --';
+
+		foreach ( $programs as $p ) {
+			$tag['raw_values'][] = $p->post_title;
+			$tag['values'][]     = $p->post_title;
+			$tag['labels'][]     = $p->post_title;
+		}
+	}
+	return $tag;
+}

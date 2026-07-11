@@ -105,8 +105,15 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<h1 class="text-2xl md:text-4xl font-black text-slate-900 leading-tight"><?php the_title(); ?></h1>
 					<p class="text-slate-500 text-sm">Địa chỉ: <?php echo esc_html( $address ?: 'Chưa cập nhật' ); ?></p>
 					<?php if ( $website ) : ?>
-						<p class="text-sm text-slate-400">Website chính thức: <a href="<?php echo esc_url( $website ); ?>" target="_blank" rel="noopener noreferrer" class="text-brand-primary hover:underline"><?php echo esc_html( $website ); ?></a></p>
+						<p class="text-sm text-slate-400">Website chính thức: <a href="<?php echo esc_url( $website ); ?>" target="_blank" rel="noopener noreferrer" class="text-brand-primary hover:underline font-bold"><?php echo esc_html( $website ); ?></a></p>
 					<?php endif; ?>
+					<?php
+					$map_url = get_field( 'google_map_url', $school_id ) ?: get_field( 'map_url', $school_id );
+					if ( ! $map_url ) {
+						$map_url = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode( $school_title . ' ' . ( $address ?: '' ) );
+					}
+					?>
+					<p class="text-sm text-slate-400">Bản đồ: <a href="<?php echo esc_url( $map_url ); ?>" target="_blank" rel="noopener noreferrer" class="text-brand-accent hover:underline font-bold">📍 Xem đường đi trên Google Maps</a></p>
 				</div>
 
 				<div class="flex flex-col gap-2 w-full md:w-auto">
@@ -331,13 +338,13 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 				<div class="sticky top-24 space-y-6">
 					
 					<!-- CONSULTATION FORM -->
-					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h3 class="text-lg font-bold text-slate-900 mb-2">Đăng ký vào <?php the_title(); ?></h3>
-						<p class="text-sm text-slate-500 mb-4">Nhận tư vấn hồ sơ miễn phí, hỗ trợ xử lý thủ tục nhập học nhanh chóng.</p>
+					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+						<h3 class="text-base font-extrabold text-slate-900 mb-1">Đăng ký vào <?php the_title(); ?></h3>
+						<p class="text-xs text-slate-500 mb-4">Nhận tư vấn hồ sơ miễn phí, hỗ trợ xử lý thủ tục nhập học nhanh chóng.</p>
 						
 						<?php 
-						if ( function_exists( 'wpcf7_contact_form_html' ) ) :
-							echo do_shortcode( '[contact-form-7 id="consultation-form" title="Form Tư vấn"]' );
+						if ( class_exists( 'WPCF7_ContactForm' ) ) :
+							echo do_shortcode( '[contact-form-7 id="f3902eb" title="Form Tư vấn"]' );
 						else :
 						?>
 							<form action="#" method="POST" class="space-y-4">
@@ -353,7 +360,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 									<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
 								</div>
 								
-								<button type="submit" class="w-full bg-brand-primary text-white py-3.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-teal-700 transition-all mt-2 min-h-[44px] flex items-center justify-center">
+								<button type="submit" class="w-full bg-brand-primary text-white py-3.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-blue-700 transition-all mt-2 min-h-[44px] flex items-center justify-center">
 									Gửi Thông Tin Đăng Ký
 								</button>
 							</form>
@@ -361,12 +368,13 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					</section>
  
 					<!-- CONTACT INFO CARD -->
-					<div class="bg-slate-950 text-white rounded-lg p-6 text-center shadow-lg">
-						<span class="text-sm text-teal-400 font-bold uppercase tracking-wider block mb-1">Văn phòng tuyển sinh</span>
-						<h4 class="font-display font-black text-2xl mb-4"><?php echo esc_html( $hotline ); ?></h4>
-						<div class="flex gap-2">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-primary text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-teal-700 transition-all min-h-[44px] flex items-center justify-center">Gọi Ngay</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white/10 text-white border border-white/20 py-3.5 rounded-lg font-semibold text-sm hover:bg-white/20 transition-all min-h-[44px] flex items-center justify-center">Nhận Trò Chuyện</a>
+					<div class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white rounded-lg p-6 text-center shadow-lg overflow-hidden border border-slate-800">
+						<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 16px 16px;"></div>
+						<span class="text-xs text-brand-accent font-extrabold uppercase tracking-wider block mb-1">Văn phòng tuyển sinh</span>
+						<h4 class="font-display font-black text-xl md:text-2xl mb-4"><?php echo esc_html( $hotline ); ?></h4>
+						<div class="flex gap-2 relative z-10">
+							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-bold text-xs hover:bg-amber-700 transition-all min-h-[44px] flex items-center justify-center shadow-sm shadow-brand-accent/20">Gọi Ngay</a>
+							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white/10 text-white border border-white/20 py-3.5 rounded-lg font-bold text-xs hover:bg-white/20 transition-all min-h-[44px] flex items-center justify-center">Chat Zalo</a>
 						</div>
 					</div>
 
