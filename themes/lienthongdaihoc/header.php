@@ -6,7 +6,7 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&family=Montserrat:wght@600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
 	
 	<!-- Tailwind CDN for rich interactive styles -->
 	<script src="https://cdn.tailwindcss.com"></script>
@@ -26,6 +26,7 @@
 					fontFamily: {
 						sans: ['"Be Vietnam Pro"', 'sans-serif'],
 						display: ['Montserrat', '"Be Vietnam Pro"', 'sans-serif'],
+						playfair: ['"Playfair Display"', 'serif'],
 					}
 				}
 			}
@@ -154,7 +155,8 @@
 		}
 		.nav-mobile-menu a:hover,
 		.nav-mobile-menu .current-menu-item > a,
-		.nav-mobile-menu .current_page_item > a {
+		.nav-mobile-menu .current_page_item > a,
+		.nav-mobile-menu .current-menu-ancestor > a {
 			color: #1E3A8A;
 		}
 		.nav-mobile-menu .menu-item-has-children > a::after {
@@ -258,12 +260,7 @@
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 			<!-- Logo Section -->
 			<div class="site-branding">
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary">
-					<div class="flex flex-col leading-none">
-						<span class="text-sm font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
-						<span class="text-xl font-extrabold text-brand-primary">ĐẠI HỌC</span>
-					</div>
-				</a>
+				<?php ltdh_site_logo( 48 ); ?>
 			</div>
 
 
@@ -301,12 +298,7 @@
 				<!-- Header Offcanvas -->
 				<div class="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
 					<div class="site-branding">
-						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary">
-							<div class="flex flex-col leading-none">
-								<span class="text-xs font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
-								<span class="text-lg font-extrabold text-brand-primary">ĐẠI HỌC</span>
-							</div>
-						</a>
+						<?php ltdh_site_logo_mobile( 36 ); ?>
 					</div>
 					<button id="mobile-menu-close" class="text-slate-400 hover:text-slate-900 focus:outline-none p-1">
 						<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

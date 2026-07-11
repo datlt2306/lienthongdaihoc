@@ -19,6 +19,12 @@ function ltdh_theme_setup() {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'html5', [ 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script' ] );
+	add_theme_support( 'custom-logo', [
+		'height'      => 80,
+		'width'       => 200,
+		'flex-height' => true,
+		'flex-width'  => true,
+	] );
 	
 	// Rank Math breadcrumbs
 	add_theme_support( 'rank-math-breadcrumbs' );
@@ -28,6 +34,105 @@ function ltdh_theme_setup() {
 		'primary-menu' => 'Header Navigation Menu',
 		'footer-menu'  => 'Footer Navigation Menu',
 	] );
+}
+
+// ----------------------------------------------------
+// Menu: Active class based on URL path
+// ----------------------------------------------------
+add_filter( 'wp_nav_menu_objects', 'ltdh_menu_add_active_classes' );
+function ltdh_menu_add_active_classes( $menu_items ) {
+	if ( empty( $menu_items ) || ! is_array( $menu_items ) ) {
+		return $menu_items;
+	}
+
+	$current_url  = trailingslashit( parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
+	$current_url  = untrailingslashit( $current_url );
+
+	foreach ( $menu_items as $key => $item ) {
+		$item_url = trailingslashit( parse_url( $item->url, PHP_URL_PATH ) );
+		$item_url = untrailingslashit( $item_url );
+
+		// Exact match
+		if ( $current_url === $item_url ) {
+			$menu_items[ $key ]->classes[] = 'current-menu-item';
+			continue;
+		}
+
+		// Parent match: current URL starts with menu item URL (e.g. /nganh-hoc/viet-nam-hoc starts with /nganh-hoc)
+		if ( $item_url && $current_url !== '/' && strpos( $current_url, $item_url ) === 0 ) {
+			$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+		}
+	}
+
+	return $menu_items;
+}
+
+// ----------------------------------------------------
+// Customizer: Logo — uses WordPress built-in custom_logo
+// ----------------------------------------------------
+
+/**
+ * Get site logo URL with fallback
+ */
+function ltdh_get_logo_url() {
+	$logo_id = get_theme_mod( 'custom_logo' );
+	if ( $logo_id ) {
+		$url = wp_get_attachment_image_url( $logo_id, 'full' );
+		if ( $url ) {
+			return $url;
+		}
+	}
+	return '';
+}
+
+/**
+ * Output site logo
+ */
+function ltdh_site_logo( $max_height = 48 ) {
+	$logo_url = ltdh_get_logo_url();
+
+	if ( $logo_url ) :
+		$site_name = get_bloginfo( 'name' );
+	?>
+		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center">
+			<img src="<?php echo esc_url( $logo_url ); ?>" 
+				 alt="<?php echo esc_attr( $site_name ); ?>" 
+				 class="h-auto object-contain"
+				 style="max-height: <?php echo esc_attr( $max_height ); ?>px; width: auto;">
+		</a>
+	<?php else : ?>
+		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary">
+			<div class="flex flex-col leading-none">
+				<span class="text-sm font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
+				<span class="text-xl font-extrabold text-brand-primary">ĐẠI HỌC</span>
+			</div>
+		</a>
+	<?php endif;
+}
+
+/**
+ * Output site logo for mobile
+ */
+function ltdh_site_logo_mobile( $max_height = 36 ) {
+	$logo_url = ltdh_get_logo_url();
+
+	if ( $logo_url ) :
+		$site_name = get_bloginfo( 'name' );
+	?>
+		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center">
+			<img src="<?php echo esc_url( $logo_url ); ?>" 
+				 alt="<?php echo esc_attr( $site_name ); ?>" 
+				 class="h-auto object-contain"
+				 style="max-height: <?php echo esc_attr( $max_height ); ?>px; width: auto;">
+		</a>
+	<?php else : ?>
+		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary">
+			<div class="flex flex-col leading-none">
+				<span class="text-xs font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
+				<span class="text-lg font-extrabold text-brand-primary">ĐẠI HỌC</span>
+			</div>
+		</a>
+	<?php endif;
 }
 
 /**
@@ -203,40 +308,39 @@ function ltdh_default_primary_menu() {
 	$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => 5 ] );
 	$majors  = get_posts( [ 'post_type' => 'major', 'numberposts' => 5 ] );
 	$types   = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
+
+	$current_path = untrailingslashit( parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
+
+	$menu_items = [
+		[ 'url' => '/',                'label' => 'Trang chủ' ],
+		[ 'url' => '/truong-lien-ket/', 'label' => 'Trường liên kết' ],
+		[ 'url' => '/nganh-hoc/',      'label' => 'Ngành học' ],
+		[ 'url' => '/chuong-trinh/',   'label' => 'Hệ đào tạo' ],
+		[ 'url' => '/tin-tuyen-sinh/', 'label' => 'Tin tức' ],
+	];
+
+	// Detect active parent
+	$active_parent = '';
+	foreach ( $menu_items as $mi ) {
+		if ( $current_path === untrailingslashit( $mi['url'] ) || strpos( $current_path, untrailingslashit( $mi['url'] ) ) === 0 ) {
+			$active_parent = $mi['url'];
+			break;
+		}
+	}
 	?>
 	<ul class="nav-primary-menu">
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Trang chủ</a></li>
-		
-		<li class="menu-item menu-item-has-children">
-			<a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>">Trường liên kết</a>
-			<?php if ( ! empty( $schools ) ) : ?>
-				<ul class="sub-menu">
-					<?php foreach ( $schools as $s ) : ?>
-						<li class="menu-item"><a href="<?php echo esc_url( get_permalink( $s->ID ) ); ?>"><?php echo esc_html( $s->post_title ); ?></a></li>
-					<?php endforeach; ?>
-				</ul>
-			<?php endif; ?>
-		</li>
-
-		<li class="menu-item menu-item-has-children">
-			<a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>">Ngành học</a>
-			<?php if ( ! empty( $majors ) ) : ?>
-				<ul class="sub-menu">
-					<?php foreach ( $majors as $m ) : ?>
-						<li class="menu-item"><a href="<?php echo esc_url( get_permalink( $m->ID ) ); ?>"><?php echo esc_html( $m->post_title ); ?></a></li>
-					<?php endforeach; ?>
-				</ul>
-			<?php endif; ?>
-		</li>
-
-		<li class="menu-item menu-item-has-children">
-			<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>">Hệ đào tạo</a>
-			<?php if ( ! empty( $types ) && ! is_wp_error( $types ) ) : ?>
-				<ul class="sub-menu">
-					<?php foreach ( $types as $t ) : ?>
-						<li class="menu-item"><a href="<?php echo esc_url( home_url( '/chuong-trinh/?he=' . $t->slug ) ); ?>"><?php echo esc_html( $t->name ); ?></a></li>
-					<?php endforeach; ?>
-				</ul>
+		<?php foreach ( $menu_items as $mi ) :
+			$url_path = untrailingslashit( $mi['url'] );
+			$is_active = ( $current_path === $url_path || $active_parent === $mi['url'] );
+			$active_class = $is_active ? ' current-menu-item' : '';
+		?>
+			<li class="menu-item<?php echo $active_class; ?>">
+				<a href="<?php echo esc_url( home_url( $mi['url'] ) ); ?>"><?php echo esc_html( $mi['label'] ); ?></a>
+			</li>
+		<?php endforeach; ?>
+	</ul>
+	<?php
+}
 			<?php endif; ?>
 		</li>
 
@@ -250,48 +354,36 @@ function ltdh_default_primary_menu() {
  * Fallback menu for mobile navigation
  */
 function ltdh_default_mobile_menu() {
-	$schools = get_posts( [ 'post_type' => 'school', 'numberposts' => 5 ] );
-	$majors  = get_posts( [ 'post_type' => 'major', 'numberposts' => 5 ] );
-	$types   = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
+	$current_path = untrailingslashit( parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
+
+	$menu_items = [
+		[ 'url' => '/',                  'label' => 'Trang chủ' ],
+		[ 'url' => '/truong-lien-ket/',  'label' => 'Trường liên kết' ],
+		[ 'url' => '/nganh-hoc/',        'label' => 'Ngành học' ],
+		[ 'url' => '/chuong-trinh/',     'label' => 'Hệ đào tạo' ],
+		[ 'url' => '/tin-tuyen-sinh/',   'label' => 'Tin tức' ],
+		[ 'url' => '/kiem-tra-dieu-kien/', 'label' => 'Kiểm tra điều kiện' ],
+	];
+
+	// Detect active parent
+	$active_parent = '';
+	foreach ( $menu_items as $mi ) {
+		if ( $current_path === untrailingslashit( $mi['url'] ) || strpos( $current_path, untrailingslashit( $mi['url'] ) ) === 0 ) {
+			$active_parent = $mi['url'];
+			break;
+		}
+	}
 	?>
 	<ul class="nav-mobile-menu">
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Trang chủ</a></li>
-		
-		<li class="menu-item menu-item-has-children">
-			<a href="<?php echo esc_url( home_url( '/truong-lien-ket/' ) ); ?>">Trường liên kết</a>
-			<?php if ( ! empty( $schools ) ) : ?>
-				<ul class="sub-menu">
-					<?php foreach ( $schools as $s ) : ?>
-						<li class="menu-item"><a href="<?php echo esc_url( get_permalink( $s->ID ) ); ?>"><?php echo esc_html( $s->post_title ); ?></a></li>
-					<?php endforeach; ?>
-				</ul>
-			<?php endif; ?>
-		</li>
-
-		<li class="menu-item menu-item-has-children">
-			<a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>">Ngành học</a>
-			<?php if ( ! empty( $majors ) ) : ?>
-				<ul class="sub-menu">
-					<?php foreach ( $majors as $m ) : ?>
-						<li class="menu-item"><a href="<?php echo esc_url( get_permalink( $m->ID ) ); ?>"><?php echo esc_html( $m->post_title ); ?></a></li>
-					<?php endforeach; ?>
-				</ul>
-			<?php endif; ?>
-		</li>
-
-		<li class="menu-item menu-item-has-children">
-			<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>">Hệ đào tạo</a>
-			<?php if ( ! empty( $types ) && ! is_wp_error( $types ) ) : ?>
-				<ul class="sub-menu">
-					<?php foreach ( $types as $t ) : ?>
-						<li class="menu-item"><a href="<?php echo esc_url( home_url( '/chuong-trinh/?he=' . $t->slug ) ); ?>"><?php echo esc_html( $t->name ); ?></a></li>
-					<?php endforeach; ?>
-				</ul>
-			<?php endif; ?>
-		</li>
-
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>">Tin tức</a></li>
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>">Kiểm tra điều kiện</a></li>
+		<?php foreach ( $menu_items as $mi ) :
+			$url_path = untrailingslashit( $mi['url'] );
+			$is_active = ( $current_path === $url_path || $active_parent === $mi['url'] );
+			$active_class = $is_active ? ' current-menu-item' : '';
+		?>
+			<li class="menu-item<?php echo $active_class; ?>">
+				<a href="<?php echo esc_url( home_url( $mi['url'] ) ); ?>"><?php echo esc_html( $mi['label'] ); ?></a>
+			</li>
+		<?php endforeach; ?>
 	</ul>
 	<?php
 }

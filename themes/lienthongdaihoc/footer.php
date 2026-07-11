@@ -18,12 +18,21 @@ $messenger = get_field( 'global_messenger_url', 'options' ) ?: 'https://m.me';
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
 			<!-- About / Info -->
 			<div class="md:col-span-2">
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 font-display font-extrabold text-2xl text-white mb-4">
-					<div class="flex flex-col leading-none">
-						<span class="text-sm font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
-						<span class="text-xl font-extrabold text-brand-primary">ĐẠI HỌC</span>
-					</div>
-				</a>
+				<?php
+				$footer_logo = ltdh_get_logo_url();
+				if ( $footer_logo ) :
+				?>
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="inline-block mb-4">
+						<img src="<?php echo esc_url( $footer_logo ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="h-auto object-contain" style="max-height: 48px; width: auto; filter: brightness(0) invert(1);">
+					</a>
+				<?php else : ?>
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 font-display font-extrabold text-2xl text-white mb-4">
+						<div class="flex flex-col leading-none">
+							<span class="text-sm font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
+							<span class="text-xl font-extrabold text-brand-primary">ĐẠI HỌC</span>
+						</div>
+					</a>
+				<?php endif; ?>
 				<p class="text-sm text-slate-400 mb-4 max-w-sm">
 					Cổng thông tin tuyển sinh đại học trực tuyến, liên thông, văn bằng 2 và vừa học vừa làm hàng đầu Việt Nam. Kết nối người học với các chương trình chất lượng từ hơn 50 trường đại học top đầu.
 				</p>
