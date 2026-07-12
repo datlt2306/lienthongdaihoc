@@ -25,9 +25,13 @@ function ltdh_theme_setup() {
 		'flex-height' => true,
 		'flex-width'  => true,
 	] );
+	add_theme_support( 'site-icon' );
 	
 	// Rank Math breadcrumbs
 	add_theme_support( 'rank-math-breadcrumbs' );
+
+	// Customize selective refresh
+	add_theme_support( 'customize-selective-refresh-widgets' );
 
 	// Register navigation menus
 	register_nav_menus( [
@@ -75,6 +79,21 @@ function ltdh_menu_add_active_classes( $menu_items ) {
  * Get site logo URL with fallback
  */
 function ltdh_get_logo_url() {
+	// 1. Try to get logo from ACF Options Page first
+	if ( function_exists( 'get_field' ) ) {
+		$acf_logo = get_field( 'global_logo', 'options' );
+		if ( $acf_logo ) {
+			if ( is_numeric( $acf_logo ) ) {
+				return wp_get_attachment_image_url( $acf_logo, 'full' );
+			} elseif ( is_array( $acf_logo ) && isset( $acf_logo['url'] ) ) {
+				return $acf_logo['url'];
+			} elseif ( is_string( $acf_logo ) ) {
+				return $acf_logo;
+			}
+		}
+	}
+
+	// 2. Fallback to WordPress default Customizer Logo
 	$logo_id = get_theme_mod( 'custom_logo' );
 	if ( $logo_id ) {
 		$url = wp_get_attachment_image_url( $logo_id, 'full' );
@@ -282,12 +301,21 @@ foreach ( $ltdh_modules as $module ) {
 // ----------------------------------------------------
 add_action( 'template_redirect', 'ltdh_redirect_taxonomy_base' );
 function ltdh_redirect_taxonomy_base() {
-	if ( is_tax( 'training_type' ) || is_tax( 'campus' ) ) {
+	if ( is_tax( 'training_type' ) ) {
+		$term = get_queried_object();
+		if ( $term && isset( $term->term_id ) ) {
+			wp_redirect( home_url( '/chuong-trinh/?he=' . $term->slug ), 301 );
+			exit;
+		}
+		return;
+	}
+
+	if ( is_tax( 'campus' ) ) {
 		return;
 	}
 
 	$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
-	if ( preg_match( '#^/he-dao-tao/?$#i', $request_path ) || preg_match( '#^/co-so/?$#i', $request_path ) ) {
+	if ( preg_match( '#^/co-so/?$#i', $request_path ) ) {
 		wp_redirect( home_url( '/chuong-trinh/' ), 301 );
 		exit;
 	}
@@ -315,7 +343,7 @@ function ltdh_default_primary_menu() {
 		[ 'url' => '/',                'label' => 'Trang chủ' ],
 		[ 'url' => '/truong-lien-ket/', 'label' => 'Trường liên kết' ],
 		[ 'url' => '/nganh-hoc/',      'label' => 'Ngành học' ],
-		[ 'url' => '/chuong-trinh/',   'label' => 'Hệ đào tạo' ],
+		[ 'url' => '/he-dao-tao/',   'label' => 'Hệ đào tạo' ],
 		[ 'url' => '/tin-tuyen-sinh/', 'label' => 'Tin tức' ],
 	];
 
@@ -338,14 +366,6 @@ function ltdh_default_primary_menu() {
 				<a href="<?php echo esc_url( home_url( $mi['url'] ) ); ?>"><?php echo esc_html( $mi['label'] ); ?></a>
 			</li>
 		<?php endforeach; ?>
-	</ul>
-	<?php
-}
-			<?php endif; ?>
-		</li>
-
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/tin-tuyen-sinh/' ) ); ?>">Tin tức</a></li>
-		<li class="menu-item"><a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>">Kiểm tra điều kiện</a></li>
 	</ul>
 	<?php
 }
@@ -623,7 +643,7 @@ function ltdh_dynamic_menu_submenu_injection( $sorted_menu_items, $args ) {
 					$sub_item->ID = $max_db_id;
 					$sub_item->db_id = $max_db_id;
 					$sub_item->title = $t->name;
-					$sub_item->url = home_url( '/chuong-trinh/?he=' . $t->slug );
+					$sub_item->url = home_url( '/he-dao-tao/' . $t->slug . '/' );
 					$sub_item->menu_item_parent = $item->ID;
 					$sub_item->classes = [ 'menu-item', 'menu-item-type-taxonomy', 'menu-item-object-training_type' ];
 					$sub_item->type = 'taxonomy';

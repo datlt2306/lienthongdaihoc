@@ -13,14 +13,46 @@ get_header();
 
 $term = get_queried_object();
 $taxonomy = $term->taxonomy;
+$is_base_archive = ! isset( $term->term_id );
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-		<!-- Dynamic Grid Output based on Taxonomy target -->
-		<?php if ( $taxonomy === 'region' ) : ?>
+		<?php if ( $is_base_archive && $taxonomy === 'training_type' ) : ?>
+			<!-- Base archive: Landing page listing all training type terms -->
+			<div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
+				<h1 class="text-2xl md:text-4xl font-black text-slate-900">Hệ đào tạo</h1>
+				<p class="text-slate-500 text-sm">Chọn hệ đào tạo phù hợp để xem tất cả chương trình liên thông, văn bằng 2, đại học từ xa...</p>
+			</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+				<?php
+				$types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
+				$card_icons = [ '📘', '📗', '📙', '📕', '📓', '📔' ];
+				$i = 0;
+				if ( ! is_wp_error( $types ) && ! empty( $types ) ) :
+					foreach ( $types as $t ) :
+						$icon = $card_icons[ $i % count( $card_icons ) ];
+						$prog_count = $t->count;
+						$i++;
+				?>
+						<a href="<?php echo esc_url( home_url( '/chuong-trinh/?he=' . $t->slug ) ); ?>"
+						   class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:border-brand-primary transition-all flex flex-col items-center text-center p-8 group">
+							<span class="text-5xl mb-4 group-hover:scale-110 transition-transform"><?php echo $icon; ?></span>
+							<h2 class="font-extrabold text-lg text-slate-800 group-hover:text-brand-primary transition-colors mb-2"><?php echo esc_html( $t->name ); ?></h2>
+							<p class="text-sm text-slate-400 font-semibold"><?php echo esc_html( $prog_count ); ?> chương trình</p>
+							<span class="mt-4 text-sm text-brand-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity">Xem chương trình →</span>
+						</a>
+				<?php
+					endforeach;
+				else :
+					echo '<div class="col-span-3 text-center py-12"><p class="text-slate-500">Chưa có hệ đào tạo nào.</p></div>';
+				endif;
+				?>
+			</div>
+
+		<?php elseif ( $taxonomy === 'region' ) : ?>
 			<!-- Region lists schools -->
 			<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
 				<?php

@@ -652,8 +652,25 @@
     },
     {
         "key": "group_ltdh_global_settings",
-        "title": "Thông tin Liên hệ & Tích hợp CRM",
+        "title": "Thông tin Cấu hình & Tích hợp CRM",
         "fields": [
+            {
+                "key": "field_tab_general",
+                "label": "Cấu hình chung",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_global_logo",
+                "label": "Logo trang web",
+                "name": "global_logo",
+                "type": "image",
+                "return_format": "id",
+                "preview_size": "thumbnail",
+                "library": "all",
+                "instructions": "Upload ảnh logo của trang web (thay thế cho logo trong Customizer)"
+            },
             {
                 "key": "field_global_hotline",
                 "label": "Hotline tư vấn chung",
