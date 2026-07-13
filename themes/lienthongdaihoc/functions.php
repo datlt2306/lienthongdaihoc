@@ -301,6 +301,7 @@ foreach ( $ltdh_modules as $module ) {
 // ----------------------------------------------------
 add_action( 'init', function() {
 	add_rewrite_rule( 'he-dao-tao/?$', 'index.php?training_type', 'top' );
+	add_rewrite_rule( 'he-dao-tao/([^/]+)/?$', 'index.php?training_type=$matches[1]', 'top' );
 });
 
 // ----------------------------------------------------
@@ -308,15 +309,6 @@ add_action( 'init', function() {
 // ----------------------------------------------------
 add_action( 'template_redirect', 'ltdh_redirect_taxonomy_base' );
 function ltdh_redirect_taxonomy_base() {
-	if ( is_tax( 'training_type' ) ) {
-		$term = get_queried_object();
-		if ( $term && isset( $term->term_id ) ) {
-			wp_redirect( home_url( '/chuong-trinh/?he=' . $term->slug ), 301 );
-			exit;
-		}
-		return;
-	}
-
 	if ( is_tax( 'campus' ) ) {
 		return;
 	}
@@ -328,12 +320,112 @@ function ltdh_redirect_taxonomy_base() {
 	}
 }
 
+// Use archive-program.php for /he-dao-tao/ and /he-dao-tao/slug/
+add_filter( 'template_include', function( $template ) {
+	$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+	if ( preg_match( '#^/he-dao-tao(?:/[^/]+)?/?$#i', $request_path ) ) {
+		$archive_template = locate_template( 'archive-program.php' );
+		if ( $archive_template ) {
+			return $archive_template;
+		}
+	}
+	return $template;
+});
+
+// ----------------------------------------------------
+// 4c. Custom rewrite rule for program posts at root level
+// ----------------------------------------------------
+add_action( 'init', function() {
+	add_rewrite_tag( '%program_slug%', '([a-z0-9-]+)' );
+	add_rewrite_rule( '^([a-z0-9-]+)/?$', 'index.php?program_slug=$matches[1]', 'top' );
+});
+
+add_action( 'template_redirect', 'ltdh_rewrite_program_slug_redirect' );
+function ltdh_rewrite_program_slug_redirect() {
+	$slug = get_query_var( 'program_slug' );
+	if ( ! $slug || is_admin() ) {
+		return;
+	}
+
+	// Try to find as program first
+	$program = get_posts( [
+		'post_type'      => 'program',
+		'name'           => $slug,
+		'posts_per_page' => 1,
+		'post_status'    => 'publish',
+	] );
+
+	if ( ! empty( $program ) ) {
+		global $wp_query, $post;
+		$post = $program[0];
+		$wp_query->post = $program[0];
+		$wp_query->posts = $program;
+		$wp_query->post_count = 1;
+		$wp_query->is_single = true;
+		$wp_query->is_singular = true;
+		$wp_query->is_page = false;
+		$wp_query->is_archive = false;
+		$wp_query->is_home = false;
+		$wp_query->is_404 = false;
+		$wp_query->set( 'post_type', 'program' );
+		$wp_query->set( 'p', $program[0]->ID );
+		$wp_query->set( 'name', $slug );
+		$wp_query->set( 'program_slug', '' );
+
+		setup_postdata( $post );
+
+		include get_stylesheet_directory() . '/single-program.php';
+		exit;
+	}
+
+	// Not a program – try regular post
+	$found = get_posts( [
+		'post_type'      => 'post',
+		'name'           => $slug,
+		'posts_per_page' => 1,
+		'post_status'    => 'publish',
+	] );
+
+	if ( ! empty( $found ) ) {
+		global $wp_query, $post;
+		$post = $found[0];
+		$wp_query->post = $found[0];
+		$wp_query->posts = $found;
+		$wp_query->post_count = 1;
+		$wp_query->is_single = true;
+		$wp_query->is_singular = true;
+		$wp_query->is_page = false;
+		$wp_query->is_archive = false;
+		$wp_query->is_home = false;
+		$wp_query->is_404 = false;
+		$wp_query->set( 'post_type', 'post' );
+		$wp_query->set( 'p', $found[0]->ID );
+		$wp_query->set( 'name', $slug );
+		$wp_query->set( 'program_slug', '' );
+
+		setup_postdata( $post );
+		return;
+	}
+
+	// No content found – let WordPress handle the 404
+	global $wp_query;
+	$wp_query->set_404();
+	status_header( 404 );
+}
+
 // ----------------------------------------------------
 // 5. Flush Rewrite Rules on Theme Activation
 // ----------------------------------------------------
 add_action( 'after_switch_theme', 'ltdh_flush_rewrite_rules' );
 function ltdh_flush_rewrite_rules() {
 	flush_rewrite_rules();
+	update_option( 'ltdh_rewrite_flushed_v2', time() );
+}
+
+// Flush once after rewrite rules update
+if ( ! get_option( 'ltdh_rewrite_flushed_v2' ) ) {
+	flush_rewrite_rules();
+	update_option( 'ltdh_rewrite_flushed_v2', time() );
 }
 
 /**
@@ -588,7 +680,7 @@ function ltdh_ajax_filter_programs() {
 								So sánh
 							</button>
 						</div>
-						<a href="<?php the_permalink(); ?>#register" class="bg-brand-accent text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-amber-700 shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
+						<a href="<?php the_permalink(); ?>" class="bg-brand-accent text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-amber-700 shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
 					</div>
 				</div>
 			</div>
@@ -731,28 +823,51 @@ function ltdh_allow_webp_upload_check( $data, $file, $filename, $mimes ) {
 }
 
 /**
- * Highlight custom menu items that have query parameters (e.g. ?he=tu-xa)
+ * Highlight custom menu items for training type pages.
+ * Supports both path-based (/he-dao-tao/slug/) and legacy query (?he=slug) URLs.
  */
 add_filter( 'nav_menu_css_class', 'ltdh_highlight_menu_parameters', 10, 2 );
 function ltdh_highlight_menu_parameters( $classes, $item ) {
 	$current_url = home_url( $_SERVER['REQUEST_URI'] );
 	$item_url    = $item->url;
 
-	if ( $item_url && strpos( $item_url, '?' ) !== false ) {
-		$item_parts    = wp_parse_url( $item_url );
-		$current_parts = wp_parse_url( $current_url );
+	if ( ! $item_url ) {
+		return $classes;
+	}
 
-		if ( isset( $item_parts['path'] ) && isset( $current_parts['path'] ) && $item_parts['path'] === $current_parts['path'] ) {
-			if ( isset( $item_parts['query'] ) && isset( $current_parts['query'] ) ) {
-				parse_str( $item_parts['query'], $item_query );
-				parse_str( $current_parts['query'], $current_query );
+	$current_parts = wp_parse_url( $current_url );
+	$item_parts    = wp_parse_url( $item_url );
 
-				if ( isset( $item_query['he'] ) && isset( $current_query['he'] ) && $item_query['he'] === $current_query['he'] ) {
-					$classes[] = 'current-menu-item';
-				}
+	if ( ! isset( $item_parts['path'] ) || ! isset( $current_parts['path'] ) ) {
+		return $classes;
+	}
+
+	// Check path-based training type: /he-dao-tao/slug/
+	if ( preg_match( '#/he-dao-tao/([^/]+)/?$#i', $item_parts['path'], $item_match ) ) {
+		if ( preg_match( '#/he-dao-tao/([^/]+)/?$#i', $current_parts['path'], $current_match ) ) {
+			if ( $item_match[1] === $current_match[1] ) {
+				$classes[] = 'current-menu-item';
 			}
 		}
 	}
+
+	// Legacy: check query-based ?he=slug
+	if ( isset( $item_parts['query'] ) ) {
+		parse_str( $item_parts['query'], $item_query );
+		if ( isset( $item_query['he'] ) ) {
+			$current_he = '';
+			if ( preg_match( '#/he-dao-tao/([^/]+)/?$#i', $current_parts['path'], $m ) ) {
+				$current_he = $m[1];
+			} elseif ( isset( $current_parts['query'] ) ) {
+				parse_str( $current_parts['query'], $current_query );
+				$current_he = isset( $current_query['he'] ) ? $current_query['he'] : '';
+			}
+			if ( $current_he && $item_query['he'] === $current_he ) {
+				$classes[] = 'current-menu-item';
+			}
+		}
+	}
+
 	return $classes;
 }
 

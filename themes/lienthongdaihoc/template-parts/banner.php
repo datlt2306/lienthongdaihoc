@@ -52,7 +52,14 @@ if ( is_page() ) {
 	$banner_title    = 'Ngành Học';
 	$banner_subtitle = 'Khám phá các ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
 } elseif ( is_post_type_archive( 'program' ) ) {
-	$selected_he = isset( $_GET['he'] ) ? sanitize_text_field( $_GET['he'] ) : '';
+	$selected_he = '';
+	$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+	if ( preg_match( '#^/he-dao-tao/([^/]+)/?$#i', $request_path, $m ) ) {
+		$selected_he = sanitize_text_field( $m[1] );
+	}
+	if ( empty( $selected_he ) ) {
+		$selected_he = isset( $_GET['he'] ) ? sanitize_text_field( $_GET['he'] ) : '';
+	}
 	if ( $selected_he ) {
 		$he_term = get_term_by( 'slug', $selected_he, 'training_type' );
 		if ( $he_term ) {

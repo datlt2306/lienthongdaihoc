@@ -13,9 +13,18 @@ get_header();
 
 // Fetch filter values from URL GET params
 $selected_school   = isset( $_GET['truong'] ) ? sanitize_text_field( $_GET['truong'] ) : '';
-$selected_major    = isset( $_GET['nganh'] ) ? sanitize_text_field( $_GET['nganh'] ) : '';
-$selected_nhom     = isset( $_GET['nhom_nganh'] ) ? sanitize_text_field( $_GET['nhom_nganh'] ) : '';
-$selected_type     = isset( $_GET['he'] ) ? sanitize_text_field( $_GET['he'] ) : '';
+$selected_nhom     = isset( $_GET['nganh'] ) ? sanitize_text_field( $_GET['nganh'] ) : '';
+if ( empty( $selected_nhom ) ) {
+	$selected_nhom = isset( $_GET['nhom_nganh'] ) ? sanitize_text_field( $_GET['nhom_nganh'] ) : '';
+}
+$selected_type     = '';
+$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+if ( preg_match( '#^/he-dao-tao/([^/]+)/?$#i', $request_path, $m ) ) {
+	$selected_type = sanitize_text_field( $m[1] );
+}
+if ( empty( $selected_type ) ) {
+	$selected_type = isset( $_GET['he'] ) ? sanitize_text_field( $_GET['he'] ) : '';
+}
 $selected_search   = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
 
 $args = [
@@ -73,18 +82,6 @@ if ( ! empty( $selected_nhom ) ) {
 			'compare' => 'IN',
 		];
 	}
-} elseif ( ! empty( $selected_major ) ) {
-	if ( ! is_numeric( $selected_major ) ) {
-		$major_post = get_page_by_path( $selected_major, OBJECT, 'major' );
-		$major_id   = $major_post ? $major_post->ID : 0;
-	} else {
-		$major_id = intval( $selected_major );
-	}
-	$args['meta_query'][] = [
-		'key'     => 'major_relationship',
-		'value'   => $major_id,
-		'compare' => '=',
-	];
 }
 
 if ( ! empty( $selected_type ) ) {
@@ -97,6 +94,19 @@ if ( ! empty( $selected_type ) ) {
 
 $args  = apply_filters( 'pre_get_posts_args_ltdh', $args );
 $query = new WP_Query( $args );
+
+// Count for "Tất cả các ngành": same filters as the main query (hệ, school, search,
+// admission_status) but WITHOUT the nhóm ngành / major filter, so selecting a
+// nhóm ngành does not change the "all majors" number.
+$all_majors_args              = $args;
+$all_majors_args['posts_per_page'] = -1;
+$all_majors_args['fields']         = 'ids';
+$all_majors_args['meta_query']     = array_filter( $all_majors_args['meta_query'], function ( $clause ) {
+	return ! ( isset( $clause['key'] ) && 'major_relationship' === $clause['key'] );
+} );
+$all_majors_query = new WP_Query( $all_majors_args );
+$all_majors_count = $all_majors_query->found_posts;
+wp_reset_postdata();
 
 // Sidebar data
 $major_cats       = get_terms( [ 'taxonomy' => 'major_cat', 'hide_empty' => false ] );
@@ -122,10 +132,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 
 					<!-- Search Box -->
 					<div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
-						<form action="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" method="GET">
-							<?php if ( $selected_type ) : ?>
-								<input type="hidden" name="he" value="<?php echo esc_attr( $selected_type ); ?>">
-							<?php endif; ?>
+						<form action="<?php echo esc_url( $selected_type ? home_url( '/he-dao-tao/' . $selected_type . '/' ) : home_url( '/chuong-trinh/' ) ); ?>" method="GET">
 							<input type="text" name="s" value="<?php echo esc_attr( $selected_search ); ?>" placeholder="Tìm kiếm chương trình..." class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 min-h-[44px]">
 						</form>
 					</div>
@@ -135,7 +142,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 						<h3 class="font-extrabold text-slate-900 text-base mb-4 border-b border-slate-100 pb-3 uppercase tracking-wider">Hệ đào tạo</h3>
 						<ul class="space-y-1">
 							<li>
-								<a href="<?php echo esc_url( remove_query_arg( 'he' ) ); ?>"
+								<a href="<?php echo esc_url( home_url( '/he-dao-tao/' ) ); ?>"
 								   class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo empty( $selected_type ) ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
 									<span>Tất cả hệ học</span>
 									<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo empty( $selected_type ) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>">
@@ -160,7 +167,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 									wp_reset_postdata();
 							?>
 									<li>
-										<a href="<?php echo esc_url( add_query_arg( 'he', $t_term->slug, remove_query_arg( 'he' ) ) ); ?>"
+										<a href="<?php echo esc_url( home_url( '/he-dao-tao/' . $t_term->slug . '/' ) ); ?>"
 										   class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo $is_active ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
 											<span><?php echo esc_html( $t_term->name ); ?></span>
 											<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>">
@@ -180,11 +187,11 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 						<h3 class="font-extrabold text-slate-900 text-base mb-4 border-b border-slate-100 pb-3 uppercase tracking-wider">Nhóm ngành</h3>
 						<ul class="space-y-1">
 							<li>
-								<a href="<?php echo esc_url( remove_query_arg( 'nhom_nganh' ) ); ?>"
+								<a href="<?php echo esc_url( remove_query_arg( 'nganh' ) ); ?>"
 								   class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo empty( $selected_nhom ) ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
 									<span>Tất cả các ngành</span>
 									<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo empty( $selected_nhom ) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>">
-										<?php echo esc_html( $query->found_posts ); ?>
+										<?php echo esc_html( $all_majors_count ); ?>
 									</span>
 								</a>
 							</li>
@@ -225,7 +232,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 									}
 								?>
 									<li>
-										<a href="<?php echo esc_url( add_query_arg( 'nhom_nganh', $cat->slug, remove_query_arg( 'nhom_nganh' ) ) ); ?>"
+										<a href="<?php echo esc_url( add_query_arg( 'nganh', $cat->slug, remove_query_arg( 'nganh' ) ) ); ?>"
 										   class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo $is_active ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
 											<span><?php echo esc_html( $cat->name ); ?></span>
 											<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>">
@@ -256,7 +263,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 							Tìm thấy <strong><?php echo esc_html( $query->found_posts ); ?></strong> chương trình học phù hợp.
 						</p>
 					</div>
-					<?php if ( $selected_type || $selected_school || $selected_search ) : ?>
+					<?php if ( $selected_type || $selected_nhom || $selected_school || $selected_search ) : ?>
 						<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="text-xs font-bold text-brand-primary hover:underline shrink-0">✕ Xóa tất cả bộ lọc</a>
 					<?php endif; ?>
 				</div>
@@ -320,7 +327,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 
 									<div class="mt-3 pt-2 md:mt-4 md:pt-3 border-t border-slate-100 flex items-center justify-between">
 										<div class="flex items-center gap-1.5 w-full">
-											<a href="<?php the_permalink(); ?>#register" class="bg-brand-accent text-white text-[10px] md:text-xs font-bold py-2.5 rounded-lg hover:bg-amber-700 transition-all min-h-[44px] flex items-center justify-center shadow-sm shadow-brand-accent/10 flex-1">Tìm hiểu</a>
+											<a href="<?php the_permalink(); ?>" class="bg-brand-accent text-white text-[10px] md:text-xs font-bold py-2.5 rounded-lg hover:bg-amber-700 transition-all min-h-[44px] flex items-center justify-center shadow-sm shadow-brand-accent/10 flex-1">Tìm hiểu</a>
 											<button type="button"
 													class="ltdh-compare-toggle text-[10px] md:text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg py-2.5 transition-all min-h-[44px] flex items-center justify-center flex-1"
 													data-compare-type="program"
@@ -346,7 +353,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 							<p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Hệ học này hiện chưa có chương trình hoặc không khớp với các bộ lọc khác. Hãy thử chọn hệ học khác hoặc đặt lại bộ lọc.</p>
 							<div class="flex flex-col sm:flex-row items-center justify-center gap-3">
 								<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="bg-brand-accent text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-amber-700 shadow-md shadow-brand-accent/20 min-h-[44px] flex items-center justify-center">✕ Đặt lại bộ lọc</a>
-								<a href="<?php echo esc_url( add_query_arg( 'he', 'lien-thong', remove_query_arg( 'he' ) ) ); ?>" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-bold text-sm transition-all min-h-[44px] flex items-center justify-center">Xem hệ Liên thông</a>
+								<a href="<?php echo esc_url( home_url( '/he-dao-tao/lien-thong/' ) ); ?>" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-bold text-sm transition-all min-h-[44px] flex items-center justify-center">Xem hệ Liên thông</a>
 							</div>
 						</div>
 					<?php

@@ -160,7 +160,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 										<?php if ( $status === 'tam-ngung' ) : ?>
 											<span class="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
 										<?php else : ?>
-											<a href="<?php the_permalink(); ?>#register" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-[#1E40AF] transition-all min-h-[44px] flex items-center justify-center">Tìm hiểu</a>
+											<a href="<?php the_permalink(); ?>" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-[#1E40AF] transition-all min-h-[44px] flex items-center justify-center">Tìm hiểu</a>
 										<?php endif; ?>
 									</div>
 								</div>
