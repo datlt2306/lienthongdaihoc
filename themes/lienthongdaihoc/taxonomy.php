@@ -21,33 +21,64 @@ $is_base_archive = ! isset( $term->term_id );
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
 		<?php if ( $is_base_archive && $taxonomy === 'training_type' ) : ?>
-			<!-- Base archive: Landing page listing all training type terms -->
+			<!-- Base archive: List all programs -->
 			<div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
 				<h1 class="text-2xl md:text-4xl font-black text-slate-900">Hệ đào tạo</h1>
-				<p class="text-slate-500 text-sm">Chọn hệ đào tạo phù hợp để xem tất cả chương trình liên thông, văn bằng 2, đại học từ xa...</p>
+				<p class="text-slate-500 text-sm">Tất cả chương trình đào tạo liên thông, văn bằng 2, đại học từ xa.</p>
 			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<?php
-				$types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
-				$card_icons = [ '📘', '📗', '📙', '📕', '📓', '📔' ];
-				$i = 0;
-				if ( ! is_wp_error( $types ) && ! empty( $types ) ) :
-					foreach ( $types as $t ) :
-						$icon = $card_icons[ $i % count( $card_icons ) ];
-						$prog_count = $t->count;
-						$i++;
+				$all_programs = new WP_Query( [
+					'post_type'      => 'program',
+					'posts_per_page' => -1,
+					'post_status'    => 'publish',
+				] );
+				if ( $all_programs->have_posts() ) :
+					while ( $all_programs->have_posts() ) : $all_programs->the_post();
+						$prog_id = get_the_ID();
+						$school_rel_id = get_field( 'school_relationship', $prog_id );
+						$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Đại học liên kết';
+						$major_rel_id = get_field( 'major_relationship', $prog_id );
+						$major_thumb = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium' ) : '';
+						if ( ! $major_thumb ) {
+							$major_thumb = 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=300';
+						}
+						$types = wp_get_post_terms( $prog_id, 'training_type' );
+						$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : 'Chưa xác định';
+						$groups = get_post_meta( $prog_id, 'admission_groups', true );
+						$learning_details = ltdh_get_program_learning_details( $prog_id );
 				?>
-						<a href="<?php echo esc_url( home_url( '/chuong-trinh/?he=' . $t->slug ) ); ?>"
-						   class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:border-brand-primary transition-all flex flex-col items-center text-center p-8 group">
-							<span class="text-5xl mb-4 group-hover:scale-110 transition-transform"><?php echo $icon; ?></span>
-							<h2 class="font-extrabold text-lg text-slate-800 group-hover:text-brand-primary transition-colors mb-2"><?php echo esc_html( $t->name ); ?></h2>
-							<p class="text-sm text-slate-400 font-semibold"><?php echo esc_html( $prog_count ); ?> chương trình</p>
-							<span class="mt-4 text-sm text-brand-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity">Xem chương trình →</span>
-						</a>
+						<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+							<div class="h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>');"></div>
+							<div class="p-6 flex-1 flex flex-col justify-between">
+								<div>
+									<div class="flex items-center flex-wrap gap-2 mb-1.5">
+										<span class="text-sm text-slate-400 font-semibold uppercase"><?php echo esc_html( $school_name ); ?></span>
+									</div>
+									<h3 class="font-extrabold text-slate-800 text-lg hover:text-brand-primary mb-3">
+										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+									</h3>
+									<div class="space-y-1.5 text-sm text-slate-500 py-3 border-t border-slate-100">
+										<p>Hệ đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
+										<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ' ); ?></span></p>
+										<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
+										<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
+										<?php if ( ! empty( $groups ) ) : ?>
+											<p>Tổ hợp: <span class="font-bold text-slate-700"><?php echo esc_html( $groups ); ?></span></p>
+										<?php endif; ?>
+									</div>
+								</div>
+								<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+									<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
+									<a href="<?php the_permalink(); ?>#register" class="bg-brand-accent text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-amber-700 shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
+								</div>
+							</div>
+						</div>
 				<?php
-					endforeach;
+					endwhile;
+					wp_reset_postdata();
 				else :
-					echo '<div class="col-span-3 text-center py-12"><p class="text-slate-500">Chưa có hệ đào tạo nào.</p></div>';
+					echo '<div class="col-span-3 text-center py-12"><p class="text-slate-500">Chưa có chương trình nào.</p></div>';
 				endif;
 				?>
 			</div>

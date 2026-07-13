@@ -297,7 +297,14 @@ foreach ( $ltdh_modules as $module ) {
 }
 
 // ----------------------------------------------------
-// 4. Redirect Empty Taxonomy Base URLs
+// 4a. Add rewrite rule for /he-dao-tao/ base archive
+// ----------------------------------------------------
+add_action( 'init', function() {
+	add_rewrite_rule( 'he-dao-tao/?$', 'index.php?training_type', 'top' );
+});
+
+// ----------------------------------------------------
+// 4b. Redirect Empty Taxonomy Base URLs
 // ----------------------------------------------------
 add_action( 'template_redirect', 'ltdh_redirect_taxonomy_base' );
 function ltdh_redirect_taxonomy_base() {
