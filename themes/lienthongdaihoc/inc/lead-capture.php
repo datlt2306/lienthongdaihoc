@@ -16,7 +16,7 @@ add_action( 'after_switch_theme', 'ltdh_create_leads_table' );
 
 function ltdh_create_leads_table() {
 	global $wpdb;
-	$table_name = $wpdb->prefix . 'ltdh_leads';
+	$table_name = $wpdb->prefix . LTDH_TABLE_LEADS;
 	$charset_collate = $wpdb->get_charset_collate();
 
 	$sql = "CREATE TABLE $table_name (
@@ -96,7 +96,7 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	}
 
 	global $wpdb;
-	$table_name = $wpdb->prefix . 'ltdh_leads';
+	$table_name = $wpdb->prefix . LTDH_TABLE_LEADS;
 
 	$wpdb->insert(
 		$table_name,

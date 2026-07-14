@@ -115,7 +115,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 							<div class="absolute inset-0 bg-gradient-to-tr from-[#0E2038] to-brand-primary flex items-center justify-center text-4xl">📰</div>
 						<?php endif; ?>
 						<?php if ( $feat_school_name ) : ?>
-							<span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#2563EB] text-[10px] font-extrabold px-3 py-1 rounded-full shadow-sm">
+							<span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#00308b] text-[10px] font-extrabold px-3 py-1 rounded-full shadow-sm">
 								<?php echo esc_html( $feat_school_name ); ?>
 							</span>
 						<?php endif; ?>
@@ -182,7 +182,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 										<div class="w-full h-full flex items-center justify-center text-3xl">📰</div>
 									<?php endif; ?>
 									<?php if ( $school_name ) : ?>
-										<span class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[#2563EB] text-[8px] md:text-[9px] font-extrabold px-2 py-0.5 rounded-full shadow-sm line-clamp-1">
+										<span class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[#00308b] text-[8px] md:text-[9px] font-extrabold px-2 py-0.5 rounded-full shadow-sm line-clamp-1">
 											<?php echo esc_html( $school_name ); ?>
 										</span>
 									<?php endif; ?>
@@ -296,7 +296,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 					<h3 class="font-extrabold text-base mb-1.5 leading-tight">Bạn chưa chọn được lộ trình học?</h3>
 					<p class="text-blue-100 text-xs mb-4 leading-relaxed">Để lại thông tin, ban tư vấn sẽ giải đáp lộ trình liên thông hoàn toàn miễn phí cho bạn.</p>
 					<a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>" 
-					   class="block w-full bg-brand-accent text-white font-extrabold text-xs py-3 rounded-lg hover:bg-amber-700 transition-all shadow-md shadow-brand-accent/20 min-h-[44px] flex items-center justify-center">
+					   class="block w-full bg-brand-accent text-white font-extrabold text-xs py-3 rounded-lg hover:bg-[#e06e00] transition-all shadow-md shadow-brand-accent/20 min-h-[44px] flex items-center justify-center">
 						KIỂM TRA ĐIỀU KIỆN NGAY
 					</a>
 				</div>

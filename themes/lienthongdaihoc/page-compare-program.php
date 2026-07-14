@@ -38,7 +38,7 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 		<?php if ( count( $items ) < 2 ) : ?>
 			<div class="bg-white rounded-lg p-12 text-center shadow-sm border border-slate-100">
 				<p class="text-slate-500 text-lg mb-4">Vui lòng chọn ít nhất 2 chương trình để so sánh.</p>
-				<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="inline-flex items-center gap-2 bg-brand-primary text-white font-bold px-6 py-3 rounded-lg hover:bg-teal-700 transition-all">
+				<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="inline-flex items-center gap-2 bg-brand-primary text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-darkBlue transition-all">
 					Xem danh sách chương trình →
 				</a>
 			</div>

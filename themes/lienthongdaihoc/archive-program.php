@@ -301,7 +301,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 								<!-- Thumbnail with optional badge -->
 								<div class="relative h-28 md:h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb ); ?>');">
 									<?php if ( $show_type_badge ) : ?>
-										<span class="absolute top-2 left-2 bg-brand-primary text-white text-[9px] md:text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wide shadow">
+										<span class="absolute top-2 left-2 bg-brand-accent text-white text-[9px] md:text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wide shadow">
 											<?php echo esc_html( $type_name ); ?>
 										</span>
 									<?php endif; ?>
@@ -327,7 +327,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 
 									<div class="mt-3 pt-2 md:mt-4 md:pt-3 border-t border-slate-100 flex items-center justify-between">
 										<div class="flex items-center gap-1.5 w-full">
-											<a href="<?php the_permalink(); ?>" class="bg-brand-accent text-white text-[10px] md:text-xs font-bold py-2.5 rounded-lg hover:bg-amber-700 transition-all min-h-[44px] flex items-center justify-center shadow-sm shadow-brand-accent/10 flex-1">Tìm hiểu</a>
+											<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-[10px] md:text-xs font-bold py-2.5 rounded-lg hover:bg-brand-darkBlue transition-all min-h-[44px] flex items-center justify-center shadow-sm flex-1">Tìm hiểu</a>
 											<button type="button"
 													class="ltdh-compare-toggle text-[10px] md:text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg py-2.5 transition-all min-h-[44px] flex items-center justify-center flex-1"
 													data-compare-type="program"
@@ -352,7 +352,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 							<h3 class="font-extrabold text-slate-800 text-lg mb-2">Không tìm thấy chương trình phù hợp</h3>
 							<p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Hệ học này hiện chưa có chương trình hoặc không khớp với các bộ lọc khác. Hãy thử chọn hệ học khác hoặc đặt lại bộ lọc.</p>
 							<div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-								<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="bg-brand-accent text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-amber-700 shadow-md shadow-brand-accent/20 min-h-[44px] flex items-center justify-center">✕ Đặt lại bộ lọc</a>
+								<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="bg-brand-primary text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-brand-darkBlue shadow-md min-h-[44px] flex items-center justify-center">✕ Đặt lại bộ lọc</a>
 								<a href="<?php echo esc_url( home_url( '/he-dao-tao/lien-thong/' ) ); ?>" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-bold text-sm transition-all min-h-[44px] flex items-center justify-center">Xem hệ Liên thông</a>
 							</div>
 						</div>

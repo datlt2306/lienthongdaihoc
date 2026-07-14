@@ -48,7 +48,7 @@ $major_cats = get_terms( [
 					<h3 class="font-extrabold text-slate-900 text-base border-t border-slate-100 pt-4 uppercase tracking-wider">Nhóm ngành</h3>
 					<ul class="space-y-1">
 						<li>
-							<a href="<?php echo esc_url( remove_query_arg( 'nhom_nganh' ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo empty( $active_cat ) ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
+							<a href="<?php echo esc_url( remove_query_arg( 'nhom_nganh' ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo empty( $active_cat ) ? 'bg-brand-accent text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
 								<span>Tất cả các ngành</span>
 								<?php
 								$total_majors = wp_count_posts( 'major' )->publish;
@@ -63,7 +63,7 @@ $major_cats = get_terms( [
 								$term_count = $cat->count;
 								?>
 								<li>
-									<a href="<?php echo esc_url( add_query_arg( 'nhom_nganh', $cat->slug ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo $is_active ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
+									<a href="<?php echo esc_url( add_query_arg( 'nhom_nganh', $cat->slug ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo $is_active ? 'bg-brand-accent text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
 										<span><?php echo esc_html( $cat->name ); ?></span>
 										<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $term_count ); ?></span>
 									</a>
@@ -115,7 +115,7 @@ $major_cats = get_terms( [
 									</div>
 
 									<div class="border-t border-slate-100 pt-3 md:pt-4 mt-auto">
-										<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-brand-primary hover:text-white py-2.5 md:py-3 rounded-lg font-bold transition-all text-[11px] md:text-sm uppercase text-brand-primary min-h-[44px] flex items-center justify-center">Tìm hiểu thêm</a>
+										<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-brand-accent hover:text-white py-2.5 md:py-3 rounded-lg font-bold transition-all text-[11px] md:text-sm uppercase text-brand-primary min-h-[44px] flex items-center justify-center">Tìm hiểu thêm</a>
 									</div>
 								</div>
 							</div>

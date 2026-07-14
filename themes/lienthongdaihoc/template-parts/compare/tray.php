@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					Xóa tất cả
 				</button>
 				<a href="#"
-				   class="ltdh-tray-link inline-flex items-center justify-center gap-1.5 bg-brand-primary text-white text-sm font-bold px-5 min-h-[44px] rounded-lg shadow-md shadow-brand-primary/20 hover:bg-teal-700 transition-all opacity-50 pointer-events-none">
+				   class="ltdh-tray-link inline-flex items-center justify-center gap-1.5 bg-brand-accent text-white text-sm font-bold px-5 min-h-[44px] rounded-lg shadow-md shadow-brand-primary/20 hover:bg-[#e06e00] transition-all opacity-50 pointer-events-none">
 					So sánh ngay →
 				</a>
 			</div>

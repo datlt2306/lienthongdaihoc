@@ -9,9 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$hotline = get_field( 'global_hotline', 'options' ) ?: '0901234567';
-$zalo    = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
-$messenger = get_field( 'global_messenger_url', 'options' ) ?: 'https://m.me';
+$hotline  = ltdh_get_hotline();
+$zalo     = ltdh_get_zalo_url();
+$messenger = ltdh_get_messenger_url();
 ?>
 
 	<footer id="colophon" class="site-footer bg-slate-900 text-slate-400 pt-16 pb-28 border-t border-slate-800">
@@ -77,7 +77,7 @@ $messenger = get_field( 'global_messenger_url', 'options' ) ?: 'https://m.me';
 <!-- Floating/Sticky CTAs for Mobile Conversion -->
 <div class="fixed bottom-4 left-4 z-40 flex flex-col gap-2.5 md:bottom-6 md:left-6">
 	<!-- Phone Hotline Float -->
-	<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-primary text-white shadow-lg hover:bg-teal-700 transition-all hover:scale-105" aria-label="Gọi ngay">
+	<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-accent text-white shadow-lg hover:bg-[#e06e00] transition-all hover:scale-105" aria-label="Gọi ngay">
 		<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
 		</svg>
@@ -91,57 +91,40 @@ $messenger = get_field( 'global_messenger_url', 'options' ) ?: 'https://m.me';
 
 <script>
 	<?php
-	$combos_query = new WP_Query( [
-		'post_type'      => 'program',
-		'posts_per_page' => -1,
-		'post_status'    => 'publish',
-	] );
-	$combos = [];
-	if ( $combos_query->have_posts() ) {
-		while ( $combos_query->have_posts() ) {
-			$combos_query->the_post();
-			$pid = get_the_ID();
-			$s_rel = get_field( 'school_relationship', $pid );
-			$m_rel = get_field( 'major_relationship', $pid );
-			
-			$s_id = 0;
-			if ( $s_rel ) {
-				if ( is_numeric( $s_rel ) ) {
-					$s_id = intval( $s_rel );
-				} elseif ( is_object( $s_rel ) && isset( $s_rel->ID ) ) {
-					$s_id = $s_rel->ID;
-				} elseif ( is_array( $s_rel ) && ! empty( $s_rel ) ) {
-					$first = reset( $s_rel );
-					$s_id = is_object( $first ) ? $first->ID : intval( $first );
+	$combos_transient = 'ltdh_combinations_data';
+	$combos = get_transient( $combos_transient );
+	if ( false === $combos ) {
+		$combos_query = new WP_Query( [
+			'post_type'      => LTDH_CPT_PROGRAM,
+			'posts_per_page' => -1,
+			'post_status'    => 'publish',
+			'fields'         => 'ids',
+		] );
+		$combos = [];
+		if ( $combos_query->have_posts() ) {
+			foreach ( $combos_query->posts as $pid ) {
+				$s_rel = get_field( LTDH_META_SCHOOL_REL, $pid );
+				$m_rel = get_field( LTDH_META_MAJOR_REL, $pid );
+
+				$s_id = is_numeric( $s_rel ) ? intval( $s_rel ) : 0;
+				$m_id = is_numeric( $m_rel ) ? intval( $m_rel ) : 0;
+
+				$t_terms = wp_get_post_terms( $pid, LTDH_TAX_TRAINING_TYPE );
+				$t_slug  = ( ! is_wp_error( $t_terms ) && ! empty( $t_terms ) ) ? $t_terms[0]->slug : '';
+				if ( $s_id && $m_id ) {
+					$combos[] = [
+						'school' => (string) $s_id,
+						'major'  => (string) $m_id,
+						'type'   => (string) $t_slug,
+					];
 				}
 			}
-
-			$m_id = 0;
-			if ( $m_rel ) {
-				if ( is_numeric( $m_rel ) ) {
-					$m_id = intval( $m_rel );
-				} elseif ( is_object( $m_rel ) && isset( $m_rel->ID ) ) {
-					$m_id = $m_rel->ID;
-				} elseif ( is_array( $m_rel ) && ! empty( $m_rel ) ) {
-					$first = reset( $m_rel );
-					$m_id = is_object( $first ) ? $first->ID : intval( $first );
-				}
-			}
-
-			$t_terms = wp_get_post_terms( $pid, 'training_type' );
-			$t_slug = ( ! is_wp_error( $t_terms ) && ! empty( $t_terms ) ) ? $t_terms[0]->slug : '';
-			if ( $s_id && $m_id ) {
-				$combos[] = [
-					'school' => (string) $s_id,
-					'major'  => (string) $m_id,
-					'type'   => (string) $t_slug,
-				];
-			}
+			wp_reset_postdata();
 		}
-		wp_reset_postdata();
+		set_transient( $combos_transient, $combos, HOUR_IN_SECONDS );
 	}
 	?>
-	window.ltdh_combinations = <?php echo json_encode( $combos ); ?>;
+	window.ltdh_combinations = <?php echo wp_json_encode( $combos ); ?>;
 </script>
 
 <?php wp_footer(); ?>

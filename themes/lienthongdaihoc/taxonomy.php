@@ -70,7 +70,7 @@ $is_base_archive = ! isset( $term->term_id );
 								</div>
 								<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
 									<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
-									<a href="<?php the_permalink(); ?>" class="bg-brand-accent text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-amber-700 shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
+									<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-darkBlue transition-all">Đăng ký học</a>
 								</div>
 							</div>
 						</div>
@@ -210,7 +210,7 @@ $is_base_archive = ! isset( $term->term_id );
 										So sánh
 									</button>
 								</div>
-								<a href="<"'?php the_permalink(); ?>"'>" class="bg-brand-accent text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-amber-700 shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
+								<a href="<"'?php the_permalink(); ?>"'>" class="bg-brand-accent text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#e06e00] shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
 							</div>
 						</div>
 					</div>

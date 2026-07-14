@@ -1,6 +1,6 @@
 <?php
 /**
- * SEO Architecture & Rank Math Integration
+ * Rank Math SEO Integration — Dynamic titles, descriptions, schema, and breadcrumbs.
  *
  * @package lienthongdaihoc
  */
@@ -10,49 +10,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ----------------------------------------------------
-// 1. Dynamic Title Tag Override
+// 1. Dynamic Title for Programs
 // ----------------------------------------------------
-add_filter( 'rank_math/frontend/title', 'ltdh_seo_dynamic_title' );
-
 function ltdh_seo_dynamic_title( $title ) {
-	if ( is_singular( 'program' ) ) {
+	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
-		$school_id  = get_field( 'school_relationship', $program_id );
+		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
 		$school     = $school_id ? get_the_title( $school_id ) : '';
-		
-		// Get training type term name
+
 		$training_type = '';
-		$terms = wp_get_post_terms( $program_id, 'training_type' );
+		$terms = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
 		if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 			$training_type = $terms[0]->name;
 		}
 
-		$year = date( 'Y' );
+		$year = (int) date( 'Y' );
 		return sprintf( 'Học %s (%s) - %s | Tuyển sinh %d', get_the_title(), $training_type ?: 'Từ xa', $school, $year );
 	}
 	return $title;
 }
+add_filter( 'rank_math/frontend/title', 'ltdh_seo_dynamic_title' );
 
 // ----------------------------------------------------
-// 2. Dynamic Meta Description Override
+// 2. Dynamic Meta Description for Programs
 // ----------------------------------------------------
-add_filter( 'rank_math/frontend/description', 'ltdh_seo_dynamic_description' );
-
 function ltdh_seo_dynamic_description( $desc ) {
-	if ( is_singular( 'program' ) ) {
+	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
-		$school_id  = get_field( 'school_relationship', $program_id );
+		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
 		$school     = $school_id ? get_the_title( $school_id ) : '';
-		$tuition    = get_field( 'tuition_fee', $program_id ) ?: 'Liên hệ';
-		$duration   = get_field( 'duration', $program_id ) ?: '1.5 - 2 năm';
-		
+		$tuition    = get_field( LTDH_META_TUITION, $program_id ) ?: 'Liên hệ';
+		$duration   = get_field( LTDH_META_DURATION, $program_id ) ?: '1.5 - 2 năm';
+
 		$training_type = '';
-		$terms = wp_get_post_terms( $program_id, 'training_type' );
+		$terms = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
 		if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 			$training_type = $terms[0]->name;
 		}
 
-		return sprintf( 
+		return sprintf(
 			'Đăng ký tuyển sinh lớp %s (%s) tại trường %s. Thời gian đào tạo %s, học phí chỉ %s. Nhận tư vấn lộ trình và hướng dẫn làm hồ sơ miễn phí.',
 			get_the_title(),
 			$training_type ?: 'Từ xa',
@@ -63,19 +59,17 @@ function ltdh_seo_dynamic_description( $desc ) {
 	}
 	return $desc;
 }
+add_filter( 'rank_math/frontend/description', 'ltdh_seo_dynamic_description' );
 
 // ----------------------------------------------------
 // 3. Schema JSON-LD Injection
 // ----------------------------------------------------
-add_filter( 'rank_math/json_ld', 'ltdh_seo_inject_custom_schema', 99, 2 );
-
 function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
-	if ( is_singular( 'program' ) ) {
+	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
-		$school_id  = get_field( 'school_relationship', $program_id );
+		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
 		$school     = $school_id ? get_the_title( $school_id ) : 'Liên kết';
-		
-		// Course Schema
+
 		$data['ltdh_course'] = [
 			'@context'    => 'https://schema.org',
 			'@type'       => 'Course',
@@ -85,10 +79,9 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				'@type' => 'CollegeOrUniversity',
 				'name'  => $school,
 				'url'   => $school_id ? get_field( 'website', $school_id ) : home_url( '/' ),
-			]
+			],
 		];
 
-		// FAQ Schema if repeaters are populated
 		$faqs = get_field( 'faq', $program_id );
 		if ( ! empty( $faqs ) && is_array( $faqs ) ) {
 			$faq_elements = [];
@@ -110,7 +103,7 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		}
 	}
 
-	if ( is_singular( 'school' ) ) {
+	if ( is_singular( LTDH_CPT_SCHOOL ) ) {
 		$school_id = get_the_ID();
 		$data['ltdh_university'] = [
 			'@context' => 'https://schema.org',
@@ -118,9 +111,9 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			'name'     => get_the_title(),
 			'url'      => get_field( 'website', $school_id ) ?: get_permalink(),
 			'address'  => [
-				'@type'           => 'PostalAddress',
-				'streetAddress'   => get_field( 'address', $school_id ) ?: '',
-				'addressCountry'  => 'VN',
+				'@type'          => 'PostalAddress',
+				'streetAddress'  => get_field( 'address', $school_id ) ?: '',
+				'addressCountry' => 'VN',
 			],
 			'telephone' => get_field( 'hotline', $school_id ) ?: '',
 		];
@@ -128,81 +121,77 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 
 	return $data;
 }
+add_filter( 'rank_math/json_ld', 'ltdh_seo_inject_custom_schema', 99, 2 );
 
 // ----------------------------------------------------
-// 4. Override Breadcrumb Items for School CPT
+// 4. Override Breadcrumb Labels
 // ----------------------------------------------------
-add_filter( 'rank_math/frontend/breadcrumb/items', 'ltdh_seo_override_breadcrumb_items', 10, 2 );
-
 function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 	foreach ( $crumbs as $key => $crumb ) {
 		$lower_label = mb_strtolower( $crumb[0], 'UTF-8' );
-		if ( $lower_label === 'trường học' || $lower_label === 'truong' || $lower_label === 'truong-lien-ket' || $lower_label === 'schools' || $lower_label === 'school' ) {
-			$crumbs[$key][0] = 'Trường liên kết';
+		if ( in_array( $lower_label, [ 'trường học', 'truong', 'truong-lien-ket', 'schools', 'school' ], true ) ) {
+			$crumbs[ $key ][0] = 'Trường liên kết';
 		}
 	}
 	return $crumbs;
 }
+add_filter( 'rank_math/frontend/breadcrumb/items', 'ltdh_seo_override_breadcrumb_items', 10, 2 );
 
 // ----------------------------------------------------
-// 5. Dynamic Title & Description for Comparison Pages
+// 5. Comparison Page SEO
 // ----------------------------------------------------
-add_filter( 'rank_math/frontend/title', 'ltdh_seo_compare_title' );
-add_filter( 'rank_math/frontend/description', 'ltdh_seo_compare_description' );
-
 function ltdh_seo_compare_title( $title ) {
-	$type = get_query_var( 'ltdh_compare' );
+	$type = get_query_var( LTDH_QV_COMPARE );
 	if ( ! $type ) {
 		return $title;
 	}
 
-	$items = ltdh_compare_get_items();
+	$items = function_exists( 'ltdh_compare_get_items' ) ? ltdh_compare_get_items() : [];
 	if ( count( $items ) < 2 ) {
 		return $title;
 	}
 
-	$names = array_map( function( $item ) { return $item['title']; }, $items );
+	$names      = array_map( fn( $item ) => $item['title'], $items );
 	$type_labels = [ 'program' => 'chương trình', 'school' => 'trường' ];
 	$type_label  = $type_labels[ $type ] ?? 'chương trình';
 
 	return sprintf( 'So sánh %s %s | LTDH', implode( ' vs ', $names ), $type_label );
 }
+add_filter( 'rank_math/frontend/title', 'ltdh_seo_compare_title' );
 
 function ltdh_seo_compare_description( $desc ) {
-	$type = get_query_var( 'ltdh_compare' );
+	$type = get_query_var( LTDH_QV_COMPARE );
 	if ( ! $type ) {
 		return $desc;
 	}
 
-	$items = ltdh_compare_get_items();
+	$items = function_exists( 'ltdh_compare_get_items' ) ? ltdh_compare_get_items() : [];
 	if ( count( $items ) < 2 ) {
 		return $desc;
 	}
 
-	$names = array_map( function( $item ) { return $item['title']; }, $items );
+	$names = array_map( fn( $item ) => $item['title'], $items );
 	return sprintf(
 		'So sánh chi tiết %s. Xem học phí, thời gian đào tạo, điều kiện tuyển sinh và cơ hội việc làm.',
 		implode( ', ', $names )
 	);
 }
+add_filter( 'rank_math/frontend/description', 'ltdh_seo_compare_description' );
 
 // ----------------------------------------------------
-// 6. JSON-LD Schema for Comparison Pages
+// 6. Comparison Schema
 // ----------------------------------------------------
-add_filter( 'rank_math/json_ld', 'ltdh_seo_compare_schema', 99, 2 );
-
 function ltdh_seo_compare_schema( $data, $json_ld ) {
-	$type = get_query_var( 'ltdh_compare' );
+	$type = get_query_var( LTDH_QV_COMPARE );
 	if ( ! $type || $type !== 'program' ) {
 		return $data;
 	}
 
-	$items = ltdh_compare_get_items();
+	$items = function_exists( 'ltdh_compare_get_items' ) ? ltdh_compare_get_items() : [];
 	if ( count( $items ) < 2 ) {
 		return $data;
 	}
 
-	// Add Course schema for each compared program
 	foreach ( $items as $index => $item ) {
 		$school_name = $item['school'] ? $item['school']['title'] : 'Liên kết';
 		$school_url  = $item['school'] && $item['school']['website'] ? $item['school']['website'] : home_url( '/' );
@@ -222,3 +211,4 @@ function ltdh_seo_compare_schema( $data, $json_ld ) {
 
 	return $data;
 }
+add_filter( 'rank_math/json_ld', 'ltdh_seo_compare_schema', 99, 2 );

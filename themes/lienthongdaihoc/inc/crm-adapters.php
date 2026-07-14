@@ -41,7 +41,7 @@ add_action( 'ltdh_cron_sync_leads', 'ltdh_process_lead_queue' );
 // ----------------------------------------------------
 function ltdh_process_lead_queue() {
 	global $wpdb;
-	$table_name = $wpdb->prefix . 'ltdh_leads';
+	$table_name = $wpdb->prefix . LTDH_TABLE_LEADS;
 
 	// Get pending or retry-eligible failed leads (limit to 10 per execution)
 	$leads = $wpdb->get_results( "

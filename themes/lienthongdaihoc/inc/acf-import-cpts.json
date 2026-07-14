@@ -145,7 +145,7 @@
         "has_archive": true,
         "has_archive_slug": "chuong-trinh",
         "rewrite": true,
-        "rewrite_slug": "/",
+        "rewrite_slug": "chuong-trinh",
         "rewrite_with_front": false,
         "rewrite_feeds": false,
         "rewrite_pages": true,

@@ -106,24 +106,17 @@ if ( empty( $banner_image ) ) {
 }
 ?>
 
-<section class="ltdh-banner relative w-full overflow-hidden" style="min-height: 220px;">
-	<!-- Background Image -->
-	<div class="absolute inset-0">
-		<img src="<?php echo esc_url( $banner_image ); ?>" 
-			 alt="<?php echo esc_attr( $banner_title ); ?>" 
-			 class="w-full h-full object-cover" 
-			 loading="eager" />
-		<!-- Gradient Overlay -->
-		<div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(15,23,42,0.85) 0%, rgba(37,99,235,0.7) 100%);"></div>
-	</div>
-	
-	<!-- Content -->
-	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-20">
-		<h1 class="text-2xl md:text-4xl font-black text-white leading-tight mb-2 drop-shadow-lg">
+	<section class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white py-14 md:py-20 overflow-hidden">
+	<!-- Dot Grid Pattern -->
+	<div class="absolute inset-0 opacity-10 pointer-events-none z-0" style="background-image: radial-gradient(white 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
+	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+
+	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+		<h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight leading-tight">
 			<?php echo esc_html( $banner_title ); ?>
 		</h1>
 		<?php if ( ! empty( $banner_subtitle ) ) : ?>
-			<p class="text-base md:text-lg text-blue-100 font-medium max-w-2xl leading-relaxed">
+			<p class="text-blue-100 text-sm md:text-base font-semibold max-w-2xl mt-2">
 				<?php echo esc_html( $banner_subtitle ); ?>
 			</p>
 		<?php endif; ?>

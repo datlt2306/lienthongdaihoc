@@ -25,7 +25,7 @@ function ltdh_filter_program_search_query( $args ) {
 
 	// 3. Query matching school IDs by keyword
 	$school_ids = get_posts( [
-		'post_type'      => 'school',
+		'post_type'      => LTDH_CPT_SCHOOL,
 		's'              => $keyword,
 		'posts_per_page' => -1,
 		'fields'         => 'ids',
@@ -34,7 +34,7 @@ function ltdh_filter_program_search_query( $args ) {
 
 	// 4. Query matching major IDs by keyword
 	$major_ids = get_posts( [
-		'post_type'      => 'major',
+		'post_type'      => LTDH_CPT_MAJOR,
 		's'              => $keyword,
 		'posts_per_page' => -1,
 		'fields'         => 'ids',
@@ -45,19 +45,19 @@ function ltdh_filter_program_search_query( $args ) {
 	$meta_status_filter = [
 		'relation' => 'OR',
 		[
-			'key'     => 'admission_status',
-			'value'   => 'tam-ngung',
+			'key'     => LTDH_META_ADMISSION_STATUS,
+			'value'   => LTDH_STATUS_PAUSED,
 			'compare' => '!=',
 		],
 		[
-			'key'     => 'admission_status',
+			'key'     => LTDH_META_ADMISSION_STATUS,
 			'compare' => 'NOT EXISTS',
 		],
 	];
 
 	// 5. Query matching program IDs by keyword directly
 	$program_ids_direct = get_posts( [
-		'post_type'      => 'program',
+		'post_type'      => LTDH_CPT_PROGRAM,
 		's'              => $keyword,
 		'posts_per_page' => -1,
 		'fields'         => 'ids',
@@ -72,7 +72,7 @@ function ltdh_filter_program_search_query( $args ) {
 	$program_ids_schools = [];
 	if ( ! empty( $school_ids ) ) {
 		$program_ids_schools = get_posts( [
-			'post_type'      => 'program',
+			'post_type'      => LTDH_CPT_PROGRAM,
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
 			'post_status'    => 'publish',
@@ -92,7 +92,7 @@ function ltdh_filter_program_search_query( $args ) {
 	$program_ids_majors = [];
 	if ( ! empty( $major_ids ) ) {
 		$program_ids_majors = get_posts( [
-			'post_type'      => 'program',
+			'post_type'      => LTDH_CPT_PROGRAM,
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
 			'post_status'    => 'publish',

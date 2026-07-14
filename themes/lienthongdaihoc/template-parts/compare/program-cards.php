@@ -75,7 +75,7 @@ $sections = [
 			<div class="divide-y divide-slate-100 border-t border-slate-100 pt-2">
 				<?php foreach ( $sections as $section_name => $attrs ) : ?>
 					<div class="py-3">
-						<h4 class="text-xs font-black text-brand-primary uppercase tracking-wider mb-2.5 bg-brand-primary/5 -mx-5 px-5 py-1"><?php echo esc_html( $section_name ); ?></h4>
+						<h4 class="text-xs font-black text-brand-primary uppercase tracking-wider mb-2.5 bg-brand-accent/5 -mx-5 px-5 py-1"><?php echo esc_html( $section_name ); ?></h4>
 						<div class="space-y-3">
 							<?php foreach ( $attrs as $attr ) :
 								$highlight_key = $attr['highlight'] ?? '';
@@ -119,7 +119,7 @@ $sections = [
 					<span>💬 Chat Zalo</span>
 				</a>
 				<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/?program_id=' . $item['id'] ) ); ?>"
-				   class="flex-1 inline-flex items-center justify-center gap-1 bg-brand-primary hover:bg-[#1E40AF] text-white text-xs font-bold py-3 px-1 rounded-lg transition-all min-h-[44px]">
+				   class="flex-1 inline-flex items-center justify-center gap-1 bg-brand-primary hover:bg-brand-darkBlue text-white text-xs font-bold py-3 px-1 rounded-lg transition-all min-h-[44px]">
 					<span>📝 Đăng ký</span>
 				</a>
 			</div>

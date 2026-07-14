@@ -18,10 +18,10 @@ $salary     = get_field( 'salary_info', $major_id );
 $market     = get_field( 'job_market', $major_id );
 
 // Retrieve pre-calculated list of programs matching this major
-$offered_program_ids = get_post_meta( $major_id, '_offered_programs', true );
+$offered_program_ids = get_post_meta( $major_id, LTDH_META_OFFERED_PROGRAMS, true );
 
-$global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
-$hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
+$global_zalo = ltdh_get_zalo_url();
+$hotline = ltdh_get_hotline();
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
@@ -41,7 +41,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					<p class="text-slate-500 text-sm font-medium">Mã ngành: <?php echo esc_html( $major_code ?: 'Đang cập nhật' ); ?></p>
 				</div>
 				<div class="flex flex-col gap-2 w-full md:w-auto">
-					<a href="#register" class="w-full md:w-auto bg-brand-primary text-white text-center px-6 py-3 rounded-lg font-bold shadow-md hover:bg-teal-700 transition-all text-sm min-h-[44px] flex items-center justify-center">
+					<a href="#register" class="w-full md:w-auto bg-brand-accent text-white text-center px-6 py-3 rounded-lg font-bold shadow-md hover:bg-[#e06e00] transition-all text-sm min-h-[44px] flex items-center justify-center">
 						Tư Vấn Hướng Nghiệp
 					</a>
 				</div>
@@ -78,12 +78,12 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					$meta_status_filter = [
 						'relation' => 'OR',
 						[
-							'key'     => 'admission_status',
+							'key'     => LTDH_META_ADMISSION_STATUS,
 							'value'   => 'tam-ngung',
 							'compare' => '!=',
 						],
 						[
-							'key'     => 'admission_status',
+							'key'     => LTDH_META_ADMISSION_STATUS,
 							'compare' => 'NOT EXISTS',
 						],
 					];
@@ -105,7 +105,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 							'meta_query' => [
 								'relation' => 'AND',
 								[
-									'key' => 'major_relationship',
+									'key' => LTDH_META_MAJOR_REL,
 									'value' => $major_id,
 									'compare' => '='
 								],
@@ -119,16 +119,16 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 						echo '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
 						while ( $programs_query->have_posts() ) : $programs_query->the_post();
 							$prog_id = get_the_ID();
-							$school_rel_id = get_field( 'school_relationship', $prog_id );
+							$school_rel_id = get_field( LTDH_META_SCHOOL_REL, $prog_id );
 							$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Mời tư vấn';
 							$school_thumb = $school_rel_id ? get_the_post_thumbnail_url( $school_rel_id, 'medium' ) : '';
-							if ( ! $school_thumb ) {
-								$school_thumb = 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=300';
-							}
-							$status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
-							$types = wp_get_post_terms( $prog_id, 'training_type' );
+						if ( ! $school_thumb ) {
+							$school_thumb = ltdh_get_fallback_image( 'school' );
+						}
+							$status = get_post_meta( $prog_id, LTDH_META_ADMISSION_STATUS, true ) ?: 'tuyen-sinh';
+							$types = wp_get_post_terms( $prog_id, LTDH_TAX_TRAINING_TYPE );
 							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
-							$tuition_fee = get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ';
+							$tuition_fee = get_field( LTDH_META_TUITION, $prog_id ) ?: 'Liên hệ';
 							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
 							?>
 							<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
@@ -139,14 +139,14 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 								</div>
 								<div class="p-5 flex-1 flex flex-col justify-between space-y-4">
 									<div>
-										<h4 class="font-extrabold text-slate-800 text-sm hover:text-[#2563EB] transition-colors leading-snug">
+										<h4 class="font-extrabold text-slate-800 text-sm hover:text-[#00308b] transition-colors leading-snug">
 											<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 										</h4>
 										
 										<div class="mt-3 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
 											<p>Trường: 
 												<?php if ( $school_rel_id ) : ?>
-													<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>" class="font-bold text-[#2563EB] hover:underline"><?php echo esc_html( $school_name ); ?></a>
+													<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>" class="font-bold text-[#00308b] hover:underline"><?php echo esc_html( $school_name ); ?></a>
 												<?php else : ?>
 													<span class="font-semibold text-slate-700"><?php echo esc_html( $school_name ); ?></span>
 												<?php endif; ?>
@@ -160,7 +160,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 										<?php if ( $status === 'tam-ngung' ) : ?>
 											<span class="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
 										<?php else : ?>
-											<a href="<?php the_permalink(); ?>" class="bg-[#2563EB] text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-[#1E40AF] transition-all min-h-[44px] flex items-center justify-center">Tìm hiểu</a>
+											<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-brand-darkBlue transition-all min-h-[44px] flex items-center justify-center">Tìm hiểu</a>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -182,7 +182,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					$distinct_school_ids = [];
 					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 						foreach ( $offered_program_ids as $p_id ) {
-							$s_id = get_field( 'school_relationship', $p_id );
+							$s_id = get_field( LTDH_META_SCHOOL_REL, $p_id );
 							if ( $s_id && ! in_array( $s_id, $distinct_school_ids ) ) {
 								$distinct_school_ids[] = $s_id;
 							}
@@ -195,7 +195,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 							'posts_per_page' => -1,
 							'meta_query'     => [
 								[
-									'key'     => 'major_relationship',
+									'key'     => LTDH_META_MAJOR_REL,
 									'value'   => $major_id,
 									'compare' => '=',
 								],
@@ -203,7 +203,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 							'fields'         => 'ids',
 						] );
 						foreach ( $linked_programs as $p_id ) {
-							$s_id = get_field( 'school_relationship', $p_id );
+							$s_id = get_field( LTDH_META_SCHOOL_REL, $p_id );
 							if ( $s_id && ! in_array( $s_id, $distinct_school_ids ) ) {
 								$distinct_school_ids[] = $s_id;
 							}
@@ -253,37 +253,20 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 						<p class="text-sm text-slate-500 mb-4">Để lại thông tin, ban tuyển sinh sẽ gửi danh sách trường đào tạo phù hợp nhất với học lực và thời gian của bạn.</p>
 						
 						<?php 
-						if ( function_exists( 'wpcf7_contact_form_html' ) ) :
-							echo do_shortcode( '[contact-form-7 id="consultation-form" title="Form Tư vấn"]' );
-						else :
-						?>
-							<form action="#" method="POST" class="space-y-4">
-								<input type="hidden" name="current_major_id" value="<?php echo esc_attr( $major_id ); ?>">
-								<input type="hidden" name="referral_source" value="<?php echo esc_attr( get_permalink() ); ?>">
-
-								<div>
-									<label class="block text-sm font-semibold text-slate-600 mb-1">Họ và tên *</label>
-									<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
-								</div>
-								<div>
-									<label class="block text-sm font-semibold text-slate-600 mb-1">Số điện thoại *</label>
-									<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
-								</div>
-								
-								<button type="submit" class="w-full bg-brand-primary text-white py-3.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-teal-700 transition-all mt-2 min-h-[44px] flex items-center justify-center">
-									Gửi Yêu Cầu Hướng Nghiệp
-								</button>
-							</form>
-						<?php endif; ?>
+						ltdh_render_consultation_form( [
+							'current_major_id' => $major_id,
+							'referral_source'  => get_permalink(),
+						] );
+					?>
 					</section>
  
 					<!-- CONTACT INFO CARD -->
-					<div class="bg-brand-primary/5 border border-brand-primary/10 rounded-lg p-6 text-center">
+					<div class="bg-brand-accent/5 border border-brand-primary/10 rounded-lg p-6 text-center">
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Ban hướng nghiệp</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $hotline ); ?></h4>
 						<div class="flex gap-2">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-primary text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-teal-700 transition-all min-h-[44px] flex items-center justify-center">Gọi Ngay</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-3.5 rounded-lg font-semibold text-sm hover:bg-brand-primary/5 transition-all min-h-[44px] flex items-center justify-center">Zalo OA</a>
+							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center">Gọi Ngay</a>
+							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-3.5 rounded-lg font-semibold text-sm hover:bg-brand-accent/5 transition-all min-h-[44px] flex items-center justify-center">Zalo OA</a>
 						</div>
 					</div>
 

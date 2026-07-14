@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
+$hotline = ltdh_get_hotline();
 ?>
 
 <main id="primary" class="site-main py-12 bg-slate-50">
@@ -29,7 +29,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 						<span class="text-xl">📍</span>
 						<div>
 							<h4 class="font-bold text-slate-700 text-sm">Địa chỉ trụ sở chính</h4>
-							<p class="text-sm text-slate-500 mt-1">123 Đường Cầu Giấy, Quận Cầu Giấy, Hà Nội</p>
+							<p class="text-sm text-slate-500 mt-1"><?php echo esc_html( ltdh_get_address() ); ?></p>
 						</div>
 					</div>
 
@@ -45,7 +45,7 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 						<span class="text-xl">✉</span>
 						<div>
 							<h4 class="font-bold text-slate-700 text-sm">Địa chỉ Email</h4>
-							<p class="text-sm text-slate-500 mt-1">tuyensinh@lienthongdaihoc.com</p>
+							<p class="text-sm text-slate-500 mt-1"><?php echo esc_html( ltdh_get_email() ); ?></p>
 						</div>
 					</div>
 				</div>
@@ -57,29 +57,8 @@ $hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
 					<h3 class="font-bold text-xl text-slate-800 mb-4">GỬI YÊU CẦU CHO CHÚNG TÔI</h3>
 					
 					<?php 
-					if ( function_exists( 'wpcf7_contact_form_html' ) ) :
-						echo do_shortcode( '[contact-form-7 id="contact-form" title="Form Liên hệ"]' );
-					else :
-					?>
-						<form action="#" method="POST" class="space-y-4">
-							<div>
-								<label class="block text-sm font-semibold text-slate-600 mb-1">Họ và tên *</label>
-								<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
-							</div>
-							<div>
-								<label class="block text-sm font-semibold text-slate-600 mb-1">Số điện thoại *</label>
-								<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên lạc">
-							</div>
-							<div>
-								<label class="block text-sm font-semibold text-slate-600 mb-1">Tin nhắn của bạn</label>
-								<textarea name="your-message" rows="4" class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="Nhập tin nhắn..."></textarea>
-							</div>
-							
-							<button type="submit" class="w-full bg-brand-accent text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-amber-700 shadow-brand-accent/20 transition-all">
-								Gửi Liên Hệ
-							</button>
-						</form>
-					<?php endif; ?>
+					ltdh_render_contact_form();
+				?>
 				</div>
 			</div>
 		</div>

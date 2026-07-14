@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 function ltdh_elig_create_table() {
 	global $wpdb;
-	$table   = $wpdb->prefix . 'ltdh_eligibility_checks';
+	$table   = $wpdb->prefix . LTDH_TABLE_ELIGIBILITY;
 	$charset = $wpdb->get_charset_collate();
 
 	$sql = "CREATE TABLE $table (
@@ -244,13 +244,13 @@ function ltdh_elig_run_check( $input ) {
 
 	// Step 1: Load candidate programs
 	$query_args = [
-		'post_type'      => 'program',
+		'post_type'      => LTDH_CPT_PROGRAM,
 		'post_status'    => 'publish',
 		'posts_per_page' => -1,
 		'meta_query'     => [
 			[
-				'key'     => 'admission_status',
-				'value'   => 'tuyen-sinh',
+				'key'     => LTDH_META_ADMISSION_STATUS,
+				'value'   => LTDH_STATUS_OPEN,
 				'compare' => '=',
 			],
 		],
@@ -644,7 +644,7 @@ function ltdh_elig_capture_lead( $input, $results, $check_id ) {
 		if ( $lead_id ) {
 			global $wpdb;
 			$wpdb->update(
-				$wpdb->prefix . 'ltdh_eligibility_checks',
+				$wpdb->prefix . LTDH_TABLE_ELIGIBILITY,
 				[ 'lead_captured' => 1, 'lead_id' => $lead_id ],
 				[ 'id' => $check_id ]
 			);
@@ -655,7 +655,7 @@ function ltdh_elig_capture_lead( $input, $results, $check_id ) {
 
 	// Fallback: direct DB insert
 	global $wpdb;
-	$wpdb->insert( $wpdb->prefix . 'ltdh_leads', [
+	$wpdb->insert( $wpdb->prefix . LTDH_TABLE_LEADS, [
 		'name'          => 'Eligibility Checker User',
 		'phone'         => $input['phone'],
 		'email'         => $input['email'],
@@ -705,7 +705,7 @@ function ltdh_elig_ajax_lead() {
 		] );
 	} else {
 		global $wpdb;
-		$wpdb->insert( $wpdb->prefix . 'ltdh_leads', [
+		$wpdb->insert( $wpdb->prefix . LTDH_TABLE_LEADS, [
 			'name'            => $name,
 			'phone'           => $phone,
 			'email'           => $email,

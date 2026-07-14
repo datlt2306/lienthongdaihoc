@@ -79,7 +79,7 @@ function ltdh_compare_resolve_ids_from_slug( $type, $slug ) {
 	}
 
 	$post_type_map = [
-		'program' => 'program',
+		'program' => LTDH_CPT_PROGRAM,
 	];
 	$post_type = $post_type_map[ $type ];
 
@@ -489,7 +489,7 @@ function ltdh_compare_rest_get_items( $request ) {
 	}
 
 	$valid_post_types = [
-		'program' => 'program',
+		'program' => LTDH_CPT_PROGRAM,
 	];
 
 	if ( ! isset( $valid_post_types[ $type ] ) ) {
@@ -537,18 +537,18 @@ function ltdh_compare_ajax_add() {
 	$type = isset( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : '';
 	$id   = isset( $_POST['id'] ) ? intval( $_POST['id'] ) : 0;
 
-	$valid_types = [ 'program', 'school' ];
+	$valid_types = [ LTDH_CPT_PROGRAM, LTDH_CPT_SCHOOL ];
 	if ( ! in_array( $type, $valid_types, true ) || $id <= 0 ) {
 		wp_send_json_error( [ 'message' => 'Dữ liệu không hợp lệ.' ] );
 	}
 
 	$post = get_post( $id );
-	$post_type_map = [ 'program' => 'program', 'school' => 'school' ];
+	$post_type_map = [ 'program' => LTDH_CPT_PROGRAM, 'school' => LTDH_CPT_SCHOOL ];
 	if ( ! $post || $post->post_type !== $post_type_map[ $type ] || $post->post_status !== 'publish' ) {
 		wp_send_json_error( [ 'message' => 'Bài viết không tồn tại.' ] );
 	}
 
-	$thumbnail = get_the_post_thumbnail_url( $id, 'thumbnail' ) ?: get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg';
+	$thumbnail = get_the_post_thumbnail_url( $id, 'thumbnail' ) ?: ( function_exists( 'ltdh_get_fallback_image' ) ? ltdh_get_fallback_image( 'program' ) : get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg' );
 
 	wp_send_json_success( [
 		'id'        => $id,
@@ -572,14 +572,14 @@ function ltdh_compare_ajax_remove() {
  * Get the global hotline for CTA sections.
  */
 function ltdh_compare_get_global_hotline() {
-	return get_field( 'global_hotline', 'options' ) ?: '0389198653';
+	return function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : ( get_field( 'global_hotline', 'options' ) ?: '' );
 }
 
 /**
  * Get the global Zalo URL.
  */
 function ltdh_compare_get_zalo_url() {
-	return get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
+	return function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : ( get_field( 'global_zalo_url', 'options' ) ?: '' );
 }
 
 /**

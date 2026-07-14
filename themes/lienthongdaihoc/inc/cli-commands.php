@@ -194,22 +194,22 @@ class LTDH_CLI_Commands {
 			$parsed_schools = json_decode( $json_content, true );
 			if ( is_array( $parsed_schools ) ) {
 				foreach ( $parsed_schools as $s ) {
-					$schools_data[ $s['title'] ] = [
-						'code'           => $s['code'],
-						'web'            => $s['web'],
-						'addr'           => $s['addr'],
-						'phone'          => $s['phone'],
-						'region'         => $s['region'],
-						'img'            => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600',
-						'logo'           => 'https://images.unsplash.com/photo-1594788094620-4579ad50c7fe?auto=format&fit=crop&q=80&w=150',
-						'en'             => $s['code'] . ' University',
-						'rating'         => '4.8',
-						'reviews'        => '120',
-						'target'         => '2.000',
-						'admission_info' => $s['admission_info'],
-						'contact_info'   => $s['contact_info'],
-						'majors'         => isset( $s['majors'] ) ? $s['majors'] : [],
-					];
+				$schools_data[ $s['title'] ] = [
+					'code'           => $s['code'],
+					'web'            => $s['web'],
+					'addr'           => $s['addr'],
+					'phone'          => $s['phone'],
+					'region'         => $s['region'],
+					'img'            => ltdh_get_fallback_image( 'school' ),
+					'logo'           => ltdh_get_fallback_image( 'school_logo' ),
+					'en'             => $s['code'] . ' University',
+					'rating'         => '4.8',
+					'reviews'        => '120',
+					'target'         => '2.000',
+					'admission_info' => $s['admission_info'],
+					'contact_info'   => $s['contact_info'],
+					'majors'         => isset( $s['majors'] ) ? $s['majors'] : [],
+				];
 				}
 			}
 		}
@@ -326,20 +326,20 @@ class LTDH_CLI_Commands {
 				// Find or create major
 				$major = get_page_by_path( sanitize_title( $m_name ), OBJECT, 'major' );
 				if ( ! $major ) {
-					$major_id = wp_insert_post( [
-						'post_title'   => $m_name,
-						'post_name'    => sanitize_title( $m_name ),
-						'post_status'  => 'publish',
-						'post_type'    => 'major',
-						'post_content' => 'Ngành đào tạo tiềm năng đón đầu xu hướng việc làm công nghệ cao.',
-					] );
-					if ( ! is_wp_error( $major_id ) ) {
-						update_post_meta( $major_id, 'major_code', '7' . str_pad( rand( 100000, 999999 ), 6, '0', STR_PAD_LEFT ) );
-						update_post_meta( $major_id, 'career_opportunities', 'Cơ hội nghề nghiệp rộng mở tại các doanh nghiệp lớn.' );
-						update_post_meta( $major_id, 'salary_info', 'Mức lương từ 10 - 30 triệu tùy năng lực.' );
-						update_post_meta( $major_id, 'job_market', 'Nhu cầu tuyển dụng cao trên toàn quốc.' );
-						update_post_meta( $major_id, 'admission_groups', 'A00, A01, D01' );
-						update_post_meta( $major_id, 'admission_status', 'tuyen-sinh' );
+				$major_id = wp_insert_post( [
+					'post_title'   => $m_name,
+					'post_name'    => sanitize_title( $m_name ),
+					'post_status'  => 'publish',
+					'post_type'    => LTDH_CPT_MAJOR,
+					'post_content' => 'Ngành đào tạo tiềm năng đón đầu xu hướng việc làm công nghệ cao.',
+				] );
+				if ( ! is_wp_error( $major_id ) ) {
+					update_post_meta( $major_id, 'major_code', '7' . str_pad( rand( 100000, 999999 ), 6, '0', STR_PAD_LEFT ) );
+					update_post_meta( $major_id, 'career_opportunities', 'Cơ hội nghề nghiệp rộng mở tại các doanh nghiệp lớn.' );
+					update_post_meta( $major_id, 'salary_info', 'Mức lương từ 10 - 30 triệu tùy năng lực.' );
+					update_post_meta( $major_id, 'job_market', 'Nhu cầu tuyển dụng cao trên toàn quốc.' );
+					update_post_meta( $major_id, 'admission_groups', 'A00, A01, D01' );
+					update_post_meta( $major_id, LTDH_META_ADMISSION_STATUS, LTDH_STATUS_OPEN );
 						WP_CLI::success( "Đã tạo Ngành học: $m_name" );
 					}
 				} else {
@@ -420,46 +420,46 @@ class LTDH_CLI_Commands {
 					continue;
 				}
 
-				$post_id = wp_insert_post( [
+				$program_id = wp_insert_post( [
 					'post_title'   => $program_title,
 					'post_name'    => sanitize_title( $program_title . '-' . $t_slug . '-' . $school_title ),
 					'post_status'  => 'publish',
-					'post_type'    => 'program',
+					'post_type'    => LTDH_CPT_PROGRAM,
 					'post_content' => "Chương trình đào tạo Cử nhân ngành $major_title hệ $t_name của $school_title. " . $variant['advantages'] . ".",
 				] );
 
-				if ( is_wp_error( $post_id ) ) {
+				if ( is_wp_error( $program_id ) ) {
 					$program_index++;
 					continue;
 				}
 
-				update_post_meta( $post_id, 'school_relationship', $school_id );
-				update_post_meta( $post_id, 'major_relationship', $major_id );
-				update_post_meta( $post_id, 'tuition_fee', $variant['tuition'] );
-				update_post_meta( $post_id, 'duration', $variant['duration'] );
-				update_post_meta( $post_id, 'campus_info', $c_slug === 'ha-noi' ? 'Hà Nội' : ( $c_slug === 'ho-chi-minh' ? 'TP. Hồ Chí Minh' : 'Online' ) );
-				update_post_meta( $post_id, 'admission_requirements', 'Xét tuyển hồ sơ văn bằng đã có (THPT, Trung cấp, Cao đẳng).' );
-				update_post_meta( $post_id, 'required_documents', 'CCCD, Ảnh 3x4, Phiếu tuyển sinh, Bản sao công chứng Bằng tốt nghiệp.' );
-				update_post_meta( $post_id, 'enrollment_period', $enrollment );
-				update_post_meta( $post_id, 'program_benefits', $variant['advantages'] );
-				update_post_meta( $post_id, 'schedule', $variant['schedule'] );
-				update_post_meta( $post_id, 'target_students', $variant['target'] );
-				update_post_meta( $post_id, 'degree_type', $variant['degree'] );
-				update_post_meta( $post_id, 'diploma_value', $variant['diploma'] );
-				update_post_meta( $post_id, 'disadvantages', $variant['disadvantages'] );
+				update_post_meta( $program_id, LTDH_META_SCHOOL_REL, $school_id );
+				update_post_meta( $program_id, LTDH_META_MAJOR_REL, $major_id );
+				update_post_meta( $program_id, LTDH_META_TUITION, $variant['tuition'] );
+				update_post_meta( $program_id, LTDH_META_DURATION, $variant['duration'] );
+				update_post_meta( $program_id, 'campus_info', $c_slug === 'ha-noi' ? 'Hà Nội' : ( $c_slug === 'ho-chi-minh' ? 'TP. Hồ Chí Minh' : 'Online' ) );
+				update_post_meta( $program_id, 'admission_requirements', 'Xét tuyển hồ sơ văn bằng đã có (THPT, Trung cấp, Cao đẳng).' );
+				update_post_meta( $program_id, 'required_documents', 'CCCD, Ảnh 3x4, Phiếu tuyển sinh, Bản sao công chứng Bằng tốt nghiệp.' );
+				update_post_meta( $program_id, 'enrollment_period', $enrollment );
+				update_post_meta( $program_id, 'program_benefits', $variant['advantages'] );
+				update_post_meta( $program_id, LTDH_META_SCHEDULE, $variant['schedule'] );
+				update_post_meta( $program_id, 'target_students', $variant['target'] );
+				update_post_meta( $program_id, 'degree_type', $variant['degree'] );
+				update_post_meta( $program_id, 'diploma_value', $variant['diploma'] );
+				update_post_meta( $program_id, 'disadvantages', $variant['disadvantages'] );
 
-				$parent_status = get_post_meta( $major_id, 'admission_status', true ) ?: 'tuyen-sinh';
-				$parent_groups = get_post_meta( $major_id, 'admission_groups', true ) ?: 'A00, A01, D01';
-				update_post_meta( $post_id, 'admission_status', $parent_status );
-				update_post_meta( $post_id, 'admission_groups', $parent_groups );
+				$parent_status = get_post_meta( $major_id, LTDH_META_ADMISSION_STATUS, true ) ?: LTDH_STATUS_OPEN;
+				$parent_groups = get_post_meta( $major_id, LTDH_META_AD_GROUPS, true ) ?: 'A00, A01, D01';
+				update_post_meta( $program_id, LTDH_META_ADMISSION_STATUS, $parent_status );
+				update_post_meta( $program_id, LTDH_META_AD_GROUPS, $parent_groups );
 
 				$faqs = [
 					[ 'question' => 'Có cần phải đến trường học trực tiếp không?', 'answer' => $t_slug === 'tu-xa' ? 'Đối với hệ Từ xa, bạn học 100% qua E-Learning và không cần đến trường học hay điểm danh.' : 'Bạn cần đến học trực tiếp theo lịch học.' ],
 					[ 'question' => 'Bằng tốt nghiệp có giá trị chính quy không?', 'answer' => 'Có. Bằng do Hiệu trưởng trường Đại học cấp và được bộ Giáo dục công nhận, có giá trị học lên Thạc sĩ/Tiến sĩ.' ]
 				];
-				update_post_meta( $post_id, 'faq', $faqs );
+				update_post_meta( $program_id, 'faq', $faqs );
 
-				// Set eligibility criteria
+				// Set eligibility criteria.
 				$elig_min_edu = '';
 				if ( $t_slug === 'lien-thong' ) {
 					$elig_min_edu = 'trung-cap';
@@ -468,17 +468,17 @@ class LTDH_CLI_Commands {
 				} else {
 					$elig_min_edu = 'thap-phan';
 				}
-				update_post_meta( $post_id, 'elig_min_education', $elig_min_edu );
-				update_post_meta( $post_id, 'elig_training_types', [ $t_slug ] );
-				update_post_meta( $post_id, 'elig_campuses', [ $c_slug ] );
-				update_post_meta( $post_id, 'elig_max_grad_years', $t_slug === 'lien-thong' ? 10 : 99 );
-				update_post_meta( $post_id, 'elig_notes', '' );
+				update_post_meta( $program_id, 'elig_min_education', $elig_min_edu );
+				update_post_meta( $program_id, 'elig_training_types', [ $t_slug ] );
+				update_post_meta( $program_id, 'elig_campuses', [ $c_slug ] );
+				update_post_meta( $program_id, 'elig_max_grad_years', $t_slug === 'lien-thong' ? 10 : 99 );
+				update_post_meta( $program_id, 'elig_notes', '' );
 
-				wp_set_object_terms( $post_id, $t_slug, 'training_type' );
-				wp_set_object_terms( $post_id, $c_slug, 'campus' );
+				wp_set_object_terms( $program_id, $t_slug, LTDH_TAX_TRAINING_TYPE );
+				wp_set_object_terms( $program_id, $c_slug, LTDH_TAX_CAMPUS );
 
 				if ( function_exists( 'ltdh_sync_program_relationships' ) ) {
-					ltdh_sync_program_relationships( $post_id );
+					ltdh_sync_program_relationships( $program_id );
 				}
 
 				$program_index++;
@@ -494,36 +494,36 @@ class LTDH_CLI_Commands {
 		$all_schools = get_posts( [ 'post_type' => 'school', 'numberposts' => -1, 'post_status' => 'publish' ] );
 		$school_ids = wp_list_pluck( $all_schools, 'ID' );
 
-		$guides_data = [
-			[
-				'title' => 'Học Đại học từ xa là gì?',
-				'desc'  => 'Tìm hiểu hình thức đào tạo E-learning trực tuyến, xu hướng phát triển giáo dục đại học cho người đi làm.',
-				'cat'   => $cat_guide,
-				'img'   => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400',
-				'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
-			],
-			[
-				'title' => 'Tuyển sinh Liên thông Cao đẳng lên Đại học năm 2026',
-				'desc'  => 'Xét tuyển hồ sơ và miễn giảm tín chỉ đối với sinh viên có bằng tốt nghiệp Trung cấp/Cao đẳng chuyển tiếp.',
-				'cat'   => $cat_news,
-				'img'   => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=400',
-				'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
-			],
-			[
-				'title' => 'Thông báo tuyển sinh Đại học từ xa đợt 1 năm 2026',
-				'desc'  => 'Thông tin chi tiết các ngành đào tạo tuyển sinh đại học trực tuyến và văn bằng 2 đợt đầu năm.',
-				'cat'   => $cat_ann,
-				'img'   => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=400',
-				'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
-			],
-			[
-				'title' => 'Quy định miễn giảm tín chỉ khi học văn bằng 2',
-				'desc'  => 'Học viên có thể rút ngắn đến 50% thời gian học nếu đối chiếu bảng điểm môn học tương đồng.',
-				'cat'   => $cat_guide,
-				'img'   => 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=400',
-				'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
-			]
-		];
+				$guides_data = [
+					[
+						'title' => 'Học Đại học từ xa là gì?',
+						'desc'  => 'Tìm hiểu hình thức đào tạo E-learning trực tuyến, xu hướng phát triển giáo dục đại học cho người đi làm.',
+						'cat'   => $cat_guide,
+						'img'   => ltdh_get_fallback_image( 'post' ),
+						'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
+					],
+					[
+						'title' => 'Tuyển sinh Liên thông Cao đẳng lên Đại học năm 2026',
+						'desc'  => 'Xét tuyển hồ sơ và miễn giảm tín chỉ đối với sinh viên có bằng tốt nghiệp Trung cấp/Cao đẳng chuyển tiếp.',
+						'cat'   => $cat_news,
+						'img'   => ltdh_get_fallback_image( 'post' ),
+						'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
+					],
+					[
+						'title' => 'Thông báo tuyển sinh Đại học từ xa đợt 1 năm 2026',
+						'desc'  => 'Thông tin chi tiết các ngành đào tạo tuyển sinh đại học trực tuyến và văn bằng 2 đợt đầu năm.',
+						'cat'   => $cat_ann,
+						'img'   => ltdh_get_fallback_image( 'post' ),
+						'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
+					],
+					[
+						'title' => 'Quy định miễn giảm tín chỉ khi học văn bằng 2',
+						'desc'  => 'Học viên có thể rút ngắn đến 50% thời gian học nếu đối chiếu bảng điểm môn học tương đồng.',
+						'cat'   => $cat_guide,
+						'img'   => ltdh_get_fallback_image( 'post' ),
+						'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
+					],
+				];
 
 		foreach ( $guides_data as $g ) {
 			$existing = get_page_by_path( sanitize_title( $g['title'] ), OBJECT, 'post' );

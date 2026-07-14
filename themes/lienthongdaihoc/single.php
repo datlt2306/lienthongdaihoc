@@ -51,7 +51,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 		<?php if ( $post_thumb ) : ?>
 			<div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('<?php echo esc_url( $post_thumb ); ?>');"></div>
 		<?php else : ?>
-			<div class="absolute inset-0 bg-gradient-to-br from-[#1E3A8A] to-[#7C3AED] opacity-70"></div>
+			<div class="absolute inset-0 bg-gradient-to-br from-[#00308b] to-[#7C3AED] opacity-70"></div>
 		<?php endif; ?>
 		<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/70 to-transparent"></div>
 
@@ -59,7 +59,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 			<!-- Category & School Badges -->
 			<div class="flex flex-wrap items-center gap-2 mb-4">
 				<?php if ( $post_cat ) : ?>
-					<span class="inline-block bg-[#2563EB] text-white text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider">
+					<span class="inline-block bg-[#00308b] text-white text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider">
 						<?php echo esc_html( $post_cat->name ); ?>
 					</span>
 				<?php endif; ?>
@@ -111,7 +111,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 					<div class="p-8 md:p-10">
 						<!-- Excerpt / Lead -->
 						<?php if ( get_the_excerpt() ) : ?>
-							<div class="text-base text-slate-600 font-medium leading-relaxed mb-6 pb-6 border-b border-slate-100 bg-blue-50/50 rounded-xl p-5 border-l-4 border-l-[#2563EB]">
+							<div class="text-base text-slate-600 font-medium leading-relaxed mb-6 pb-6 border-b border-slate-100 bg-blue-50/50 rounded-xl p-5 border-l-4 border-l-[#00308b]">
 								<?php the_excerpt(); ?>
 							</div>
 						<?php endif; ?>
@@ -120,9 +120,9 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 						<div class="prose prose-slate max-w-none
 							prose-headings:font-extrabold prose-headings:text-slate-900
 							prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-slate-100 prose-h2:pb-3
-							prose-a:text-[#2563EB] prose-a:no-underline hover:prose-a:underline
+							prose-a:text-[#00308b] prose-a:no-underline hover:prose-a:underline
 							prose-img:rounded-xl prose-img:shadow-md
-							prose-blockquote:border-l-4 prose-blockquote:border-[#2563EB] prose-blockquote:bg-blue-50 prose-blockquote:rounded-r-lg prose-blockquote:py-1
+							prose-blockquote:border-l-4 prose-blockquote:border-[#00308b] prose-blockquote:bg-blue-50 prose-blockquote:rounded-r-lg prose-blockquote:py-1
 							text-slate-700 leading-relaxed text-[15px]">
 							<?php the_content(); ?>
 						</div>
@@ -133,7 +133,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 								<span class="text-xs font-bold text-slate-400 uppercase mr-2 self-center">Tags:</span>
 								<?php foreach ( $tags as $tag ) : ?>
 									<a href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>"
-									   class="px-3 py-1 bg-slate-100 hover:bg-[#2563EB] hover:text-white text-slate-600 text-xs font-semibold rounded-full transition-all">
+									   class="px-3 py-1 bg-slate-100 hover:bg-[#00308b] hover:text-white text-slate-600 text-xs font-semibold rounded-full transition-all">
 										#<?php echo esc_html( $tag->name ); ?>
 									</a>
 								<?php endforeach; ?>
@@ -187,7 +187,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 								</div>
 								<div class="p-4 flex flex-col justify-between min-w-0">
 									<?php if ( $rp_cat ) : ?>
-										<span class="text-[10px] font-extrabold text-[#2563EB] uppercase tracking-wide"><?php echo esc_html( $rp_cat->name ); ?></span>
+										<span class="text-[10px] font-extrabold text-[#00308b] uppercase tracking-wide"><?php echo esc_html( $rp_cat->name ); ?></span>
 									<?php endif; ?>
 									<h3 class="font-bold text-slate-800 text-sm leading-snug line-clamp-2 mt-1"><?php echo esc_html( $rp->post_title ); ?></h3>
 									<time class="text-[10px] text-slate-400 mt-2 block"><?php echo get_the_date( 'd/m/Y', $rp->ID ); ?></time>
@@ -208,14 +208,14 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 					<ul class="space-y-1">
 						<li>
 							<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>"
-							   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#2563EB] transition-all">
+							   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#00308b] transition-all">
 								<span>Tất cả tin tức</span>
 							</a>
 						</li>
 						<?php foreach ( $blog_cats as $bcat ) : ?>
 							<li>
 								<a href="<?php echo esc_url( home_url( '/tin-tuc/?danh-muc=' . $bcat->slug ) ); ?>"
-								   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold <?php echo ( $post_cat && $post_cat->slug === $bcat->slug ) ? 'bg-[#2563EB] text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-[#2563EB]'; ?> transition-all">
+								   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold <?php echo ( $post_cat && $post_cat->slug === $bcat->slug ) ? 'bg-[#00308b] text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-[#00308b]'; ?> transition-all">
 									<span><?php echo esc_html( $bcat->name ); ?></span>
 									<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo ( $post_cat && $post_cat->slug === $bcat->slug ) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>">
 										<?php echo esc_html( $bcat->count ); ?>
@@ -240,7 +240,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 									<div class="w-14 h-14 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 text-xl">📰</div>
 								<?php endif; ?>
 								<div class="min-w-0">
-									<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-xs font-bold text-slate-800 hover:text-[#2563EB] leading-snug block line-clamp-2 transition-colors">
+									<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-xs font-bold text-slate-800 hover:text-[#00308b] leading-snug block line-clamp-2 transition-colors">
 										<?php echo esc_html( $rp->post_title ); ?>
 									</a>
 									<time class="text-[10px] text-slate-400 mt-1 block"><?php echo get_the_date( 'd/m/Y', $rp->ID ); ?></time>
@@ -251,12 +251,12 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 				</div>
 
 				<!-- CTA -->
-				<div class="bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] rounded-xl p-6 text-center text-white shadow-lg">
+				<div class="bg-gradient-to-br from-[#00308b] to-[#00308b] rounded-xl p-6 text-center text-white shadow-lg">
 					<div class="text-3xl mb-3">🎓</div>
 					<h3 class="font-extrabold text-base mb-2">Cần tư vấn tuyển sinh?</h3>
 					<p class="text-blue-100 text-xs mb-4 leading-relaxed">Đội ngũ tư vấn sẵn sàng hỗ trợ bạn 24/7</p>
 					<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>"
-					   class="block w-full bg-white text-[#2563EB] font-extrabold text-sm py-2.5 rounded-xl hover:bg-blue-50 transition-all mb-2">
+					   class="block w-full bg-white text-[#00308b] font-extrabold text-sm py-2.5 rounded-xl hover:bg-blue-50 transition-all mb-2">
 						Đăng ký ngay
 					</a>
 					<a href="tel:0389198653" class="block text-blue-200 text-xs font-semibold hover:text-white transition-colors">

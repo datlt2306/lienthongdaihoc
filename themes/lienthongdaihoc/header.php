@@ -16,10 +16,10 @@
 				extend: {
 					colors: {
 						brand: {
-							primary: '#1E3A8A', // Deep Navy Blue
+							primary: '#00308b', // Deep Blue (default buttons, links)
 							secondary: '#0F172A', // Slate 900
-							accent: '#D97706', // Amber Gold Accent
-							darkBlue: '#1D4ED8', // Slate/Indigo Hover
+							accent: '#fe8100', // Orange CTA buttons only
+							darkBlue: '#002266', // Darker blue hover
 							light: '#F8FAFC', // Light Background
 						}
 					},
@@ -65,7 +65,7 @@
 
 		/* Breadcrumb styles */
 		.ltdh-breadcrumb { background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
-		.ltdh-breadcrumb a { color: #1E3A8A; text-decoration: none; font-weight: 500; }
+		.ltdh-breadcrumb a { color: #00308b; text-decoration: none; font-weight: 500; }
 		.ltdh-breadcrumb a:hover { text-decoration: underline; }
 		.ltdh-breadcrumb .separator { margin: 0 0.375rem; color: #94a3b8; }
 		.ltdh-breadcrumb .last { color: #64748b; font-weight: 600; }
@@ -95,8 +95,8 @@
 		.nav-primary-menu .current-menu-item > a,
 		.nav-primary-menu .current_page_item > a,
 		.nav-primary-menu .current-menu-ancestor > a {
-			color: #1E3A8A;
-			border-bottom-color: #1E3A8A;
+			color: #00308b;
+			border-bottom-color: #00308b;
 		}
 		/* Submenu hover panel */
 		.nav-primary-menu ul.sub-menu {
@@ -135,7 +135,7 @@
 		.nav-primary-menu ul.sub-menu a:hover,
 		.nav-primary-menu ul.sub-menu .current-menu-item > a {
 			background: #f8fafc;
-			color: #1E3A8A;
+			color: #00308b;
 		}
 
 		/* Mobile Nav styling */
@@ -157,7 +157,7 @@
 		.nav-mobile-menu .current-menu-item > a,
 		.nav-mobile-menu .current_page_item > a,
 		.nav-mobile-menu .current-menu-ancestor > a {
-			color: #1E3A8A;
+			color: #00308b;
 		}
 		.nav-mobile-menu .menu-item-has-children > a::after {
 			content: ' ▾';
@@ -210,13 +210,13 @@
 		.ltdh-cf7-form input[type="email"]:focus,
 		.ltdh-cf7-form select:focus,
 		.ltdh-cf7-form textarea:focus {
-			border-color: #1E3A8A !important;
+			border-color: #00308b !important;
 			outline: none !important;
 			box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15) !important;
 		}
 		.ltdh-cf7-form input[type="submit"] {
 			width: 100% !important;
-			background-color: #D97706 !important;
+			background-color: #00308b !important;
 			color: #ffffff !important;
 			padding: 0.875rem 2rem !important;
 			border-radius: 0.5rem !important;
@@ -274,14 +274,14 @@
 					'fallback_cb'    => 'ltdh_default_primary_menu',
 				] );
 				?>
-				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-primary text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-md shadow-brand-primary/20 hover:bg-[#1E40AF] hover:shadow-lg transition-all tracking-wide">
+				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-accent text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-md shadow-brand-primary/20 hover:bg-[#e06e00] hover:shadow-lg transition-all tracking-wide">
 					TƯ VẤN NGAY
 				</a>
 			</nav>
 
 			<!-- Mobile Toggle -->
 			<div class="flex lg:hidden items-center">
-				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-primary text-white px-4 py-2 rounded-lg text-sm font-bold mr-3">Tư vấn</a>
+				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="bg-brand-accent text-white px-4 py-2 rounded-lg text-sm font-bold mr-3">Tư vấn</a>
 				<button id="mobile-menu-toggle" class="text-slate-600 hover:text-brand-primary focus:outline-none">
 					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -318,7 +318,7 @@
 			</div>
 			
 			<div class="pt-6 border-t border-slate-100">
-				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="block w-full text-center bg-brand-primary text-white py-3 rounded-lg font-bold text-sm tracking-wide shadow-md shadow-brand-primary/10 hover:bg-[#1E40AF]">
+				<a href="<?php echo esc_url( home_url( '#register-section' ) ); ?>" class="block w-full text-center bg-brand-accent text-white py-3 rounded-lg font-bold text-sm tracking-wide shadow-md shadow-brand-primary/10 hover:bg-[#e06e00]">
 					TƯ VẤN NGAY
 				</a>
 			</div>

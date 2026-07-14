@@ -1,0 +1,145 @@
+<?php
+/**
+ * Theme Setup — Supports, menus, asset enqueuing, and core initializations.
+ *
+ * @package lienthongdaihoc
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Register theme supports, menus, and core features.
+ */
+function ltdh_theme_setup() {
+	add_theme_support( 'title-tag' );
+	add_theme_support( 'post-thumbnails' );
+	add_theme_support( 'html5', [
+		'search-form',
+		'comment-form',
+		'comment-list',
+		'gallery',
+		'caption',
+		'style',
+		'script',
+	] );
+	add_theme_support( 'custom-logo', [
+		'height'      => 80,
+		'width'       => 200,
+		'flex-height' => true,
+		'flex-width'  => true,
+	] );
+	add_theme_support( 'rank-math-breadcrumbs' );
+	add_theme_support( 'customize-selective-refresh-widgets' );
+
+	register_nav_menus( [
+		'primary-menu' => 'Header Navigation Menu',
+		'footer-menu'  => 'Footer Navigation Menu',
+	] );
+}
+add_action( 'after_setup_theme', 'ltdh_theme_setup' );
+
+/**
+ * Enqueue frontend styles and scripts.
+ */
+function ltdh_enqueue_assets() {
+	wp_enqueue_style( 'ltdh-main-style', get_template_directory_uri() . '/style.css', [], LTDH_VERSION );
+
+	if ( file_exists( get_template_directory() . '/assets/css/main.min.css' ) ) {
+		wp_enqueue_style( 'ltdh-theme-styles', get_template_directory_uri() . '/assets/css/main.min.css', [], LTDH_VERSION );
+	}
+
+	$script_handle = 'ltdh-fallback-js';
+	if ( file_exists( get_template_directory() . '/assets/js/main.bundle.js' ) ) {
+		wp_enqueue_script( 'ltdh-theme-js', get_template_directory_uri() . '/assets/js/main.bundle.js', [], LTDH_VERSION, true );
+		$script_handle = 'ltdh-theme-js';
+	} else {
+		wp_enqueue_script( 'ltdh-fallback-js', get_template_directory_uri() . '/assets/js/main.js', [], LTDH_VERSION, true );
+	}
+
+	wp_localize_script( $script_handle, 'ltdh_ajax', [
+		'ajax_url'      => admin_url( 'admin-ajax.php' ),
+		'compare_nonce' => wp_create_nonce( LTDH_NONCE_COMPARE ),
+	] );
+
+	wp_enqueue_script( 'ltdh-compare-js', get_template_directory_uri() . '/assets/js/compare.js', [], LTDH_VERSION, true );
+}
+add_action( 'wp_enqueue_scripts', 'ltdh_enqueue_assets' );
+
+/**
+ * Output the floating compare tray on all frontend pages.
+ */
+function ltdh_compare_output_tray() {
+	if ( is_admin() ) {
+		return;
+	}
+	get_template_part( 'template-parts/compare/tray' );
+}
+add_action( 'wp_footer', 'ltdh_compare_output_tray' );
+
+/**
+ * Enable WebP upload support.
+ */
+function ltdh_enable_webp_upload( $mimes ) {
+	$mimes['webp'] = 'image/webp';
+	return $mimes;
+}
+add_filter( 'upload_mimes', 'ltdh_enable_webp_upload' );
+
+function ltdh_allow_webp_upload_check( $data, $file, $filename, $mimes ) {
+	$filetype = wp_check_filetype( $filename, $mimes );
+	$ext      = $filetype['ext'];
+	if ( 'webp' === $ext ) {
+		$data['ext']  = 'webp';
+		$data['type'] = 'image/webp';
+	}
+	return $data;
+}
+add_filter( 'wp_check_filetype_and_ext', 'ltdh_allow_webp_upload_check', 10, 4 );
+
+/**
+ * Flush rewrite rules on theme activation.
+ */
+function ltdh_flush_rewrite_rules_on_switch() {
+	flush_rewrite_rules();
+	update_option( LTDH_OPT_REWRITE_FLUSHED, time() );
+}
+add_action( 'after_switch_theme', 'ltdh_flush_rewrite_rules_on_switch' );
+
+if ( ! get_option( LTDH_OPT_REWRITE_FLUSHED ) || get_option( LTDH_OPT_REWRITE_FLUSHED ) < 1752500000 ) {
+	flush_rewrite_rules();
+	update_option( LTDH_OPT_REWRITE_FLUSHED, time() );
+}
+
+/**
+ * Override WordPress favicon with ACF one.
+ */
+function ltdh_override_favicon() {
+	remove_action( 'wp_head', 'wp_site_icon', 1 );
+	remove_action( 'admin_head', 'wp_site_icon' );
+}
+add_action( 'after_setup_theme', 'ltdh_override_favicon' );
+
+function ltdh_favicon_ob_start() {
+	if ( is_admin() ) {
+		return;
+	}
+	ob_start( 'ltdh_favicon_replace' );
+}
+add_action( 'init', 'ltdh_favicon_ob_start' );
+
+function ltdh_favicon_replace( $html ) {
+	$html = preg_replace( '/<link[^>]*rel=["\'](?:shortcut )?icon["\'][^>]*>\s*/i', '', $html );
+
+	if ( function_exists( 'get_field' ) ) {
+		$favicon_url = get_field( 'global_favicon', 'option' );
+		if ( ! empty( $favicon_url ) ) {
+			$favicon_tag  = '<link rel="icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
+			$favicon_tag .= '<link rel="shortcut icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
+			$html = str_replace( '</head>', $favicon_tag . '</head>', $html );
+		}
+	}
+
+	return $html;
+}
