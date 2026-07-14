@@ -25,8 +25,7 @@ function ltdh_theme_setup() {
 		'flex-height' => true,
 		'flex-width'  => true,
 	] );
-	add_theme_support( 'site-icon' );
-	
+
 	// Rank Math breadcrumbs
 	add_theme_support( 'rank-math-breadcrumbs' );
 
@@ -426,6 +425,44 @@ function ltdh_flush_rewrite_rules() {
 if ( ! get_option( 'ltdh_rewrite_flushed_v2' ) ) {
 	flush_rewrite_rules();
 	update_option( 'ltdh_rewrite_flushed_v2', time() );
+}
+
+/**
+ * Custom favicon — overrides WordPress site_icon entirely
+ */
+add_action( 'after_setup_theme', 'ltdh_override_favicon' );
+function ltdh_override_favicon() {
+	remove_action( 'wp_head', 'wp_site_icon', 1 );
+	remove_action( 'admin_head', 'wp_site_icon' );
+}
+
+/**
+ * Strip WordPress-generated favicon tags and inject our ACF one.
+ * Uses output buffering so we can remove WP tags AND add ours in one pass.
+ */
+add_action( 'init', 'ltdh_favicon_ob_start' );
+function ltdh_favicon_ob_start() {
+	if ( is_admin() ) {
+		return;
+	}
+	ob_start( 'ltdh_favicon_replace' );
+}
+
+function ltdh_favicon_replace( $html ) {
+	// 1. Remove any existing <link rel="icon"> or <link rel="shortcut icon"> tags
+	$html = preg_replace( '/<link[^>]*rel=["\'](?:shortcut )?icon["\'][^>]*>\s*/i', '', $html );
+
+	// 2. Inject our ACF favicon before </head>
+	if ( function_exists( 'get_field' ) ) {
+		$favicon_url = get_field( 'global_favicon', 'option' );
+		if ( ! empty( $favicon_url ) ) {
+			$favicon_tag  = '<link rel="icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
+			$favicon_tag .= '<link rel="shortcut icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
+			$html = str_replace( '</head>', $favicon_tag . '</head>', $html );
+		}
+	}
+
+	return $html;
 }
 
 /**

@@ -334,6 +334,16 @@
                 "instructions": "Upload ảnh logo của trang web (thay thế cho logo trong Customizer)"
             },
             {
+                "key": "field_global_favicon",
+                "label": "Favicon / Site Icon",
+                "name": "global_favicon",
+                "type": "image",
+                "return_format": "url",
+                "preview_size": "thumbnail",
+                "library": "all",
+                "instructions": "Kích thước đề nghị: 512x512px, định dạng PNG hoặc ICO. Ảnh sẽ hiển thị trên tab trình duyệt."
+            },
+            {
                 "key": "field_global_hotline",
                 "label": "Hotline tư vấn chung",
                 "name": "global_hotline",
