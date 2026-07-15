@@ -298,9 +298,18 @@ $global_zalo = ltdh_get_zalo_url();
 						echo '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">';
 						while ( $majors_query->have_posts() ) : $majors_query->the_post();
 						?>
-							<a href="<?php the_permalink(); ?>" class="block p-4 border border-slate-100 rounded-lg hover:border-brand-primary hover:shadow-sm transition-all bg-white">
-								<h4 class="font-bold text-slate-800 text-sm mb-1"><?php the_title(); ?></h4>
-								<span class="text-sm text-slate-400">Mã ngành: <?php echo esc_html( get_field( 'major_code' ) ?: 'Đang cập nhật' ); ?></span>
+							<a href="<?php the_permalink(); ?>" class="flex items-center gap-3 p-3 border border-slate-100 rounded-lg hover:border-brand-primary hover:shadow-sm transition-all bg-white">
+								<?php 
+								$major_thumb = get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' );
+								if ( ! $major_thumb ) {
+									$major_thumb = ltdh_get_fallback_image( 'program' );
+								}
+								?>
+								<img src="<?php echo esc_url( $major_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="h-12 w-12 rounded-lg object-cover shrink-0 bg-slate-50 border border-slate-100">
+								<div class="min-w-0 flex-1">
+									<h4 class="font-bold text-slate-800 text-sm mb-0.5 truncate"><?php the_title(); ?></h4>
+									<span class="text-xs text-slate-400 block">Mã ngành: <?php echo esc_html( get_field( 'major_code' ) ?: 'Đang cập nhật' ); ?></span>
+								</div>
 							</a>
 						<?php
 						endwhile;

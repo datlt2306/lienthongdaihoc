@@ -37,6 +37,18 @@ function ltdh_customize_archive_queries( $query ) {
 				],
 			] );
 		}
+
+		$sort = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
+		if ( $sort === 'title_asc' ) {
+			$query->set( 'orderby', 'title' );
+			$query->set( 'order', 'ASC' );
+		} elseif ( $sort === 'title_desc' ) {
+			$query->set( 'orderby', 'title' );
+			$query->set( 'order', 'DESC' );
+		} elseif ( $sort === 'date_desc' ) {
+			$query->set( 'orderby', 'date' );
+			$query->set( 'order', 'DESC' );
+		}
 	}
 }
 add_action( 'pre_get_posts', 'ltdh_customize_archive_queries' );

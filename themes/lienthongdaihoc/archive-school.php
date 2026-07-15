@@ -131,18 +131,19 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 			?>
 			<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
 				<div class="flex flex-col sm:flex-row items-stretch">
-					<div class="sm:w-36 h-32 sm:h-auto bg-slate-50 flex items-center justify-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-100 p-6">
-						<?php if ( $logo_id ) : ?>
-							<?php echo wp_get_attachment_image( $logo_id, 'medium', false, [ 'class' => 'h-24 w-24 sm:h-28 sm:w-28 object-contain' ] ); ?>
-						<?php else : ?>
-							<span class="font-display font-extrabold text-brand-primary text-2xl">UNI</span>
-						<?php endif; ?>
-					</div>
+					<div class="sm:w-36 h-32 sm:h-auto bg-cover bg-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-100" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
 					<div class="flex-1 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
 						<div class="flex-1 min-w-0">
-							<h3 class="font-extrabold text-slate-900 text-base sm:text-lg leading-tight">
-								<a href="<?php the_permalink(); ?>" class="hover:text-brand-accent transition-colors"><?php the_title(); ?></a>
-							</h3>
+							<div class="flex items-center gap-2">
+								<?php if ( $logo_id ) : ?>
+									<div class="h-8 w-8 bg-white border border-slate-100 rounded shrink-0 flex items-center justify-center overflow-hidden p-0.5">
+										<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
+									</div>
+								<?php endif; ?>
+								<h3 class="font-extrabold text-slate-900 text-base sm:text-lg leading-tight">
+									<a href="<?php the_permalink(); ?>" class="hover:text-brand-accent transition-colors"><?php the_title(); ?></a>
+								</h3>
+							</div>
 							<?php if ( $en_name ) : ?>
 								<p class="text-xs text-slate-400 italic mt-0.5"><?php echo esc_html( $en_name ); ?></p>
 							<?php endif; ?>

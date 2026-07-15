@@ -332,7 +332,7 @@ $zalo    = ltdh_get_zalo_url();
 										<?php if (! empty($systems_label)) : ?>
 											<span class="font-bold text-brand-primary bg-blue-50 px-2.5 py-1 rounded-full inline-block leading-none mb-1.5"><?php echo esc_html($systems_label); ?></span>
 										<?php endif; ?>
-										<p class="text-slate-500 font-semibold">📊 <?php echo esc_html($prog_count); ?> ngành đào tạo</p>
+										<p class="text-slate-500 font-semibold">📊 <?php echo esc_html($prog_count); ?> ngành tuyển sinh</p>
 									</div>
 								</div>
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">

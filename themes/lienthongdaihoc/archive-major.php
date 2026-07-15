@@ -76,19 +76,30 @@ $major_cats = get_terms( [
 
 			<!-- Main Content -->
 			<div class="lg:col-span-3">
-				<!-- Limit Dropdown Selector -->
+				<!-- Limit & Sorting Dropdowns -->
 				<div class="flex flex-col sm:flex-row items-center justify-between mb-8 pb-4 border-b border-slate-200 gap-4">
 					<p class="text-sm font-medium text-slate-500">Danh sách các ngành đào tạo tuyển sinh đại học trực tuyến và liên thông.</p>
-					<div class="flex items-center gap-3">
-						<label for="limit-select" class="text-xs font-bold text-slate-500 uppercase tracking-wider">Số lượng hiển thị:</label>
-						<select id="limit-select" class="rounded-lg border-slate-300 text-sm py-2.5 px-3 bg-white text-slate-700 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary cursor-pointer shadow-sm min-h-[44px]" onchange="location = this.value;">
-							<option value="<?php echo esc_url( add_query_arg( 'limit', -1 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, -1 ); ?>>Tất cả</option>
-							<option value="<?php echo esc_url( add_query_arg( 'limit', 10 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 10 ); ?>>10</option>
-							<option value="<?php echo esc_url( add_query_arg( 'limit', 20 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 20 ); ?>>20</option>
-							<option value="<?php echo esc_url( add_query_arg( 'limit', 30 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 30 ); ?>>30</option>
-							<option value="<?php echo esc_url( add_query_arg( 'limit', 50 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 50 ); ?>>50</option>
-							<option value="<?php echo esc_url( add_query_arg( 'limit', 100 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 100 ); ?>>100</option>
-						</select>
+					<div class="flex flex-row flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 w-full sm:w-auto justify-start sm:justify-end">
+						<div class="flex items-center gap-2">
+							<label for="sort-select" class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0">Sắp xếp:</label>
+							<select id="sort-select" class="rounded-lg border-slate-300 text-sm py-2 px-3 bg-white text-slate-700 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary cursor-pointer shadow-sm min-h-[44px]" onchange="location = this.value;">
+								<option value="<?php echo esc_url( remove_query_arg( 'sort' ) ); ?>" <?php selected( isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : '', '' ); ?>>Mặc định</option>
+								<option value="<?php echo esc_url( add_query_arg( 'sort', 'title_asc' ) ); ?>" <?php selected( isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : '', 'title_asc' ); ?>>Tên ngành (A-Z)</option>
+								<option value="<?php echo esc_url( add_query_arg( 'sort', 'title_desc' ) ); ?>" <?php selected( isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : '', 'title_desc' ); ?>>Tên ngành (Z-A)</option>
+								<option value="<?php echo esc_url( add_query_arg( 'sort', 'date_desc' ) ); ?>" <?php selected( isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : '', 'date_desc' ); ?>>Mới nhất</option>
+							</select>
+						</div>
+						<div class="flex items-center gap-2">
+							<label for="limit-select" class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0">Hiển thị:</label>
+							<select id="limit-select" class="rounded-lg border-slate-300 text-sm py-2 px-3 bg-white text-slate-700 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary cursor-pointer shadow-sm min-h-[44px]" onchange="location = this.value;">
+								<option value="<?php echo esc_url( add_query_arg( 'limit', -1 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, -1 ); ?>>Tất cả</option>
+								<option value="<?php echo esc_url( add_query_arg( 'limit', 10 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 10 ); ?>>10</option>
+								<option value="<?php echo esc_url( add_query_arg( 'limit', 20 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 20 ); ?>>20</option>
+								<option value="<?php echo esc_url( add_query_arg( 'limit', 30 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 30 ); ?>>30</option>
+								<option value="<?php echo esc_url( add_query_arg( 'limit', 50 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 50 ); ?>>50</option>
+								<option value="<?php echo esc_url( add_query_arg( 'limit', 100 ) ); ?>" <?php selected( isset($_GET['limit']) ? intval($_GET['limit']) : -1, 100 ); ?>>100</option>
+							</select>
+						</div>
 					</div>
 				</div>
 
