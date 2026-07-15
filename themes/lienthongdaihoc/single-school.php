@@ -181,7 +181,7 @@ $global_zalo = ltdh_get_zalo_url();
 					}
 
 					if ( $programs_query->have_posts() ) :
-						echo '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+						echo '<div class="space-y-4">';
 						while ( $programs_query->have_posts() ) : $programs_query->the_post();
 							$prog_id = get_the_ID();
 							$major_rel_id = get_field( LTDH_META_MAJOR_REL, $prog_id );
@@ -203,19 +203,20 @@ $global_zalo = ltdh_get_zalo_url();
 							$tuition_fee = get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ';
 							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
 							?>
-							<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-								<div class="relative h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>');">
-									<?php if ( $type_name ) : ?>
-										<span class="absolute top-3 left-3 bg-orange-50 text-orange-600 text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm z-10"><?php echo esc_html( $type_name ); ?></span>
-									<?php endif; ?>
-								</div>
-								<div class="p-5 flex-1 flex flex-col justify-between space-y-4">
-									<div>
-										<h4 class="font-extrabold text-slate-800 text-sm hover:text-brand-primary transition-colors leading-snug">
-											<a href="<?php the_permalink(); ?>"><?php echo esc_html( $clean_title ); ?></a>
-										</h4>
+							<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+								<div class="flex items-center gap-4 flex-1">
+									<div class="h-16 w-16 bg-slate-200 bg-cover bg-center rounded-lg shrink-0" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>'); font-size: 0;"></div>
+									<div class="space-y-1 flex-1 min-w-0">
+										<div class="flex items-center gap-2 flex-wrap">
+											<h4 class="font-extrabold text-slate-800 text-base hover:text-[#00308b] transition-colors leading-snug">
+												<a href="<?php the_permalink(); ?>"><?php echo esc_html( $clean_title ); ?></a>
+											</h4>
+											<?php if ( $type_name ) : ?>
+												<a href="<?php the_permalink(); ?>" class="bg-orange-50 text-orange-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider hover:bg-orange-100 transition-all"><?php echo esc_html( $type_name ); ?></a>
+											<?php endif; ?>
+										</div>
 										
-										<div class="mt-3 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
+										<div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-slate-500 pt-1">
 											<p>Ngành học: 
 												<?php if ( $major_rel_id ) : ?>
 													<a href="<?php echo esc_url( get_permalink( $major_rel_id ) ); ?>" class="font-bold text-brand-primary hover:underline"><?php echo esc_html( $major_name ); ?></a>
@@ -227,14 +228,14 @@ $global_zalo = ltdh_get_zalo_url();
 											<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $tuition_fee ); ?></span></p>
 										</div>
 									</div>
+								</div>
 
-									<div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-										<?php if ( $status === 'tam-ngung' ) : ?>
-											<span class="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
-										<?php else : ?>
-											<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-brand-darkBlue transition-all min-h-[44px] flex items-center justify-center">Tìm hiểu</a>
-										<?php endif; ?>
-									</div>
+								<div class="shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex items-center justify-end">
+									<?php if ( $status === 'tam-ngung' ) : ?>
+										<span class="text-xs text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-bold">Tạm ngưng</span>
+									<?php else : ?>
+										<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto bg-brand-primary text-white text-xs font-bold px-6 py-2.5 rounded-lg hover:bg-brand-darkBlue transition-all min-h-[40px] flex items-center justify-center">Tìm hiểu</a>
+									<?php endif; ?>
 								</div>
 							</div>
 							<?php

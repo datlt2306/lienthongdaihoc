@@ -104,13 +104,30 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						foreach ( $tag_ids as $tid ) {
 							$title = get_the_title( $tid );
 							if ( $title ) {
-								$prog_tags[] = $title;
+								$prog_tags[] = [
+									'title' => $title,
+									'link'  => get_permalink( $tid ),
+								];
 							}
 						}
 					}
 
 					$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
 					$region = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
+
+					$training_modes = [];
+					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
+						foreach ( $offered_program_ids as $pid ) {
+							$terms = wp_get_post_terms( $pid, LTDH_TAX_TRAINING_TYPE );
+							if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+								foreach ( $terms as $term ) {
+									if ( ! in_array( $term->name, $training_modes ) ) {
+										$training_modes[] = $term->name;
+									}
+								}
+							}
+						}
+					}
 			?>
 			<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
 				<div class="flex flex-col sm:flex-row items-stretch">
@@ -137,14 +154,17 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								<?php if ( $prog_count > 0 ) : ?>
 									<span class="flex items-center gap-1"><span class="text-brand-primary">📊</span> <?php echo esc_html( $prog_count ); ?> chương trình</span>
 								<?php endif; ?>
+								<?php if ( ! empty( $training_modes ) ) : ?>
+									<span class="flex items-center gap-1"><span class="text-brand-primary">🎓</span> <?php echo esc_html( implode( ', ', $training_modes ) ); ?></span>
+								<?php endif; ?>
 							</div>
 							<?php if ( ! empty( $prog_tags ) ) : ?>
 								<div class="flex flex-wrap gap-1.5 mt-2">
 									<?php foreach ( $prog_tags as $tag ) : ?>
-										<span class="inline-block bg-blue-50 text-brand-primary text-[10px] font-bold px-2 py-0.5 rounded-full"><?php echo esc_html( $tag ); ?></span>
+										<a href="<?php echo esc_url( $tag['link'] ); ?>" class="inline-block bg-blue-50 text-brand-primary text-[10px] font-bold px-2 py-0.5 rounded-full hover:bg-blue-100 transition-colors"><?php echo esc_html( $tag['title'] ); ?></a>
 									<?php endforeach; ?>
 									<?php if ( $prog_count > 5 ) : ?>
-										<span class="inline-block bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full">+<?php echo esc_html( $prog_count - 5 ); ?> nữa</span>
+										<a href="<?php the_permalink(); ?>" class="inline-block bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full hover:bg-slate-200 transition-colors">+<?php echo esc_html( $prog_count - 5 ); ?> nữa</a>
 									<?php endif; ?>
 								</div>
 							<?php endif; ?>

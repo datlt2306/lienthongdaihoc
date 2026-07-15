@@ -72,7 +72,7 @@ $hotline = ltdh_get_hotline();
 
 				<!-- PROGRAMS FOR THIS MAJOR -->
 				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Chương trình tuyển sinh ngành <?php the_title(); ?></h2>
+					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Các trường tuyển sinh ngành <?php the_title(); ?></h2>
 					
 					<?php
 					$meta_status_filter = [
@@ -116,7 +116,7 @@ $hotline = ltdh_get_hotline();
 					}
 
 					if ( $programs_query->have_posts() ) :
-						echo '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+						echo '<div class="space-y-4">';
 						while ( $programs_query->have_posts() ) : $programs_query->the_post();
 							$prog_id = get_the_ID();
 							$school_rel_id = get_field( LTDH_META_SCHOOL_REL, $prog_id );
@@ -130,39 +130,45 @@ $hotline = ltdh_get_hotline();
 							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
 							$tuition_fee = get_field( LTDH_META_TUITION, $prog_id ) ?: 'Liên hệ';
 							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
+							$school_code = $school_rel_id ? get_field( 'school_code', $school_rel_id ) : '';
+							$school_address = $school_rel_id ? get_field( 'address', $school_rel_id ) : '';
 							?>
-							<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-								<div class="relative h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');">
-									<?php if ( $type_name ) : ?>
-										<span class="absolute top-3 left-3 bg-orange-50 text-orange-600 text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm z-10"><?php echo esc_html( $type_name ); ?></span>
-									<?php endif; ?>
-								</div>
-								<div class="p-5 flex-1 flex flex-col justify-between space-y-4">
-									<div>
-										<h4 class="font-extrabold text-slate-800 text-sm hover:text-[#00308b] transition-colors leading-snug">
-											<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-										</h4>
-										
-										<div class="mt-3 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
-											<p>Trường: 
+							<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+								<div class="flex items-center gap-4 flex-1">
+									<div class="h-16 w-16 bg-slate-200 bg-cover bg-center rounded-lg shrink-0" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>'); font-size: 0;"></div>
+									<div class="space-y-1 flex-1 min-w-0">
+										<div class="flex items-center gap-2 flex-wrap">
+											<h4 class="font-extrabold text-slate-800 text-base hover:text-[#00308b] transition-colors leading-snug">
 												<?php if ( $school_rel_id ) : ?>
-													<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>" class="font-bold text-[#00308b] hover:underline"><?php echo esc_html( $school_name ); ?></a>
+													<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>"><?php echo esc_html( $school_name ); ?><?php if ( $school_code ) { echo ' - ' . esc_html( $school_code ); } ?></a>
 												<?php else : ?>
 													<span class="font-semibold text-slate-700"><?php echo esc_html( $school_name ); ?></span>
 												<?php endif; ?>
+											</h4>
+											<?php if ( $type_name ) : ?>
+												<a href="<?php the_permalink(); ?>" class="bg-orange-50 text-orange-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider hover:bg-orange-100 transition-all"><?php echo esc_html( $type_name ); ?></a>
+											<?php endif; ?>
+										</div>
+										<?php if ( $school_address ) : ?>
+											<p class="text-xs text-slate-400 flex items-center gap-1">
+												<span>📍</span>
+												<span class="truncate"><?php echo esc_html( $school_address ); ?></span>
 											</p>
+										<?php endif; ?>
+										
+										<div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-slate-500 pt-1">
 											<p>Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $duration ); ?></span></p>
 											<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $tuition_fee ); ?></span></p>
 										</div>
 									</div>
+								</div>
 
-									<div class="pt-2 border-t border-slate-100 flex items-center">
-										<?php if ( $status === 'tam-ngung' ) : ?>
-											<span class="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
-										<?php else : ?>
-											<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-brand-darkBlue transition-all min-h-[44px] flex items-center justify-center">Tìm hiểu</a>
-										<?php endif; ?>
-									</div>
+								<div class="shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex items-center justify-end">
+									<?php if ( $status === 'tam-ngung' ) : ?>
+										<span class="text-xs text-slate-400 bg-slate-100 px-4 py-2 rounded-lg font-bold">Tạm ngưng</span>
+									<?php else : ?>
+										<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto bg-brand-primary text-white text-xs font-bold px-6 py-2.5 rounded-lg hover:bg-brand-darkBlue transition-all min-h-[40px] flex items-center justify-center">Tìm hiểu</a>
+									<?php endif; ?>
 								</div>
 							</div>
 							<?php
@@ -174,73 +180,6 @@ $hotline = ltdh_get_hotline();
 					endif;
 					?>
 				</section>
-
-				<!-- SCHOOLS OFFERING THIS MAJOR -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Các trường đào tạo ngành này</h2>
-					<?php
-					$distinct_school_ids = [];
-					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
-						foreach ( $offered_program_ids as $p_id ) {
-							$s_id = get_field( LTDH_META_SCHOOL_REL, $p_id );
-							if ( $s_id && ! in_array( $s_id, $distinct_school_ids ) ) {
-								$distinct_school_ids[] = $s_id;
-							}
-						}
-					}
-					
-					if ( empty( $distinct_school_ids ) ) {
-						$linked_programs = get_posts( [
-							'post_type'      => 'program',
-							'posts_per_page' => -1,
-							'meta_query'     => [
-								[
-									'key'     => LTDH_META_MAJOR_REL,
-									'value'   => $major_id,
-									'compare' => '=',
-								],
-							],
-							'fields'         => 'ids',
-						] );
-						foreach ( $linked_programs as $p_id ) {
-							$s_id = get_field( LTDH_META_SCHOOL_REL, $p_id );
-							if ( $s_id && ! in_array( $s_id, $distinct_school_ids ) ) {
-								$distinct_school_ids[] = $s_id;
-							}
-						}
-					}
-					
-					if ( ! empty( $distinct_school_ids ) ) {
-						$schools_query = new WP_Query( [
-							'post_type' => 'school',
-							'post__in'  => $distinct_school_ids,
-							'post_status' => 'publish'
-						] );
-					} else {
-						$schools_query = false;
-					}
-
-					if ( $schools_query && $schools_query->have_posts() ) :
-						echo '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">';
-						while ( $schools_query->have_posts() ) : $schools_query->the_post();
-						?>
-							<a href="<?php the_permalink(); ?>" class="block p-4 border border-slate-100 rounded-lg hover:border-brand-primary hover:shadow-sm transition-all bg-white flex items-center gap-3">
-								<?php ltdh_render_school_thumbnail( get_the_ID(), 'thumbnail', 'h-10 w-10 object-cover shrink-0 rounded-lg border border-slate-100 bg-white' ); ?>
-								<div>
-									<h4 class="font-bold text-slate-800 text-sm"><?php the_title(); ?></h4>
-									<span class="text-[10px] text-slate-400 block truncate max-w-[200px]"><?php echo esc_html( get_field( 'address' ) ?: 'Xem bản đồ' ); ?></span>
-								</div>
-							</a>
-						<?php
-						endwhile;
-						echo '</div>';
-						wp_reset_postdata();
-					else :
-						echo '<p class="text-sm text-slate-500">Danh sách các trường tuyển sinh ngành này đang được bổ sung.</p>';
-					endif;
-					?>
-				</section>
-
 			</div>
 
 			<!-- Sidebar Column -->

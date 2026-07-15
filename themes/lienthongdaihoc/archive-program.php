@@ -69,18 +69,29 @@ if ( ! empty( $selected_school ) ) {
 
 // Filter by nhóm ngành: get all major IDs in that category, then filter programs
 if ( ! empty( $selected_nhom ) ) {
-	$majors_in_cat = get_posts( [
-		'post_type'   => 'major',
-		'numberposts' => -1,
-		'fields'      => 'ids',
-		'tax_query'   => [ [ 'taxonomy' => 'major_cat', 'field' => 'slug', 'terms' => $selected_nhom ] ],
-	] );
-	if ( ! empty( $majors_in_cat ) ) {
+	// Check if this is a major slug (filter by major_relationship)
+	$major_post = get_page_by_path( $selected_nhom, OBJECT, 'major' );
+	if ( $major_post ) {
 		$args['meta_query'][] = [
 			'key'     => 'major_relationship',
-			'value'   => $majors_in_cat,
-			'compare' => 'IN',
+			'value'   => $major_post->ID,
+			'compare' => '=',
 		];
+	} else {
+		// Fallback: treat as major_cat taxonomy slug
+		$majors_in_cat = get_posts( [
+			'post_type'   => 'major',
+			'numberposts' => -1,
+			'fields'      => 'ids',
+			'tax_query'   => [ [ 'taxonomy' => 'major_cat', 'field' => 'slug', 'terms' => $selected_nhom ] ],
+		] );
+		if ( ! empty( $majors_in_cat ) ) {
+			$args['meta_query'][] = [
+				'key'     => 'major_relationship',
+				'value'   => $majors_in_cat,
+				'compare' => 'IN',
+			];
+		}
 	}
 }
 
@@ -182,9 +193,9 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 						</ul>
 					</div>
 
-					<!-- Nhóm ngành Filter -->
+					<!-- Ngành học Filter -->
 					<div class="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
-						<h3 class="font-extrabold text-slate-900 text-base mb-4 border-b border-slate-100 pb-3 uppercase tracking-wider">Nhóm ngành</h3>
+						<h3 class="font-extrabold text-slate-900 text-base mb-4 border-b border-slate-100 pb-3 uppercase tracking-wider">Ngành học</h3>
 						<ul class="space-y-1">
 							<li>
 								<a href="<?php echo esc_url( remove_query_arg( 'nganh' ) ); ?>"
@@ -195,46 +206,35 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 									</span>
 								</a>
 							</li>
-							<?php if ( ! is_wp_error( $major_cats ) && ! empty( $major_cats ) ) : ?>
-								<?php foreach ( $major_cats as $cat ) :
-									$is_active = ( $selected_nhom === $cat->slug );
-									// Get major IDs in this category
-									$cat_major_ids = get_posts( [
-										'post_type'   => 'major',
-										'numberposts' => -1,
-										'fields'      => 'ids',
-										'tax_query'   => [ [ 'taxonomy' => 'major_cat', 'field' => 'slug', 'terms' => $cat->slug ] ],
-									] );
-									$prog_count = 0;
-									if ( ! empty( $cat_major_ids ) ) {
-										// Build count args that mirror the main query's active filters
-										$count_args = [
-											'post_type'      => 'program',
-											'post_status'    => 'publish',
-											'posts_per_page' => -1,
-											'fields'         => 'ids',
-											'meta_query'     => [
-												'relation' => 'AND',
-												[ 'key' => 'major_relationship', 'value' => $cat_major_ids, 'compare' => 'IN' ],
-											],
-										];
-										// Apply training type filter if set
-										if ( ! empty( $selected_type ) ) {
-											$count_args['tax_query'] = [ [ 'taxonomy' => 'training_type', 'field' => 'slug', 'terms' => $selected_type ] ];
-										}
-										// Apply search filter if set
-										if ( ! empty( $selected_search ) ) {
-											$count_args['s'] = $selected_search;
-										}
-										$prog_count_q = new WP_Query( $count_args );
-										$prog_count   = $prog_count_q->found_posts;
-										wp_reset_postdata();
+							<?php
+							$all_majors_list = get_posts( [ 'post_type' => 'major', 'numberposts' => -1, 'post_status' => 'publish', 'orderby' => 'title', 'order' => 'ASC' ] );
+							if ( ! empty( $all_majors_list ) ) :
+								foreach ( $all_majors_list as $maj ) :
+									$is_active = ( $selected_nhom === $maj->post_name );
+									$count_args = [
+										'post_type'      => 'program',
+										'post_status'    => 'publish',
+										'posts_per_page' => -1,
+										'fields'         => 'ids',
+										'meta_query'     => [
+											'relation' => 'AND',
+											[ 'key' => 'major_relationship', 'value' => $maj->ID, 'compare' => '=' ],
+										],
+									];
+									if ( ! empty( $selected_type ) ) {
+										$count_args['tax_query'] = [ [ 'taxonomy' => 'training_type', 'field' => 'slug', 'terms' => $selected_type ] ];
 									}
-								?>
+									if ( ! empty( $selected_search ) ) {
+										$count_args['s'] = $selected_search;
+									}
+									$prog_count_q = new WP_Query( $count_args );
+									$prog_count   = $prog_count_q->found_posts;
+									wp_reset_postdata();
+							?>
 									<li>
-										<a href="<?php echo esc_url( add_query_arg( 'nganh', $cat->slug, remove_query_arg( 'nganh' ) ) ); ?>"
+										<a href="<?php echo esc_url( add_query_arg( 'nganh', $maj->post_name, remove_query_arg( 'nganh' ) ) ); ?>"
 										   class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo $is_active ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
-											<span><?php echo esc_html( $cat->name ); ?></span>
+											<span><?php echo esc_html( $maj->post_title ); ?></span>
 											<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>">
 												<?php echo esc_html( $prog_count ); ?>
 											</span>

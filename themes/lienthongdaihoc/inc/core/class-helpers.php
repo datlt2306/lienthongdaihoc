@@ -563,6 +563,71 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 				}
 			}
 		}
+
+		if ($title === 'ngành học') {
+			$filtered_items = [];
+			foreach ($new_items as $ni) {
+				if ((int) $ni->menu_item_parent === (int) $item->ID) {
+					continue;
+				}
+				$filtered_items[] = $ni;
+			}
+			$new_items = $filtered_items;
+
+			$item->classes[] = 'menu-item-has-children';
+			$hot_majors = ltdh_get_hot_majors();
+			foreach ($hot_majors as $maj) {
+				$max_db_id++;
+				$sub_item = new stdClass();
+				$sub_item->ID = $max_db_id;
+				$sub_item->db_id = $max_db_id;
+				$sub_item->title = $maj->post_title;
+				$sub_item->url = get_permalink($maj->ID);
+				$sub_item->menu_item_parent = $item->ID;
+				$sub_item->classes = ['menu-item', 'menu-item-type-post_type', 'menu-item-object-major'];
+				$sub_item->type = 'post_type';
+				$sub_item->object = LTDH_CPT_MAJOR;
+				$sub_item->object_id = $maj->ID;
+				$sub_item->post_parent = 0;
+				$sub_item->post_title = $maj->post_title;
+				$sub_item->post_status = 'publish';
+				$sub_item->post_type = 'nav_menu_item';
+				$sub_item->menu_order = 0;
+				$sub_item->target = '';
+				$sub_item->attr_title = '';
+				$sub_item->description = '';
+				$sub_item->xfn = '';
+				$sub_item->current = false;
+				$sub_item->current_item_parent = false;
+				$sub_item->current_item_ancestor = false;
+				$new_items[] = $sub_item;
+			}
+
+			$max_db_id++;
+			$view_all = new stdClass();
+			$view_all->ID = $max_db_id;
+			$view_all->db_id = $max_db_id;
+			$view_all->title = 'Xem tất cả ngành →';
+			$view_all->url = home_url('/nganh-hoc/');
+			$view_all->menu_item_parent = $item->ID;
+			$view_all->classes = ['menu-item', 'ltdh-view-all-link'];
+			$view_all->type = 'custom';
+			$view_all->object = '';
+			$view_all->object_id = 0;
+			$view_all->post_parent = 0;
+			$view_all->post_title = 'Xem tất cả ngành →';
+			$view_all->post_status = 'publish';
+			$view_all->post_type = 'nav_menu_item';
+			$view_all->menu_order = 0;
+			$view_all->target = '';
+			$view_all->attr_title = '';
+			$view_all->description = '';
+			$view_all->xfn = '';
+			$view_all->current = false;
+			$view_all->current_item_parent = false;
+			$view_all->current_item_ancestor = false;
+			$new_items[] = $view_all;
+		}
 	}
 
 	return $new_items;
@@ -646,4 +711,32 @@ add_filter('wpcf7_form_tag', 'ltdh_cf7_dynamic_programs', 10, 2);
 
 function ltdh_get_fallback_image(string $context = 'program'): string {
 	return ltdh_default('images', "fallback_{$context}", '');
+}
+
+// ----------------------------------------------------
+// 14. Hot Majors Helper
+// ----------------------------------------------------
+
+/**
+ * Get the top 5 hot majors for menu and homepage.
+ * Looks for ACF option first, falls back to hardcoded slugs.
+ */
+function ltdh_get_hot_majors(): array {
+	$slugs = [];
+	if ( function_exists('get_field') ) {
+		$slugs = get_field('hot_major_slugs', 'options') ?: [];
+	}
+	if ( empty($slugs) ) {
+		$slugs = ['cong-nghe-thong-tin', 'quan-tri-kinh-doanh', 'ke-toan', 'thuong-mai-dien-tu', 'logistics'];
+	}
+
+	$majors = [];
+	foreach ($slugs as $slug) {
+		$post = get_page_by_path($slug, OBJECT, LTDH_CPT_MAJOR);
+		if ($post && $post->post_status === 'publish') {
+			$majors[] = $post;
+		}
+	}
+
+	return $majors;
 }

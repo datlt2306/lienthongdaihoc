@@ -119,11 +119,13 @@ function ltdh_ajax_filter_programs() {
 		} else {
 			$major_id = intval( $selected_major );
 		}
-		$args['meta_query'][] = [
-			'key'     => LTDH_META_MAJOR_REL,
-			'value'   => $major_id,
-			'compare' => '=',
-		];
+		if ( $major_id ) {
+			$args['meta_query'][] = [
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => $major_id,
+				'compare' => '=',
+			];
+		}
 	}
 
 	if ( ! empty( $selected_type ) ) {
