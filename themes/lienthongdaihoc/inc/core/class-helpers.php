@@ -332,6 +332,9 @@ function ltdh_clear_transients_on_save($post_id) {
 		delete_transient(LTDH_TRANSIENT_FEATURED_SCHOOLS);
 		delete_transient('ltdh_combinations_data');
 	}
+	if ('post' === $post_type) {
+		delete_transient('ltdh_homepage_news');
+	}
 }
 add_action('save_post', 'ltdh_clear_transients_on_save');
 

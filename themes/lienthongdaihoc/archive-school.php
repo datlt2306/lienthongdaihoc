@@ -18,6 +18,117 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 	<?php get_template_part( 'template-parts/banner' ); ?>
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
+		<?php
+		// Query featured schools
+		$featured_args = [
+			'post_type'      => 'school',
+			'posts_per_page' => 6,
+			'post_status'    => 'publish',
+			'meta_query'     => [
+				[
+					'key'     => 'is_featured',
+					'value'   => '1',
+					'compare' => '='
+				]
+			]
+		];
+		$featured_query = new WP_Query( $featured_args );
+		$featured_posts = $featured_query->posts;
+
+		// If less than 6, query latest schools to fill the remaining slots
+		if ( count( $featured_posts ) < 6 ) {
+			$exclude_ids = wp_list_pluck( $featured_posts, 'ID' );
+			$fallback_args = [
+				'post_type'      => 'school',
+				'posts_per_page' => 6 - count( $featured_posts ),
+				'post_status'    => 'publish',
+				'post__not_in'   => ! empty( $exclude_ids ) ? $exclude_ids : [],
+			];
+			$fallback_query = new WP_Query( $fallback_args );
+			$featured_posts = array_merge( $featured_posts, $fallback_query->posts );
+		}
+
+		if ( ! empty( $featured_posts ) ) :
+		?>
+			<!-- Section: Trường nổi bật (3-column grid) -->
+			<div class="mb-16">
+				<div class="flex items-center gap-3 mb-6 border-b border-slate-200 pb-4">
+					<span class="flex items-center justify-center w-8 h-8 rounded-lg bg-brand-primary text-white">
+						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.371 1.24.588 1.81l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.97-2.883a1 1 0 00-1.176 0l-3.97 2.883c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.98 10.3c-.783-.57-.373-1.81.588-1.81h4.906a1 1 0 00.95-.69l1.519-4.674z"/>
+						</svg>
+					</span>
+					<div>
+						<h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Trường đại học nổi bật</h2>
+						<p class="text-xs text-slate-500 mt-0.5">Các trường đại học liên kết tuyển sinh hàng đầu với chất lượng đào tạo vượt trội.</p>
+					</div>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					<?php
+					foreach ( $featured_posts as $featured_post ) :
+						$school_id = $featured_post->ID;
+						$logo_id   = get_field( 'logo', $school_id );
+						$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
+
+						$offered_program_ids = get_post_meta( $school_id, LTDH_META_OFFERED_PROGRAMS, true );
+						$prog_count = is_array( $offered_program_ids ) ? count( $offered_program_ids ) : 0;
+
+						$school_types = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => 'names' ] );
+						$systems_label = ( ! is_wp_error( $school_types ) && ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
+						
+						$address = get_field( 'address', $school_id ) ?: 'Việt Nam';
+						$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
+						$region = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
+					?>
+						<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+							<div class="relative h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'large' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');">
+								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-slate-900/20 to-transparent"></div>
+								<span class="absolute top-3 left-3 bg-brand-accent text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider shadow-sm z-10 flex items-center gap-1">
+									⭐️ Nổi bật
+								</span>
+							</div>
+
+							<!-- Floating Logo -->
+							<div class="h-16 w-16 bg-white rounded-xl border-4 border-white shadow-md -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden p-1 transition-transform group-hover:scale-105 duration-300">
+								<?php if ( $logo_id ) : ?>
+									<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
+								<?php else : ?>
+									<span class="font-display font-extrabold text-brand-primary text-sm">UNI</span>
+								<?php endif; ?>
+							</div>
+
+							<div class="p-6 pt-3 flex-1 flex flex-col justify-between">
+								<div class="text-center">
+									<h4 class="font-extrabold text-slate-800 text-sm md:text-base tracking-tight leading-snug uppercase min-h-[48px] line-clamp-2 mt-1 group-hover:text-brand-primary transition-colors">
+										<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>"><?php echo esc_html( get_the_title( $school_id ) ); ?></a>
+									</h4>
+									<p class="text-xs text-slate-400 mt-1 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
+									
+									<div class="mt-4 space-y-2 text-center text-xs">
+										<?php if ( ! empty( $systems_label ) ) : ?>
+											<span class="font-bold text-brand-primary bg-blue-50 px-3 py-1 rounded-full inline-block leading-none"><?php echo esc_html( $systems_label ); ?></span>
+										<?php endif; ?>
+										
+										<div class="flex items-center justify-center gap-x-4 gap-y-1 flex-wrap text-slate-500 font-medium pt-2">
+											<span class="flex items-center gap-1">📍 <?php echo esc_html( $region ?: 'Việt Nam' ); ?></span>
+											<span class="flex items-center gap-1">📊 <?php echo esc_html( $prog_count ); ?> ngành</span>
+										</div>
+									</div>
+								</div>
+								
+								<div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="w-full text-center bg-brand-primary hover:bg-[#002263] text-white py-2.5 rounded-lg font-bold transition-all text-xs uppercase tracking-wider">Tìm hiểu chi tiết</a>
+								</div>
+							</div>
+						</div>
+					<?php
+					endforeach;
+					?>
+				</div>
+			</div>
+		<?php endif; ?>
+
 		<!-- Header with view toggle -->
 		<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-slate-200 gap-4">
 			<p class="text-sm font-medium text-slate-500">Hiển thị tất cả các trường đại học liên kết tuyển sinh chính thức.</p>

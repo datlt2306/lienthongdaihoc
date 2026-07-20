@@ -273,7 +273,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 							<li class="flex items-start gap-3">
 								<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-100 block">
 									<?php if ( $rp_thumb ) : ?>
-										<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="" class="w-full h-full object-cover">
+										<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="" class="w-full h-full object-cover" loading="lazy">
 									<?php else : ?>
 										<div class="w-full h-full flex items-center justify-center text-base">📰</div>
 									<?php endif; ?>

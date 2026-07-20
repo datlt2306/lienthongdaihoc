@@ -13,6 +13,25 @@
                 "library": "all"
             },
             {
+                "key": "field_school_is_featured",
+                "label": "Trường nổi bật",
+                "name": "is_featured",
+                "type": "true_false",
+                "instructions": "Bật để hiển thị trường này trong phần trường nổi bật",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "Bật",
+                "ui_off_text": "Tắt"
+            },
+            {
                 "key": "field_school_banner",
                 "label": "Banner Trường",
                 "name": "school_banner",

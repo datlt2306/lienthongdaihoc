@@ -239,7 +239,7 @@ $global_zalo = ltdh_get_zalo_url();
 							<!-- Overlapping Logo Wrapper -->
 							<div class="relative flex justify-center -mt-10 mb-3">
 								<div class="w-20 h-20 bg-white p-1 rounded-xl shadow-md border border-slate-100 flex items-center justify-center overflow-hidden">
-									<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain">
+									<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain" loading="lazy">
 								</div>
 							</div>
 							

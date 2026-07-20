@@ -19,11 +19,12 @@ $schools_query = ltdh_get_cached_query('ltdh_featured_schools', [
 	'post_status'    => 'publish',
 ], HOUR_IN_SECONDS);
 
-$news_query = new WP_Query([
+$news_query = ltdh_get_cached_query('ltdh_homepage_news', [
 	'post_type'      => 'post',
 	'posts_per_page' => 4,
 	'post_status'    => 'publish',
-]);
+	'no_found_rows'  => true,
+], HOUR_IN_SECONDS);
 
 $hotline = ltdh_get_hotline();
 $zalo    = ltdh_get_zalo_url();

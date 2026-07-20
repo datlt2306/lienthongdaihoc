@@ -140,6 +140,58 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 					<span class="text-slate-400 group-open:rotate-180 transition-transform duration-200">▾</span>
 				</summary>
 				<div class="p-4 lg:p-0 pt-0 lg:pt-0 border-t lg:border-0 border-slate-100 space-y-6 sticky top-24">
+					<?php
+					// Pre-fetch program metadata to avoid N+1 queries in the loop
+					$all_sidebar_programs = get_posts( [
+						'post_type'      => 'program',
+						'post_status'    => 'publish',
+						'posts_per_page' => -1,
+						'fields'         => 'ids',
+					] );
+
+					$t_counts = [];
+					$m_counts = [];
+
+					if ( ! empty( $all_sidebar_programs ) ) {
+						foreach ( $all_sidebar_programs as $p_id ) {
+							$t_terms = wp_get_post_terms( $p_id, 'training_type' );
+							if ( ! is_wp_error( $t_terms ) ) {
+								foreach ( $t_terms as $tt ) {
+									$t_counts[ $tt->slug ] = ( $t_counts[ $tt->slug ] ?? 0 ) + 1;
+								}
+							}
+						}
+					}
+
+					// Pre-filter programs for current parameters
+					$major_filter_args = [
+						'post_type'      => 'program',
+						'post_status'    => 'publish',
+						'posts_per_page' => -1,
+						'fields'         => 'ids',
+					];
+					if ( ! empty( $selected_type ) ) {
+						$major_filter_args['tax_query'] = [
+							[
+								'taxonomy' => 'training_type',
+								'field'    => 'slug',
+								'terms'    => $selected_type,
+							]
+						];
+					}
+					if ( ! empty( $selected_search ) ) {
+						$major_filter_args['s'] = $selected_search;
+					}
+					$filtered_sidebar_programs = get_posts( $major_filter_args );
+					if ( ! empty( $filtered_sidebar_programs ) ) {
+						foreach ( $filtered_sidebar_programs as $p_id ) {
+							$major_rel = get_field( 'major_relationship', $p_id );
+							if ( $major_rel ) {
+								$m_counts[ $major_rel ] = ( $m_counts[ $major_rel ] ?? 0 ) + 1;
+							}
+						}
+					}
+					?>
 
 					<!-- Search Box -->
 					<div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
@@ -166,16 +218,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 							if ( ! is_wp_error( $all_types ) && ! empty( $all_types ) ) :
 								foreach ( $all_types as $t_term ) :
 									$is_active = ( $selected_type === $t_term->slug );
-									// Calculate count of programs in this training type
-									$count_args = [
-										'post_type'      => 'program',
-										'posts_per_page' => -1,
-										'post_status'    => 'publish',
-										'tax_query'      => [ [ 'taxonomy' => 'training_type', 'field' => 'slug', 'terms' => $t_term->slug ] ]
-									];
-									$t_query = new WP_Query( $count_args );
-									$t_count = $t_query->found_posts;
-									wp_reset_postdata();
+									$t_count = $t_counts[ $t_term->slug ] ?? 0;
 							?>
 									<li>
 										<a href="<?php echo esc_url( home_url( '/he-dao-tao/' . $t_term->slug . '/' ) ); ?>"
@@ -186,7 +229,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 											</span>
 										</a>
 									</li>
-							<?php
+								<?php
 								endforeach;
 							endif;
 							?>
@@ -211,25 +254,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 							if ( ! empty( $all_majors_list ) ) :
 								foreach ( $all_majors_list as $maj ) :
 									$is_active = ( $selected_nhom === $maj->post_name );
-									$count_args = [
-										'post_type'      => 'program',
-										'post_status'    => 'publish',
-										'posts_per_page' => -1,
-										'fields'         => 'ids',
-										'meta_query'     => [
-											'relation' => 'AND',
-											[ 'key' => 'major_relationship', 'value' => $maj->ID, 'compare' => '=' ],
-										],
-									];
-									if ( ! empty( $selected_type ) ) {
-										$count_args['tax_query'] = [ [ 'taxonomy' => 'training_type', 'field' => 'slug', 'terms' => $selected_type ] ];
-									}
-									if ( ! empty( $selected_search ) ) {
-										$count_args['s'] = $selected_search;
-									}
-									$prog_count_q = new WP_Query( $count_args );
-									$prog_count   = $prog_count_q->found_posts;
-									wp_reset_postdata();
+									$prog_count = $m_counts[ $maj->ID ] ?? 0;
 							?>
 									<li>
 										<a href="<?php echo esc_url( add_query_arg( 'nganh', $maj->post_name, remove_query_arg( 'nganh' ) ) ); ?>"

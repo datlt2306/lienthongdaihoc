@@ -235,7 +235,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 						?>
 							<li class="flex items-start gap-3">
 								<?php if ( $rp_thumb ) : ?>
-									<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-14 h-14 rounded-lg object-cover shrink-0 border border-slate-100">
+									<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-14 h-14 rounded-lg object-cover shrink-0 border border-slate-100" loading="lazy">
 								<?php else : ?>
 									<div class="w-14 h-14 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 text-xl">📰</div>
 								<?php endif; ?>

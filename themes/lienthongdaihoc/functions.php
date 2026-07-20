@@ -204,3 +204,9 @@ function ltdh_ajax_filter_programs() {
 
 	wp_send_json_success( [ 'html' => $html ] );
 }
+
+// Exclude .git directory from All-in-One WP Migration export to prevent size ballooning
+add_filter( 'ai1wm_exclude_content_from_export', function ( $exclude_filters ) {
+	$exclude_filters[] = '.git';
+	return $exclude_filters;
+} );
