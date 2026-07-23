@@ -336,8 +336,6 @@ class LTDH_CLI_Commands {
 				if ( ! is_wp_error( $major_id ) ) {
 					update_post_meta( $major_id, 'major_code', '7' . str_pad( rand( 100000, 999999 ), 6, '0', STR_PAD_LEFT ) );
 					update_post_meta( $major_id, 'career_opportunities', 'Cơ hội nghề nghiệp rộng mở tại các doanh nghiệp lớn.' );
-					update_post_meta( $major_id, 'salary_info', 'Mức lương từ 10 - 30 triệu tùy năng lực.' );
-					update_post_meta( $major_id, 'job_market', 'Nhu cầu tuyển dụng cao trên toàn quốc.' );
 					update_post_meta( $major_id, 'admission_groups', 'A00, A01, D01' );
 					update_post_meta( $major_id, LTDH_META_ADMISSION_STATUS, LTDH_STATUS_OPEN );
 						WP_CLI::success( "Đã tạo Ngành học: $m_name" );

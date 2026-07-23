@@ -73,7 +73,7 @@
             },
             {
                 "key": "field_school_admission_info",
-                "label": "Thông tin tuyển sinh chung",
+                "label": "Phương thức tuyển sinh",
                 "name": "admission_info",
                 "type": "wysiwyg",
                 "toolbar": "full",
@@ -81,7 +81,7 @@
             },
             {
                 "key": "field_school_contact_info",
-                "label": "Thông tin liên hệ chi tiết",
+                "label": "Thông tin liên hệ tuyển sinh",
                 "name": "contact_info",
                 "type": "wysiwyg",
                 "toolbar": "full",
@@ -126,20 +126,8 @@
             },
             {
                 "key": "field_major_opportunities",
-                "label": "Cơ hội nghề nghiệp",
+                "label": "Cơ hội nghề nghiệp & Định hướng",
                 "name": "career_opportunities",
-                "type": "wysiwyg"
-            },
-            {
-                "key": "field_major_salary",
-                "label": "Thông tin mức lương",
-                "name": "salary_info",
-                "type": "wysiwyg"
-            },
-            {
-                "key": "field_major_job_market",
-                "label": "Nhu cầu thị trường lao động",
-                "name": "job_market",
                 "type": "wysiwyg"
             },
             {

@@ -8,40 +8,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&family=Montserrat:wght@600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
 	
-	<!-- Tailwind CDN for rich interactive styles -->
-	<script src="https://cdn.tailwindcss.com"></script>
-	<script>
-		tailwind.config = {
-			theme: {
-				extend: {
-					colors: {
-						brand: {
-							primary: '#00308b', // Deep Blue (default buttons, links)
-							secondary: '#0F172A', // Slate 900
-							accent: '#fe8100', // Orange CTA buttons only
-							darkBlue: '#002266', // Darker blue hover
-							light: '#F8FAFC', // Light Background
-						}
-					},
-					fontFamily: {
-						sans: ['"Be Vietnam Pro"', 'sans-serif'],
-						display: ['Montserrat', '"Be Vietnam Pro"', 'sans-serif'],
-						playfair: ['"Playfair Display"', 'serif'],
-					}
-				}
-			}
-		}
-	</script>
-	<style type="text/tailwindcss">
-		@layer base {
-			body {
-				@apply font-sans text-brand-secondary bg-slate-50 antialiased;
-			}
-			h1, h2, h3, h4, h5, h6 {
-				@apply font-display font-bold;
-			}
-		}
-	</style>
+
 	<style>
 		/* Prevent Montserrat font weights from being too heavy */
 		h1, h2, h3, h4, h5, h6,

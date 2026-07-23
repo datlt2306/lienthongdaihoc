@@ -14,8 +14,6 @@ get_header();
 $major_id   = get_the_ID();
 $major_code = get_field( 'major_code', $major_id );
 $career     = get_field( 'career_opportunities', $major_id );
-$salary     = get_field( 'salary_info', $major_id );
-$market     = get_field( 'job_market', $major_id );
 
 // Retrieve pre-calculated list of programs matching this major
 $offered_program_ids = get_post_meta( $major_id, LTDH_META_OFFERED_PROGRAMS, true );
