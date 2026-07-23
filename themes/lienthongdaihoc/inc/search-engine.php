@@ -23,93 +23,100 @@ function ltdh_filter_program_search_query( $args ) {
 	// Sanitize the search keyword safely for safe search queries
 	$keyword = sanitize_text_field( $keyword );
 
-	// 3. Query matching school IDs by keyword
-	$school_ids = get_posts( [
-		'post_type'      => LTDH_CPT_SCHOOL,
-		's'              => $keyword,
-		'posts_per_page' => -1,
-		'fields'         => 'ids',
-		'post_status'    => 'publish',
-	] );
+	// Check transient cache
+	$cache_key = 'ltdh_search_' . md5( $keyword );
+	$matched_ids = get_transient( $cache_key );
 
-	// 4. Query matching major IDs by keyword
-	$major_ids = get_posts( [
-		'post_type'      => LTDH_CPT_MAJOR,
-		's'              => $keyword,
-		'posts_per_page' => -1,
-		'fields'         => 'ids',
-		'post_status'    => 'publish',
-	] );
+	if ( false === $matched_ids ) {
+		// 3. Query matching school IDs by keyword
+		$school_ids = get_posts( [
+			'post_type'      => LTDH_CPT_SCHOOL,
+			's'              => $keyword,
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'post_status'    => 'publish',
+		] );
 
-	// Define status exclusion filter
-	$meta_status_filter = [
-		'relation' => 'OR',
-		[
-			'key'     => LTDH_META_ADMISSION_STATUS,
-			'value'   => LTDH_STATUS_PAUSED,
-			'compare' => '!=',
-		],
-		[
-			'key'     => LTDH_META_ADMISSION_STATUS,
-			'compare' => 'NOT EXISTS',
-		],
-	];
+		// 4. Query matching major IDs by keyword
+		$major_ids = get_posts( [
+			'post_type'      => LTDH_CPT_MAJOR,
+			's'              => $keyword,
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'post_status'    => 'publish',
+		] );
 
-	// 5. Query matching program IDs by keyword directly
-	$program_ids_direct = get_posts( [
-		'post_type'      => LTDH_CPT_PROGRAM,
-		's'              => $keyword,
-		'posts_per_page' => -1,
-		'fields'         => 'ids',
-		'post_status'    => 'publish',
-		'meta_query'     => [
-			'relation' => 'AND',
-			$meta_status_filter,
-		],
-	] );
+		// Define status exclusion filter
+		$meta_status_filter = [
+			'relation' => 'OR',
+			[
+				'key'     => LTDH_META_ADMISSION_STATUS,
+				'value'   => LTDH_STATUS_PAUSED,
+				'compare' => '!=',
+			],
+			[
+				'key'     => LTDH_META_ADMISSION_STATUS,
+				'compare' => 'NOT EXISTS',
+			],
+		];
 
-	// 6. Query program IDs linked to matched schools
-	$program_ids_schools = [];
-	if ( ! empty( $school_ids ) ) {
-		$program_ids_schools = get_posts( [
+		// 5. Query matching program IDs by keyword directly
+		$program_ids_direct = get_posts( [
 			'post_type'      => LTDH_CPT_PROGRAM,
+			's'              => $keyword,
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
 			'post_status'    => 'publish',
 			'meta_query'     => [
 				'relation' => 'AND',
-				[
-					'key'     => 'school_relationship',
-					'value'   => $school_ids,
-					'compare' => 'IN',
-				],
 				$meta_status_filter,
 			],
 		] );
-	}
 
-	// 7. Query program IDs linked to matched majors
-	$program_ids_majors = [];
-	if ( ! empty( $major_ids ) ) {
-		$program_ids_majors = get_posts( [
-			'post_type'      => LTDH_CPT_PROGRAM,
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'post_status'    => 'publish',
-			'meta_query'     => [
-				'relation' => 'AND',
-				[
-					'key'     => 'major_relationship',
-					'value'   => $major_ids,
-					'compare' => 'IN',
+		// 6. Query program IDs linked to matched schools
+		$program_ids_schools = [];
+		if ( ! empty( $school_ids ) ) {
+			$program_ids_schools = get_posts( [
+				'post_type'      => LTDH_CPT_PROGRAM,
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'post_status'    => 'publish',
+				'meta_query'     => [
+					'relation' => 'AND',
+					[
+						'key'     => 'school_relationship',
+						'value'   => $school_ids,
+						'compare' => 'IN',
+					],
+					$meta_status_filter,
 				],
-				$meta_status_filter,
-			],
-		] );
-	}
+			] );
+		}
 
-	// Merge all matched program IDs
-	$matched_ids = array_unique( array_merge( $program_ids_direct, $program_ids_schools, $program_ids_majors ) );
+		// 7. Query program IDs linked to matched majors
+		$program_ids_majors = [];
+		if ( ! empty( $major_ids ) ) {
+			$program_ids_majors = get_posts( [
+				'post_type'      => LTDH_CPT_PROGRAM,
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'post_status'    => 'publish',
+				'meta_query'     => [
+					'relation' => 'AND',
+					[
+						'key'     => 'major_relationship',
+						'value'   => $major_ids,
+						'compare' => 'IN',
+					],
+					$meta_status_filter,
+				],
+			] );
+		}
+
+		// Merge all matched program IDs
+		$matched_ids = array_unique( array_merge( $program_ids_direct, $program_ids_schools, $program_ids_majors ) );
+		set_transient( $cache_key, $matched_ids, HOUR_IN_SECONDS );
+	}
 
 	// If no matches found, force empty result by passing post__in = [0]
 	if ( empty( $matched_ids ) ) {

@@ -21,6 +21,10 @@ $contact    = get_field( 'contact_info', $school_id );
 
 // Retrieve pre-calculated list of programs offered by this school
 $offered_program_ids = get_post_meta( $school_id, LTDH_META_OFFERED_PROGRAMS, true );
+if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
+	update_meta_cache( 'post', $offered_program_ids );
+	update_object_term_cache( $offered_program_ids, 'program' );
+}
 
 $global_zalo = ltdh_get_zalo_url();
 ?>
@@ -181,6 +185,10 @@ $global_zalo = ltdh_get_zalo_url();
 					}
 
 					if ( $programs_query->have_posts() ) :
+						$queried_ids = wp_list_pluck( $programs_query->posts, 'ID' );
+						update_meta_cache( 'post', $queried_ids );
+						update_object_term_cache( $queried_ids, 'program' );
+						
 						echo '<div class="space-y-4">';
 						while ( $programs_query->have_posts() ) : $programs_query->the_post();
 							$prog_id = get_the_ID();
@@ -256,7 +264,11 @@ $global_zalo = ltdh_get_zalo_url();
 					$distinct_major_ids = [];
 					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 						foreach ( $offered_program_ids as $p_id ) {
-							$m_id = get_field( LTDH_META_MAJOR_REL, $p_id );
+							$m_id = get_post_meta( $p_id, 'major_relationship', true );
+							if ( is_array( $m_id ) ) {
+								$m_id = ! empty( $m_id ) ? $m_id[0] : 0;
+							}
+							$m_id = intval( $m_id );
 							if ( $m_id && ! in_array( $m_id, $distinct_major_ids ) ) {
 								$distinct_major_ids[] = $m_id;
 							}
@@ -276,10 +288,17 @@ $global_zalo = ltdh_get_zalo_url();
 							],
 							'fields'         => 'ids',
 						] );
-						foreach ( $linked_programs as $p_id ) {
-							$m_id = get_field( LTDH_META_MAJOR_REL, $p_id );
-							if ( $m_id && ! in_array( $m_id, $distinct_major_ids ) ) {
-								$distinct_major_ids[] = $m_id;
+						if ( ! empty( $linked_programs ) ) {
+							update_meta_cache( 'post', $linked_programs );
+							foreach ( $linked_programs as $p_id ) {
+								$m_id = get_post_meta( $p_id, 'major_relationship', true );
+								if ( is_array( $m_id ) ) {
+									$m_id = ! empty( $m_id ) ? $m_id[0] : 0;
+								}
+								$m_id = intval( $m_id );
+								if ( $m_id && ! in_array( $m_id, $distinct_major_ids ) ) {
+									$distinct_major_ids[] = $m_id;
+								}
 							}
 						}
 					}

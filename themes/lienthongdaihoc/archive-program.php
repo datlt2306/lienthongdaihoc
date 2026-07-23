@@ -141,27 +141,25 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 				</summary>
 				<div class="p-4 lg:p-0 pt-0 lg:pt-0 border-t lg:border-0 border-slate-100 space-y-6 sticky top-24">
 					<?php
-					// Pre-fetch program metadata to avoid N+1 queries in the loop
-					$all_sidebar_programs = get_posts( [
-						'post_type'      => 'program',
-						'post_status'    => 'publish',
-						'posts_per_page' => -1,
-						'fields'         => 'ids',
-					] );
+					global $wpdb;
+					$t_results = $wpdb->get_results( "
+						SELECT t.slug, COUNT(p.ID) as count
+						FROM {$wpdb->posts} p
+						INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+						INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+						INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+						WHERE p.post_type = 'program' AND p.post_status = 'publish' AND tt.taxonomy = 'training_type'
+						GROUP BY t.slug
+					" );
 
 					$t_counts = [];
-					$m_counts = [];
-
-					if ( ! empty( $all_sidebar_programs ) ) {
-						foreach ( $all_sidebar_programs as $p_id ) {
-							$t_terms = wp_get_post_terms( $p_id, 'training_type' );
-							if ( ! is_wp_error( $t_terms ) ) {
-								foreach ( $t_terms as $tt ) {
-									$t_counts[ $tt->slug ] = ( $t_counts[ $tt->slug ] ?? 0 ) + 1;
-								}
-							}
+					if ( ! is_wp_error( $t_results ) && ! empty( $t_results ) ) {
+						foreach ( $t_results as $row ) {
+							$t_counts[ $row->slug ] = intval( $row->count );
 						}
 					}
+
+					$m_counts = [];
 
 					// Pre-filter programs for current parameters
 					$major_filter_args = [
@@ -184,8 +182,14 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 					}
 					$filtered_sidebar_programs = get_posts( $major_filter_args );
 					if ( ! empty( $filtered_sidebar_programs ) ) {
+						// Prime meta cache to avoid N+1 queries in the loop
+						update_meta_cache( 'post', $filtered_sidebar_programs );
 						foreach ( $filtered_sidebar_programs as $p_id ) {
-							$major_rel = get_field( 'major_relationship', $p_id );
+							$major_rel = get_post_meta( $p_id, 'major_relationship', true );
+							if ( is_array( $major_rel ) ) {
+								$major_rel = ! empty( $major_rel ) ? $major_rel[0] : 0;
+							}
+							$major_rel = intval( $major_rel );
 							if ( $major_rel ) {
 								$m_counts[ $major_rel ] = ( $m_counts[ $major_rel ] ?? 0 ) + 1;
 							}

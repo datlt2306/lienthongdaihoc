@@ -21,7 +21,7 @@ function ltdh_add_cron_intervals( $schedules ) {
 	return $schedules;
 }
 
-add_action( 'wp', 'ltdh_schedule_crm_sync' );
+add_action( 'admin_init', 'ltdh_schedule_crm_sync' );
 function ltdh_schedule_crm_sync() {
 	if ( ! wp_next_scheduled( 'ltdh_cron_sync_leads' ) ) {
 		wp_schedule_event( time(), 'every_five_minutes', 'ltdh_cron_sync_leads' );

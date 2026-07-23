@@ -126,43 +126,7 @@ $messenger = ltdh_get_messenger_url();
 }
 </style>
 
-<script>
-	<?php
-	$combos_transient = 'ltdh_combinations_data';
-	$combos = get_transient( $combos_transient );
-	if ( false === $combos ) {
-		$combos_query = new WP_Query( [
-			'post_type'      => LTDH_CPT_PROGRAM,
-			'posts_per_page' => -1,
-			'post_status'    => 'publish',
-			'fields'         => 'ids',
-		] );
-		$combos = [];
-		if ( $combos_query->have_posts() ) {
-			foreach ( $combos_query->posts as $pid ) {
-				$s_rel = get_field( LTDH_META_SCHOOL_REL, $pid );
-				$m_rel = get_field( LTDH_META_MAJOR_REL, $pid );
 
-				$s_id = is_numeric( $s_rel ) ? intval( $s_rel ) : 0;
-				$m_id = is_numeric( $m_rel ) ? intval( $m_rel ) : 0;
-
-				$t_terms = wp_get_post_terms( $pid, LTDH_TAX_TRAINING_TYPE );
-				$t_slug  = ( ! is_wp_error( $t_terms ) && ! empty( $t_terms ) ) ? $t_terms[0]->slug : '';
-				if ( $s_id && $m_id ) {
-					$combos[] = [
-						'school' => (string) $s_id,
-						'major'  => (string) $m_id,
-						'type'   => (string) $t_slug,
-					];
-				}
-			}
-			wp_reset_postdata();
-		}
-		set_transient( $combos_transient, $combos, HOUR_IN_SECONDS );
-	}
-	?>
-	window.ltdh_combinations = <?php echo wp_json_encode( $combos ); ?>;
-</script>
 
 <?php wp_footer(); ?>
 </body>

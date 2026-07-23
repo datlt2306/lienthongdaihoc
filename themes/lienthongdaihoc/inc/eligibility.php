@@ -242,6 +242,25 @@ function ltdh_elig_run_check( $input ) {
 		$user_major_slug = get_post_field( 'post_name', $input['major_id'] );
 	}
 
+	$related_ids = [];
+	if ( $input['desired_major'] ) {
+		$rel_field = get_field( 'major_related', $input['desired_major'] );
+		if ( ! is_array( $rel_field ) ) {
+			$related_ids = $rel_field ? [ $rel_field ] : [];
+		} else {
+			$related_ids = $rel_field;
+		}
+	}
+	if ( $input['major_id'] ) {
+		$current_related = get_field( 'major_related', $input['major_id'] );
+		if ( is_array( $current_related ) ) {
+			$related_ids = array_merge( $related_ids, $current_related );
+		} elseif ( $current_related ) {
+			$related_ids[] = $current_related;
+		}
+	}
+	$related_ids = array_map( 'intval', array_unique( $related_ids ) );
+
 	// Step 1: Load candidate programs
 	$query_args = [
 		'post_type'      => LTDH_CPT_PROGRAM,
@@ -269,6 +288,12 @@ function ltdh_elig_run_check( $input ) {
 
 	$candidates = get_posts( $query_args );
 	$total_candidates = count( $candidates );
+
+	if ( ! empty( $candidates ) ) {
+		$candidate_ids = wp_list_pluck( $candidates, 'ID' );
+		update_meta_cache( 'post', $candidate_ids );
+		update_object_term_cache( $candidate_ids, 'program' );
+	}
 
 	// Step 2: Apply hard filters and score
 	$eligible = [];
@@ -363,20 +388,6 @@ function ltdh_elig_run_check( $input ) {
 				$score += $weights['major_match'];
 				$breakdown['major'] = [ 'score' => $weights['major_match'], 'label' => 'Ngành trùng khớp' ];
 			} else {
-				$related_ids = get_field( 'major_related', $input['desired_major'] );
-				if ( ! is_array( $related_ids ) ) {
-					$related_ids = $related_ids ? [ $related_ids ] : [];
-				}
-				if ( $input['major_id'] ) {
-					$current_related = get_field( 'major_related', $input['major_id'] );
-					if ( is_array( $current_related ) ) {
-						$related_ids = array_merge( $related_ids, $current_related );
-					} elseif ( $current_related ) {
-						$related_ids[] = $current_related;
-					}
-				}
-				$related_ids = array_map( 'intval', $related_ids );
-
 				if ( in_array( $prog_major_id, $related_ids, true ) ) {
 					$score += $weights['major_related'];
 					$breakdown['major'] = [ 'score' => $weights['major_related'], 'label' => 'Ngành liên quan' ];

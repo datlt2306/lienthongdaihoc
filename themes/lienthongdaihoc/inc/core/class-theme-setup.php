@@ -63,15 +63,24 @@ function ltdh_enqueue_assets() {
 		'compare_nonce' => wp_create_nonce( LTDH_NONCE_COMPARE ),
 	] );
 
-	wp_enqueue_script( 'ltdh-compare-js', get_template_directory_uri() . '/assets/js/compare.js', [], LTDH_VERSION, true );
+	if ( ltdh_compare_should_load() ) {
+		wp_enqueue_script( 'ltdh-compare-js', get_template_directory_uri() . '/assets/js/compare.js', [], LTDH_VERSION, true );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'ltdh_enqueue_assets' );
+
+/**
+ * Check if the current page should load program comparison logic.
+ */
+function ltdh_compare_should_load() {
+	return is_post_type_archive( 'program' ) || is_singular( 'program' ) || is_tax( 'training_type' ) || is_tax( 'major' ) || is_search() || is_page_template( 'template-search.php' );
+}
 
 /**
  * Output the floating compare tray on all frontend pages.
  */
 function ltdh_compare_output_tray() {
-	if ( is_admin() ) {
+	if ( is_admin() || ! ltdh_compare_should_load() ) {
 		return;
 	}
 	get_template_part( 'template-parts/compare/tray' );
@@ -121,25 +130,15 @@ function ltdh_override_favicon() {
 }
 add_action( 'after_setup_theme', 'ltdh_override_favicon' );
 
-function ltdh_favicon_ob_start() {
-	if ( is_admin() ) {
-		return;
-	}
-	ob_start( 'ltdh_favicon_replace' );
-}
-add_action( 'init', 'ltdh_favicon_ob_start' );
-
-function ltdh_favicon_replace( $html ) {
-	$html = preg_replace( '/<link[^>]*rel=["\'](?:shortcut )?icon["\'][^>]*>\s*/i', '', $html );
-
+function ltdh_output_custom_favicon() {
 	if ( function_exists( 'get_field' ) ) {
 		$favicon_url = get_field( 'global_favicon', 'option' );
 		if ( ! empty( $favicon_url ) ) {
-			$favicon_tag  = '<link rel="icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
-			$favicon_tag .= '<link rel="shortcut icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
-			$html = str_replace( '</head>', $favicon_tag . '</head>', $html );
+			echo '<link rel="icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
+			echo '<link rel="shortcut icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
 		}
 	}
-
-	return $html;
 }
+add_action( 'wp_head', 'ltdh_output_custom_favicon', 1 );
+add_action( 'admin_head', 'ltdh_output_custom_favicon', 1 );
+add_action( 'login_head', 'ltdh_output_custom_favicon', 1 );

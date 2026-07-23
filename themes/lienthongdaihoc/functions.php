@@ -22,6 +22,7 @@ require_once __DIR__ . '/inc/config/class-defaults.php';
 // ----------------------------------------------------
 require_once __DIR__ . '/inc/core/class-theme-setup.php';
 require_once __DIR__ . '/inc/core/class-helpers.php';
+require_once __DIR__ . '/inc/core/class-menus.php';
 require_once __DIR__ . '/inc/core/class-rewrite-rules.php';
 require_once __DIR__ . '/inc/core/class-query-filters.php';
 

@@ -13,11 +13,7 @@ if (! defined('ABSPATH')) {
 get_header();
 
 // Cache queries for schools
-$schools_query = ltdh_get_cached_query('ltdh_featured_schools', [
-	'post_type'      => 'school',
-	'posts_per_page' => 5,
-	'post_status'    => 'publish',
-], HOUR_IN_SECONDS);
+$featured_schools = ltdh_get_cached_featured_schools();
 
 $news_query = ltdh_get_cached_query('ltdh_homepage_news', [
 	'post_type'      => 'post',
@@ -273,47 +269,16 @@ $zalo    = ltdh_get_zalo_url();
 
 			<div class="flex lg:grid overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory lg:snap-none gap-4 pb-4 lg:pb-0 no-scrollbar lg:grid-cols-5">
 				<?php
-				if ($schools_query->have_posts()) {
-					$index = 0;
-					$fallback_images = ltdh_default('images', 'fallback_school_covers', []);
-					while ($schools_query->have_posts()) : $schools_query->the_post();
-						$school_id = get_the_ID();
-						$address = get_field('address', $school_id);
-						$hotline = get_field('hotline', $school_id) ?: get_field('global_hotline', 'options');
-						$thumb_url = get_the_post_thumbnail_url($school_id, 'medium') ?: ($fallback_images[$index % 5] ?? ltdh_get_fallback_image('school'));
-						$logo_id = get_field('logo', $school_id);
-						$en_name = get_post_meta($school_id, 'english_name', true) ?: 'University';
-
-						$school_progs = get_posts([
-							'post_type' => 'program',
-							'numberposts' => -1,
-							'meta_query' => [
-								[
-									'key' => LTDH_META_SCHOOL_REL,
-									'value' => $school_id,
-									'compare' => '='
-								]
-							]
-						]);
-
-						$systems = [];
-						foreach ($school_progs as $sp) {
-							$terms = wp_get_post_terms($sp->ID, LTDH_TAX_TRAINING_TYPE);
-							if (! is_wp_error($terms)) {
-								foreach ($terms as $t) {
-									$systems[$t->slug] = $t->name;
-								}
-							}
-						}
-						$systems_label = '';
-						if (! empty($systems)) {
-							if (count($systems) === 1 && isset($systems['tu-xa'])) {
-								$systems_label = '';
-							} else {
-								$systems_label = implode(' · ', $systems);
-							}
-						}
-						$prog_count = count($school_progs);
+				if ( ! empty( $featured_schools ) ) {
+					foreach ( $featured_schools as $school ) :
+						$school_id = $school['id'];
+						$address = $school['address'];
+						$hotline = $school['hotline'];
+						$thumb_url = $school['thumb_url'];
+						$logo_id = $school['logo_id'];
+						$en_name = $school['en_name'];
+						$systems_label = $school['systems_label'];
+						$prog_count = $school['prog_count'];
 				?>
 						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[45vw] sm:w-[250px] lg:w-auto snap-center">
 							<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url($thumb_url); ?>');"></div>
@@ -327,24 +292,22 @@ $zalo    = ltdh_get_zalo_url();
 
 							<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
 								<div class="text-center">
-									<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
+									<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php echo esc_html($school['title']); ?></h4>
 									<p class="text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html($en_name); ?></p>
 									<div class="mt-3 space-y-1 text-center text-[10px] md:text-xs">
-										<?php if (! empty($systems_label)) : ?>
+										<?php if ( ! empty($systems_label) ) : ?>
 											<span class="font-bold text-brand-primary bg-blue-50 px-2.5 py-1 rounded-full inline-block leading-none mb-1.5"><?php echo esc_html($systems_label); ?></span>
 										<?php endif; ?>
 										<p class="text-slate-500 font-semibold">📊 <?php echo esc_html($prog_count); ?> ngành tuyển sinh</p>
 									</div>
 								</div>
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-brand-accent hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-brand-primary">Tìm hiểu thêm</a>
+									<a href="<?php echo esc_url($school['permalink']); ?>" class="w-full text-center bg-slate-50 hover:bg-brand-accent hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-brand-primary">Tìm hiểu thêm</a>
 								</div>
 							</div>
 						</div>
 				<?php
-						$index++;
-					endwhile;
-					wp_reset_postdata();
+					endforeach;
 				} else {
 					echo '<div class="col-span-5 text-center text-slate-500 py-6">Chưa có trường liên kết nào được gieo dữ liệu.</div>';
 				}
