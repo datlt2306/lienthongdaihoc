@@ -199,7 +199,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 
 					<!-- Search Box -->
 					<div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
-						<form action="<?php echo esc_url( $selected_type ? home_url( '/he-dao-tao/' . $selected_type . '/' ) : home_url( '/chuong-trinh/' ) ); ?>" method="GET">
+						<form action="<?php echo esc_url( $selected_type ? home_url( '/he-dao-tao/' . $selected_type . '/' ) : home_url( '/he-dao-tao/tu-xa/' ) ); ?>" method="GET">
 							<input type="text" name="s" value="<?php echo esc_attr( $selected_search ); ?>" placeholder="Tìm kiếm chương trình..." class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 min-h-[44px]">
 						</form>
 					</div>
@@ -293,7 +293,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 						</p>
 					</div>
 					<?php if ( $selected_type || $selected_nhom || $selected_school || $selected_search ) : ?>
-						<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="text-xs font-bold text-brand-primary hover:underline shrink-0">✕ Xóa tất cả bộ lọc</a>
+						<a href="<?php echo esc_url( $selected_type ? home_url( '/he-dao-tao/' . $selected_type . '/' ) : home_url( '/he-dao-tao/tu-xa/' ) ); ?>" class="text-xs font-bold text-brand-primary hover:underline shrink-0">✕ Xóa tất cả bộ lọc</a>
 					<?php endif; ?>
 				</div>
 
@@ -316,10 +316,9 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 							$type_name  = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->name : '';
 							$type_slug  = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->slug : '';
 
-							// Only show badge if NOT already filtered by this type
 							$show_type_badge = ! empty( $type_name ) && ( empty( $selected_type ) || $selected_type !== $type_slug );
 					?>
-							<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+							<div class="bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between p-4"
 								 data-compare-btn
 								 data-compare-type="program"
 								 data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
@@ -327,47 +326,57 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 								 data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
 								 data-compare-thumb="<?php echo esc_url( $thumb ); ?>">
 
-								<!-- Thumbnail with optional badge -->
-								<div class="relative h-28 md:h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb ); ?>');">
-									<?php if ( $show_type_badge ) : ?>
-										<span class="absolute top-2 left-2 bg-brand-accent text-white text-[9px] md:text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wide shadow">
-											<?php echo esc_html( $type_name ); ?>
-										</span>
-									<?php endif; ?>
-								</div>
-
-								<!-- Card Body -->
-								<div class="p-3 md:p-5 flex-1 flex flex-col justify-between">
-									<div>
-										<span class="text-[10px] md:text-xs text-slate-400 font-semibold uppercase block mb-0.5 md:mb-1 truncate"><?php echo esc_html( $school_name ); ?></span>
-										<h3 class="font-extrabold text-slate-800 text-xs md:text-base hover:text-brand-primary mb-2 md:mb-3 leading-snug line-clamp-2 min-h-[32px] md:min-h-[48px]">
-											<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-										</h3>
-
-										<?php
-										$learning_details = ltdh_get_program_learning_details( $prog_id );
-										?>
-										<div class="space-y-0.5 md:space-y-1 text-[11px] md:text-sm text-slate-500 py-2 md:py-3 border-t border-slate-100">
-											<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ' ); ?></span></p>
-											<p class="hidden sm:block">Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
-											<p>Hình thức: <span class="font-bold text-slate-700 text-[10px] md:text-xs"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
+								<div>
+									<!-- Top Header: Logo & System Badge -->
+									<div class="flex items-center justify-between gap-2 mb-3">
+										<div class="w-10 h-10 bg-white border border-slate-100 rounded-lg flex items-center justify-center p-1 shrink-0 shadow-xs">
+											<?php 
+											$school_logo_id = $school_rel_id ? get_field( 'logo', $school_rel_id ) : null;
+											if ( $school_logo_id ) : 
+											?>
+												<?php echo wp_get_attachment_image( $school_logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
+											<?php else : ?>
+												<span class="font-display font-extrabold text-brand-primary text-xs">UNI</span>
+											<?php endif; ?>
 										</div>
+										<?php if ( $show_type_badge ) : ?>
+											<span class="bg-blue-50 text-brand-primary text-[9px] md:text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wide">
+												Hệ <?php echo esc_html( $type_name ); ?>
+											</span>
+										<?php endif; ?>
 									</div>
 
-									<div class="mt-3 pt-2 md:mt-4 md:pt-3 border-t border-slate-100 flex items-center justify-between">
-										<div class="flex items-center gap-1.5 w-full">
-											<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-[10px] md:text-xs font-bold py-2.5 rounded-lg hover:bg-brand-darkBlue transition-all min-h-[44px] flex items-center justify-center shadow-sm flex-1">Tìm hiểu</a>
-											<button type="button"
-													class="ltdh-compare-toggle text-[10px] md:text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg py-2.5 transition-all min-h-[44px] flex items-center justify-center flex-1"
-													data-compare-type="program"
-													data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
-													data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
-													data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
-													data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
-													data-compare-nganh="<?php echo esc_attr( $major_rel_id ); ?>">
-												So sánh
-											</button>
-										</div>
+									<!-- Title Info -->
+									<div>
+										<h3 class="font-extrabold text-slate-950 text-sm md:text-base hover:text-brand-primary mb-1 leading-snug line-clamp-2 min-h-[40px]">
+											<a href="<?php the_permalink(); ?>"><?php echo esc_html( $school_name ); ?></a>
+										</h3>
+										<span class="text-[11px] text-slate-500 font-semibold bg-slate-50 px-1.5 py-0.5 rounded inline-block mb-3 border border-slate-200/50"><?php the_title(); ?></span>
+									</div>
+
+									<?php
+									$learning_details = ltdh_get_program_learning_details( $prog_id );
+									?>
+									<div class="space-y-0.5 md:space-y-1 text-[11px] md:text-sm text-slate-500 py-2 md:py-3 border-t border-slate-100">
+										<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ' ); ?></span></p>
+										<p class="hidden sm:block">Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
+										<p>Hình thức: <span class="font-bold text-slate-700 text-[10px] md:text-xs"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
+									</div>
+								</div>
+
+								<div class="mt-3 pt-2 md:mt-4 md:pt-3 border-t border-slate-100 flex items-center justify-between">
+									<div class="flex items-center gap-1.5 w-full">
+										<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-[10px] md:text-xs font-bold py-2.5 rounded-lg hover:bg-brand-darkBlue transition-all min-h-[44px] flex items-center justify-center shadow-sm flex-1">Tìm hiểu</a>
+										<button type="button"
+												class="ltdh-compare-toggle text-[10px] md:text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg py-2.5 transition-all min-h-[44px] flex items-center justify-center flex-1"
+												data-compare-type="program"
+												data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
+												data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
+												data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
+												data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
+												data-compare-nganh="<?php echo esc_attr( $major_rel_id ); ?>">
+											So sánh
+										</button>
 									</div>
 								</div>
 							</div>
@@ -376,12 +385,12 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 						wp_reset_postdata();
 					else :
 					?>
-						<div class="col-span-3 text-center py-16 bg-white border border-slate-200 rounded-xl p-8 shadow-xs">
+						<div class="col-span-3 text-center py-16 bg-white border border-slate-200 rounded-xl p-8 shadow-xs w-full">
 							<span class="text-5xl block mb-4">🔍</span>
 							<h3 class="font-extrabold text-slate-800 text-lg mb-2">Không tìm thấy chương trình phù hợp</h3>
 							<p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Hệ học này hiện chưa có chương trình hoặc không khớp với các bộ lọc khác. Hãy thử chọn hệ học khác hoặc đặt lại bộ lọc.</p>
 							<div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-								<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="bg-brand-primary text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-brand-darkBlue shadow-md min-h-[44px] flex items-center justify-center">✕ Đặt lại bộ lọc</a>
+								<a href="<?php echo esc_url( $selected_type ? home_url( '/he-dao-tao/' . $selected_type . '/' ) : home_url( '/he-dao-tao/tu-xa/' ) ); ?>" class="bg-brand-primary text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-brand-darkBlue shadow-md min-h-[44px] flex items-center justify-center">✕ Đặt lại bộ lọc</a>
 								<a href="<?php echo esc_url( home_url( '/he-dao-tao/lien-thong/' ) ); ?>" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-bold text-sm transition-all min-h-[44px] flex items-center justify-center">Xem hệ Liên thông</a>
 							</div>
 						</div>

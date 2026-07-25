@@ -1,86 +1,109 @@
 /**
- * Eligibility Checker — Styles
+ * Eligibility Checker — Premium Styles
  *
  * @package lienthongdaihoc
  */
 
 /* ----------------------------------------------------
-   Progress Bar
+   Core UI Variables
    ---------------------------------------------------- */
-.elig-progress {
-	margin-bottom: 2rem;
-	text-align: center;
-}
-.elig-progress-bar {
-	height: 6px;
-	background: #e2e8f0;
-	border-radius: 999px;
-	overflow: hidden;
-	margin-bottom: 0.5rem;
-}
-.elig-progress-fill {
-	height: 100%;
-	background: linear-gradient(90deg, #1E3A8A, #3B82F6);
-	border-radius: 999px;
-	transition: width 0.4s ease;
-}
-.elig-progress-text {
-	font-size: 0.875rem;
-	color: #64748b;
-	font-weight: 600;
+:root {
+	--brand-blue: #0E2038;
+	--brand-sky: #3B82F6;
+	--brand-accent: #D97706;
+	--emerald-600: #059669;
+	--amber-600: #D97706;
+	--rose-600: #E11D48;
+	--slate-800: #1E293B;
+	--slate-600: #475569;
+	--slate-400: #94A3B8;
+	--slate-100: #F1F5F9;
+	--radius-lg: 1rem;
+	--radius-md: 0.75rem;
 }
 
 /* ----------------------------------------------------
-   Steps
+   Progress Bar
+   ---------------------------------------------------- */
+.elig-progress {
+	margin-bottom: 2.5rem;
+	text-align: center;
+}
+.elig-progress-bar {
+	height: 8px;
+	background: #E2E8F0;
+	border-radius: 999px;
+	overflow: hidden;
+	margin-bottom: 0.75rem;
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.elig-progress-fill {
+	height: 100%;
+	background: linear-gradient(90deg, #0e2038, #3b82f6);
+	border-radius: 999px;
+	transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.elig-progress-text {
+	font-size: 0.85rem;
+	color: var(--slate-600);
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+
+/* ----------------------------------------------------
+   Steps & Typography
    ---------------------------------------------------- */
 .elig-steps {
-	min-height: 320px;
+	min-height: 180px;
 }
 .elig-step {
 	display: none;
-	animation: eligFadeIn 0.3s ease;
+	animation: eligSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .elig-step.active {
 	display: block;
 }
-@keyframes eligFadeIn {
-	from { opacity: 0; transform: translateY(10px); }
+@keyframes eligSlideUp {
+	from { opacity: 0; transform: translateY(16px); }
 	to { opacity: 1; transform: translateY(0); }
 }
 .elig-step-title {
-	font-size: 1.5rem;
-	font-weight: 800;
-	color: #0f172a;
-	margin-bottom: 0.25rem;
+	font-size: 1.65rem;
+	font-weight: 900;
+	color: var(--slate-800);
+	margin-bottom: 0.5rem;
+	letter-spacing: -0.02em;
 }
 .elig-step-desc {
-	color: #64748b;
-	margin-bottom: 1.5rem;
+	color: var(--slate-600);
+	margin-bottom: 2rem;
+	font-size: 0.95rem;
 }
 .elig-step-hint {
-	color: #94a3b8;
-	font-size: 0.875rem;
-	margin-top: 0.75rem;
+	color: var(--slate-400);
+	font-size: 0.85rem;
+	margin-top: 1rem;
+	text-align: center;
 }
 
 /* ----------------------------------------------------
-   Option Cards
+   Premium Option Cards
    ---------------------------------------------------- */
 .elig-options {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 0.75rem;
+	gap: 1rem;
 }
 @media (min-width: 640px) {
 	.elig-options {
 		grid-template-columns: repeat(2, 1fr);
 	}
 }
-.elig-options-grid {
-	/* Same as above but used for explicit grid items */
-}
 .elig-option {
 	cursor: pointer;
+	position: relative;
+	user-select: none;
 }
 .elig-option input[type="radio"] {
 	position: absolute;
@@ -91,81 +114,74 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 0.25rem;
-	padding: 1.25rem 1rem;
-	border: 2px solid #e2e8f0;
-	border-radius: 1rem;
-	background: #fff;
-	transition: all 0.2s ease;
+	gap: 0.5rem;
+	padding: 1.5rem 1.25rem;
+	border: 2px solid #E2E8F0;
+	border-radius: var(--radius-lg);
+	background: #FFFFFF;
+	transition: all 0.25s ease;
 	text-align: center;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 .elig-option-box:hover {
-	border-color: #1E3A8A;
-	background: #EFF6FF;
+	border-color: var(--brand-sky);
+	background: #F8FAFC;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
 }
 .elig-option input:checked + .elig-option-box {
-	border-color: #1E3A8A;
+	border-color: var(--brand-sky);
 	background: #EFF6FF;
-	box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
 .elig-option-icon {
-	font-size: 1.75rem;
+	font-size: 2.25rem;
 	line-height: 1;
+	margin-bottom: 0.25rem;
 }
 .elig-option-text {
-	font-weight: 700;
-	color: #0f172a;
-	font-size: 0.9375rem;
+	font-weight: 800;
+	color: var(--slate-800);
+	font-size: 1rem;
 }
 .elig-option-sub {
-	font-size: 0.875rem;
-	color: #94a3b8;
+	font-size: 0.85rem;
+	color: var(--slate-600);
 }
 
 /* ----------------------------------------------------
-   Search Dropdown
+   Search Select Autocomplete
    ---------------------------------------------------- */
-.elig-search-wrap {
+.elig-search-select-container {
 	position: relative;
 }
 .elig-search-input {
 	width: 100%;
-	padding: 0.875rem 1rem;
-	border: 2px solid #e2e8f0;
-	border-radius: 0.75rem;
+	padding: 0.75rem 1rem;
+	border: 2px solid #E2E8F0;
+	border-radius: var(--radius-md);
 	font-size: 1rem;
-	background: #fff;
-	transition: border-color 0.2s;
+	background: #FFFFFF;
+	transition: all 0.2s ease;
 }
 .elig-search-input:focus {
 	outline: none;
-	border-color: #1E3A8A;
-	box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+	border-color: var(--brand-sky);
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
-.elig-dropdown {
-	display: none;
-	position: absolute;
-	top: 100%;
-	left: 0;
-	right: 0;
-	max-height: 240px;
-	overflow-y: auto;
-	background: #fff;
-	border: 1px solid #e2e8f0;
-	border-radius: 0 0 0.75rem 0.75rem;
-	box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-	z-index: 50;
+.elig-search-dropdown {
+	background: #FFFFFF;
+	border: 1px solid #E2E8F0;
+	border-radius: var(--radius-md);
+	box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+	z-index: 100;
 }
-.elig-dropdown-item {
-	padding: 0.625rem 1rem;
-	cursor: pointer;
-	font-size: 0.9375rem;
-	color: #334155;
-	transition: background 0.15s;
+.elig-search-option-item {
+	transition: background 0.15s ease, color 0.15s ease;
 }
-.elig-dropdown-item:hover {
+.elig-search-option-item:hover {
 	background: #EFF6FF;
-	color: #1E3A8A;
+	color: var(--brand-sky) !important;
 }
 
 /* ----------------------------------------------------
@@ -174,19 +190,19 @@
 .elig-select,
 .elig-input {
 	width: 100%;
-	padding: 0.875rem 1rem;
-	border: 2px solid #e2e8f0;
-	border-radius: 0.75rem;
+	padding: 0.75rem 1rem;
+	border: 2px solid #E2E8F0;
+	border-radius: var(--radius-md);
 	font-size: 1rem;
-	background: #fff;
-	transition: border-color 0.2s;
+	background: #FFFFFF;
+	transition: all 0.2s ease;
 	box-sizing: border-box;
 }
 .elig-select:focus,
 .elig-input:focus {
 	outline: none;
-	border-color: #1E3A8A;
-	box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+	border-color: var(--brand-sky);
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
 
 /* ----------------------------------------------------
@@ -196,95 +212,102 @@
 	display: flex;
 	justify-content: space-between;
 	gap: 1rem;
-	margin-top: 2rem;
-	padding-top: 1.5rem;
-	border-top: 1px solid #e2e8f0;
+	margin-top: 2.5rem;
+	padding-top: 1.75rem;
+	border-top: 1px solid #E2E8F0;
 }
 .elig-btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	padding: 0.75rem 1.5rem;
-	border-radius: 0.75rem;
-	font-weight: 700;
-	font-size: 0.9375rem;
+	padding: 0.85rem 1.75rem;
+	border-radius: var(--radius-md);
+	font-weight: 800;
+	font-size: 0.95rem;
 	cursor: pointer;
 	border: 2px solid transparent;
-	transition: all 0.2s;
+	transition: all 0.2s ease;
 }
 .elig-btn-primary {
-	background: #D97706;
-	color: #fff;
-	border-color: #D97706;
+	background: var(--brand-accent);
+	color: #FFFFFF;
+	border-color: var(--brand-accent);
+	box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
 }
 .elig-btn-primary:hover {
 	background: #B45309;
 	border-color: #B45309;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
 }
 .elig-btn-secondary {
-	background: #fff;
-	color: #475569;
-	border-color: #e2e8f0;
+	background: #FFFFFF;
+	color: var(--slate-600);
+	border-color: #E2E8F0;
 }
 .elig-btn-secondary:hover {
-	border-color: #cbd5e1;
-	background: #f8fafc;
+	border-color: #CBD5E1;
+	background: #F8FAFC;
 }
 .elig-btn-sm {
-	padding: 0.5rem 1rem;
-	font-size: 0.875rem;
-	border-radius: 0.5rem;
+	padding: 0.6rem 1.25rem;
+	font-size: 0.85rem;
+	border-radius: var(--radius-md);
 }
 .elig-btn-full {
 	width: 100%;
 }
 .elig-btn:disabled {
-	opacity: 0.6;
+	opacity: 0.5;
 	cursor: not-allowed;
+	transform: none !important;
+	box-shadow: none !important;
 }
 .elig-link-btn {
 	background: none;
 	border: none;
-	color: #1E3A8A;
-	font-weight: 600;
+	color: var(--brand-sky);
+	font-weight: 700;
 	cursor: pointer;
 	text-decoration: underline;
-	font-size: 0.875rem;
+	font-size: 0.85rem;
 	padding: 0;
 }
 .elig-link-btn:hover {
-	color: #1D4ED8;
+	color: #2563EB;
 }
 
 /* ----------------------------------------------------
-   Results
+   Results Template Elements
    ---------------------------------------------------- */
 .elig-results-header {
 	text-align: center;
-	margin-bottom: 2rem;
+	margin-bottom: 2.5rem;
 }
 .elig-results-icon {
-	font-size: 3rem;
+	font-size: 3.5rem;
 	line-height: 1;
-	margin-bottom: 0.5rem;
+	margin-bottom: 0.75rem;
 }
 .elig-results-title {
-	font-size: 1.75rem;
-	font-weight: 800;
-	color: #0f172a;
+	font-size: 2rem;
+	font-weight: 900;
+	color: var(--slate-800);
+	letter-spacing: -0.02em;
 }
 .elig-results-subtitle {
-	color: #64748b;
-	margin-top: 0.25rem;
+	color: var(--slate-600);
+	margin-top: 0.5rem;
+	font-size: 1.05rem;
 }
 
 /* Input Summary */
 .elig-input-summary {
-	background: #f8fafc;
-	border: 1px solid #e2e8f0;
-	border-radius: 1rem;
-	padding: 1rem 1.25rem;
-	margin-bottom: 1.5rem;
+	background: #F8FAFC;
+	border: 1px solid #E2E8F0;
+	border-radius: var(--radius-lg);
+	padding: 1.25rem;
+	margin-bottom: 2rem;
 }
 .elig-summary-row {
 	display: flex;
@@ -293,142 +316,95 @@
 	flex-wrap: wrap;
 }
 .elig-summary-label {
-	font-weight: 600;
-	color: #475569;
-	font-size: 0.875rem;
-	white-space: nowrap;
+	font-weight: 700;
+	color: var(--slate-600);
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
 }
 .elig-summary-tags {
 	display: flex;
-	gap: 0.375rem;
+	gap: 0.5rem;
 	flex-wrap: wrap;
 	flex: 1;
 }
 .elig-tag {
 	display: inline-block;
-	padding: 0.25rem 0.625rem;
+	padding: 0.35rem 0.75rem;
 	background: #EFF6FF;
-	color: #1E3A8A;
+	color: var(--brand-sky);
 	border: 1px solid #DBEAFE;
 	border-radius: 999px;
-	font-size: 0.875rem;
-	font-weight: 600;
+	font-size: 0.85rem;
+	font-weight: 700;
 }
 
 /* ----------------------------------------------------
-   Program Cards
+   Program Matching Cards Design
    ---------------------------------------------------- */
 .elig-program-list {
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
+	gap: 1.5rem;
 }
 .elig-card {
-	background: #fff;
-	border: 1px solid #e2e8f0;
-	border-radius: 1rem;
+	background: #FFFFFF;
+	border: 1px solid #E2E8F0;
+	border-radius: var(--radius-lg);
 	overflow: hidden;
-	transition: box-shadow 0.2s;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
 }
 .elig-card:hover {
-	box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+	transform: translateY(-3px);
+	box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05), 0 8px 8px -6px rgba(0, 0, 0, 0.05);
+	border-color: #CBD5E1;
 }
 .elig-card-header {
-	display: flex;
-	align-items: center;
-	gap: 1rem;
-	padding: 1rem 1.25rem;
-	border-bottom: 1px solid #f1f5f9;
+	padding: 1.25rem;
 }
 .elig-card-rank {
-	font-size: 0.875rem;
-	font-weight: 800;
-	color: #94a3b8;
+	font-size: 0.95rem;
+	font-weight: 900;
+	color: var(--slate-400);
 }
-.elig-card-score {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	margin-left: auto;
-}
-.elig-score-num {
-	font-size: 1.25rem;
-	font-weight: 800;
-}
-.elig-score-label {
-	font-size: 0.875rem;
-	font-weight: 600;
-}
-.elig-card-score.perfect .elig-score-num { color: #059669; }
-.elig-card-score.perfect .elig-score-label { color: #059669; }
-.elig-card-score.very-good .elig-score-num { color: #1E3A8A; }
-.elig-card-score.very-good .elig-score-label { color: #1E3A8A; }
-.elig-card-score.possible .elig-score-num { color: #d97706; }
-.elig-card-score.possible .elig-score-label { color: #d97706; }
-.elig-card-score.not-match .elig-score-num { color: #dc2626; }
-.elig-card-score.not-match .elig-score-label { color: #dc2626; }
-
 .elig-card-body {
-	padding: 1.25rem;
+	padding: 1.5rem;
 }
 .elig-card-school {
 	display: flex;
 	align-items: center;
-	gap: 0.5rem;
-	margin-bottom: 0.5rem;
-	font-size: 0.875rem;
-	color: #64748b;
-	font-weight: 500;
+	gap: 0.6rem;
+	margin-bottom: 0.75rem;
+	font-size: 0.85rem;
+	color: var(--slate-600);
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
 }
 .elig-card-school-logo {
-	width: 24px;
-	height: 24px;
-	border-radius: 6px;
+	width: 28px;
+	height: 28px;
+	border-radius: 8px;
 	object-fit: cover;
-	border: 1px solid #e2e8f0;
+	border: 1px solid #E2E8F0;
 }
-.elig-card-title {
-	font-size: 1.125rem;
-	font-weight: 700;
-	margin: 0 0 0.75rem;
+
+/* Compatibility Status Styling */
+.elig-status-compatible .elig-score-label {
+	background: #ECFDF5;
+	color: var(--emerald-600);
+	border: 1px solid #A7F3D0;
 }
-.elig-card-title a {
-	color: #0f172a;
-	text-decoration: none;
+.elig-status-verification .elig-score-label {
+	background: #FFFBEB;
+	color: var(--amber-600);
+	border: 1px solid #FDE68A;
 }
-.elig-card-title a:hover {
-	color: #1E3A8A;
-}
-.elig-card-meta {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem 1rem;
-	margin-bottom: 0.75rem;
-}
-.elig-meta-item {
-	font-size: 0.875rem;
-	color: #475569;
-}
-.elig-card-badges {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.375rem;
-	margin-bottom: 1rem;
-}
-.elig-badge {
-	display: inline-block;
-	padding: 0.25rem 0.5rem;
-	border-radius: 0.375rem;
-	font-size: 0.875rem;
-	font-weight: 600;
-}
-.elig-badge-pass {
-	background: #f0fdf4;
-	color: #16a34a;
-}
-.elig-card-actions {
-	display: flex;
-	gap: 0.5rem;
+.elig-status-incompatible .elig-score-label {
+	background: #FFF1F2;
+	color: var(--rose-600);
+	border: 1px solid #FECDD3;
 }
 
 /* ----------------------------------------------------
@@ -436,127 +412,130 @@
    ---------------------------------------------------- */
 .elig-no-results {
 	text-align: center;
-	padding: 3rem 1rem;
+	padding: 4rem 1.5rem;
+	background: #F8FAFC;
+	border-radius: var(--radius-lg);
+	border: 2px dashed #E2E8F0;
 }
 .elig-no-results-icon {
-	font-size: 3rem;
-	margin-bottom: 1rem;
+	font-size: 3.5rem;
+	margin-bottom: 1.25rem;
 }
 .elig-no-results h3 {
-	font-size: 1.25rem;
-	font-weight: 700;
-	color: #0f172a;
+	font-size: 1.4rem;
+	font-weight: 800;
+	color: var(--slate-800);
 }
 .elig-no-results p {
-	color: #64748b;
-	margin: 0.5rem 0 1.5rem;
-}
-.elig-no-results-actions {
-	display: flex;
-	gap: 1rem;
-	justify-content: center;
-	flex-wrap: wrap;
+	color: var(--slate-600);
+	margin: 0.75rem 0 2rem;
 }
 
 /* ----------------------------------------------------
-   Alternatives
+   Alternatives Section
    ---------------------------------------------------- */
 .elig-alternatives {
-	margin-top: 2rem;
-	padding: 1.5rem;
-	background: #fffbeb;
-	border: 1px solid #fde68a;
-	border-radius: 1rem;
+	margin-top: 2.5rem;
+	padding: 1.75rem;
+	background: #FFFBEB;
+	border: 1px solid #FDE68A;
+	border-radius: var(--radius-lg);
 }
 .elig-alternatives h3 {
-	font-size: 1rem;
-	font-weight: 700;
-	color: #92400e;
-	margin-bottom: 1rem;
+	font-size: 1.1rem;
+	font-weight: 800;
+	color: #92400E;
+	margin-bottom: 1.25rem;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
 }
 .elig-alt-item {
 	display: flex;
 	flex-direction: column;
-	padding: 0.75rem 0;
-	border-bottom: 1px solid #fde68a;
+	padding: 1rem 0;
+	border-bottom: 1px solid #FDE68A;
 }
 .elig-alt-item:last-child { border-bottom: none; }
 .elig-alt-title {
-	font-weight: 600;
-	color: #78350f;
+	font-weight: 800;
+	color: #78350F;
+	font-size: 1rem;
 }
 .elig-alt-reason {
-	font-size: 0.875rem;
-	color: #92400e;
+	font-size: 0.9rem;
+	color: #92400E;
+	margin-top: 0.25rem;
 }
 
 /* ----------------------------------------------------
-   Documents
+   Documents Needed Card
    ---------------------------------------------------- */
 .elig-documents {
-	margin-top: 2rem;
-	padding: 1.5rem;
-	background: #f8fafc;
-	border: 1px solid #e2e8f0;
-	border-radius: 1rem;
+	margin-top: 2.5rem;
+	padding: 1.75rem;
+	background: #F8FAFC;
+	border: 1px solid #E2E8F0;
+	border-radius: var(--radius-lg);
 }
 .elig-documents h3 {
-	font-size: 1rem;
-	font-weight: 700;
-	color: #0f172a;
-	margin-bottom: 1rem;
+	font-size: 1.1rem;
+	font-weight: 800;
+	color: var(--slate-800);
+	margin-bottom: 1.25rem;
 }
 .elig-documents ul {
 	margin: 0;
-	padding-left: 1.25rem;
+	padding-left: 1.5rem;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.5rem;
+}
+@media (min-width: 640px) {
+	.elig-documents ul {
+		grid-template-columns: repeat(2, 1fr);
+	}
 }
 .elig-documents li {
-	margin-bottom: 0.5rem;
-	color: #475569;
+	color: var(--slate-600);
+	font-size: 0.95rem;
 }
 
 /* ----------------------------------------------------
-   Lead Form
+   Lead capture form
    ---------------------------------------------------- */
 .elig-lead-form {
-	margin-top: 2rem;
-	padding: 1.5rem;
-	background: #fff;
-	border: 2px solid #1E3A8A;
-	border-radius: 1rem;
+	margin-top: 2.5rem;
+	padding: 2rem;
+	background: #FFFFFF;
+	border: 2px solid var(--brand-blue);
+	border-radius: var(--radius-lg);
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 .elig-lead-form h3 {
-	font-size: 1.125rem;
-	font-weight: 700;
-	color: #0f172a;
-	margin-bottom: 0.25rem;
+	font-size: 1.3rem;
+	font-weight: 800;
+	color: var(--brand-blue);
+	margin-bottom: 0.5rem;
 }
 .elig-lead-form > p {
-	color: #64748b;
-	font-size: 0.875rem;
-	margin-bottom: 1.25rem;
+	color: var(--slate-600);
+	font-size: 0.9rem;
+	margin-bottom: 1.5rem;
 }
 .elig-form-row {
-	margin-bottom: 0.75rem;
-}
-.elig-lead-success {
-	text-align: center;
-	padding: 2rem;
-	color: #059669;
-	font-weight: 600;
-	font-size: 1.125rem;
+	margin-bottom: 1rem;
 }
 
 /* ----------------------------------------------------
-   CTA Bar
+   CTA Bar & Channels
    ---------------------------------------------------- */
 .elig-cta-bar {
-	margin-top: 2rem;
+	margin-top: 2.5rem;
 }
 .elig-cta-channels {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	gap: 0.75rem;
+	gap: 1rem;
 }
 @media (min-width: 640px) {
 	.elig-cta-channels {
@@ -567,39 +546,64 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 0.25rem;
-	padding: 1.25rem 1rem;
-	border-radius: 1rem;
+	gap: 0.35rem;
+	padding: 1.5rem 1rem;
+	border-radius: var(--radius-lg);
 	text-decoration: none;
 	text-align: center;
-	transition: all 0.2s;
+	transition: all 0.2s ease;
 	border: 1px solid transparent;
 }
+.elig-cta-card:hover {
+	transform: translateY(-2px);
+}
 .elig-cta-phone {
-	background: #f0fdf4;
-	border-color: #bbf7d0;
+	background: #F0FDF4;
+	border-color: #BBF7D0;
 }
-.elig-cta-phone:hover { background: #dcfce7; }
+.elig-cta-phone:hover {
+	background: #DCFCE7;
+	box-shadow: 0 4px 12px rgba(34, 197, 94, 0.12);
+}
 .elig-cta-zalo {
-	background: #eff6ff;
-	border-color: #bfdbfe;
+	background: #EFF6FF;
+	border-color: #BFDBFE;
 }
-.elig-cta-zalo:hover { background: #dbeafe; }
+.elig-cta-zalo:hover {
+	background: #DBEAFE;
+	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+}
 .elig-cta-form {
-	background: #f0fdfa;
-	border-color: #ccfbf1;
+	background: #F0FDFA;
+	border-color: #CCFBF1;
 }
-.elig-cta-form:hover { background: #ccfbf1; }
-.elig-cta-icon { font-size: 1.5rem; }
+.elig-cta-form:hover {
+	background: #CCFBF1;
+	box-shadow: 0 4px 12px rgba(20, 184, 166, 0.12);
+}
+.elig-cta-icon { font-size: 1.75rem; }
 .elig-cta-label {
-	font-size: 0.875rem;
-	color: #64748b;
-	font-weight: 500;
+	font-size: 0.85rem;
+	color: var(--slate-600);
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
 }
 .elig-cta-value {
-	font-size: 0.875rem;
-	font-weight: 700;
-	color: #0f172a;
+	font-size: 0.95rem;
+	font-weight: 800;
+	color: var(--slate-800);
 }
 
+/* Helper hidden class scoped to fix specificity issues without breaking site navigation */
+#eligibility-app .hidden,
+.elig-wizard .hidden,
+.elig-results .hidden {
+	display: none !important;
+}
 
+/* Inline Validation Styles */
+.elig-input-error {
+	border-color: #EF4444 !important;
+	box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;
+}

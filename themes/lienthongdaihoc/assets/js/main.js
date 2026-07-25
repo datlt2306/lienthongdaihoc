@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('lienthongdaihoc.com Theme Initialized.');
 
-    const filterForm = document.querySelector('form[action*="/chuong-trinh/"]');
+    const filterForm = document.querySelector('form[action*="/chuong-trinh/"], form[action*="/he-dao-tao/"]');
     const container = document.getElementById('program-results-container');
 
     if (filterForm && container) {
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Intercept Reset button clicks
-        const resetBtn = filterForm.querySelector('a[href*="/chuong-trinh/"]');
+        const resetBtn = filterForm.querySelector('a[href*="/chuong-trinh/"], a[href*="/he-dao-tao/"]');
         if (resetBtn) {
             resetBtn.addEventListener('click', (e) => {
                 e.preventDefault();

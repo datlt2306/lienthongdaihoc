@@ -67,3 +67,44 @@ function ltdh_load_acf_field_groups_from_json() {
 		acf_add_local_field_group( $field_group );
 	}
 }
+
+// Ensure ACF labels in WordPress admin match frontend labels exactly
+add_filter( 'acf/load_field/key=field_program_tuition', 'ltdh_override_field_program_tuition_label' );
+function ltdh_override_field_program_tuition_label( $field ) {
+	$field['label'] = 'Học phí chỉ từ';
+	return $field;
+}
+
+add_filter( 'acf/load_field/key=field_program_duration', 'ltdh_override_field_program_duration_label' );
+function ltdh_override_field_program_duration_label( $field ) {
+	$field['label'] = 'Thời gian học';
+	return $field;
+}
+
+add_filter( 'acf/load_field/key=field_program_period', 'ltdh_override_field_program_period_label' );
+function ltdh_override_field_program_period_label( $field ) {
+	$field['label'] = 'Hạn hồ sơ';
+	return $field;
+}
+
+add_filter( 'acf/load_field/key=field_program_benefits', 'ltdh_override_field_program_benefits_label' );
+function ltdh_override_field_program_benefits_label( $field ) {
+	$field['label'] = 'Quyền lợi nổi bật';
+	return $field;
+}
+
+add_filter( 'acf/load_field/key=field_program_faq', 'ltdh_override_field_program_faq_label' );
+function ltdh_override_field_program_faq_label( $field ) {
+	$field['label'] = 'Câu hỏi thường gặp';
+	return $field;
+}
+
+// Remove/hide unwanted program fields in admin area dynamically
+add_filter( 'acf/prepare_field/key=field_program_why_choose', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_schedule', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_target_students', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_degree_type', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_diploma_value', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_disadvantages', '__return_false' );
+
+

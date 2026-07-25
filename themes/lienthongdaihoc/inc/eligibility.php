@@ -27,6 +27,7 @@ function ltdh_elig_create_table() {
 		session_token varchar(64) NOT NULL,
 		input_education varchar(50) NOT NULL DEFAULT '',
 		input_major_id bigint(20) UNSIGNED DEFAULT 0,
+		input_previous_school varchar(255) NOT NULL DEFAULT '',
 		input_graduation year DEFAULT NULL,
 		input_desired_major bigint(20) UNSIGNED DEFAULT 0,
 		input_training_type varchar(50) NOT NULL DEFAULT '',
@@ -56,9 +57,9 @@ add_action( 'after_switch_theme', 'ltdh_elig_create_table' );
 
 // Run on module load as well (safe — dbDelta is idempotent)
 add_action( 'init', function() {
-	if ( get_option( 'ltdh_elig_table_version' ) !== '1.0' ) {
+	if ( get_option( 'ltdh_elig_table_version' ) !== '1.1' ) {
 		ltdh_elig_create_table();
-		update_option( 'ltdh_elig_table_version', '1.0' );
+		update_option( 'ltdh_elig_table_version', '1.1' );
 	}
 });
 
@@ -102,14 +103,14 @@ function ltdh_elig_enqueue_assets() {
 			'ltdh-eligibility-css',
 			get_template_directory_uri() . '/assets/css/eligibility.css',
 			[],
-			'1.0.0'
+			LTDH_VERSION
 		);
 
 		wp_enqueue_script(
 			'ltdh-eligibility-js',
 			get_template_directory_uri() . '/assets/js/eligibility.js',
 			[],
-			'1.0.0',
+			LTDH_VERSION,
 			true
 		);
 
@@ -152,16 +153,47 @@ add_action( 'wp_ajax_nopriv_ltdh_elig_lead', 'ltdh_elig_ajax_lead' );
 function ltdh_elig_ajax_check() {
 	check_ajax_referer( 'ltdh_elig_nonce', 'nonce' );
 
+	// Honeypot check
+	if ( ! empty( $_POST['website_confirm'] ) ) {
+		wp_send_json_error( [ 'message' => 'Spam detected.' ], 400 );
+	}
+
+	// Rate limiting check
+	if ( ltdh_elig_is_rate_limited() ) {
+		wp_send_json_error( [ 'message' => 'Yêu cầu quá nhanh. Vui lòng thử lại sau.' ], 429 );
+	}
+
+	// Process file upload if any
+	$degree_file_url = '';
+	if ( ! empty( $_FILES['degree_file'] ) && ! empty( $_FILES['degree_file']['name'] ) ) {
+		require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		$uploadedfile = $_FILES['degree_file'];
+		$upload_overrides = array( 'test_form' => false );
+		$movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
+
+		if ( $movefile && ! isset( $movefile['error'] ) ) {
+			$degree_file_url = $movefile['url'];
+		}
+	}
+
+	$degree_link = sanitize_text_field( $_POST['degree_link'] ?? '' );
+	if ( ! empty( $degree_file_url ) ) {
+		$degree_link = $degree_file_url;
+	}
+
 	$input = [
-		'education'     => sanitize_text_field( $_POST['education'] ?? '' ),
-		'major_id'      => intval( $_POST['major_id'] ?? 0 ),
-		'graduation'    => intval( $_POST['graduation'] ?? 0 ),
-		'desired_major' => intval( $_POST['desired_major'] ?? 0 ),
-		'training_type' => sanitize_text_field( $_POST['training_type'] ?? '' ),
-		'campus'        => sanitize_text_field( $_POST['campus'] ?? '' ),
-		'budget'        => sanitize_text_field( $_POST['budget'] ?? '' ),
-		'phone'         => sanitize_text_field( $_POST['phone'] ?? '' ),
-		'email'         => sanitize_email( $_POST['email'] ?? '' ),
+		'name'            => sanitize_text_field( $_POST['name'] ?? '' ),
+		'education'       => sanitize_text_field( $_POST['education'] ?? '' ),
+		'major_id'        => intval( $_POST['major_id'] ?? 0 ),
+		'previous_school' => sanitize_text_field( $_POST['previous_school'] ?? '' ),
+		'graduation'      => intval( $_POST['graduation'] ?? 0 ),
+		'desired_major'   => intval( $_POST['desired_major'] ?? 0 ),
+		'training_type'   => sanitize_text_field( $_POST['training_type'] ?? '' ),
+		'campus'          => sanitize_text_field( $_POST['campus'] ?? '' ),
+		'budget'          => sanitize_text_field( $_POST['budget'] ?? '' ),
+		'phone'           => sanitize_text_field( $_POST['phone'] ?? '' ),
+		'email'           => sanitize_email( $_POST['email'] ?? '' ),
+		'degree_link'     => $degree_link,
 	];
 
 	// Validate required fields
@@ -234,38 +266,13 @@ function ltdh_elig_run_check( $input ) {
 	$hierarchy     = ltdh_elig_get_education_hierarchy();
 	$weights       = ltdh_elig_get_scoring_weights();
 	$budget_ranges = ltdh_elig_get_budget_ranges();
-	$major_rels    = ltdh_elig_get_major_relationships();
 
-	// Load user's major slug for relationship lookup
-	$user_major_slug = '';
-	if ( $input['major_id'] ) {
-		$user_major_slug = get_post_field( 'post_name', $input['major_id'] );
-	}
-
-	$related_ids = [];
-	if ( $input['desired_major'] ) {
-		$rel_field = get_field( 'major_related', $input['desired_major'] );
-		if ( ! is_array( $rel_field ) ) {
-			$related_ids = $rel_field ? [ $rel_field ] : [];
-		} else {
-			$related_ids = $rel_field;
-		}
-	}
-	if ( $input['major_id'] ) {
-		$current_related = get_field( 'major_related', $input['major_id'] );
-		if ( is_array( $current_related ) ) {
-			$related_ids = array_merge( $related_ids, $current_related );
-		} elseif ( $current_related ) {
-			$related_ids[] = $current_related;
-		}
-	}
-	$related_ids = array_map( 'intval', array_unique( $related_ids ) );
-
-	// Step 1: Load candidate programs
+	// Step 1: Load candidate programs using safe pre-filters
 	$query_args = [
 		'post_type'      => LTDH_CPT_PROGRAM,
 		'post_status'    => 'publish',
-		'posts_per_page' => -1,
+		'posts_per_page' => 100, // Limit to prevent memory exhaustion
+		'fields'         => 'ids', // Get IDs first for optimization
 		'meta_query'     => [
 			[
 				'key'     => LTDH_META_ADMISSION_STATUS,
@@ -275,7 +282,7 @@ function ltdh_elig_run_check( $input ) {
 		],
 	];
 
-	// Pre-filter by training type if specified
+	// Pre-filter by training type if specified (Safe Filter)
 	if ( ! empty( $input['training_type'] ) ) {
 		$query_args['tax_query'] = [
 			[
@@ -286,93 +293,57 @@ function ltdh_elig_run_check( $input ) {
 		];
 	}
 
-	$candidates = get_posts( $query_args );
-	$total_candidates = count( $candidates );
+	// Pre-filter by campus (Safe Filter - matches selected campus exactly)
+	if ( ! empty( $input['campus'] ) ) {
+		if ( ! isset( $query_args['tax_query'] ) ) {
+			$query_args['tax_query'] = [ 'relation' => 'AND' ];
+		}
+		$query_args['tax_query'][] = [
+			'taxonomy' => 'campus',
+			'field'    => 'slug',
+			'terms'    => $input['campus'],
+		];
+	}
 
-	if ( ! empty( $candidates ) ) {
-		$candidate_ids = wp_list_pluck( $candidates, 'ID' );
+	$candidate_ids = get_posts( $query_args );
+	$total_candidates = count( $candidate_ids );
+
+	if ( ! empty( $candidate_ids ) ) {
 		update_meta_cache( 'post', $candidate_ids );
 		update_object_term_cache( $candidate_ids, 'program' );
 	}
 
-	// Step 2: Apply hard filters and score
+	// Step 2: Apply safe compatibility filters, score, and evaluate status
 	$eligible = [];
 	$rejected = [];
 
-	foreach ( $candidates as $program ) {
-		$program_id = $program->ID;
-
-		// --- HARD FILTERS ---
+	foreach ( $candidate_ids as $program_id ) {
+		$preliminary_status = 'compatible';
+		$match_reasons = [];
+		$verification_items = [];
+		$mismatch_reasons = [];
 		$hard_fail = false;
-		$fail_reason = '';
+		$match_score = 0;
 
-		// H01: Education level minimum
+		// 1. Safe Filter: Education level minimum
 		$min_edu = get_field( 'elig_min_education', $program_id ) ?: '';
 		if ( $min_edu ) {
 			$user_level = $hierarchy[ $input['education'] ] ?? 0;
 			$min_level  = $hierarchy[ $min_edu ] ?? 0;
 			if ( $user_level < $min_level ) {
+				$preliminary_status = 'not_compatible';
+				$mismatch_reasons[] = 'Trình độ học vấn của bạn chưa đáp ứng yêu cầu tối thiểu của chương trình (Yêu cầu: ' . ltdh_elig_get_education_label( $min_edu ) . ').';
 				$hard_fail = true;
-				$fail_reason = 'Trình độ tối thiểu yêu cầu: ' . ltdh_elig_get_education_label( $min_edu );
+			} else {
+				$match_reasons[] = 'Đáp ứng yêu cầu học vấn tối thiểu (' . ltdh_elig_get_education_label( $min_edu ) . ').';
 			}
+		} else {
+			// Unknown minimum, needs verification
+			$preliminary_status = 'needs_verification';
+			$verification_items[] = 'Chương trình chưa cấu hình điều kiện học vấn tối thiểu chính thức (Cần xác minh thêm).';
 		}
 
-		// H02: Training type compatibility
-		if ( ! $hard_fail && ! empty( $input['training_type'] ) ) {
-			$user_edu = $input['education'];
-			$allowed_types = $compatibility[ $user_edu ] ?? [];
-			if ( ! in_array( $input['training_type'], $allowed_types, true ) ) {
-				// Check if program explicitly accepts this type
-				$prog_types = get_field( 'elig_training_types', $program_id );
-				$prog_types = is_array( $prog_types ) ? $prog_types : [];
-				$program_taxes = wp_get_post_terms( $program_id, 'training_type', [ 'fields' => 'slugs' ] );
-				$all_types = array_unique( array_merge( $prog_types, $program_taxes ) );
-
-				if ( ! in_array( $input['training_type'], $all_types, true ) ) {
-					$hard_fail = true;
-					$fail_reason = 'Hệ ' . ltdh_elig_get_training_label( $input['training_type'] ) . ' không áp dụng cho trình độ này.';
-				}
-			}
-		}
-
-		// H03: Campus availability
-		if ( ! $hard_fail && ! empty( $input['campus'] ) && $input['campus'] !== 'online' ) {
-			$all_campuses = wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'slugs' ] );
-
-			if ( ! in_array( $input['campus'], $all_campuses, true ) ) {
-				// Check if online is available (online works everywhere)
-				if ( ! in_array( 'online', $all_campuses, true ) ) {
-					$hard_fail = true;
-					$fail_reason = 'Chương trình chưa có tại ' . ltdh_elig_get_campus_label( $input['campus'] );
-				}
-			}
-		}
-
-		// H05: University + Liên thông block
-		if ( ! $hard_fail && $input['education'] === 'dai-hoc' && $input['training_type'] === 'lien-thong' ) {
-			$hard_fail = true;
-			$fail_reason = 'Người đã có bằng Đại học không áp dụng hệ Liên thông. Hãy xem hệ Văn bằng 2.';
-		}
-
-		// H05: Thạc sĩ + Liên thông block
-		if ( ! $hard_fail && $input['education'] === 'thac-si' && $input['training_type'] === 'lien-thong' ) {
-			$hard_fail = true;
-			$fail_reason = 'Người đã có bằng Thạc sĩ không áp dụng hệ Liên thông.';
-		}
-
-		if ( $hard_fail ) {
-			$rejected[] = [
-				'program_id' => $program_id,
-				'reason'     => $fail_reason,
-			];
-			continue;
-		}
-
-		// --- SOFT SCORING ---
-		$score = 0;
-		$breakdown = [];
-
-		// S01: Major match
+		// 2. Desired Major Match
 		$prog_major_id = get_field( 'major_relationship', $program_id );
 		if ( is_array( $prog_major_id ) ) {
 			$prog_major_id = ! empty( $prog_major_id ) ? $prog_major_id[0] : 0;
@@ -381,95 +352,99 @@ function ltdh_elig_run_check( $input ) {
 			$prog_major_id = $prog_major_id->ID;
 		}
 		$prog_major_id = intval( $prog_major_id );
-		$prog_major_slug = $prog_major_id ? get_post_field( 'post_name', $prog_major_id ) : '';
 
-		if ( $input['desired_major'] && $prog_major_id ) {
+		if ( ! empty( $input['desired_major'] ) && $prog_major_id ) {
 			if ( (int) $input['desired_major'] === $prog_major_id ) {
-				$score += $weights['major_match'];
-				$breakdown['major'] = [ 'score' => $weights['major_match'], 'label' => 'Ngành trùng khớp' ];
+				$match_score += $weights['major_match'];
+				$match_reasons[] = 'Đúng ngành bạn mong muốn học.';
 			} else {
-				if ( in_array( $prog_major_id, $related_ids, true ) ) {
-					$score += $weights['major_related'];
-					$breakdown['major'] = [ 'score' => $weights['major_related'], 'label' => 'Ngành liên quan' ];
-				} elseif ( isset( $major_rels[ $user_major_slug ] ) && in_array( $prog_major_slug, $major_rels[ $user_major_slug ], true ) ) {
-					$score += $weights['major_related'];
-					$breakdown['major'] = [ 'score' => $weights['major_related'], 'label' => 'Ngành liên quan' ];
+				$preliminary_status = 'not_compatible';
+				$mismatch_reasons[] = 'Không khớp ngành đào tạo mong muốn.';
+				$hard_fail = true;
+			}
+		}
+
+		// 3. User Current Major vs Desired Program Major
+		if ( ! $hard_fail ) {
+			if ( empty( $input['major_id'] ) ) {
+				if ( $preliminary_status !== 'not_compatible' ) {
+					$preliminary_status = 'needs_verification';
+				}
+				$verification_items[] = 'Chưa có thông tin ngành học hiện tại/đã tốt nghiệp (Cần xác minh tính hợp lệ của văn bằng).';
+			} else {
+				if ( $prog_major_id && (int) $input['major_id'] === $prog_major_id ) {
+					$match_score += $weights['major_related'];
+					$match_reasons[] = 'Ngành học muốn học trùng khớp với ngành bạn đã tốt nghiệp.';
 				} else {
-					$breakdown['major'] = [ 'score' => 0, 'label' => 'Ngành khác' ];
+					if ( $preliminary_status !== 'not_compatible' ) {
+						$preliminary_status = 'needs_verification';
+					}
+					$verification_items[] = 'Ngành bạn muốn học khác với ngành đã tốt nghiệp (Cần kiểm tra quy chế tiếp nhận ngành chéo của trường).';
 				}
 			}
 		}
 
-		// S02: Graduation recency (estimated from Birth Year + 18)
-		if ( $input['graduation'] ) {
-			$estimated_graduation = $input['graduation'] + 18;
-			$years_since = date( 'Y' ) - $estimated_graduation;
-			if ( $years_since <= 3 ) {
-				$pts = $weights['graduation_recent'];
-				$breakdown['graduation'] = [ 'score' => $pts, 'label' => 'Tốt nghiệp gần đây' ];
-			} elseif ( $years_since <= 5 ) {
-				$pts = (int) ( $weights['graduation_recent'] * 0.7 );
-				$breakdown['graduation'] = [ 'score' => $pts, 'label' => 'Tốt nghiệp 3-5 năm' ];
-			} elseif ( $years_since <= 10 ) {
-				$pts = (int) ( $weights['graduation_recent'] * 0.5 );
-				$breakdown['graduation'] = [ 'score' => $pts, 'label' => 'Tốt nghiệp 5-10 năm' ];
+		// 4. Training Type Compatibility (Safe checking)
+		if ( ! $hard_fail && ! empty( $input['training_type'] ) ) {
+			$user_edu = $input['education'];
+			$allowed_types = $compatibility[ $user_edu ] ?? [];
+			if ( ! in_array( $input['training_type'], $allowed_types, true ) ) {
+				if ( $preliminary_status !== 'not_compatible' ) {
+					$preliminary_status = 'needs_verification';
+				}
+				$verification_items[] = 'Hệ đào tạo ' . ltdh_elig_get_training_label( $input['training_type'] ) . ' cần được nhà trường xác nhận với trình độ hiện tại.';
 			} else {
-				$pts = (int) ( $weights['graduation_recent'] * 0.2 );
-				$breakdown['graduation'] = [ 'score' => $pts, 'label' => 'Tốt nghiệp > 10 năm' ];
+				$match_score += $weights['schedule_match'];
+				$match_reasons[] = 'Hỗ trợ hệ đào tạo ' . ltdh_elig_get_training_label( $input['training_type'] ) . ' phù hợp.';
 			}
-			$score += $pts;
 		}
 
-		// S03: Budget fit
-		if ( $input['budget'] && isset( $budget_ranges[ $input['budget'] ] ) ) {
+		// 5. Campus Availability
+		if ( ! $hard_fail && ! empty( $input['campus'] ) ) {
+			$all_campuses = wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'slugs' ] );
+			if ( in_array( $input['campus'], $all_campuses, true ) ) {
+				$match_score += $weights['campus_match'];
+				$match_reasons[] = 'Có địa điểm học trực tiếp tại ' . ltdh_elig_get_campus_label( $input['campus'] ) . '.';
+			} elseif ( in_array( 'online', $all_campuses, true ) ) {
+				$match_score += (int) ( $weights['campus_match'] * 0.5 );
+				$match_reasons[] = 'Hỗ trợ học từ xa / Online.';
+			} else {
+				$preliminary_status = 'not_compatible';
+				$mismatch_reasons[] = 'Không có cơ sở đào tạo tại ' . ltdh_elig_get_campus_label( $input['campus'] ) . '.';
+				$hard_fail = true;
+			}
+		}
+
+		// 6. Budget
+		if ( ! $hard_fail && ! empty( $input['budget'] ) && isset( $budget_ranges[ $input['budget'] ] ) ) {
 			$budget = $budget_ranges[ $input['budget'] ];
 			$tuition_str = get_post_meta( $program_id, 'tuition_fee', true ) ?: '';
 			$tuition_num = ltdh_elig_parse_tuition( $tuition_str );
 			$duration_num = ltdh_elig_parse_duration( get_post_meta( $program_id, 'duration', true ) ?: '' );
-			$total_cost = $tuition_num * 120 * $duration_num; // rough estimate: 120 credits
+			$total_cost = $tuition_num * 120 * $duration_num;
 
 			if ( $total_cost > 0 && $budget['max'] < PHP_INT_MAX ) {
 				if ( $total_cost <= $budget['max'] ) {
-					$score += $weights['budget_match'];
-					$breakdown['budget'] = [ 'score' => $weights['budget_match'], 'label' => 'Phù hợp ngân sách' ];
+					$match_score += $weights['budget_match'];
+					$match_reasons[] = 'Học phí phù hợp với ngân sách dự kiến của bạn.';
 				} elseif ( $total_cost <= $budget['max'] * 1.2 ) {
-					$pts = (int) ( $weights['budget_match'] * 0.5 );
-					$score += $pts;
-					$breakdown['budget'] = [ 'score' => $pts, 'label' => 'Vượt ngân sách nhẹ' ];
+					$match_score += (int) ( $weights['budget_match'] * 0.5 );
+					$match_reasons[] = 'Học phí vượt nhẹ so với ngân sách của bạn.';
 				} else {
-					$breakdown['budget'] = [ 'score' => 0, 'label' => 'Vượt ngân sách' ];
+					if ( $preliminary_status !== 'not_compatible' ) {
+						$preliminary_status = 'needs_verification';
+					}
+					$verification_items[] = 'Mức học phí ước tính cao hơn ngân sách dự kiến của bạn.';
 				}
-			} elseif ( $total_cost > 0 && $budget['max'] === PHP_INT_MAX ) {
-				$score += $weights['budget_match'];
-				$breakdown['budget'] = [ 'score' => $weights['budget_match'], 'label' => 'Phù hợp ngân sách' ];
+			} else {
+				$match_score += $weights['budget_match'];
+				$match_reasons[] = 'Chi phí phù hợp.';
 			}
 		}
 
-		// S04: Campus match
-		if ( $input['campus'] ) {
-			$all_campuses2 = wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'slugs' ] );
+		$match_score = min( $match_score, 100 );
 
-			if ( in_array( $input['campus'], $all_campuses2, true ) ) {
-				$score += $weights['campus_match'];
-				$breakdown['campus'] = [ 'score' => $weights['campus_match'], 'label' => 'Cơ sở phù hợp' ];
-			} elseif ( in_array( 'online', $all_campuses2, true ) ) {
-				$pts = (int) ( $weights['campus_match'] * 0.5 );
-				$score += $pts;
-				$breakdown['campus'] = [ 'score' => $pts, 'label' => 'Có Online' ];
-			}
-		}
-
-		// S05: Schedule match
-		$schedule = get_post_meta( $program_id, 'schedule', true ) ?: '';
-		if ( $schedule ) {
-			$score += $weights['schedule_match'];
-			$breakdown['schedule'] = [ 'score' => $weights['schedule_match'], 'label' => 'Có lịch học' ];
-		}
-
-		// Cap score at 100
-		$score = min( $score, 100 );
-
-		// Get school data
+		// Get school information
 		$school_id = get_field( 'school_relationship', $program_id );
 		if ( is_array( $school_id ) ) {
 			$school_id = ! empty( $school_id ) ? $school_id[0] : 0;
@@ -480,57 +455,63 @@ function ltdh_elig_run_check( $input ) {
 		$school_id = intval( $school_id );
 		$school_logo_id = $school_id ? ltdh_get_school_image_id( $school_id ) : 0;
 
-		$eligible[] = [
-			'program_id'   => $program_id,
-			'title'        => get_the_title( $program_id ),
-			'permalink'    => get_permalink( $program_id ),
-			'thumbnail'    => get_the_post_thumbnail_url( $program_id, 'medium' ) ?: get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg',
-			'score'        => $score,
-			'breakdown'    => $breakdown,
-			'school'       => $school_id ? [
+		$program_data = [
+			'program_id'         => $program_id,
+			'title'              => get_the_title( $program_id ),
+			'permalink'          => get_permalink( $program_id ),
+			'thumbnail'          => get_the_post_thumbnail_url( $program_id, 'medium' ) ?: get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg',
+			'score'              => $match_score,
+			'preliminary_status' => $preliminary_status,
+			'match_reasons'      => $match_reasons,
+			'verification_items' => $verification_items,
+			'mismatch_reasons'   => $mismatch_reasons,
+			'school'             => $school_id ? [
 				'id'     => $school_id,
 				'title'  => get_the_title( $school_id ),
 				'logo'   => $school_logo_id ? wp_get_attachment_image_url( $school_logo_id, 'thumbnail' ) : '',
 			] : null,
-			'major'        => $prog_major_id ? get_the_title( $prog_major_id ) : '',
-			'training_type'=> wp_get_post_terms( $program_id, 'training_type', [ 'fields' => 'names' ] )[0] ?? '',
-			'tuition_fee'  => get_post_meta( $program_id, 'tuition_fee', true ) ?: '',
-			'duration'     => get_post_meta( $program_id, 'duration', true ) ?: '',
-			'schedule'     => $schedule,
-			'campus_info'  => implode( ', ', wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'names' ] ) ) ?: '—',
+			'major'              => $prog_major_id ? get_the_title( $prog_major_id ) : '',
+			'training_type'      => wp_get_post_terms( $program_id, 'training_type', [ 'fields' => 'names' ] )[0] ?? '',
+			'tuition_fee'        => get_post_meta( $program_id, 'tuition_fee', true ) ?: '',
+			'duration'           => get_post_meta( $program_id, 'duration', true ) ?: '',
+			'schedule'           => get_post_meta( $program_id, 'schedule', true ) ?: '',
+			'campus_info'        => implode( ', ', wp_get_post_terms( $program_id, 'campus', [ 'fields' => 'names' ] ) ) ?: '—',
 		];
+
+		if ( $preliminary_status === 'not_compatible' || $hard_fail ) {
+			$rejected[] = $program_data;
+		} else {
+			$eligible[] = $program_data;
+		}
 	}
 
-	// Sort by score descending
+	// Sort eligible programs by match score descending
 	usort( $eligible, function( $a, $b ) {
 		return $b['score'] <=> $a['score'];
 	});
 
-	// Limit to top 10
-	$eligible = array_slice( $eligible, 0, 10 );
+	$eligible_slice = array_slice( $eligible, 0, 10 );
 
-	// Find alternatives (rejected programs with reasons)
+	// Build alternatives (programs that are not fully compatible but might interest the user)
 	$alternatives = [];
-	$shown_reasons = [];
 	foreach ( $rejected as $r ) {
-		$reason = $r['reason'];
-		if ( ! in_array( $reason, $shown_reasons, true ) ) {
-			$shown_reasons[] = $reason;
-			$alternatives[] = [
-				'program_id' => $r['program_id'],
-				'title'      => get_the_title( $r['program_id'] ),
-				'reason'     => $reason,
-			];
+		if ( count( $alternatives ) >= 5 ) {
+			break;
 		}
+		$alternatives[] = [
+			'program_id' => $r['program_id'],
+			'title'      => $r['title'],
+			'reason'     => ! empty( $r['mismatch_reasons'] ) ? $r['mismatch_reasons'][0] : 'Chưa phù hợp điều kiện',
+		];
 	}
 
 	return [
-		'eligible'         => ! empty( $eligible ),
-		'programs'         => $eligible,
+		'eligible'         => ! empty( $eligible_slice ),
+		'programs'         => $eligible_slice,
 		'total_candidates' => $total_candidates,
 		'eligible_count'   => count( $eligible ),
-		'top_score'        => $eligible[0]['score'] ?? 0,
-		'alternatives'     => array_slice( $alternatives, 0, 5 ),
+		'top_score'        => $eligible_slice[0]['score'] ?? 0,
+		'alternatives'     => $alternatives,
 	];
 }
 
@@ -603,23 +584,24 @@ function ltdh_elig_store_check( $input, $results ) {
 	$token = wp_generate_password( 32, false );
 
 	$wpdb->insert( $table, [
-		'session_token'    => $token,
-		'input_education'  => $input['education'],
-		'input_major_id'   => $input['major_id'],
-		'input_graduation' => $input['graduation'] ?: null,
-		'input_desired_major' => $input['desired_major'],
-		'input_training_type' => $input['training_type'],
-		'input_campus'     => $input['campus'],
-		'input_budget'     => $input['budget'],
-		'total_candidates' => $results['total_candidates'],
-		'eligible_count'   => $results['eligible_count'],
-		'top_score'        => $results['top_score'],
-		'top_program_id'   => $results['programs'][0]['program_id'] ?? 0,
-		'phone'            => $input['phone'],
-		'email'            => $input['email'],
-		'created_at'       => current_time( 'mysql' ),
-		'referrer_url'     => wp_get_referer() ?: '',
-	], [ '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s' ] );
+		'session_token'         => $token,
+		'input_education'       => $input['education'],
+		'input_major_id'        => $input['major_id'],
+		'input_previous_school' => $input['previous_school'],
+		'input_graduation'      => $input['graduation'] ?: null,
+		'input_desired_major'   => $input['desired_major'],
+		'input_training_type'   => $input['training_type'],
+		'input_campus'          => $input['campus'],
+		'input_budget'          => $input['budget'],
+		'total_candidates'      => $results['total_candidates'],
+		'eligible_count'        => $results['eligible_count'],
+		'top_score'             => $results['top_score'],
+		'top_program_id'        => $results['programs'][0]['program_id'] ?? 0,
+		'phone'                 => $input['phone'],
+		'email'                 => $input['email'],
+		'created_at'            => current_time( 'mysql' ),
+		'referrer_url'          => wp_get_referer() ?: '',
+	], [ '%s', '%s', '%d', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s' ] );
 
 	return $wpdb->insert_id;
 }
@@ -638,10 +620,22 @@ function ltdh_elig_capture_lead( $input, $results, $check_id ) {
 	$school_id   = $top_program['school']['id'] ?? 0;
 	$major_id    = $input['desired_major'] ?: $input['major_id'];
 
+	$is_verification_required = ($top_program && $top_program['preliminary_status'] === 'needs_verification') ? '1' : '0';
+	$ref_source = 'eligibility_checker?education_level=' . urlencode($input['education']) . 
+		'&current_major=' . urlencode($input['major_id']) . 
+		'&previous_school=' . urlencode($input['previous_school']) .
+		'&desired_major=' . urlencode($input['desired_major']) . 
+		'&birth_year=' . urlencode($input['graduation']) . 
+		'&verification_required=' . $is_verification_required;
+
+	if ( ! empty( $input['degree_link'] ) ) {
+		$ref_source .= '&degree_link=' . urlencode( $input['degree_link'] );
+	}
+
 	// Use existing lead capture system
 	if ( function_exists( 'ltdh_insert_lead' ) ) {
 		$lead_id = ltdh_insert_lead( [
-			'name'            => 'Eligibility Checker User',
+			'name'            => ! empty( $input['name'] ) ? $input['name'] : 'Eligibility Checker User',
 			'phone'           => $input['phone'],
 			'email'           => $input['email'],
 			'program_id'      => $program_id,
@@ -649,7 +643,8 @@ function ltdh_elig_capture_lead( $input, $results, $check_id ) {
 			'major_id'        => $major_id,
 			'training_type'   => $input['training_type'],
 			'campus'          => $input['campus'],
-			'referral_source' => 'eligibility_checker',
+			'referral_source' => $ref_source,
+			'message'         => ! empty( $input['degree_link'] ) ? 'Ảnh bằng cấp đính kèm: ' . $input['degree_link'] : '',
 		] );
 
 		if ( $lead_id ) {
@@ -667,7 +662,7 @@ function ltdh_elig_capture_lead( $input, $results, $check_id ) {
 	// Fallback: direct DB insert
 	global $wpdb;
 	$wpdb->insert( $wpdb->prefix . LTDH_TABLE_LEADS, [
-		'name'          => 'Eligibility Checker User',
+		'name'          => ! empty( $input['name'] ) ? $input['name'] : 'Eligibility Checker User',
 		'phone'         => $input['phone'],
 		'email'         => $input['email'],
 		'program_id'    => $program_id,
@@ -675,7 +670,8 @@ function ltdh_elig_capture_lead( $input, $results, $check_id ) {
 		'major_id'      => $major_id,
 		'training_type' => $input['training_type'],
 		'campus'        => $input['campus'],
-		'referral_source' => 'eligibility_checker',
+		'referral_source' => $ref_source,
+		'error_message' => ! empty( $input['degree_link'] ) ? 'Ảnh bằng cấp đính kèm: ' . $input['degree_link'] : '',
 		'created_at'    => current_time( 'mysql' ),
 	] );
 
@@ -688,6 +684,16 @@ function ltdh_elig_capture_lead( $input, $results, $check_id ) {
 
 function ltdh_elig_ajax_lead() {
 	check_ajax_referer( 'ltdh_elig_nonce', 'nonce' );
+
+	// Honeypot check
+	if ( ! empty( $_POST['website_confirm'] ) ) {
+		wp_send_json_error( [ 'message' => 'Spam detected.' ], 400 );
+	}
+
+	// Rate limiting check
+	if ( ltdh_elig_is_rate_limited() ) {
+		wp_send_json_error( [ 'message' => 'Yêu cầu quá nhanh. Vui lòng thử lại sau.' ], 429 );
+	}
 
 	$name  = sanitize_text_field( $_POST['cf_name'] ?? '' );
 	$phone = sanitize_text_field( $_POST['cf_phone'] ?? '' );
@@ -741,6 +747,101 @@ function ltdh_elig_ajax_lead() {
 	wp_send_json_success( [ 'lead_id' => $lead_id ] );
 }
 
+add_action( 'wp_ajax_ltdh_elig_advanced_verify', 'ltdh_elig_ajax_advanced_verify' );
+add_action( 'wp_ajax_nopriv_ltdh_elig_advanced_verify', 'ltdh_elig_ajax_advanced_verify' );
+
+function ltdh_elig_ajax_advanced_verify() {
+	check_ajax_referer( 'ltdh_elig_nonce', 'nonce' );
+
+	$lead_id = intval( $_POST['lead_id'] ?? 0 );
+	if ( ! $lead_id ) {
+		wp_send_json_error( [ 'message' => 'Yêu cầu không hợp lệ.' ] );
+	}
+
+	$previous_school = sanitize_text_field( $_POST['previous_school'] ?? '' );
+	$graduation      = intval( $_POST['graduation'] ?? 0 );
+	$degree_link     = sanitize_text_field( $_POST['degree_link'] ?? '' );
+
+	// Handle file upload if any
+	$degree_file_url = '';
+	if ( ! empty( $_FILES['degree_file'] ) && ! empty( $_FILES['degree_file']['name'] ) ) {
+		require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		$uploadedfile = $_FILES['degree_file'];
+		$upload_overrides = array( 'test_form' => false );
+		$movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
+
+		if ( $movefile && ! isset( $movefile['error'] ) ) {
+			$degree_file_url = $movefile['url'];
+		}
+	}
+
+	if ( ! empty( $degree_file_url ) ) {
+		$degree_link = $degree_file_url;
+	}
+
+	global $wpdb;
+	
+	// Get existing lead details to update
+	$lead = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ltdh_leads WHERE id = %d", $lead_id ) );
+
+	if ( $lead ) {
+		$ref_source = $lead->referral_source;
+		if ( ! empty( $previous_school ) ) {
+			$ref_source .= (strpos($ref_source, '?') !== false ? '&' : '?') . 'previous_school=' . urlencode( $previous_school );
+		}
+		if ( ! empty( $graduation ) ) {
+			$ref_source .= (strpos($ref_source, '?') !== false ? '&' : '?') . 'birth_year=' . $graduation;
+		}
+		if ( ! empty( $degree_link ) ) {
+			$ref_source .= (strpos($ref_source, '?') !== false ? '&' : '?') . 'degree_link=' . urlencode( $degree_link );
+		}
+
+		$current_msg = $lead->error_message;
+		$notes = [];
+		if ( ! empty( $previous_school ) ) {
+			$notes[] = "Trường cũ: " . $previous_school;
+		}
+		if ( ! empty( $graduation ) ) {
+			$notes[] = "Năm sinh: " . $graduation;
+		}
+		if ( ! empty( $degree_link ) ) {
+			$notes[] = "Ảnh bằng cấp: " . $degree_link;
+		}
+
+		if ( ! empty( $notes ) ) {
+			$current_msg = trim( ($current_msg ? $current_msg . ' | ' : '') . implode(' | ', $notes) );
+		}
+
+		$wpdb->update(
+			$wpdb->prefix . 'ltdh_leads',
+			[
+				'referral_source' => $ref_source,
+				'error_message'   => $current_msg,
+			],
+			[ 'id' => $lead_id ]
+		);
+
+		// Send updated Telegram Notification
+		$telegram_data = [
+			'name'            => $lead->name,
+			'phone'           => $lead->phone,
+			'email'           => $lead->email,
+			'program_id'      => $lead->program_id,
+			'school_id'       => $lead->school_id,
+			'major_id'        => $lead->major_id,
+			'referral_source' => $ref_source,
+			'message'         => '📎 Gửi bổ sung hồ sơ xác minh nâng cao. ' . (!empty($previous_school) ? 'Trường cũ: ' . $previous_school . '. ' : '') . (!empty($graduation) ? 'Năm sinh: ' . $graduation . '. ' : ''),
+		];
+		if ( function_exists( 'ltdh_trigger_telegram_notification' ) ) {
+			ltdh_trigger_telegram_notification( $telegram_data );
+		}
+
+		wp_send_json_success( [ 'message' => 'Hồ sơ đã được bổ sung thành công.' ] );
+	}
+
+	wp_send_json_error( [ 'message' => 'Không tìm thấy lead tương ứng.' ] );
+}
+
 // ----------------------------------------------------
 // 11. REST API Endpoints
 // ----------------------------------------------------
@@ -754,16 +855,28 @@ add_action( 'rest_api_init', function() {
 } );
 
 function ltdh_elig_rest_check( $request ) {
+	// Honeypot check
+	if ( ! empty( $request->get_param( 'website_confirm' ) ) ) {
+		return new WP_REST_Response( [ 'error' => 'Spam detected.' ], 400 );
+	}
+
+	// Rate limiting check
+	if ( ltdh_elig_is_rate_limited() ) {
+		return new WP_REST_Response( [ 'error' => 'Too many requests. Please try again later.' ], 429 );
+	}
+
 	$input = [
-		'education'     => sanitize_text_field( $request->get_param( 'education' ) ?? '' ),
-		'major_id'      => intval( $request->get_param( 'major_id' ) ?? 0 ),
-		'graduation'    => intval( $request->get_param( 'graduation' ) ?? 0 ),
-		'desired_major' => intval( $request->get_param( 'desired_major' ) ?? 0 ),
-		'training_type' => sanitize_text_field( $request->get_param( 'training_type' ) ?? '' ),
-		'campus'        => sanitize_text_field( $request->get_param( 'campus' ) ?? '' ),
-		'budget'        => sanitize_text_field( $request->get_param( 'budget' ) ?? '' ),
-		'phone'         => sanitize_text_field( $request->get_param( 'phone' ) ?? '' ),
-		'email'         => sanitize_email( $request->get_param( 'email' ) ?? '' ),
+		'name'            => sanitize_text_field( $request->get_param( 'name' ) ?? '' ),
+		'education'       => sanitize_text_field( $request->get_param( 'education' ) ?? '' ),
+		'major_id'        => intval( $request->get_param( 'major_id' ) ?? 0 ),
+		'previous_school' => sanitize_text_field( $request->get_param( 'previous_school' ) ?? '' ),
+		'graduation'      => intval( $request->get_param( 'graduation' ) ?? 0 ),
+		'desired_major'   => intval( $request->get_param( 'desired_major' ) ?? 0 ),
+		'training_type'   => sanitize_text_field( $request->get_param( 'training_type' ) ?? '' ),
+		'campus'          => sanitize_text_field( $request->get_param( 'campus' ) ?? '' ),
+		'budget'          => sanitize_text_field( $request->get_param( 'budget' ) ?? '' ),
+		'phone'           => sanitize_text_field( $request->get_param( 'phone' ) ?? '' ),
+		'email'           => sanitize_email( $request->get_param( 'email' ) ?? '' ),
 	];
 
 	$validation = ltdh_elig_validate_input( $input );
@@ -801,3 +914,249 @@ add_action( 'manage_program_posts_custom_column', function( $column, $post_id ) 
 		echo $min_edu ? esc_html( ltdh_elig_get_education_label( $min_edu ) . '+' ) : '<span style="color:#999">—</span>';
 	}
 }, 10, 2 );
+
+/**
+ * Get client IP address safely.
+ */
+function ltdh_get_client_ip() {
+	if ( ! empty( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
+		return sanitize_text_field( wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ) );
+	}
+	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		return sanitize_text_field( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
+	}
+	if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$ips = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
+		return sanitize_text_field( wp_unslash( trim( $ips[0] ) ) );
+	}
+	return sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+}
+
+/**
+ * Check if the current client is rate limited.
+ * Allow 10 check requests per 5 minutes.
+ */
+function ltdh_elig_is_rate_limited() {
+	$ip = ltdh_get_client_ip();
+	if ( empty( $ip ) ) {
+		return false;
+	}
+	$key = 'ltdh_elig_rate_' . md5( $ip );
+	$count = intval( get_transient( $key ) );
+	if ( $count >= 10 ) {
+		return true;
+	}
+	set_transient( $key, $count + 1, 300 );
+	return false;
+}
+
+// ----------------------------------------------------
+// 12. WordPress Admin Dashboard Panels
+// ----------------------------------------------------
+
+add_action( 'admin_menu', 'ltdh_elig_register_admin_menu' );
+
+function ltdh_elig_register_admin_menu() {
+	add_menu_page(
+		'Quản lý Tuyển sinh',
+		'Tuyển sinh & Leads',
+		'manage_options',
+		'ltdh_leads_menu',
+		'ltdh_elig_admin_leads_page',
+		'dashicons-groups',
+		30
+	);
+
+	add_submenu_page(
+		'ltdh_leads_menu',
+		'Danh sách Leads',
+		'Danh sách Leads',
+		'manage_options',
+		'ltdh_leads_menu',
+		'ltdh_elig_admin_leads_page'
+	);
+
+	add_submenu_page(
+		'ltdh_leads_menu',
+		'Lượt kiểm tra điều kiện',
+		'Nhật ký kiểm tra',
+		'manage_options',
+		'ltdh_elig_checks_menu',
+		'ltdh_elig_admin_checks_page'
+	);
+}
+
+function ltdh_elig_admin_leads_page() {
+	global $wpdb;
+	$table = $wpdb->prefix . LTDH_TABLE_LEADS;
+	
+	// Handle delete lead
+	if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' && isset( $_GET['lead_id'] ) ) {
+		check_admin_referer( 'ltdh_delete_lead_nonce' );
+		$wpdb->delete( $table, [ 'id' => intval( $_GET['lead_id'] ) ] );
+		echo '<div class="updated"><p>Đã xóa lead thành công.</p></div>';
+	}
+
+	$leads = $wpdb->get_results( "SELECT * FROM $table ORDER BY id DESC LIMIT 200" );
+	?>
+	<div class="wrap">
+		<h1 class="wp-heading-inline">Danh sách Leads Đăng ký học</h1>
+		<hr class="wp-header-end">
+
+		<table class="wp-list-table widefat fixed striped table-view-list posts" style="margin-top: 15px;">
+			<thead>
+				<tr>
+					<th class="manage-column" style="width: 50px;">ID</th>
+					<th class="manage-column">Họ tên</th>
+					<th class="manage-column">Số điện thoại</th>
+					<th class="manage-column">Email</th>
+					<th class="manage-column">Ngành đăng ký</th>
+					<th class="manage-column">Trường liên kết</th>
+					<th class="manage-column">Cơ sở / Hệ học</th>
+					<th class="manage-column" style="width: 250px;">Chi tiết khảo sát</th>
+					<th class="manage-column">Trạng thái đồng bộ</th>
+					<th class="manage-column">Ngày tạo</th>
+					<th class="manage-column" style="width: 80px;">Hành động</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php if ( empty( $leads ) ) : ?>
+					<tr><td colspan="11" style="text-align: center;">Chưa có lượt đăng ký nào.</td></tr>
+				<?php else : ?>
+					<?php foreach ( $leads as $lead ) : 
+						$school_title = $lead->school_id ? get_the_title( $lead->school_id ) : '—';
+						$major_title = $lead->major_id ? get_the_title( $lead->major_id ) : '—';
+						
+						// Decode survey metadata
+						$metadata_html = '—';
+						if ( ! empty( $lead->referral_source ) && strpos( $lead->referral_source, 'eligibility_checker' ) !== false ) {
+							$parts = parse_url( $lead->referral_source );
+							if ( isset( $parts['query'] ) ) {
+								parse_str( $parts['query'], $query_data );
+								$metadata_html = '<div style="font-size: 11px; line-height: 1.4;">';
+								if ( isset( $query_data['education_level'] ) ) {
+									$metadata_html .= '<strong>Học vấn:</strong> ' . esc_html( ltdh_elig_get_education_label( $query_data['education_level'] ) ) . '<br>';
+								}
+								if ( ! empty( $query_data['current_major'] ) && intval( $query_data['current_major'] ) > 0 ) {
+									$metadata_html .= '<strong>Ngành cũ:</strong> ' . esc_html( get_the_title( intval( $query_data['current_major'] ) ) ) . '<br>';
+								}
+								if ( ! empty( $query_data['previous_school'] ) ) {
+									$metadata_html .= '<strong>Trường cũ:</strong> ' . esc_html( $query_data['previous_school'] ) . '<br>';
+								}
+								if ( isset( $query_data['birth_year'] ) ) {
+									$metadata_html .= '<strong>Năm sinh:</strong> ' . esc_html( $query_data['birth_year'] ) . '<br>';
+								}
+								$metadata_html .= '</div>';
+							}
+						} else {
+							$metadata_html = esc_html( $lead->referral_source );
+						}
+						?>
+						<tr>
+							<td><?php echo esc_html( $lead->id ); ?></td>
+							<td><strong><?php echo esc_html( $lead->name ); ?></strong></td>
+							<td><a href="tel:<?php echo esc_attr( $lead->phone ); ?>"><?php echo esc_html( $lead->phone ); ?></a></td>
+							<td><?php echo esc_html( $lead->email ?: '—' ); ?></td>
+							<td><?php echo esc_html( $major_title ); ?></td>
+							<td><?php echo esc_html( $school_title ); ?></td>
+							<td>
+								<?php echo esc_html( $lead->campus ? ltdh_elig_get_campus_label( $lead->campus ) : '—' ); ?> / 
+								<?php echo esc_html( $lead->training_type ? ltdh_elig_get_training_label( $lead->training_type ) : '—' ); ?>
+							</td>
+							<td><?php echo $metadata_html; ?></td>
+							<td>
+								<span class="badge" style="padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; background: <?php echo $lead->sync_status === 'synced' ? '#d1e7dd' : '#f8d7da'; ?>; color: <?php echo $lead->sync_status === 'synced' ? '#0f5132' : '#842029'; ?>;">
+									<?php echo esc_html( strtoupper( $lead->sync_status ) ); ?>
+								</span>
+							</td>
+							<td><?php echo esc_html( $lead->created_at ); ?></td>
+							<td>
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=ltdh_leads_menu&action=delete&lead_id=' . $lead->id ), 'ltdh_delete_lead_nonce' ) ); ?>" class="button button-link-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa lead này?');">Xóa</a>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</tbody>
+		</table>
+	</div>
+	<?php
+}
+
+function ltdh_elig_admin_checks_page() {
+	global $wpdb;
+	$table = $wpdb->prefix . 'ltdh_eligibility_checks';
+
+	// Handle clear log
+	if ( isset( $_GET['action'] ) && $_GET['action'] === 'clear' ) {
+		check_admin_referer( 'ltdh_clear_checks_nonce' );
+		$wpdb->query( "TRUNCATE TABLE $table" );
+		echo '<div class="updated"><p>Đã xóa toàn bộ nhật ký kiểm tra.</p></div>';
+	}
+
+	$checks = $wpdb->get_results( "SELECT * FROM $table ORDER BY id DESC LIMIT 200" );
+	?>
+	<div class="wrap">
+		<h1 class="wp-heading-inline">Nhật ký Lượt kiểm tra Điều kiện</h1>
+		<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=ltdh_elig_checks_menu&action=clear' ), 'ltdh_clear_checks_nonce' ) ); ?>" class="page-title-action" onclick="return confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử log?');" style="color: #d63638; border-color: #d63638;">Xóa toàn bộ Log</a>
+		<hr class="wp-header-end">
+
+		<table class="wp-list-table widefat fixed striped table-view-list posts" style="margin-top: 15px;">
+			<thead>
+				<tr>
+					<th style="width: 50px;">ID</th>
+					<th>Trình độ hiện tại</th>
+					<th>Ngành tốt nghiệp</th>
+					<th>Trường đã học</th>
+					<th>Năm sinh</th>
+					<th>Ngành mong muốn</th>
+					<th>Hệ / Cơ sở học / Ngân sách</th>
+					<th>Kết quả đối chiếu</th>
+					<th>Lượt liên hệ</th>
+					<th>Thời gian</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php if ( empty( $checks ) ) : ?>
+					<tr><td colspan="10" style="text-align: center;">Chưa có lượt kiểm tra nào được ghi nhận.</td></tr>
+				<?php else : ?>
+					<?php foreach ( $checks as $check ) : 
+						$curr_major = $check->input_major_id ? get_the_title( $check->input_major_id ) : '—';
+						$desired_major = $check->input_desired_major ? get_the_title( $check->input_desired_major ) : '—';
+						?>
+						<tr>
+							<td><?php echo esc_html( $check->id ); ?></td>
+							<td><strong><?php echo esc_html( ltdh_elig_get_education_label( $check->input_education ) ); ?></strong></td>
+							<td><?php echo esc_html( $curr_major ); ?></td>
+							<td><?php echo esc_html( $check->input_previous_school ?: '—' ); ?></td>
+							<td><?php echo esc_html( $check->input_graduation ?: '—' ); ?></td>
+							<td><strong><?php echo esc_html( $desired_major ); ?></strong></td>
+							<td>
+								Hệ: <?php echo esc_html( ltdh_elig_get_training_label( $check->input_training_type ) ); ?><br>
+								Cơ sở: <?php echo esc_html( ltdh_elig_get_campus_label( $check->input_campus ) ); ?><br>
+								Ngân sách: <?php echo esc_html( ltdh_elig_get_budget_label( $check->input_budget ) ); ?>
+							</td>
+							<td>
+								Tìm thấy: <?php echo esc_html( $check->total_candidates ); ?> ngành<br>
+								Khớp: <?php echo esc_html( $check->eligible_count ); ?> ngành<br>
+								Match tốt nhất: <?php echo esc_html( $check->top_score ); ?>%
+							</td>
+							<td>
+								<?php if ( ! empty( $check->phone ) ) : ?>
+									📞 <strong><?php echo esc_html( $check->phone ); ?></strong><br>
+								<?php endif; ?>
+								<?php if ( ! empty( $check->email ) ) : ?>
+									✉️ <?php echo esc_html( $check->email ); ?><br>
+								<?php endif; ?>
+								<?php if ( empty( $check->phone ) && empty( $check->email ) ) : ?>
+									<span style="color: #94a3b8;">—</span>
+								<?php endif; ?>
+							</td>
+							<td><?php echo esc_html( $check->created_at ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</tbody>
+		</table>
+	</div>
+	<?php
+}

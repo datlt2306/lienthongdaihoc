@@ -116,6 +116,8 @@ function ltdh_sync_lead_to_crm( $lead ) {
 		return ltdh_sync_onschool_adapter( $payload );
 	} elseif ( $crm_type === 'aum' ) {
 		return ltdh_sync_aum_adapter( $payload );
+	} elseif ( $crm_type === 'erpnext' ) {
+		return ltdh_sync_erpnext_adapter( $payload );
 	}
 
 	return new WP_Error( 'invalid_crm', 'Hệ thống CRM cấu hình không hợp lệ.' );
@@ -132,7 +134,7 @@ function ltdh_sync_onschool_adapter( $payload ) {
 		return new WP_Error( 'missing_config', 'Thiếu OnSchool API Endpoint.' );
 	}
 
-	$response = wp_remote_post( $endpoint, [
+	$response = wp_safe_remote_post( $endpoint, [
 		'headers' => [
 			'Content-Type'  => 'application/json',
 			'Authorization' => 'Bearer ' . $token,
@@ -174,7 +176,7 @@ function ltdh_sync_aum_adapter( $payload ) {
 		return new WP_Error( 'missing_config', 'Thiếu AUM API Endpoint.' );
 	}
 
-	$response = wp_remote_post( $endpoint, [
+	$response = wp_safe_remote_post( $endpoint, [
 		'headers' => [
 			'Content-Type'  => 'application/json',
 			'X-API-Key'     => $token,
@@ -201,6 +203,50 @@ function ltdh_sync_aum_adapter( $payload ) {
 	$code = wp_remote_retrieve_response_code( $response );
 	if ( $code < 200 || $code >= 300 ) {
 		return new WP_Error( 'api_error', 'AUM API returned HTTP code ' . $code );
+	}
+
+	return true;
+}
+
+/**
+ * ERPNext Webhook API Adapter (Prepared for future integration)
+ */
+function ltdh_sync_erpnext_adapter( $payload ) {
+	$endpoint = get_field( 'erpnext_endpoint', 'options' );
+	$token    = get_field( 'erpnext_token', 'options' ); // Token key:secret format
+
+	if ( empty( $endpoint ) ) {
+		return new WP_Error( 'missing_config', 'Thiếu ERPNext Webhook Endpoint.' );
+	}
+
+	$response = wp_safe_remote_post( $endpoint, [
+		'headers' => [
+			'Content-Type'  => 'application/json',
+			'Authorization' => 'token ' . $token,
+		],
+		'body'    => wp_json_encode( [
+			'naming_series'   => 'CRM-LEAD-.YYYY.-',
+			'lead_name'       => $payload['name'],
+			'phone'           => $payload['phone'],
+			'email_id'        => $payload['email'],
+			'custom_program'  => $payload['program'],
+			'custom_school'   => $payload['school'],
+			'custom_major'    => $payload['major'],
+			'custom_training' => $payload['training_type'],
+			'custom_campus'   => $payload['campus'],
+			'source'          => 'lienthongdaihoc.com',
+			'custom_referrer' => $payload['referrer'],
+		] ),
+		'timeout' => 15,
+	] );
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$code = wp_remote_retrieve_response_code( $response );
+	if ( $code < 200 || $code >= 300 ) {
+		return new WP_Error( 'api_error', 'ERPNext Webhook returned HTTP code ' . $code );
 	}
 
 	return true;

@@ -24,7 +24,7 @@ get_header();
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="bg-white text-brand-primary px-8 py-3.5 rounded-lg font-bold hover:bg-slate-100 transition-all shadow-md">
 					Về trang chủ
 				</a>
-				<a href="<?php echo esc_url( home_url( '/chuong-trinh/' ) ); ?>" class="border border-white/30 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-white/10 transition-all">
+				<a href="<?php echo esc_url( home_url( '/he-dao-tao/tu-xa/' ) ); ?>" class="border border-white/30 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-white/10 transition-all">
 					Xem chương trình đào tạo
 				</a>
 			</div>

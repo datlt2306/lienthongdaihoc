@@ -35,42 +35,47 @@ $major_cats = get_terms( [
 					</span>
 					<span class="text-slate-400 group-open:rotate-180 transition-transform duration-200">▾</span>
 				</summary>
-				<div class="p-4 lg:p-0 pt-0 lg:pt-0 border-t lg:border-0 border-slate-100 space-y-5 sticky top-24">
+				<div class="p-4 lg:p-0 pt-0 lg:pt-0 border-t lg:border-0 border-slate-100 space-y-6 sticky top-24">
 
 					<!-- Search Box -->
-					<form action="<?php echo esc_url( get_post_type_archive_link( 'major' ) ); ?>" method="GET" class="relative">
-						<?php if ( $active_cat ) : ?>
-							<input type="hidden" name="nhom_nganh" value="<?php echo esc_attr( $active_cat ); ?>">
-						<?php endif; ?>
-						<input type="text" name="s" value="<?php echo esc_attr( isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '' ); ?>" placeholder="Tìm kiếm ngành học..." class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 min-h-[44px]">
-					</form>
+					<div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+						<form action="<?php echo esc_url( get_post_type_archive_link( 'major' ) ); ?>" method="GET" class="relative">
+							<?php if ( $active_cat ) : ?>
+								<input type="hidden" name="nhom_nganh" value="<?php echo esc_attr( $active_cat ); ?>">
+							<?php endif; ?>
+							<input type="text" name="s" value="<?php echo esc_attr( isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '' ); ?>" placeholder="Tìm kiếm ngành học..." class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 min-h-[44px]">
+						</form>
+					</div>
 
-					<h3 class="font-extrabold text-slate-900 text-base border-t border-slate-100 pt-4 uppercase tracking-wider">Nhóm ngành</h3>
-					<ul class="space-y-1">
-						<li>
-							<a href="<?php echo esc_url( remove_query_arg( 'nhom_nganh' ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo empty( $active_cat ) ? 'bg-brand-accent text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
-								<span>Tất cả các ngành</span>
-								<?php
-								$total_majors = wp_count_posts( 'major' )->publish;
-								?>
-								<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo empty( $active_cat ) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $total_majors ); ?></span>
-							</a>
-						</li>
-						<?php if ( ! is_wp_error( $major_cats ) && ! empty( $major_cats ) ) : ?>
-							<?php foreach ( $major_cats as $cat ) : ?>
-								<?php
-								$is_active = ( $active_cat === $cat->slug );
-								$term_count = $cat->count;
-								?>
-								<li>
-									<a href="<?php echo esc_url( add_query_arg( 'nhom_nganh', $cat->slug ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo $is_active ? 'bg-brand-accent text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
-										<span><?php echo esc_html( $cat->name ); ?></span>
-										<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $term_count ); ?></span>
-									</a>
-								</li>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</ul>
+					<!-- Nhóm ngành Filter Card -->
+					<div class="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+						<h3 class="font-extrabold text-slate-900 text-base mb-4 border-b border-slate-100 pb-3 uppercase tracking-wider">Nhóm ngành</h3>
+						<ul class="space-y-1">
+							<li>
+								<a href="<?php echo esc_url( remove_query_arg( 'nhom_nganh' ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo empty( $active_cat ) ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
+									<span>Tất cả các ngành</span>
+									<?php
+									$total_majors = wp_count_posts( 'major' )->publish;
+									?>
+									<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo empty( $active_cat ) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $total_majors ); ?></span>
+								</a>
+							</li>
+							<?php if ( ! is_wp_error( $major_cats ) && ! empty( $major_cats ) ) : ?>
+								<?php foreach ( $major_cats as $cat ) : ?>
+									<?php
+									$is_active = ( $active_cat === $cat->slug );
+									$term_count = $cat->count;
+									?>
+									<li>
+										<a href="<?php echo esc_url( add_query_arg( 'nhom_nganh', $cat->slug ) ); ?>" class="flex items-center justify-between px-3 py-3 rounded-lg text-sm font-semibold transition-all <?php echo $is_active ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[44px]">
+											<span><?php echo esc_html( $cat->name ); ?></span>
+											<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $term_count ); ?></span>
+										</a>
+									</li>
+								<?php endforeach; ?>
+							<?php endif; ?>
+						</ul>
+					</div>
 				</div>
 			</details>
 

@@ -250,7 +250,7 @@ function ltdh_register_options_fields() {
 					'label'        => 'CTA chính - Link',
 					'name'         => 'hero_cta_primary_url',
 					'type'         => 'url',
-					'default_value' => '/chuong-trinh/',
+					'default_value' => '/he-dao-tao/tu-xa/',
 				],
 				[
 					'key'          => 'field_hero_cta_secondary_text',
@@ -328,61 +328,74 @@ function ltdh_register_options_fields() {
 				],
 				[
 					'key'   => 'field_hp_cert_left_badge',
-					'label' => 'Box trái - Badge',
+					'label' => 'Badge tiêu đề',
 					'name'  => 'hp_cert_left_badge',
 					'type'  => 'text',
-					'default_value' => 'BẰNG CẤP TƯƠNG ĐƯƠNG',
+					'default_value' => 'BẰNG CẤP CHÍNH QUY',
 				],
 				[
 					'key'   => 'field_hp_cert_left_heading',
-					'label' => 'Box trái - Heading',
+					'label' => 'Heading chính',
 					'name'  => 'hp_cert_left_heading',
 					'type'  => 'text',
-					'default_value' => 'BẰNG ĐẠO TẠO CHÍNH QUY',
+					'default_value' => 'KHÔNG GHI HÌNH THỨC ĐÀO TẠO',
 				],
 				[
-					'key'   => 'field_hp_cert_left_items',
-					'label' => 'Box trái - Nội dung',
-					'name'  => 'hp_cert_left_items',
-					'type'  => 'textarea',
-					'rows'  => 5,
-					'default_value' => "✔ Học chương trình chuẩn theo quy định của bộ GD&ĐT.\n✔ Đảm bảo giá trị pháp lý, sử dụng toàn quốc.\n✔ Phục vụ học tập, thi công chức, nâng lương nâng bậc.\n✔ Hồ sơ nhanh gọn - Quy trình rõ ràng.",
+					'key'          => 'field_hp_cert_slider',
+					'label'        => 'Slider ảnh bên phải',
+					'name'         => 'hp_cert_slider',
+					'type'         => 'repeater',
+					'layout'       => 'table',
+					'button_label' => 'Thêm ảnh slider',
+					'instructions' => 'Thêm các hình ảnh hiển thị ở slider bên phải. Nếu không có ảnh nào, hệ thống sẽ sử dụng ảnh tốt nghiệp mặc định.',
+					'sub_fields'   => [
+						[
+							'key'           => 'field_hp_cert_slide_img',
+							'label'         => 'Hình ảnh',
+							'name'          => 'image',
+							'type'          => 'image',
+							'return_format' => 'url',
+							'preview_size'  => 'medium',
+						],
+					],
 				],
 				[
-					'key'   => 'field_hp_cert_left_cta',
-					'label' => 'Box trái - CTA Text',
-					'name'  => 'hp_cert_left_cta',
+					'key'   => 'field_hp_cert_left_image',
+					'label' => 'Ảnh Video trái (Dưới - Có nút Play)',
+					'name'  => 'hp_cert_left_image',
+					'type'  => 'image',
+					'return_format' => 'url',
+					'preview_size'  => 'medium',
+					'instructions' => 'Chọn hoặc upload ảnh đại diện cho video.',
+				],
+				[
+					'key'   => 'field_hp_cert_left_youtube',
+					'label' => 'Link Video YouTube trái',
+					'name'  => 'hp_cert_left_youtube',
 					'type'  => 'text',
-					'default_value' => 'Tìm hiểu thêm',
+					'instructions' => 'Gắn link YouTube (ví dụ: https://www.youtube.com/watch?v=...). Khi click sẽ mở video dạng popup.',
+					'placeholder'  => 'https://www.youtube.com/watch?v=...',
 				],
 				[
-					'key'   => 'field_hp_cert_right_badge',
-					'label' => 'Box phải - Badge',
-					'name'  => 'hp_cert_right_badge',
-					'type'  => 'text',
-					'default_value' => 'BẰNG CÓ GIÁ TRỊ SỬ DỤNG',
-				],
-				[
-					'key'   => 'field_hp_cert_right_heading',
-					'label' => 'Box phải - Heading',
-					'name'  => 'hp_cert_right_heading',
-					'type'  => 'text',
-					'default_value' => 'SUỐT ĐỜI TRÊN TOÀN QUỐC',
-				],
-				[
-					'key'   => 'field_hp_cert_right_items',
-					'label' => 'Box phải - Nội dung',
-					'name'  => 'hp_cert_right_items',
-					'type'  => 'textarea',
-					'rows'  => 4,
-					'default_value' => "✔ Bằng đại học sử dụng lâu dài, không giới hạn thời gian.\n✔ Cơ hội tiếp tục học lên cao học, thạc sĩ, tiến sĩ.\n✔ Hỗ trợ kết nối việc làm sau khi hoàn thành khóa học.",
-				],
-				[
-					'key'   => 'field_hp_cert_right_cta',
-					'label' => 'Box phải - CTA Text',
-					'name'  => 'hp_cert_right_cta',
-					'type'  => 'text',
-					'default_value' => 'Xem chi tiết',
+					'key'   => 'field_hp_cert_right_content',
+					'label' => 'Nội dung bên phải (Dưới)',
+					'name'  => 'hp_cert_right_content',
+					'type'  => 'wysiwyg',
+					'instructions' => 'Nhập nội dung văn bản hiển thị ở ô dưới bên phải.',
+					'tabs'  => 'all',
+					'toolbar' => 'full',
+					'media_upload' => 1,
+					'default_value' => '
+<p><span style="color: #0284c7; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Bạn có thể sử dụng văn bằng để làm gì?</span></p>
+<h2>VĂN BẰNG SAU TỐT NGHIỆP</h2>
+<h3>Giá trị sử dụng của văn bằng</h3>
+<p>Sau khi tốt nghiệp, người học được cấp văn bằng theo quy định hiện hành và có thể sử dụng để phục vụ các mục tiêu học tập, nghề nghiệp theo điều kiện của từng đơn vị tiếp nhận.</p>
+<ul>
+<li><strong>🎓 Học tiếp lên trình độ cao hơn</strong><br>Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.</li>
+<li><strong>💼 Bổ sung và hoàn thiện hồ sơ nghề nghiệp</strong><br>Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.</li>
+<li><strong>📋 Tham gia tuyển dụng, thi tuyển</strong><br>Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.</li>
+</ul>
+',
 				],
 
 				// ---- Section: Lợi ích ----

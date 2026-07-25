@@ -185,7 +185,13 @@ function ltdh_render_contact_form(): void {
  */
 function ltdh_render_native_form(string $type = 'consultation', array $hidden_fields = []): void {
 ?>
-	<form action="#" method="POST" class="space-y-4">
+	<form action="" method="POST" class="space-y-4">
+		<?php if ( isset( $_GET['submit_success'] ) && '1' === $_GET['submit_success'] ) : ?>
+			<div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 border border-green-200" role="alert">
+				<span class="font-bold">Gửi thông tin thành công!</span> Đội ngũ tư vấn tuyển sinh sẽ liên hệ với bạn trong thời gian sớm nhất.
+			</div>
+		<?php endif; ?>
+
 		<?php foreach ($hidden_fields as $name => $value) : ?>
 			<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>">
 		<?php endforeach; ?>
@@ -198,18 +204,14 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 			<label class="block text-sm font-semibold text-slate-600 mb-1"><?php esc_html_e('Số điện thoại *'); ?></label>
 			<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="<?php esc_attr_e('Số điện thoại liên hệ'); ?>">
 		</div>
-		<?php if ('consultation' === $type) : ?>
-			<div>
-				<label class="block text-sm font-semibold text-slate-600 mb-1"><?php esc_html_e('Email (Tùy chọn)'); ?></label>
-				<input type="email" name="your-email" class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="<?php esc_attr_e('Địa chỉ email'); ?>">
-			</div>
-		<?php endif; ?>
-		<?php if ('consultation' === $type) : ?>
-			<div>
-				<label class="block text-sm font-semibold text-slate-600 mb-1"><?php esc_html_e('Nội dung cần tư vấn'); ?></label>
-				<textarea name="your-message" rows="3" class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="<?php esc_attr_e('Nhập câu hỏi hoặc yêu cầu cụ thể...'); ?>"></textarea>
-			</div>
-		<?php endif; ?>
+		<div>
+			<label class="block text-sm font-semibold text-slate-600 mb-1"><?php esc_html_e('Email (Tùy chọn)'); ?></label>
+			<input type="email" name="your-email" class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="<?php esc_attr_e('Địa chỉ email'); ?>">
+		</div>
+		<div>
+			<label class="block text-sm font-semibold text-slate-600 mb-1"><?php esc_html_e('Nội dung cần tư vấn'); ?></label>
+			<textarea name="your-message" rows="3" class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="<?php esc_attr_e('Nhập câu hỏi hoặc yêu cầu cụ thể...'); ?>"></textarea>
+		</div>
 
 		<button type="submit" class="w-full bg-brand-primary text-white py-3.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-brand-darkBlue transition-all mt-2 min-h-[44px] flex items-center justify-center">
 			<?php echo 'contact' === $type ? esc_html__('Gửi Liên Hệ') : esc_html__('Gửi Thông Tin Ngay'); ?>

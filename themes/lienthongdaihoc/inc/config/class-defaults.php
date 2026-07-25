@@ -36,14 +36,16 @@ function ltdh_get_defaults( string $group ): array {
 				[ 'url' => '/nganh-hoc/',         'label' => 'Ngành học' ],
 				[ 'url' => '/he-dao-tao/',        'label' => 'Hệ đào tạo' ],
 				[ 'url' => '/tin-tuyen-sinh/',    'label' => 'Tin tức' ],
+				[ 'url' => '/lien-he/',           'label' => 'Liên hệ' ],
 			],
 			'mobile' => [
 				[ 'url' => '/',                   'label' => 'Trang chủ' ],
 				[ 'url' => '/truong-lien-ket/',   'label' => 'Trường liên kết' ],
 				[ 'url' => '/nganh-hoc/',         'label' => 'Ngành học' ],
-				[ 'url' => '/chuong-trinh/',      'label' => 'Chương trình' ],
+				[ 'url' => '/he-dao-tao/tu-xa/',  'label' => 'Chương trình' ],
 				[ 'url' => '/tin-tuyen-sinh/',    'label' => 'Tin tức' ],
 				[ 'url' => '/kiem-tra-dieu-kien/', 'label' => 'Kiểm tra điều kiện' ],
+				[ 'url' => '/lien-he/',           'label' => 'Liên hệ' ],
 			],
 			'footer' => [
 				[ 'url' => '/gioi-thieu/',            'label' => 'Giới thiệu' ],

@@ -37,32 +37,7 @@ get_header();
 
 	</div>
 
-	<!-- SEO Content -->
-	<section class="max-w-4xl mx-auto px-4 py-12">
-		<div class="prose prose-slate max-w-none">
-			<h2>Kiểm tra điều kiện tuyển sinh đại học</h2>
-			<p>Công cụ kiểm tra điều kiện tuyển sinh giúp bạn xác định nhanh chóng mình đủ điều kiện tham gia những chương trình đào tạo nào. Chỉ cần trả lời một vài câu hỏi đơn giản, hệ thống sẽ phân tích và gợi ý những chương trình phù hợp nhất.</p>
 
-			<h3>Các bước kiểm tra</h3>
-			<ol>
-				<li>Chọn trình độ học vấn hiện tại</li>
-				<li>Chọn chuyên ngành đang học hoặc đã tốt nghiệp</li>
-				<li>Nhập năm tốt nghiệp</li>
-				<li>Chọn ngành mong muốn</li>
-				<li>Chọn hệ đào tạo phù hợp</li>
-				<li>Chọn cơ sở học</li>
-				<li>Xác định ngân sách</li>
-			</ol>
-
-			<h3>Hệ đào tạo phù hợp</h3>
-			<ul>
-				<li><strong>Liên thông:</strong> Dành cho người có bằng Trung cấp/Cao đẳng muốn nâng cấp lên Đại học</li>
-				<li><strong>Văn bằng 2:</strong> Dành cho người đã có bằng Đại học muốn học thêm ngành khác</li>
-				<li><strong>Từ xa:</strong> Học trực tuyến, phù hợp người đi làm</li>
-				<li><strong>Vừa học vừa làm:</strong> Lịch học linh hoạt, phù hợp người đi làm</li>
-			</ul>
-		</div>
-	</section>
 </main>
 
 <?php

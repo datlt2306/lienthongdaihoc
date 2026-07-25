@@ -195,14 +195,14 @@
             },
             {
                 "key": "field_program_tuition",
-                "label": "Học phí",
+                "label": "Học phí chỉ từ",
                 "name": "tuition_fee",
                 "type": "text",
                 "placeholder": "Ví dụ: 450,000đ / tín chỉ hoặc 15,000,000đ / học kỳ"
             },
             {
                 "key": "field_program_duration",
-                "label": "Thời gian đào tạo",
+                "label": "Thời gian học",
                 "name": "duration",
                 "type": "text",
                 "placeholder": "Ví dụ: 1.5 - 2 năm"
@@ -221,7 +221,7 @@
             },
             {
                 "key": "field_program_period",
-                "label": "Hạn nhận hồ sơ / Thời gian khai giảng",
+                "label": "Hạn hồ sơ",
                 "name": "enrollment_period",
                 "type": "text",
                 "placeholder": "Ví dụ: Đợt 1 đến hết 30/11/2026"
@@ -235,19 +235,13 @@
             },
             {
                 "key": "field_program_benefits",
-                "label": "Quyền lợi / Ưu điểm chương trình",
+                "label": "Quyền lợi nổi bật",
                 "name": "program_benefits",
                 "type": "wysiwyg"
             },
             {
-                "key": "field_program_why_choose",
-                "label": "Tại sao nên học chương trình này?",
-                "name": "why_choose_us",
-                "type": "wysiwyg"
-            },
-            {
                 "key": "field_program_faq",
-                "label": "Câu hỏi thường gặp (FAQs)",
+                "label": "Câu hỏi thường gặp",
                 "name": "faq",
                 "type": "repeater",
                 "layout": "row",
@@ -267,38 +261,6 @@
                         "rows": 3
                     }
                 ]
-            },
-            {
-                "key": "field_program_schedule",
-                "label": "Lịch học",
-                "name": "schedule",
-                "type": "text",
-                "placeholder": "Ví dụ: Thứ 7 hàng tuần, 2 buổi/tuần..."
-            },
-            {
-                "key": "field_program_target_students",
-                "label": "Đối tượng tuyển sinh",
-                "name": "target_students",
-                "type": "wysiwyg"
-            },
-            {
-                "key": "field_program_degree_type",
-                "label": "Loại bằng",
-                "name": "degree_type",
-                "type": "text",
-                "placeholder": "Ví dụ: Cử nhân, Thạc sĩ..."
-            },
-            {
-                "key": "field_program_diploma_value",
-                "label": "Giá trị bằng cấp",
-                "name": "diploma_value",
-                "type": "wysiwyg"
-            },
-            {
-                "key": "field_program_disadvantages",
-                "label": "Nhược điểm",
-                "name": "disadvantages",
-                "type": "wysiwyg"
             }
         ],
         "location": [
@@ -446,6 +408,29 @@
                         }
                     ]
                 ]
+            },
+            {
+                "key": "field_tab_telegram",
+                "label": "Tích hợp Telegram",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_telegram_bot_token",
+                "label": "Telegram Bot Token",
+                "name": "telegram_bot_token",
+                "type": "text",
+                "instructions": "Nhập Token của Telegram Bot nhận từ BotFather. Hệ thống sẽ ưu tiên nếu hằng số constants.php không khai báo.",
+                "placeholder": "Ví dụ: 8601249321:AAEEXIyFMz1o9-Pcs8pAIyrAlrG7EYaYjaE"
+            },
+            {
+                "key": "field_telegram_chat_id",
+                "label": "Telegram Chat ID / Group ID",
+                "name": "telegram_chat_id",
+                "type": "text",
+                "instructions": "Nhập Chat ID hoặc ID của Group nhận thông báo. Hệ thống sẽ ưu tiên nếu hằng số constants.php không khai báo.",
+                "placeholder": "Ví dụ: 233224973 hoặc -100123456789"
             }
         ],
         "location": [

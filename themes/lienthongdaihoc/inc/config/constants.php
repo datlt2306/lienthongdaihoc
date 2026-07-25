@@ -71,3 +71,14 @@ define( 'LTDH_META_AD_GROUPS', 'admission_groups' );
 define( 'LTDH_STATUS_OPEN', 'tuyen-sinh' );
 define( 'LTDH_STATUS_PAUSED', 'tam-ngung' );
 define( 'LTDH_STATUS_COMING_SOON', 'sap-mo' );
+
+// ====================================================
+// Telegram Bot Settings (For Lead Notifications)
+// Can be overridden in wp-config.php for production security
+// ====================================================
+if ( ! defined( 'LTDH_TELEGRAM_BOT_TOKEN' ) ) {
+	define( 'LTDH_TELEGRAM_BOT_TOKEN', '' );
+}
+if ( ! defined( 'LTDH_TELEGRAM_CHAT_ID' ) ) {
+	define( 'LTDH_TELEGRAM_CHAT_ID', '' );
+}

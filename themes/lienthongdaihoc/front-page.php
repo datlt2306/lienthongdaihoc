@@ -104,7 +104,7 @@ $zalo    = ltdh_get_zalo_url();
 							$cta_sec_text = get_field('hero_cta_secondary_text', 'options') ?: '';
 						}
 						?>
-						<a href="<?php echo esc_url($cta_url ? home_url($cta_url) : home_url('/chuong-trinh/')); ?>" class="bg-brand-accent text-white text-center px-8 py-4 rounded-xl font-bold hover:bg-[#e06e00] transition-all flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20">
+						<a href="<?php echo esc_url($cta_url ? $cta_url : home_url('/he-dao-tao/tu-xa/')); ?>" class="bg-brand-accent text-white text-center px-8 py-4 rounded-xl font-bold hover:bg-[#e06e00] transition-all flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20">
 							<?php echo esc_html($cta_text ?: 'Tra cứu tuyển sinh'); ?>
 							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -142,7 +142,7 @@ $zalo    = ltdh_get_zalo_url();
 	<!-- Search & Filters Container (Compact Single-Row Bar) -->
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-30 hidden">
 		<div class="bg-white rounded-xl shadow-xl border border-slate-100 p-4 md:p-5">
-			<form action="<?php echo esc_url(home_url('/chuong-trinh/')); ?>" method="GET" class="space-y-3 md:space-y-0">
+			<form action="<?php echo esc_url(home_url('/he-dao-tao/tu-xa/')); ?>" method="GET" class="space-y-3 md:space-y-0">
 				<!-- Keyword (always visible) -->
 				<div class="flex-1 min-w-[20%]">
 					<input type="text" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm md:text-xs focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[40px] md:min-h-[38px]" />
@@ -184,7 +184,7 @@ $zalo    = ltdh_get_zalo_url();
 						<button type="submit" class="flex-1 md:flex-none bg-brand-primary hover:bg-brand-darkBlue text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition-all uppercase tracking-wider min-h-[40px] md:min-h-[38px]">
 							Tìm kiếm
 						</button>
-						<a href="<?php echo esc_url(home_url('/chuong-trinh/')); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition-all flex items-center justify-center min-h-[40px] md:min-h-[38px]" title="Reset bộ lọc">
+						<a href="<?php echo esc_url(home_url('/he-dao-tao/tu-xa/')); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition-all flex items-center justify-center min-h-[40px] md:min-h-[38px]" title="Reset bộ lọc">
 							🔄
 						</a>
 					</div>
@@ -316,80 +316,7 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<!-- 4. ELIGIBILITY QUICK CHECK SECTION -->
-	<section class="py-12 bg-slate-50 border-t border-slate-100">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-				<div class="lg:col-span-7 space-y-4">
-					<?php
-					$e_badge = '';
-					$e_heading = '';
-					$e_desc = '';
-					$e_items = [];
-					$e_cta_text = '';
-					$e_cta_url = '';
-					if (function_exists('get_field')) {
-						$e_badge = get_field('hp_elig_badge', 'options') ?: '';
-						$e_heading = get_field('hp_elig_heading', 'options') ?: '';
-						$e_desc = get_field('hp_elig_desc', 'options') ?: '';
-						$e_items = get_field('hp_elig_items', 'options') ?: [];
-						$e_cta_text = get_field('hp_elig_cta_text', 'options') ?: '';
-						$e_cta_url = get_field('hp_elig_cta_url', 'options') ?: '';
-					}
-					$e_heading = str_replace('\n', '<br>', $e_heading);
-					?>
-					<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">
-						<?php echo esc_html($e_badge ?: 'Điều kiện tuyển sinh'); ?>
-					</span>
-					<h2 class="text-2xl sm:text-3xl lg:text-4xl font-black font-display text-slate-900 leading-tight">
-						<?php echo $e_heading ?: 'Bạn có đủ điều kiện học<br>Liên thông & Đại học từ xa?'; ?>
-					</h2>
-					<p class="text-slate-500 text-sm leading-relaxed max-w-2xl">
-						<?php echo esc_html($e_desc ?: 'Chương trình tuyển sinh mở rộng cho nhiều đối tượng. Chỉ mất 1 phút để kiểm tra tự động.'); ?>
-					</p>
-					<?php
-					$e_items_default = [
-						['title' => 'Người đi làm', 'desc' => 'Học trực tuyến linh hoạt'],
-						['title' => 'Đã tốt nghiệp TC/CĐ', 'desc' => 'Liên thông miễn giảm tín'],
-						['title' => 'Học sinh tốt nghiệp THPT', 'desc' => 'Xét học bạ tuyển thẳng'],
-					];
-					$e_items_render = !empty($e_items) ? $e_items : $e_items_default;
-					?>
-					<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-						<?php foreach ($e_items_render as $item) : ?>
-							<div class="bg-white p-3 rounded-lg border border-slate-200">
-								<span class="block text-sm font-bold text-slate-800 mb-0.5"><?php echo esc_html($item['title'] ?? ''); ?></span>
-								<span class="text-xs text-slate-500"><?php echo esc_html($item['desc'] ?? ''); ?></span>
-							</div>
-						<?php endforeach; ?>
-					</div>
-					<div class="flex flex-wrap gap-3 pt-4">
-						<a href="<?php echo esc_url($e_cta_url ? home_url($e_cta_url) : home_url('/kiem-tra-dieu-kien/')); ?>" class="bg-brand-accent text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-[#e06e00] transition-all shadow-md shadow-brand-primary/10">
-							<?php echo esc_html($e_cta_text ?: 'Bắt đầu kiểm tra ngay ➔'); ?>
-						</a>
-						<a href="#register-section" class="bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all">
-							Tư vấn tiêu chuẩn tuyển sinh
-						</a>
-					</div>
-				</div>
-				<div class="lg:col-span-5 flex justify-center">
-					<div class="relative w-full max-w-sm aspect-video sm:aspect-square bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-						<div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 space-y-2">
-							<?php foreach ($e_items_render as $item) : ?>
-								<div class="flex items-center gap-2">
-									<span class="text-green-500 text-lg">✔</span>
-									<span class="text-xs font-bold text-slate-700"><?php echo esc_html($item['title'] ?? ''); ?></span>
-								</div>
-							<?php endforeach; ?>
-						</div>
-						<div class="text-center pt-2">
-							<span class="text-[11px] text-slate-400 block font-medium">Bằng đại học được Bộ GD&ĐT cấp phép và công nhận</span>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
+
 	<!-- 8. DOUBLE CERTIFICATE VALUE PROPOSITION -->
 	<?php
 	$c_left_badge = '';
@@ -400,51 +327,414 @@ $zalo    = ltdh_get_zalo_url();
 	$c_right_heading = '';
 	$c_right_items = '';
 	$c_right_cta = '';
+	$c_left_badge = '';
+	$c_left_heading = '';
+	$c_slider_items = [];
+	$c_left_image = '';
+	$c_left_youtube = '';
+	$c_right_image = '';
+	$c_right_content = '';
 	if (function_exists('get_field')) {
 		$c_left_badge = get_field('hp_cert_left_badge', 'options') ?: '';
 		$c_left_heading = get_field('hp_cert_left_heading', 'options') ?: '';
-		$c_left_items = get_field('hp_cert_left_items', 'options') ?: '';
-		$c_left_cta = get_field('hp_cert_left_cta', 'options') ?: '';
-		$c_right_badge = get_field('hp_cert_right_badge', 'options') ?: '';
-		$c_right_heading = get_field('hp_cert_right_heading', 'options') ?: '';
-		$c_right_items = get_field('hp_cert_right_items', 'options') ?: '';
-		$c_right_cta = get_field('hp_cert_right_cta', 'options') ?: '';
+		$c_slider_items = get_field('hp_cert_slider', 'options') ?: [];
+		$c_left_image = get_field('hp_cert_left_image', 'options') ?: '';
+		$c_left_youtube = get_field('hp_cert_left_youtube', 'options') ?: '';
+		$c_right_image = get_field('hp_cert_right_image', 'options') ?: '';
+		$c_right_content = get_field('hp_cert_right_content', 'options') ?: '';
 	}
 	?>
-	<section class="py-12 bg-white">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-			<div class="bg-slate-50 border border-slate-100 rounded-lg p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
-				<div class="flex-1 space-y-4">
-					<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider"><?php echo esc_html($c_left_badge ?: 'BẰNG CẤP TƯƠNG ĐƯƠNG'); ?></span>
-					<h3 class="font-extrabold text-xl text-slate-900 leading-tight"><?php echo esc_html($c_left_heading ?: 'BẰNG ĐẠO TẠO CHÍNH QUY'); ?></h3>
-					<div class="space-y-2 text-sm text-slate-600">
-						<?php echo nl2br(esc_html($c_left_items ?: "✔ Học chương trình chuẩn theo quy định của bộ GD&ĐT.\n✔ Đảm bảo giá trị pháp lý, sử dụng toàn quốc.\n✔ Phục vụ học tập, thi công chức, nâng lương nâng bậc.\n✔ Hồ sơ nhanh gọn - Quy trình rõ ràng.")); ?>
+	<section class="py-16 bg-white overflow-hidden">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 lg:space-y-24">
+			
+			<!-- Row 1: [Text Content] [Slider] -->
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+				<!-- Left column: Text Content -->
+				<div class="space-y-6">
+					<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider"><?php echo esc_html($c_left_badge ?: 'BẰNG CẤP TƯƠNG ĐƯƠNG'); ?></span>
+					
+					<h2 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+						<?php 
+						$heading = $c_left_heading ?: 'Không ghi hình thức đào tạo';
+						$words = explode(' ', $heading);
+						if ( count($words) > 2 ) {
+							$last_words = implode(' ', array_slice($words, -3));
+							$first_words = implode(' ', array_slice($words, 0, count($words) - 3));
+							echo esc_html($first_words) . ' <span class="text-brand-primary inline">' . esc_html($last_words) . '</span>';
+						} else {
+							echo esc_html($heading);
+						}
+						?>
+					</h2>
+
+					<div class="space-y-4 text-slate-600 text-sm md:text-base leading-relaxed">
+						<p>Từ ngày <strong>01/03/2020</strong>, bằng tốt nghiệp đại học sẽ không còn phân biệt hình thức đào tạo như chính quy, tại chức, từ xa...</p>
+						<p>Theo <strong>Thông tư 27/2019/TT-BGDĐT</strong>, trên văn bằng sẽ vẫn ghi các nội dung cũ nhưng không ghi thông tin về hình thức đào tạo.</p>
+					</div>
+
+					<div class="pt-4 border-t border-slate-100">
+						<h3 class="font-bold text-slate-800 text-lg mb-4">Có Giá Trị Sử Dụng Suốt Đời Trên Toàn Quốc</h3>
+						
+						<div class="space-y-4">
+							<div class="flex gap-4">
+								<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+									<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+									</svg>
+								</div>
+								<div>
+									<h4 class="font-bold text-slate-900 text-base">Bằng đỏ</h4>
+									<p class="text-slate-500 text-sm leading-relaxed">Sau khi hoàn thành chương trình, học viên sẽ được trường Đại học cấp bằng Cử nhân (Bằng đỏ), được Bộ GD&ĐT công nhận.</p>
+								</div>
+							</div>
+
+							<div class="flex gap-4">
+								<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+									<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+									</svg>
+								</div>
+								<div>
+									<h4 class="font-bold text-slate-900 text-base">Có Thể Dùng Để Học Lên Các Bậc Cao Hơn</h4>
+									<p class="text-slate-500 text-sm leading-relaxed">Thi công chức nhà nước, xét nâng bậc lương, đi du học.</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="w-full md:w-36 shrink-0 aspect-[3/4] bg-white border border-slate-100 rounded-lg p-2 flex items-center justify-center shadow-inner">
-					<div class="text-center leading-none">
-						<span class="text-4xl block mb-2">📜</span>
-						<span class="text-sm text-slate-400 block uppercase font-bold">BẰNG ĐẠI HỌC</span>
+
+				<!-- Right column: Slider Wrapper -->
+				<div class="relative flex justify-center w-full">
+					<style>
+						.cert-slider-wrapper {
+							position: relative;
+							width: 100%;
+							max-width: 32rem; /* max-w-lg */
+							aspect-ratio: 1.4; /* Perfect aspect ratio for certificate documents */
+							border-radius: 1.5rem; /* rounded-3xl */
+							overflow: hidden;
+							box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
+							background-color: #ffffff; /* match white degree background */
+						}
+						.cert-slider-container {
+							position: relative;
+							width: 100%;
+							height: 100%;
+							overflow: hidden;
+						}
+						.cert-slide {
+							position: absolute;
+							top: 0;
+							left: 0;
+							width: 100%;
+							height: 100%;
+							opacity: 0;
+							z-index: 1;
+							transition: opacity 1s ease-in-out;
+						}
+						.cert-slide.active {
+							opacity: 1;
+							z-index: 10;
+						}
+						.cert-slide img {
+							width: 100%;
+							height: 100%;
+							object-fit: contain;
+							background-color: #ffffff;
+						}
+						.cert-slider-dots {
+							position: absolute;
+							bottom: 24px;
+							right: 24px;
+							z-index: 20;
+							display: flex;
+							gap: 8px;
+						}
+						.cert-slider-dot {
+							width: 10px;
+							height: 10px;
+							border-radius: 50%;
+							border: none;
+							background-color: rgba(255, 255, 255, 0.5);
+							cursor: pointer;
+							transition: all 0.3s ease;
+						}
+						.cert-slider-dot.active {
+							background-color: #ffffff;
+							transform: scale(1.2);
+						}
+					</style>
+					<div class="cert-slider-wrapper">
+						<!-- Slider Container -->
+						<div class="cert-slider-container">
+							<?php 
+							$slides = [];
+							if ( ! empty( $c_slider_items ) ) {
+								foreach ( $c_slider_items as $item ) {
+									if ( ! empty( $item['image'] ) ) {
+										$img_val = $item['image'];
+										if ( is_numeric( $img_val ) ) {
+											$slides[] = wp_get_attachment_url( $img_val );
+										} elseif ( is_array( $img_val ) && isset( $img_val['url'] ) ) {
+											$slides[] = $img_val['url'];
+										} else {
+											$slides[] = $img_val;
+										}
+									}
+								}
+							}
+							
+							if ( empty( $slides ) ) {
+								$slides[] = home_url('wp-content/uploads/2026/07/students-graduation.jpg');
+							}
+							
+							foreach ( $slides as $index => $slide_url ) :
+							?>
+								<div class="cert-slide <?php echo $index === 0 ? 'active' : ''; ?>" data-slide-index="<?php echo $index; ?>">
+									<img src="<?php echo esc_url($slide_url); ?>" alt="Students Graduation Slide">
+								</div>
+							<?php endforeach; ?>
+						</div>
+
+						<!-- Slider Dots -->
+						<?php if ( count($slides) > 1 ) : ?>
+							<div class="cert-slider-dots">
+								<?php foreach ( $slides as $index => $slide ) : ?>
+									<button class="cert-slider-dot <?php echo $index === 0 ? 'active' : ''; ?>" data-dot-index="<?php echo $index; ?>" aria-label="Go to slide <?php echo $index + 1; ?>"></button>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+
+						<!-- Orange badge -->
+						<div class="absolute bottom-6 left-6 bg-[#f97316] text-white p-5 rounded-2xl shadow-xl flex flex-col justify-center max-w-[150px] z-20 hover:scale-105 transition-transform duration-300 pointer-events-none">
+							<span class="text-3xl font-black leading-none">100%</span>
+							<span class="text-[9px] font-extrabold tracking-wider uppercase mt-2 leading-tight">BẰNG CỬ NHÂN<br>CHÍNH QUY</span>
+						</div>
 					</div>
 				</div>
 			</div>
-			<div class="bg-slate-50 border border-slate-100 rounded-lg p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
-				<div class="flex-1 space-y-4">
-					<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider"><?php echo esc_html($c_right_badge ?: 'BẰNG CÓ GIÁ TRỊ SỬ DỤNG'); ?></span>
-					<h3 class="font-extrabold text-xl text-slate-900 leading-tight"><?php echo esc_html($c_right_heading ?: 'SUỐT ĐỜI TRÊN TOÀN QUỐC'); ?></h3>
-					<div class="space-y-2 text-sm text-slate-600">
-						<?php echo nl2br(esc_html($c_right_items ?: "✔ Bằng đại học sử dụng lâu dài, không giới hạn thời gian.\n✔ Cơ hội tiếp tục học lên cao học, thạc sĩ, tiến sĩ.\n✔ Hỗ trợ kết nối việc làm sau khi hoàn thành khóa học.")); ?>
+
+			<!-- Row 2: [Video Card] [Text Content] -->
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+				<!-- Left column: Video Card -->
+				<div class="relative overflow-hidden rounded-3xl shadow-lg aspect-video group bg-slate-800 flex items-center justify-center <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
+					<img src="<?php echo esc_url($c_left_image ?: home_url('wp-content/uploads/2026/07/vtv-news-thumb.png')); ?>" alt="VTV24 Video Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+					
+					<?php if (!empty($c_left_youtube)): ?>
+						<!-- Play button overlay -->
+						<div class="absolute inset-0 bg-slate-950/20 flex items-center justify-center">
+							<div class="w-16 h-16 bg-[#e11d48] text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
+								<svg class="w-8 h-8 fill-current translate-x-0.5" viewBox="0 0 24 24">
+									<path d="M8 5v14l11-7z"/>
+								</svg>
+							</div>
+						</div>
+					<?php endif; ?>
+
+					<!-- Bottom title bar -->
+					<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent p-5 pt-10">
+						<p class="text-white font-extrabold text-sm md:text-base leading-snug">Văn bằng đại học mới sẽ không còn ghi hình thức đào tạo - VTV24 News</p>
 					</div>
 				</div>
-				<div class="w-full md:w-36 shrink-0 aspect-[3/4] bg-white border border-slate-100 rounded-lg p-2 flex items-center justify-center shadow-inner">
-					<div class="text-center leading-none">
-						<span class="text-4xl block mb-2">🛡</span>
-						<span class="text-sm text-slate-400 block uppercase font-bold">CHỨNG CHỈ</span>
-					</div>
+
+				<!-- Right column: Text Content -->
+				<div class="space-y-6">
+					<?php if (!empty($c_right_content)): ?>
+						<div class="prose max-w-none text-slate-700 text-sm md:text-base leading-relaxed">
+							<?php echo wp_kses_post($c_right_content); ?>
+						</div>
+					<?php else: ?>
+						<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">
+							Bạn có thể sử dụng văn bằng để làm gì?
+						</span>
+						
+						<h2 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+							<?php 
+							$right_heading = 'Văn bằng sau tốt nghiệp';
+							$words_right = explode(' ', $right_heading);
+							if ( count($words_right) > 2 ) {
+								$last_words_right = implode(' ', array_slice($words_right, -3));
+								$first_words_right = implode(' ', array_slice($words_right, 0, count($words_right) - 3));
+								echo esc_html($first_words_right) . ' <span class="text-brand-primary inline">' . esc_html($last_words_right) . '</span>';
+							} else {
+								echo esc_html($right_heading);
+							}
+							?>
+						</h2>
+
+						<div class="space-y-4 text-slate-600 text-sm md:text-base leading-relaxed">
+							<p>Sau khi tốt nghiệp, người học được cấp văn bằng theo quy định hiện hành và có thể sử dụng để phục vụ các mục tiêu học tập, nghề nghiệp theo điều kiện của từng đơn vị tiếp nhận.</p>
+						</div>
+
+						<div class="pt-4 border-t border-slate-100">
+							<h3 class="font-bold text-slate-800 text-lg mb-4">Giá trị sử dụng của văn bằng</h3>
+							
+							<div class="space-y-4">
+								<div class="flex gap-4">
+									<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+										<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+										</svg>
+									</div>
+									<div>
+										<h4 class="font-bold text-slate-900 text-base">Học tiếp lên trình độ cao hơn</h4>
+										<p class="text-slate-500 text-sm leading-relaxed">Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.</p>
+									</div>
+								</div>
+
+								<div class="flex gap-4">
+									<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+										<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+										</svg>
+									</div>
+									<div>
+										<h4 class="font-bold text-slate-900 text-base">Bổ sung và hoàn thiện hồ sơ nghề nghiệp</h4>
+										<p class="text-slate-500 text-sm leading-relaxed">Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.</p>
+									</div>
+								</div>
+
+								<div class="flex gap-4">
+									<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+										<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+										</svg>
+									</div>
+									<div>
+										<h4 class="font-bold text-slate-900 text-base">Tham gia tuyển dụng, thi tuyển</h4>
+										<p class="text-slate-500 text-sm leading-relaxed">Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					<?php endif; ?>
 				</div>
 			</div>
+			
 		</div>
 	</section>
+
+	<!-- YouTube Video Popup Modal -->
+	<div id="youtube-video-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-slate-900/80 p-4 transition-all duration-300 opacity-0">
+		<div class="relative w-full max-w-4xl bg-black rounded-lg overflow-hidden shadow-2xl">
+			<!-- Close Button -->
+			<button id="close-video-modal" class="absolute top-3 right-3 text-white/80 hover:text-white bg-slate-800/50 hover:bg-slate-700 rounded-full p-2 focus:outline-none transition-colors z-50">
+				<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</button>
+			<!-- Video Container -->
+			<div class="aspect-video w-full">
+				<iframe id="modal-video-iframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const modal = document.getElementById('youtube-video-modal');
+			const iframe = document.getElementById('modal-video-iframe');
+			const closeBtn = document.getElementById('close-video-modal');
+			const triggerElements = document.querySelectorAll('[data-youtube]');
+
+			function getYoutubeId(url) {
+				const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+				const match = url.match(regExp);
+				return (match && match[2].length === 11) ? match[2] : null;
+			}
+
+			triggerElements.forEach(elem => {
+				elem.addEventListener('click', function() {
+					const url = this.getAttribute('data-youtube');
+					const videoId = getYoutubeId(url);
+					if (videoId) {
+						iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+						modal.classList.remove('hidden');
+						modal.classList.add('flex');
+						// Force reflow
+						setTimeout(() => {
+							modal.classList.remove('opacity-0');
+							modal.classList.add('opacity-100');
+						}, 50);
+					}
+				});
+			});
+
+			function closeModal() {
+				modal.classList.remove('opacity-100');
+				modal.classList.add('opacity-0');
+				setTimeout(() => {
+					modal.classList.remove('flex');
+					modal.classList.add('hidden');
+					iframe.src = '';
+				}, 300);
+			}
+
+			if (closeBtn) {
+				closeBtn.addEventListener('click', closeModal);
+			}
+			if (modal) {
+				modal.addEventListener('click', function(e) {
+					if (e.target === modal) {
+						closeModal();
+					}
+				});
+			}
+
+			// Image Slider Logic
+			const slides = document.querySelectorAll('.cert-slide');
+			const dots = document.querySelectorAll('.cert-slider-dot');
+			if (slides.length > 1) {
+				let currentSlide = 0;
+				let slideInterval;
+
+				function showSlide(index) {
+					slides.forEach((slide, i) => {
+						if (i === index) {
+							slide.classList.remove('opacity-0', 'z-0');
+							slide.classList.add('opacity-100', 'z-10');
+						} else {
+							slide.classList.remove('opacity-100', 'z-10');
+							slide.classList.add('opacity-0', 'z-0');
+						}
+					});
+					dots.forEach((dot, i) => {
+						if (i === index) {
+							dot.classList.remove('bg-white/50', 'scale-100');
+							dot.classList.add('bg-white', 'scale-125');
+						} else {
+							dot.classList.remove('bg-white', 'scale-125');
+							dot.classList.add('bg-white/50', 'scale-100');
+						}
+					});
+					currentSlide = index;
+				}
+
+				function nextSlide() {
+					let next = (currentSlide + 1) % slides.length;
+					showSlide(next);
+				}
+
+				function startSlider() {
+					slideInterval = setInterval(nextSlide, 4000);
+				}
+
+				function stopSlider() {
+					clearInterval(slideInterval);
+				}
+
+				dots.forEach((dot, i) => {
+					dot.addEventListener('click', () => {
+						stopSlider();
+						showSlide(i);
+						startSlider();
+					});
+				});
+
+				startSlider();
+			}
+		});
+	</script>
 	<!-- 5. STUDENT BENEFITS -->
 	<?php
 	$b_heading = '';
@@ -582,44 +872,7 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<!-- 8. SEGMENTS SECTION -->
-	<?php
-	$s_heading = '';
-	$s_desc = '';
-	$s_items = [];
-	if (function_exists('get_field')) {
-		$s_heading = get_field('hp_seg_heading', 'options') ?: '';
-		$s_desc = get_field('hp_seg_desc', 'options') ?: '';
-		$s_items = get_field('hp_seg_items', 'options') ?: [];
-	}
-	$s_items_default = [
-		['image' => ltdh_get_fallback_image('segment_1'), 'title' => 'Cho người đi làm', 'desc' => 'Lịch học linh hoạt, học trực tuyến 100% không làm gián đoạn công việc bận rộn hàng ngày.'],
-		['image' => ltdh_get_fallback_image('segment_2'), 'title' => 'Cho học sinh lớp 12', 'desc' => 'Định hướng nghề nghiệp sớm, đăng ký lộ trình học liên kết đại học - mở ra tương lai rộng mở.'],
-		['image' => ltdh_get_fallback_image('segment_3'), 'title' => 'Cho người muốn liên thông', 'desc' => 'Từ Trung cấp/Cao đẳng lên Đại học. Rút ngắn thời gian đào tạo và tối ưu hóa chi phí học tập.'],
-		['image' => ltdh_get_fallback_image('segment_4'), 'title' => 'Cho người muốn chuyển ngành', 'desc' => 'Đón đầu xu hướng chuyển dịch lao động sang các ngành công nghệ, dịch vụ hot nhất hiện nay.'],
-		['image' => ltdh_get_fallback_image('segment_5'), 'title' => 'Cho người học văn bằng 2', 'desc' => 'Mở rộng kiến thức đa lĩnh vực, gấp đôi cơ hội ứng tuyển và nâng cao giá trị thương hiệu cá nhân.'],
-	];
-	$s_items_render = !empty($s_items) ? $s_items : $s_items_default;
-	?>
-	<section class="py-16 bg-slate-50 border-y border-slate-100">
-		<div class="max-w-7xl mx-auto relative">
-			<div class="text-center max-w-2xl mx-auto mb-12 px-4">
-				<h2 class="text-xl md:text-3xl font-black text-slate-900 mb-2"><?php echo esc_html($s_heading ?: 'Chương trình phù hợp với bạn?'); ?></h2>
-				<p class="text-slate-500 text-sm"><?php echo esc_html($s_desc ?: 'Chúng tôi thiết kế các lộ trình học tối ưu riêng cho từng nhóm đối tượng cụ thể.'); ?></p>
-			</div>
-			<div class="flex md:grid md:grid-cols-5 gap-4 overflow-x-auto snap-x snap-mandatory px-4 pb-2 md:px-0 md:pb-0 scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
-				<?php foreach ($s_items_render as $i => $seg) : ?>
-					<div class="bg-white border border-slate-100 rounded-lg p-5 hover:border-brand-primary transition-all flex flex-col justify-between snap-start shrink-0 w-[200px] md:w-auto">
-						<div class="space-y-2">
-							<div class="h-32 bg-slate-100 rounded-lg overflow-hidden bg-cover bg-center mb-3" style="background-image: url('<?php echo esc_url($seg['image'] ?? ltdh_get_fallback_image('segment_' . ($i + 1))); ?>');"></div>
-							<h4 class="font-bold text-slate-800 text-xs"><?php echo esc_html($seg['title'] ?? ''); ?></h4>
-							<p class="text-[11px] text-slate-500 leading-normal"><?php echo esc_html($seg['desc'] ?? ''); ?></p>
-						</div>
-					</div>
-				<?php endforeach; ?>
-			</div>
-		</div>
-	</section>
+
 
 	<!-- 9. DYNAMIC CONSULTATION FORM SECTION -->
 	<section id="register-section" class="py-16 bg-white">

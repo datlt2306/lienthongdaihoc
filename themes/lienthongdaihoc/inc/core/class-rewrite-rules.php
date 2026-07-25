@@ -27,7 +27,15 @@ function ltdh_redirect_taxonomy_base() {
 	}
 	$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
 	if ( preg_match( '#^/co-so/?$#i', $request_path ) ) {
-		wp_redirect( home_url( '/chuong-trinh/' ), 301 );
+		wp_redirect( home_url( '/he-dao-tao/tu-xa/' ), 301 );
+		exit;
+	}
+	if ( preg_match( '#^/chuong-trinh/?$#i', $request_path ) ) {
+		$redirect_url = home_url( '/he-dao-tao/tu-xa/' );
+		if ( ! empty( $_GET ) ) {
+			$redirect_url = add_query_arg( $_GET, $redirect_url );
+		}
+		wp_redirect( $redirect_url, 301 );
 		exit;
 	}
 }

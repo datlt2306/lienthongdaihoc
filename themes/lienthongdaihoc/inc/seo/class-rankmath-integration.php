@@ -212,3 +212,42 @@ function ltdh_seo_compare_schema( $data, $json_ld ) {
 	return $data;
 }
 add_filter( 'rank_math/json_ld', 'ltdh_seo_compare_schema', 99, 2 );
+
+// ----------------------------------------------------
+// 7. Open Graph & Social Share Image
+// ----------------------------------------------------
+
+/**
+ * Filter Rank Math OpenGraph Image.
+ */
+add_filter( 'rank_math/opengraph/facebook/image', 'ltdh_seo_fallback_og_image' );
+add_filter( 'rank_math/opengraph/twitter/image', 'ltdh_seo_fallback_og_image' );
+
+function ltdh_seo_fallback_og_image( $image_url ) {
+	if ( ! empty( $image_url ) ) {
+		return $image_url;
+	}
+	return get_template_directory_uri() . '/assets/images/banner-program.jpg';
+}
+
+/**
+ * Output og:image tag in wp_head as a robust fallback for general sharing.
+ */
+add_action( 'wp_head', function() {
+	if ( class_exists( 'RankMath' ) ) {
+		return;
+	}
+	
+	$thumbnail_url = get_template_directory_uri() . '/assets/images/banner-program.jpg';
+	
+	if ( is_singular() && has_post_thumbnail() ) {
+		$thumbnail_url = get_the_post_thumbnail_url( null, 'large' );
+	}
+	
+	echo "\n" . '<!-- Social Share Meta Tags -->' . "\n";
+	echo '<meta property="og:image" content="' . esc_url( $thumbnail_url ) . '" />' . "\n";
+	echo '<meta property="og:image:width" content="1200" />' . "\n";
+	echo '<meta property="og:image:height" content="630" />' . "\n";
+	echo '<meta name="twitter:image" content="' . esc_url( $thumbnail_url ) . '" />' . "\n";
+}, 5 );
+

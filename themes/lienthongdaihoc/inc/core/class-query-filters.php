@@ -17,6 +17,10 @@ function ltdh_customize_archive_queries( $query ) {
 		return;
 	}
 
+	if ( $query->is_tax( LTDH_TAX_TRAINING_TYPE ) ) {
+		$query->set( 'post_type', LTDH_CPT_PROGRAM );
+	}
+
 	if ( $query->is_post_type_archive( LTDH_CPT_SCHOOL ) || $query->is_post_type_archive( LTDH_CPT_MAJOR ) ) {
 		$limit        = isset( $_GET['limit'] ) ? intval( $_GET['limit'] ) : -1;
 		$valid_limits = [ 10, 20, 30, 50, 100, -1 ];

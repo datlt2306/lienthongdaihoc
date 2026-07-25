@@ -1,236 +1,122 @@
 <?php
 /**
- * Eligibility Checker — Multi-step Wizard
+ * Eligibility Checker — Unified Single-Page Form (Quick Check Only)
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // Load majors for dropdown
 $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC' ] );
-
-// Graduation years (now Birth Years)
-$current_year = (int) date( 'Y' );
-$years = range( $current_year - 18, $current_year - 70 );
 ?>
 
-<div class="elig-wizard-container">
+<div class="elig-form-container bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
 
-	<!-- Progress Bar -->
-	<div class="elig-progress">
-		<div class="elig-progress-bar">
-			<div id="elig-progress-fill" class="elig-progress-fill" style="width: 11%"></div>
-		</div>
-		<span id="elig-progress-text" class="elig-progress-text">Bước 1 / 8</span>
-	</div>
-
-	<!-- Steps Container -->
-	<div id="elig-steps" class="elig-steps">
-
-		<!-- Step 1: Education Level -->
-		<div class="elig-step active" data-step="1">
-			<h2 class="elig-step-title">Trình độ học vấn hiện tại</h2>
-			<p class="elig-step-desc">Bạn hiện có bằng cấp nào?</p>
-			<div class="elig-options">
-				<label class="elig-option">
-					<input type="radio" name="education" value="thap-phan">
-					<span class="elig-option-box">
-						<span class="elig-option-icon">🎓</span>
-						<span class="elig-option-text">THPT</span>
-						<span class="elig-option-sub">Tốt nghiệp Phổ thông</span>
-					</span>
-				</label>
-				<label class="elig-option">
-					<input type="radio" name="education" value="trung-cap">
-					<span class="elig-option-box">
-						<span class="elig-option-icon">📘</span>
-						<span class="elig-option-text">Trung cấp</span>
-						<span class="elig-option-sub">Bằng Trung cấp</span>
-					</span>
-				</label>
-				<label class="elig-option">
-					<input type="radio" name="education" value="cao-dang">
-					<span class="elig-option-box">
-						<span class="elig-option-icon">📗</span>
-						<span class="elig-option-text">Cao đẳng</span>
-						<span class="elig-option-sub">Bằng Cao đẳng</span>
-					</span>
-				</label>
-				<label class="elig-option">
-					<input type="radio" name="education" value="dai-hoc">
-					<span class="elig-option-box">
-						<span class="elig-option-icon">📕</span>
-						<span class="elig-option-text">Đại học</span>
-						<span class="elig-option-sub">Bằng Cử nhân</span>
-					</span>
-				</label>
-				<label class="elig-option">
-					<input type="radio" name="education" value="thac-si">
-					<span class="elig-option-box">
-						<span class="elig-option-icon">🏆</span>
-						<span class="elig-option-text">Thạc sĩ / Tiến sĩ</span>
-						<span class="elig-option-sub">Bằng sau đại học</span>
-					</span>
-				</label>
-			</div>
-		</div>
-
-		<!-- Step 2: Current Major -->
-		<div class="elig-step" data-step="2">
-			<h2 class="elig-step-title">Chuyên ngành hiện tại</h2>
-			<p class="elig-step-desc">Bạn đang học hoặc đã tốt nghiệp ngành gì?</p>
-			<div class="elig-search-select-container relative" data-search-select>
-				<input type="text" class="elig-search-input" placeholder="Gõ để tìm chuyên ngành..." autocomplete="off">
-				<input type="hidden" name="major_id" class="elig-select elig-search-value">
-				<div class="elig-search-dropdown absolute w-full max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg hidden z-50 mt-1">
-					<div class="p-3 text-xs font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">Danh sách chuyên ngành</div>
-					<div class="elig-search-options">
-						<div class="elig-search-option-item p-3 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-500 border-b border-slate-50" data-value="">-- Chọn chuyên ngành --</div>
-						<?php foreach ( $majors as $m ) : ?>
-							<div class="elig-search-option-item p-3 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-700 border-b border-slate-50 last:border-0" data-value="<?php echo esc_attr( $m->ID ); ?>"><?php echo esc_html( $m->post_title ); ?></div>
-						<?php endforeach; ?>
-					</div>
+	<form id="elig-unified-form" class="space-y-8" autocomplete="off">
+		
+		<!-- Section 1: Hồ sơ hiện tại của bạn -->
+		<div class="elig-section space-y-4">
+			<h3 class="text-lg font-extrabold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2">
+				<span class="text-xl">🎓</span> 1. Hồ sơ học vấn hiện tại của bạn
+			</h3>
+			
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<!-- Trình độ học vấn -->
+				<div class="space-y-2">
+					<label class="block text-sm font-bold text-slate-700">Trình độ học vấn hiện tại *</label>
+					<select name="education" class="elig-select select-education">
+						<option value="">-- Chọn trình độ hiện tại --</option>
+						<option value="thap-phan">THPT (Tốt nghiệp Phổ thông)</option>
+						<option value="trung-cap">Trung cấp (Bằng Trung cấp)</option>
+						<option value="cao-dang">Cao đẳng (Bằng Cao đẳng)</option>
+						<option value="dai-hoc">Đại học (Bằng Cử nhân)</option>
+					</select>
 				</div>
-			</div>
-			<p class="elig-step-hint">Bỏ qua nếu chưa có chuyên ngành</p>
-		</div>
 
-		<!-- Step 3: Birth Year -->
-		<div class="elig-step" data-step="3">
-			<h2 class="elig-step-title">Năm sinh</h2>
-			<p class="elig-step-desc">Bạn sinh năm nào?</p>
-			<select name="graduation" class="elig-select">
-				<option value="">-- Chọn năm --</option>
-				<?php foreach ( $years as $y ) : ?>
-					<option value="<?php echo esc_attr( $y ); ?>"><?php echo esc_html( $y ); ?></option>
-				<?php endforeach; ?>
-			</select>
-		</div>
-
-		<!-- Step 4: Desired Major -->
-		<div class="elig-step" data-step="4">
-			<h2 class="elig-step-title">Ngành mong muốn</h2>
-			<p class="elig-step-desc">Bạn muốn học ngành gì?</p>
-			<div class="elig-search-select-container relative" data-search-select>
-				<input type="text" class="elig-search-input" placeholder="Gõ để tìm ngành học..." autocomplete="off">
-				<input type="hidden" name="desired_major" class="elig-select elig-search-value">
-				<div class="elig-search-dropdown absolute w-full max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg hidden z-50 mt-1">
-					<div class="p-3 text-xs font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">Danh sách ngành học</div>
-					<div class="elig-search-options">
-						<div class="elig-search-option-item p-3 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-500 border-b border-slate-50" data-value="">-- Chọn ngành học --</div>
-						<?php foreach ( $majors as $m ) : ?>
-							<div class="elig-search-option-item p-3 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-700 border-b border-slate-50 last:border-0" data-value="<?php echo esc_attr( $m->ID ); ?>"><?php echo esc_html( $m->post_title ); ?></div>
-						<?php endforeach; ?>
+				<!-- Chuyên ngành đã học -->
+				<div class="space-y-2 relative" data-search-select>
+					<label class="block text-sm font-bold text-slate-700">Chuyên ngành đã tốt nghiệp / đang học</label>
+					<input type="text" class="elig-search-input" placeholder="Gõ để tìm chuyên ngành..." autocomplete="off">
+					<input type="hidden" name="major_id" class="elig-select elig-search-value">
+					<div class="elig-search-dropdown absolute w-full max-h-48 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg hidden z-50 mt-1">
+						<div class="p-2 text-xs font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">Danh sách chuyên ngành</div>
+						<div class="elig-search-options">
+							<div class="elig-search-option-item p-2.5 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-500 border-b border-slate-50" data-value="">-- Chọn chuyên ngành --</div>
+							<?php foreach ( $majors as $m ) : ?>
+								<div class="elig-search-option-item p-2.5 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-700 border-b border-slate-50 last:border-0" data-value="<?php echo esc_attr( $m->ID ); ?>"><?php echo esc_html( $m->post_title ); ?></div>
+							<?php endforeach; ?>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- Step 5: Training Type -->
-		<div class="elig-step" data-step="5">
-			<h2 class="elig-step-title">Hệ đào tạo</h2>
-			<p class="elig-step-desc">Bạn muốn học hệ nào?</p>
-			<div class="elig-options elig-options-grid">
-				<?php 
-				$training_types = get_terms( [
-					'taxonomy'   => 'training_type',
-					'hide_empty' => false,
-				] );
-				if ( ! is_wp_error( $training_types ) && ! empty( $training_types ) ) :
-					$tt_icons = [
-						'tu-xa' => '💻',
-						'van-bang-2' => '📋',
-						'vua-hoc-vua-lam' => '⏰',
-						'lien-thong' => '🔗',
-						'chinh-quy' => '🎓',
-					];
-					$tt_subs = [
-						'tu-xa' => 'Học trực tuyến',
-						'van-bang-2' => 'Học thêm ngành mới',
-						'vua-hoc-vua-lam' => 'Lịch học linh hoạt',
-						'lien-thong' => 'Nâng cấp bằng cấp',
-						'chinh-quy' => 'Học tập trung',
-					];
-					foreach ( $training_types as $tt ) : 
-						$icon = $tt_icons[ $tt->slug ] ?? '🎓';
-						$sub = $tt_subs[ $tt->slug ] ?? '';
+		<!-- Section 2: Nhu cầu học tập mong muốn -->
+		<div class="elig-section space-y-4 pt-4 border-t border-slate-100">
+			<h3 class="text-lg font-extrabold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2">
+				<span class="text-xl">🎯</span> 2. Nhu cầu học tập mong muốn
+			</h3>
+			
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				<!-- Ngành mong muốn -->
+				<div class="space-y-2 relative" data-search-select>
+					<label class="block text-sm font-bold text-slate-700">Ngành học mong muốn *</label>
+					<input type="text" class="elig-search-input" placeholder="Gõ để tìm ngành học..." autocomplete="off">
+					<input type="hidden" name="desired_major" class="elig-select elig-search-value">
+					<div class="elig-search-dropdown absolute w-full max-h-48 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg hidden z-50 mt-1">
+						<div class="p-2 text-xs font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">Danh sách ngành học</div>
+						<div class="elig-search-options">
+							<div class="elig-search-option-item p-2.5 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-500 border-b border-slate-50" data-value="">-- Chọn ngành học --</div>
+							<?php foreach ( $majors as $m ) : ?>
+								<div class="elig-search-option-item p-2.5 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-700 border-b border-slate-50 last:border-0" data-value="<?php echo esc_attr( $m->ID ); ?>"><?php echo esc_html( $m->post_title ); ?></div>
+							<?php endforeach; ?>
+						</div>
+					</div>
+				</div>
+
+				<!-- Hệ đào tạo mong muốn -->
+				<div class="space-y-2">
+					<label class="block text-sm font-bold text-slate-700">Hệ đào tạo mong muốn</label>
+					<select name="training_type" class="elig-select">
+						<option value="">Chưa xác định / Gợi ý cho tôi</option>
+						<?php 
+						$training_types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
+						if ( ! is_wp_error( $training_types ) && ! empty( $training_types ) ) {
+							foreach ( $training_types as $tt ) {
+								echo '<option value="' . esc_attr( $tt->slug ) . '">' . esc_html( $tt->name ) . '</option>';
+							}
+						}
 						?>
-						<label class="elig-option">
-							<input type="radio" name="training_type" value="<?php echo esc_attr( $tt->slug ); ?>">
-							<span class="elig-option-box">
-								<span class="elig-option-icon"><?php echo esc_html( $icon ); ?></span>
-								<span class="elig-option-text"><?php echo esc_html( $tt->name ); ?></span>
-								<?php if ( $sub ) : ?>
-									<span class="elig-option-sub"><?php echo esc_html( $sub ); ?></span>
-								<?php endif; ?>
-							</span>
-						</label>
-					<?php 
-					endforeach;
-				endif;
-				?>
+					</select>
+				</div>
+
+				<!-- Cơ sở học mong muốn -->
+				<div class="space-y-2">
+					<label class="block text-sm font-bold text-slate-700">Khu vực / Cơ sở muốn học</label>
+					<select name="campus" class="elig-select">
+						<option value="">Không quan trọng / Bất kỳ đâu</option>
+						<?php 
+						$campuses = get_terms( [ 'taxonomy' => 'campus', 'hide_empty' => false ] );
+						if ( ! is_wp_error( $campuses ) && ! empty( $campuses ) ) {
+							foreach ( $campuses as $cp ) {
+								if ( $cp->slug === 'online' ) {
+									continue;
+								}
+								echo '<option value="' . esc_attr( $cp->slug ) . '">' . esc_html( $cp->name ) . '</option>';
+							}
+						}
+						?>
+					</select>
+				</div>
 			</div>
 		</div>
 
-		<!-- Step 6: Campus -->
-		<div class="elig-step" data-step="6">
-			<h2 class="elig-step-title">Cơ sở học</h2>
-			<p class="elig-step-desc">Bạn muốn học ở đâu?</p>
-			<div class="elig-options elig-options-grid">
-				<?php 
-				$campuses = get_terms( [
-					'taxonomy'   => 'campus',
-					'hide_empty' => false,
-				] );
-				if ( ! is_wp_error( $campuses ) && ! empty( $campuses ) ) :
-					$campus_icons = [
-						'ha-noi' => '🏛️',
-						'ho-chi-minh' => '🏙️',
-						'da-nang' => '🌉',
-						'thai-nguyen' => '⛰️',
-						'online' => '💻',
-					];
-					foreach ( $campuses as $cp ) : 
-						$icon = $campus_icons[ $cp->slug ] ?? '📍';
-						?>
-						<label class="elig-option">
-							<input type="radio" name="campus" value="<?php echo esc_attr( $cp->slug ); ?>">
-							<span class="elig-option-box">
-								<span class="elig-option-icon"><?php echo esc_html( $icon ); ?></span>
-								<span class="elig-option-text"><?php echo esc_html( $cp->name ); ?></span>
-							</span>
-						</label>
-					<?php 
-					endforeach;
-				endif;
-				?>
-			</div>
+		<!-- Submit Button -->
+		<div class="pt-6 border-t border-slate-100 flex justify-end">
+			<button type="button" id="elig-unified-submit" class="elig-btn elig-btn-primary px-8 py-3.5 text-base w-full md:w-auto" style="box-shadow: 0 4px 14px rgba(217, 119, 6, 0.25);">
+				<span class="elig-btn-text flex items-center gap-2 justify-center">🔎 XEM CHƯƠNG TRÌNH PHÙ HỢP</span>
+				<span class="elig-btn-loading hidden">Đang tìm kiếm chương trình...</span>
+			</button>
 		</div>
 
-		<!-- Step 7: Phone -->
-		<div class="elig-step" data-step="7">
-			<h2 class="elig-step-title">Số điện thoại</h2>
-			<p class="elig-step-desc">Để tư vấn viên liên hệ hỗ trợ (không bắt buộc)</p>
-			<input type="tel" name="phone" class="elig-input" placeholder="Ví dụ: 0912 345 678">
-			<p class="elig-step-hint">Bỏ qua nếu không muốn nhận tư vấn</p>
-		</div>
-
-		<!-- Step 8: Email -->
-		<div class="elig-step" data-step="8">
-			<h2 class="elig-step-title">Email</h2>
-			<p class="elig-step-desc">Nhận kết quả qua email (không bắt buộc)</p>
-			<input type="email" name="email" class="elig-input" placeholder="Ví dụ: email@example.com">
-			<p class="elig-step-hint">Bỏ qua nếu không muốn nhận email</p>
-		</div>
-
-	</div>
-
-	<!-- Navigation -->
-	<div class="elig-nav">
-		<button type="button" id="elig-prev" class="elig-btn elig-btn-secondary hidden">← Quay lại</button>
-		<button type="button" id="elig-next" class="elig-btn elig-btn-primary">Tiếp theo →</button>
-		<button type="button" id="elig-submit" class="elig-btn elig-btn-primary hidden">
-			<span class="elig-btn-text">Kiểm tra ngay</span>
-			<span class="elig-btn-loading hidden">Đang kiểm tra...</span>
-		</button>
-	</div>
+	</form>
 
 </div>
