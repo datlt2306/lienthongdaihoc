@@ -72,8 +72,11 @@ function ltdh_program_request_guard( $query_vars ) {
 		return $query_vars;
 	}
 
-	// Not a program slug. Determine what it actually is.
+	// Not a program slug. Clean up all CPT-injected vars so WordPress
+	// falls through to pagename-based resolution for pages, posts, etc.
 	unset( $query_vars['program'] );
+	unset( $query_vars['post_type'] );
+	unset( $query_vars['name'] );
 
 	// Check if it's a regular post (post type = post).
 	$regular_post = get_posts( [

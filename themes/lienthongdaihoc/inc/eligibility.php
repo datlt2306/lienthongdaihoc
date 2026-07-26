@@ -54,6 +54,7 @@ function ltdh_elig_create_table() {
 	dbDelta( $sql );
 }
 add_action( 'after_switch_theme', 'ltdh_elig_create_table' );
+add_action( 'after_switch_theme', 'ltdh_elig_ensure_page' );
 
 // Run on module load as well (safe — dbDelta is idempotent)
 add_action( 'init', function() {
@@ -61,7 +62,35 @@ add_action( 'init', function() {
 		ltdh_elig_create_table();
 		update_option( 'ltdh_elig_table_version', '1.1' );
 	}
+	if ( get_option( 'ltdh_elig_page_created' ) !== '1' ) {
+		ltdh_elig_ensure_page();
+	}
 });
+
+/**
+ * Auto-create the eligibility checker page if missing.
+ */
+function ltdh_elig_ensure_page() {
+	$slug = 'kiem-tra-dieu-kien';
+	$page = get_page_by_path( $slug );
+	if ( $page ) {
+		update_option( 'ltdh_elig_page_created', '1' );
+		return;
+	}
+
+	$post_id = wp_insert_post( [
+		'post_title'  => 'Kiểm tra điều kiện',
+		'post_name'   => $slug,
+		'post_status' => 'publish',
+		'post_type'   => 'page',
+	] );
+
+	if ( ! is_wp_error( $post_id ) ) {
+		update_post_meta( $post_id, '_wp_page_template', 'page-eligible.php' );
+		update_option( 'ltdh_elig_page_created', '1' );
+		flush_rewrite_rules();
+	}
+}
 
 // ----------------------------------------------------
 // 2. Eligibility Page Template

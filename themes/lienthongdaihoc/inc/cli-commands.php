@@ -29,12 +29,13 @@ class LTDH_CLI_Commands {
 		WP_CLI::log( 'Đang thiết lập các trang cốt lõi...' );
 
 		$required_pages = [
-			'gioi-thieu'        => [ 'title' => 'Giới thiệu', 'template' => 'page-about.php' ],
-			'lien-he'           => [ 'title' => 'Liên hệ', 'template' => 'page-contact.php' ],
-			'dang-ky-tu-van'    => [ 'title' => 'Đăng ký tư vấn', 'template' => 'page-register.php' ],
-			'faq'               => [ 'title' => 'Câu hỏi thường gặp', 'template' => 'page-faq.php' ],
-			'dieu-khoan'        => [ 'title' => 'Điều khoản dịch vụ', 'template' => '' ],
-			'chinh-sach-bao-mat'=> [ 'title' => 'Chính sách bảo mật', 'template' => '' ],
+			'gioi-thieu'            => [ 'title' => 'Giới thiệu', 'template' => 'page-about.php' ],
+			'lien-he'               => [ 'title' => 'Liên hệ', 'template' => 'page-contact.php' ],
+			'dang-ky-tu-van'        => [ 'title' => 'Đăng ký tư vấn', 'template' => 'page-register.php' ],
+			'faq'                   => [ 'title' => 'Câu hỏi thường gặp', 'template' => 'page-faq.php' ],
+			'kiem-tra-dieu-kien'    => [ 'title' => 'Kiểm tra điều kiện', 'template' => 'page-eligible.php' ],
+			'dieu-khoan'            => [ 'title' => 'Điều khoản dịch vụ', 'template' => '' ],
+			'chinh-sach-bao-mat'    => [ 'title' => 'Chính sách bảo mật', 'template' => '' ],
 		];
 
 		foreach ( $required_pages as $slug => $meta ) {
