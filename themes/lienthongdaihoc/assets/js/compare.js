@@ -9,6 +9,10 @@
 	var STORAGE_KEY = 'ltdh_compare_items';
 	var MAX_ITEMS   = 4;
 	var ajaxUrl     = (window.ltdh_ajax && window.ltdh_ajax.ajax_url) || '/wp-admin/admin-ajax.php';
+	var homeUrl     = (window.ltdh_ajax && window.ltdh_ajax.home_url) || '/';
+	if (homeUrl.slice(-1) !== '/') {
+		homeUrl += '/';
+	}
 
 	// ----------------------------------------------------
 	// 1. sessionStorage Helpers
@@ -43,7 +47,22 @@
 		} catch (e) { /* silent */ }
 	}
 
-	function addItem(type, id, he, nganh) {
+	function getDetailsCache() {
+		try {
+			var raw = sessionStorage.getItem('ltdh_compare_details');
+			return raw ? JSON.parse(raw) : {};
+		} catch (e) {
+			return {};
+		}
+	}
+
+	function saveDetailsCache(cache) {
+		try {
+			sessionStorage.setItem('ltdh_compare_details', JSON.stringify(cache));
+		} catch (e) { /* silent */ }
+	}
+
+	function addItem(type, id, he, nganh, title, thumb) {
 		var items = getItems();
 		if (!items[type]) items[type] = [];
 		if (items[type].indexOf(id) === -1) {
@@ -55,6 +74,11 @@
 			var meta = getMetadata();
 			meta[id] = { he: he || '', nganh: nganh || '' };
 			saveMetadata(meta);
+
+			// Save details
+			var cache = getDetailsCache();
+			cache[id] = { title: title || '', thumb: thumb || '' };
+			saveDetailsCache(cache);
 		}
 		return true;
 	}
@@ -69,6 +93,11 @@
 		var meta = getMetadata();
 		delete meta[id];
 		saveMetadata(meta);
+
+		// Remove details
+		var cache = getDetailsCache();
+		delete cache[id];
+		saveDetailsCache(cache);
 	}
 
 	function getCount(type) {
@@ -79,6 +108,22 @@
 	function hasItem(type, id) {
 		var items = getItems();
 		return items[type] && items[type].indexOf(id) !== -1;
+	}
+
+	function clearAll() {
+		sessionStorage.removeItem(STORAGE_KEY);
+		sessionStorage.removeItem('ltdh_compare_metadata');
+		sessionStorage.removeItem('ltdh_compare_details');
+
+		// Reset all buttons on the page
+		var buttons = document.querySelectorAll('.ltdh-compare-toggle, .ltdh-compare-single-btn');
+		buttons.forEach(function (btn) {
+			btn.classList.remove('is-compared');
+			btn.textContent = btn.classList.contains('ltdh-compare-single-btn') ? '📊 Thêm vào so sánh' : 'So sánh';
+		});
+
+		updateTray();
+		showToast('Đã xóa tất cả mục so sánh.', 'info');
 	}
 
 	// ----------------------------------------------------
@@ -112,30 +157,41 @@
 						return;
 					}
 
-					// Validation: Same system (he) and same major (nganh)
+					// Validation: Same major (nganh)
 					var btnHe = btn.getAttribute('data-compare-he');
 					var btnNganh = btn.getAttribute('data-compare-nganh');
 					var activeIds = items[type] || [];
 
-					if (activeIds.length > 0 && btnHe && btnNganh) {
+					if (activeIds.length > 0 && btnNganh) {
 						var meta = getMetadata();
 						for (var idx = 0; idx < activeIds.length; idx++) {
 							var existingId = activeIds[idx];
 							var existingMeta = meta[existingId];
 							if (existingMeta) {
-								if (existingMeta.he && existingMeta.he !== btnHe) {
-									showToast('Chỉ được so sánh các chương trình CÙNG HỆ ĐÀO TẠO.', 'error');
-									return;
-								}
 								if (existingMeta.nganh && existingMeta.nganh !== btnNganh) {
-									showToast('Chỉ được so sánh các chương trình CÙNG NGÀNH HỌC.', 'error');
+									showToast('Chỉ được so sánh các chương trình CÙNG NGÀNH ĐÀO TẠO.', 'error');
 									return;
 								}
 							}
 						}
 					}
 
-					addItem(type, id, btnHe, btnNganh);
+					var btnTitle = btn.getAttribute('data-compare-title') || '';
+					var btnThumb = btn.getAttribute('data-compare-thumb') || '';
+					if (!btnThumb) {
+						var cardEl = document.querySelector('[data-compare-id="' + id + '"][data-compare-thumb]');
+						if (cardEl) {
+							btnThumb = cardEl.getAttribute('data-compare-thumb') || '';
+						}
+					}
+					if (!btnTitle) {
+						var cardEl = document.querySelector('[data-compare-id="' + id + '"][data-compare-title]');
+						if (cardEl) {
+							btnTitle = cardEl.getAttribute('data-compare-title') || '';
+						}
+					}
+
+					addItem(type, id, btnHe, btnNganh, btnTitle, btnThumb);
 					btn.classList.add('is-compared');
 					btn.textContent = '✓ Đã thêm';
 					showToast('Đã thêm vào danh sách so sánh (' + (total + 1) + '/' + MAX_ITEMS + ')', 'success');
@@ -169,10 +225,21 @@
 		listEl.innerHTML = '';
 		var activeItems = items[activeType] || [];
 
+		var cache = getDetailsCache();
 		activeItems.forEach(function (id) {
-			var card = document.querySelector('[data-compare-id="' + id + '"]');
-			var title = card ? (card.getAttribute('data-compare-title') || 'Mục #' + id) : 'Mục #' + id;
-			var thumb = card ? (card.getAttribute('data-compare-thumb') || '') : '';
+			var cached = cache[id] || {};
+			var title = cached.title || 'Mục #' + id;
+			var thumb = cached.thumb || '';
+
+			if (!cached.title || !cached.thumb) {
+				var card = document.querySelector('[data-compare-id="' + id + '"][data-compare-thumb]');
+				if (card) {
+					title = card.getAttribute('data-compare-title') || title;
+					thumb = card.getAttribute('data-compare-thumb') || thumb;
+					cache[id] = { title: title, thumb: thumb };
+					saveDetailsCache(cache);
+				}
+			}
 
 			var el = document.createElement('div');
 			el.className = 'flex items-center gap-2 bg-slate-100 rounded-lg px-3 py-1.5 text-sm';
@@ -209,7 +276,7 @@
 		var link = tray.querySelector('.ltdh-tray-link');
 		if (link && activeItems.length >= 2) {
 			var slug = generateCompareSlug(activeType, activeItems);
-			link.href = '/so-sanh/' + getTypeSlug(activeType) + '/' + slug + '/';
+			link.href = homeUrl + 'so-sanh/' + getTypeSlug(activeType) + '/' + slug + '/';
 			link.classList.remove('opacity-50', 'pointer-events-none');
 		} else if (link) {
 			link.href = '#';
@@ -229,7 +296,7 @@
 	function generateCompareSlug(type, ids) {
 		var parts = [];
 		ids.forEach(function (id) {
-			var el = document.querySelector('[data-compare-id="' + id + '"]');
+			var el = document.querySelector('[data-compare-id="' + id + '"][data-compare-slug]');
 			if (el) {
 				var slug = el.getAttribute('data-compare-slug');
 				if (slug) { parts.push(slug); return; }
@@ -287,8 +354,9 @@
 
 	// Expose for external use
 	window.ltdhCompare = {
-		add: function (type, id) { addItem(type, id); updateTray(); },
+		add: function (type, id, he, nganh, title, thumb) { addItem(type, id, he, nganh, title, thumb); updateTray(); },
 		remove: function (type, id) { removeItem(type, id); updateTray(); },
+		clearAll: clearAll,
 		getItems: getItems,
 		getCount: getCount,
 		hasItem: hasItem,

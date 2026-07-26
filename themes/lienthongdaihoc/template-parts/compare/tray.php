@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<div class="ltdh-tray-items flex items-center gap-2 overflow-x-auto min-w-0"></div>
 			</div>
 			<div class="flex items-center gap-3 shrink-0">
-				<button onclick="document.getElementById('ltdh-compare-tray').classList.add('hidden'); sessionStorage.removeItem('<?php echo esc_js( 'ltdh_compare_items' ); ?>');"
+				<button onclick="window.ltdhCompare && window.ltdhCompare.clearAll();"
 					class="text-xs text-slate-400 hover:text-red-500 font-semibold whitespace-nowrap min-h-[44px] px-3 flex items-center justify-center">
 					Xóa tất cả
 				</button>

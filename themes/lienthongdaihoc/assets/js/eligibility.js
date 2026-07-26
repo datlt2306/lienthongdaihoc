@@ -15,12 +15,18 @@
 	// ----------------------------------------------------
 	// DOM Ready
 	// ----------------------------------------------------
-	document.addEventListener('DOMContentLoaded', function () {
+	function initAll() {
 		initForm();
 		initNavigation();
 		initResultsActions();
 		initFileUpload();
-	});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initAll);
+	} else {
+		initAll();
+	}
 
 	// ----------------------------------------------------
 	// Form Init

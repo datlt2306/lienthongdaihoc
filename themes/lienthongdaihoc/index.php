@@ -11,26 +11,43 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-// Active category filter
-$active_cat_slug = isset( $_GET['danh-muc'] ) ? sanitize_text_field( $_GET['danh-muc'] ) : '';
-$active_cat      = $active_cat_slug ? get_term_by( 'slug', $active_cat_slug, 'category' ) : null;
+// Active category filter — read from URL routing (/tin-tuc/slug/) via WordPress query vars
+$active_cat      = is_category() ? get_queried_object() : null;
+$active_cat_slug = $active_cat ? $active_cat->slug : '';
 
 // Blog categories for sidebar/tabs
 $blog_cats = get_categories( [ 'hide_empty' => true, 'exclude' => [ 1 ] ] );
 
-// Featured post (most recent, optionally sticky)
-$featured_post = null;
-$sticky_ids    = get_option( 'sticky_posts' );
-if ( ! empty( $sticky_ids ) ) {
-	$featured_posts = get_posts( [ 'post__in' => $sticky_ids, 'numberposts' => 1 ] );
-	$featured_post  = $featured_posts[0] ?? null;
+// Filter parameters
+$school_filter   = isset( $_GET['truong'] ) ? intval( $_GET['truong'] ) : 0;
+$major_filter    = isset( $_GET['nganh'] ) ? intval( $_GET['nganh'] ) : 0;
+$program_filter  = isset( $_GET['chuong-trinh'] ) ? intval( $_GET['chuong-trinh'] ) : 0;
+$is_filtered     = ( $school_filter || $major_filter || $program_filter );
+
+$filter_title = '';
+if ( $school_filter ) {
+	$filter_title = get_the_title( $school_filter );
+} elseif ( $major_filter ) {
+	$filter_title = get_the_title( $major_filter );
+} elseif ( $program_filter ) {
+	$filter_title = get_the_title( $program_filter );
 }
-if ( ! $featured_post ) {
-	$featured_posts = get_posts( [
-		'numberposts'    => 1,
-		'category__not_in' => [ 1 ],
-	] );
-	$featured_post = $featured_posts[0] ?? null;
+
+// Featured post (most recent, optionally sticky) - Only show if not filtering
+$featured_post = null;
+if ( ! $is_filtered ) {
+	$sticky_ids = get_option( 'sticky_posts' );
+	if ( ! empty( $sticky_ids ) ) {
+		$featured_posts = get_posts( [ 'post__in' => $sticky_ids, 'numberposts' => 1 ] );
+		$featured_post  = $featured_posts[0] ?? null;
+	}
+	if ( ! $featured_post ) {
+		$featured_posts = get_posts( [
+			'numberposts'      => 1,
+			'category__not_in' => [ 1 ],
+		] );
+		$featured_post = $featured_posts[0] ?? null;
+	}
 }
 
 // Main query args
@@ -41,6 +58,32 @@ if ( $active_cat ) {
 }
 if ( $featured_post ) {
 	$cat_args['post__not_in'] = [ $featured_post->ID ];
+}
+
+// Apply metadata filtering for related entities
+if ( $is_filtered ) {
+	$cat_args['meta_query'] = [ 'relation' => 'AND' ];
+	if ( $school_filter ) {
+		$cat_args['meta_query'][] = [
+			'key'     => 'related_schools',
+			'value'   => '"' . $school_filter . '"',
+			'compare' => 'LIKE',
+		];
+	}
+	if ( $major_filter ) {
+		$cat_args['meta_query'][] = [
+			'key'     => 'related_majors',
+			'value'   => '"' . $major_filter . '"',
+			'compare' => 'LIKE',
+		];
+	}
+	if ( $program_filter ) {
+		$cat_args['meta_query'][] = [
+			'key'     => 'related_programs',
+			'value'   => '"' . $program_filter . '"',
+			'compare' => 'LIKE',
+		];
+	}
 }
 
 $blog_query = new WP_Query( array_merge( [
@@ -68,12 +111,27 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 				<span class="text-white">Tin tức tuyển sinh</span>
 			</nav>
 			<h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight leading-tight uppercase">CẨM NANG TUYỂN SINH & TIN TỨC</h1>
-			<p class="text-blue-100 text-sm md:text-base font-semibold max-w-2xl mt-2">Cập nhật nhanh nhất và chính xác các quy chế thi, đề án tuyển sinh, học bổng từ các trường đại học liên kết.</p>
+			<p class="text-blue-100 text-sm md:text-base font-semibold max-w-2xl mt-2">Cập nhật nhanh nhất và chính xác các quy chế thi, đề án tuyển sinh, học bổng từ các trường đại học đối tác.</p>
 		</div>
 	</section>
 
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 		
+		<?php if ( $is_filtered && $filter_title ) : ?>
+			<div class="mb-8 bg-blue-50 border border-blue-100 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+				<div class="flex items-center gap-3">
+					<span class="text-2xl">🔍</span>
+					<div>
+						<h3 class="font-bold text-slate-800 text-sm md:text-base">Đang lọc tin tức tuyển sinh</h3>
+						<p class="text-xs text-slate-500 mt-0.5">Hiển thị tin tức liên quan đến: <strong class="text-[#00308b] font-bold"><?php echo esc_html( $filter_title ); ?></strong></p>
+					</div>
+				</div>
+				<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>" class="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-bold text-xs hover:bg-slate-50 transition-all min-h-[38px] flex items-center justify-center">
+					❌ Tắt bộ lọc
+				</a>
+			</div>
+		<?php endif; ?>
+
 		<!-- Category Pills Navigation (Horizontal scroll on mobile) -->
 		<div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-4 mb-8 border-b border-slate-200">
 			<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>" 
@@ -83,7 +141,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 			<?php foreach ( $blog_cats as $bcat ) :
 				$is_active_cat = ( $active_cat_slug === $bcat->slug );
 			?>
-				<a href="<?php echo esc_url( home_url( '/tin-tuc/?danh-muc=' . $bcat->slug ) ); ?>" 
+				<a href="<?php echo esc_url( get_category_link( $bcat->term_id ) ); ?>" 
 				   class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all <?php echo $is_active_cat ? 'bg-brand-primary text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'; ?> min-h-[38px] flex items-center justify-center">
 					<?php echo esc_html( $bcat->name ); ?>
 				</a>

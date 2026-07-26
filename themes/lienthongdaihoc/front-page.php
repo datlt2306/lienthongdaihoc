@@ -13,6 +13,7 @@ if (! defined('ABSPATH')) {
 get_header();
 
 // Cache queries for schools
+delete_transient( 'ltdh_featured_schools_data' );
 $featured_schools = ltdh_get_cached_featured_schools();
 
 $news_query = ltdh_get_cached_query('ltdh_homepage_news', [
@@ -28,116 +29,113 @@ $zalo    = ltdh_get_zalo_url();
 
 <main id="primary" class="site-main bg-white">
 
-	<!-- 1. HERO SECTION -->
-	<section class="relative bg-gradient-to-br from-[#EFF6FF] via-[#F8FAFC] to-[#FFFFFF] overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-32">
-		<div class="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full opacity-10 bg-[radial-gradient(var(--tw-gradient-to-r,#00308b)_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
-
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-				<!-- Hero Left Text Column -->
-				<div class="lg:col-span-6 space-y-6 text-center lg:text-left z-10">
-					<div class="pt-2">
-						<span class="bg-[#F5BF23] text-[#0F172A] px-6 py-2 rounded-full inline-block text-base font-extrabold shadow-md">
-							<?php
-							$hero_year = '';
-							if (function_exists('get_field')) {
-								$hero_year = get_field('hero_year_label', 'options');
-							}
-							echo esc_html($hero_year ?: ltdh_default('homepage', 'hero_year_label'));
-							?>
-						</span>
-					</div>
-
-					<?php
-					$hero_heading = '';
-					$hero_heading_hl = '';
-					$hero_subtitle = '';
-					if (function_exists('get_field')) {
-						$hero_heading = get_field('hero_heading', 'options') ?: '';
-						$hero_heading_hl = get_field('hero_heading_highlight', 'options') ?: '';
-						$hero_subtitle = get_field('hero_subtitle', 'options') ?: '';
-					}
+	<!-- 1. HERO SECTION (Swiper Banner Slider) -->
+	<?php
+	$hero_slides = [];
+	if (function_exists('get_field')) {
+		$hero_slides = get_field('hero_slides', 'options') ?: [];
+	}
+	// Fallback if empty
+	if (empty($hero_slides)) {
+		$hero_slides = [
+			[
+				'image' => ltdh_get_fallback_image('hero'),
+				'link'  => '',
+			]
+		];
+	}
+	?>
+	<section class="relative w-full overflow-hidden bg-slate-50 border-b border-slate-100">
+		<div class="swiper hero-swiper w-full">
+			<div class="swiper-wrapper">
+				<?php foreach ($hero_slides as $slide) : 
+					if (empty($slide['image'])) continue;
 					?>
-					<h1 class="text-4xl font-black text-[#0B2545] leading-[1.1] tracking-tight font-display uppercase">
-						<?php echo esc_html($hero_heading ?: 'Tìm ngành học liên thông'); ?><br>
-						<?php if ($hero_heading_hl) : ?>
-							<span class="text-brand-primary"><?php echo esc_html($hero_heading_hl); ?></span>
-						<?php else : ?>
-							<span class="text-brand-primary">phù hợp cho bạn</span>
+					<div class="swiper-slide w-full">
+						<?php if (!empty($slide['link'])) : ?>
+							<a href="<?php echo esc_url($slide['link']); ?>" class="block w-full h-full">
 						<?php endif; ?>
-					</h1>
-					<p class="text-lg text-slate-600 leading-relaxed max-w-lg">
-						<?php echo esc_html($hero_subtitle ?: 'Học Liên thông Đại học chính quy, Đại học từ xa uy tín trên toàn quốc'); ?>
-					</p>
-
-
-					<!-- Badges Grid (3 items row layout) -->
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 w-full text-left">
-						<?php
-						$hero_badges = [];
-						if (function_exists('get_field')) {
-							$hero_badges = get_field('hero_badges', 'options') ?: [];
-						}
-						if (empty($hero_badges)) {
-							$hero_badges = ltdh_default('homepage', 'hero_badges');
-						}
-						foreach ($hero_badges as $badge) :
-						?>
-							<div class="flex items-center gap-3 bg-white px-4 py-3.5 rounded-xl border border-slate-100 shadow-sm">
-								<div class="leading-tight">
-									<span class="block text-sm font-bold text-slate-800"><?php echo esc_html($badge['text'] ?? ''); ?></span>
-									<span class="text-sm text-slate-500"><?php echo esc_html($badge['subtext'] ?? ''); ?></span>
-								</div>
-							</div>
-						<?php endforeach; ?>
-					</div>
-
-					<!-- CTAs -->
-					<div class="flex flex-col sm:flex-row gap-4 pt-2 justify-center lg:justify-start">
-						<?php
-						$cta_text = '';
-						$cta_url = '';
-						$cta_sec_text = '';
-						if (function_exists('get_field')) {
-							$cta_text = get_field('hero_cta_primary_text', 'options') ?: '';
-							$cta_url = get_field('hero_cta_primary_url', 'options') ?: '';
-							$cta_sec_text = get_field('hero_cta_secondary_text', 'options') ?: '';
-						}
-						?>
-						<a href="<?php echo esc_url($cta_url ? $cta_url : home_url('/he-dao-tao/tu-xa/')); ?>" class="bg-brand-accent text-white text-center px-8 py-4 rounded-xl font-bold hover:bg-[#e06e00] transition-all flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20">
-							<?php echo esc_html($cta_text ?: 'Tra cứu tuyển sinh'); ?>
-							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-							</svg>
-						</a>
-						<a href="tel:<?php echo esc_attr(preg_replace('/\D/', '', $hotline)); ?>" class="flex items-center justify-center gap-3 bg-white border border-slate-200 px-6 py-4 rounded-xl font-bold text-slate-800 hover:bg-slate-50 transition-all">
-							<span class="h-10 w-10 bg-emerald-50 text-emerald-600 flex items-center justify-center rounded-full shrink-0">📞</span>
-							<div class="text-left leading-tight">
-								<span class="block text-xs text-slate-400 font-medium"><?php echo esc_html($cta_sec_text ?: 'Hotline tư vấn'); ?></span>
-								<span class="text-sm font-black text-brand-primary"><?php echo esc_html($hotline); ?></span>
-							</div>
-						</a>
-					</div>
-				</div>
-
-				<!-- Hero Right Image Column -->
-				<div class="lg:col-span-6 relative hidden lg:flex justify-center items-center">
-					<?php
-					$hero_img = '';
-					if (function_exists('get_field')) {
-						$hero_img = get_field('hero_image', 'options') ?: '';
-					}
-					?>
-					<div class="relative w-full max-w-md md:max-w-lg aspect-square">
-						<div class="absolute inset-0 bg-gradient-to-tr from-brand-primary/20 to-[#EFF6FF]/50 rounded-lg blur-2xl -z-10"></div>
-						<div class="w-full h-full  overflow-hidden relative bg-slate-100 flex items-center justify-center">
-							<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo esc_url($hero_img ?: ltdh_get_fallback_image('hero')); ?>');"></div>
+						
+						<div class="relative w-full aspect-[16/9] md:aspect-[21/7] lg:aspect-[21/6.5] max-h-[800px] overflow-hidden bg-[#f8fafc]" style="max-height: 800px;">
+							<!-- Blurred Background Shadow (Desktop and Mobile adaptive) -->
+							<div class="absolute inset-0 bg-cover bg-center scale-125 opacity-80 pointer-events-none hidden md:block" style="background-image: url('<?php echo esc_url($slide['image']); ?>'); filter: blur(100px); transform: scale(1.2);"></div>
+							<?php 
+							$mobile_bg = !empty($slide['image_mobile']) ? $slide['image_mobile'] : $slide['image'];
+							?>
+							<div class="absolute inset-0 bg-cover bg-center scale-125 opacity-80 pointer-events-none md:hidden" style="background-image: url('<?php echo esc_url($mobile_bg); ?>'); filter: blur(80px); transform: scale(1.2);"></div>
+							
+							<!-- Main Banner Image (Contain with <picture> for responsive loading) -->
+							<picture class="relative z-10 flex w-full h-full items-center justify-center">
+								<?php if (!empty($slide['image_mobile'])) : ?>
+									<source media="(max-width: 768px)" srcset="<?php echo esc_url($slide['image_mobile']); ?>">
+								<?php endif; ?>
+								<img src="<?php echo esc_url($slide['image']); ?>" alt="Banner Hero" class="h-full w-auto max-w-full object-contain pointer-events-none" loading="eager" decoding="async">
+							</picture>
 						</div>
+
+						<?php if (!empty($slide['link'])) : ?>
+							</a>
+						<?php endif; ?>
 					</div>
-				</div>
+				<?php endforeach; ?>
 			</div>
+			<!-- Add Pagination -->
+			<div class="swiper-pagination"></div>
+			<!-- Add Navigation Arrows -->
+			<div class="swiper-button-next !text-white after:!text-base bg-black/30 hover:bg-black/50 !w-8 md:!w-10 !h-8 md:!h-10 rounded-full transition-all flex items-center justify-center"></div>
+			<div class="swiper-button-prev !text-white after:!text-base bg-black/30 hover:bg-black/50 !w-8 md:!w-10 !h-8 md:!h-10 rounded-full transition-all flex items-center justify-center"></div>
 		</div>
 	</section>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			if (typeof Swiper !== 'undefined') {
+				new Swiper('.hero-swiper', {
+					loop: true,
+					autoplay: {
+						delay: 5000,
+						disableOnInteraction: false,
+					},
+					pagination: {
+						el: '.swiper-pagination',
+						clickable: true,
+					},
+					navigation: {
+						nextEl: '.swiper-button-next',
+						prevEl: '.swiper-button-prev',
+					},
+					speed: 800,
+				});
+			}
+		});
+	</script>
+
+	<!-- Styling specifically for pagination position and arrows -->
+	<style>
+		.hero-swiper .swiper-pagination-bullet-active {
+			background: #f5bf23 !important;
+			width: 24px;
+			border-radius: 4px;
+		}
+		.hero-swiper .swiper-pagination-bullet {
+			transition: all 0.3s ease;
+		}
+		.hero-swiper .swiper-button-next, .hero-swiper .swiper-button-prev {
+			opacity: 0;
+			margin-top: -16px;
+			transition: all 0.3s ease;
+		}
+		.hero-swiper:hover .swiper-button-next, .hero-swiper:hover .swiper-button-prev {
+			opacity: 1;
+		}
+		.hero-swiper .swiper-button-next {
+			right: 20px;
+		}
+		.hero-swiper .swiper-button-prev {
+			left: 20px;
+		}
+	</style>
+
 
 	<!-- Search & Filters Container (Compact Single-Row Bar) -->
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-30 hidden">
@@ -259,9 +257,9 @@ $zalo    = ltdh_get_zalo_url();
 			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8">
 				<div class="space-y-2">
 					<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">ĐỐI TÁC ĐẠI HỌC</span>
-					<h2 class="text-xl md:text-3xl font-black text-slate-900">Trường liên kết đào tạo</h2>
+					<h2 class="text-xl md:text-3xl font-black text-slate-900">Trường đối tác đào tạo</h2>
 				</div>
-				<a href="<?php echo esc_url(home_url('/truong-lien-ket/')); ?>" class="text-sm text-brand-primary font-bold hover:underline mt-4 sm:mt-0 flex items-center gap-1">
+				<a href="<?php echo esc_url(home_url('/truong-doi-tac/')); ?>" class="text-sm text-brand-primary font-bold hover:underline mt-4 sm:mt-0 flex items-center gap-1">
 					Xem tất cả
 					<span>→</span>
 				</a>
@@ -286,7 +284,7 @@ $zalo    = ltdh_get_zalo_url();
 								<?php if ($logo_id) : ?>
 									<?php echo wp_get_attachment_image($logo_id, 'thumbnail', false, ['class' => 'h-full w-full object-contain']); ?>
 								<?php else : ?>
-									<span class="font-display font-extrabold text-brand-primary text-xs">UNI</span>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-brand-primary/80"><path d="M11.7 2.805a.75.75 0 0 1 .6 0l9.3 4.25a.75.75 0 0 1 0 1.39l-9.3 4.25a.75.75 0 0 1-.6 0L2.4 8.445a.75.75 0 0 1 0-1.39l9.3-4.25ZM2.84 10.74l6.735 3.08a2.25 2.25 0 0 0 1.85 0l6.735-3.08v3.42c0 .532-.244 1.026-.642 1.378L12.5 19.544a1.25 1.25 0 0 1-1.6 0l-5.023-3.97a1.75 1.75 0 0 1-.642-1.378v-3.456Z" /><path d="M20.25 10.32v5.43a3.25 3.25 0 0 1-3.25 3.25h-.5a.75.75 0 0 0 0 1.5h.5a4.75 4.75 0 0 0 4.75-4.75v-5.43a.75.75 0 0 0-1.5 0Z" /></svg>
 								<?php endif; ?>
 							</div>
 
@@ -295,27 +293,81 @@ $zalo    = ltdh_get_zalo_url();
 									<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php echo esc_html($school['title']); ?></h4>
 									<p class="text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html($en_name); ?></p>
 									<div class="mt-3 space-y-1 text-center text-[10px] md:text-xs">
-										<?php if ( ! empty($systems_label) ) : ?>
-											<span class="font-bold text-brand-primary bg-blue-50 px-2.5 py-1 rounded-full inline-block leading-none mb-1.5"><?php echo esc_html($systems_label); ?></span>
-										<?php endif; ?>
 										<p class="text-slate-500 font-semibold">📊 <?php echo esc_html($prog_count); ?> ngành tuyển sinh</p>
 									</div>
 								</div>
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<a href="<?php echo esc_url($school['permalink']); ?>" class="w-full text-center bg-slate-50 hover:bg-brand-accent hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-brand-primary">Tìm hiểu thêm</a>
+									<a href="<?php echo esc_url($school['permalink']); ?>" class="w-full text-center py-2.5 rounded-lg text-xs uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
 								</div>
 							</div>
 						</div>
 				<?php
 					endforeach;
 				} else {
-					echo '<div class="col-span-5 text-center text-slate-500 py-6">Chưa có trường liên kết nào được gieo dữ liệu.</div>';
+					echo '<div class="col-span-5 text-center text-slate-500 py-6">Chưa có trường đối tác nào được gieo dữ liệu.</div>';
 				}
 				?>
 			</div>
 		</div>
 	</section>
 
+	<!-- 4. ELIGIBILITY QUICK CHECK SECTION -->
+	<section class="py-16 bg-slate-50 border-t border-slate-100">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+			<div class="space-y-4">
+				<?php
+				$e_badge = '';
+				$e_heading = '';
+				$e_desc = '';
+				$e_items = [];
+				$e_cta_text = '';
+				$e_cta_url = '';
+				if (function_exists('get_field')) {
+					$e_badge = get_field('hp_elig_badge', 'options') ?: '';
+					$e_heading = get_field('hp_elig_heading', 'options') ?: '';
+					$e_desc = get_field('hp_elig_desc', 'options') ?: '';
+					$e_items = get_field('hp_elig_items', 'options') ?: [];
+					$e_cta_text = get_field('hp_elig_cta_text', 'options') ?: '';
+					$e_cta_url = get_field('hp_elig_cta_url', 'options') ?: '';
+				}
+				$e_heading = str_replace('\n', '<br>', $e_heading);
+				?>
+				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">
+					<?php echo esc_html($e_badge ?: 'Điều kiện tuyển sinh'); ?>
+				</span>
+				<h2 class="text-2xl sm:text-3xl lg:text-4xl font-black font-display text-slate-900 leading-tight">
+					<?php echo $e_heading ?: 'Bạn có đủ điều kiện học<br>Liên thông & Đại học từ xa?'; ?>
+				</h2>
+				<p class="text-slate-500 text-sm leading-relaxed max-w-2xl mx-auto">
+					<?php echo esc_html($e_desc ?: 'Chương trình tuyển sinh mở rộng cho nhiều đối tượng. Chỉ mất 1 phút để kiểm tra tự động.'); ?>
+				</p>
+				<?php
+				$e_items_default = [
+					['title' => 'Người đi làm', 'desc' => 'Học trực tuyến linh hoạt'],
+					['title' => 'Đã tốt nghiệp TC/CĐ', 'desc' => 'Liên thông miễn giảm tín'],
+					['title' => 'Học sinh tốt nghiệp THPT', 'desc' => 'Xét học bạ tuyển thẳng'],
+				];
+				$e_items_render = !empty($e_items) ? $e_items : $e_items_default;
+				?>
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 max-w-3xl mx-auto text-left">
+					<?php foreach ($e_items_render as $item) : ?>
+						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+							<span class="block text-sm font-bold text-slate-800 mb-0.5"><?php echo esc_html($item['title'] ?? ''); ?></span>
+							<span class="text-xs text-slate-500"><?php echo esc_html($item['desc'] ?? ''); ?></span>
+						</div>
+					<?php endforeach; ?>
+				</div>
+				<div class="flex flex-wrap justify-center gap-3 pt-6">
+					<a href="<?php echo esc_url($e_cta_url ? home_url($e_cta_url) : home_url('/kiem-tra-dieu-kien/')); ?>" class="bg-brand-accent text-white px-6 py-3.5 rounded-lg font-bold text-sm hover:bg-[#e06e00] transition-all shadow-md shadow-brand-primary/10">
+						<?php echo esc_html($e_cta_text ?: 'Bắt đầu kiểm tra ngay ➔'); ?>
+					</a>
+					<a href="#register-section" class="bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all">
+						Tư vấn tiêu chuẩn tuyển sinh
+					</a>
+				</div>
+			</div>
+		</div>
+	</section>
 
 	<!-- 8. DOUBLE CERTIFICATE VALUE PROPOSITION -->
 	<?php
@@ -416,94 +468,66 @@ $zalo    = ltdh_get_zalo_url();
 							box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
 							background-color: #ffffff; /* match white degree background */
 						}
-						.cert-slider-container {
-							position: relative;
+						.cert-swiper {
 							width: 100%;
 							height: 100%;
-							overflow: hidden;
 						}
-						.cert-slide {
-							position: absolute;
-							top: 0;
-							left: 0;
-							width: 100%;
-							height: 100%;
-							opacity: 0;
-							z-index: 1;
-							transition: opacity 1s ease-in-out;
-						}
-						.cert-slide.active {
-							opacity: 1;
-							z-index: 10;
-						}
-						.cert-slide img {
+						.cert-swiper .swiper-slide img {
 							width: 100%;
 							height: 100%;
 							object-fit: contain;
 							background-color: #ffffff;
 						}
-						.cert-slider-dots {
-							position: absolute;
-							bottom: 24px;
-							right: 24px;
-							z-index: 20;
-							display: flex;
-							gap: 8px;
-						}
-						.cert-slider-dot {
+						.cert-swiper .swiper-pagination-bullet {
+							background: rgba(0, 48, 139, 0.3) !important;
+							opacity: 1 !important;
 							width: 10px;
 							height: 10px;
-							border-radius: 50%;
-							border: none;
-							background-color: rgba(255, 255, 255, 0.5);
-							cursor: pointer;
 							transition: all 0.3s ease;
 						}
-						.cert-slider-dot.active {
-							background-color: #ffffff;
+						.cert-swiper .swiper-pagination-bullet-active {
+							background: #0284c7 !important;
 							transform: scale(1.2);
 						}
 					</style>
 					<div class="cert-slider-wrapper">
 						<!-- Slider Container -->
-						<div class="cert-slider-container">
-							<?php 
-							$slides = [];
-							if ( ! empty( $c_slider_items ) ) {
-								foreach ( $c_slider_items as $item ) {
-									if ( ! empty( $item['image'] ) ) {
-										$img_val = $item['image'];
-										if ( is_numeric( $img_val ) ) {
-											$slides[] = wp_get_attachment_url( $img_val );
-										} elseif ( is_array( $img_val ) && isset( $img_val['url'] ) ) {
-											$slides[] = $img_val['url'];
-										} else {
-											$slides[] = $img_val;
+						<div class="swiper cert-swiper">
+							<div class="swiper-wrapper">
+								<?php 
+								$slides = [];
+								if ( ! empty( $c_slider_items ) ) {
+									foreach ( $c_slider_items as $item ) {
+										if ( ! empty( $item['image'] ) ) {
+											$img_val = $item['image'];
+											if ( is_numeric( $img_val ) ) {
+												$slides[] = wp_get_attachment_url( $img_val );
+											} elseif ( is_array( $img_val ) && isset( $img_val['url'] ) ) {
+												$slides[] = $img_val['url'];
+											} else {
+												$slides[] = $img_val;
+											}
 										}
 									}
 								}
-							}
-							
-							if ( empty( $slides ) ) {
-								$slides[] = home_url('wp-content/uploads/2026/07/students-graduation.jpg');
-							}
-							
-							foreach ( $slides as $index => $slide_url ) :
-							?>
-								<div class="cert-slide <?php echo $index === 0 ? 'active' : ''; ?>" data-slide-index="<?php echo $index; ?>">
-									<img src="<?php echo esc_url($slide_url); ?>" alt="Students Graduation Slide">
-								</div>
-							<?php endforeach; ?>
-						</div>
-
-						<!-- Slider Dots -->
-						<?php if ( count($slides) > 1 ) : ?>
-							<div class="cert-slider-dots">
-								<?php foreach ( $slides as $index => $slide ) : ?>
-									<button class="cert-slider-dot <?php echo $index === 0 ? 'active' : ''; ?>" data-dot-index="<?php echo $index; ?>" aria-label="Go to slide <?php echo $index + 1; ?>"></button>
+								
+								if ( empty( $slides ) ) {
+									$slides[] = home_url('wp-content/uploads/2026/07/students-graduation.jpg');
+								}
+								
+								foreach ( $slides as $index => $slide_url ) :
+								?>
+									<div class="swiper-slide w-full h-full">
+										<img src="<?php echo esc_url($slide_url); ?>" alt="Students Graduation Slide">
+									</div>
 								<?php endforeach; ?>
 							</div>
-						<?php endif; ?>
+
+							<!-- Swiper Pagination -->
+							<?php if ( count($slides) > 1 ) : ?>
+								<div class="swiper-pagination !bottom-6 !right-6 !left-auto !w-auto flex gap-2"></div>
+							<?php endif; ?>
+						</div>
 
 						<!-- Orange badge -->
 						<div class="absolute bottom-6 left-6 bg-[#f97316] text-white p-5 rounded-2xl shadow-xl flex flex-col justify-center max-w-[150px] z-20 hover:scale-105 transition-transform duration-300 pointer-events-none">
@@ -517,7 +541,7 @@ $zalo    = ltdh_get_zalo_url();
 			<!-- Row 2: [Video Card] [Text Content] -->
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 				<!-- Left column: Video Card -->
-				<div class="relative overflow-hidden rounded-3xl shadow-lg aspect-video group bg-slate-800 flex items-center justify-center <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
+				<div class="rounded-2xl relative overflow-hidden rounded-3xl shadow-lg aspect-video group bg-slate-800 flex items-center justify-center <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
 					<img src="<?php echo esc_url($c_left_image ?: home_url('wp-content/uploads/2026/07/vtv-news-thumb.png')); ?>" alt="VTV24 Video Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
 					
 					<?php if (!empty($c_left_youtube)): ?>
@@ -531,10 +555,7 @@ $zalo    = ltdh_get_zalo_url();
 						</div>
 					<?php endif; ?>
 
-					<!-- Bottom title bar -->
-					<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent p-5 pt-10">
-						<p class="text-white font-extrabold text-sm md:text-base leading-snug">Văn bằng đại học mới sẽ không còn ghi hình thức đào tạo - VTV24 News</p>
-					</div>
+					
 				</div>
 
 				<!-- Right column: Text Content -->
@@ -681,57 +702,20 @@ $zalo    = ltdh_get_zalo_url();
 				});
 			}
 
-			// Image Slider Logic
-			const slides = document.querySelectorAll('.cert-slide');
-			const dots = document.querySelectorAll('.cert-slider-dot');
-			if (slides.length > 1) {
-				let currentSlide = 0;
-				let slideInterval;
-
-				function showSlide(index) {
-					slides.forEach((slide, i) => {
-						if (i === index) {
-							slide.classList.remove('opacity-0', 'z-0');
-							slide.classList.add('opacity-100', 'z-10');
-						} else {
-							slide.classList.remove('opacity-100', 'z-10');
-							slide.classList.add('opacity-0', 'z-0');
-						}
-					});
-					dots.forEach((dot, i) => {
-						if (i === index) {
-							dot.classList.remove('bg-white/50', 'scale-100');
-							dot.classList.add('bg-white', 'scale-125');
-						} else {
-							dot.classList.remove('bg-white', 'scale-125');
-							dot.classList.add('bg-white/50', 'scale-100');
-						}
-					});
-					currentSlide = index;
-				}
-
-				function nextSlide() {
-					let next = (currentSlide + 1) % slides.length;
-					showSlide(next);
-				}
-
-				function startSlider() {
-					slideInterval = setInterval(nextSlide, 4000);
-				}
-
-				function stopSlider() {
-					clearInterval(slideInterval);
-				}
-
-				dots.forEach((dot, i) => {
-					dot.addEventListener('click', () => {
-						stopSlider();
-						showSlide(i);
-						startSlider();
-					});
+			// Certificate Swiper Slider Logic
+			if (typeof Swiper !== 'undefined') {
+				new Swiper('.cert-swiper', {
+					loop: true,
+					autoplay: {
+						delay: 4000,
+						disableOnInteraction: false,
+					},
+					pagination: {
+						el: '.cert-swiper .swiper-pagination',
+						clickable: true,
+					},
+					speed: 600,
 				});
-
-				startSlider();
 			}
 		});
 	</script>
@@ -787,7 +771,7 @@ $zalo    = ltdh_get_zalo_url();
 					<h3 class="text-lg md:text-xl font-extrabold font-display tracking-tight text-white uppercase">
 						<?php echo esc_html($w_heading ?: 'Vì sao chọn chúng tôi?'); ?>
 					</h3>
-					<p class="text-slate-400 text-xs mt-1"><?php echo esc_html($w_desc ?: 'Đơn vị tư vấn và liên kết tuyển sinh hàng đầu.'); ?></p>
+					<p class="text-slate-400 text-xs mt-1"><?php echo esc_html($w_desc ?: 'Đơn vị tư vấn và đối tác tuyển sinh hàng đầu.'); ?></p>
 				</div>
 				<div class="w-full lg:w-2/3 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
 					<?php

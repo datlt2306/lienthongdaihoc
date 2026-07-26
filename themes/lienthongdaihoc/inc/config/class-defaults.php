@@ -22,26 +22,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 function ltdh_get_defaults( string $group ): array {
 	$defaults = [
 		'contact' => [
-			'hotline'    => '0389 198 653',
+			'hotline'    => '0338 615 497',
 			'zalo_url'   => 'https://zalo.me',
 			'messenger_url' => 'https://m.me',
 			'email'      => 'tuyensinh@lienthongdaihoc.com',
 			'address'    => '123 Đường Cầu Giấy, Quận Cầu Giấy, Hà Nội',
-			'company_name' => 'Cổng thông tin Tuyển sinh liên kết Đại học',
+			'company_name' => 'Cổng thông tin Tuyển sinh đối tác Đại học',
 		],
 		'navigation' => [
 			'primary' => [
 				[ 'url' => '/',                   'label' => 'Trang chủ' ],
-				[ 'url' => '/truong-lien-ket/',   'label' => 'Trường liên kết' ],
-				[ 'url' => '/nganh-hoc/',         'label' => 'Ngành học' ],
+				[ 'url' => '/truong-doi-tac/',   'label' => 'Trường đối tác' ],
+				[ 'url' => '/nganh-hoc/',         'label' => 'Chuyên ngành' ],
 				[ 'url' => '/he-dao-tao/',        'label' => 'Hệ đào tạo' ],
 				[ 'url' => '/tin-tuyen-sinh/',    'label' => 'Tin tức' ],
 				[ 'url' => '/lien-he/',           'label' => 'Liên hệ' ],
 			],
 			'mobile' => [
 				[ 'url' => '/',                   'label' => 'Trang chủ' ],
-				[ 'url' => '/truong-lien-ket/',   'label' => 'Trường liên kết' ],
-				[ 'url' => '/nganh-hoc/',         'label' => 'Ngành học' ],
+				[ 'url' => '/truong-doi-tac/',   'label' => 'Trường đối tác' ],
+				[ 'url' => '/nganh-hoc/',         'label' => 'Chuyên ngành' ],
 				[ 'url' => '/he-dao-tao/tu-xa/',  'label' => 'Chương trình' ],
 				[ 'url' => '/tin-tuyen-sinh/',    'label' => 'Tin tức' ],
 				[ 'url' => '/kiem-tra-dieu-kien/', 'label' => 'Kiểm tra điều kiện' ],

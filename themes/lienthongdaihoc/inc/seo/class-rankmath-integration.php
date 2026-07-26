@@ -68,7 +68,7 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
 		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
-		$school     = $school_id ? get_the_title( $school_id ) : 'Liên kết';
+		$school     = $school_id ? get_the_title( $school_id ) : 'Đối tác';
 
 		$data['ltdh_course'] = [
 			'@context'    => 'https://schema.org',
@@ -124,15 +124,87 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 add_filter( 'rank_math/json_ld', 'ltdh_seo_inject_custom_schema', 99, 2 );
 
 // ----------------------------------------------------
-// 4. Override Breadcrumb Labels
+// 4. Override Breadcrumb Labels & Tin tức Structure
 // ----------------------------------------------------
+
+/**
+ * Build breadcrumb crumb array helper.
+ *
+ * @param string $label Display label.
+ * @param string $url   URL (empty string for last item).
+ * @return array
+ */
+function ltdh_seo_crumb( $label, $url = '' ) {
+	return [ $label, $url ];
+}
+
+/**
+ * Override breadcrumb items for:
+ * - CPT archive labels (Trường đối tác, etc.)
+ * - Blog archive (is_home): Trang chủ > Tin tức
+ * - Category archive (is_category): Trang chủ > Tin tức > [Tên danh mục]
+ * - Single post (is_single + post): Trang chủ > Tin tức > [Tên danh mục] > [Tiêu đề bài]
+ */
 function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
+	$home_url   = home_url( '/' );
+	$home_label = 'Trang chủ';
+
+	// ---- Blog archive: is_home() ----
+	if ( is_home() ) {
+		return [
+			ltdh_seo_crumb( $home_label, $home_url ),
+			ltdh_seo_crumb( 'Tin tức' ),
+		];
+	}
+
+	// ---- Category archive: is_category() ----
+	if ( is_category() ) {
+		$tin_tuc_url = get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/tin-tuc/' );
+		$cat         = get_queried_object();
+		return [
+			ltdh_seo_crumb( $home_label, $home_url ),
+			ltdh_seo_crumb( 'Tin tức', $tin_tuc_url ),
+			ltdh_seo_crumb( $cat ? $cat->name : 'Danh mục' ),
+		];
+	}
+
+	// ---- Single post (post type = post): Trang chủ > Tin tức > [Cat] > [Title] ----
+	if ( is_singular( 'post' ) ) {
+		$tin_tuc_url = get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/tin-tuc/' );
+		$post_id     = get_the_ID();
+		$post_cats   = get_the_category( $post_id );
+
+		// Pick first non-uncategorized category
+		$post_cat = null;
+		foreach ( $post_cats as $pc ) {
+			if ( 'uncategorized' !== $pc->slug ) {
+				$post_cat = $pc;
+				break;
+			}
+		}
+
+		$new_crumbs = [
+			ltdh_seo_crumb( $home_label, $home_url ),
+			ltdh_seo_crumb( 'Tin tức', $tin_tuc_url ),
+		];
+
+		if ( $post_cat ) {
+			$new_crumbs[] = ltdh_seo_crumb( $post_cat->name, get_category_link( $post_cat->term_id ) );
+		}
+
+		$new_crumbs[] = ltdh_seo_crumb( get_the_title() );
+
+		return $new_crumbs;
+	}
+
+	// ---- Default: fix CPT archive labels ----
 	foreach ( $crumbs as $key => $crumb ) {
 		$lower_label = mb_strtolower( $crumb[0], 'UTF-8' );
-		if ( in_array( $lower_label, [ 'trường học', 'truong', 'truong-lien-ket', 'schools', 'school' ], true ) ) {
-			$crumbs[ $key ][0] = 'Trường liên kết';
+		if ( in_array( $lower_label, [ 'trường học', 'truong', 'truong-lien-ket', 'truong-doi-tac', 'trường đối tác', 'schools', 'school' ], true ) ) {
+			$crumbs[ $key ][0] = 'Trường đối tác';
 		}
 	}
+
 	return $crumbs;
 }
 add_filter( 'rank_math/frontend/breadcrumb/items', 'ltdh_seo_override_breadcrumb_items', 10, 2 );
@@ -193,7 +265,7 @@ function ltdh_seo_compare_schema( $data, $json_ld ) {
 	}
 
 	foreach ( $items as $index => $item ) {
-		$school_name = $item['school'] ? $item['school']['title'] : 'Liên kết';
+		$school_name = $item['school'] ? $item['school']['title'] : 'Đối tác';
 		$school_url  = $item['school'] && $item['school']['website'] ? $item['school']['website'] : home_url( '/' );
 
 		$data[ 'ltdh_compare_course_' . $index ] = [

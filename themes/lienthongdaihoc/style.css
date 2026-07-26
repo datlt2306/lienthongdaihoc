@@ -226,3 +226,25 @@ h1, h2, h3, h4, h5, h6,
 .ltdh-cf7-form p {
 	margin-bottom: 0 !important;
 }
+
+/* Unified Button Find Out More (Tìm hiểu thêm) */
+.ltdh-btn-details {
+	background-color: #f8fafc !important;
+	color: #00308b !important;
+	font-weight: 700 !important;
+	transition: all 0.2s ease-in-out !important;
+	border: 1px solid #cbd5e1 !important;
+}
+.ltdh-btn-details:hover {
+	background-color: #ff7b00 !important;
+	border-color: #ff7b00 !important;
+	color: #ffffff !important;
+}
+
+/* Ensure all buttons have pointer cursor on hover */
+button,
+.ltdh-compare-toggle,
+.ltdh-compare-single-btn,
+#ltdh-compare-tray button {
+	cursor: pointer !important;
+}

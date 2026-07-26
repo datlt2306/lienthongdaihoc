@@ -187,8 +187,8 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		$msg_text .= "👤 <b>Họ và tên:</b> " . esc_html( $name ) . "\n";
 		$msg_text .= "📞 <b>Số điện thoại:</b> " . esc_html( $phone ) . "\n";
 		$msg_text .= "✉ <b>Email:</b> " . esc_html( $email ) . "\n";
-		$msg_text .= "🏫 <b>Trường liên kết:</b> " . esc_html( $school_title ) . "\n";
-		$msg_text .= "🎓 <b>Ngành học:</b> " . esc_html( $major_title ) . "\n";
+		$msg_text .= "🏫 <b>Trường đối tác:</b> " . esc_html( $school_title ) . "\n";
+		$msg_text .= "🎓 <b>Chuyên ngành:</b> " . esc_html( $major_title ) . "\n";
 		if ( $training_type !== 'N/A' ) {
 			$msg_text .= "🏷 <b>Hệ học:</b> " . esc_html( $training_type ) . "\n";
 		}

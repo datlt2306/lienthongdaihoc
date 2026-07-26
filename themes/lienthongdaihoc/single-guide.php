@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 $guide_id = get_the_ID();
-$hotline = get_field( 'global_hotline', 'options' ) ?: '0389198653';
+$hotline = ltdh_get_hotline();
 $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 ?>
 
@@ -50,7 +50,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<!-- Sidebar register widget -->
 					<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
 						<h3 class="text-lg font-bold text-slate-900 mb-2">Nhận thêm thông tin chi tiết</h3>
-						<p class="text-sm text-slate-500 mb-4">Để lại câu hỏi của bạn. Ban tuyển sinh đại học liên kết sẽ giải đáp nhanh chóng sau 15 phút.</p>
+						<p class="text-sm text-slate-500 mb-4">Để lại câu hỏi của bạn. Ban tuyển sinh đại học đối tác sẽ giải đáp nhanh chóng sau 15 phút.</p>
 						
 						<?php 
 						if ( function_exists( 'wpcf7_contact_form_html' ) ) :

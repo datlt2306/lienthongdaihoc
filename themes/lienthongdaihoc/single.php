@@ -46,20 +46,20 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 
 <main id="primary" class="site-main bg-slate-50">
 
-	<!-- Hero Banner with Post Thumbnail -->
-	<div class="relative bg-slate-900 overflow-hidden" style="min-height: 340px;">
+	<!-- Hero Banner with Post Thumbnail (Aligned with standard layout) -->
+	<section class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white py-14 md:py-20 overflow-hidden">
+		<!-- Dot Grid Pattern -->
+		<div class="absolute inset-0 opacity-10 pointer-events-none z-0" style="background-image: radial-gradient(white 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
+		<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
 		<?php if ( $post_thumb ) : ?>
-			<div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('<?php echo esc_url( $post_thumb ); ?>');"></div>
-		<?php else : ?>
-			<div class="absolute inset-0 bg-gradient-to-br from-[#00308b] to-[#7C3AED] opacity-70"></div>
+			<div class="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none mix-blend-overlay" style="background-image: url('<?php echo esc_url( $post_thumb ); ?>');"></div>
 		<?php endif; ?>
-		<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/70 to-transparent"></div>
 
-		<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+		<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<!-- Category & School Badges -->
 			<div class="flex flex-wrap items-center gap-2 mb-4">
 				<?php if ( $post_cat ) : ?>
-					<span class="inline-block bg-[#00308b] text-white text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider">
+					<span class="inline-block bg-white/20 backdrop-blur-sm text-white text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
 						<?php echo esc_html( $post_cat->name ); ?>
 					</span>
 				<?php endif; ?>
@@ -68,33 +68,33 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 				if ( $school_id ) :
 					$school_name = get_the_title( $school_id );
 				?>
-					<span class="inline-block bg-white/20 backdrop-blur-sm text-white text-xs font-extrabold px-3 py-1.5 rounded-full tracking-wider">
+					<span class="inline-block bg-white/10 backdrop-blur-sm text-white text-xs font-extrabold px-3 py-1 rounded-full tracking-wider">
 						<?php echo esc_html( $school_name ); ?>
 					</span>
 				<?php endif; ?>
 			</div>
 
-			<h1 class="text-2xl md:text-4xl font-black text-white leading-tight mb-5">
+			<h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight leading-tight mb-5">
 				<?php the_title(); ?>
 			</h1>
 
 			<!-- Meta -->
-			<div class="flex flex-wrap items-center gap-4 text-sm text-blue-200">
+			<div class="flex flex-wrap items-center gap-4 text-xs md:text-sm text-blue-100/90 font-medium">
 				<span class="flex items-center gap-1.5">
-					<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+					<svg class="w-4 h-4 text-blue-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
 					<?php echo get_the_date( 'd/m/Y' ); ?>
 				</span>
 				<span class="flex items-center gap-1.5">
-					<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+					<svg class="w-4 h-4 text-blue-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
 					<?php echo esc_html( $reading_time ); ?> phút đọc
 				</span>
 				<span class="flex items-center gap-1.5">
-					<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+					<svg class="w-4 h-4 text-blue-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
 					<?php the_author(); ?>
 				</span>
 			</div>
 		</div>
-	</div>
+	</section>
 
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 		<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -259,8 +259,9 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 					   class="block w-full bg-white text-[#00308b] font-extrabold text-sm py-2.5 rounded-xl hover:bg-blue-50 transition-all mb-2">
 						Đăng ký ngay
 					</a>
-					<a href="tel:0389198653" class="block text-blue-200 text-xs font-semibold hover:text-white transition-colors">
-						📞 0389 198 653
+					<?php $hotline = ltdh_get_hotline(); ?>
+					<a href="tel:<?php echo esc_attr( str_replace( ' ', '', $hotline ) ); ?>" class="block text-blue-200 text-xs font-semibold hover:text-white transition-colors">
+						📞 <?php echo esc_html( $hotline ); ?>
 					</a>
 				</div>
 			</aside>

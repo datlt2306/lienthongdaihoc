@@ -27,10 +27,9 @@ require_once __DIR__ . '/inc/core/class-rewrite-rules.php';
 require_once __DIR__ . '/inc/core/class-query-filters.php';
 
 // ----------------------------------------------------
-// 3. ACF: Field Groups & Options Page Extensions
+// 3. ACF: Field Groups
 // ----------------------------------------------------
 require_once __DIR__ . '/inc/acf-fields.php';
-require_once __DIR__ . '/inc/admin/class-options-page.php';
 
 // ----------------------------------------------------
 // 4. Content: CPTs & Taxonomies

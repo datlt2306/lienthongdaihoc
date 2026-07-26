@@ -288,6 +288,74 @@ $global_zalo = ltdh_get_zalo_url();
 					?>
 					</section>
 
+					<!-- RELATED NEWS & ANNOUNCEMENTS (Sidebar) -->
+					<?php
+					$related_news_query = new WP_Query( [
+						'post_type'      => [ 'post', 'guide' ],
+						'posts_per_page' => 6,
+						'post_status'    => 'publish',
+						'meta_query'     => [
+							[
+								'key'     => 'related_programs',
+								'value'   => '"' . $program_id . '"',
+								'compare' => 'LIKE',
+							],
+						],
+					] );
+
+					if ( $related_news_query->have_posts() ) :
+						$has_more = ( $related_news_query->post_count > 5 );
+					?>
+						<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+							<h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-3">Tin tức & Thông báo liên quan</h3>
+							<div class="space-y-3.5">
+								<?php
+								$news_counter = 0;
+								while ( $related_news_query->have_posts() ) :
+									$related_news_query->the_post();
+									if ( $news_counter >= 5 ) {
+										continue;
+									}
+									$news_thumb = get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' );
+									$news_counter++;
+								?>
+									<div class="flex gap-3 items-start pb-3 border-b border-slate-100 last:border-b-0 last:pb-0">
+										<?php if ( $news_thumb ) : ?>
+											<a href="<?php the_permalink(); ?>" class="shrink-0">
+												<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded border border-slate-100" loading="lazy">
+											</a>
+										<?php else : ?>
+											<div class="w-12 h-12 bg-slate-50 border border-slate-100 rounded flex items-center justify-center shrink-0">
+												<span class="text-lg">📰</span>
+											</div>
+										<?php endif; ?>
+										
+										<div class="flex-1 min-w-0">
+											<h4 class="font-bold text-slate-800 text-xs md:text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
+												<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+											</h4>
+											<p class="text-[10px] text-slate-400 mt-0.5">📅 <?php echo get_the_date(); ?></p>
+										</div>
+									</div>
+								<?php
+								endwhile;
+								wp_reset_postdata();
+								?>
+							</div>
+
+							<?php if ( $has_more ) : ?>
+								<div class="mt-4 pt-3 border-t border-slate-100">
+									<a href="<?php echo esc_url( home_url( '/tin-tuc/?chuong-trinh=' . $program_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-xs hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
+										<span>Xem thêm tin tức</span>
+										<span>→</span>
+									</a>
+								</div>
+							<?php endif; ?>
+						</section>
+					<?php
+					endif;
+					?>
+
 					<!-- SECTION 13: PHONE CTA & SECTION 14: ZALO CTA sidebar cards -->
 					<div class="bg-brand-accent/5 border border-brand-primary/10 rounded-lg p-6 text-center">
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Cần hỗ trợ trực tiếp?</span>

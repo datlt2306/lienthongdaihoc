@@ -177,7 +177,7 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 			}
 		}
 
-		if ($title === 'ngành học') {
+		if ($title === 'chuyên ngành') {
 			$filtered_items = [];
 			foreach ($new_items as $ni) {
 				if ((int) $ni->menu_item_parent === (int) $item->ID) {

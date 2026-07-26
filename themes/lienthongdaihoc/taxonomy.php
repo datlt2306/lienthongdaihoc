@@ -37,7 +37,7 @@ $is_base_archive = ! isset( $term->term_id );
 					while ( $all_programs->have_posts() ) : $all_programs->the_post();
 						$prog_id = get_the_ID();
 						$school_rel_id = get_field( 'school_relationship', $prog_id );
-						$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Đại học liên kết';
+						$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Đại học đối tác';
 						$major_rel_id = get_field( 'major_relationship', $prog_id );
 						$major_thumb = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium' ) : '';
 						if ( ! $major_thumb ) {
@@ -101,7 +101,7 @@ $is_base_archive = ! isset( $term->term_id );
 						$address = get_field( 'address', $school_id ) ?: 'Việt Nam';
 						$hotline = get_field( 'hotline', $school_id ) ?: get_field( 'global_hotline', 'options' );
 						$thumb_url = get_the_post_thumbnail_url( $school_id, 'medium' ) ?: $fallback_images[$index % 5];
-						$logo_id = get_field( 'logo', $school_id );
+						$logo_id = ltdh_get_school_image_id( $school_id );
 						$en_name = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
 						$rating  = get_post_meta( $school_id, 'rating', true ) ?: '4.8';
 						$reviews = get_post_meta( $school_id, 'reviews_count', true ) ?: '256';
@@ -115,7 +115,7 @@ $is_base_archive = ! isset( $term->term_id );
 								<?php if ( $logo_id ) : ?>
 									<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
 								<?php else : ?>
-									<span class="font-display font-extrabold text-brand-primary text-xs">UNI</span>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-brand-primary/80"><path d="M11.7 2.805a.75.75 0 0 1 .6 0l9.3 4.25a.75.75 0 0 1 0 1.39l-9.3 4.25a.75.75 0 0 1-.6 0L2.4 8.445a.75.75 0 0 1 0-1.39l9.3-4.25ZM2.84 10.74l6.735 3.08a2.25 2.25 0 0 0 1.85 0l6.735-3.08v3.42c0 .532-.244 1.026-.642 1.378L12.5 19.544a1.25 1.25 0 0 1-1.6 0l-5.023-3.97a1.75 1.75 0 0 1-.642-1.378v-3.456Z" /><path d="M20.25 10.32v5.43a3.25 3.25 0 0 1-3.25 3.25h-.5a.75.75 0 0 0 0 1.5h.5a4.75 4.75 0 0 0 4.75-4.75v-5.43a.75.75 0 0 0-1.5 0Z" /></svg>
 								<?php endif; ?>
 							</div>
 
@@ -139,7 +139,7 @@ $is_base_archive = ! isset( $term->term_id );
 						$index++;
 					endwhile;
 				else :
-					echo '<div class="col-span-4 text-center py-12"><p class="text-slate-500 text-base">Chưa có trường liên kết nào thuộc khu vực này.</p></div>';
+					echo '<div class="col-span-4 text-center py-12"><p class="text-slate-500 text-base">Chưa có trường đối tác nào thuộc khu vực này.</p></div>';
 				endif;
 				?>
 			</div>
@@ -152,10 +152,17 @@ $is_base_archive = ! isset( $term->term_id );
 					while ( have_posts() ) : the_post();
 						$prog_id = get_the_ID();
 						$school_rel_id = get_field( 'school_relationship', $prog_id );
-						$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Đại học liên kết';
+						$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Đại học đối tác';
 				?>
 					<?php
 					$major_rel_id = get_field( 'major_relationship', $prog_id );
+					if ( is_array( $major_rel_id ) ) {
+						$major_rel_id = ! empty( $major_rel_id ) ? ( is_object( $major_rel_id[0] ) ? $major_rel_id[0]->ID : $major_rel_id[0] ) : 0;
+					} elseif ( is_object( $major_rel_id ) ) {
+						$major_rel_id = $major_rel_id->ID;
+					}
+					$major_rel_id = intval( $major_rel_id );
+
 					$major_thumb = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium' ) : '';
 					if ( ! $major_thumb ) {
 						$major_thumb = 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=300';

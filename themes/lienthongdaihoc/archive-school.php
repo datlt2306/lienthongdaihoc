@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card' ], true ) ? $_GET['view'] : 'list';
+$view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card' ], true ) ? $_GET['view'] : ( wp_is_mobile() ? 'card' : 'list' );
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
@@ -22,7 +22,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 		// Query featured schools
 		$featured_args = [
 			'post_type'      => 'school',
-			'posts_per_page' => 6,
+			'posts_per_page' => 4,
 			'post_status'    => 'publish',
 			'meta_query'     => [
 				[
@@ -35,12 +35,12 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 		$featured_query = new WP_Query( $featured_args );
 		$featured_posts = $featured_query->posts;
 
-		// If less than 6, query latest schools to fill the remaining slots
-		if ( count( $featured_posts ) < 6 ) {
+		// If less than 4, query latest schools to fill the remaining slots
+		if ( count( $featured_posts ) < 4 ) {
 			$exclude_ids = wp_list_pluck( $featured_posts, 'ID' );
 			$fallback_args = [
 				'post_type'      => 'school',
-				'posts_per_page' => 6 - count( $featured_posts ),
+				'posts_per_page' => 4 - count( $featured_posts ),
 				'post_status'    => 'publish',
 				'post__not_in'   => ! empty( $exclude_ids ) ? $exclude_ids : [],
 			];
@@ -48,9 +48,11 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 			$featured_posts = array_merge( $featured_posts, $fallback_query->posts );
 		}
 
+		$featured_school_ids = wp_list_pluck( $featured_posts, 'ID' );
+
 		if ( ! empty( $featured_posts ) ) :
 		?>
-			<!-- Section: Trường nổi bật (3-column grid) -->
+			<!-- Section: Trường nổi bật (4-column grid) -->
 			<div class="mb-16">
 				<div class="flex items-center gap-3 mb-6 border-b border-slate-200 pb-4">
 					<span class="flex items-center justify-center w-8 h-8 rounded-lg bg-brand-primary text-white">
@@ -60,19 +62,18 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 					</span>
 					<div>
 						<h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Trường đại học nổi bật</h2>
-						<p class="text-xs text-slate-500 mt-0.5">Các trường đại học liên kết tuyển sinh hàng đầu với chất lượng đào tạo vượt trội.</p>
+						<p class="text-xs text-slate-500 mt-0.5">Các trường đại học đối tác tuyển sinh hàng đầu với chất lượng đào tạo vượt trội.</p>
 					</div>
 				</div>
 
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
 					<?php
 					foreach ( $featured_posts as $featured_post ) :
 						$school_id = $featured_post->ID;
 						$logo_id   = get_field( 'logo', $school_id );
 						$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
 
-						$offered_program_ids = get_post_meta( $school_id, LTDH_META_OFFERED_PROGRAMS, true );
-						$prog_count = is_array( $offered_program_ids ) ? count( $offered_program_ids ) : 0;
+						$prog_count = ltdh_get_school_unique_majors_count( $school_id );
 
 						$school_types = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => 'names' ] );
 						$systems_label = ( ! is_wp_error( $school_types ) && ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
@@ -106,19 +107,24 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 									<p class="text-xs text-slate-400 mt-1 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
 									
 									<div class="mt-4 space-y-2 text-center text-xs">
-										<?php if ( ! empty( $systems_label ) ) : ?>
-											<span class="font-bold text-brand-primary bg-blue-50 px-3 py-1 rounded-full inline-block leading-none"><?php echo esc_html( $systems_label ); ?></span>
+										<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
+											<div class="flex flex-wrap justify-center gap-1">
+												<?php
+												foreach ( $school_types as $st_term ) {
+													echo ltdh_get_training_type_badge_html( $st_term );
+												}
+												?>
+											</div>
 										<?php endif; ?>
 										
 										<div class="flex items-center justify-center gap-x-4 gap-y-1 flex-wrap text-slate-500 font-medium pt-2">
-											<span class="flex items-center gap-1">📍 <?php echo esc_html( $region ?: 'Việt Nam' ); ?></span>
 											<span class="flex items-center gap-1">📊 <?php echo esc_html( $prog_count ); ?> ngành</span>
 										</div>
 									</div>
 								</div>
 								
 								<div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="w-full text-center bg-brand-primary hover:bg-[#002263] text-white py-2.5 rounded-lg font-bold transition-all text-xs uppercase tracking-wider">Tìm hiểu chi tiết</a>
+									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="w-full text-center py-2.5 rounded-lg text-xs uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu chi tiết</a>
 								</div>
 							</div>
 						</div>
@@ -131,7 +137,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 		<!-- Header with view toggle -->
 		<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-slate-200 gap-4">
-			<p class="text-sm font-medium text-slate-500">Hiển thị tất cả các trường đại học liên kết tuyển sinh chính thức.</p>
+			<p class="text-sm font-medium text-slate-500">Hiển thị tất cả các trường đại học đối tác tuyển sinh chính thức.</p>
 			<a href="<?php echo esc_url( add_query_arg( 'view', 'list' === $view_mode ? 'card' : 'list' ) ); ?>"
 			   class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-brand-accent transition-all"
 			   title="<?php echo 'list' === $view_mode ? 'Chuyển sang Card' : 'Chuyển sang List'; ?>">
@@ -145,16 +151,18 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 		<?php if ( 'card' === $view_mode ) : ?>
 		<!-- ============ CARD VIEW ============ -->
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+		<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
 			<?php
 			if ( have_posts() ) :
 				while ( have_posts() ) : the_post();
 					$school_id = get_the_ID();
+					if ( ! empty( $featured_school_ids ) && in_array( $school_id, $featured_school_ids, true ) ) {
+						continue;
+					}
 					$logo_id   = get_field( 'logo', $school_id );
 					$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
 
-					$offered_program_ids = get_post_meta( $school_id, LTDH_META_OFFERED_PROGRAMS, true );
-					$prog_count = is_array( $offered_program_ids ) ? count( $offered_program_ids ) : 0;
+					$prog_count = ltdh_get_school_unique_majors_count( $school_id );
 
 					$school_types = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => 'names' ] );
 					$systems_label = ( ! is_wp_error( $school_types ) && ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
@@ -175,21 +183,27 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 							<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
 							<p class="text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
 							<div class="mt-3 space-y-1 text-center text-[10px] md:text-xs">
-								<?php if ( ! empty( $systems_label ) ) : ?>
-									<span class="font-bold text-brand-primary bg-blue-50 px-2.5 py-1 rounded-full inline-block leading-none mb-1.5"><?php echo esc_html( $systems_label ); ?></span>
+								<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
+									<div class="flex flex-wrap justify-center gap-1 mb-1.5">
+										<?php
+										foreach ( $school_types as $st_term ) {
+											echo ltdh_get_training_type_badge_html( $st_term );
+										}
+										?>
+									</div>
 								<?php endif; ?>
 								<p class="text-slate-500 font-semibold">📊 <?php echo esc_html( $prog_count ); ?> ngành đào tạo</p>
 							</div>
 						</div>
 						<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-							<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-brand-primary hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-brand-primary">Tìm hiểu thêm</a>
+							<a href="<?php the_permalink(); ?>" class="w-full text-center py-2.5 rounded-lg text-xs uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
 						</div>
 					</div>
 				</div>
 			<?php
 				endwhile;
 			else :
-				echo '<div class="col-span-4 text-center py-12"><p class="text-slate-500 text-base">Chưa có trường liên kết nào.</p></div>';
+				echo '<div class="col-span-4 text-center py-12"><p class="text-slate-500 text-base">Chưa có trường đối tác nào.</p></div>';
 			endif;
 			?>
 		</div>
@@ -201,13 +215,27 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 			if ( have_posts() ) :
 				while ( have_posts() ) : the_post();
 					$school_id = get_the_ID();
+					if ( ! empty( $featured_school_ids ) && in_array( $school_id, $featured_school_ids, true ) ) {
+						continue;
+					}
 					$address   = get_field( 'address', $school_id ) ?: 'Việt Nam';
 					$hotline   = ltdh_get_school_hotline( $school_id );
 					$logo_id   = get_field( 'logo', $school_id );
 					$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: '';
 
-					$offered_program_ids = get_post_meta( $school_id, LTDH_META_OFFERED_PROGRAMS, true );
-					$prog_count = is_array( $offered_program_ids ) ? count( $offered_program_ids ) : 0;
+					$prog_count = ltdh_get_school_unique_majors_count( $school_id );
+					$offered_program_ids = get_posts( [
+						'post_type'   => 'program',
+						'numberposts' => -1,
+						'fields'      => 'ids',
+						'meta_query'  => [
+							[
+								'key'     => 'school_relationship',
+								'value'   => $school_id,
+								'compare' => '=',
+							],
+						],
+					] );
 
 					$prog_tags = [];
 					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
@@ -260,14 +288,20 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 							<?php endif; ?>
 							<div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-slate-500">
 								<span class="flex items-center gap-1"><span class="text-brand-primary">📍</span> <?php echo esc_html( $address ); ?></span>
-								<?php if ( $region ) : ?>
-									<span class="flex items-center gap-1"><span class="text-brand-primary">🗺</span> <?php echo esc_html( $region ); ?></span>
-								<?php endif; ?>
 								<?php if ( $prog_count > 0 ) : ?>
 									<span class="flex items-center gap-1"><span class="text-brand-primary">📊</span> <?php echo esc_html( $prog_count ); ?> chương trình</span>
 								<?php endif; ?>
 								<?php if ( ! empty( $training_modes ) ) : ?>
-									<span class="flex items-center gap-1"><span class="text-brand-primary">🎓</span> <?php echo esc_html( implode( ', ', $training_modes ) ); ?></span>
+									<span class="flex items-center gap-1.5">
+										<span class="text-brand-primary">🎓</span>
+										<span class="flex flex-wrap gap-1">
+											<?php
+											foreach ( $training_modes as $mode ) {
+												echo ltdh_get_training_type_badge_html( $mode );
+											}
+											?>
+										</span>
+									</span>
 								<?php endif; ?>
 							</div>
 							<?php if ( ! empty( $prog_tags ) ) : ?>
@@ -281,9 +315,8 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								</div>
 							<?php endif; ?>
 						</div>
-						<div class="flex items-center gap-2 shrink-0">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex items-center gap-1.5 bg-brand-accent text-white px-4 py-2.5 rounded-lg font-bold text-xs hover:bg-[#e06e00] transition-all min-h-[40px]">📞 Gọi ngay</a>
-							<a href="<?php the_permalink(); ?>" class="flex items-center gap-1.5 bg-slate-100 text-slate-700 px-4 py-2.5 rounded-lg font-bold text-xs hover:bg-slate-200 transition-all min-h-[40px]">Chi tiết →</a>
+						<div class="flex items-center gap-2 shrink-0 w-full sm:w-auto mt-3 sm:mt-0">
+							<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-6 py-2.5 rounded-lg text-xs uppercase ltdh-btn-details min-h-[40px] flex items-center">Tìm hiểu chi tiết</a>
 						</div>
 					</div>
 				</div>
@@ -291,7 +324,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 			<?php
 				endwhile;
 			else :
-				echo '<div class="text-center py-12"><p class="text-slate-500 text-base">Chưa có trường liên kết nào.</p></div>';
+				echo '<div class="text-center py-12"><p class="text-slate-500 text-base">Chưa có trường đối tác nào.</p></div>';
 			endif;
 			?>
 		</div>

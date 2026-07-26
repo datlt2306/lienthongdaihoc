@@ -19,14 +19,23 @@ $banner_image    = '';
 $banner_title    = '';
 $banner_subtitle = '';
 
-if ( is_page() ) {
+$type = get_query_var( 'ltdh_compare' );
+$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
+
+if ( preg_match( '#^/he-dao-tao/?$#i', $request_path ) ) {
+	$banner_title    = 'Hệ Đào Tạo';
+	$banner_subtitle = 'Tổng hợp các chương trình đào tạo từ xa, liên thông, văn bằng 2';
+} elseif ( $type === 'program' ) {
+	$banner_title    = 'So sánh chương trình đào tạo';
+	$banner_subtitle = 'So sánh chi tiết học phí, thời gian học, điều kiện tuyển sinh của các chương trình học.';
+} elseif ( is_page() ) {
 	// Pages: ACF banner field → featured image → default
 	$banner_image    = get_field( 'page_banner' ) ?: '';
 	$banner_subtitle = get_field( 'page_banner_subtitle' ) ?: '';
 	$banner_title    = get_the_title();
 } elseif ( is_singular( 'school' ) ) {
 	$banner_title    = get_the_title();
-	$banner_subtitle = 'Thông tin chi tiết về trường đào tạo liên kết';
+	$banner_subtitle = 'Thông tin chi tiết về trường đào tạo đối tác';
 	$banner_image    = get_field( 'school_banner' ) ?: get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'major' ) ) {
 	$banner_title    = 'Ngành ' . get_the_title();
@@ -46,10 +55,10 @@ if ( is_page() ) {
 	$banner_subtitle = $school_id ? get_the_title( $school_id ) : 'Chương trình đào tạo chất lượng cao';
 	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: ( $school_id ? get_field( 'school_banner', $school_id ) : '' ) ?: '';
 } elseif ( is_post_type_archive( 'school' ) ) {
-	$banner_title    = 'Trường Đại học Liên kết';
+	$banner_title    = 'Trường Đại học Đối tác';
 	$banner_subtitle = 'Hệ thống các trường đại học uy tín hàng đầu Việt Nam';
 } elseif ( is_post_type_archive( 'major' ) ) {
-	$banner_title    = 'Ngành Học';
+	$banner_title    = 'Chuyên Ngành';
 	$banner_subtitle = 'Khám phá các ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
 } elseif ( is_post_type_archive( 'program' ) ) {
 	$selected_he = '';

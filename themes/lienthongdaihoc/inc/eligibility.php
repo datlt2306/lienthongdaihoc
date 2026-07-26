@@ -99,18 +99,25 @@ add_filter( 'template_include', 'ltdh_elig_template_redirect' );
 
 function ltdh_elig_enqueue_assets() {
 	if ( is_page_template( 'page-eligible.php' ) ) {
+		$theme_dir = get_template_directory();
+		$css_path  = $theme_dir . '/assets/css/eligibility.css';
+		$js_path   = $theme_dir . '/assets/js/eligibility.js';
+		
+		$css_ver = file_exists( $css_path ) ? filemtime( $css_path ) : LTDH_VERSION;
+		$js_ver  = file_exists( $js_path ) ? filemtime( $js_path ) : LTDH_VERSION;
+
 		wp_enqueue_style(
 			'ltdh-eligibility-css',
 			get_template_directory_uri() . '/assets/css/eligibility.css',
 			[],
-			LTDH_VERSION
+			$css_ver
 		);
 
 		wp_enqueue_script(
 			'ltdh-eligibility-js',
 			get_template_directory_uri() . '/assets/js/eligibility.js',
 			[],
-			LTDH_VERSION,
+			$js_ver,
 			true
 		);
 
@@ -370,11 +377,11 @@ function ltdh_elig_run_check( $input ) {
 				if ( $preliminary_status !== 'not_compatible' ) {
 					$preliminary_status = 'needs_verification';
 				}
-				$verification_items[] = 'Chưa có thông tin ngành học hiện tại/đã tốt nghiệp (Cần xác minh tính hợp lệ của văn bằng).';
+				$verification_items[] = 'Chưa có thông tin chuyên ngành hiện tại/đã tốt nghiệp (Cần xác minh tính hợp lệ của văn bằng).';
 			} else {
 				if ( $prog_major_id && (int) $input['major_id'] === $prog_major_id ) {
 					$match_score += $weights['major_related'];
-					$match_reasons[] = 'Ngành học muốn học trùng khớp với ngành bạn đã tốt nghiệp.';
+					$match_reasons[] = 'Chuyên ngành muốn học trùng khớp với ngành bạn đã tốt nghiệp.';
 				} else {
 					if ( $preliminary_status !== 'not_compatible' ) {
 						$preliminary_status = 'needs_verification';
@@ -990,6 +997,10 @@ function ltdh_elig_admin_leads_page() {
 	global $wpdb;
 	$table = $wpdb->prefix . LTDH_TABLE_LEADS;
 	
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( 'Bạn không có quyền truy cập trang này.' );
+	}
+	
 	// Handle delete lead
 	if ( isset( $_GET['action'] ) && $_GET['action'] === 'delete' && isset( $_GET['lead_id'] ) ) {
 		check_admin_referer( 'ltdh_delete_lead_nonce' );
@@ -997,87 +1008,292 @@ function ltdh_elig_admin_leads_page() {
 		echo '<div class="updated"><p>Đã xóa lead thành công.</p></div>';
 	}
 
-	$leads = $wpdb->get_results( "SELECT * FROM $table ORDER BY id DESC LIMIT 200" );
+	// Handle bulk delete
+	$bulk_action = isset( $_POST['action'] ) && $_POST['action'] !== '-1' ? sanitize_text_field( $_POST['action'] ) : '';
+	if ( empty( $bulk_action ) ) {
+		$bulk_action = isset( $_POST['action2'] ) && $_POST['action2'] !== '-1' ? sanitize_text_field( $_POST['action2'] ) : '';
+	}
+
+	if ( $bulk_action === 'bulk-delete' && isset( $_POST['lead_ids'] ) && is_array( $_POST['lead_ids'] ) ) {
+		check_admin_referer( 'ltdh_bulk_leads_nonce' );
+		$lead_ids = array_map( 'intval', $_POST['lead_ids'] );
+		if ( ! empty( $lead_ids ) ) {
+			$placeholders = implode( ',', array_fill( 0, count( $lead_ids ), '%d' ) );
+			$wpdb->query( $wpdb->prepare( "DELETE FROM $table WHERE id IN ($placeholders)", $lead_ids ) );
+			echo '<div class="updated"><p>Đã xóa ' . count( $lead_ids ) . ' leads thành công.</p></div>';
+		}
+	}
+
+	// Filters and Search params
+	$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+	$sync_status = isset( $_GET['sync_status'] ) ? sanitize_text_field( wp_unslash( $_GET['sync_status'] ) ) : '';
+	$school_id = isset( $_GET['school_id'] ) ? intval( $_GET['school_id'] ) : 0;
+	$major_id = isset( $_GET['major_id'] ) ? intval( $_GET['major_id'] ) : 0;
+
+	// Build WHERE query
+	$where_clauses = array();
+	$where_params = array();
+
+	if ( ! empty( $search ) ) {
+		$where_clauses[] = '(name LIKE %s OR phone LIKE %s OR email LIKE %s)';
+		$like_search = '%' . $wpdb->esc_like( $search ) . '%';
+		$where_params[] = $like_search;
+		$where_params[] = $like_search;
+		$where_params[] = $like_search;
+	}
+
+	if ( ! empty( $sync_status ) ) {
+		$where_clauses[] = 'sync_status = %s';
+		$where_params[] = $sync_status;
+	}
+
+	if ( $school_id > 0 ) {
+		$where_clauses[] = 'school_id = %d';
+		$where_params[] = $school_id;
+	}
+
+	if ( $major_id > 0 ) {
+		$where_clauses[] = 'major_id = %d';
+		$where_params[] = $major_id;
+	}
+
+	$where_sql = '';
+	if ( ! empty( $where_clauses ) ) {
+		$where_sql = ' WHERE ' . implode( ' AND ', $where_clauses );
+	}
+
+	// Count matching items
+	$count_query = "SELECT COUNT(*) FROM $table $where_sql";
+	if ( ! empty( $where_params ) ) {
+		$count_query = $wpdb->prepare( $count_query, $where_params );
+	}
+	$total_items = intval( $wpdb->get_var( $count_query ) );
+
+	// Pagination setup
+	$per_page = 20;
+	$paged = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
+	$offset = ( $paged - 1 ) * $per_page;
+	$total_pages = ceil( $total_items / $per_page );
+
+	// Fetch items
+	$query = "SELECT * FROM $table $where_sql ORDER BY id DESC LIMIT %d OFFSET %d";
+	$query_params = $where_params;
+	$query_params[] = $per_page;
+	$query_params[] = $offset;
+
+	$leads = $wpdb->get_results( $wpdb->prepare( $query, $query_params ) );
 	?>
 	<div class="wrap">
 		<h1 class="wp-heading-inline">Danh sách Leads Đăng ký học</h1>
 		<hr class="wp-header-end">
 
-		<table class="wp-list-table widefat fixed striped table-view-list posts" style="margin-top: 15px;">
-			<thead>
-				<tr>
-					<th class="manage-column" style="width: 50px;">ID</th>
-					<th class="manage-column">Họ tên</th>
-					<th class="manage-column">Số điện thoại</th>
-					<th class="manage-column">Email</th>
-					<th class="manage-column">Ngành đăng ký</th>
-					<th class="manage-column">Trường liên kết</th>
-					<th class="manage-column">Cơ sở / Hệ học</th>
-					<th class="manage-column" style="width: 250px;">Chi tiết khảo sát</th>
-					<th class="manage-column">Trạng thái đồng bộ</th>
-					<th class="manage-column">Ngày tạo</th>
-					<th class="manage-column" style="width: 80px;">Hành động</th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php if ( empty( $leads ) ) : ?>
-					<tr><td colspan="11" style="text-align: center;">Chưa có lượt đăng ký nào.</td></tr>
-				<?php else : ?>
-					<?php foreach ( $leads as $lead ) : 
-						$school_title = $lead->school_id ? get_the_title( $lead->school_id ) : '—';
-						$major_title = $lead->major_id ? get_the_title( $lead->major_id ) : '—';
-						
-						// Decode survey metadata
-						$metadata_html = '—';
-						if ( ! empty( $lead->referral_source ) && strpos( $lead->referral_source, 'eligibility_checker' ) !== false ) {
-							$parts = parse_url( $lead->referral_source );
-							if ( isset( $parts['query'] ) ) {
-								parse_str( $parts['query'], $query_data );
-								$metadata_html = '<div style="font-size: 11px; line-height: 1.4;">';
-								if ( isset( $query_data['education_level'] ) ) {
-									$metadata_html .= '<strong>Học vấn:</strong> ' . esc_html( ltdh_elig_get_education_label( $query_data['education_level'] ) ) . '<br>';
-								}
-								if ( ! empty( $query_data['current_major'] ) && intval( $query_data['current_major'] ) > 0 ) {
-									$metadata_html .= '<strong>Ngành cũ:</strong> ' . esc_html( get_the_title( intval( $query_data['current_major'] ) ) ) . '<br>';
-								}
-								if ( ! empty( $query_data['previous_school'] ) ) {
-									$metadata_html .= '<strong>Trường cũ:</strong> ' . esc_html( $query_data['previous_school'] ) . '<br>';
-								}
-								if ( isset( $query_data['birth_year'] ) ) {
-									$metadata_html .= '<strong>Năm sinh:</strong> ' . esc_html( $query_data['birth_year'] ) . '<br>';
-								}
-								$metadata_html .= '</div>';
-							}
-						} else {
-							$metadata_html = esc_html( $lead->referral_source );
+		<!-- Search and Filters Form -->
+		<form method="get" action="" style="margin-top: 15px; margin-bottom: 15px; background: #fff; padding: 15px; border: 1px solid #ccd0d4; border-radius: 4px;">
+			<input type="hidden" name="page" value="ltdh_leads_menu">
+			
+			<div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+				<!-- Search -->
+				<div>
+					<label for="lead-search" style="font-weight: 600; display: block; margin-bottom: 5px;">Tìm kiếm:</label>
+					<input type="search" id="lead-search" name="s" placeholder="Số điện thoại, Họ tên, Email..." value="<?php echo esc_attr( $search ); ?>" style="width: 250px;">
+				</div>
+				
+				<!-- Filter Sync Status -->
+				<div>
+					<label for="lead-sync-status" style="font-weight: 600; display: block; margin-bottom: 5px;">Đồng bộ:</label>
+					<select id="lead-sync-status" name="sync_status">
+						<option value="">Tất cả trạng thái</option>
+						<option value="synced" <?php selected( $sync_status, 'synced' ); ?>>Synced</option>
+						<option value="pending" <?php selected( $sync_status, 'pending' ); ?>>Pending</option>
+						<option value="failed" <?php selected( $sync_status, 'failed' ); ?>>Failed</option>
+					</select>
+				</div>
+				
+				<!-- Filter School -->
+				<div>
+					<label for="lead-school" style="font-weight: 600; display: block; margin-bottom: 5px;">Trường đối tác:</label>
+					<select id="lead-school" name="school_id" style="max-width: 250px;">
+						<option value="">Tất cả các trường</option>
+						<?php
+						$all_schools = get_posts( [ 'post_type' => 'school', 'numberposts' => -1, 'post_status' => 'publish' ] );
+						foreach ( $all_schools as $school ) {
+							printf( '<option value="%d" %s>%s</option>', $school->ID, selected( $school_id, $school->ID, false ), esc_html( $school->post_title ) );
 						}
 						?>
-						<tr>
-							<td><?php echo esc_html( $lead->id ); ?></td>
-							<td><strong><?php echo esc_html( $lead->name ); ?></strong></td>
-							<td><a href="tel:<?php echo esc_attr( $lead->phone ); ?>"><?php echo esc_html( $lead->phone ); ?></a></td>
-							<td><?php echo esc_html( $lead->email ?: '—' ); ?></td>
-							<td><?php echo esc_html( $major_title ); ?></td>
-							<td><?php echo esc_html( $school_title ); ?></td>
-							<td>
-								<?php echo esc_html( $lead->campus ? ltdh_elig_get_campus_label( $lead->campus ) : '—' ); ?> / 
-								<?php echo esc_html( $lead->training_type ? ltdh_elig_get_training_label( $lead->training_type ) : '—' ); ?>
-							</td>
-							<td><?php echo $metadata_html; ?></td>
-							<td>
-								<span class="badge" style="padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; background: <?php echo $lead->sync_status === 'synced' ? '#d1e7dd' : '#f8d7da'; ?>; color: <?php echo $lead->sync_status === 'synced' ? '#0f5132' : '#842029'; ?>;">
-									<?php echo esc_html( strtoupper( $lead->sync_status ) ); ?>
-								</span>
-							</td>
-							<td><?php echo esc_html( $lead->created_at ); ?></td>
-							<td>
-								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=ltdh_leads_menu&action=delete&lead_id=' . $lead->id ), 'ltdh_delete_lead_nonce' ) ); ?>" class="button button-link-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa lead này?');">Xóa</a>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-				<?php endif; ?>
-			</tbody>
-		</table>
+					</select>
+				</div>
+				
+				<!-- Filter Major -->
+				<div>
+					<label for="lead-major" style="font-weight: 600; display: block; margin-bottom: 5px;">Chuyên ngành đăng ký:</label>
+					<select id="lead-major" name="major_id" style="max-width: 250px;">
+						<option value="">Tất cả các ngành</option>
+						<?php
+						$all_majors = get_posts( [ 'post_type' => 'major', 'numberposts' => -1, 'post_status' => 'publish' ] );
+						foreach ( $all_majors as $major ) {
+							printf( '<option value="%d" %s>%s</option>', $major->ID, selected( $major_id, $major->ID, false ), esc_html( $major->post_title ) );
+						}
+						?>
+					</select>
+				</div>
+
+				<div style="padding-top: 20px;">
+					<input type="submit" class="button button-primary" value="Tìm kiếm & Lọc">
+					<?php if ( ! empty( $search ) || ! empty( $sync_status ) || $school_id > 0 || $major_id > 0 ) : ?>
+						<a href="admin.php?page=ltdh_leads_menu" class="button button-secondary" style="margin-left: 5px;">Xóa bộ lọc</a>
+					<?php endif; ?>
+				</div>
+			</div>
+		</form>
+
+		<!-- Bulk Action and Table Form -->
+		<form method="post" action="<?php echo esc_url( add_query_arg( array() ) ); ?>">
+			<?php wp_nonce_field( 'ltdh_bulk_leads_nonce' ); ?>
+			
+			<div class="tablenav top" style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+				<div class="alignleft actions bulkactions" style="display: flex; gap: 5px;">
+					<select name="action">
+						<option value="-1">Hành động hàng loạt</option>
+						<option value="bulk-delete">Xóa hàng loạt</option>
+					</select>
+					<input type="submit" id="doaction" class="button action" value="Áp dụng" onclick="return confirm('Bạn có chắc chắn muốn xóa những lead đã chọn?');">
+				</div>
+				
+				<div class="tablenav-pages">
+					<span class="displaying-num" style="margin-right: 10px;"><?php echo number_format_i18n( $total_items ); ?> mục</span>
+					<?php
+					echo paginate_links( array(
+						'base'      => add_query_arg( 'paged', '%#%' ),
+						'format'    => '',
+						'prev_text' => '&laquo;',
+						'next_text' => '&raquo;',
+						'total'     => $total_pages,
+						'current'   => $paged,
+					) );
+					?>
+				</div>
+			</div>
+
+			<table class="wp-list-table widefat fixed striped table-view-list posts">
+				<thead>
+					<tr>
+						<td id="cb" class="manage-column column-cb check-column" style="width: 30px; padding: 8px 10px;"><input id="cb-select-all-1" type="checkbox"></td>
+						<th class="manage-column" style="width: 50px;">ID</th>
+						<th class="manage-column">Họ tên</th>
+						<th class="manage-column">Số điện thoại</th>
+						<th class="manage-column">Email</th>
+						<th class="manage-column">Ngành đăng ký</th>
+						<th class="manage-column">Trường đối tác</th>
+						<th class="manage-column">Cơ sở / Hệ học</th>
+						<th class="manage-column" style="width: 250px;">Chi tiết khảo sát</th>
+						<th class="manage-column">Trạng thái đồng bộ</th>
+						<th class="manage-column">Ngày tạo</th>
+						<th class="manage-column" style="width: 80px;">Hành động</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php if ( empty( $leads ) ) : ?>
+						<tr><td colspan="12" style="text-align: center;">Chưa có lượt đăng ký nào phù hợp với tìm kiếm/bộ lọc.</td></tr>
+					<?php else : ?>
+						<?php foreach ( $leads as $lead ) : 
+							$school_title = $lead->school_id ? get_the_title( $lead->school_id ) : '—';
+							$major_title = $lead->major_id ? get_the_title( $lead->major_id ) : '—';
+							
+							// Decode survey metadata
+							$metadata_html = '—';
+							if ( ! empty( $lead->referral_source ) && strpos( $lead->referral_source, 'eligibility_checker' ) !== false ) {
+								$parts = parse_url( $lead->referral_source );
+								if ( isset( $parts['query'] ) ) {
+									parse_str( $parts['query'], $query_data );
+									$metadata_html = '<div style="font-size: 11px; line-height: 1.4;">';
+									if ( isset( $query_data['education_level'] ) ) {
+										$metadata_html .= '<strong>Học vấn:</strong> ' . esc_html( ltdh_elig_get_education_label( $query_data['education_level'] ) ) . '<br>';
+									}
+									if ( ! empty( $query_data['current_major'] ) && intval( $query_data['current_major'] ) > 0 ) {
+										$metadata_html .= '<strong>Ngành cũ:</strong> ' . esc_html( get_the_title( intval( $query_data['current_major'] ) ) ) . '<br>';
+									}
+									if ( ! empty( $query_data['previous_school'] ) ) {
+										$metadata_html .= '<strong>Trường cũ:</strong> ' . esc_html( $query_data['previous_school'] ) . '<br>';
+									}
+									if ( isset( $query_data['birth_year'] ) ) {
+										$metadata_html .= '<strong>Năm sinh:</strong> ' . esc_html( $query_data['birth_year'] ) . '<br>';
+									}
+									$metadata_html .= '</div>';
+								}
+							} else {
+								$metadata_html = esc_html( $lead->referral_source );
+							}
+							?>
+							<tr>
+								<th scope="row" class="check-column" style="padding: 8px 10px;"><input id="cb-select-<?php echo esc_attr( $lead->id ); ?>" type="checkbox" name="lead_ids[]" value="<?php echo esc_attr( $lead->id ); ?>"></th>
+								<td><?php echo esc_html( $lead->id ); ?></td>
+								<td><strong><?php echo esc_html( $lead->name ); ?></strong></td>
+								<td><a href="tel:<?php echo esc_attr( $lead->phone ); ?>"><?php echo esc_html( $lead->phone ); ?></a></td>
+								<td><?php echo esc_html( $lead->email ?: '—' ); ?></td>
+								<td><?php echo esc_html( $major_title ); ?></td>
+								<td><?php echo esc_html( $school_title ); ?></td>
+								<td>
+									<?php echo esc_html( $lead->campus ? ltdh_elig_get_campus_label( $lead->campus ) : '—' ); ?> / 
+									<?php echo esc_html( $lead->training_type ? ltdh_elig_get_training_label( $lead->training_type ) : '—' ); ?>
+								</td>
+								<td><?php echo $metadata_html; ?></td>
+								<td>
+									<span class="badge" style="padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; background: <?php echo $lead->sync_status === 'synced' ? '#d1e7dd' : '#f8d7da'; ?>; color: <?php echo $lead->sync_status === 'synced' ? '#0f5132' : '#842029'; ?>;">
+										<?php echo esc_html( strtoupper( $lead->sync_status ) ); ?>
+									</span>
+								</td>
+								<td><?php echo esc_html( $lead->created_at ); ?></td>
+								<td>
+									<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=ltdh_leads_menu&action=delete&lead_id=' . $lead->id ), 'ltdh_delete_lead_nonce' ) ); ?>" class="button button-link-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa lead này?');">Xóa</a>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</tbody>
+			</table>
+			
+			<div class="tablenav bottom" style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+				<div class="alignleft actions bulkactions" style="display: flex; gap: 5px;">
+					<select name="action2">
+						<option value="-1">Hành động hàng loạt</option>
+						<option value="bulk-delete">Xóa hàng loạt</option>
+					</select>
+					<input type="submit" id="doaction2" class="button action" value="Áp dụng" onclick="return confirm('Bạn có chắc chắn muốn xóa những lead đã chọn?');">
+				</div>
+				
+				<div class="tablenav-pages">
+					<span class="displaying-num" style="margin-right: 10px;"><?php echo number_format_i18n( $total_items ); ?> mục</span>
+					<?php
+					echo paginate_links( array(
+						'base'      => add_query_arg( 'paged', '%#%' ),
+						'format'    => '',
+						'prev_text' => '&laquo;',
+						'next_text' => '&raquo;',
+						'total'     => $total_pages,
+						'current'   => $paged,
+					) );
+					?>
+				</div>
+			</div>
+		</form>
+		
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const selectAll1 = document.getElementById('cb-select-all-1');
+			const checkboxes = document.querySelectorAll('input[name="lead_ids[]"]');
+
+			function toggleAll(checked) {
+				checkboxes.forEach(cb => cb.checked = checked);
+				if (selectAll1) selectAll1.checked = checked;
+			}
+
+			if (selectAll1) {
+				selectAll1.addEventListener('change', function() {
+					toggleAll(this.checked);
+				});
+			}
+		});
+		</script>
 	</div>
 	<?php
 }
@@ -1086,6 +1302,10 @@ function ltdh_elig_admin_checks_page() {
 	global $wpdb;
 	$table = $wpdb->prefix . 'ltdh_eligibility_checks';
 
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( 'Bạn không có quyền truy cập trang này.' );
+	}
+
 	// Handle clear log
 	if ( isset( $_GET['action'] ) && $_GET['action'] === 'clear' ) {
 		check_admin_referer( 'ltdh_clear_checks_nonce' );
@@ -1093,70 +1313,295 @@ function ltdh_elig_admin_checks_page() {
 		echo '<div class="updated"><p>Đã xóa toàn bộ nhật ký kiểm tra.</p></div>';
 	}
 
-	$checks = $wpdb->get_results( "SELECT * FROM $table ORDER BY id DESC LIMIT 200" );
+	// Handle bulk delete
+	$bulk_action = isset( $_POST['action'] ) && $_POST['action'] !== '-1' ? sanitize_text_field( $_POST['action'] ) : '';
+	if ( empty( $bulk_action ) ) {
+		$bulk_action = isset( $_POST['action2'] ) && $_POST['action2'] !== '-1' ? sanitize_text_field( $_POST['action2'] ) : '';
+	}
+
+	if ( $bulk_action === 'bulk-delete' && isset( $_POST['check_ids'] ) && is_array( $_POST['check_ids'] ) ) {
+		check_admin_referer( 'ltdh_bulk_checks_nonce' );
+		$check_ids = array_map( 'intval', $_POST['check_ids'] );
+		if ( ! empty( $check_ids ) ) {
+			$placeholders = implode( ',', array_fill( 0, count( $check_ids ), '%d' ) );
+			$wpdb->query( $wpdb->prepare( "DELETE FROM $table WHERE id IN ($placeholders)", $check_ids ) );
+			echo '<div class="updated"><p>Đã xóa ' . count( $check_ids ) . ' nhật ký thành công.</p></div>';
+		}
+	}
+
+	// Filters and Search params
+	$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+	$input_education = isset( $_GET['input_education'] ) ? sanitize_text_field( wp_unslash( $_GET['input_education'] ) ) : '';
+	$input_desired_major = isset( $_GET['input_desired_major'] ) ? intval( $_GET['input_desired_major'] ) : 0;
+	$input_training_type = isset( $_GET['input_training_type'] ) ? sanitize_text_field( wp_unslash( $_GET['input_training_type'] ) ) : '';
+	$input_campus = isset( $_GET['input_campus'] ) ? sanitize_text_field( wp_unslash( $_GET['input_campus'] ) ) : '';
+
+	// Build WHERE query
+	$where_clauses = array();
+	$where_params = array();
+
+	if ( ! empty( $search ) ) {
+		$where_clauses[] = '(phone LIKE %s OR email LIKE %s OR input_previous_school LIKE %s)';
+		$like_search = '%' . $wpdb->esc_like( $search ) . '%';
+		$where_params[] = $like_search;
+		$where_params[] = $like_search;
+		$where_params[] = $like_search;
+	}
+
+	if ( ! empty( $input_education ) ) {
+		$where_clauses[] = 'input_education = %s';
+		$where_params[] = $input_education;
+	}
+
+	if ( $input_desired_major > 0 ) {
+		$where_clauses[] = 'input_desired_major = %d';
+		$where_params[] = $input_desired_major;
+	}
+
+	if ( ! empty( $input_training_type ) ) {
+		$where_clauses[] = 'input_training_type = %s';
+		$where_params[] = $input_training_type;
+	}
+
+	if ( ! empty( $input_campus ) ) {
+		$where_clauses[] = 'input_campus = %s';
+		$where_params[] = $input_campus;
+	}
+
+	$where_sql = '';
+	if ( ! empty( $where_clauses ) ) {
+		$where_sql = ' WHERE ' . implode( ' AND ', $where_clauses );
+	}
+
+	// Count matching items
+	$count_query = "SELECT COUNT(*) FROM $table $where_sql";
+	if ( ! empty( $where_params ) ) {
+		$count_query = $wpdb->prepare( $count_query, $where_params );
+	}
+	$total_items = intval( $wpdb->get_var( $count_query ) );
+
+	// Pagination setup
+	$per_page = 20;
+	$paged = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
+	$offset = ( $paged - 1 ) * $per_page;
+	$total_pages = ceil( $total_items / $per_page );
+
+	// Fetch items
+	$query = "SELECT * FROM $table $where_sql ORDER BY id DESC LIMIT %d OFFSET %d";
+	$query_params = $where_params;
+	$query_params[] = $per_page;
+	$query_params[] = $offset;
+
+	$checks = $wpdb->get_results( $wpdb->prepare( $query, $query_params ) );
 	?>
 	<div class="wrap">
 		<h1 class="wp-heading-inline">Nhật ký Lượt kiểm tra Điều kiện</h1>
 		<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=ltdh_elig_checks_menu&action=clear' ), 'ltdh_clear_checks_nonce' ) ); ?>" class="page-title-action" onclick="return confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử log?');" style="color: #d63638; border-color: #d63638;">Xóa toàn bộ Log</a>
 		<hr class="wp-header-end">
 
-		<table class="wp-list-table widefat fixed striped table-view-list posts" style="margin-top: 15px;">
-			<thead>
-				<tr>
-					<th style="width: 50px;">ID</th>
-					<th>Trình độ hiện tại</th>
-					<th>Ngành tốt nghiệp</th>
-					<th>Trường đã học</th>
-					<th>Năm sinh</th>
-					<th>Ngành mong muốn</th>
-					<th>Hệ / Cơ sở học / Ngân sách</th>
-					<th>Kết quả đối chiếu</th>
-					<th>Lượt liên hệ</th>
-					<th>Thời gian</th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php if ( empty( $checks ) ) : ?>
-					<tr><td colspan="10" style="text-align: center;">Chưa có lượt kiểm tra nào được ghi nhận.</td></tr>
-				<?php else : ?>
-					<?php foreach ( $checks as $check ) : 
-						$curr_major = $check->input_major_id ? get_the_title( $check->input_major_id ) : '—';
-						$desired_major = $check->input_desired_major ? get_the_title( $check->input_desired_major ) : '—';
+		<!-- Search and Filters Form -->
+		<form method="get" action="" style="margin-top: 15px; margin-bottom: 15px; background: #fff; padding: 15px; border: 1px solid #ccd0d4; border-radius: 4px;">
+			<input type="hidden" name="page" value="ltdh_elig_checks_menu">
+			
+			<div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+				<!-- Search -->
+				<div>
+					<label for="check-search" style="font-weight: 600; display: block; margin-bottom: 5px;">Tìm kiếm:</label>
+					<input type="search" id="check-search" name="s" placeholder="Số điện thoại, Email, Trường cũ..." value="<?php echo esc_attr( $search ); ?>" style="width: 250px;">
+				</div>
+				
+				<!-- Filter Education -->
+				<div>
+					<label for="check-education" style="font-weight: 600; display: block; margin-bottom: 5px;">Trình độ:</label>
+					<select id="check-education" name="input_education">
+						<option value="">Tất cả trình độ</option>
+						<option value="thap-phan" <?php selected( $input_education, 'thap-phan' ); ?>>THPT</option>
+						<option value="trung-cap" <?php selected( $input_education, 'trung-cap' ); ?>>Trung cấp</option>
+						<option value="cao-dang" <?php selected( $input_education, 'cao-dang' ); ?>>Cao đẳng</option>
+						<option value="dai-hoc" <?php selected( $input_education, 'dai-hoc' ); ?>>Đại học</option>
+						<option value="thac-si" <?php selected( $input_education, 'thac-si' ); ?>>Thạc sĩ</option>
+					</select>
+				</div>
+				
+				<!-- Filter Desired Major -->
+				<div>
+					<label for="check-desired-major" style="font-weight: 600; display: block; margin-bottom: 5px;">Ngành mong muốn:</label>
+					<select id="check-desired-major" name="input_desired_major" style="max-width: 250px;">
+						<option value="">Tất cả ngành mong muốn</option>
+						<?php
+						$all_majors = get_posts( [ 'post_type' => 'major', 'numberposts' => -1, 'post_status' => 'publish' ] );
+						foreach ( $all_majors as $major ) {
+							printf( '<option value="%d" %s>%s</option>', $major->ID, selected( $input_desired_major, $major->ID, false ), esc_html( $major->post_title ) );
+						}
 						?>
-						<tr>
-							<td><?php echo esc_html( $check->id ); ?></td>
-							<td><strong><?php echo esc_html( ltdh_elig_get_education_label( $check->input_education ) ); ?></strong></td>
-							<td><?php echo esc_html( $curr_major ); ?></td>
-							<td><?php echo esc_html( $check->input_previous_school ?: '—' ); ?></td>
-							<td><?php echo esc_html( $check->input_graduation ?: '—' ); ?></td>
-							<td><strong><?php echo esc_html( $desired_major ); ?></strong></td>
-							<td>
-								Hệ: <?php echo esc_html( ltdh_elig_get_training_label( $check->input_training_type ) ); ?><br>
-								Cơ sở: <?php echo esc_html( ltdh_elig_get_campus_label( $check->input_campus ) ); ?><br>
-								Ngân sách: <?php echo esc_html( ltdh_elig_get_budget_label( $check->input_budget ) ); ?>
-							</td>
-							<td>
-								Tìm thấy: <?php echo esc_html( $check->total_candidates ); ?> ngành<br>
-								Khớp: <?php echo esc_html( $check->eligible_count ); ?> ngành<br>
-								Match tốt nhất: <?php echo esc_html( $check->top_score ); ?>%
-							</td>
-							<td>
-								<?php if ( ! empty( $check->phone ) ) : ?>
-									📞 <strong><?php echo esc_html( $check->phone ); ?></strong><br>
-								<?php endif; ?>
-								<?php if ( ! empty( $check->email ) ) : ?>
-									✉️ <?php echo esc_html( $check->email ); ?><br>
-								<?php endif; ?>
-								<?php if ( empty( $check->phone ) && empty( $check->email ) ) : ?>
-									<span style="color: #94a3b8;">—</span>
-								<?php endif; ?>
-							</td>
-							<td><?php echo esc_html( $check->created_at ); ?></td>
-						</tr>
-					<?php endforeach; ?>
-				<?php endif; ?>
-			</tbody>
-		</table>
+					</select>
+				</div>
+				
+				<!-- Filter Training Type -->
+				<div>
+					<label for="check-training-type" style="font-weight: 600; display: block; margin-bottom: 5px;">Hệ học:</label>
+					<select id="check-training-type" name="input_training_type">
+						<option value="">Tất cả hệ học</option>
+						<option value="lien-thong" <?php selected( $input_training_type, 'lien-thong' ); ?>>Liên thông</option>
+						<option value="van-bang-2" <?php selected( $input_training_type, 'van-bang-2' ); ?>>Văn bằng 2</option>
+						<option value="tu-xa" <?php selected( $input_training_type, 'tu-xa' ); ?>>Từ xa</option>
+						<option value="vua-hoc-vua-lam" <?php selected( $input_training_type, 'vua-hoc-vua-lam' ); ?>>Vừa học vừa làm</option>
+						<option value="chinh-quy" <?php selected( $input_training_type, 'chinh-quy' ); ?>>Chính quy</option>
+					</select>
+				</div>
+
+				<!-- Filter Campus -->
+				<div>
+					<label for="check-campus" style="font-weight: 600; display: block; margin-bottom: 5px;">Cơ sở:</label>
+					<select id="check-campus" name="input_campus">
+						<option value="">Tất cả cơ sở</option>
+						<option value="ha-noi" <?php selected( $input_campus, 'ha-noi' ); ?>>Hà Nội</option>
+						<option value="ho-chi-minh" <?php selected( $input_campus, 'ho-chi-minh' ); ?>>TP. Hồ Chí Minh</option>
+						<option value="da-nang" <?php selected( $input_campus, 'da-nang' ); ?>>Đà Nẵng</option>
+						<option value="thai-nguyen" <?php selected( $input_campus, 'thai-nguyen' ); ?>>Thái Nguyên</option>
+						<option value="online" <?php selected( $input_campus, 'online' ); ?>>Online</option>
+					</select>
+				</div>
+
+				<div style="padding-top: 20px;">
+					<input type="submit" class="button button-primary" value="Tìm kiếm & Lọc">
+					<?php if ( ! empty( $search ) || ! empty( $input_education ) || $input_desired_major > 0 || ! empty( $input_training_type ) || ! empty( $input_campus ) ) : ?>
+						<a href="admin.php?page=ltdh_elig_checks_menu" class="button button-secondary" style="margin-left: 5px;">Xóa bộ lọc</a>
+					<?php endif; ?>
+				</div>
+			</div>
+		</form>
+
+		<!-- Bulk Action and Table Form -->
+		<form method="post" action="<?php echo esc_url( add_query_arg( array() ) ); ?>">
+			<?php wp_nonce_field( 'ltdh_bulk_checks_nonce' ); ?>
+			
+			<div class="tablenav top" style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+				<div class="alignleft actions bulkactions" style="display: flex; gap: 5px;">
+					<select name="action">
+						<option value="-1">Hành động hàng loạt</option>
+						<option value="bulk-delete">Xóa hàng loạt</option>
+					</select>
+					<input type="submit" id="doaction" class="button action" value="Áp dụng" onclick="return confirm('Bạn có chắc chắn muốn xóa những nhật ký đã chọn?');">
+				</div>
+				
+				<div class="tablenav-pages">
+					<span class="displaying-num" style="margin-right: 10px;"><?php echo number_format_i18n( $total_items ); ?> mục</span>
+					<?php
+					echo paginate_links( array(
+						'base'      => add_query_arg( 'paged', '%#%' ),
+						'format'    => '',
+						'prev_text' => '&laquo;',
+						'next_text' => '&raquo;',
+						'total'     => $total_pages,
+						'current'   => $paged,
+					) );
+					?>
+				</div>
+			</div>
+
+			<table class="wp-list-table widefat fixed striped table-view-list posts">
+				<thead>
+					<tr>
+						<td id="cb" class="manage-column column-cb check-column" style="width: 30px; padding: 8px 10px;"><input id="cb-select-all-1" type="checkbox"></td>
+						<th style="width: 50px;">ID</th>
+						<th>Trình độ hiện tại</th>
+						<th>Ngành tốt nghiệp</th>
+						<th>Trường đã học</th>
+						<th>Năm sinh</th>
+						<th>Ngành mong muốn</th>
+						<th>Hệ / Cơ sở học / Ngân sách</th>
+						<th>Kết quả đối chiếu</th>
+						<th>Lượt liên hệ</th>
+						<th>Thời gian</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php if ( empty( $checks ) ) : ?>
+						<tr><td colspan="11" style="text-align: center;">Chưa có lượt kiểm tra nào được ghi nhận phù hợp với tìm kiếm/bộ lọc.</td></tr>
+					<?php else : ?>
+						<?php foreach ( $checks as $check ) : 
+							$curr_major = $check->input_major_id ? get_the_title( $check->input_major_id ) : '—';
+							$desired_major = $check->input_desired_major ? get_the_title( $check->input_desired_major ) : '—';
+							?>
+							<tr>
+								<th scope="row" class="check-column" style="padding: 8px 10px;"><input id="cb-select-<?php echo esc_attr( $check->id ); ?>" type="checkbox" name="check_ids[]" value="<?php echo esc_attr( $check->id ); ?>"></th>
+								<td><?php echo esc_html( $check->id ); ?></td>
+								<td><strong><?php echo esc_html( ltdh_elig_get_education_label( $check->input_education ) ); ?></strong></td>
+								<td><?php echo esc_html( $curr_major ); ?></td>
+								<td><?php echo esc_html( $check->input_previous_school ?: '—' ); ?></td>
+								<td><?php echo esc_html( $check->input_graduation ?: '—' ); ?></td>
+								<td><strong><?php echo esc_html( $desired_major ); ?></strong></td>
+								<td>
+									Hệ: <?php echo esc_html( ltdh_elig_get_training_label( $check->input_training_type ) ); ?><br>
+									Cơ sở: <?php echo esc_html( ltdh_elig_get_campus_label( $check->input_campus ) ); ?><br>
+									Ngân sách: <?php echo esc_html( ltdh_elig_get_budget_label( $check->input_budget ) ); ?>
+								</td>
+								<td>
+									Tìm thấy: <?php echo esc_html( $check->total_candidates ); ?> ngành<br>
+									Khớp: <?php echo esc_html( $check->eligible_count ); ?> ngành<br>
+									Match tốt nhất: <?php echo esc_html( $check->top_score ); ?>%
+								</td>
+								<td>
+									<?php if ( ! empty( $check->phone ) ) : ?>
+										📞 <strong><?php echo esc_html( $check->phone ); ?></strong><br>
+									<?php endif; ?>
+									<?php if ( ! empty( $check->email ) ) : ?>
+										✉️ <?php echo esc_html( $check->email ); ?><br>
+									<?php endif; ?>
+									<?php if ( empty( $check->phone ) && empty( $check->email ) ) : ?>
+										<span style="color: #94a3b8;">—</span>
+									<?php endif; ?>
+								</td>
+								<td><?php echo esc_html( $check->created_at ); ?></td>
+							</tr>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</tbody>
+			</table>
+			
+			<div class="tablenav bottom" style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+				<div class="alignleft actions bulkactions" style="display: flex; gap: 5px;">
+					<select name="action2">
+						<option value="-1">Hành động hàng loạt</option>
+						<option value="bulk-delete">Xóa hàng loạt</option>
+					</select>
+					<input type="submit" id="doaction2" class="button action" value="Áp dụng" onclick="return confirm('Bạn có chắc chắn muốn xóa những nhật ký đã chọn?');">
+				</div>
+				
+				<div class="tablenav-pages">
+					<span class="displaying-num" style="margin-right: 10px;"><?php echo number_format_i18n( $total_items ); ?> mục</span>
+					<?php
+					echo paginate_links( array(
+						'base'      => add_query_arg( 'paged', '%#%' ),
+						'format'    => '',
+						'prev_text' => '&laquo;',
+						'next_text' => '&raquo;',
+						'total'     => $total_pages,
+						'current'   => $paged,
+					) );
+					?>
+				</div>
+			</div>
+		</form>
+		
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const selectAll1 = document.getElementById('cb-select-all-1');
+			const checkboxes = document.querySelectorAll('input[name="check_ids[]"]');
+
+			function toggleAll(checked) {
+				checkboxes.forEach(cb => cb.checked = checked);
+				if (selectAll1) selectAll1.checked = checked;
+			}
+
+			if (selectAll1) {
+				selectAll1.addEventListener('change', function() {
+					toggleAll(this.checked);
+				});
+			}
+		});
+		</script>
 	</div>
 	<?php
 }

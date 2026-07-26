@@ -44,7 +44,7 @@ function ltdh_register_post_types_and_taxonomies_from_json() {
 			$rewrite = false;
 			if ( isset( $item['rewrite'] ) && $item['rewrite'] ) {
 				$rewrite = [
-					'slug'       => isset( $item['rewrite_slug'] ) ? $item['rewrite_slug'] : $post_type,
+					'slug'       => array_key_exists( 'rewrite_slug', $item ) ? $item['rewrite_slug'] : $post_type,
 					'with_front' => isset( $item['rewrite_with_front'] ) ? $item['rewrite_with_front'] : false,
 				];
 			}

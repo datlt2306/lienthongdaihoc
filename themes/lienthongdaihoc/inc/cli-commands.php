@@ -234,7 +234,7 @@ class LTDH_CLI_Commands {
 					update_post_meta( $post_id, 'school_code', $meta['code'] );
 					update_post_meta( $post_id, 'website', $meta['web'] );
 					update_post_meta( $post_id, 'address', $meta['addr'] );
-					update_post_meta( $post_id, 'hotline', $meta['phone'] );
+					update_post_meta( $post_id, 'hotline', '0338 615 497' );
 					update_post_meta( $post_id, 'english_name', $meta['en'] );
 					update_post_meta( $post_id, 'rating', $meta['rating'] );
 					update_post_meta( $post_id, 'reviews_count', $meta['reviews'] );
@@ -248,6 +248,7 @@ class LTDH_CLI_Commands {
 				}
 			} else {
 				update_post_meta( $school->ID, 'school_code', $meta['code'] );
+				update_post_meta( $school->ID, 'hotline', '0338 615 497' );
 				update_post_meta( $school->ID, 'english_name', $meta['en'] );
 				update_post_meta( $school->ID, 'rating', $meta['rating'] );
 				update_post_meta( $school->ID, 'reviews_count', $meta['reviews'] );
@@ -623,6 +624,288 @@ class LTDH_CLI_Commands {
 		} else {
 			WP_CLI::error( 'Không tìm thấy hàm ltdh_process_lead_queue. Kiểm tra xem crm-adapters đã được kích hoạt chưa.' );
 		}
+	}
+
+	/**
+	 * Seed UTC (Đại học Giao thông Vận tải) with Information Technology major for 3 training types.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp ltdh seed-utc
+	 */
+	public function seed_utc( $args, $assoc_args ) {
+		WP_CLI::log( 'Bắt đầu gieo mẫu dữ liệu cho Trường Đại học Giao thông Vận tải (UTC)...' );
+
+		// Make sure taxonomies exist
+		$this->create_taxonomies([], []);
+
+		// 1. Seed/Get UTC School
+		$school_title = 'Trường Đại học Giao thông Vận tải';
+		$school_slug = sanitize_title( $school_title );
+		$school = get_page_by_path( $school_slug, OBJECT, 'school' );
+		
+		if ( ! $school ) {
+			$school_id = wp_insert_post( [
+				'post_title'   => $school_title,
+				'post_name'    => $school_slug,
+				'post_status'  => 'publish',
+				'post_type'    => 'school',
+				'post_content' => 'Trường Đại học Giao thông Vận tải (UTC) là một trong những trường đại học kỹ thuật đa ngành hàng đầu Việt Nam, có bề dày truyền thống đào tạo cán bộ kỹ thuật cho ngành giao thông vận tải và các ngành kinh tế khác.',
+			] );
+			if ( is_wp_error( $school_id ) ) {
+				WP_CLI::error( 'Lỗi khi tạo Trường Đại học Giao thông Vận tải: ' . $school_id->get_error_message() );
+				return;
+			}
+			WP_CLI::success( "Đã tạo Trường: $school_title" );
+		} else {
+			$school_id = $school->ID;
+			WP_CLI::line( "Trường đã tồn tại: $school_title" );
+		}
+
+		// Update School Meta
+		update_post_meta( $school_id, 'school_code', 'UTC' );
+		update_post_meta( $school_id, 'website', 'https://www.utc.edu.vn' );
+		update_post_meta( $school_id, 'address', 'Số 3 Cầu Giấy, Láng Thượng, Đống Đa, Hà Nội' );
+		update_post_meta( $school_id, 'hotline', '0338 615 497' );
+		update_post_meta( $school_id, 'english_name', 'University of Transport and Communications' );
+		update_post_meta( $school_id, 'rating', '4.7' );
+		update_post_meta( $school_id, 'reviews_count', '98' );
+		update_post_meta( $school_id, 'admission_target', '1.500' );
+		update_post_meta( $school_id, 'admission_info', '<h4>Học phí & Lệ phí</h4><ul><li><strong>Học phí:</strong> 420.000 đ/tín chỉ</li><li><strong>Lệ phí xét tuyển:</strong> 200.000đ</li></ul>' );
+		update_post_meta( $school_id, 'contact_info', '<h4>Địa điểm khai giảng & thi</h4><p>Phòng Khảo thí và Đảm bảo chất lượng đào tạo - Trường Đại học Giao thông vận tải, Số 3 Cầu Giấy, Láng Thượng, Đống Đa, Hà Nội.</p>' );
+		wp_set_object_terms( $school_id, 'mien-bac', 'region' );
+
+		// 2. Seed/Get IT Major
+		$major_title = 'Công nghệ thông tin';
+		$major_slug = sanitize_title( $major_title );
+		$major = get_page_by_path( $major_slug, OBJECT, LTDH_CPT_MAJOR );
+
+		if ( ! $major ) {
+			$major_id = wp_insert_post( [
+				'post_title'   => $major_title,
+				'post_name'    => $major_slug,
+				'post_status'  => 'publish',
+				'post_type'    => LTDH_CPT_MAJOR,
+				'post_content' => 'Ngành đào tạo mũi nhọn đón đầu cuộc cách mạng công nghiệp 4.0 và chuyển đổi số.',
+			] );
+			if ( is_wp_error( $major_id ) ) {
+				WP_CLI::error( 'Lỗi khi tạo Ngành Công nghệ thông tin: ' . $major_id->get_error_message() );
+				return;
+			}
+			WP_CLI::success( "Đã tạo Ngành học: $major_title" );
+		} else {
+			$major_id = $major->ID;
+			WP_CLI::line( "Ngành học đã tồn tại: $major_title" );
+		}
+
+		// Update Major Meta
+		update_post_meta( $major_id, 'major_code', '7480201' );
+		update_post_meta( $major_id, 'career_opportunities', 'Cơ hội làm việc tại các tập đoàn công nghệ lớn: Viettel, FPT, VNPT, CMC với vai trò Kỹ sư Phần mềm, Quản trị Hệ thống, Kiểm thử Phần mềm, DevOps, AI Engineer.' );
+		update_post_meta( $major_id, 'admission_groups', 'A00, A01, D01, D07' );
+		update_post_meta( $major_id, LTDH_META_ADMISSION_STATUS, LTDH_STATUS_OPEN );
+		wp_set_object_terms( $major_id, 'ky-thuat-cong-nghe', 'major_cat' );
+
+		// 3. Seed Programs for the 3 training types
+		$programs_data = [
+			'vua-hoc-vua-lam' => [
+				'title' => 'Cử nhân Công nghệ thông tin (Vừa học vừa làm)',
+				'tuition' => '450.000đ / tín chỉ',
+				'duration' => '2.5 - 3.5 năm',
+				'schedule' => 'Tối thứ 2 - thứ 6 hoặc Thứ 7 & Chủ nhật',
+				'target' => 'Người đi làm, người muốn học liên thông từ Trung cấp/Cao đẳng lên Đại học',
+				'advantages' => 'Vừa học vừa đi làm tích lũy kinh nghiệm thực tế, lịch học linh hoạt ngoài giờ hành chính.',
+				'disadvantages' => 'Yêu cầu thời gian cam kết học tập đều đặn vào buổi tối hoặc cuối tuần.',
+			],
+			'chinh-quy' => [
+				'title' => 'Cử nhân Công nghệ thông tin (Chính quy)',
+				'tuition' => '420.000đ / tín chỉ',
+				'duration' => '4 năm',
+				'schedule' => 'Ban ngày theo thời khóa biểu của trường',
+				'target' => 'Học sinh tốt nghiệp THPT',
+				'advantages' => 'Chương trình đào tạo chính quy chuẩn quốc gia, môi trường học tập tương tác cao trực tiếp với giảng viên.',
+				'disadvantages' => 'Lịch học cố định ban ngày, khó sắp xếp đi làm song song.',
+			],
+			'tu-xa' => [
+				'title' => 'Cử nhân Công nghệ thông tin (Từ xa)',
+				'tuition' => '450.000đ / tín chỉ',
+				'duration' => '1.5 - 3 năm',
+				'schedule' => 'Học trực tuyến (E-learning) linh hoạt mọi lúc mọi nơi',
+				'target' => 'Người đi làm bận rộn, người ở xa không có điều kiện đến giảng đường trực tiếp',
+				'advantages' => 'Học 100% online linh động thời gian, tiết kiệm chi phí di chuyển và sinh hoạt.',
+				'disadvantages' => 'Yêu cầu tính tự giác học tập cao của học viên.',
+			]
+		];
+
+		foreach ( $programs_data as $t_slug => $p_info ) {
+			$program_title = $p_info['title'];
+			$program_name_slug = sanitize_title( $program_title . '-' . $t_slug . '-utc' );
+
+			$existing_program = get_posts( [
+				'post_type'  => LTDH_CPT_PROGRAM,
+				'name'       => $program_name_slug,
+				'posts_per_page' => 1,
+			] );
+
+			if ( ! empty( $existing_program ) ) {
+				$program_id = $existing_program[0]->ID;
+				WP_CLI::line( "Chương trình đã tồn tại: $program_title" );
+			} else {
+				$program_id = wp_insert_post( [
+					'post_title'   => $program_title,
+					'post_name'    => $program_name_slug,
+					'post_status'  => 'publish',
+					'post_type'    => LTDH_CPT_PROGRAM,
+					'post_content' => "Chương trình đào tạo Cử nhân ngành $major_title hệ " . ( $t_slug === 'tu-xa' ? 'Đào tạo từ xa' : ( $t_slug === 'chinh-quy' ? 'Chính quy' : 'Vừa học vừa làm' ) ) . " của $school_title.",
+				] );
+
+				if ( is_wp_error( $program_id ) ) {
+					WP_CLI::line( "Lỗi khi tạo chương trình $program_title: " . $program_id->get_error_message() );
+					continue;
+				}
+				WP_CLI::success( "Đã tạo Chương trình: $program_title" );
+			}
+
+			// Update Program Meta
+			update_post_meta( $program_id, LTDH_META_SCHOOL_REL, $school_id );
+			update_post_meta( $program_id, LTDH_META_MAJOR_REL, $major_id );
+			update_post_meta( $program_id, LTDH_META_TUITION, $p_info['tuition'] );
+			update_post_meta( $program_id, LTDH_META_DURATION, $p_info['duration'] );
+			update_post_meta( $program_id, 'campus_info', 'Hà Nội' );
+			update_post_meta( $program_id, 'admission_requirements', 'Xét tuyển học bạ hoặc hồ sơ văn bằng (THPT, Trung cấp, Cao đẳng, Đại học).' );
+			update_post_meta( $program_id, 'required_documents', 'Bản sao công chứng CCCD, Ảnh chân dung, Bằng tốt nghiệp cao nhất, Học bạ/Bảng điểm tương ứng.' );
+			update_post_meta( $program_id, 'enrollment_period', 'Tuyển sinh liên tục trong năm' );
+			update_post_meta( $program_id, 'program_benefits', $p_info['advantages'] );
+			update_post_meta( $program_id, LTDH_META_SCHEDULE, $p_info['schedule'] );
+			update_post_meta( $program_id, 'target_students', $p_info['target'] );
+			update_post_meta( $program_id, 'degree_type', 'Cử nhân Công nghệ thông tin' );
+			update_post_meta( $program_id, 'diploma_value', 'Phôi bằng chuẩn Bộ GD&ĐT, đủ điều kiện học tiếp lên Thạc sĩ/Tiến sĩ hoặc thi công chức.' );
+			update_post_meta( $program_id, 'disadvantages', $p_info['disadvantages'] );
+
+			update_post_meta( $program_id, LTDH_META_ADMISSION_STATUS, LTDH_STATUS_OPEN );
+			update_post_meta( $program_id, LTDH_META_AD_GROUPS, 'A00, A01, D01, D07' );
+
+			$faqs = [
+				[ 'question' => 'Học hệ từ xa có giá trị tương đương hệ chính quy không?', 'answer' => 'Có. Theo Thông tư của Bộ GD&ĐT, từ ngày 01/03/2020 trên văn bằng tốt nghiệp Đại học không ghi hình thức đào tạo (Chính quy, Từ xa, hay Vừa học vừa làm), giá trị pháp lý là hoàn toàn như nhau.' ],
+				[ 'question' => 'Thời gian đào tạo tối đa là bao lâu?', 'answer' => 'Thời gian đào tạo tiêu chuẩn là từ 1.5 đến 4 năm tùy thuộc văn bằng đầu vào của học viên (Liên thông, văn bằng 2 hoặc tốt nghiệp THPT).' ]
+			];
+			update_post_meta( $program_id, 'faq', $faqs );
+
+			// Set eligibility criteria
+			$elig_min_edu = ( $t_slug === 'tu-xa' || $t_slug === 'vua-hoc-vua-lam' ) ? 'thap-phan' : 'thap-phan';
+			update_post_meta( $program_id, 'elig_min_education', $elig_min_edu );
+			update_post_meta( $program_id, 'elig_training_types', [ $t_slug ] );
+			update_post_meta( $program_id, 'elig_campuses', [ 'ha-noi' ] );
+			update_post_meta( $program_id, 'elig_max_grad_years', 99 );
+			update_post_meta( $program_id, 'elig_notes', '' );
+
+			wp_set_object_terms( $program_id, $t_slug, LTDH_TAX_TRAINING_TYPE );
+			wp_set_object_terms( $program_id, 'ha-noi', LTDH_TAX_CAMPUS );
+
+			if ( function_exists( 'ltdh_sync_program_relationships' ) ) {
+				ltdh_sync_program_relationships( $program_id );
+			}
+		}
+
+		WP_CLI::success( 'Đã gieo mẫu thành công dữ liệu Trường UTC, Ngành CNTT và 3 Hệ đào tạo!' );
+	}
+
+	/**
+	 * Seed 20 news posts across 3 categories.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp ltdh seed-posts
+	 */
+	public function seed_posts( $args, $assoc_args ) {
+		WP_CLI::log( 'Đang chuẩn bị danh mục tin tức...' );
+
+		$cat_guide = wp_create_category( 'Hướng dẫn tuyển sinh' );
+		$cat_news  = wp_create_category( 'Tin tuyển sinh' );
+		$cat_ann   = wp_create_category( 'Thông báo' );
+
+		$titles_guides = [
+			'Lộ trình học liên thông đại học cho người đi làm bận rộn',
+			'Cách chuyển đổi tín chỉ khi học Văn bằng 2 đại học từ xa',
+			'Những lưu ý quan trọng khi chuẩn bị hồ sơ tuyển sinh đại học trực tuyến',
+			'Bằng Đại học từ xa có được thi công chức, cao học không?',
+			'Kinh nghiệm tự học trực tuyến E-Learning đạt kết quả xuất sắc',
+			'So sánh ưu nhược điểm giữa Đại học từ xa và Vừa học vừa làm',
+			'Học phí đại học từ xa 2026 của các trường tốp đầu'
+		];
+
+		$titles_news = [
+			'Nhu cầu nhân lực ngành Công nghệ thông tin tăng mạnh năm 2026',
+			'Các trường đại học công bố chỉ tiêu tuyển sinh liên thông đợt mới',
+			'Xu hướng chọn ngành Quản trị kinh doanh trong kỷ nguyên số',
+			'Đại học Giao thông Vận tải mở rộng đào tạo hệ từ xa chất lượng cao',
+			'Thị trường lao động ưu tiên nhân sự sở hữu từ hai văn bằng',
+			'Phương thức tuyển sinh bằng học bạ tiếp tục giữ ưu thế',
+			'Ngành Kế toán doanh nghiệp chuyển mình với công nghệ AI'
+		];
+
+		$titles_ann = [
+			'Thông báo tuyển sinh đợt 2 hệ Đại học từ xa năm 2026',
+			'Lịch khai giảng các lớp liên thông và văn bằng 2 tháng tới',
+			'Danh sách học viên trúng tuyển đợt tuyển sinh vừa qua',
+			'Thông báo nhận hồ sơ xét tuyển học bạ đợt 1',
+			'Lịch thi tốt nghiệp và hướng dẫn thủ tục làm khóa luận tốt nghiệp',
+			'Chương trình học bổng khuyến học cho tân sinh viên E-Learning'
+		];
+
+		$posts_seeded = 0;
+
+		foreach ( $titles_guides as $title ) {
+			$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );
+			if ( ! $existing ) {
+				$post_id = wp_insert_post([
+					'post_title'   => $title,
+					'post_name'    => sanitize_title( $title ),
+					'post_status'  => 'publish',
+					'post_type'    => 'post',
+					'post_content' => 'Nội dung chi tiết của bài viết hướng dẫn tuyển sinh về chủ đề: "' . $title . '". Bài viết cung cấp các thông tin hữu ích, phân tích chuyên sâu giúp học viên dễ dàng định hướng con đường học tập nâng cao bằng cấp phù hợp với công việc hiện tại.',
+				]);
+				if ( ! is_wp_error( $post_id ) ) {
+					wp_set_post_categories( $post_id, [ $cat_guide ] );
+					$posts_seeded++;
+				}
+			}
+		}
+
+		foreach ( $titles_news as $title ) {
+			$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );
+			if ( ! $existing ) {
+				$post_id = wp_insert_post([
+					'post_title'   => $title,
+					'post_name'    => sanitize_title( $title ),
+					'post_status'  => 'publish',
+					'post_type'    => 'post',
+					'post_content' => 'Cập nhật tin tức tuyển sinh mới nhất về chủ đề: "' . $title . '". Phản ánh thực trạng nhu cầu học tập, xu hướng tuyển dụng của doanh nghiệp và những thay đổi trong phương thức tuyển sinh của các trường đại học đối tác.',
+				]);
+				if ( ! is_wp_error( $post_id ) ) {
+					wp_set_post_categories( $post_id, [ $cat_news ] );
+					$posts_seeded++;
+				}
+			}
+		}
+
+		foreach ( $titles_ann as $title ) {
+			$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );
+			if ( ! $existing ) {
+				$post_id = wp_insert_post([
+					'post_title'   => $title,
+					'post_name'    => sanitize_title( $title ),
+					'post_status'  => 'publish',
+					'post_type'    => 'post',
+					'post_content' => 'Bản tin thông báo chính thức từ ban tuyển sinh: "' . $title . '". Yêu cầu tất cả học viên và quý thí sinh quan tâm chú ý theo dõi để chuẩn bị hồ sơ và hoàn thành các thủ tục đúng thời hạn quy định.',
+				]);
+				if ( ! is_wp_error( $post_id ) ) {
+					wp_set_post_categories( $post_id, [ $cat_ann ] );
+					$posts_seeded++;
+				}
+			}
+		}
+
+		WP_CLI::success( "Đã gieo thành công $posts_seeded bài viết mới vào 3 danh mục tin tức!" );
 	}
 }
 

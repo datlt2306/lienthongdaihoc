@@ -35,8 +35,15 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 							<a href="<?php echo esc_url( $item['permalink'] ); ?>" class="font-bold text-slate-900 text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
 								<?php echo esc_html( $item['title'] ); ?>
 							</a>
+							<div class="flex items-center justify-center gap-1.5 mt-1.5">
+								<?php 
+								if ( function_exists( 'ltdh_get_training_type_badge_html' ) && ! empty( $item['training_type'] ) ) {
+									echo ltdh_get_training_type_badge_html( $item['training_type'] );
+								}
+								?>
+							</div>
 							<?php if ( $school_name ) : ?>
-								<span class="text-xs text-slate-400 mt-0.5 block"><?php echo esc_html( $school_name ); ?></span>
+								<span class="text-xs text-slate-400 mt-1 block"><?php echo esc_html( $school_name ); ?></span>
 							<?php endif; ?>
 						</div>
 					</div>

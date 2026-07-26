@@ -42,7 +42,7 @@
             },
             {
                 "key": "field_school_code",
-                "label": "Mã trường / Viết tắt",
+                "label": "Mã trường \/ Viết tắt",
                 "name": "school_code",
                 "type": "text",
                 "placeholder": "Ví dụ: NEU, TMU, PTIT..."
@@ -198,7 +198,7 @@
                 "label": "Học phí chỉ từ",
                 "name": "tuition_fee",
                 "type": "text",
-                "placeholder": "Ví dụ: 450,000đ / tín chỉ hoặc 15,000,000đ / học kỳ"
+                "placeholder": "Ví dụ: 450,000đ \/ tín chỉ hoặc 15,000,000đ \/ học kỳ"
             },
             {
                 "key": "field_program_duration",
@@ -224,7 +224,7 @@
                 "label": "Hạn hồ sơ",
                 "name": "enrollment_period",
                 "type": "text",
-                "placeholder": "Ví dụ: Đợt 1 đến hết 30/11/2026"
+                "placeholder": "Ví dụ: Đợt 1 đến hết 30\/11\/2026"
             },
             {
                 "key": "field_program_hotline",
@@ -304,7 +304,7 @@
             },
             {
                 "key": "field_global_favicon",
-                "label": "Favicon / Site Icon",
+                "label": "Favicon \/ Site Icon",
                 "name": "global_favicon",
                 "type": "image",
                 "return_format": "url",
@@ -320,7 +320,7 @@
             },
             {
                 "key": "field_global_zalo",
-                "label": "Đường dẫn Zalo OA / Zalo cá nhân",
+                "label": "Đường dẫn Zalo OA \/ Zalo cá nhân",
                 "name": "global_zalo_url",
                 "type": "url"
             },
@@ -426,7 +426,7 @@
             },
             {
                 "key": "field_telegram_chat_id",
-                "label": "Telegram Chat ID / Group ID",
+                "label": "Telegram Chat ID \/ Group ID",
                 "name": "telegram_chat_id",
                 "type": "text",
                 "instructions": "Nhập Chat ID hoặc ID của Group nhận thông báo. Hệ thống sẽ ưu tiên nếu hằng số constants.php không khai báo.",
@@ -613,5 +613,645 @@
         "active": true,
         "description": "",
         "show_in_rest": 0
+    },
+    {
+        "key": "group_ltdh_page_mapping",
+        "title": "Ánh xạ Form & Trang",
+        "fields": [
+            {
+                "key": "field_ltdh_tab_forms",
+                "label": "Contact Form 7 Mapping",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_cf7_default_id",
+                "label": "Form mặc định (ID)",
+                "name": "cf7_default_form_id",
+                "type": "text",
+                "instructions": "Nhập ID của CF7 form mặc định dùng làm fallback. Xem tại WP Admin → Contact → Contact Forms.",
+                "placeholder": "Ví dụ: f3902eb"
+            },
+            {
+                "key": "field_cf7_consultation_id",
+                "label": "Form Tư vấn (Consultation)",
+                "name": "cf7_consultation_form_id",
+                "type": "text",
+                "instructions": "ID CF7 form dùng cho các trang đăng ký tư vấn.",
+                "placeholder": "Ví dụ: f3902eb"
+            },
+            {
+                "key": "field_cf7_contact_id",
+                "label": "Form Liên hệ (Contact)",
+                "name": "cf7_contact_form_id",
+                "type": "text",
+                "instructions": "ID CF7 form dùng cho trang Liên hệ.",
+                "placeholder": "Ví dụ: contact-form"
+            },
+            {
+                "key": "field_cf7_program_id",
+                "label": "Form Chương trình (Program Sidebar)",
+                "name": "cf7_program_form_id",
+                "type": "text",
+                "instructions": "ID CF7 form dùng trong sidebar trang chương trình.",
+                "placeholder": "Ví dụ: consultation-form"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "ltdh-settings"
+                }
+            ]
+        ],
+        "menu_order": 1,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true
+    },
+    {
+        "key": "group_ltdh_faq",
+        "title": "Nội dung Trang FAQ",
+        "fields": [
+            {
+                "key": "field_faq_items",
+                "label": "Câu hỏi thường gặp",
+                "name": "faq_items",
+                "type": "repeater",
+                "layout": "block",
+                "button_label": "Thêm câu hỏi",
+                "sub_fields": [
+                    {
+                        "key": "field_faq_question",
+                        "label": "Câu hỏi",
+                        "name": "question",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_faq_answer",
+                        "label": "Câu trả lời",
+                        "name": "answer",
+                        "type": "textarea",
+                        "rows": 4
+                    }
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "ltdh-settings"
+                }
+            ]
+        ],
+        "menu_order": 2,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true
+    },
+    {
+        "key": "group_ltdh_hot_majors",
+        "title": "Ngành học nổi bật",
+        "fields": [
+            {
+                "key": "field_hot_major_slugs",
+                "label": "Slug ngành hot (5 ngành)",
+                "name": "hot_major_slugs",
+                "type": "repeater",
+                "layout": "table",
+                "button_label": "Thêm ngành",
+                "max": 5,
+                "instructions": "Nhap slug của ngành (ví dụ: cong-nghe-thong-tin). Hiển thị ở menu dropdown và trang chủ.",
+                "sub_fields": [
+                    {
+                        "key": "field_hot_major_slug",
+                        "label": "Slug",
+                        "name": "slug",
+                        "type": "text"
+                    }
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "ltdh-settings"
+                }
+            ]
+        ],
+        "menu_order": 3,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true
+    },
+    {
+        "key": "group_ltdh_homepage_sections",
+        "title": "Cấu hình Sections Homepage",
+        "fields": [
+            {
+                "key": "field_hp_tab_hero",
+                "label": "Hero Banner",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_hero_heading",
+                "label": "Heading chính",
+                "name": "hero_heading",
+                "type": "text",
+                "default_value": "Tìm ngành học liên thông"
+            },
+            {
+                "key": "field_hero_heading_highlight",
+                "label": "Heading highlight",
+                "name": "hero_heading_highlight",
+                "type": "text",
+                "default_value": "phù hợp cho bạn"
+            },
+            {
+                "key": "field_hero_subtitle",
+                "label": "Mô tả ngắn",
+                "name": "hero_subtitle",
+                "type": "textarea",
+                "rows": 2,
+                "default_value": "Học Liên thông Đại học chính quy, Đại học từ xa uy tín trên toàn quốc"
+            },
+            {
+                "key": "field_hero_slides",
+                "label": "Danh sách Banner Slide",
+                "name": "hero_slides",
+                "type": "repeater",
+                "layout": "block",
+                "button_label": "Thêm slide",
+                "instructions": "Thêm từng slide banner. Ảnh Desktop là bắt buộc. Ảnh Mobile và Link là tùy chọn.",
+                "sub_fields": [
+                    {
+                        "key": "field_hero_slide_image",
+                        "label": "Ảnh Desktop",
+                        "name": "image",
+                        "type": "image",
+                        "return_format": "url",
+                        "preview_size": "large",
+                        "instructions": "Khuyến nghị: 2400×800px hoặc tỉ lệ 21:7"
+                    },
+                    {
+                        "key": "field_hero_slide_image_mobile",
+                        "label": "Ảnh Mobile (tùy chọn)",
+                        "name": "image_mobile",
+                        "type": "image",
+                        "return_format": "url",
+                        "preview_size": "medium",
+                        "instructions": "Nếu để trống, sẽ dùng ảnh Desktop. Khuyến nghị: 800×600px"
+                    },
+                    {
+                        "key": "field_hero_slide_link",
+                        "label": "Đường dẫn khi click (tùy chọn)",
+                        "name": "link",
+                        "type": "url",
+                        "instructions": "Nếu để trống, slide sẽ không có liên kết"
+                    }
+                ]
+            },
+            {
+                "key": "field_hero_tab_cta",
+                "label": "CTA Buttons",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_hero_cta_primary_text",
+                "label": "CTA chính - Text",
+                "name": "hero_cta_primary_text",
+                "type": "text",
+                "default_value": "Tra cứu tuyển sinh"
+            },
+            {
+                "key": "field_hero_cta_primary_url",
+                "label": "CTA chính - Link",
+                "name": "hero_cta_primary_url",
+                "type": "url",
+                "default_value": "\/he-dao-tao\/tu-xa\/"
+            },
+            {
+                "key": "field_hero_cta_secondary_text",
+                "label": "CTA phụ - Text",
+                "name": "hero_cta_secondary_text",
+                "type": "text",
+                "default_value": "Hotline tư vấn"
+            },
+            {
+                "key": "field_hp_tab_eligibility",
+                "label": "Kiểm tra điều kiện",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_hp_elig_badge",
+                "label": "Badge label",
+                "name": "hp_elig_badge",
+                "type": "text",
+                "default_value": "Điều kiện tuyển sinh"
+            },
+            {
+                "key": "field_hp_elig_heading",
+                "label": "Heading",
+                "name": "hp_elig_heading",
+                "type": "text",
+                "default_value": "Bạn có đủ điều kiện học\\nLiên thông & Đại học từ xa?"
+            },
+            {
+                "key": "field_hp_elig_desc",
+                "label": "Mô tả",
+                "name": "hp_elig_desc",
+                "type": "textarea",
+                "rows": 3,
+                "default_value": "Chương trình tuyển sinh mở rộng cho nhiều đối tượng. Chỉ mất 1 phút để kiểm tra tự động."
+            },
+            {
+                "key": "field_hp_elig_items",
+                "label": "3 ô thông tin",
+                "name": "hp_elig_items",
+                "type": "repeater",
+                "max": 3,
+                "layout": "table",
+                "button_label": "Thêm mục",
+                "sub_fields": [
+                    {
+                        "key": "field_hp_elig_item_title",
+                        "label": "Tiêu đề",
+                        "name": "title",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_hp_elig_item_desc",
+                        "label": "Mô tả",
+                        "name": "desc",
+                        "type": "text"
+                    }
+                ]
+            },
+            {
+                "key": "field_hp_elig_cta_text",
+                "label": "CTA Text",
+                "name": "hp_elig_cta_text",
+                "type": "text",
+                "default_value": "Bắt đầu kiểm tra ngay ➔"
+            },
+            {
+                "key": "field_hp_elig_cta_url",
+                "label": "CTA URL",
+                "name": "hp_elig_cta_url",
+                "type": "url",
+                "default_value": "\/kiem-tra-dieu-kien\/"
+            },
+            {
+                "key": "field_hp_tab_certificate",
+                "label": "Bằng cấp & Giá trị",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_hp_cert_left_badge",
+                "label": "Badge tiêu đề",
+                "name": "hp_cert_left_badge",
+                "type": "text",
+                "default_value": "BẰNG CẤP CHÍNH QUY"
+            },
+            {
+                "key": "field_hp_cert_left_heading",
+                "label": "Heading chính",
+                "name": "hp_cert_left_heading",
+                "type": "text",
+                "default_value": "KHÔNG GHI HÌNH THỨC ĐÀO TẠO"
+            },
+            {
+                "key": "field_hp_cert_slider",
+                "label": "Slider ảnh bên phải",
+                "name": "hp_cert_slider",
+                "type": "repeater",
+                "layout": "table",
+                "button_label": "Thêm ảnh slider",
+                "instructions": "Thêm các hình ảnh hiển thị ở slider bên phải. Nếu không có ảnh nào, hệ thống sẽ sử dụng ảnh tốt nghiệp mặc định.",
+                "sub_fields": [
+                    {
+                        "key": "field_hp_cert_slide_img",
+                        "label": "Hình ảnh",
+                        "name": "image",
+                        "type": "image",
+                        "return_format": "url",
+                        "preview_size": "medium"
+                    }
+                ]
+            },
+            {
+                "key": "field_hp_cert_left_image",
+                "label": "Ảnh Video trái (Dưới - Có nút Play)",
+                "name": "hp_cert_left_image",
+                "type": "image",
+                "return_format": "url",
+                "preview_size": "medium",
+                "instructions": "Chọn hoặc upload ảnh đại diện cho video."
+            },
+            {
+                "key": "field_hp_cert_left_youtube",
+                "label": "Link Video YouTube trái",
+                "name": "hp_cert_left_youtube",
+                "type": "text",
+                "instructions": "Gắn link YouTube (ví dụ: https:\/\/www.youtube.com\/watch?v=...). Khi click sẽ mở video dạng popup.",
+                "placeholder": "https:\/\/www.youtube.com\/watch?v=..."
+            },
+            {
+                "key": "field_hp_cert_right_content",
+                "label": "Nội dung bên phải (Dưới)",
+                "name": "hp_cert_right_content",
+                "type": "wysiwyg",
+                "instructions": "Nhập nội dung văn bản hiển thị ở ô dưới bên phải.",
+                "tabs": "all",
+                "toolbar": "full",
+                "media_upload": 1,
+                "default_value": "\n<p><span style=\"color: #0284c7; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;\">Bạn có thể sử dụng văn bằng để làm gì?<\/span><\/p>\n<h2>VĂN BẰNG SAU TỐT NGHIỆP<\/h2>\n<h3>Giá trị sử dụng của văn bằng<\/h3>\n<p>Sau khi tốt nghiệp, người học được cấp văn bằng theo quy định hiện hành và có thể sử dụng để phục vụ các mục tiêu học tập, nghề nghiệp theo điều kiện của từng đơn vị tiếp nhận.<\/p>\n<ul>\n<li><strong>🎓 Học tiếp lên trình độ cao hơn<\/strong><br>Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.<\/li>\n<li><strong>💼 Bổ sung và hoàn thiện hồ sơ nghề nghiệp<\/strong><br>Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.<\/li>\n<li><strong>📋 Tham gia tuyển dụng, thi tuyển<\/strong><br>Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.<\/li>\n<\/ul>\n"
+            },
+            {
+                "key": "field_hp_tab_benefits",
+                "label": "Lợi ích học viên",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_hp_benefits_heading",
+                "label": "Heading",
+                "name": "hp_benefits_heading",
+                "type": "text",
+                "default_value": "Lợi ích dành cho bạn"
+            },
+            {
+                "key": "field_hp_benefits_desc",
+                "label": "Mô tả",
+                "name": "hp_benefits_desc",
+                "type": "text",
+                "default_value": "Chương trình tối ưu giúp người đi làm nâng cao bằng cấp dễ dàng."
+            },
+            {
+                "key": "field_hp_benefits_items",
+                "label": "4 lợi ích",
+                "name": "hp_benefits_items",
+                "type": "repeater",
+                "max": 4,
+                "layout": "table",
+                "button_label": "Thêm lợi ích",
+                "sub_fields": [
+                    {
+                        "key": "field_hp_ben_icon",
+                        "label": "Icon (emoji)",
+                        "name": "icon",
+                        "type": "text",
+                        "default_value": "📜"
+                    },
+                    {
+                        "key": "field_hp_ben_title",
+                        "label": "Tiêu đề",
+                        "name": "title",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_hp_ben_desc",
+                        "label": "Mô tả",
+                        "name": "desc",
+                        "type": "textarea",
+                        "rows": 2
+                    }
+                ]
+            },
+            {
+                "key": "field_hp_tab_whyus",
+                "label": "Vì sao chọn chúng tôi",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_hp_whyus_heading",
+                "label": "Heading",
+                "name": "hp_whyus_heading",
+                "type": "text",
+                "default_value": "Vì sao chọn chúng tôi?"
+            },
+            {
+                "key": "field_hp_whyus_desc",
+                "label": "Mô tả",
+                "name": "hp_whyus_desc",
+                "type": "text",
+                "default_value": "Đơn vị tư vấn và liên kết tuyển sinh hàng đầu."
+            },
+            {
+                "key": "field_hp_tab_segments",
+                "label": "Đối tượng học viên",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_hp_seg_heading",
+                "label": "Heading",
+                "name": "hp_seg_heading",
+                "type": "text",
+                "default_value": "Chương trình phù hợp với bạn?"
+            },
+            {
+                "key": "field_hp_seg_desc",
+                "label": "Mô tả",
+                "name": "hp_seg_desc",
+                "type": "text",
+                "default_value": "Chúng tôi thiết kế các lộ trình học tối ưu riêng cho từng nhóm đối tượng cụ thể."
+            },
+            {
+                "key": "field_hp_seg_items",
+                "label": "5 đối tượng",
+                "name": "hp_seg_items",
+                "type": "repeater",
+                "max": 5,
+                "layout": "table",
+                "button_label": "Thêm đối tượng",
+                "sub_fields": [
+                    {
+                        "key": "field_hp_seg_img",
+                        "label": "Ảnh",
+                        "name": "image",
+                        "type": "image",
+                        "return_format": "url",
+                        "preview_size": "thumbnail"
+                    },
+                    {
+                        "key": "field_hp_seg_title",
+                        "label": "Tiêu đề",
+                        "name": "title",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_hp_seg_desc",
+                        "label": "Mô tả",
+                        "name": "desc",
+                        "type": "textarea",
+                        "rows": 2
+                    }
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "ltdh-settings"
+                }
+            ]
+        ],
+        "menu_order": 4,
+        "active": true
+    },
+    {
+        "key": "group_related_entities",
+        "title": "Liên kết Thực thể Liên quan",
+        "fields": [
+            {
+                "key": "field_related_schools",
+                "label": "Trường đối tác liên quan",
+                "name": "related_schools",
+                "type": "relationship",
+                "post_type": [
+                    "school"
+                ],
+                "filters": [
+                    "search"
+                ],
+                "elements": [
+                    "featured_image"
+                ],
+                "min": "",
+                "max": "",
+                "return_format": "id"
+            },
+            {
+                "key": "field_related_majors",
+                "label": "Ngành học liên quan",
+                "name": "related_majors",
+                "type": "relationship",
+                "post_type": [
+                    "major"
+                ],
+                "filters": [
+                    "search"
+                ],
+                "elements": [
+                    "featured_image"
+                ],
+                "min": "",
+                "max": "",
+                "return_format": "id"
+            },
+            {
+                "key": "field_related_programs",
+                "label": "Chương trình liên quan",
+                "name": "related_programs",
+                "type": "relationship",
+                "post_type": [
+                    "program"
+                ],
+                "filters": [
+                    "search"
+                ],
+                "elements": [
+                    "featured_image"
+                ],
+                "min": "",
+                "max": "",
+                "return_format": "id"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "guide"
+                }
+            ]
+        ],
+        "menu_order": 10,
+        "position": "side",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true,
+        "description": "Chọn các thực thể liên kết với bài viết này để hiển thị trên trang chi tiết tương ứng."
+    },
+    {
+        "key": "group_ltdh_compare_faq",
+        "title": "FAQ Trang So Sánh",
+        "fields": [
+            {
+                "key": "field_faq_compare_items",
+                "label": "Câu hỏi thường gặp khi so sánh",
+                "name": "faq_compare_items",
+                "type": "repeater",
+                "layout": "block",
+                "button_label": "Thêm câu hỏi so sánh",
+                "sub_fields": [
+                    {
+                        "key": "field_faq_compare_question",
+                        "label": "Câu hỏi",
+                        "name": "question",
+                        "type": "text"
+                    },
+                    {
+                        "key": "field_faq_compare_answer",
+                        "label": "Câu trả lời",
+                        "name": "answer",
+                        "type": "textarea",
+                        "rows": 4
+                    }
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "options_page",
+                    "operator": "==",
+                    "value": "ltdh-settings"
+                }
+            ]
+        ],
+        "menu_order": 2,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "active": true
     }
 ]

@@ -1,6 +1,6 @@
 <?php
 /**
- * Archive Program Template (with Sidebar + 3-Column Grid)
+ * Taxonomy Training Type Archive Template (handles /he-dao-tao/)
  *
  * @package ltdh
  */
@@ -25,14 +25,15 @@ if ( preg_match( '#^/he-dao-tao/([^/]+)/?$#i', $request_path, $m ) ) {
 if ( empty( $selected_type ) ) {
 	$selected_type = isset( $_GET['he'] ) ? sanitize_text_field( $_GET['he'] ) : '';
 }
-$selected_search   = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
-$selected_limit    = isset( $_GET['limit'] ) ? intval( $_GET['limit'] ) : 12;
-$selected_sort     = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
 
 $valid_limits = [ 10, 12, 20, 24, 30, 36, 48, 50, 100, -1 ];
+$selected_limit    = isset( $_GET['limit'] ) ? intval( $_GET['limit'] ) : 12;
 if ( ! in_array( $selected_limit, $valid_limits, true ) ) {
 	$selected_limit = 12;
 }
+
+$selected_search   = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
+$selected_sort     = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
 
 $args = [
 	'post_type'      => 'program',
@@ -124,9 +125,7 @@ if ( ! empty( $selected_type ) ) {
 $args  = apply_filters( 'pre_get_posts_args_ltdh', $args );
 $query = new WP_Query( $args );
 
-// Count for "Tất cả các ngành": same filters as the main query (hệ, school, search,
-// admission_status) but WITHOUT the nhóm ngành / major filter, so selecting a
-// nhóm ngành does not change the "all majors" number.
+// Count for "Tất cả các ngành"
 $all_majors_args              = $args;
 $all_majors_args['posts_per_page'] = -1;
 $all_majors_args['fields']         = 'ids';
@@ -260,7 +259,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 
 					<!-- Ngành học Filter -->
 					<div class="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
-						<h3 class="font-extrabold text-slate-900 text-base mb-4 border-b border-slate-100 pb-3 uppercase tracking-wider">Chuyên ngành</h3>
+						<h3 class="font-extrabold text-slate-950 text-base mb-4 border-b border-slate-100 pb-3 uppercase tracking-wider">Chuyên ngành</h3>
 						
 						<!-- Instant Search Filter -->
 						<div class="mb-3 relative">
@@ -365,7 +364,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 
 							$thumb         = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium' ) : '';
 							if ( ! $thumb ) {
-								$thumb = ltdh_get_fallback_image( 'program' );
+								$thumb = 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=300';
 							}
 
 							$prog_types = wp_get_post_terms( $prog_id, 'training_type' );
@@ -400,7 +399,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 									<?php
 									$school_thumb = $school_rel_id ? get_the_post_thumbnail_url( $school_rel_id, 'medium' ) : '';
 									if ( ! $school_thumb ) {
-										$school_thumb = ltdh_get_fallback_image( 'school' );
+										$school_thumb = 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=300';
 									}
 									?>
 									<div class="h-24 w-full bg-slate-200 bg-cover bg-center relative" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');">
@@ -457,8 +456,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 													data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 													data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
 													data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
-													data-compare-nganh="<?php echo esc_attr( $major_rel_id ); ?>"
-													data-compare-thumb="<?php echo esc_url( $thumb ); ?>">
+													data-compare-nganh="<?php echo esc_attr( $major_rel_id ); ?>">
 												So sánh
 											</button>
 										</div>

@@ -46,6 +46,15 @@ add_action( 'after_setup_theme', 'ltdh_theme_setup' );
 function ltdh_enqueue_assets() {
 	wp_enqueue_style( 'ltdh-main-style', get_template_directory_uri() . '/style.css', [], LTDH_VERSION );
 
+	if ( is_front_page() ) {
+		if ( file_exists( get_template_directory() . '/assets/css/swiper-bundle.min.css' ) ) {
+			wp_enqueue_style( 'swiper-css', get_template_directory_uri() . '/assets/css/swiper-bundle.min.css', [], '11.0.0' );
+		}
+		if ( file_exists( get_template_directory() . '/assets/js/swiper-bundle.min.js' ) ) {
+			wp_enqueue_script( 'swiper-js', get_template_directory_uri() . '/assets/js/swiper-bundle.min.js', [], '11.0.0', true );
+		}
+	}
+
 	if ( file_exists( get_template_directory() . '/assets/css/main.min.css' ) ) {
 		wp_enqueue_style( 'ltdh-theme-styles', get_template_directory_uri() . '/assets/css/main.min.css', [], LTDH_VERSION );
 	}
@@ -61,6 +70,7 @@ function ltdh_enqueue_assets() {
 	wp_localize_script( $script_handle, 'ltdh_ajax', [
 		'ajax_url'      => admin_url( 'admin-ajax.php' ),
 		'compare_nonce' => wp_create_nonce( LTDH_NONCE_COMPARE ),
+		'home_url'      => esc_url( home_url( '/' ) ),
 	] );
 
 	if ( ltdh_compare_should_load() ) {
@@ -73,7 +83,14 @@ add_action( 'wp_enqueue_scripts', 'ltdh_enqueue_assets' );
  * Check if the current page should load program comparison logic.
  */
 function ltdh_compare_should_load() {
-	return is_post_type_archive( 'program' ) || is_singular( 'program' ) || is_tax( 'training_type' ) || is_tax( 'major' ) || is_search() || is_page_template( 'template-search.php' );
+	if ( is_admin() ) {
+		return false;
+	}
+	$request_uri = $_SERVER['REQUEST_URI'] ?? '';
+	if ( strpos( $request_uri, '/he-dao-tao' ) !== false || strpos( $request_uri, '/so-sanh' ) !== false ) {
+		return true;
+	}
+	return is_post_type_archive( 'program' ) || is_singular( 'program' ) || is_tax( 'training_type' ) || is_tax( 'major' ) || is_search() || is_page_template( 'template-search.php' ) || is_page( 'he-dao-tao' );
 }
 
 /**

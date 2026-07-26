@@ -58,13 +58,13 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<!-- Ngành mong muốn -->
 				<div class="space-y-2 relative" data-search-select>
-					<label class="block text-sm font-bold text-slate-700">Ngành học mong muốn *</label>
-					<input type="text" class="elig-search-input" placeholder="Gõ để tìm ngành học..." autocomplete="off">
+					<label class="block text-sm font-bold text-slate-700">Chuyên ngành mong muốn *</label>
+					<input type="text" class="elig-search-input" placeholder="Gõ để tìm chuyên ngành..." autocomplete="off">
 					<input type="hidden" name="desired_major" class="elig-select elig-search-value">
 					<div class="elig-search-dropdown absolute w-full max-h-48 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg hidden z-50 mt-1">
-						<div class="p-2 text-xs font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">Danh sách ngành học</div>
+						<div class="p-2 text-xs font-bold text-slate-400 border-b border-slate-100 uppercase tracking-wider">Danh sách chuyên ngành</div>
 						<div class="elig-search-options">
-							<div class="elig-search-option-item p-2.5 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-500 border-b border-slate-50" data-value="">-- Chọn ngành học --</div>
+							<div class="elig-search-option-item p-2.5 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-500 border-b border-slate-50" data-value="">-- Chọn chuyên ngành --</div>
 							<?php foreach ( $majors as $m ) : ?>
 								<div class="elig-search-option-item p-2.5 text-sm cursor-pointer hover:bg-slate-50 font-semibold text-slate-700 border-b border-slate-50 last:border-0" data-value="<?php echo esc_attr( $m->ID ); ?>"><?php echo esc_html( $m->post_title ); ?></div>
 							<?php endforeach; ?>

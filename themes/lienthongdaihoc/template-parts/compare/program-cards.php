@@ -68,6 +68,13 @@ $sections = [
 							<?php echo esc_html( $item['title'] ); ?>
 						</a>
 					</h3>
+					<div class="flex items-center gap-1.5 mt-1.5">
+						<?php 
+						if ( function_exists( 'ltdh_get_training_type_badge_html' ) && ! empty( $item['training_type'] ) ) {
+							echo ltdh_get_training_type_badge_html( $item['training_type'] );
+						}
+						?>
+					</div>
 				</div>
 			</div>
 

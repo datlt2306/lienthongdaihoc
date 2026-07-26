@@ -65,7 +65,7 @@ get_header();
 				</div>
 				<div class="bg-slate-50 p-6 rounded-lg border border-slate-100">
 					<h3 class="font-bold text-slate-800 text-lg mb-2"><?php echo esc_html( $about_vs_title ); ?></h3>
-					<p class="text-sm text-slate-500">Mở rộng liên kết với hơn 50+ trường đại học chính quy, hỗ trợ giải đáp lộ trình học cho hàng chục ngàn học viên mỗi năm.</p>
+					<p class="text-sm text-slate-500">Mở rộng đối tác với hơn 50+ trường đại học chính quy, hỗ trợ giải đáp lộ trình học cho hàng chục ngàn học viên mỗi năm.</p>
 				</div>
 			</div>
 		</article>

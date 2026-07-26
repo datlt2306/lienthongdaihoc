@@ -59,61 +59,43 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 				<?php get_template_part( 'template-parts/compare/cta-bar' ); ?>
 			</div>
 
-			<!-- SEO Content Section -->
-			<section class="mt-12 bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-				<h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">
-					Thông tin so sánh chi tiết
-				</h2>
-				<div class="prose prose-slate max-w-none text-slate-600 text-sm">
-					<?php
-					foreach ( $items as $item ) :
-						$school_name = $item['school'] ? $item['school']['title'] : '';
-					?>
-						<h3><?php echo esc_html( $item['title'] ); ?> <?php echo esc_html( $school_name ? '(' . $school_name . ')' : '' ); ?></h3>
-						<p><?php echo wp_kses_post( $item['excerpt'] ); ?></p>
-						<?php if ( ! empty( $item['advantages'] ) ) : ?>
-							<p><strong>Ưu điểm:</strong> <?php echo wp_kses_post( $item['advantages'] ); ?></p>
-						<?php endif; ?>
-						<?php if ( ! empty( $item['disadvantages'] ) ) : ?>
-							<p><strong>Nhược điểm:</strong> <?php echo wp_kses_post( $item['disadvantages'] ); ?></p>
-						<?php endif; ?>
-					<?php endforeach; ?>
-				</div>
-			</section>
-
 			<!-- FAQ Section -->
+			<?php
+			$faqs = get_field( 'faq_compare_items', 'option' );
+			if ( empty( $faqs ) ) {
+				// Fallback to defaults
+				$faqs = [
+					[
+						'question' => 'Làm sao để chọn chương trình phù hợp?',
+						'answer'   => 'Hãy xem xét học phí, thời gian đào tạo, lịch học và cơ hội việc làm. Nếu bạn đang đi làm, ưu tiên chương trình có lịch học linh hoạt.'
+					],
+					[
+						'question' => 'Bằng cấp từ các chương trình này có giá trị không?',
+						'answer'   => 'Các chương trình liên thông và văn bằng 2 đều được Bộ Giáo dục & Đào tạo công nhận. Bằng cấp có giá trị toàn quốc.'
+					],
+					[
+						'question' => 'Tôi có thể vừa học vừa làm được không?',
+						'answer'   => 'Có. Hầu hết các chương trình liên thông và từ xa đều thiết kế cho người đi làm với lịch học cuối tuần hoặc học trực tuyến linh hoạt.'
+					]
+				];
+			}
+			?>
 			<section class="mt-8 bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 				<h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">
 					Câu hỏi thường gặp khi so sánh chương trình
 				</h2>
 				<div class="space-y-4">
-					<div class="border-b border-slate-100 pb-4">
-						<h4 class="font-semibold text-slate-800 text-sm mb-1.5 flex items-start gap-2">
-							<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
-							<span>Làm sao để chọn chương trình phù hợp?</span>
-						</h4>
-						<p class="text-slate-600 text-sm pl-7 leading-relaxed">
-							Hãy xem xét học phí, thời gian đào tạo, lịch học và cơ hội việc làm. Nếu bạn đang đi làm, ưu tiên chương trình có lịch học linh hoạt.
-						</p>
-					</div>
-					<div class="border-b border-slate-100 pb-4">
-						<h4 class="font-semibold text-slate-800 text-sm mb-1.5 flex items-start gap-2">
-							<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
-							<span>Bằng cấp từ các chương trình này có giá trị không?</span>
-						</h4>
-						<p class="text-slate-600 text-sm pl-7 leading-relaxed">
-							Các chương trình liên thông và văn bằng 2 đều được Bộ Giáo dục & Đào tạo công nhận. Bằng cấp có giá trị toàn quốc.
-						</p>
-					</div>
-					<div class="border-b border-slate-100 pb-4">
-						<h4 class="font-semibold text-slate-800 text-sm mb-1.5 flex items-start gap-2">
-							<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
-							<span>Tôi có thể vừa học vừa làm được không?</span>
-						</h4>
-						<p class="text-slate-600 text-sm pl-7 leading-relaxed">
-							Có. Hầu hết các chương trình liên thông và từ xa đều thiết kế cho người đi làm với lịch học cuối tuần hoặc học trực tuyến linh hoạt.
-						</p>
-					</div>
+					<?php foreach ( $faqs as $faq ) : ?>
+						<div class="border-b border-slate-100 pb-4">
+							<h4 class="font-semibold text-slate-800 text-sm mb-1.5 flex items-start gap-2">
+								<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
+								<span><?php echo esc_html( $faq['question'] ); ?></span>
+							</h4>
+							<p class="text-slate-600 text-sm pl-7 leading-relaxed">
+								<?php echo esc_html( $faq['answer'] ); ?>
+							</p>
+						</div>
+					<?php endforeach; ?>
 				</div>
 			</section>
 

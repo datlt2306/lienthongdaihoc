@@ -90,6 +90,22 @@ function ltdh_compare_resolve_ids_from_slug( $type, $slug ) {
 			continue;
 		}
 
+		// Check if it is a numeric ID format "item-123" or just "123"
+		if ( preg_match( '/^item-(\d+)$/', $part, $m ) ) {
+			$id = intval( $m[1] );
+			if ( get_post_type( $id ) === $post_type ) {
+				$ids[] = $id;
+				continue;
+			}
+		}
+		if ( is_numeric( $part ) ) {
+			$id = intval( $part );
+			if ( get_post_type( $id ) === $post_type ) {
+				$ids[] = $id;
+				continue;
+			}
+		}
+
 		// Try to find by slug first
 		$post = get_page_by_path( $part, OBJECT, $post_type );
 		if ( $post ) {
@@ -133,6 +149,17 @@ function ltdh_compare_generate_slug( $type, $ids ) {
 function ltdh_compare_resolve_program( $program_id ) {
 	$school_id  = get_field( 'school_relationship', $program_id );
 	$major_id   = get_field( 'major_relationship', $program_id );
+	if ( is_array( $major_id ) ) {
+		$major_id = ! empty( $major_id ) ? ( is_object( $major_id[0] ) ? $major_id[0]->ID : $major_id[0] ) : 0;
+	} elseif ( is_object( $major_id ) ) {
+		$major_id = $major_id->ID;
+	}
+	$major_id = intval( $major_id );
+
+	$thumbnail = $major_id ? get_the_post_thumbnail_url( $major_id, 'medium' ) : '';
+	if ( ! $thumbnail ) {
+		$thumbnail = get_the_post_thumbnail_url( $program_id, 'medium' ) ?: ltdh_get_fallback_image( 'program' );
+	}
 
 	// Resolve taxonomy terms
 	$training_terms = wp_get_post_terms( $program_id, 'training_type' );
@@ -168,7 +195,7 @@ function ltdh_compare_resolve_program( $program_id ) {
 		'id'                    => $program_id,
 		'title'                 => get_the_title( $program_id ),
 		'permalink'             => get_permalink( $program_id ),
-		'thumbnail'             => get_the_post_thumbnail_url( $program_id, 'medium' ) ?: get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg',
+		'thumbnail'             => $thumbnail,
 		'excerpt'               => get_the_excerpt( $program_id ),
 		'school'                => $school_id ? [
 			'id'        => $school_id,
