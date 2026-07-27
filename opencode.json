@@ -7,6 +7,7 @@
       "headers": {
         "Authorization": "Basic {env:WP_MCP_AUTH}"
       },
+      "oauth": false,
       "enabled": true
     }
   }
