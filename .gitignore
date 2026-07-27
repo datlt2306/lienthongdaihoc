@@ -23,6 +23,11 @@ plugins/all-in-one-wp-migration/storage/error.log
 .DS_Store
 Thumbs.db
 
+# MCP credentials
+.wp-mcp-url
+.wp-mcp-user
+.wp-mcp-pass
+
 # Docker volumes
 db_data/
 wp_data/
