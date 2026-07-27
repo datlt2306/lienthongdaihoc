@@ -22,3 +22,10 @@ plugins/all-in-one-wp-migration/storage/error.log
 # OS files
 .DS_Store
 Thumbs.db
+
+# Docker volumes
+db_data/
+wp_data/
+
+# Local Docker overrides (not for VPS)
+docker-compose.override.yml
