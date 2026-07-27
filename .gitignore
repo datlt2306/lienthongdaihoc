@@ -1,2 +1,24 @@
 themes/lienthongdaihoc/node_modules
 themes/lienthongdaihoc/dist
+
+# Uploads
+uploads/
+!uploads/.gitkeep
+
+# Backups
+ai1wm-backups/
+
+# Logs
+debug.log
+*.log
+
+# Binaries
+wp-cli.phar
+
+# Plugin build artifacts
+plugins/advanced-custom-fields-pro/assets/build/**/*.map
+plugins/all-in-one-wp-migration/storage/error.log
+
+# OS files
+.DS_Store
+Thumbs.db
