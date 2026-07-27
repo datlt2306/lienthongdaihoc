@@ -62,13 +62,18 @@
 		} catch (e) { /* silent */ }
 	}
 
-	function addItem(type, id, title, thumb) {
+	function addItem(type, id, he, nganh, title, thumb) {
 		var items = getItems();
 		if (!items[type]) items[type] = [];
 		if (items[type].indexOf(id) === -1) {
 			if (items[type].length >= MAX_ITEMS) return false;
 			items[type].push(id);
 			saveItems(items);
+
+			// Save metadata
+			var meta = getMetadata();
+			meta[id] = { he: he || '', nganh: nganh || '' };
+			saveMetadata(meta);
 
 			// Save details
 			var cache = getDetailsCache();
@@ -152,7 +157,26 @@
 						return;
 					}
 
-						var btnTitle = btn.getAttribute('data-compare-title') || '';
+					// Validation: Same major (nganh)
+					var btnHe = btn.getAttribute('data-compare-he');
+					var btnNganh = btn.getAttribute('data-compare-nganh');
+					var activeIds = items[type] || [];
+
+					if (activeIds.length > 0 && btnNganh) {
+						var meta = getMetadata();
+						for (var idx = 0; idx < activeIds.length; idx++) {
+							var existingId = activeIds[idx];
+							var existingMeta = meta[existingId];
+							if (existingMeta) {
+								if (existingMeta.nganh && existingMeta.nganh !== btnNganh) {
+									showToast('Chỉ được so sánh các chương trình CÙNG NGÀNH ĐÀO TẠO.', 'error');
+									return;
+								}
+							}
+						}
+					}
+
+					var btnTitle = btn.getAttribute('data-compare-title') || '';
 					var btnThumb = btn.getAttribute('data-compare-thumb') || '';
 					if (!btnThumb) {
 						var cardEl = document.querySelector('[data-compare-id="' + id + '"][data-compare-thumb]');
@@ -167,7 +191,7 @@
 						}
 					}
 
-					addItem(type, id, btnTitle, btnThumb);
+					addItem(type, id, btnHe, btnNganh, btnTitle, btnThumb);
 					btn.classList.add('is-compared');
 					btn.textContent = '✓ Đã thêm';
 					showToast('Đã thêm vào danh sách so sánh (' + (total + 1) + '/' + MAX_ITEMS + ')', 'success');
@@ -330,7 +354,7 @@
 
 	// Expose for external use
 	window.ltdhCompare = {
-		add: function (type, id, title, thumb) { addItem(type, id, title, thumb); updateTray(); },
+		add: function (type, id, he, nganh, title, thumb) { addItem(type, id, he, nganh, title, thumb); updateTray(); },
 		remove: function (type, id) { removeItem(type, id); updateTray(); },
 		clearAll: clearAll,
 		getItems: getItems,

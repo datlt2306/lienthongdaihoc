@@ -370,7 +370,16 @@ $global_zalo = ltdh_get_zalo_url();
 					<?php
 					$types = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
 					$type_slug = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->slug : '';
-					$major_rel_id = get_field( LTDH_META_MAJOR_REL, $program_id );
+					$major_rel_id_raw = get_field( LTDH_META_MAJOR_REL, $program_id );
+					$major_rel_id = 0;
+					if ( is_array( $major_rel_id_raw ) ) {
+						$major_rel_id = ! empty( $major_rel_id_raw ) ? ( is_object( $major_rel_id_raw[0] ) ? $major_rel_id_raw[0]->ID : $major_rel_id_raw[0] ) : 0;
+					} elseif ( is_object( $major_rel_id_raw ) ) {
+						$major_rel_id = $major_rel_id_raw->ID;
+					} elseif ( $major_rel_id_raw ) {
+						$major_rel_id = intval( $major_rel_id_raw );
+					}
+					$major_slug = $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '';
 					?>
 					<button type="button"
 							class="w-full text-center bg-white border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold shadow-xs hover:bg-slate-50 transition-all ltdh-compare-single-btn text-sm flex items-center justify-center gap-2 mt-4 min-h-[44px]"
@@ -378,7 +387,7 @@ $global_zalo = ltdh_get_zalo_url();
 							data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>"
 							data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
-							data-compare-nganh="<?php echo esc_attr( $major_rel_id ); ?>">
+							data-compare-nganh="<?php echo esc_attr( $major_slug ); ?>">
 						<span>📊</span> <span>Thêm vào so sánh</span>
 					</button>
 

@@ -456,7 +456,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 													data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 													data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
 													data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
-													data-compare-nganh="<?php echo esc_attr( $major_rel_id ); ?>">
+													data-compare-nganh="<?php echo esc_attr( $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '' ); ?>">
 												So sánh
 											</button>
 										</div>
