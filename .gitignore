@@ -28,6 +28,9 @@ Thumbs.db
 .wp-mcp-user
 .wp-mcp-pass
 
+# Environment variables
+.env
+
 # Docker volumes
 db_data/
 wp_data/
