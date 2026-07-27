@@ -140,6 +140,13 @@ function ltdh_redirect_taxonomy_base() {
 		return;
 	}
 	$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
+
+	// 301 redirect: /program/slug/ → /slug/
+	if ( preg_match( '#^/program/([^/]+)/?$#i', $request_path, $matches ) ) {
+		wp_redirect( home_url( '/' . $matches[1] . '/' ), 301 );
+		exit;
+	}
+
 	if ( preg_match( '#^/co-so/?$#i', $request_path ) ) {
 		wp_redirect( home_url( '/he-dao-tao/tu-xa/' ), 301 );
 		exit;
