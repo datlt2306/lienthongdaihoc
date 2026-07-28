@@ -2,12 +2,9 @@
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
     "wordpress": {
-      "type": "remote",
-      "url": "http://103.72.56.213:8082/wp-json/mcp/mcp-adapter-default-server",
-      "headers": {
-        "Authorization": "Basic {env:WP_MCP_AUTH}"
-      },
-      "oauth": false,
+      "type": "stdio",
+      "command": "wp",
+      "args": ["mcp-adapter", "serve", "--user=admin", "--path=/Users/ken/Local Sites/lienthongdaihoc/app/public"],
       "enabled": true
     }
   }
