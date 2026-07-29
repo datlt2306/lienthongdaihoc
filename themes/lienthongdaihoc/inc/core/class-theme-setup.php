@@ -133,29 +133,24 @@ function ltdh_flush_rewrite_rules_on_switch() {
 }
 add_action( 'after_switch_theme', 'ltdh_flush_rewrite_rules_on_switch' );
 
-if ( ! get_option( LTDH_OPT_REWRITE_FLUSHED ) || get_option( LTDH_OPT_REWRITE_FLUSHED ) < 1752500000 ) {
-	flush_rewrite_rules();
-	update_option( LTDH_OPT_REWRITE_FLUSHED, time() );
-}
+/**
+ * One-time rewrite flush after deploy — runs inside 'init' at priority 99
+ * so all CPTs and taxonomies are already registered before flushing.
+ *
+ * NEVER call flush_rewrite_rules() at global scope; it fires during
+ * WordPress's fatal-error sandbox scrape on theme activation and can
+ * cause the theme to be paused / "Cannot Activate".
+ */
+add_action( 'init', function() {
+	$flushed = (int) get_option( LTDH_OPT_REWRITE_FLUSHED );
+	if ( ! $flushed || $flushed < 1752500000 ) {
+		flush_rewrite_rules();
+		update_option( LTDH_OPT_REWRITE_FLUSHED, time() );
+	}
+}, 99 );
 
 /**
- * Override WordPress favicon with ACF one.
+ * Let WordPress Customizer handle logo and favicon natively.
+ * ACF fields (global_logo, global_favicon) are kept only as fallback
+ * when Customizer values are not set.
  */
-function ltdh_override_favicon() {
-	remove_action( 'wp_head', 'wp_site_icon', 1 );
-	remove_action( 'admin_head', 'wp_site_icon' );
-}
-add_action( 'after_setup_theme', 'ltdh_override_favicon' );
-
-function ltdh_output_custom_favicon() {
-	if ( function_exists( 'get_field' ) ) {
-		$favicon_url = get_field( 'global_favicon', 'option' );
-		if ( ! empty( $favicon_url ) ) {
-			echo '<link rel="icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
-			echo '<link rel="shortcut icon" href="' . esc_url( $favicon_url ) . '" />' . "\n";
-		}
-	}
-}
-add_action( 'wp_head', 'ltdh_output_custom_favicon', 1 );
-add_action( 'admin_head', 'ltdh_output_custom_favicon', 1 );
-add_action( 'login_head', 'ltdh_output_custom_favicon', 1 );

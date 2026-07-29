@@ -225,9 +225,17 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 // ----------------------------------------------------
 
 /**
- * Get site logo URL with ACF → Customizer fallback.
+ * Get site logo URL with Customizer → ACF fallback.
  */
 function ltdh_get_logo_url(): string {
+	$logo_id = get_theme_mod('custom_logo');
+	if ($logo_id) {
+		$url = wp_get_attachment_image_url($logo_id, 'full');
+		if ($url) {
+			return $url;
+		}
+	}
+
 	if (function_exists('get_field')) {
 		$acf_logo = get_field('global_logo', 'options');
 		if ($acf_logo) {
@@ -241,13 +249,6 @@ function ltdh_get_logo_url(): string {
 		}
 	}
 
-	$logo_id = get_theme_mod('custom_logo');
-	if ($logo_id) {
-		$url = wp_get_attachment_image_url($logo_id, 'full');
-		if ($url) {
-			return $url;
-		}
-	}
 	return '';
 }
 
