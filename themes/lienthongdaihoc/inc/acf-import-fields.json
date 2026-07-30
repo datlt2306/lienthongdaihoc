@@ -313,6 +313,16 @@
                 "instructions": "Kích thước đề nghị: 512x512px, định dạng PNG hoặc ICO. Ảnh sẽ hiển thị trên tab trình duyệt."
             },
             {
+                "key": "field_global_share_image",
+                "label": "Ảnh chia sẻ mặc định (OG Image \/ Fallback Banner)",
+                "name": "global_share_image",
+                "type": "image",
+                "return_format": "url",
+                "preview_size": "medium",
+                "library": "all",
+                "instructions": "Kích thước khuyên dùng: 1200x630px. Sẽ được dùng làm ảnh đại diện khi chia sẻ liên kết (Facebook, Zalo) hoặc banner mặc định khi bài viết\/chương trình không có ảnh đại diện."
+            },
+            {
                 "key": "field_global_hotline",
                 "label": "Hotline tư vấn chung",
                 "name": "global_hotline",

@@ -299,6 +299,12 @@ function ltdh_seo_fallback_og_image( $image_url ) {
 	if ( ! empty( $image_url ) ) {
 		return $image_url;
 	}
+	if ( function_exists( 'get_field' ) ) {
+		$custom_share_image = get_field( 'global_share_image', 'options' );
+		if ( ! empty( $custom_share_image ) ) {
+			return $custom_share_image;
+		}
+	}
 	return get_template_directory_uri() . '/assets/images/banner-program.jpg';
 }
 
@@ -310,10 +316,18 @@ add_action( 'wp_head', function() {
 		return;
 	}
 	
-	$thumbnail_url = get_template_directory_uri() . '/assets/images/banner-program.jpg';
+	$thumbnail_url = '';
 	
 	if ( is_singular() && has_post_thumbnail() ) {
 		$thumbnail_url = get_the_post_thumbnail_url( null, 'large' );
+	}
+	
+	if ( empty( $thumbnail_url ) && function_exists( 'get_field' ) ) {
+		$thumbnail_url = get_field( 'global_share_image', 'options' );
+	}
+	
+	if ( empty( $thumbnail_url ) ) {
+		$thumbnail_url = get_template_directory_uri() . '/assets/images/banner-program.jpg';
 	}
 	
 	echo "\n" . '<!-- Social Share Meta Tags -->' . "\n";

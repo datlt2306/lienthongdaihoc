@@ -608,6 +608,12 @@ function ltdh_get_fallback_image(string $context = 'program'): string {
 	if ( $context === 'school' ) {
 		return $theme_uri . '/assets/images/banner-school.jpg';
 	}
+	if ( function_exists( 'get_field' ) ) {
+		$custom_share_image = get_field( 'global_share_image', 'options' );
+		if ( ! empty( $custom_share_image ) ) {
+			return $custom_share_image;
+		}
+	}
 	return $theme_uri . '/assets/images/banner-program.jpg';
 }
 
