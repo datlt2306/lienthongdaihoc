@@ -7,6 +7,8 @@
     "test": "tests"
   },
   "scripts": {
+    "build": "NODE_ENV=production postcss assets/css/input.css -o assets/css/main.min.css --no-map",
+    "watch": "postcss assets/css/input.css -o assets/css/main.min.css --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,6 +17,8 @@
   "type": "commonjs",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/typography": "^0.5.20",
+    "cssnano": "^8.0.2",
     "postcss": "^8.5.22",
     "tailwindcss": "^4.3.3"
   }

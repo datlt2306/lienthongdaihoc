@@ -31,7 +31,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 <style>
 /* Custom styled Admission info & Contact info cards */
-.prose h4 {
+.prose-card-list h4 {
 	font-size: 0.95rem;
 	font-weight: 800;
 	color: #1e293b;
@@ -44,7 +44,7 @@ $global_zalo = ltdh_get_zalo_url();
 	display: flex;
 	align-items: center;
 }
-.prose ul {
+.prose-card-list ul {
 	list-style-type: none !important;
 	padding-left: 0 !important;
 	margin-bottom: 1.5rem;
@@ -53,7 +53,7 @@ $global_zalo = ltdh_get_zalo_url();
 	overflow: hidden;
 	background-color: #ffffff;
 }
-.prose ul li {
+.prose-card-list ul li {
 	padding: 0.75rem 1rem !important;
 	border-bottom: 1px solid #f1f5f9;
 	margin: 0 !important;
@@ -63,20 +63,20 @@ $global_zalo = ltdh_get_zalo_url();
 	flex-direction: column;
 }
 @media (min-width: 640px) {
-	.prose ul li {
+	.prose-card-list ul li {
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
 		gap: 1.5rem;
 	}
 }
-.prose ul li:last-child {
+.prose-card-list ul li:last-child {
 	border-bottom: none;
 }
-.prose ul li:nth-child(even) {
+.prose-card-list ul li:nth-child(even) {
 	background-color: #f8fafc;
 }
-.prose ul li strong {
+.prose-card-list ul li strong {
 	color: #0f172a;
 	font-weight: 700;
 	min-width: 180px;
@@ -443,13 +443,11 @@ $global_zalo = ltdh_get_zalo_url();
 					endif;
 					?>
 				</section>
-
-
 				<!-- ADMISSION INFORMATION -->
 				<?php if ( $adm_info ) : ?>
 					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Phương thức tuyển sinh</h2>
-						<div class="prose prose-slate max-w-none text-slate-600 text-sm">
+						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
 							<?php echo wp_kses_post( $adm_info ); ?>
 						</div>
 					</section>
@@ -459,12 +457,11 @@ $global_zalo = ltdh_get_zalo_url();
 				<?php if ( $contact ) : ?>
 					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Thông tin liên hệ tuyển sinh</h2>
-						<div class="prose prose-slate max-w-none text-slate-600 text-sm">
+						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
 							<?php echo wp_kses_post( $contact ); ?>
 						</div>
 					</section>
 				<?php endif; ?>
-
 			</div>
 
 			<!-- Sidebar Column -->

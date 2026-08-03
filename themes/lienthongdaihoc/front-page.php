@@ -196,7 +196,7 @@ $zalo    = ltdh_get_zalo_url();
 		<div class="max-w-7xl mx-auto relative z-10">
 			<div class="text-center max-w-2xl mx-auto mb-8 space-y-2 px-4">
 				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">KHÁM PHÁ NGÀNH HỌC</span>
-				<h2 class="text-xl md:text-3xl font-black text-slate-900">5 ngành đào tạo hot nhất</h2>
+				<h2 class="text-xl md:text-4xl font-black text-slate-900">5 ngành đào tạo hot nhất</h2>
 				<p class="text-slate-500 text-sm">Top ngành được yêu thích nhất, phù hợp xu hướng thị trường lao động.</p>
 			</div>
 
@@ -232,7 +232,7 @@ $zalo    = ltdh_get_zalo_url();
 							<div class="h-12 w-12 <?php echo $c['icon_bg']; ?> <?php echo $c['icon_text']; ?> rounded-xl flex items-center justify-center mb-3 text-xl group-hover:scale-110 transition-transform">
 								<?php echo $icon; ?>
 							</div>
-							<h4 class="font-bold text-xs text-slate-700 leading-snug line-clamp-2"><?php echo esc_html($maj->post_title); ?></h4>
+							<h4 class="font-semibold text-slate-700 leading-snug line-clamp-2"><?php echo esc_html($maj->post_title); ?></h4>
 						</a>
 				<?php
 					endforeach;

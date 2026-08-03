@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
     --color-brand-primary: #00308b;
@@ -13,11 +14,7 @@
 /*
   Prevent Montserrat font weights from being too heavy
 */
-h1, h2, h3, h4, h5, h6,
-.font-black,
-.font-extrabold {
-    font-weight: 700 !important;
-}
+
 
 /* Dropdown animation */
 .dropdown-panel {
