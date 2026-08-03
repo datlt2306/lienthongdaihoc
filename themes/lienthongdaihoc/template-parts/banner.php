@@ -116,6 +116,14 @@ if ( empty( $banner_image ) ) {
 ?>
 
 	<section class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white py-14 md:py-20 overflow-hidden">
+	<?php if ( ! empty( $banner_image ) ) : ?>
+		<!-- Banner Background Image with Overlay -->
+		<div class="absolute inset-0 z-0">
+			<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center" alt="<?php echo esc_attr( $banner_title ); ?>">
+			<div class="absolute inset-0 bg-gradient-to-r from-[#0c1b30]/90 to-brand-primary/85 mix-blend-multiply"></div>
+		</div>
+	<?php endif; ?>
+
 	<!-- Dot Grid Pattern -->
 	<div class="absolute inset-0 opacity-10 pointer-events-none z-0" style="background-image: radial-gradient(white 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
 	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
