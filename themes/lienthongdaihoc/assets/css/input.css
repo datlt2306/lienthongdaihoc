@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@source "../../**/*.php";
+@source "../../**/*.js";
 
 @theme {
     --color-brand-primary: #00308b;

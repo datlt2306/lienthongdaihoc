@@ -44,7 +44,9 @@ add_action( 'after_setup_theme', 'ltdh_theme_setup' );
  * Enqueue frontend styles and scripts.
  */
 function ltdh_enqueue_assets() {
-	wp_enqueue_style( 'ltdh-main-style', get_template_directory_uri() . '/style.css', [], LTDH_VERSION );
+	$main_css_path = get_template_directory() . '/style.css';
+	$main_version = file_exists( $main_css_path ) ? filemtime( $main_css_path ) : LTDH_VERSION;
+	wp_enqueue_style( 'ltdh-main-style', get_template_directory_uri() . '/style.css', [], $main_version );
 
 	if ( is_front_page() ) {
 		if ( file_exists( get_template_directory() . '/assets/css/swiper-bundle.min.css' ) ) {
@@ -55,8 +57,10 @@ function ltdh_enqueue_assets() {
 		}
 	}
 
-	if ( file_exists( get_template_directory() . '/assets/css/main.min.css' ) ) {
-		wp_enqueue_style( 'ltdh-theme-styles', get_template_directory_uri() . '/assets/css/main.min.css', [], LTDH_VERSION );
+	$theme_css_path = get_template_directory() . '/assets/css/main.min.css';
+	if ( file_exists( $theme_css_path ) ) {
+		$theme_version = filemtime( $theme_css_path );
+		wp_enqueue_style( 'ltdh-theme-styles', get_template_directory_uri() . '/assets/css/main.min.css', [], $theme_version );
 	}
 
 	$script_handle = 'ltdh-fallback-js';
