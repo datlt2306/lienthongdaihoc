@@ -46,13 +46,13 @@ $global_zalo = ltdh_get_zalo_url();
 				<!-- SECTION 2: PROGRAM OVERVIEW -->
 				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan chương trình</h2>
-					<div class="prose prose-slate max-w-none text-slate-600 text-sm md:text-base">
+					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 						<?php the_content(); ?>
 					</div>
 					<?php if ( $benefits ) : ?>
 						<div class="mt-6 bg-teal-50/50 p-4 rounded-lg border border-teal-100/50 mb-6">
 							<h3 class="text-teal-800 font-bold text-base mb-2">Quyền lợi nổi bật</h3>
-							<div class="prose prose-teal max-w-none text-slate-600 text-sm">
+							<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 								<?php echo wp_kses_post( $benefits ); ?>
 							</div>
 						</div>
@@ -113,7 +113,7 @@ $global_zalo = ltdh_get_zalo_url();
 				<?php if ( $requirements ) : ?>
 					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Điều kiện xét tuyển</h2>
-						<div class="prose prose-slate max-w-none text-slate-600 text-sm md:text-base">
+						<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 							<?php echo wp_kses_post( $requirements ); ?>
 						</div>
 					</section>
@@ -138,7 +138,7 @@ $global_zalo = ltdh_get_zalo_url();
 				<?php if ( $documents ) : ?>
 					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Hồ sơ xét tuyển cần thiết</h2>
-						<div class="prose prose-slate max-w-none text-slate-600 text-sm">
+						<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 							<?php echo wp_kses_post( $documents ); ?>
 						</div>
 					</section>

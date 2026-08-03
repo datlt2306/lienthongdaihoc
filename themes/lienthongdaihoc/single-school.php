@@ -134,7 +134,7 @@ $global_zalo = ltdh_get_zalo_url();
 				<!-- OVERVIEW -->
 				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Giới thiệu về trường</h2>
-					<div class="prose prose-slate max-w-none text-slate-600 text-sm md:text-base">
+					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 						<?php the_content(); ?>
 					</div>
 				</section>

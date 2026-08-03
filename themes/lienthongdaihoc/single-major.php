@@ -53,7 +53,7 @@ $hotline = ltdh_get_hotline();
 				<!-- OVERVIEW -->
 				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan về ngành</h2>
-					<div class="prose prose-slate max-w-none text-slate-600 text-sm md:text-base">
+					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 						<?php the_content(); ?>
 					</div>
 				</section>
@@ -62,7 +62,7 @@ $hotline = ltdh_get_hotline();
 				<?php if ( $career ) : ?>
 					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Cơ hội nghề nghiệp & Định hướng</h2>
-						<div class="prose prose-slate max-w-none text-slate-600 text-sm">
+						<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 							<?php echo wp_kses_post( $career ); ?>
 						</div>
 					</section>

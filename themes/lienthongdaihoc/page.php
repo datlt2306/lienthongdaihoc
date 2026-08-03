@@ -27,7 +27,7 @@ get_header();
 				<h1 class="text-2xl md:text-3xl font-black text-slate-900 mb-6 border-b border-slate-100 pb-4">
 					<?php the_title(); ?>
 				</h1>
-				<div class="prose prose-slate max-w-none text-slate-600 text-sm md:text-base">
+				<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 					<?php the_content(); ?>
 				</div>
 			</article>
