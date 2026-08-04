@@ -43,10 +43,49 @@ function ltdh_create_leads_table() {
 	dbDelta( $sql );
 }
 
+/**
+ * Check if the submission contains indicators of spam.
+ */
+function ltdh_is_spam_submission( array $data ): bool {
+	$name    = isset( $data['name'] ) ? $data['name'] : '';
+	$phone   = isset( $data['phone'] ) ? $data['phone'] : '';
+	$email   = isset( $data['email'] ) ? $data['email'] : '';
+	$message = isset( $data['message'] ) ? $data['message'] : '';
+
+	// 1. Check for Cyrillic (Russian/Ukrainian/etc.) characters in any field
+	if ( preg_match( '/[\p{Cyrillic}]/u', $name ) || 
+	     preg_match( '/[\p{Cyrillic}]/u', $phone ) || 
+	     preg_match( '/[\p{Cyrillic}]/u', $message ) ) {
+		return true;
+	}
+
+	// 2. Check for links/URLs in the message or name
+	if ( preg_match( '/https?:\/\//i', $message ) || preg_match( '/www\./i', $message ) ||
+	     preg_match( '/https?:\/\//i', $name ) || preg_match( '/www\./i', $name ) ) {
+		return true;
+	}
+
+	// 3. Validate Phone Number length and format (must start with 0, 84, or +84)
+	$clean_phone = preg_replace( '/[^\d+]/', '', $phone );
+	if ( ! empty( $phone ) ) {
+		if ( strlen( $clean_phone ) < 8 || strlen( $clean_phone ) > 15 ) {
+			return true;
+		}
+		if ( ! preg_match( '/^(0|\+84|84)/', $clean_phone ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 // ----------------------------------------------------
 // 2. Centralized Lead Insertion Function
 // ----------------------------------------------------
 function ltdh_insert_lead( array $data ): int {
+	if ( ltdh_is_spam_submission( $data ) ) {
+		return 0;
+	}
 	global $wpdb;
 	$table_name = $wpdb->prefix . LTDH_TABLE_LEADS;
 
@@ -246,12 +285,20 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 // ----------------------------------------------------
 add_action( 'wpcf7_before_send_mail', 'ltdh_capture_cf7_lead', 10, 3 );
 
+
 function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	$posted_data = $submission->get_posted_data();
 
-	$name  = isset( $posted_data['your-name'] ) ? sanitize_text_field( $posted_data['your-name'] ) : '';
-	$phone = isset( $posted_data['your-phone'] ) ? sanitize_text_field( $posted_data['your-phone'] ) : '';
-	$email = isset( $posted_data['your-email'] ) ? sanitize_email( $posted_data['your-email'] ) : '';
+	$name    = isset( $posted_data['your-name'] ) ? sanitize_text_field( $posted_data['your-name'] ) : '';
+	$phone   = isset( $posted_data['your-phone'] ) ? sanitize_text_field( $posted_data['your-phone'] ) : '';
+	$email   = isset( $posted_data['your-email'] ) ? sanitize_email( $posted_data['your-email'] ) : '';
+	$message = isset( $posted_data['your-message'] ) ? sanitize_textarea_field( $posted_data['your-message'] ) : '';
+
+	// Perform spam check
+	if ( ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $message ] ) ) {
+		$abort = true;
+		return;
+	}
 
 	if ( empty( $name ) || empty( $phone ) ) {
 		return;
@@ -274,6 +321,7 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 		'school_id'       => $school_id,
 		'major_id'        => $major_id,
 		'referral_source' => $referral_source,
+		'message'         => $message,
 	] );
 }
 
@@ -291,10 +339,15 @@ function ltdh_handle_native_form_submit() {
 		return;
 	}
 
-	$name  = sanitize_text_field( wp_unslash( $_POST['your-name'] ) );
-	$phone = sanitize_text_field( wp_unslash( $_POST['your-phone'] ) );
-	$email = isset( $_POST['your-email'] ) ? sanitize_email( wp_unslash( $_POST['your-email'] ) ) : '';
+	$name    = sanitize_text_field( wp_unslash( $_POST['your-name'] ) );
+	$phone   = sanitize_text_field( wp_unslash( $_POST['your-phone'] ) );
+	$email   = isset( $_POST['your-email'] ) ? sanitize_email( wp_unslash( $_POST['your-email'] ) ) : '';
 	$message = isset( $_POST['your-message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['your-message'] ) ) : '';
+
+	// Perform spam check
+	if ( ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $message ] ) ) {
+		wp_die( 'Yêu cầu của bạn bị chặn do nghi ngờ spam. Vui lòng liên hệ hotline.', 'Spam Blocked', [ 'response' => 403 ] );
+	}
 
 	if ( empty( $name ) || empty( $phone ) ) {
 		return;
