@@ -485,7 +485,7 @@ function ltdh_get_cached_featured_schools() {
 				'logo_id'       => $logo_id,
 				'en_name'       => $en_name,
 				'systems_label' => $systems_label,
-				'prog_count'    => count($school_progs),
+				'prog_count'    => ltdh_get_school_unique_majors_count($school_id),
 			];
 			$index++;
 		}

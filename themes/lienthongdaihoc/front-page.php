@@ -56,20 +56,13 @@ $zalo    = ltdh_get_zalo_url();
 							<a href="<?php echo esc_url($slide['link']); ?>" class="block w-full h-full">
 						<?php endif; ?>
 						
-						<div class="relative w-full aspect-[16/9] md:aspect-[21/7] lg:aspect-[21/6.5] max-h-[800px] overflow-hidden bg-[#f8fafc]" style="max-height: 800px;">
-							<!-- Blurred Background Shadow (Desktop and Mobile adaptive) -->
-							<div class="absolute inset-0 bg-cover bg-center scale-125 opacity-80 pointer-events-none hidden md:block" style="background-image: url('<?php echo esc_url($slide['image']); ?>'); filter: blur(100px); transform: scale(1.2);"></div>
-							<?php 
-							$mobile_bg = !empty($slide['image_mobile']) ? $slide['image_mobile'] : $slide['image'];
-							?>
-							<div class="absolute inset-0 bg-cover bg-center scale-125 opacity-80 pointer-events-none md:hidden" style="background-image: url('<?php echo esc_url($mobile_bg); ?>'); filter: blur(80px); transform: scale(1.2);"></div>
-							
-							<!-- Main Banner Image (Contain with <picture> for responsive loading) -->
-							<picture class="relative z-10 flex w-full h-full items-center justify-center">
+						<div class="relative w-full h-[500px] md:h-[600px] lg:h-[800px] overflow-hidden bg-[#f8fafc]">
+							<!-- Main Banner Image -->
+							<picture class="relative z-10 flex w-full h-full">
 								<?php if (!empty($slide['image_mobile'])) : ?>
 									<source media="(max-width: 768px)" srcset="<?php echo esc_url($slide['image_mobile']); ?>">
 								<?php endif; ?>
-								<img src="<?php echo esc_url($slide['image']); ?>" alt="Banner Hero" class="h-full w-auto max-w-full object-contain pointer-events-none" loading="eager" decoding="async">
+								<img src="<?php echo esc_url($slide['image']); ?>" alt="Banner Hero" class="w-full h-full object-cover object-center pointer-events-none" loading="eager" decoding="async">
 							</picture>
 						</div>
 

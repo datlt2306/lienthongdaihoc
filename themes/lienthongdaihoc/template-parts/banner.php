@@ -115,7 +115,7 @@ if ( empty( $banner_image ) ) {
 }
 ?>
 
-	<section class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white py-14 md:py-20 overflow-hidden">
+	<section class="relative w-full bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white py-14 md:py-20 overflow-hidden">
 	<?php if ( ! empty( $banner_image ) ) : ?>
 		<!-- Banner Background Image with Overlay -->
 		<div class="absolute inset-0 z-0">
