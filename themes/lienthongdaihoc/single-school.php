@@ -97,17 +97,16 @@ $global_zalo = ltdh_get_zalo_url();
 </style>
 
 <main id="primary" class="site-main bg-slate-50">
-	<?php 
-	$banner_image = get_field( 'school_banner', $school_id ) ?: get_the_post_thumbnail_url( $school_id, 'full' );
-	if ( $banner_image ) : 
-	?>
-		<!-- School Cover/Banner Image full width -->
-		<div class="w-full h-48 sm:h-64 md:h-80 lg:h-96 overflow-hidden mb-6 shadow-sm border-b border-slate-100 bg-slate-200">
-			<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center" alt="<?php the_title_attribute(); ?>">
-		</div>
-	<?php endif; ?>
-
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+		<?php 
+		$banner_image = get_field( 'school_banner', $school_id ) ?: get_the_post_thumbnail_url( $school_id, 'full' );
+		if ( $banner_image ) : 
+		?>
+			<!-- School Cover/Banner Image inside container -->
+			<div class="w-full h-48 sm:h-64 md:h-80 lg:h-96 rounded-2xl overflow-hidden mb-6 shadow-sm border border-slate-100 bg-slate-200">
+				<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center" alt="<?php the_title_attribute(); ?>">
+			</div>
+		<?php endif; ?>
 		
 		<!-- HERO SECTION -->
 		<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
