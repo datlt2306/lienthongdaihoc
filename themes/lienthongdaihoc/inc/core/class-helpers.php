@@ -676,7 +676,7 @@ function ltdh_get_training_type_badge_html( string $type_name ): string {
 /**
  * Get dynamic program tuition display with fallback.
  */
-function ltdh_get_program_tuition_display(int $program_id): string {
+function ltdh_get_program_tuition_display(int $program_id, bool $include_year = false): string {
 	$amount        = get_field('tuition_amount', $program_id);
 	$unit          = get_field('tuition_unit', $program_id);
 	$academic_year = get_field('tuition_academic_year', $program_id);
@@ -684,15 +684,15 @@ function ltdh_get_program_tuition_display(int $program_id): string {
 	if (! empty($amount)) {
 		$unit_label = 'đ';
 		if ($unit === 'tin-chi') {
-			$unit_label = ' đ / tín chỉ';
+			$unit_label = 'đ/tín chỉ';
 		} elseif ($unit === 'hoc-ky') {
-			$unit_label = ' đ / học kỳ';
+			$unit_label = 'đ/học kỳ';
 		} elseif ($unit === 'nam') {
-			$unit_label = ' đ / năm';
+			$unit_label = 'đ/năm';
 		}
 		
-		$year_suffix = ! empty($academic_year) ? ' (Năm học: ' . $academic_year . ')' : '';
-		return number_format((float) $amount, 0, ',', '.') . $unit_label . $year_suffix;
+		$year_suffix = ($include_year && ! empty($academic_year)) ? ' · ' . $academic_year : '';
+		return number_format((float) $amount, 0, ',', '.') . ' ' . $unit_label . $year_suffix;
 	}
 
 	// Fallback to original tuition_fee
@@ -704,18 +704,18 @@ function ltdh_get_program_tuition_display(int $program_id): string {
  * Get dynamic admission deadline display based on batches or enrollment_period.
  */
 function ltdh_get_program_admission_deadline_display(int $program_id): string {
-	if (have_rows('admission_batches', $program_id)) {
-		$batches = [];
-		while (have_rows('admission_batches', $program_id)) {
-			the_row();
-			$status             = get_sub_field('batch_status');
-			$batch_name         = get_sub_field('batch_name');
-			$application_period = get_sub_field('application_period');
+	$batches = get_field('admission_batches', $program_id);
+	if (is_array($batches) && ! empty($batches)) {
+		$sap_mo_batches = [];
+		foreach ($batches as $b) {
+			$status             = $b['batch_status'] ?? '';
+			$batch_name         = $b['batch_name'] ?? '';
+			$application_period = $b['application_period'] ?? '';
 			
 			if ($status === 'dang-nhan') {
 				return esc_html($batch_name) . ': ' . esc_html($application_period);
 			}
-			$batches[] = [
+			$sap_mo_batches[] = [
 				'status' => $status,
 				'name'   => $batch_name,
 				'period' => $application_period,
@@ -723,7 +723,7 @@ function ltdh_get_program_admission_deadline_display(int $program_id): string {
 		}
 		
 		// If no batch is active, try to find a "sap-mo" batch
-		foreach ($batches as $b) {
+		foreach ($sap_mo_batches as $b) {
 			if ($b['status'] === 'sap-mo') {
 				return esc_html($b['name']) . ' (Sắp mở): ' . esc_html($b['period']);
 			}

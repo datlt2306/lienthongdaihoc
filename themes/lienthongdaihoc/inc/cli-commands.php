@@ -706,6 +706,28 @@ class LTDH_CLI_Commands {
 		update_post_meta( $major_id, LTDH_META_ADMISSION_STATUS, LTDH_STATUS_OPEN );
 		wp_set_object_terms( $major_id, 'ky-thuat-cong-nghe', 'major_cat' );
 
+		// Cleanup legacy/duplicate UTC IT programs if any exist
+		$valid_slugs = [
+			'cu-nhan-cong-nghe-thong-tin-vua-hoc-vua-lam-vua-hoc-vua-lam-utc',
+			'cu-nhan-cong-nghe-thong-tin-lien-thong-chinh-quy-chinh-quy-utc',
+			'cu-nhan-cong-nghe-thong-tin-dao-tao-tu-xa-tu-xa-utc',
+		];
+		$all_utc_programs = get_posts( [
+			'post_type'      => LTDH_CPT_PROGRAM,
+			'posts_per_page' => -1,
+			'meta_query'     => [
+				[
+					'key'   => LTDH_META_SCHOOL_REL,
+					'value' => $school_id,
+				],
+			],
+		] );
+		foreach ( $all_utc_programs as $old_p ) {
+			if ( ! in_array( $old_p->post_name, $valid_slugs, true ) ) {
+				wp_delete_post( $old_p->ID, true );
+			}
+		}
+
 		// 3. Seed Programs for the 3 training types
 		$programs_data = [
 			'vua-hoc-vua-lam' => [
@@ -714,6 +736,8 @@ class LTDH_CLI_Commands {
 				'tuition_amount' => 684026,
 				'tuition_unit' => 'tin-chi',
 				'tuition_year' => '2025 - 2026',
+				'total_credits' => 136,
+				'increase_roadmap' => 'Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước và lộ trình của nhà trường (tăng không quá 10%/năm).',
 				'duration' => '2.0 năm',
 				'quota' => 200,
 				'schedule' => 'Tối thứ 2 - thứ 6 hoặc Thứ 7 & Chủ nhật',
@@ -721,8 +745,8 @@ class LTDH_CLI_Commands {
 				'advantages' => 'Vừa học vừa đi làm tích lũy kinh nghiệm thực tế, lịch học linh hoạt ngoài giờ hành chính.',
 				'disadvantages' => 'Yêu cầu thời gian cam kết học tập đều đặn vào buổi tối hoặc cuối tuần.',
 				'batches' => [
-					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'application_period' => '20/04/2026 - 15/06/2026', 'evaluation_time' => 'Tháng 6/2026', 'enrollment_time' => 'Tháng 7/2026', 'batch_status' => 'dang-nhan' ],
-					[ 'batch_name' => 'Tuyển sinh Đợt 2', 'application_period' => '20/08/2026 - 15/09/2026', 'evaluation_time' => 'Tháng 9/2026', 'enrollment_time' => 'Tháng 10/2026', 'batch_status' => 'sap-mo' ]
+					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'release_period' => '20/04/2026 - 15/06/2026', 'application_period' => '20/04/2026 - 15/06/2026', 'review_time' => '-', 'evaluation_time' => 'Tháng 6/2026', 'enrollment_time' => 'Tháng 7/2026', 'batch_status' => 'dang-nhan' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 2', 'release_period' => '20/08/2026 - 15/09/2026', 'application_period' => '20/08/2026 - 15/09/2026', 'review_time' => '-', 'evaluation_time' => 'Tháng 9/2026', 'enrollment_time' => 'Tháng 10/2026', 'batch_status' => 'sap-mo' ]
 				]
 			],
 			'chinh-quy' => [
@@ -731,6 +755,8 @@ class LTDH_CLI_Commands {
 				'tuition_amount' => 526174,
 				'tuition_unit' => 'tin-chi',
 				'tuition_year' => '2025 - 2026',
+				'total_credits' => 136,
+				'increase_roadmap' => 'Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước và lộ trình của nhà trường (tăng không quá 10%/năm).',
 				'duration' => '2.0 năm',
 				'quota' => 700,
 				'schedule' => 'Học ban ngày tại giảng đường',
@@ -738,9 +764,33 @@ class LTDH_CLI_Commands {
 				'advantages' => 'Bằng đại học chính quy danh giá, môi trường học tập tập trung chuyên sâu.',
 				'disadvantages' => 'Lịch học ban ngày cố định, khó sắp xếp đi làm thêm.',
 				'batches' => [
-					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'application_period' => '22/12/2025 - 07/01/2026', 'evaluation_time' => 'Xét tuyển 09-14/01/2026', 'enrollment_time' => 'Thi tuyển 17-18/01/2026', 'batch_status' => 'da-dong' ],
-					[ 'batch_name' => 'Tuyển sinh Đợt 2', 'application_period' => '25/03/2026 - 18/05/2026', 'evaluation_time' => 'Xét tuyển 01-04/06/2026', 'enrollment_time' => 'Thi tuyển 06-07/06/2026', 'batch_status' => 'dang-nhan' ],
-					[ 'batch_name' => 'Tuyển sinh Đợt 3', 'application_period' => '07/07/2026 - 14/08/2026', 'evaluation_time' => 'Xét tuyển 07-09/09/2026', 'enrollment_time' => 'Thi tuyển 12-13/09/2026', 'batch_status' => 'sap-mo' ]
+					[ 
+						'batch_name' => 'Tuyển sinh Đợt 1',
+						'release_period' => '19/12/2025 - 05/01/2026',
+						'application_period' => '22/12/2025 - 07/01/2026',
+						'review_time' => 'Dự kiến từ 25/12/2025',
+						'evaluation_time' => 'Xét tuyển 09-14/01/2026',
+						'enrollment_time' => 'Thi tuyển 17-18/01/2026',
+						'batch_status' => 'da-dong'
+					],
+					[
+						'batch_name' => 'Tuyển sinh Đợt 2',
+						'release_period' => '24/03/2026 - 13/05/2026',
+						'application_period' => '25/03/2026 - 18/05/2026',
+						'review_time' => 'Dự kiến từ 12/04/2026',
+						'evaluation_time' => 'Xét tuyển 01-04/06/2026',
+						'enrollment_time' => 'Thi tuyển 06-07/06/2026',
+						'batch_status' => 'dang-nhan'
+					],
+					[
+						'batch_name' => 'Tuyển sinh Đợt 3 (Bổ sung)',
+						'release_period' => '06/07/2026 - 13/08/2026',
+						'application_period' => '07/07/2026 - 14/08/2026',
+						'review_time' => 'Dự kiến từ 12/07/2026',
+						'evaluation_time' => 'Xét tuyển 07-09/09/2026',
+						'enrollment_time' => 'Thi tuyển 12-13/09/2026',
+						'batch_status' => 'sap-mo'
+					]
 				]
 			],
 			'tu-xa' => [
@@ -749,6 +799,8 @@ class LTDH_CLI_Commands {
 				'tuition_amount' => 606369,
 				'tuition_unit' => 'tin-chi',
 				'tuition_year' => '2025 - 2026',
+				'total_credits' => 136,
+				'increase_roadmap' => 'Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước và lộ trình của nhà trường (tăng không quá 10%/năm).',
 				'duration' => 'Tối thiểu 1.5 năm',
 				'quota' => 800,
 				'schedule' => 'Học trực tuyến (E-learning) 100% linh hoạt',
@@ -756,10 +808,10 @@ class LTDH_CLI_Commands {
 				'advantages' => 'Tự chủ thời gian và không gian học tập, phôi bằng tốt nghiệp không ghi hình thức đào tạo.',
 				'disadvantages' => 'Đòi hỏi tính tự kỷ luật và chủ động cao trong tự học.',
 				'batches' => [
-					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'application_period' => 'Liên tục trong năm', 'evaluation_time' => 'Xét tuyển tháng 3/2026', 'enrollment_time' => 'Khai giảng tháng 4/2026', 'batch_status' => 'da-dong' ],
-					[ 'batch_name' => 'Tuyển sinh Đợt 2', 'application_period' => 'Liên tục trong năm', 'evaluation_time' => 'Xét tuyển tháng 5/2026', 'enrollment_time' => 'Khai giảng tháng 6/2026', 'batch_status' => 'da-dong' ],
-					[ 'batch_name' => 'Tuyển sinh Đợt 3', 'application_period' => 'Liên tục trong năm', 'evaluation_time' => 'Xét tuyển tháng 8/2026', 'enrollment_time' => 'Khai giảng tháng 9/2026', 'batch_status' => 'dang-nhan' ],
-					[ 'batch_name' => 'Tuyển sinh Đợt 4', 'application_period' => 'Liên tục trong năm', 'evaluation_time' => 'Xét tuyển tháng 11/2026', 'enrollment_time' => 'Khai giảng tháng 12/2026', 'batch_status' => 'sap-mo' ]
+					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'release_period' => '-', 'application_period' => 'Liên tục trong năm', 'review_time' => '-', 'evaluation_time' => 'Xét tuyển tháng 3/2026', 'enrollment_time' => 'Khai giảng tháng 4/2026', 'batch_status' => 'da-dong' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 2', 'release_period' => '-', 'application_period' => 'Liên tục trong năm', 'review_time' => '-', 'evaluation_time' => 'Xét tuyển tháng 5/2026', 'enrollment_time' => 'Khai giảng tháng 6/2026', 'batch_status' => 'da-dong' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 3', 'release_period' => '-', 'application_period' => 'Liên tục trong năm', 'review_time' => '-', 'evaluation_time' => 'Xét tuyển tháng 8/2026', 'enrollment_time' => 'Khai giảng tháng 9/2026', 'batch_status' => 'dang-nhan' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 4', 'release_period' => '-', 'application_period' => 'Liên tục trong năm', 'review_time' => '-', 'evaluation_time' => 'Xét tuyển tháng 11/2026', 'enrollment_time' => 'Khai giảng tháng 12/2026', 'batch_status' => 'sap-mo' ]
 				]
 			]
 		];
@@ -800,6 +852,8 @@ class LTDH_CLI_Commands {
 			update_post_meta( $program_id, 'tuition_amount', $p_info['tuition_amount'] );
 			update_post_meta( $program_id, 'tuition_unit', $p_info['tuition_unit'] );
 			update_post_meta( $program_id, 'tuition_academic_year', $p_info['tuition_year'] );
+			update_post_meta( $program_id, 'tuition_total_credits', $p_info['total_credits'] );
+			update_post_meta( $program_id, 'tuition_increase_roadmap', $p_info['increase_roadmap'] );
 			update_post_meta( $program_id, 'quota', $p_info['quota'] );
 			update_post_meta( $program_id, LTDH_META_DURATION, $p_info['duration'] );
 			update_post_meta( $program_id, 'campus_info', 'Hà Nội' );
@@ -820,28 +874,39 @@ class LTDH_CLI_Commands {
 			update_post_meta( $program_id, 'admission_batches', count( $p_info['batches'] ) );
 			foreach ( $p_info['batches'] as $index => $batch ) {
 				update_post_meta( $program_id, "admission_batches_{$index}_batch_name", $batch['batch_name'] );
+				update_post_meta( $program_id, "admission_batches_{$index}_release_period", $batch['release_period'] ?? '' );
 				update_post_meta( $program_id, "admission_batches_{$index}_application_period", $batch['application_period'] );
+				update_post_meta( $program_id, "admission_batches_{$index}_review_time", $batch['review_time'] ?? '' );
 				update_post_meta( $program_id, "admission_batches_{$index}_evaluation_time", $batch['evaluation_time'] );
 				update_post_meta( $program_id, "admission_batches_{$index}_enrollment_time", $batch['enrollment_time'] );
 				update_post_meta( $program_id, "admission_batches_{$index}_batch_status", $batch['batch_status'] );
 				
 				// ACF subfields mapping keys (optional but helpful)
 				update_post_meta( $program_id, "_admission_batches_{$index}_batch_name", 'field_program_batch_name' );
+				update_post_meta( $program_id, "_admission_batches_{$index}_release_period", 'field_program_batch_release_period' );
 				update_post_meta( $program_id, "_admission_batches_{$index}_application_period", 'field_program_batch_application_period' );
+				update_post_meta( $program_id, "_admission_batches_{$index}_review_time", 'field_program_batch_review_time' );
 				update_post_meta( $program_id, "_admission_batches_{$index}_evaluation_time", 'field_program_batch_evaluation_time' );
 				update_post_meta( $program_id, "_admission_batches_{$index}_enrollment_time", 'field_program_batch_enrollment_time' );
 				update_post_meta( $program_id, "_admission_batches_{$index}_batch_status", 'field_program_batch_status' );
 			}
 			update_post_meta( $program_id, '_admission_batches', 'field_program_admission_batches' );
 
+			$faq_question = 'Học hệ từ xa có giá trị tương đương hệ chính quy không?';
+			if ( $t_slug === 'vua-hoc-vua-lam' ) {
+				$faq_question = 'Học hệ vừa học vừa làm có giá trị tương đương hệ chính quy không?';
+			} elseif ( $t_slug === 'chinh-quy' ) {
+				$faq_question = 'Bằng liên thông chính quy khác gì bằng đại học chính quy 4 năm?';
+			}
+
 			$faqs = [
-				[ 'question' => 'Học hệ từ xa có giá trị tương đương hệ chính quy không?', 'answer' => 'Có. Theo Thông tư của Bộ GD&ĐT, từ ngày 01/03/2020 trên văn bằng tốt nghiệp Đại học không ghi hình thức đào tạo (Chính quy, Từ xa, hay Vừa học vừa làm), giá trị pháp lý là hoàn toàn như nhau.' ],
+				[ 'question' => $faq_question, 'answer' => 'Có. Theo Thông tư của Bộ GD&ĐT, từ ngày 01/03/2020 trên văn bằng tốt nghiệp Đại học không ghi hình thức đào tạo (Chính quy, Từ xa, hay Vừa học vừa làm), giá trị pháp lý là hoàn toàn như nhau.' ],
 				[ 'question' => 'Thời gian đào tạo tối đa là bao lâu?', 'answer' => 'Thời gian đào tạo tiêu chuẩn là từ 1.5 đến 4 năm tùy thuộc văn bằng đầu vào của học viên (Liên thông, văn bằng 2 hoặc tốt nghiệp THPT).' ]
 			];
 			update_post_meta( $program_id, 'faq', $faqs );
 
 			// Set eligibility criteria
-			$elig_min_edu = ( $t_slug === 'tu-xa' || $t_slug === 'vua-hoc-vua-lam' ) ? 'thap-phan' : 'thap-phan';
+			$elig_min_edu = ( $t_slug === 'tu-xa' || $t_slug === 'vua-hoc-vua-lam' ) ? 'thap-phan' : 'cao-dang';
 			update_post_meta( $program_id, 'elig_min_education', $elig_min_edu );
 			update_post_meta( $program_id, 'elig_training_types', [ $t_slug ] );
 			update_post_meta( $program_id, 'elig_campuses', [ 'ha-noi' ] );

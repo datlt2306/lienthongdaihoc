@@ -294,22 +294,36 @@
                         "placeholder": "Ví dụ: Đợt 1"
                     },
                     {
+                        "key": "field_program_batch_release_period",
+                        "label": "Phát hành hồ sơ",
+                        "name": "release_period",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Từ 19/12/2025 đến 05/01/2026"
+                    },
+                    {
                         "key": "field_program_batch_application_period",
-                        "label": "Thời gian nhận hồ sơ",
+                        "label": "Nhận hồ sơ",
                         "name": "application_period",
                         "type": "text",
-                        "placeholder": "Ví dụ: Từ 20/04 đến 15/06/2026"
+                        "placeholder": "Ví dụ: Từ 22/12/2025 đến 07/01/2026"
+                    },
+                    {
+                        "key": "field_program_batch_review_time",
+                        "label": "Thời gian ôn tập",
+                        "name": "review_time",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Dự kiến từ 25/12/2025"
                     },
                     {
                         "key": "field_program_batch_evaluation_time",
-                        "label": "Thời gian xét tuyển",
+                        "label": "Thời gian xét tuyển / Thi tuyển",
                         "name": "evaluation_time",
                         "type": "text",
-                        "placeholder": "Ví dụ: Tháng 6/2026"
+                        "placeholder": "Ví dụ: Thi tuyển 17-18/01/2026"
                     },
                     {
                         "key": "field_program_batch_enrollment_time",
-                        "label": "Thời gian nhập học",
+                        "label": "Thời gian nhập học / Thi tuyển",
                         "name": "enrollment_time",
                         "type": "text",
                         "placeholder": "Ví dụ: Tháng 7/2026"

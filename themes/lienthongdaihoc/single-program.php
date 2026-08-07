@@ -93,27 +93,178 @@ $global_zalo = ltdh_get_zalo_url();
 						</div>
 					</div>
 
-					<?php if ( have_rows( 'admission_batches', $program_id ) ) : ?>
-						<div class="mt-6 pt-6 border-t border-slate-100 space-y-4">
-							<h3 class="font-bold text-slate-800 text-sm tracking-wider uppercase">Lịch trình các đợt tuyển sinh</h3>
-							<div class="overflow-x-auto rounded-xl border border-slate-200">
-								<table class="w-full text-sm text-left text-slate-500">
-									<thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+					<?php 
+					$batches_data = get_field( 'admission_batches', $program_id );
+					if ( ! empty( $batches_data ) && is_array( $batches_data ) ) : 
+						$has_release = false;
+						$has_app     = false;
+						$has_review  = false;
+						$has_eval    = false;
+
+						foreach ( $batches_data as $b_item ) {
+							$rel = trim( $b_item['release_period'] ?? '' );
+							$app = trim( $b_item['application_period'] ?? '' );
+							$rev = trim( $b_item['review_time'] ?? '' );
+							$ev1 = trim( $b_item['evaluation_time'] ?? '' );
+							$ev2 = trim( $b_item['enrollment_time'] ?? '' );
+
+							if ( $rel !== '' && $rel !== '-' ) {
+								$has_release = true;
+							}
+							if ( $app !== '' && $app !== '-' ) {
+								$has_app = true;
+							}
+							if ( $rev !== '' && $rev !== '-' ) {
+								$has_review = true;
+							}
+							if ( ( $ev1 !== '' && $ev1 !== '-' ) || ( $ev2 !== '' && $ev2 !== '-' ) ) {
+								$has_eval = true;
+							}
+						}
+					?>
+						<div class="mt-6 pt-6 border-t border-slate-100 space-y-3">
+							<h3 class="font-bold text-slate-800 text-xs tracking-wider uppercase">Lịch trình các đợt tuyển sinh</h3>
+
+							<!-- MOBILE TABBED CARD VIEW (< 768px) -->
+							<div class="block md:hidden admission-batches-mobile">
+								<!-- iOS Segmented Control Tab Navigation -->
+								<div class="bg-slate-100 p-1 rounded-xl flex items-center justify-between gap-1 mb-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+									<?php foreach ( $batches_data as $b_idx => $b_item ) :
+										$raw_name = $b_item['batch_name'] ?? '';
+										// Shorten batch name for tabs: "Tuyển sinh Đợt 1" -> "Đợt 1", "Tuyển sinh Đợt 3 (Bổ sung)" -> "Đợt 3"
+										$short_name = $raw_name;
+										if ( preg_match( '/Đợt\s*\d+/i', $raw_name, $matches ) ) {
+											$short_name = $matches[0];
+										} elseif ( empty( $short_name ) ) {
+											$short_name = 'Đợt ' . ( $b_idx + 1 );
+										}
+
+										$b_status  = $b_item['batch_status'] ?? '';
+										$is_active = ( $b_idx === 0 );
+										$tab_badge = '';
+										if ( 'dang-nhan' === $b_status ) {
+											$tab_badge = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-0.5 inline-block"></span>';
+										}
+									?>
+										<button type="button" 
+											onclick="ltdhSwitchBatchTab(this, <?php echo (int) $b_idx; ?>)"
+											class="ltdh-batch-tab-btn flex-1 py-2 px-3 text-xs rounded-lg transition-all text-center flex items-center justify-center gap-1 shrink-0 whitespace-nowrap outline-none focus:outline-none focus:ring-0 focus-visible:outline-none border-0 <?php echo $is_active ? 'bg-[#00308b] text-white font-bold shadow-xs' : 'bg-transparent text-slate-600 font-medium hover:text-slate-900'; ?>">
+											<span><?php echo esc_html( $short_name ); ?></span>
+											<?php echo $tab_badge; ?>
+										</button>
+									<?php endforeach; ?>
+								</div>
+
+								<!-- Tab Content Cards -->
+								<?php foreach ( $batches_data as $b_idx => $b_item ) :
+									$batch_name     = $b_item['batch_name'] ?? '';
+									$release_period = $b_item['release_period'] ?? '';
+									$app_period     = $b_item['application_period'] ?? '';
+									$review_time    = $b_item['review_time'] ?? '';
+									$eval_time      = $b_item['evaluation_time'] ?? '';
+									$enrol_time     = $b_item['enrollment_time'] ?? '';
+									$status         = $b_item['batch_status'] ?? 'dang-nhan';
+									
+									$status_label = 'Đang nhận hồ sơ';
+									$status_class = 'bg-green-50 text-green-700 border-green-200';
+									if ( $status === 'sap-mo' ) {
+										$status_label = 'Sắp mở';
+										$status_class = 'bg-amber-50 text-amber-700 border-amber-200';
+									} elseif ( $status === 'da-dong' ) {
+										$status_label = 'Đã đóng';
+										$status_class = 'bg-slate-100 text-slate-600 border-slate-200';
+									}
+
+									$eval_dates = array_filter([ $eval_time, $enrol_time ], function( $v ) {
+										$v_clean = trim( $v );
+										return $v_clean !== '' && $v_clean !== '-';
+									});
+									$eval_display = ! empty( $eval_dates ) ? implode(' | ', $eval_dates) : '';
+									$is_hidden = ( $b_idx !== 0 );
+								?>
+									<div class="ltdh-batch-tab-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3 <?php echo $is_hidden ? 'hidden' : ''; ?>" data-batch-card="<?php echo (int) $b_idx; ?>">
+										<div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+											<span class="font-extrabold text-slate-900 text-sm"><?php echo esc_html( $batch_name ); ?></span>
+											<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border <?php echo esc_attr( $status_class ); ?>">
+												<?php echo esc_html( $status_label ); ?>
+											</span>
+										</div>
+
+										<div class="space-y-3 pt-0.5">
+											<?php if ( ! empty( $release_period ) && $release_period !== '-' ) : ?>
+												<div class="flex items-start gap-2.5">
+													<div class="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 shrink-0"></div>
+													<div class="flex-1 min-w-0">
+														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phát hành hồ sơ</div>
+														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $release_period ); ?></div>
+													</div>
+												</div>
+											<?php endif; ?>
+
+											<?php if ( ! empty( $app_period ) && $app_period !== '-' ) : ?>
+												<div class="flex items-start gap-2.5">
+													<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+													<div class="flex-1 min-w-0">
+														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hạn nhận hồ sơ</div>
+														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $app_period ); ?></div>
+													</div>
+												</div>
+											<?php endif; ?>
+
+											<?php if ( ! empty( $review_time ) && $review_time !== '-' ) : ?>
+												<div class="flex items-start gap-2.5">
+													<div class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></div>
+													<div class="flex-1 min-w-0">
+														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Thời gian ôn tập</div>
+														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $review_time ); ?></div>
+													</div>
+												</div>
+											<?php endif; ?>
+
+											<?php if ( ! empty( $eval_display ) ) : ?>
+												<div class="flex items-start gap-2.5 pt-1.5 border-t border-slate-100">
+													<div class="w-1.5 h-1.5 rounded-full bg-indigo-600 mt-1.5 shrink-0"></div>
+													<div class="flex-1 min-w-0">
+														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Xét tuyển / Thi tuyển</div>
+														<div class="text-xs font-bold text-[#00308b] mt-0.5"><?php echo esc_html( $eval_display ); ?></div>
+													</div>
+												</div>
+											<?php endif; ?>
+										</div>
+									</div>
+								<?php endforeach; ?>
+							</div>
+
+							<!-- DESKTOP DATA TABLE VIEW (>= 768px) -->
+							<div class="hidden md:block rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs">
+								<table class="w-full text-xs text-left text-slate-500">
+									<thead class="text-[11px] text-slate-700 uppercase bg-slate-50/90 border-b border-slate-200/80">
 										<tr>
-											<th scope="col" class="px-4 py-3 font-extrabold">Đợt tuyển sinh</th>
-											<th scope="col" class="px-4 py-3 font-extrabold">Hạn nhận hồ sơ</th>
-											<th scope="col" class="px-4 py-3 font-extrabold">Xét tuyển</th>
-											<th scope="col" class="px-4 py-3 font-extrabold">Nhập học</th>
-											<th scope="col" class="px-4 py-3 font-extrabold">Trạng thái</th>
+											<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Đợt tuyển sinh</th>
+											<?php if ( $has_release ) : ?>
+												<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Phát hành hồ sơ</th>
+											<?php endif; ?>
+											<?php if ( $has_app ) : ?>
+												<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Nhận hồ sơ</th>
+											<?php endif; ?>
+											<?php if ( $has_review ) : ?>
+												<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Thời gian ôn tập</th>
+											<?php endif; ?>
+											<?php if ( $has_eval ) : ?>
+												<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Xét tuyển / Thi tuyển</th>
+											<?php endif; ?>
+											<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap text-right">Trạng thái</th>
 										</tr>
 									</thead>
-									<tbody>
-										<?php while ( have_rows( 'admission_batches', $program_id ) ) : the_row();
-											$batch_name = get_sub_field( 'batch_name' );
-											$app_period = get_sub_field( 'application_period' );
-											$eval_time  = get_sub_field( 'evaluation_time' );
-											$enrol_time = get_sub_field( 'enrollment_time' );
-											$status     = get_sub_field( 'batch_status' );
+									<tbody class="divide-y divide-slate-100">
+										<?php foreach ( $batches_data as $b_item ) :
+											$batch_name     = $b_item['batch_name'] ?? '';
+											$release_period = $b_item['release_period'] ?? '';
+											$app_period     = $b_item['application_period'] ?? '';
+											$review_time    = $b_item['review_time'] ?? '';
+											$eval_time      = $b_item['evaluation_time'] ?? '';
+											$enrol_time     = $b_item['enrollment_time'] ?? '';
+											$status         = $b_item['batch_status'] ?? 'dang-nhan';
 											
 											$status_label = 'Đang nhận hồ sơ';
 											$status_class = 'bg-green-50 text-green-700 border-green-200';
@@ -125,22 +276,71 @@ $global_zalo = ltdh_get_zalo_url();
 												$status_class = 'bg-slate-100 text-slate-600 border-slate-200';
 											}
 										?>
-											<tr class="bg-white border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
-												<td class="px-4 py-3.5 font-bold text-slate-900"><?php echo esc_html( $batch_name ); ?></td>
-												<td class="px-4 py-3.5 text-slate-600"><?php echo esc_html( $app_period ); ?></td>
-												<td class="px-4 py-3.5 text-slate-500"><?php echo esc_html( $eval_time ); ?></td>
-												<td class="px-4 py-3.5 text-slate-500"><?php echo esc_html( $enrol_time ); ?></td>
-												<td class="px-4 py-3.5">
-													<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border <?php echo esc_attr( $status_class ); ?>">
+											<tr class="bg-white hover:bg-slate-50/60 transition-colors">
+												<td class="px-3 py-2.5 font-bold text-slate-900 whitespace-nowrap"><?php echo esc_html( $batch_name ); ?></td>
+												<?php if ( $has_release ) : ?>
+													<td class="px-3 py-2.5 text-slate-600 whitespace-nowrap"><?php echo esc_html( $release_period ?: '-' ); ?></td>
+												<?php endif; ?>
+												<?php if ( $has_app ) : ?>
+													<td class="px-3 py-2.5 text-slate-600 whitespace-nowrap"><?php echo esc_html( $app_period ?: '-' ); ?></td>
+												<?php endif; ?>
+												<?php if ( $has_review ) : ?>
+													<td class="px-3 py-2.5 text-slate-600 whitespace-nowrap"><?php echo esc_html( $review_time ?: '-' ); ?></td>
+												<?php endif; ?>
+												<?php if ( $has_eval ) : ?>
+													<td class="px-3 py-2.5 text-slate-600">
+														<?php if ( ! empty( $eval_time ) && $eval_time !== '-' ) : ?>
+															<div class="whitespace-nowrap"><?php echo esc_html( $eval_time ); ?></div>
+														<?php endif; ?>
+														<?php if ( ! empty( $enrol_time ) && $enrol_time !== '-' ) : ?>
+															<div class="whitespace-nowrap text-[#00308b] font-semibold mt-0.5"><?php echo esc_html( $enrol_time ); ?></div>
+														<?php endif; ?>
+														<?php if ( ( empty( $eval_time ) || $eval_time === '-' ) && ( empty( $enrol_time ) || $enrol_time === '-' ) ) : ?>
+															<span>-</span>
+														<?php endif; ?>
+													</td>
+												<?php endif; ?>
+												<td class="px-3 py-2.5 whitespace-nowrap text-right">
+													<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold border <?php echo esc_attr( $status_class ); ?>">
 														<?php echo esc_html( $status_label ); ?>
 													</span>
 												</td>
 											</tr>
-										<?php endwhile; ?>
+										<?php endforeach; ?>
 									</tbody>
 								</table>
 							</div>
 						</div>
+
+						<script>
+						function ltdhSwitchBatchTab(btn, idx) {
+							const container = btn.closest('.admission-batches-mobile');
+							if (!container) return;
+							const btns = container.querySelectorAll('.ltdh-batch-tab-btn');
+							const cards = container.querySelectorAll('.ltdh-batch-tab-card');
+							
+							const activeCls   = ['bg-[#00308b]', 'text-white', 'font-bold', 'shadow-xs'];
+							const inactiveCls = ['bg-transparent', 'text-slate-600', 'font-medium'];
+
+							btns.forEach((b, i) => {
+								if (i === idx) {
+									inactiveCls.forEach(c => b.classList.remove(c));
+									activeCls.forEach(c => b.classList.add(c));
+								} else {
+									activeCls.forEach(c => b.classList.remove(c));
+									inactiveCls.forEach(c => b.classList.add(c));
+								}
+							});
+
+							cards.forEach((c, i) => {
+								if (i === idx) {
+									c.classList.remove('hidden');
+								} else {
+									c.classList.add('hidden');
+								}
+							});
+						}
+						</script>
 					<?php endif; ?>
 
 				</section>
@@ -183,13 +383,55 @@ $global_zalo = ltdh_get_zalo_url();
 				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Học phí & Thời gian học</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-						<div class="bg-slate-50 p-3.5 md:p-4 rounded-lg">
-							<h3 class="font-extrabold text-sm md:text-base text-slate-800 mb-1.5">Học phí chi tiết</h3>
-							<p class="text-slate-600 text-sm"><?php echo esc_html( $tuition ?: 'Liên hệ ban tuyển sinh để nhận biểu phí và chính sách đóng học phí theo đợt.' ); ?></p>
+						<div class="bg-slate-50 p-3.5 md:p-4 rounded-lg flex flex-col justify-between">
+							<div>
+								<h3 class="font-extrabold text-sm md:text-base text-slate-800 mb-2.5">Học phí chi tiết</h3>
+								<p class="text-slate-800 text-sm font-semibold mb-3">
+									<?php echo esc_html( $tuition ?: 'Liên hệ ban tuyển sinh để nhận biểu phí và chính sách đóng học phí theo đợt.' ); ?>
+								</p>
+								
+								<?php 
+								$tuition_amount   = get_field( 'tuition_amount', $program_id );
+								$tuition_unit     = get_field( 'tuition_unit', $program_id );
+								$total_credits    = get_field( 'tuition_total_credits', $program_id );
+								$increase_roadmap = get_field( 'tuition_increase_roadmap', $program_id );
+								
+								if ( $tuition_amount && $tuition_unit === 'tin-chi' && $total_credits ) : 
+									$estimated_total = floatval( $tuition_amount ) * intval( $total_credits );
+								?>
+									<div class="mt-3 pt-3 border-t border-slate-200/60 text-xs md:text-sm space-y-1.5 text-slate-600">
+										<div class="flex justify-between">
+											<span>Tổng số tín chỉ toàn khóa:</span>
+											<span class="font-bold text-slate-800"><?php echo esc_html( $total_credits ); ?> tín chỉ</span>
+										</div>
+										<div class="flex justify-between">
+											<span>Tổng học phí tạm tính:</span>
+											<span class="font-bold text-brand-primary"><?php echo number_format( $estimated_total, 0, ',', '.' ); ?> đ</span>
+										</div>
+									</div>
+								<?php endif; ?>
+							</div>
+
+							<?php if ( $increase_roadmap ) : ?>
+								<div class="mt-4 pt-3 border-t border-slate-200/60 text-[11px] text-slate-400 leading-normal">
+									<span class="font-bold text-slate-500 block mb-0.5">Lộ trình học phí / Ghi chú:</span>
+									<?php echo esc_html( $increase_roadmap ); ?>
+								</div>
+							<?php endif; ?>
 						</div>
-						<div class="bg-slate-50 p-3.5 md:p-4 rounded-lg">
-							<h3 class="font-extrabold text-sm md:text-base text-slate-800 mb-1.5">Thời gian học tập</h3>
-							<p class="text-slate-600 text-sm"><?php echo esc_html( $duration ?: 'Lộ trình từ 1.5 - 2 năm tùy thuộc số lượng tín chỉ được miễn giảm khi nhập học.' ); ?></p>
+
+						<div class="bg-slate-50 p-3.5 md:p-4 rounded-lg flex flex-col justify-between">
+							<div>
+								<h3 class="font-extrabold text-sm md:text-base text-slate-800 mb-2.5">Thời gian học tập</h3>
+								<p class="text-slate-800 text-sm font-semibold mb-2">Lộ trình chuẩn: <?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></p>
+								<p class="text-slate-500 text-xs md:text-sm leading-relaxed">
+									Thời gian đào tạo thực tế có thể được rút ngắn hoặc kéo dài tùy thuộc vào số lượng học phần học viên được miễn giảm (chuyển đổi tín chỉ từ văn bằng trước đó) hoặc tiến độ đăng ký học phần học tập.
+								</p>
+							</div>
+							<div class="mt-4 pt-3 border-t border-slate-200/60 text-[11px] text-slate-400 leading-normal">
+								<span class="font-bold text-slate-500 block mb-0.5">Lưu ý:</span>
+								Thời gian đào tạo thực tế sẽ do hội đồng xét miễn giảm môn quyết định dựa trên bảng điểm tốt nghiệp bậc học trước đó của học viên.
+							</div>
 						</div>
 					</div>
 				</section>

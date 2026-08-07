@@ -304,7 +304,7 @@ $global_zalo = ltdh_get_zalo_url();
 							}
 							$types = wp_get_post_terms( $prog_id, 'training_type' );
 							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
-							$tuition_fee = get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ';
+							$tuition_fee = ltdh_get_program_tuition_display( $prog_id );
 							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
 							$permalink = get_permalink( $prog_id );
 
@@ -321,15 +321,18 @@ $global_zalo = ltdh_get_zalo_url();
 								}
 							}
 
+							$academic_year = get_field( 'tuition_academic_year', $prog_id ) ?: '2025 - 2026';
+
 							$majors_data[ $major_key ]['programs'][] = [
-								'id'          => $prog_id,
-								'title'       => $clean_title,
-								'status'      => $status,
-								'type_name'   => $type_name,
-								'badge_class' => $badge_class,
-								'tuition_fee' => $tuition_fee,
-								'duration'    => $duration,
-								'permalink'   => $permalink,
+								'id'            => $prog_id,
+								'title'         => $clean_title,
+								'status'        => $status,
+								'type_name'     => $type_name,
+								'badge_class'   => $badge_class,
+								'tuition_fee'   => $tuition_fee,
+								'academic_year' => $academic_year,
+								'duration'      => $duration,
+								'permalink'     => $permalink,
 							];
 						}
 						wp_reset_postdata();
@@ -343,8 +346,8 @@ $global_zalo = ltdh_get_zalo_url();
 								?>
 								<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all p-4 md:p-5 flex flex-col gap-4">
 									<!-- Major Primary Info Header -->
-									<div class="flex items-start sm:items-center gap-4">
-										<div class="h-16 w-16 bg-slate-200 bg-cover bg-center rounded-lg shrink-0 border border-slate-100" style="background-image: url('<?php echo esc_url( $major['thumb'] ); ?>'); font-size: 0;"></div>
+									<div class="flex items-center gap-4">
+										<div class="h-14 w-14 bg-slate-200 bg-cover bg-center rounded-xl shrink-0 border border-slate-100 shadow-sm" style="background-image: url('<?php echo esc_url( $major['thumb'] ); ?>'); font-size: 0;"></div>
 										<div class="space-y-1 flex-1 min-w-0">
 											<h4 class="font-extrabold text-slate-800 text-lg hover:text-[#00308b] transition-colors leading-snug">
 												<?php if ( $major['id'] ) : ?>
@@ -360,39 +363,47 @@ $global_zalo = ltdh_get_zalo_url();
 
 									<!-- Programs Offered under this Major -->
 									<div class="border-t border-slate-100 pt-3">
-										<div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hệ đào tạo tuyển sinh:</div>
+										<div class="flex items-center justify-between mb-2">
+											<div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Hệ đào tạo tuyển sinh:</div>
+											<?php 
+											$header_year = ! empty( $major['programs'][0]['academic_year'] ) ? $major['programs'][0]['academic_year'] : '2025 - 2026';
+											?>
+											<span class="text-[11px] font-semibold text-slate-500 bg-slate-100/90 px-2.5 py-0.5 rounded border border-slate-200/50">
+												Biểu phí Năm học <?php echo esc_html( $header_year ); ?>
+											</span>
+										</div>
 										<div class="divide-y divide-slate-100">
 											<?php foreach ( $major['programs'] as $prog ) : ?>
-												<div class="flex items-center justify-between gap-4 py-3.5 sm:px-3 sm:-mx-3 sm:rounded-xl sm:hover:bg-slate-50 transition-all duration-200">
-													<div class="flex-1 min-w-0">
-														<div class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
-															<?php if ( $prog['type_name'] ) : ?>
-																<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 w-fit">
+												<div class="flex items-center justify-between gap-3 py-2.5 sm:py-3 rounded-xl hover:bg-slate-50/90 transition-all text-xs sm:text-sm border-b border-slate-100/60 last:border-0 my-0.5">
+													<div class="flex items-center gap-4 sm:gap-6 min-w-0 flex-1">
+														<?php if ( $prog['type_name'] ) : ?>
+															<div class="w-[115px] sm:w-[125px] shrink-0">
+																<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> inline-block w-full text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider text-center">
 																	<?php echo esc_html( $prog['type_name'] ); ?>
 																</span>
-															<?php endif; ?>
-															<div class="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-xs sm:text-sm text-slate-500">
-																<span class="inline-flex items-center gap-1.5">
-																	<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-																		<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-																	</svg>
-																	Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $prog['duration'] ); ?></span>
-																</span>
-																<span class="hidden sm:inline text-slate-200">|</span>
-																<span class="inline-flex items-center gap-1.5">
-																	<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-																		<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
-																	</svg>
-																	Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></span>
-																</span>
 															</div>
+														<?php endif; ?>
+														<div class="flex items-center gap-x-4 sm:gap-x-6 gap-y-1 flex-wrap text-slate-600 min-w-0">
+															<span class="inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+																<span class="text-slate-400">⏱</span>
+																<span>Thời gian: <strong class="font-semibold text-slate-800"><?php echo esc_html( $prog['duration'] ); ?></strong></span>
+															</span>
+															<span class="hidden sm:inline text-slate-200">|</span>
+															<span class="inline-flex items-center gap-1.5 min-w-0 whitespace-nowrap">
+																<span>Học phí: <strong class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></strong></span>
+															</span>
 														</div>
 													</div>
-													<div class="shrink-0">
+													<div class="shrink-0 ml-3">
 														<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
-															<span class="text-xs sm:text-sm text-slate-400 bg-slate-200 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
+															<span class="text-xs text-slate-400 font-medium">Tạm ngưng</span>
 														<?php else : ?>
-															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="text-xs sm:text-sm px-4 py-1.5 rounded-lg uppercase ltdh-btn-details min-h-[32px] flex items-center justify-center">Tìm hiểu</a>
+															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="text-xs font-bold text-[#00308b] hover:text-blue-700 hover:underline inline-flex items-center gap-1 py-1.5 px-2.5 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
+																<span>Tìm hiểu</span>
+																<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+																	<path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+																</svg>
+															</a>
 														<?php endif; ?>
 													</div>
 												</div>
