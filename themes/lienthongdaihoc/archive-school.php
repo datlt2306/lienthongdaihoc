@@ -68,6 +68,8 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 				<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
 					<?php
+					$featured_count = count( $featured_posts );
+					$featured_index = 0;
 					foreach ( $featured_posts as $featured_post ) :
 						$school_id = $featured_post->ID;
 						$logo_id   = get_field( 'logo', $school_id );
@@ -81,8 +83,13 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						$address = get_field( 'address', $school_id ) ?: 'Việt Nam';
 						$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
 						$region = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
+
+						$grid_span_class = '';
+						if ( $featured_count % 2 !== 0 && $featured_index === $featured_count - 1 ) {
+							$grid_span_class = 'col-span-2 lg:col-span-1';
+						}
 					?>
-						<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+						<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group<?php echo $grid_span_class ? ' ' . esc_attr( $grid_span_class ) : ''; ?>">
 							<div class="relative h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'large' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');">
 								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-slate-900/20 to-transparent"></div>
 								<span class="absolute top-3 left-3 bg-brand-accent text-white text-xs font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider shadow-sm z-10 flex items-center gap-1">
@@ -129,6 +136,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 							</div>
 						</div>
 					<?php
+						$featured_index++;
 					endforeach;
 					?>
 				</div>
@@ -177,6 +185,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 			<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
 				<?php
 				if ( have_posts() ) :
+					$regular_index = 0;
 					while ( have_posts() ) : the_post();
 						$school_id = get_the_ID();
 						if ( ! empty( $featured_school_ids ) && in_array( $school_id, $featured_school_ids, true ) ) {
@@ -189,8 +198,13 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 						$school_types = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => 'names' ] );
 						$systems_label = ( ! is_wp_error( $school_types ) && ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
+
+						$grid_span_class = '';
+						if ( $non_featured_count % 2 !== 0 && $regular_index === $non_featured_count - 1 ) {
+							$grid_span_class = 'col-span-2 lg:col-span-1';
+						}
 				?>
-					<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+					<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between<?php echo $grid_span_class ? ' ' . esc_attr( $grid_span_class ) : ''; ?>">
 						<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
 
 						<div class="h-12 w-12 md:h-16 md:w-16 bg-white rounded-lg border-2 md:border-4 border-white shadow-md bg-white -mt-6 md:-mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
@@ -224,6 +238,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						</div>
 					</div>
 				<?php
+						$regular_index++;
 					endwhile;
 				else :
 					echo '<div class="col-span-4 text-center py-12"><p class="text-slate-500 text-base">Chưa có trường đối tác nào.</p></div>';
