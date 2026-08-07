@@ -667,7 +667,7 @@ function ltdh_get_training_type_badge_html( string $type_name ): string {
 		$badge_class = 'bg-amber-50 text-amber-600 border border-amber-100';
 	}
 	return sprintf(
-		'<span class="%s text-[9px] md:text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide border shadow-xs inline-block leading-normal">%s</span>',
+		'<span class="%s text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide border shadow-xs inline-block leading-normal">%s</span>',
 		esc_attr( $badge_class ),
 		esc_html( $type_name )
 	);

@@ -263,7 +263,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 						
 						<!-- Instant Search Filter -->
 						<div class="mb-3 relative">
-							<input type="text" id="major-search-filter" placeholder="Tìm nhanh chuyên ngành..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs focus:border-brand-primary focus:outline-none placeholder-slate-400 min-h-[36px]">
+							<input type="text" id="major-search-filter" placeholder="Tìm nhanh chuyên ngành..." class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 min-h-[36px]">
 						</div>
 
 						<div class="pr-1 space-y-1" id="major-list-container" style="max-height: 480px; overflow-y: auto; scrollbar-width: thin;">
@@ -320,7 +320,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 					
 					<div class="flex flex-row flex-wrap items-center gap-3 justify-start lg:justify-end w-full lg:w-auto">
 						<div class="flex items-center gap-2">
-							<label for="sort-select" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0">Sắp xếp:</label>
+							<label for="sort-select" class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0">Sắp xếp:</label>
 							<select id="sort-select" class="rounded-lg border-slate-300 text-sm py-2 px-3 bg-white text-slate-700 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary cursor-pointer shadow-sm min-h-[44px]" onchange="location = this.value;">
 								<option value="<?php echo esc_url( remove_query_arg( 'sort' ) ); ?>" <?php selected( $selected_sort, '' ); ?>>Mặc định</option>
 								<option value="<?php echo esc_url( add_query_arg( 'sort', 'title_asc' ) ); ?>" <?php selected( $selected_sort, 'title_asc' ); ?>>Tên chương trình (A-Z)</option>
@@ -330,7 +330,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 						</div>
 						
 						<div class="flex items-center gap-2">
-							<label for="limit-select" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0">Hiển thị:</label>
+							<label for="limit-select" class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0">Hiển thị:</label>
 							<select id="limit-select" class="rounded-lg border-slate-300 text-sm py-2 px-3 bg-white text-slate-700 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary cursor-pointer shadow-sm min-h-[44px]" onchange="location = this.value;">
 								<option value="<?php echo esc_url( add_query_arg( 'limit', 12 ) ); ?>" <?php selected( $selected_limit, 12 ); ?>>12</option>
 								<option value="<?php echo esc_url( add_query_arg( 'limit', 24 ) ); ?>" <?php selected( $selected_limit, 24 ); ?>>24</option>
@@ -341,7 +341,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 						</div>
 						
 						<?php if ( $selected_type || $selected_nhom || $selected_school || $selected_search || $selected_sort || $selected_limit != 12 ) : ?>
-							<a href="<?php echo esc_url( home_url( '/he-dao-tao/' ) ); ?>" class="text-xs font-bold text-brand-primary hover:underline shrink-0">✕ Xóa bộ lọc</a>
+							<a href="<?php echo esc_url( home_url( '/he-dao-tao/' ) ); ?>" class="text-sm font-bold text-brand-primary hover:underline shrink-0">✕ Xóa bộ lọc</a>
 						<?php endif; ?>
 					</div>
 				</div>
@@ -405,7 +405,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 									<div class="h-24 w-full bg-slate-200 bg-cover bg-center relative" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');">
 										<div class="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent"></div>
 										<?php if ( $show_type_badge ) : ?>
-											<span class="absolute top-2.5 right-2.5 <?php echo esc_attr( $badge_class ); ?> text-[9px] md:text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide border shadow-sm z-10">
+											<span class="absolute top-2.5 right-2.5 <?php echo esc_attr( $badge_class ); ?> text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide border shadow-sm z-10">
 												Hệ <?php echo esc_html( $type_name ); ?>
 											</span>
 										<?php endif; ?>
@@ -431,16 +431,16 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 											<h3 class="font-extrabold text-slate-950 text-sm md:text-base hover:text-brand-primary mb-1 leading-snug line-clamp-2 min-h-[40px]">
 												<a href="<?php the_permalink(); ?>"><?php echo esc_html( $school_name ); ?></a>
 											</h3>
-											<span class="text-[11px] text-slate-500 font-semibold bg-slate-50 px-1.5 py-0.5 rounded inline-block mb-3 border border-slate-200/50"><?php the_title(); ?></span>
+											<span class="text-xs text-slate-500 font-semibold bg-slate-50 px-1.5 py-0.5 rounded inline-block mb-3 border border-slate-200/50"><?php the_title(); ?></span>
 										</div>
 
 										<?php
 										$learning_details = ltdh_get_program_learning_details( $prog_id );
 										?>
-										<div class="space-y-0.5 md:space-y-1 text-[11px] md:text-sm text-slate-500 py-2 md:py-3 border-t border-slate-100">
+										<div class="space-y-0.5 md:space-y-1 text-sm text-slate-500 py-2 md:py-3 border-t border-slate-100">
 											<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ' ); ?></span></p>
 											<p class="hidden sm:block">Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
-											<p>Hình thức: <span class="font-bold text-slate-700 text-[10px] md:text-xs"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
+											<p>Hình thức: <span class="font-bold text-slate-700 text-xs md:text-sm"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
 										</div>
 									</div>
 								</div>
@@ -448,9 +448,9 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 								<div class="p-3 md:p-4 pt-0">
 									<div class="pt-2 md:pt-3 border-t border-slate-100 flex items-center justify-between">
 										<div class="flex items-center gap-1.5 w-full">
-											<a href="<?php the_permalink(); ?>" class="text-[10px] md:text-xs py-2.5 rounded-lg uppercase ltdh-btn-details min-h-[44px] flex items-center justify-center flex-1">Tìm hiểu</a>
+											<a href="<?php the_permalink(); ?>" class="text-sm py-2.5 rounded-lg uppercase ltdh-btn-details min-h-[44px] flex items-center justify-center flex-1">Tìm hiểu</a>
 											<button type="button"
-													class="ltdh-compare-toggle text-[10px] md:text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg py-2.5 transition-all min-h-[44px] flex items-center justify-center flex-1"
+													class="ltdh-compare-toggle text-sm text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg py-2.5 transition-all min-h-[44px] flex items-center justify-center flex-1"
 													data-compare-type="program"
 													data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 													data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"

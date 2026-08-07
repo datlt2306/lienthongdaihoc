@@ -81,8 +81,8 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Tổng đài hỗ trợ</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $hotline ); ?></h4>
 						<div class="flex gap-2">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-2 rounded-lg font-semibold text-xs hover:bg-[#e06e00] transition-all flex items-center justify-center min-h-[44px]">Gọi Điện</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-2 rounded-lg font-semibold text-xs hover:bg-blue-50 transition-all flex items-center justify-center min-h-[44px]">Zalo OA</a>
+							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-2 rounded-lg font-semibold text-sm hover:bg-[#e06e00] transition-all flex items-center justify-center min-h-[44px]">Gọi Điện</a>
+							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-2 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-all flex items-center justify-center min-h-[44px]">Zalo OA</a>
 						</div>
 					</div>
 

@@ -62,7 +62,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 					</span>
 					<div>
 						<h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Trường đại học nổi bật</h2>
-						<p class="text-xs text-slate-500 mt-0.5">Các trường đại học đối tác tuyển sinh hàng đầu với chất lượng đào tạo vượt trội.</p>
+						<p class="text-sm text-slate-500 mt-0.5">Các trường đại học đối tác tuyển sinh hàng đầu với chất lượng đào tạo vượt trội.</p>
 					</div>
 				</div>
 
@@ -85,7 +85,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
 							<div class="relative h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'large' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');">
 								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-slate-900/20 to-transparent"></div>
-								<span class="absolute top-3 left-3 bg-brand-accent text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider shadow-sm z-10 flex items-center gap-1">
+								<span class="absolute top-3 left-3 bg-brand-accent text-white text-xs font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider shadow-sm z-10 flex items-center gap-1">
 									⭐️ Nổi bật
 								</span>
 							</div>
@@ -104,9 +104,9 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 									<h4 class="font-extrabold text-slate-800 text-sm md:text-base tracking-tight leading-snug uppercase min-h-[48px] line-clamp-2 mt-1 group-hover:text-brand-primary transition-colors">
 										<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>"><?php echo esc_html( get_the_title( $school_id ) ); ?></a>
 									</h4>
-									<p class="text-xs text-slate-400 mt-1 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
+									<p class="text-sm text-slate-400 mt-1 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
 									
-									<div class="mt-4 space-y-2 text-center text-xs">
+									<div class="mt-4 space-y-2 text-center text-sm">
 										<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
 											<div class="flex flex-wrap justify-center gap-1">
 												<?php
@@ -124,7 +124,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								</div>
 								
 								<div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="w-full text-center py-2.5 rounded-lg text-xs uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu chi tiết</a>
+									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="w-full text-center py-2.5 rounded-lg text-sm uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu chi tiết</a>
 								</div>
 							</div>
 						</div>
@@ -180,9 +180,9 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 					<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
 						<div class="text-center">
-							<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
-							<p class="text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
-							<div class="mt-3 space-y-1 text-center text-[10px] md:text-xs">
+							<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
+							<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
+							<div class="mt-3 space-y-1 text-center text-xs md:text-sm">
 								<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
 									<div class="flex flex-wrap justify-center gap-1 mb-1.5">
 										<?php
@@ -196,7 +196,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 							</div>
 						</div>
 						<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-							<a href="<?php the_permalink(); ?>" class="w-full text-center py-2.5 rounded-lg text-xs uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
+							<a href="<?php the_permalink(); ?>" class="w-full text-center py-2.5 rounded-lg text-sm uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
 						</div>
 					</div>
 				</div>
@@ -284,9 +284,9 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								</h3>
 							</div>
 							<?php if ( $en_name ) : ?>
-								<p class="text-xs text-slate-400 italic mt-0.5"><?php echo esc_html( $en_name ); ?></p>
+								<p class="text-sm text-slate-400 italic mt-0.5"><?php echo esc_html( $en_name ); ?></p>
 							<?php endif; ?>
-							<div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-slate-500">
+							<div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-500">
 								<span class="flex items-center gap-1"><span class="text-brand-primary">📍</span> <?php echo esc_html( $address ); ?></span>
 								<?php if ( $prog_count > 0 ) : ?>
 									<span class="flex items-center gap-1"><span class="text-brand-primary">📊</span> <?php echo esc_html( $prog_count ); ?> chương trình</span>
@@ -307,16 +307,16 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 							<?php if ( ! empty( $prog_tags ) ) : ?>
 								<div class="flex flex-wrap gap-1.5 mt-2">
 									<?php foreach ( $prog_tags as $tag ) : ?>
-										<a href="<?php echo esc_url( $tag['link'] ); ?>" class="inline-block bg-blue-50 text-brand-primary text-[10px] font-bold px-2 py-0.5 rounded-full hover:bg-blue-100 transition-colors"><?php echo esc_html( $tag['title'] ); ?></a>
+										<a href="<?php echo esc_url( $tag['link'] ); ?>" class="inline-block bg-blue-50 text-brand-primary text-xs font-bold px-2 py-0.5 rounded-full hover:bg-blue-100 transition-colors"><?php echo esc_html( $tag['title'] ); ?></a>
 									<?php endforeach; ?>
 									<?php if ( $prog_count > 5 ) : ?>
-										<a href="<?php the_permalink(); ?>" class="inline-block bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full hover:bg-slate-200 transition-colors">+<?php echo esc_html( $prog_count - 5 ); ?> nữa</a>
+										<a href="<?php the_permalink(); ?>" class="inline-block bg-slate-100 text-slate-500 text-xs font-bold px-2 py-0.5 rounded-full hover:bg-slate-200 transition-colors">+<?php echo esc_html( $prog_count - 5 ); ?> nữa</a>
 									<?php endif; ?>
 								</div>
 							<?php endif; ?>
 						</div>
 						<div class="flex items-center gap-2 shrink-0 w-full sm:w-auto mt-3 sm:mt-0">
-							<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-6 py-2.5 rounded-lg text-xs uppercase ltdh-btn-details min-h-[40px] flex items-center">Tìm hiểu chi tiết</a>
+							<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-6 py-2.5 rounded-lg text-sm uppercase ltdh-btn-details min-h-[40px] flex items-center">Tìm hiểu chi tiết</a>
 						</div>
 					</div>
 				</div>

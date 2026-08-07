@@ -117,16 +117,16 @@ $messenger = ltdh_get_messenger_url();
 						</div>
 						<div class="min-w-0">
 							<h4 class="font-extrabold text-white text-sm truncate">Fan Page</h4>
-							<span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider block mt-0.5">Cập nhật tin tức mỗi ngày</span>
+							<span class="text-xs text-slate-500 font-bold uppercase tracking-wider block mt-0.5">Cập nhật tin tức mỗi ngày</span>
 						</div>
 					</div>
-					<a href="#" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg transition-colors text-center w-full shadow-sm" style="background-color: #1877f2;">Tham gia ngay</a>
+					<a href="#" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 rounded-lg transition-colors text-center w-full shadow-sm" style="background-color: #1877f2;">Tham gia ngay</a>
 				</div>
 			</div>
 		</div>
 
 		<!-- Footer Bottom -->
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 font-semibold uppercase tracking-wider gap-4">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 font-semibold uppercase tracking-wider gap-4">
 			<p>© 2026 lienthongdaihoc.com. Tất cả các quyền được bảo hộ.</p>
 			<div class="flex items-center gap-6">
 				<a href="#" class="hover:text-white transition-colors">Chính sách bảo mật</a>

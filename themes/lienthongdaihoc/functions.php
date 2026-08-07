@@ -174,7 +174,7 @@ function ltdh_ajax_filter_programs() {
 							<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( LTDH_META_TUITION, $prog_id ) ?: 'Liên hệ' ); ?></span></p>
 							<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( LTDH_META_DURATION, $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
 							<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
-							<p>Hình thức: <span class=" text-xs"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
+							<p>Hình thức: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
 							<?php if ( ! empty( $groups ) ) : ?>
 								<p>Tổ hợp: <span class="font-bold text-slate-700"><?php echo esc_html( $groups ); ?></span></p>
 							<?php endif; ?>
@@ -183,14 +183,14 @@ function ltdh_ajax_filter_programs() {
 					<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
 						<div class="flex items-center gap-2">
 							<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
-							<button type="button" class="ltdh-compare-toggle text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg px-2.5 py-1 transition-all"
+							<button type="button" class="ltdh-compare-toggle text-sm text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg px-2.5 py-1 transition-all"
 									data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 									data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 									data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>">
 								So sánh
 							</button>
 						</div>
-						<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-darkBlue shadow-sm transition-all">Đăng ký học</a>
+						<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-brand-darkBlue shadow-sm transition-all">Đăng ký học</a>
 					</div>
 				</div>
 			</div>

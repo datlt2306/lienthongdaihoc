@@ -123,15 +123,15 @@ $major_cats = get_terms( [
 								<div class="h-28 md:h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb ); ?>');"></div>
 								<div class="p-3 md:p-6 flex-1 flex flex-col justify-between">
 									<div>
-										<h3 class="font-extrabold text-slate-800 text-xs md:text-lg hover:text-brand-primary mb-1 line-clamp-2 min-h-[32px] md:min-h-[48px] leading-tight">
+										<h3 class="font-extrabold text-slate-800 text-sm md:text-lg hover:text-brand-primary mb-1 line-clamp-2 min-h-[32px] md:min-h-[48px] leading-tight">
 											<a href="<?php the_permalink(); ?>">Ngành <?php the_title(); ?></a>
 										</h3>
-										<span class="text-[10px] md:text-sm text-slate-400 block mb-2 md:mb-3 font-semibold uppercase">Mã: <?php echo esc_html( $code ); ?></span>
+										<span class="text-xs md:text-sm text-slate-400 block mb-2 md:mb-3 font-semibold uppercase">Mã: <?php echo esc_html( $code ); ?></span>
 										<div class="text-sm text-slate-500 line-clamp-3 mb-6 hidden md:block"><?php the_excerpt(); ?></div>
 									</div>
 
 									<div class="border-t border-slate-100 pt-3 md:pt-4 mt-auto">
-										<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-brand-accent hover:text-white py-2.5 md:py-3 rounded-lg font-bold transition-all text-[11px] md:text-sm uppercase text-brand-primary min-h-[44px] flex items-center justify-center">Tìm hiểu thêm</a>
+										<a href="<?php the_permalink(); ?>" class="block w-full text-center bg-slate-50 hover:bg-brand-accent hover:text-white py-2.5 md:py-3 rounded-lg font-bold transition-all text-sm uppercase text-brand-primary min-h-[44px] flex items-center justify-center">Tìm hiểu thêm</a>
 									</div>
 								</div>
 							</div>

@@ -135,8 +135,8 @@ $zalo    = ltdh_get_zalo_url();
 		<div class="bg-white rounded-xl shadow-xl border border-slate-100 p-4 md:p-5">
 			<form action="<?php echo esc_url(home_url('/he-dao-tao/tu-xa/')); ?>" method="GET" class="space-y-3 md:space-y-0">
 				<!-- Keyword (always visible) -->
-				<div class="flex-1 min-w-[20%]">
-					<input type="text" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm md:text-xs focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[40px] md:min-h-[38px]" />
+				<div class="flex-grow min-w-[20%]">
+					<input type="text" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[40px] md:min-h-[38px]" />
 				</div>
 
 				<?php
@@ -148,7 +148,7 @@ $zalo    = ltdh_get_zalo_url();
 				<!-- Filters: stacked on mobile, inline on desktop -->
 				<div class="flex flex-col md:flex-row md:items-center md:gap-3 gap-2">
 					<div class="flex-1">
-						<select name="truong" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm md:text-xs focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
+						<select name="truong" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
 							<option value="">-- Chọn trường --</option>
 							<?php foreach ($schools as $sc) : ?>
 								<option value="<?php echo esc_attr($sc->post_name); ?>"><?php echo esc_html($sc->post_title); ?></option>
@@ -156,7 +156,7 @@ $zalo    = ltdh_get_zalo_url();
 						</select>
 					</div>
 					<div class="flex-1">
-						<select name="nganh" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm md:text-xs focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
+						<select name="nganh" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
 							<option value="">-- Chọn ngành học --</option>
 							<?php foreach ($majors as $mj) : ?>
 								<option value="<?php echo esc_attr($mj->post_name); ?>"><?php echo esc_html($mj->post_title); ?></option>
@@ -164,7 +164,7 @@ $zalo    = ltdh_get_zalo_url();
 						</select>
 					</div>
 					<div class="flex-1">
-						<select name="he" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm md:text-xs focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
+						<select name="he" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
 							<option value="">-- Chọn hệ học --</option>
 							<?php foreach ($types as $tp) : ?>
 								<option value="<?php echo esc_attr($tp->slug); ?>"><?php echo esc_html($tp->name); ?></option>
@@ -172,7 +172,7 @@ $zalo    = ltdh_get_zalo_url();
 						</select>
 					</div>
 					<div class="flex gap-2 md:shrink-0">
-						<button type="submit" class="flex-1 md:flex-none bg-brand-primary hover:bg-brand-darkBlue text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition-all uppercase tracking-wider min-h-[40px] md:min-h-[38px]">
+						<button type="submit" class="flex-1 md:flex-none bg-brand-primary hover:bg-brand-darkBlue text-white font-extrabold text-sm px-5 py-2.5 rounded-lg transition-all uppercase tracking-wider min-h-[40px] md:min-h-[38px]">
 							Tìm kiếm
 						</button>
 						<a href="<?php echo esc_url(home_url('/he-dao-tao/tu-xa/')); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition-all flex items-center justify-center min-h-[40px] md:min-h-[38px]" title="Reset bộ lọc">
@@ -283,14 +283,14 @@ $zalo    = ltdh_get_zalo_url();
 
 							<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
 								<div class="text-center">
-									<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php echo esc_html($school['title']); ?></h4>
-									<p class="text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html($en_name); ?></p>
-									<div class="mt-3 space-y-1 text-center text-[10px] md:text-xs">
+									<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php echo esc_html($school['title']); ?></h4>
+									<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html($en_name); ?></p>
+									<div class="mt-3 space-y-1 text-center text-xs md:text-sm">
 										<p class="text-slate-500 font-semibold">📊 <?php echo esc_html($prog_count); ?> ngành tuyển sinh</p>
 									</div>
 								</div>
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<a href="<?php echo esc_url($school['permalink']); ?>" class="w-full text-center py-2.5 rounded-lg text-xs uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
+									<a href="<?php echo esc_url($school['permalink']); ?>" class="w-full text-center py-2.5 rounded-lg text-sm uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
 								</div>
 							</div>
 						</div>
@@ -346,7 +346,7 @@ $zalo    = ltdh_get_zalo_url();
 					<?php foreach ($e_items_render as $item) : ?>
 						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
 							<span class="block text-sm font-bold text-slate-800 mb-0.5"><?php echo esc_html($item['title'] ?? ''); ?></span>
-							<span class="text-xs text-slate-500"><?php echo esc_html($item['desc'] ?? ''); ?></span>
+							<span class="text-sm text-slate-500"><?php echo esc_html($item['desc'] ?? ''); ?></span>
 						</div>
 					<?php endforeach; ?>
 				</div>
@@ -525,7 +525,7 @@ $zalo    = ltdh_get_zalo_url();
 						<!-- Orange badge -->
 						<div class="absolute bottom-6 left-6 bg-[#f97316] text-white p-5 rounded-2xl shadow-xl flex flex-col justify-center max-w-[150px] z-20 hover:scale-105 transition-transform duration-300 pointer-events-none">
 							<span class="text-3xl font-black leading-none">100%</span>
-							<span class="text-[9px] font-extrabold tracking-wider uppercase mt-2 leading-tight">BẰNG CỬ NHÂN<br>CHÍNH QUY</span>
+							<span class="text-xs font-extrabold tracking-wider uppercase mt-2 leading-tight">BẰNG CỬ NHÂN<br>CHÍNH QUY</span>
 						</div>
 					</div>
 				</div>
@@ -741,7 +741,7 @@ $zalo    = ltdh_get_zalo_url();
 					<div class="bg-slate-50/70 border border-slate-100 rounded-xl p-5 text-left shadow-sm">
 						<div class="h-10 w-10 bg-blue-50 text-[#00308b] flex items-center justify-center rounded-lg mb-3 text-lg"><?php echo esc_html($item['icon'] ?? '📜'); ?></div>
 						<h4 class="font-bold text-sm text-slate-800 mb-1"><?php echo esc_html($item['title'] ?? ''); ?></h4>
-						<p class="text-xs text-slate-500 leading-relaxed"><?php echo esc_html($item['desc'] ?? ''); ?></p>
+						<p class="text-sm text-slate-500 leading-relaxed"><?php echo esc_html($item['desc'] ?? ''); ?></p>
 					</div>
 				<?php endforeach; ?>
 			</div>
@@ -764,7 +764,7 @@ $zalo    = ltdh_get_zalo_url();
 					<h3 class="text-lg md:text-xl font-extrabold font-display tracking-tight text-white uppercase">
 						<?php echo esc_html($w_heading ?: 'Vì sao chọn chúng tôi?'); ?>
 					</h3>
-					<p class="text-slate-400 text-xs mt-1"><?php echo esc_html($w_desc ?: 'Đơn vị tư vấn và đối tác tuyển sinh hàng đầu.'); ?></p>
+					<p class="text-slate-400 text-sm mt-1"><?php echo esc_html($w_desc ?: 'Đơn vị tư vấn và đối tác tuyển sinh hàng đầu.'); ?></p>
 				</div>
 				<div class="w-full lg:w-2/3 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
 					<?php
@@ -779,7 +779,7 @@ $zalo    = ltdh_get_zalo_url();
 					?>
 						<div>
 							<span class="block font-display font-black text-2xl md:text-3xl text-brand-accent leading-none mb-1"><?php echo esc_html($metric['value'] ?? ''); ?></span>
-							<span class="text-xs text-slate-300 font-bold block"><?php echo esc_html($metric['label'] ?? ''); ?></span>
+							<span class="text-sm text-slate-300 font-bold block"><?php echo esc_html($metric['label'] ?? ''); ?></span>
 						</div>
 					<?php endforeach; ?>
 				</div>
@@ -815,7 +815,7 @@ $zalo    = ltdh_get_zalo_url();
 								<div class="h-10 w-10 bg-brand-accent text-white rounded-full flex items-center justify-center font-bold text-sm"><?php echo esc_html($initials); ?></div>
 								<div>
 									<p class="font-bold text-sm text-slate-800"><?php echo esc_html($t['name'] ?? ''); ?></p>
-									<p class="text-xs text-slate-400"><?php echo esc_html($t['role'] ?? ''); ?></p>
+									<p class="text-sm text-slate-400"><?php echo esc_html($t['role'] ?? ''); ?></p>
 								</div>
 							</div>
 						</div>
@@ -837,7 +837,7 @@ $zalo    = ltdh_get_zalo_url();
 								<div class="h-10 w-10 bg-brand-accent text-white rounded-full flex items-center justify-center font-bold text-sm"><?php echo esc_html($t['initials']); ?></div>
 								<div>
 									<p class="font-bold text-sm text-slate-800"><?php echo esc_html($t['name']); ?></p>
-									<p class="text-xs text-slate-400"><?php echo esc_html($t['role']); ?></p>
+									<p class="text-sm text-slate-400"><?php echo esc_html($t['role']); ?></p>
 								</div>
 							</div>
 						</div>
@@ -913,12 +913,12 @@ $zalo    = ltdh_get_zalo_url();
 							<div class="h-36 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url($thumb_url); ?>');"></div>
 							<div class="p-4 flex-1 flex flex-col justify-between">
 								<div>
-									<span class="text-[10px] font-bold text-brand-primary uppercase tracking-wider block mb-1"><?php echo esc_html($category_name); ?></span>
-									<h4 class="font-extrabold text-slate-800 text-xs sm:text-sm line-clamp-2 hover:text-[#00308b] transition-colors leading-snug">
+									<span class="text-xs font-bold text-brand-primary uppercase tracking-wider block mb-1"><?php echo esc_html($category_name); ?></span>
+									<h4 class="font-extrabold text-slate-800 text-sm line-clamp-2 hover:text-[#00308b] transition-colors leading-snug">
 										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 									</h4>
 								</div>
-								<time class="text-[10px] text-slate-400 mt-3 block"><?php echo get_the_date('d/m/Y'); ?></time>
+								<time class="text-xs text-slate-400 mt-3 block"><?php echo get_the_date('d/m/Y'); ?></time>
 							</div>
 						</div>
 					<?php
@@ -932,11 +932,11 @@ $zalo    = ltdh_get_zalo_url();
 					?>
 						<div class="bg-white border border-slate-100 rounded-lg p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 							<div>
-								<span class="text-[10px] font-bold text-brand-primary uppercase tracking-wider block mb-1">Hướng dẫn</span>
-								<h4 class="font-bold text-slate-800 text-xs sm:text-sm line-clamp-2 leading-snug"><?php echo esc_html($mn['title']); ?></h4>
-								<p class="text-[11px] text-slate-400 leading-normal line-clamp-3 mt-2"><?php echo esc_html($mn['desc']); ?></p>
+								<span class="text-xs font-bold text-brand-primary uppercase tracking-wider block mb-1">Hướng dẫn</span>
+								<h4 class="font-bold text-slate-800 text-sm line-clamp-2 leading-snug"><?php echo esc_html($mn['title']); ?></h4>
+								<p class="text-sm text-slate-400 leading-normal line-clamp-3 mt-2"><?php echo esc_html($mn['desc']); ?></p>
 							</div>
-							<time class="text-[10px] text-slate-400 mt-3 block"><?php echo esc_html($mn['date']); ?></time>
+							<time class="text-xs text-slate-400 mt-3 block"><?php echo esc_html($mn['date']); ?></time>
 						</div>
 				<?php
 					}

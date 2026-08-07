@@ -60,7 +60,7 @@ $sections = [
 									 alt="<?php echo esc_attr( $school_name ); ?>"
 									 class="h-4 w-4 object-cover rounded border border-slate-200">
 							<?php endif; ?>
-							<span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block truncate"><?php echo esc_html( $school_name ); ?></span>
+							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block truncate"><?php echo esc_html( $school_name ); ?></span>
 						</div>
 					<?php endif; ?>
 					<h3 class="font-extrabold text-slate-900 text-sm leading-snug line-clamp-2">
@@ -101,7 +101,7 @@ $sections = [
 								$is_best = $highlight_key ? ltdh_compare_is_best( $highlights, $highlight_key, $item['id'] ) : false;
 							?>
 								<div class="flex flex-col gap-1 py-1 <?php echo $is_best ? 'bg-emerald-50 -mx-3 px-3 rounded-lg border border-emerald-100' : ''; ?>">
-									<span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider"><?php echo esc_html( $attr['label'] ); ?></span>
+									<span class="text-xs font-bold text-slate-400 uppercase tracking-wider"><?php echo esc_html( $attr['label'] ); ?></span>
 									<div class="text-sm font-medium text-slate-700 leading-relaxed min-w-0">
 										<?php echo $value; ?>
 										<?php if ( $is_best ) : ?>

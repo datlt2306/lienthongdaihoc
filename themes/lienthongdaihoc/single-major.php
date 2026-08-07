@@ -194,7 +194,7 @@ $hotline = ltdh_get_hotline();
 												<?php endif; ?>
 											</h4>
 											<?php if ( $school['address'] ) : ?>
-												<p class="text-xs text-slate-400 flex items-center gap-1">
+												<p class="text-sm text-slate-400 flex items-center gap-1">
 													<span>📍</span>
 													<span class="truncate"><?php echo esc_html( $school['address'] ); ?></span>
 												</p>
@@ -204,17 +204,17 @@ $hotline = ltdh_get_hotline();
 
 									<!-- Programs Offered by this School -->
 									<div class="border-t border-slate-100 pt-3">
-										<div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Chương trình đào tạo:</div>
+										<div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Chương trình đào tạo:</div>
 										<div class="grid grid-cols-1 gap-2.5">
 											<?php foreach ( $school['programs'] as $prog ) : ?>
 												<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 hover:bg-slate-100/70 border border-slate-100 rounded-lg p-3 transition-colors">
 													<div class="flex items-center gap-3 flex-wrap">
 														<?php if ( $prog['type_name'] ) : ?>
-															<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">
+															<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs font-black px-2 py-0.5 rounded uppercase tracking-wider">
 																<?php echo esc_html( $prog['type_name'] ); ?>
 															</span>
 														<?php endif; ?>
-														<div class="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-500">
+														<div class="flex flex-wrap gap-x-4 gap-y-0.5 text-sm text-slate-500">
 															<p>Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $prog['duration'] ); ?></span></p>
 															<p class="hidden sm:inline text-slate-300">|</p>
 															<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></span></p>
@@ -222,9 +222,9 @@ $hotline = ltdh_get_hotline();
 													</div>
 													<div class="shrink-0 flex items-center justify-end w-full sm:w-auto">
 														<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
-															<span class="text-xs text-slate-400 bg-slate-200 px-4 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
+															<span class="text-sm text-slate-400 bg-slate-200 px-4 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
 														<?php else : ?>
-															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-xs px-4 py-1.5 rounded-lg uppercase ltdh-btn-details min-h-[32px] flex items-center justify-center">Tìm hiểu</a>
+															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-sm px-4 py-1.5 rounded-lg uppercase ltdh-btn-details min-h-[32px] flex items-center justify-center">Tìm hiểu</a>
 														<?php endif; ?>
 													</div>
 												</div>
@@ -252,19 +252,19 @@ $hotline = ltdh_get_hotline();
 													<?php endif; ?>
 												</h4>
 												<?php if ( $prog['type_name'] ) : ?>
-													<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">
+													<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs font-black px-2 py-0.5 rounded uppercase tracking-wider">
 														<?php echo esc_html( $prog['type_name'] ); ?>
 													</span>
 												<?php endif; ?>
 											</div>
 											<?php if ( $school['address'] ) : ?>
-												<p class="text-xs text-slate-400 flex items-center gap-1">
+												<p class="text-sm text-slate-400 flex items-center gap-1">
 													<span>📍</span>
 													<span class="truncate"><?php echo esc_html( $school['address'] ); ?></span>
 												</p>
 											<?php endif; ?>
 											
-											<div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-slate-500 pt-1">
+											<div class="flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-500 pt-1">
 												<p>Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $prog['duration'] ); ?></span></p>
 												<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></span></p>
 											</div>
@@ -273,9 +273,9 @@ $hotline = ltdh_get_hotline();
 
 									<div class="shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex items-center justify-end">
 										<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
-											<span class="text-xs text-slate-400 bg-slate-150 px-4 py-2.5 rounded-lg font-bold">Tạm ngưng</span>
+											<span class="text-sm text-slate-400 bg-slate-150 px-4 py-2.5 rounded-lg font-bold">Tạm ngưng</span>
 										<?php else : ?>
-											<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-xs px-6 py-2.5 rounded-lg uppercase ltdh-btn-details min-h-[40px] flex items-center justify-center">Tìm hiểu</a>
+											<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-sm px-6 py-2.5 rounded-lg uppercase ltdh-btn-details min-h-[40px] flex items-center justify-center">Tìm hiểu</a>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -351,10 +351,10 @@ $hotline = ltdh_get_hotline();
 										<?php endif; ?>
 										
 										<div class="flex-1 min-w-0">
-											<h4 class="font-bold text-slate-800 text-xs md:text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
+											<h4 class="font-bold text-slate-800 text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
 												<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 											</h4>
-											<p class="text-[10px] text-slate-400 mt-0.5">📅 <?php echo get_the_date(); ?></p>
+											<p class="text-xs text-slate-400 mt-0.5">📅 <?php echo get_the_date(); ?></p>
 										</div>
 									</div>
 								<?php
@@ -365,7 +365,7 @@ $hotline = ltdh_get_hotline();
 
 							<?php if ( $has_more ) : ?>
 								<div class="mt-4 pt-3 border-t border-slate-100">
-									<a href="<?php echo esc_url( home_url( '/tin-tuc/?nganh=' . $major_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-xs hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
+									<a href="<?php echo esc_url( home_url( '/tin-tuc/?nganh=' . $major_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
 										<span>Xem thêm tin tức</span>
 										<span>→</span>
 									</a>

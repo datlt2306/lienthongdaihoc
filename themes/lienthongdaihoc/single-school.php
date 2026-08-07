@@ -283,17 +283,17 @@ $global_zalo = ltdh_get_zalo_url();
 
 									<!-- Programs Offered under this Major -->
 									<div class="border-t border-slate-100 pt-3">
-										<div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Hệ đào tạo tuyển sinh:</div>
+										<div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hệ đào tạo tuyển sinh:</div>
 										<div class="grid grid-cols-1 gap-2.5">
 											<?php foreach ( $major['programs'] as $prog ) : ?>
 												<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 hover:bg-slate-100/70 border border-slate-100 rounded-lg p-3 transition-colors">
 													<div class="flex items-center gap-3 flex-wrap">
 														<?php if ( $prog['type_name'] ) : ?>
-															<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">
+															<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs font-black px-2 py-0.5 rounded uppercase tracking-wider">
 																<?php echo esc_html( $prog['type_name'] ); ?>
 															</span>
 														<?php endif; ?>
-														<div class="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-500">
+														<div class="flex flex-wrap gap-x-4 gap-y-0.5 text-sm text-slate-500">
 															<p>Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $prog['duration'] ); ?></span></p>
 															<p class="hidden sm:inline text-slate-300">|</p>
 															<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></span></p>
@@ -301,9 +301,9 @@ $global_zalo = ltdh_get_zalo_url();
 													</div>
 													<div class="shrink-0 flex items-center justify-end w-full sm:w-auto">
 														<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
-															<span class="text-xs text-slate-400 bg-slate-200 px-4 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
+															<span class="text-sm text-slate-400 bg-slate-200 px-4 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
 														<?php else : ?>
-															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-xs px-4 py-1.5 rounded-lg uppercase ltdh-btn-details min-h-[32px] flex items-center justify-center">Tìm hiểu</a>
+															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-sm px-4 py-1.5 rounded-lg uppercase ltdh-btn-details min-h-[32px] flex items-center justify-center">Tìm hiểu</a>
 														<?php endif; ?>
 													</div>
 												</div>
@@ -331,12 +331,12 @@ $global_zalo = ltdh_get_zalo_url();
 													<?php endif; ?>
 												</h4>
 												<?php if ( $prog['type_name'] ) : ?>
-													<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider">
+													<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs font-black px-2.5 py-1 rounded uppercase tracking-wider">
 														<?php echo esc_html( $prog['type_name'] ); ?>
 													</span>
 												<?php endif; ?>
 											</div>
-											<div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-slate-500 pt-1">
+											<div class="flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-500 pt-1">
 												<p>Chuyên ngành: 
 													<?php if ( $major['id'] ) : ?>
 														<a href="<?php echo esc_url( get_permalink( $major['id'] ) ); ?>" class="font-bold text-brand-primary hover:underline"><?php echo esc_html( $major['name'] ); ?></a>
@@ -352,9 +352,9 @@ $global_zalo = ltdh_get_zalo_url();
 
 									<div class="shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex items-center justify-end">
 										<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
-											<span class="text-xs text-slate-400 bg-slate-150 px-4 py-2.5 rounded-lg font-bold">Tạm ngưng</span>
+											<span class="text-sm text-slate-400 bg-slate-150 px-4 py-2.5 rounded-lg font-bold">Tạm ngưng</span>
 										<?php else : ?>
-											<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-xs px-6 py-2.5 rounded-lg uppercase ltdh-btn-details min-h-[40px] flex items-center justify-center">Tìm hiểu</a>
+											<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-sm px-6 py-2.5 rounded-lg uppercase ltdh-btn-details min-h-[40px] flex items-center justify-center">Tìm hiểu</a>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -439,7 +439,7 @@ $global_zalo = ltdh_get_zalo_url();
 								<img src="<?php echo esc_url( $major_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="h-12 w-12 rounded-lg object-cover shrink-0 bg-slate-50 border border-slate-100" loading="lazy">
 								<div class="min-w-0 flex-1">
 									<h4 class="font-bold text-slate-800 text-sm mb-0.5 truncate"><?php the_title(); ?></h4>
-									<span class="text-xs text-slate-400 block">Mã ngành: <?php echo esc_html( get_field( 'major_code' ) ?: 'Đang cập nhật' ); ?></span>
+									<span class="text-sm text-slate-400 block">Mã ngành: <?php echo esc_html( get_field( 'major_code' ) ?: 'Đang cập nhật' ); ?></span>
 								</div>
 							</a>
 						<?php
@@ -479,7 +479,7 @@ $global_zalo = ltdh_get_zalo_url();
 					<!-- CONSULTATION FORM -->
 					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
 						<h3 class="text-base font-extrabold text-slate-900 mb-1">Đăng ký vào <?php the_title(); ?></h3>
-						<p class="text-xs text-slate-500 mb-4">Nhận tư vấn hồ sơ miễn phí, hỗ trợ xử lý thủ tục nhập học nhanh chóng.</p>
+						<p class="text-sm text-slate-500 mb-4">Nhận tư vấn hồ sơ miễn phí, hỗ trợ xử lý thủ tục nhập học nhanh chóng.</p>
 						
 						<?php 
 						ltdh_render_consultation_form( [
@@ -532,10 +532,10 @@ $global_zalo = ltdh_get_zalo_url();
 										<?php endif; ?>
 										
 										<div class="flex-1 min-w-0">
-											<h4 class="font-bold text-slate-800 text-xs md:text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
+											<h4 class="font-bold text-slate-800 text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
 												<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 											</h4>
-											<p class="text-[10px] text-slate-400 mt-0.5">📅 <?php echo get_the_date(); ?></p>
+											<p class="text-xs text-slate-400 mt-0.5">📅 <?php echo get_the_date(); ?></p>
 										</div>
 									</div>
 								<?php
@@ -546,7 +546,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 							<?php if ( $has_more ) : ?>
 								<div class="mt-4 pt-3 border-t border-slate-100">
-									<a href="<?php echo esc_url( home_url( '/tin-tuc/?truong=' . $school_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-xs hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
+									<a href="<?php echo esc_url( home_url( '/tin-tuc/?truong=' . $school_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
 										<span>Xem thêm tin tức</span>
 										<span>→</span>
 									</a>
@@ -560,11 +560,11 @@ $global_zalo = ltdh_get_zalo_url();
 					<!-- CONTACT INFO CARD -->
 					<div class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white rounded-lg p-6 text-center shadow-lg overflow-hidden border border-slate-800">
 						<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 16px 16px;"></div>
-						<span class="text-xs text-brand-accent font-extrabold uppercase tracking-wider block mb-1">Văn phòng tuyển sinh</span>
+						<span class="text-sm text-brand-accent font-extrabold uppercase tracking-wider block mb-1">Văn phòng tuyển sinh</span>
 						<h4 class="font-display font-black text-xl md:text-2xl mb-4"><?php echo esc_html( $hotline ); ?></h4>
 						<div class="flex gap-2 relative z-10">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-bold text-xs hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center shadow-sm shadow-brand-accent/20">Gọi Ngay</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white/10 text-white border border-white/20 py-3.5 rounded-lg font-bold text-xs hover:bg-white/20 transition-all min-h-[44px] flex items-center justify-center">Chat Zalo</a>
+							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-bold text-sm hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center shadow-sm shadow-brand-accent/20">Gọi Ngay</a>
+							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white/10 text-white border border-white/20 py-3.5 rounded-lg font-bold text-sm hover:bg-white/20 transition-all min-h-[44px] flex items-center justify-center">Chat Zalo</a>
 						</div>
 					</div>
 

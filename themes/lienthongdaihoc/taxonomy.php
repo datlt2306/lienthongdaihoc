@@ -70,7 +70,7 @@ $is_base_archive = ! isset( $term->term_id );
 								</div>
 								<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
 									<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
-									<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-darkBlue transition-all">Đăng ký học</a>
+									<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-brand-darkBlue transition-all">Đăng ký học</a>
 								</div>
 							</div>
 						</div>
@@ -121,17 +121,17 @@ $is_base_archive = ! isset( $term->term_id );
 
 							<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
 								<div class="text-center">
-									<h4 class="font-extrabold text-slate-800 text-xs md:text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
-									<p class="text-[11px] text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
+									<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
+									<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
 									
-									<div class="flex items-center justify-center gap-1 mt-2.5 text-[11px] text-slate-500 font-bold">
+									<div class="flex items-center justify-center gap-1 mt-2.5 text-xs text-slate-500 font-bold">
 										<span class="text-yellow-400">★</span>
 										<span><?php echo esc_html( $rating ); ?> (<?php echo esc_html( $reviews ); ?> đánh giá)</span>
 									</div>
 								</div>
 								
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-brand-primary hover:text-white py-2 rounded-lg font-bold transition-all text-xs uppercase text-brand-primary">Tìm hiểu thêm</a>
+									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-brand-primary hover:text-white py-2 rounded-lg font-bold transition-all text-sm uppercase text-brand-primary">Tìm hiểu thêm</a>
 								</div>
 							</div>
 						</div>
@@ -208,7 +208,7 @@ $is_base_archive = ! isset( $term->term_id );
 							<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
 								<div class="flex items-center gap-2">
 									<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
-									<button type="button" class="ltdh-compare-toggle text-xs text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg px-2.5 py-1 transition-all"
+									<button type="button" class="ltdh-compare-toggle text-sm text-slate-400 hover:text-brand-primary font-semibold border border-slate-200 hover:border-brand-primary rounded-lg px-2.5 py-1 transition-all"
 											data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 											data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 											data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
@@ -217,7 +217,7 @@ $is_base_archive = ! isset( $term->term_id );
 										So sánh
 									</button>
 								</div>
-								<a href="<"'?php the_permalink(); ?>"'>" class="bg-brand-accent text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#e06e00] shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
+								<a href="<"'?php the_permalink(); ?>"'>" class="bg-brand-accent text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-[#e06e00] shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
 							</div>
 						</div>
 					</div>

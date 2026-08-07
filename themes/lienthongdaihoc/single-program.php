@@ -63,24 +63,24 @@ $global_zalo = ltdh_get_zalo_url();
 					?>
 					<div class="grid grid-cols-2 md:grid-cols-5 gap-3.5 py-4 border-t border-slate-100">
 						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí chỉ từ</span>
-							<span class="font-extrabold text-[#00308b] text-xs md:text-sm leading-snug"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
+							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí chỉ từ</span>
+							<span class="font-extrabold text-[#00308b] text-sm leading-snug"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
 						</div>
 						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
-							<span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
+							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
+							<span class="font-extrabold text-slate-800 text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
 						</div>
 						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
-							<span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug"><?php echo esc_html( $learning_details['campus'] ); ?></span>
+							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
+							<span class="font-extrabold text-slate-800 text-sm leading-snug"><?php echo esc_html( $learning_details['campus'] ); ?></span>
 						</div>
 						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
-							<span class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
+							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
+							<span class="font-extrabold text-slate-800 text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 						</div>
 						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
-							<span class="font-extrabold text-[#EA580C] text-xs md:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
+							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
+							<span class="font-extrabold text-[#EA580C] text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
 					</div>
 				</section>
@@ -250,12 +250,12 @@ $global_zalo = ltdh_get_zalo_url();
 								</h4>
 								
 								<?php if ( $school_web ) : ?>
-									<p class="text-xs text-slate-500 mb-2 font-medium">
+									<p class="text-sm text-slate-500 mb-2 font-medium">
 										Website: <a href="<?php echo esc_url( $school_web ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#00308b] hover:underline"><?php echo esc_html( $school_web ); ?></a>
 									</p>
 								<?php endif; ?>
 
-								<div class="flex items-start justify-center gap-2 text-xs text-slate-500 font-medium max-w-xs mx-auto mb-4">
+								<div class="flex items-start justify-center gap-2 text-sm text-slate-500 font-medium max-w-xs mx-auto mb-4">
 									<span class="text-[#00308b] shrink-0 mt-0.5">📍</span>
 									<span class="text-left leading-relaxed">
 										Địa chỉ: <?php echo esc_html( $school_address ); ?>
@@ -263,7 +263,7 @@ $global_zalo = ltdh_get_zalo_url();
 									</span>
 								</div>
 								<div class="border-t border-slate-100 pt-3">
-									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="text-[#00308b] font-bold text-xs hover:underline flex items-center justify-center gap-1">
+									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="text-[#00308b] font-bold text-sm hover:underline flex items-center justify-center gap-1">
 										<span>Xem chi tiết về trường & các chương trình khác</span> <span>→</span>
 									</a>
 								</div>
@@ -331,10 +331,10 @@ $global_zalo = ltdh_get_zalo_url();
 										<?php endif; ?>
 										
 										<div class="flex-1 min-w-0">
-											<h4 class="font-bold text-slate-800 text-xs md:text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
+											<h4 class="font-bold text-slate-800 text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
 												<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 											</h4>
-											<p class="text-[10px] text-slate-400 mt-0.5">📅 <?php echo get_the_date(); ?></p>
+											<p class="text-xs text-slate-400 mt-0.5">📅 <?php echo get_the_date(); ?></p>
 										</div>
 									</div>
 								<?php
@@ -345,7 +345,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 							<?php if ( $has_more ) : ?>
 								<div class="mt-4 pt-3 border-t border-slate-100">
-									<a href="<?php echo esc_url( home_url( '/tin-tuc/?chuong-trinh=' . $program_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-xs hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
+									<a href="<?php echo esc_url( home_url( '/tin-tuc/?chuong-trinh=' . $program_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
 										<span>Xem thêm tin tức</span>
 										<span>→</span>
 									</a>
@@ -401,7 +401,7 @@ $global_zalo = ltdh_get_zalo_url();
 <!-- SECTION 12: STICKY CTA (Mobile Bottom Sticky Bar) -->
 <div class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 shadow-[0_-4px_10px_rgba(0,0,0,0.04)] py-3 px-4 flex items-center justify-between md:hidden">
 	<div class="flex-1 mr-3">
-		<span class="text-[10px] text-slate-400 block font-medium uppercase leading-none mb-1">Đăng ký lớp khai giảng</span>
+		<span class="text-xs text-slate-400 block font-medium uppercase leading-none mb-1">Đăng ký lớp khai giảng</span>
 		<h4 class="font-bold text-slate-800 text-sm truncate leading-none"><?php the_title(); ?></h4>
 	</div>
 	<a href="#register" class="bg-brand-accent text-white px-5 py-3 rounded-lg text-sm font-extrabold shadow-md shadow-brand-primary/20 hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center">

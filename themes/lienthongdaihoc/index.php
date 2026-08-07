@@ -105,7 +105,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 		<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-accent/20 rounded-full blur-3xl"></div>
 		
 		<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-			<nav class="text-xs text-blue-200 mb-3 flex items-center gap-2">
+			<nav class="text-sm text-blue-200 mb-3 flex items-center gap-2">
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-white transition-colors">Trang chủ</a>
 				<span>›</span>
 				<span class="text-white">Tin tức tuyển sinh</span>
@@ -123,10 +123,10 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 					<span class="text-2xl">🔍</span>
 					<div>
 						<h3 class="font-bold text-slate-800 text-sm md:text-base">Đang lọc tin tức tuyển sinh</h3>
-						<p class="text-xs text-slate-500 mt-0.5">Hiển thị tin tức liên quan đến: <strong class="text-[#00308b] font-bold"><?php echo esc_html( $filter_title ); ?></strong></p>
+						<p class="text-sm text-slate-500 mt-0.5">Hiển thị tin tức liên quan đến: <strong class="text-[#00308b] font-bold"><?php echo esc_html( $filter_title ); ?></strong></p>
 					</div>
 				</div>
-				<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>" class="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-bold text-xs hover:bg-slate-50 transition-all min-h-[38px] flex items-center justify-center">
+				<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>" class="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all min-h-[38px] flex items-center justify-center">
 					❌ Tắt bộ lọc
 				</a>
 			</div>
@@ -135,14 +135,14 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 		<!-- Category Pills Navigation (Horizontal scroll on mobile) -->
 		<div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-4 mb-8 border-b border-slate-200">
 			<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>" 
-			   class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all <?php echo empty( $active_cat_slug ) ? 'bg-brand-primary text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'; ?> min-h-[38px] flex items-center justify-center">
+			   class="px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all <?php echo empty( $active_cat_slug ) ? 'bg-brand-primary text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'; ?> min-h-[38px] flex items-center justify-center">
 				Tất cả tin tức
 			</a>
 			<?php foreach ( $blog_cats as $bcat ) :
 				$is_active_cat = ( $active_cat_slug === $bcat->slug );
 			?>
 				<a href="<?php echo esc_url( get_category_link( $bcat->term_id ) ); ?>" 
-				   class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all <?php echo $is_active_cat ? 'bg-brand-primary text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'; ?> min-h-[38px] flex items-center justify-center">
+				   class="px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all <?php echo $is_active_cat ? 'bg-brand-primary text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'; ?> min-h-[38px] flex items-center justify-center">
 					<?php echo esc_html( $bcat->name ); ?>
 				</a>
 			<?php endforeach; ?>
@@ -173,7 +173,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 							<div class="absolute inset-0 bg-gradient-to-tr from-[#0E2038] to-brand-primary flex items-center justify-center text-4xl">📰</div>
 						<?php endif; ?>
 						<?php if ( $feat_school_name ) : ?>
-							<span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#00308b] text-[10px] font-extrabold px-3 py-1 rounded-full shadow-sm">
+							<span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#00308b] text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">
 								<?php echo esc_html( $feat_school_name ); ?>
 							</span>
 						<?php endif; ?>
@@ -183,11 +183,11 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 					<div class="md:col-span-5 p-6 md:p-8 flex flex-col justify-between space-y-4">
 						<div class="space-y-3">
 							<div class="flex items-center gap-2">
-								<span class="bg-brand-primary text-white text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+								<span class="bg-brand-primary text-white text-xs font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
 									NỔI BẬT
 								</span>
 								<?php if ( $feat_cat ) : ?>
-									<span class="text-[10px] text-slate-400 font-bold uppercase"><?php echo esc_html( $feat_cat->name ); ?></span>
+									<span class="text-xs text-slate-400 font-bold uppercase"><?php echo esc_html( $feat_cat->name ); ?></span>
 								<?php endif; ?>
 							</div>
 							<h2 class="text-base md:text-xl font-extrabold text-slate-900 leading-snug hover:text-brand-primary transition-colors">
@@ -195,11 +195,11 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 									<?php echo esc_html( $featured_post->post_title ); ?>
 								</a>
 							</h2>
-							<p class="text-xs md:text-sm text-slate-500 line-clamp-3 leading-relaxed">
+							<p class="text-sm text-slate-500 line-clamp-3 leading-relaxed">
 								<?php echo esc_html( wp_trim_words( $featured_post->post_excerpt ?: $featured_post->post_content, 25 ) ); ?>
 							</p>
 						</div>
-						<div class="flex items-center justify-between pt-4 border-t border-slate-100 text-[11px] text-slate-400">
+						<div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs text-slate-400">
 							<span><?php echo get_the_date( 'd/m/Y', $featured_post->ID ); ?></span>
 							<a href="<?php echo esc_url( get_permalink( $featured_post->ID ) ); ?>" class="text-brand-primary font-bold hover:underline">Chi tiết →</a>
 						</div>
@@ -213,7 +213,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 						<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider">
 							<?php echo $active_cat ? esc_html( $active_cat->name ) : 'Bài viết mới nhất'; ?>
 						</h3>
-						<span class="text-xs text-slate-400 font-bold bg-slate-100 px-2.5 py-1 rounded-full"><?php echo esc_html( $blog_query->found_posts ); ?> Bài viết</span>
+						<span class="text-sm text-slate-400 font-bold bg-slate-100 px-2.5 py-1 rounded-full"><?php echo esc_html( $blog_query->found_posts ); ?> Bài viết</span>
 					</div>
 
 					<!-- 2-Column Responsive Card Grid (Consistent with school/major page) -->
@@ -240,7 +240,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 										<div class="w-full h-full flex items-center justify-center text-3xl">📰</div>
 									<?php endif; ?>
 									<?php if ( $school_name ) : ?>
-										<span class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[#00308b] text-[8px] md:text-[9px] font-extrabold px-2 py-0.5 rounded-full shadow-sm line-clamp-1">
+										<span class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[#00308b] text-xs font-extrabold px-2 py-0.5 rounded-full shadow-sm line-clamp-1">
 											<?php echo esc_html( $school_name ); ?>
 										</span>
 									<?php endif; ?>
@@ -248,21 +248,21 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 
 								<div class="p-3 md:p-5 flex-1 flex flex-col justify-between">
 									<div>
-										<div class="flex items-center justify-between text-[9px] md:text-[10px] font-bold text-slate-400 mb-1">
+										<div class="flex items-center justify-between text-xs font-bold text-slate-400 mb-1">
 											<?php if ( $post_cat ) : ?>
 												<span class="text-brand-primary uppercase"><?php echo esc_html( $post_cat->name ); ?></span>
 											<?php endif; ?>
 											<time class="font-normal"><?php echo get_the_date( 'd/m/Y' ); ?></time>
 										</div>
-										<h4 class="font-extrabold text-slate-800 text-xs md:text-sm leading-snug hover:text-brand-primary transition-colors line-clamp-2 min-h-[32px] md:min-h-[40px]">
+										<h4 class="font-extrabold text-slate-800 text-sm leading-snug hover:text-brand-primary transition-colors line-clamp-2 min-h-[32px] md:min-h-[40px]">
 											<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 										</h4>
-										<div class="hidden md:block text-xs text-slate-500 line-clamp-2 leading-relaxed mt-2">
+										<div class="hidden md:block text-sm text-slate-500 line-clamp-2 leading-relaxed mt-2">
 											<?php echo esc_html( wp_strip_all_tags( get_the_excerpt() ) ); ?>
 										</div>
 									</div>
 
-									<div class="border-t border-slate-100 pt-3 mt-3 md:mt-4 flex items-center justify-between text-[11px] font-bold text-brand-primary">
+									<div class="border-t border-slate-100 pt-3 mt-3 md:mt-4 flex items-center justify-between text-sm font-bold text-brand-primary">
 										<a href="<?php the_permalink(); ?>" class="hover:underline">Chi tiết bài viết</a>
 										<span>→</span>
 									</div>
@@ -298,13 +298,13 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 
 				<!-- Sidebar Category Card -->
 				<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-					<h3 class="font-extrabold text-slate-900 text-xs uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">📂 Chuyên mục cẩm nang</h3>
+					<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">📂 Chuyên mục cẩm nang</h3>
 					<ul class="space-y-1">
 						<li>
 							<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>" 
-							   class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all <?php echo empty( $active_cat_slug ) ? 'bg-slate-50 text-brand-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
+							   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-all <?php echo empty( $active_cat_slug ) ? 'bg-slate-50 text-brand-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
 								<span>Tất cả tin tức</span>
-								<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500"><?php echo esc_html( wp_count_posts( 'post' )->publish ); ?></span>
+								<span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500"><?php echo esc_html( wp_count_posts( 'post' )->publish ); ?></span>
 							</a>
 						</li>
 						<?php foreach ( $blog_cats as $bcat ) :
@@ -312,9 +312,9 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 						?>
 							<li>
 								<a href="<?php echo esc_url( home_url( '/tin-tuc/?danh-muc=' . $bcat->slug ) ); ?>" 
-								   class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all <?php echo $is_active_cat ? 'bg-slate-50 text-brand-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
+								   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-all <?php echo $is_active_cat ? 'bg-slate-50 text-brand-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
 									<span><?php echo esc_html( $bcat->name ); ?></span>
-									<span class="text-[10px] px-2 py-0.5 rounded-full <?php echo $is_active_cat ? 'bg-blue-50 text-brand-primary' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $bcat->count ); ?></span>
+									<span class="text-xs px-2 py-0.5 rounded-full <?php echo $is_active_cat ? 'bg-blue-50 text-brand-primary' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $bcat->count ); ?></span>
 								</a>
 							</li>
 						<?php endforeach; ?>
@@ -323,7 +323,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 
 				<!-- Featured Posts / Recent Widget -->
 				<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-					<h3 class="font-extrabold text-slate-900 text-xs uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">🔥 Tin xem nhiều nhất</h3>
+					<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">🔥 Tin xem nhiều nhất</h3>
 					<ul class="space-y-4">
 						<?php foreach ( $recent_posts as $rp ) :
 							$rp_thumb = get_the_post_thumbnail_url( $rp->ID, 'thumbnail' );
@@ -337,10 +337,10 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 									<?php endif; ?>
 								</a>
 								<div class="min-w-0">
-									<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-[11px] font-bold text-slate-800 hover:text-brand-primary leading-snug block line-clamp-2 transition-all">
+									<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-sm font-bold text-slate-800 hover:text-brand-primary leading-snug block line-clamp-2 transition-all">
 										<?php echo esc_html( $rp->post_title ); ?>
 									</a>
-									<time class="text-[9px] text-slate-400 mt-0.5 block"><?php echo get_the_date( 'd/m/Y', $rp->ID ); ?></time>
+									<time class="text-xs text-slate-400 mt-0.5 block"><?php echo get_the_date( 'd/m/Y', $rp->ID ); ?></time>
 								</div>
 							</li>
 						<?php endforeach; ?>
@@ -352,9 +352,9 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 					<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 16px 16px;"></div>
 					<div class="text-3xl mb-2">💡</div>
 					<h3 class="font-extrabold text-base mb-1.5 leading-tight">Bạn chưa chọn được lộ trình học?</h3>
-					<p class="text-blue-100 text-xs mb-4 leading-relaxed">Để lại thông tin, ban tư vấn sẽ giải đáp lộ trình liên thông hoàn toàn miễn phí cho bạn.</p>
+					<p class="text-blue-100 text-sm mb-4 leading-relaxed">Để lại thông tin, ban tư vấn sẽ giải đáp lộ trình liên thông hoàn toàn miễn phí cho bạn.</p>
 					<a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>" 
-					   class="block w-full bg-brand-accent text-white font-extrabold text-xs py-3 rounded-lg hover:bg-[#e06e00] transition-all shadow-md shadow-brand-accent/20 min-h-[44px] flex items-center justify-center">
+					   class="block w-full bg-brand-accent text-white font-extrabold text-sm py-3 rounded-lg hover:bg-[#e06e00] transition-all shadow-md shadow-brand-accent/20 min-h-[44px] flex items-center justify-center">
 						KIỂM TRA ĐIỀU KIỆN NGAY
 					</a>
 				</div>

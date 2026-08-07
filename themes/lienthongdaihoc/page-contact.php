@@ -43,7 +43,7 @@ $address = ltdh_get_address();
 			<!-- Right Side Form (Matches Mockup exact copy and style) -->
 			<div class="lg:col-span-7 p-6 md:p-10 flex flex-col justify-center">
 				<div class="mb-6">
-					<span class="inline-block bg-blue-50 text-[#00308b] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">
+					<span class="inline-block bg-blue-50 text-[#00308b] text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">
 						ĐĂNG KÝ TRỰC TUYẾN
 					</span>
 					<h3 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
@@ -81,7 +81,7 @@ $address = ltdh_get_address();
 				<div>
 					<h4 class="font-bold text-slate-950 text-sm mb-1">Hotline tư vấn</h4>
 					<p class="text-sm text-[#00308b] font-bold leading-normal"><?php echo esc_html( $hotline ); ?></p>
-					<p class="text-xs text-slate-400 mt-0.5">Hỗ trợ 24/7 toàn quốc</p>
+					<p class="text-sm text-slate-400 mt-0.5">Hỗ trợ 24/7 toàn quốc</p>
 				</div>
 			</div>
 
@@ -93,7 +93,7 @@ $address = ltdh_get_address();
 				<div>
 					<h4 class="font-bold text-slate-950 text-sm mb-1">Địa chỉ Email</h4>
 					<p class="text-sm text-slate-500 leading-normal break-all"><?php echo esc_html( $email ); ?></p>
-					<p class="text-xs text-slate-400 mt-0.5">Phản hồi trong vòng 24h làm việc</p>
+					<p class="text-sm text-slate-400 mt-0.5">Phản hồi trong vòng 24h làm việc</p>
 				</div>
 			</div>
 		</div>
