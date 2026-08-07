@@ -171,7 +171,7 @@ function ltdh_ajax_filter_programs() {
 						</h3>
 						<div class="space-y-1.5 text-sm text-slate-500 py-3 border-t border-slate-100">
 							<p>Hệ đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
-							<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( LTDH_META_TUITION, $prog_id ) ?: 'Liên hệ' ); ?></span></p>
+							<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( ltdh_get_program_tuition_display( $prog_id ) ); ?></span></p>
 							<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( LTDH_META_DURATION, $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
 							<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
 							<p>Hình thức: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>

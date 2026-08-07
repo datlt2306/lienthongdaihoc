@@ -201,6 +201,57 @@
                 "placeholder": "Ví dụ: 450,000đ \/ tín chỉ hoặc 15,000,000đ \/ học kỳ"
             },
             {
+                "key": "field_program_tuition_amount",
+                "label": "Mức học phí định mức (số tiền)",
+                "name": "tuition_amount",
+                "type": "number",
+                "instructions": "Ví dụ: 684026 (không nhập dấu phẩy hoặc chữ đ)",
+                "placeholder": "684026"
+            },
+            {
+                "key": "field_program_tuition_unit",
+                "label": "Đơn vị tính học phí",
+                "name": "tuition_unit",
+                "type": "select",
+                "choices": {
+                    "tin-chi": "đồng / tín chỉ",
+                    "hoc-ky": "đồng / học kỳ",
+                    "nam": "đồng / năm học"
+                },
+                "default_value": "tin-chi"
+            },
+            {
+                "key": "field_program_tuition_academic_year",
+                "label": "Năm học áp dụng",
+                "name": "tuition_academic_year",
+                "type": "text",
+                "placeholder": "Ví dụ: 2025 - 2026"
+            },
+            {
+                "key": "field_program_tuition_total_credits",
+                "label": "Tổng số tín chỉ toàn khóa (Nếu có)",
+                "name": "tuition_total_credits",
+                "type": "number",
+                "instructions": "Dùng để tạm tính tổng học phí toàn khóa",
+                "placeholder": "136"
+            },
+            {
+                "key": "field_program_tuition_increase_roadmap",
+                "label": "Lộ trình tăng học phí / Ghi chú học phí",
+                "name": "tuition_increase_roadmap",
+                "type": "textarea",
+                "rows": 3,
+                "placeholder": "Ví dụ: Học phí có thể tăng hàng năm theo quy định..."
+            },
+            {
+                "key": "field_program_quota",
+                "label": "Chỉ tiêu tuyển sinh",
+                "name": "quota",
+                "type": "number",
+                "placeholder": "Ví dụ: 50"
+            },
+
+            {
                 "key": "field_program_duration",
                 "label": "Thời gian học",
                 "name": "duration",
@@ -226,6 +277,58 @@
                 "type": "text",
                 "placeholder": "Ví dụ: Đợt 1 đến hết 30\/11\/2026"
             },
+            {
+                "key": "field_program_admission_batches",
+                "label": "Các đợt tuyển sinh",
+                "name": "admission_batches",
+                "type": "repeater",
+                "instructions": "Nhập lịch trình các đợt tuyển sinh của chương trình này",
+                "layout": "table",
+                "button_label": "Thêm đợt tuyển sinh",
+                "sub_fields": [
+                    {
+                        "key": "field_program_batch_name",
+                        "label": "Tên đợt",
+                        "name": "batch_name",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Đợt 1"
+                    },
+                    {
+                        "key": "field_program_batch_application_period",
+                        "label": "Thời gian nhận hồ sơ",
+                        "name": "application_period",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Từ 20/04 đến 15/06/2026"
+                    },
+                    {
+                        "key": "field_program_batch_evaluation_time",
+                        "label": "Thời gian xét tuyển",
+                        "name": "evaluation_time",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Tháng 6/2026"
+                    },
+                    {
+                        "key": "field_program_batch_enrollment_time",
+                        "label": "Thời gian nhập học",
+                        "name": "enrollment_time",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Tháng 7/2026"
+                    },
+                    {
+                        "key": "field_program_batch_status",
+                        "label": "Trạng thái đợt",
+                        "name": "batch_status",
+                        "type": "select",
+                        "choices": {
+                            "dang-nhan": "Đang nhận hồ sơ",
+                            "sap-mo": "Sắp mở nhận",
+                            "da-dong": "Đã đóng tuyển sinh"
+                        },
+                        "default_value": "dang-nhan"
+                    }
+                ]
+            },
+
             {
                 "key": "field_program_hotline",
                 "label": "Hotline riêng chương trình (Nếu có)",

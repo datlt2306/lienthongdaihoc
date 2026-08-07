@@ -220,7 +220,7 @@ $hotline = ltdh_get_hotline();
 							$status = get_post_meta( $prog_id, LTDH_META_ADMISSION_STATUS, true ) ?: 'tuyen-sinh';
 							$types = wp_get_post_terms( $prog_id, LTDH_TAX_TRAINING_TYPE );
 							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
-							$tuition_fee = get_field( LTDH_META_TUITION, $prog_id ) ?: 'Liên hệ';
+							$tuition_fee = ltdh_get_program_tuition_display( $prog_id );
 							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
 							$permalink = get_permalink( $prog_id );
 

@@ -19,11 +19,13 @@ $major_id   = get_field( LTDH_META_MAJOR_REL, $program_id );
 $school_title = $school_id ? get_the_title( $school_id ) : '';
 $major_title  = $major_id ? get_the_title( $major_id ) : '';
 
-$tuition         = get_field( LTDH_META_TUITION, $program_id );
+$tuition         = ltdh_get_program_tuition_display( $program_id );
 $duration        = get_field( LTDH_META_DURATION, $program_id );
 $requirements    = get_field( 'admission_requirements', $program_id );
 $documents       = get_field( 'required_documents', $program_id );
-$enrollment      = get_field( 'enrollment_period', $program_id );
+$enrollment      = ltdh_get_program_admission_deadline_display( $program_id );
+$quota           = get_field( 'quota', $program_id );
+
 $program_hotline = ltdh_get_program_hotline( $program_id );
 $benefits        = get_field( 'program_benefits', $program_id );
 $opportunities   = get_field( 'career_opportunities', $program_id );
@@ -60,8 +62,9 @@ $global_zalo = ltdh_get_zalo_url();
 
 					<?php
 					$learning_details = ltdh_get_program_learning_details( $program_id );
+					$grid_cols_class = $quota ? 'grid-cols-2 md:grid-cols-6' : 'grid-cols-2 md:grid-cols-5';
 					?>
-					<div class="grid grid-cols-2 md:grid-cols-5 gap-2.5 md:gap-3.5 py-4 border-t border-slate-100">
+					<div class="grid <?php echo esc_attr( $grid_cols_class ); ?> gap-2.5 md:gap-3.5 py-4 border-t border-slate-100">
 						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí chỉ từ</span>
 							<span class="font-extrabold text-[#00308b] text-xs sm:text-sm leading-snug"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
@@ -70,6 +73,12 @@ $global_zalo = ltdh_get_zalo_url();
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
 							<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
 						</div>
+						<?php if ( $quota ) : ?>
+							<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+								<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
+								<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
+							</div>
+						<?php endif; ?>
 						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
 							<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['campus'] ); ?></span>
@@ -83,6 +92,57 @@ $global_zalo = ltdh_get_zalo_url();
 							<span class="font-extrabold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
 					</div>
+
+					<?php if ( have_rows( 'admission_batches', $program_id ) ) : ?>
+						<div class="mt-6 pt-6 border-t border-slate-100 space-y-4">
+							<h3 class="font-bold text-slate-800 text-sm tracking-wider uppercase">Lịch trình các đợt tuyển sinh</h3>
+							<div class="overflow-x-auto rounded-xl border border-slate-200">
+								<table class="w-full text-sm text-left text-slate-500">
+									<thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+										<tr>
+											<th scope="col" class="px-4 py-3 font-extrabold">Đợt tuyển sinh</th>
+											<th scope="col" class="px-4 py-3 font-extrabold">Hạn nhận hồ sơ</th>
+											<th scope="col" class="px-4 py-3 font-extrabold">Xét tuyển</th>
+											<th scope="col" class="px-4 py-3 font-extrabold">Nhập học</th>
+											<th scope="col" class="px-4 py-3 font-extrabold">Trạng thái</th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php while ( have_rows( 'admission_batches', $program_id ) ) : the_row();
+											$batch_name = get_sub_field( 'batch_name' );
+											$app_period = get_sub_field( 'application_period' );
+											$eval_time  = get_sub_field( 'evaluation_time' );
+											$enrol_time = get_sub_field( 'enrollment_time' );
+											$status     = get_sub_field( 'batch_status' );
+											
+											$status_label = 'Đang nhận hồ sơ';
+											$status_class = 'bg-green-50 text-green-700 border-green-200';
+											if ( $status === 'sap-mo' ) {
+												$status_label = 'Sắp mở';
+												$status_class = 'bg-amber-50 text-amber-700 border-amber-200';
+											} elseif ( $status === 'da-dong' ) {
+												$status_label = 'Đã đóng';
+												$status_class = 'bg-slate-100 text-slate-600 border-slate-200';
+											}
+										?>
+											<tr class="bg-white border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
+												<td class="px-4 py-3.5 font-bold text-slate-900"><?php echo esc_html( $batch_name ); ?></td>
+												<td class="px-4 py-3.5 text-slate-600"><?php echo esc_html( $app_period ); ?></td>
+												<td class="px-4 py-3.5 text-slate-500"><?php echo esc_html( $eval_time ); ?></td>
+												<td class="px-4 py-3.5 text-slate-500"><?php echo esc_html( $enrol_time ); ?></td>
+												<td class="px-4 py-3.5">
+													<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border <?php echo esc_attr( $status_class ); ?>">
+														<?php echo esc_html( $status_label ); ?>
+													</span>
+												</td>
+											</tr>
+										<?php endwhile; ?>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					<?php endif; ?>
+
 				</section>
 
 
@@ -198,7 +258,7 @@ $global_zalo = ltdh_get_zalo_url();
 									<span class="text-sm text-slate-400 block mb-1 font-medium"><?php echo esc_html( $rel_school ); ?></span>
 									<h4 class="font-bold text-slate-800 text-sm group-hover:text-brand-primary transition-colors line-clamp-2"><?php the_title(); ?></h4>
 									<div class="mt-3 flex justify-between items-center text-sm text-slate-500 border-t border-slate-50 pt-2">
-										<span>Học phí: <?php echo esc_html( get_field( 'tuition_fee' ) ?: 'Liên hệ' ); ?></span>
+										<span>Học phí: <?php echo esc_html( ltdh_get_program_tuition_display( get_the_ID() ) ); ?></span>
 									</div>
 								</a>
 							<?php 

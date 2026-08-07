@@ -710,30 +710,57 @@ class LTDH_CLI_Commands {
 		$programs_data = [
 			'vua-hoc-vua-lam' => [
 				'title' => 'Cử nhân Công nghệ thông tin (Vừa học vừa làm)',
-				'tuition' => '450.000đ / tín chỉ',
-				'duration' => '2.5 - 3.5 năm',
+				'tuition' => '684.026đ / tín chỉ',
+				'tuition_amount' => 684026,
+				'tuition_unit' => 'tin-chi',
+				'tuition_year' => '2025 - 2026',
+				'duration' => '2.0 năm',
+				'quota' => 200,
 				'schedule' => 'Tối thứ 2 - thứ 6 hoặc Thứ 7 & Chủ nhật',
 				'target' => 'Người đi làm, người muốn học liên thông từ Trung cấp/Cao đẳng lên Đại học',
 				'advantages' => 'Vừa học vừa đi làm tích lũy kinh nghiệm thực tế, lịch học linh hoạt ngoài giờ hành chính.',
 				'disadvantages' => 'Yêu cầu thời gian cam kết học tập đều đặn vào buổi tối hoặc cuối tuần.',
+				'batches' => [
+					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'application_period' => '20/04/2026 - 15/06/2026', 'evaluation_time' => 'Tháng 6/2026', 'enrollment_time' => 'Tháng 7/2026', 'batch_status' => 'dang-nhan' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 2', 'application_period' => '20/08/2026 - 15/09/2026', 'evaluation_time' => 'Tháng 9/2026', 'enrollment_time' => 'Tháng 10/2026', 'batch_status' => 'sap-mo' ]
+				]
 			],
 			'chinh-quy' => [
-				'title' => 'Cử nhân Công nghệ thông tin (Chính quy)',
-				'tuition' => '420.000đ / tín chỉ',
-				'duration' => '4 năm',
-				'schedule' => 'Ban ngày theo thời khóa biểu của trường',
-				'target' => 'Học sinh tốt nghiệp THPT',
-				'advantages' => 'Chương trình đào tạo chính quy chuẩn quốc gia, môi trường học tập tương tác cao trực tiếp với giảng viên.',
-				'disadvantages' => 'Lịch học cố định ban ngày, khó sắp xếp đi làm song song.',
+				'title' => 'Cử nhân Công nghệ thông tin (Liên thông Chính quy)',
+				'tuition' => '526.174đ / tín chỉ',
+				'tuition_amount' => 526174,
+				'tuition_unit' => 'tin-chi',
+				'tuition_year' => '2025 - 2026',
+				'duration' => '2.0 năm',
+				'quota' => 700,
+				'schedule' => 'Học ban ngày tại giảng đường',
+				'target' => 'Sinh viên tốt nghiệp Cao đẳng muốn liên thông chính quy lên Đại học',
+				'advantages' => 'Bằng đại học chính quy danh giá, môi trường học tập tập trung chuyên sâu.',
+				'disadvantages' => 'Lịch học ban ngày cố định, khó sắp xếp đi làm thêm.',
+				'batches' => [
+					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'application_period' => '22/12/2025 - 07/01/2026', 'evaluation_time' => 'Xét tuyển 09-14/01/2026', 'enrollment_time' => 'Thi tuyển 17-18/01/2026', 'batch_status' => 'da-dong' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 2', 'application_period' => '25/03/2026 - 18/05/2026', 'evaluation_time' => 'Xét tuyển 01-04/06/2026', 'enrollment_time' => 'Thi tuyển 06-07/06/2026', 'batch_status' => 'dang-nhan' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 3', 'application_period' => '07/07/2026 - 14/08/2026', 'evaluation_time' => 'Xét tuyển 07-09/09/2026', 'enrollment_time' => 'Thi tuyển 12-13/09/2026', 'batch_status' => 'sap-mo' ]
+				]
 			],
 			'tu-xa' => [
-				'title' => 'Cử nhân Công nghệ thông tin (Từ xa)',
-				'tuition' => '450.000đ / tín chỉ',
-				'duration' => '1.5 - 3 năm',
-				'schedule' => 'Học trực tuyến (E-learning) linh hoạt mọi lúc mọi nơi',
-				'target' => 'Người đi làm bận rộn, người ở xa không có điều kiện đến giảng đường trực tiếp',
-				'advantages' => 'Học 100% online linh động thời gian, tiết kiệm chi phí di chuyển và sinh hoạt.',
-				'disadvantages' => 'Yêu cầu tính tự giác học tập cao của học viên.',
+				'title' => 'Cử nhân Công nghệ thông tin (Đào tạo từ xa)',
+				'tuition' => '606.369đ / tín chỉ',
+				'tuition_amount' => 606369,
+				'tuition_unit' => 'tin-chi',
+				'tuition_year' => '2025 - 2026',
+				'duration' => 'Tối thiểu 1.5 năm',
+				'quota' => 800,
+				'schedule' => 'Học trực tuyến (E-learning) 100% linh hoạt',
+				'target' => 'Người đi làm bận rộn, người muốn học văn bằng 2 hoặc liên thông từ xa',
+				'advantages' => 'Tự chủ thời gian và không gian học tập, phôi bằng tốt nghiệp không ghi hình thức đào tạo.',
+				'disadvantages' => 'Đòi hỏi tính tự kỷ luật và chủ động cao trong tự học.',
+				'batches' => [
+					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'application_period' => 'Liên tục trong năm', 'evaluation_time' => 'Xét tuyển tháng 3/2026', 'enrollment_time' => 'Khai giảng tháng 4/2026', 'batch_status' => 'da-dong' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 2', 'application_period' => 'Liên tục trong năm', 'evaluation_time' => 'Xét tuyển tháng 5/2026', 'enrollment_time' => 'Khai giảng tháng 6/2026', 'batch_status' => 'da-dong' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 3', 'application_period' => 'Liên tục trong năm', 'evaluation_time' => 'Xét tuyển tháng 8/2026', 'enrollment_time' => 'Khai giảng tháng 9/2026', 'batch_status' => 'dang-nhan' ],
+					[ 'batch_name' => 'Tuyển sinh Đợt 4', 'application_period' => 'Liên tục trong năm', 'evaluation_time' => 'Xét tuyển tháng 11/2026', 'enrollment_time' => 'Khai giảng tháng 12/2026', 'batch_status' => 'sap-mo' ]
+				]
 			]
 		];
 
@@ -770,6 +797,10 @@ class LTDH_CLI_Commands {
 			update_post_meta( $program_id, LTDH_META_SCHOOL_REL, $school_id );
 			update_post_meta( $program_id, LTDH_META_MAJOR_REL, $major_id );
 			update_post_meta( $program_id, LTDH_META_TUITION, $p_info['tuition'] );
+			update_post_meta( $program_id, 'tuition_amount', $p_info['tuition_amount'] );
+			update_post_meta( $program_id, 'tuition_unit', $p_info['tuition_unit'] );
+			update_post_meta( $program_id, 'tuition_academic_year', $p_info['tuition_year'] );
+			update_post_meta( $program_id, 'quota', $p_info['quota'] );
 			update_post_meta( $program_id, LTDH_META_DURATION, $p_info['duration'] );
 			update_post_meta( $program_id, 'campus_info', 'Hà Nội' );
 			update_post_meta( $program_id, 'admission_requirements', 'Xét tuyển học bạ hoặc hồ sơ văn bằng (THPT, Trung cấp, Cao đẳng, Đại học).' );
@@ -784,6 +815,24 @@ class LTDH_CLI_Commands {
 
 			update_post_meta( $program_id, LTDH_META_ADMISSION_STATUS, LTDH_STATUS_OPEN );
 			update_post_meta( $program_id, LTDH_META_AD_GROUPS, 'A00, A01, D01, D07' );
+
+			// Save Repeater field for batches
+			update_post_meta( $program_id, 'admission_batches', count( $p_info['batches'] ) );
+			foreach ( $p_info['batches'] as $index => $batch ) {
+				update_post_meta( $program_id, "admission_batches_{$index}_batch_name", $batch['batch_name'] );
+				update_post_meta( $program_id, "admission_batches_{$index}_application_period", $batch['application_period'] );
+				update_post_meta( $program_id, "admission_batches_{$index}_evaluation_time", $batch['evaluation_time'] );
+				update_post_meta( $program_id, "admission_batches_{$index}_enrollment_time", $batch['enrollment_time'] );
+				update_post_meta( $program_id, "admission_batches_{$index}_batch_status", $batch['batch_status'] );
+				
+				// ACF subfields mapping keys (optional but helpful)
+				update_post_meta( $program_id, "_admission_batches_{$index}_batch_name", 'field_program_batch_name' );
+				update_post_meta( $program_id, "_admission_batches_{$index}_application_period", 'field_program_batch_application_period' );
+				update_post_meta( $program_id, "_admission_batches_{$index}_evaluation_time", 'field_program_batch_evaluation_time' );
+				update_post_meta( $program_id, "_admission_batches_{$index}_enrollment_time", 'field_program_batch_enrollment_time' );
+				update_post_meta( $program_id, "_admission_batches_{$index}_batch_status", 'field_program_batch_status' );
+			}
+			update_post_meta( $program_id, '_admission_batches', 'field_program_admission_batches' );
 
 			$faqs = [
 				[ 'question' => 'Học hệ từ xa có giá trị tương đương hệ chính quy không?', 'answer' => 'Có. Theo Thông tư của Bộ GD&ĐT, từ ngày 01/03/2020 trên văn bằng tốt nghiệp Đại học không ghi hình thức đào tạo (Chính quy, Từ xa, hay Vừa học vừa làm), giá trị pháp lý là hoàn toàn như nhau.' ],

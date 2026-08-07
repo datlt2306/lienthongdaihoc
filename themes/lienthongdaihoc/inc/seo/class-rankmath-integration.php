@@ -39,7 +39,7 @@ function ltdh_seo_dynamic_description( $desc ) {
 		$program_id = get_the_ID();
 		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
 		$school     = $school_id ? get_the_title( $school_id ) : '';
-		$tuition    = get_field( LTDH_META_TUITION, $program_id ) ?: 'Liên hệ';
+		$tuition    = ltdh_get_program_tuition_display( $program_id );
 		$duration   = get_field( LTDH_META_DURATION, $program_id ) ?: '1.5 - 2 năm';
 
 		$training_type = '';
