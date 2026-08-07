@@ -807,12 +807,26 @@ $zalo    = ltdh_get_zalo_url();
 				if (! empty($testimonials)) :
 					foreach ($testimonials as $t) :
 						$initials = strtoupper(substr($t['initials'] ?? 'U', 0, 2));
+						$avatar_url = '';
+						if (!empty($t['image'])) {
+							if (is_array($t['image'])) {
+								$avatar_url = $t['image']['sizes']['thumbnail'] ?? $t['image']['url'] ?? '';
+							} elseif (is_numeric($t['image'])) {
+								$avatar_url = wp_get_attachment_image_url($t['image'], 'thumbnail');
+							} else {
+								$avatar_url = $t['image'];
+							}
+						}
 				?>
 						<div class="shrink-0 w-[85vw] md:w-auto snap-center bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
 							<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
 							<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"<?php echo esc_html($t['content'] ?? ''); ?>"</p>
 							<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
-								<div class="h-10 w-10 bg-brand-accent text-white rounded-full flex items-center justify-center font-bold text-sm"><?php echo esc_html($initials); ?></div>
+								<?php if ($avatar_url) : ?>
+									<img class="h-10 w-10 rounded-full object-cover border border-slate-200" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>">
+								<?php else : ?>
+									<div class="h-10 w-10 bg-brand-accent text-white rounded-full flex items-center justify-center font-bold text-sm"><?php echo esc_html($initials); ?></div>
+								<?php endif; ?>
 								<div>
 									<p class="font-bold text-sm text-slate-800"><?php echo esc_html($t['name'] ?? ''); ?></p>
 									<p class="text-sm text-slate-400"><?php echo esc_html($t['role'] ?? ''); ?></p>
@@ -824,9 +838,27 @@ $zalo    = ltdh_get_zalo_url();
 				else :
 					// Fallback hardcoded testimonials when ACF not populated.
 					$fallback_testimonials = [
-						['name' => 'Nguyễn Hương', 'role' => 'VB2 Công nghệ thông tin', 'initials' => 'NH', 'content' => 'Mình đã học Văn bằng 2 CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'],
-						['name' => 'Trần Minh', 'role' => 'Đại học Từ xa - Quản trị kinh doanh', 'initials' => 'TM', 'content' => 'Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy.'],
-						['name' => 'Lê Phương', 'role' => 'Liên thông Đại học - Kế toán', 'initials' => 'LP', 'content' => 'Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận.'],
+						[
+							'name' => 'Nguyễn Hương',
+							'role' => 'VB2 Công nghệ thông tin',
+							'initials' => 'NH',
+							'image' => get_template_directory_uri() . '/assets/images/student-huong.jpg',
+							'content' => 'Mình đã học Văn bằng 2 CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
+						],
+						[
+							'name' => 'Trần Minh',
+							'role' => 'Đại học Từ xa - Quản trị kinh doanh',
+							'initials' => 'TM',
+							'image' => get_template_directory_uri() . '/assets/images/student-minh.jpg',
+							'content' => 'Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy.'
+						],
+						[
+							'name' => 'Lê Phương',
+							'role' => 'Liên thông Đại học - Kế toán',
+							'initials' => 'LP',
+							'image' => get_template_directory_uri() . '/assets/images/student-phuong.jpg',
+							'content' => 'Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận.'
+						],
 					];
 					foreach ($fallback_testimonials as $t) :
 					?>
@@ -834,7 +866,11 @@ $zalo    = ltdh_get_zalo_url();
 							<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
 							<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"<?php echo esc_html($t['content']); ?>"</p>
 							<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
-								<div class="h-10 w-10 bg-brand-accent text-white rounded-full flex items-center justify-center font-bold text-sm"><?php echo esc_html($t['initials']); ?></div>
+								<?php if (!empty($t['image'])) : ?>
+									<img class="h-10 w-10 rounded-full object-cover border border-slate-200" src="<?php echo esc_url($t['image']); ?>" alt="<?php echo esc_attr($t['name']); ?>">
+								<?php else : ?>
+									<div class="h-10 w-10 bg-brand-accent text-white rounded-full flex items-center justify-center font-bold text-sm"><?php echo esc_html($t['initials']); ?></div>
+								<?php endif; ?>
 								<div>
 									<p class="font-bold text-sm text-slate-800"><?php echo esc_html($t['name']); ?></p>
 									<p class="text-sm text-slate-400"><?php echo esc_html($t['role']); ?></p>
