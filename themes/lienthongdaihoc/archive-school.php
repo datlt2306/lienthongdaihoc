@@ -108,7 +108,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 							<div class="p-6 pt-3 flex-1 flex flex-col justify-between">
 								<div class="text-center">
-									<h4 class="font-extrabold text-slate-800 text-sm md:text-base tracking-tight leading-snug uppercase min-h-[48px] line-clamp-2 mt-1 group-hover:text-brand-primary transition-colors">
+									<h4 class="font-extrabold text-slate-800 text-sm md:text-base tracking-tight leading-snug  min-h-[48px] line-clamp-2 mt-1 group-hover:text-brand-primary transition-colors">
 										<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>"><?php echo esc_html( get_the_title( $school_id ) ); ?></a>
 									</h4>
 									<p class="text-sm text-slate-400 mt-1 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
@@ -125,7 +125,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 										<?php endif; ?>
 										
 										<div class="flex items-center justify-center gap-x-4 gap-y-1 flex-wrap text-slate-500 font-medium pt-2">
-											<span class="flex items-center gap-1">📊 <?php echo esc_html( $prog_count ); ?> ngành</span>
+											<span class="flex items-center gap-1 text-xs">📊 <?php echo esc_html( $prog_count ); ?> ngành</span>
 										</div>
 									</div>
 								</div>
@@ -217,7 +217,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 						<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
 							<div class="text-center">
-								<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
+								<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug  min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
 								<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
 								<div class="mt-3 space-y-1 text-center text-xs md:text-sm">
 									<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>

@@ -283,10 +283,10 @@ $zalo    = ltdh_get_zalo_url();
 
 							<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
 								<div class="text-center">
-									<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php echo esc_html($school['title']); ?></h4>
+									<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug  min-h-[36px] line-clamp-2 mt-1"><?php echo esc_html($school['title']); ?></h4>
 									<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html($en_name); ?></p>
 									<div class="mt-3 space-y-1 text-center text-xs md:text-sm">
-										<p class="text-slate-500 font-semibold">📊 <?php echo esc_html($prog_count); ?> ngành tuyển sinh</p>
+										<p class="text-slate-500 font-semibold text-xs">📊 <?php echo esc_html($prog_count); ?> ngành tuyển sinh</p>
 									</div>
 								</div>
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">

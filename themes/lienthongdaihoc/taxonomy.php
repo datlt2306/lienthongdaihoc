@@ -121,7 +121,7 @@ $is_base_archive = ! isset( $term->term_id );
 
 							<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
 								<div class="text-center">
-									<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
+									<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug  min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
 									<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
 									
 									<div class="flex items-center justify-center gap-1 mt-2.5 text-xs text-slate-500 font-bold">

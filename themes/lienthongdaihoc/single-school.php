@@ -363,19 +363,29 @@ $global_zalo = ltdh_get_zalo_url();
 										<div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hệ đào tạo tuyển sinh:</div>
 										<div class="divide-y divide-slate-100">
 											<?php foreach ( $major['programs'] as $prog ) : ?>
-												<div class="flex items-center justify-between gap-3 py-3 sm:px-2 sm:-mx-2 sm:rounded-lg sm:hover:bg-slate-50 transition-colors">
-													<div class="flex-1 min-w-0 space-y-1">
-														<div class="flex items-center gap-2 flex-wrap">
+												<div class="flex items-center justify-between gap-4 py-3.5 sm:px-3 sm:-mx-3 sm:rounded-xl sm:hover:bg-slate-50 transition-all duration-200">
+													<div class="flex-1 min-w-0">
+														<div class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
 															<?php if ( $prog['type_name'] ) : ?>
-																<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">
+																<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 w-fit">
 																	<?php echo esc_html( $prog['type_name'] ); ?>
 																</span>
 															<?php endif; ?>
-														</div>
-														<div class="flex flex-wrap gap-x-4 gap-y-0.5 text-xs sm:text-sm text-slate-500 pt-0.5">
-															<p>Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $prog['duration'] ); ?></span></p>
-															<p class="hidden sm:inline text-slate-300">|</p>
-															<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></span></p>
+															<div class="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-xs sm:text-sm text-slate-500">
+																<span class="inline-flex items-center gap-1.5">
+																	<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+																		<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+																	</svg>
+																	Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $prog['duration'] ); ?></span>
+																</span>
+																<span class="hidden sm:inline text-slate-200">|</span>
+																<span class="inline-flex items-center gap-1.5">
+																	<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+																		<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+																	</svg>
+																	Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></span>
+																</span>
+															</div>
 														</div>
 													</div>
 													<div class="shrink-0">
