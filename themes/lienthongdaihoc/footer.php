@@ -185,6 +185,38 @@ $messenger = ltdh_get_messenger_url();
   body {
     padding-bottom: 72px !important;
   }
+  
+  /* Mobile footer overrides - keeps desktop HTML completely unchanged */
+  #colophon.site-footer {
+    padding-top: 2.5rem !important; /* 40px */
+    padding-bottom: 6rem !important; /* 96px */
+  }
+  #colophon .grid {
+    row-gap: 1.5rem !important; /* 24px */
+  }
+  #colophon h2 {
+    margin-bottom: 0.75rem !important; /* 12px */
+  }
+  #colophon p.text-slate-400 {
+    margin-bottom: 1rem !important; /* 16px */
+  }
+  #colophon h3 {
+    margin-bottom: 1rem !important; /* 16px */
+  }
+  #colophon ul.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.75rem !important; /* 12px */
+  }
+  #colophon ul.space-y-2\.5 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.5rem !important; /* 8px */
+  }
+  #colophon .border-slate-800 {
+    padding: 0.875rem !important; /* 14px */
+    gap: 0.75rem !important; /* 12px */
+  }
+  #colophon .mt-12 {
+    margin-top: 2rem !important; /* 32px */
+    padding-top: 1.5rem !important; /* 24px */
+  }
 }
 </style>
 

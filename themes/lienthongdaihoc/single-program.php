@@ -35,17 +35,17 @@ $global_zalo = ltdh_get_zalo_url();
 
 <main id="primary" class="site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
 		
 
 		<!-- CONTENT GRID -->
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 			<!-- Main Column -->
-			<div class="lg:col-span-2 space-y-8">
+			<div class="lg:col-span-2 space-y-6 md:space-y-8">
 				
 				<!-- SECTION 2: PROGRAM OVERVIEW -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan chương trình</h2>
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Tổng quan chương trình</h2>
 					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 						<?php the_content(); ?>
 					</div>
@@ -61,26 +61,26 @@ $global_zalo = ltdh_get_zalo_url();
 					<?php
 					$learning_details = ltdh_get_program_learning_details( $program_id );
 					?>
-					<div class="grid grid-cols-2 md:grid-cols-5 gap-3.5 py-4 border-t border-slate-100">
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí chỉ từ</span>
-							<span class="font-extrabold text-[#00308b] text-sm leading-snug"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
+					<div class="grid grid-cols-2 md:grid-cols-5 gap-2.5 md:gap-3.5 py-4 border-t border-slate-100">
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí chỉ từ</span>
+							<span class="font-extrabold text-[#00308b] text-xs sm:text-sm leading-snug"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
 						</div>
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
-							<span class="font-extrabold text-slate-800 text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
+							<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
 						</div>
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
-							<span class="font-extrabold text-slate-800 text-sm leading-snug"><?php echo esc_html( $learning_details['campus'] ); ?></span>
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
+							<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['campus'] ); ?></span>
 						</div>
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
-							<span class="font-extrabold text-slate-800 text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
+							<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 						</div>
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
-							<span class="font-extrabold text-[#EA580C] text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
+						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
+							<span class="font-extrabold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
 					</div>
 				</section>
@@ -89,9 +89,9 @@ $global_zalo = ltdh_get_zalo_url();
 
 				<!-- SECTION 4: MAJOR INFORMATION -->
 				<?php if ( $major_id ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Thông tin ngành học</h2>
-						<h3 class="font-bold text-lg text-slate-900 mb-2"><?php echo esc_html( $major_title ); ?> (Mã ngành: <?php echo esc_html( get_field( 'major_code', $major_id ) ); ?>)</h3>
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Thông tin ngành học</h2>
+						<h3 class="font-bold text-base md:text-lg text-slate-900 mb-2"><?php echo esc_html( $major_title ); ?> (Mã ngành: <?php echo esc_html( get_field( 'major_code', $major_id ) ); ?>)</h3>
 						<div class="prose prose-slate max-w-none text-sm text-slate-600 mb-4">
 							<?php echo wp_kses_post( get_post_field( 'post_content', $major_id ) ); ?>
 						</div>
@@ -111,8 +111,8 @@ $global_zalo = ltdh_get_zalo_url();
 
 				<!-- SECTION 5: ADMISSION REQUIREMENTS -->
 				<?php if ( $requirements ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Điều kiện xét tuyển</h2>
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Điều kiện xét tuyển</h2>
 						<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 							<?php echo wp_kses_post( $requirements ); ?>
 						</div>
@@ -120,15 +120,15 @@ $global_zalo = ltdh_get_zalo_url();
 				<?php endif; ?>
 
 				<!-- SECTION 6: TUITION & SECTION 7: DURATION -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Học phí & Thời gian học</h2>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div class="bg-slate-50 p-4 rounded-lg">
-							<h3 class="font-bold text-slate-800 mb-2">Học phí chi tiết</h3>
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Học phí & Thời gian học</h2>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+						<div class="bg-slate-50 p-3.5 md:p-4 rounded-lg">
+							<h3 class="font-extrabold text-sm md:text-base text-slate-800 mb-1.5">Học phí chi tiết</h3>
 							<p class="text-slate-600 text-sm"><?php echo esc_html( $tuition ?: 'Liên hệ ban tuyển sinh để nhận biểu phí và chính sách đóng học phí theo đợt.' ); ?></p>
 						</div>
-						<div class="bg-slate-50 p-4 rounded-lg">
-							<h3 class="font-bold text-slate-800 mb-2">Thời gian học tập</h3>
+						<div class="bg-slate-50 p-3.5 md:p-4 rounded-lg">
+							<h3 class="font-extrabold text-sm md:text-base text-slate-800 mb-1.5">Thời gian học tập</h3>
 							<p class="text-slate-600 text-sm"><?php echo esc_html( $duration ?: 'Lộ trình từ 1.5 - 2 năm tùy thuộc số lượng tín chỉ được miễn giảm khi nhập học.' ); ?></p>
 						</div>
 					</div>
@@ -136,8 +136,8 @@ $global_zalo = ltdh_get_zalo_url();
 
 				<!-- SECTION 8: DOCUMENTS REQUIRED -->
 				<?php if ( $documents ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Hồ sơ xét tuyển cần thiết</h2>
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Hồ sơ xét tuyển cần thiết</h2>
 						<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 							<?php echo wp_kses_post( $documents ); ?>
 						</div>
@@ -146,8 +146,8 @@ $global_zalo = ltdh_get_zalo_url();
 
 				<!-- SECTION 9: FAQ -->
 				<?php if ( ! empty( $faqs ) ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Câu hỏi thường gặp</h2>
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Câu hỏi thường gặp</h2>
 						<div class="space-y-4">
 							<?php foreach ( $faqs as $index => $item ) : ?>
 								<div class="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
@@ -185,8 +185,8 @@ $global_zalo = ltdh_get_zalo_url();
 
 				if ( $related_query->have_posts() ) :
 				?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Chương trình liên quan</h2>
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Chương trình liên quan</h2>
 						<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 							<?php 
 							while ( $related_query->have_posts() ) : 
@@ -272,8 +272,8 @@ $global_zalo = ltdh_get_zalo_url();
 					<?php endif; ?>
 					
 					<!-- SECTION 11: CONSULTATION FORM -->
-					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h3 class="text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
+					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
 						<p class="text-sm text-slate-500 mb-4">Hãy để lại thông tin, ban tư vấn tuyển sinh sẽ liên hệ và giải đáp lộ trình cụ thể cho bạn trong vòng 15 phút.</p>
 						
 						<!-- Simple Dynamic form utilizing the CF7 dynamic layout if CF7 plugin exists, else native fallback -->
@@ -306,7 +306,7 @@ $global_zalo = ltdh_get_zalo_url();
 					if ( $related_news_query->have_posts() ) :
 						$has_more = ( $related_news_query->post_count > 5 );
 					?>
-						<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+						<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 md:p-5">
 							<h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-3">Tin tức & Thông báo liên quan</h3>
 							<div class="space-y-3.5">
 								<?php
