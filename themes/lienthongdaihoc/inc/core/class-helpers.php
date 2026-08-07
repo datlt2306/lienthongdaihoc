@@ -318,7 +318,7 @@ function ltdh_breadcrumb(): void {
 	}
 
 	$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
-	$is_he_dao_tao = (bool) preg_match( '#^/he-dao-tao(?:/([^/]+))?/?$#i', $request_path );
+	$is_he_dao_tao = (bool) preg_match( '#^/he-dao-tao(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path );
 
 	$html = '';
 	if ( ! $is_he_dao_tao && function_exists( 'rank_math_the_breadcrumbs' ) ) {
@@ -362,15 +362,15 @@ function ltdh_breadcrumb(): void {
 			} elseif ( $post_type === 'major' ) {
 				$crumbs[] = [ 'label' => 'Chuyên ngành', 'url' => '' ];
 			} else {
-				$crumbs[] = [ 'label' => 'Lưu trữ', 'url' => '' ];
+				$crumbs[] = [ 'label' => 'Hệ đào tạo', 'url' => '' ];
 			}
 		} elseif ( is_home() ) {
 			$crumbs[] = [ 'label' => 'Tin tức', 'url' => '' ];
 		} else {
 			// Check if we are on training_type virtual archive /he-dao-tao/
 			$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
-			if ( preg_match( '#^/he-dao-tao(?:/([^/]+))?/?$#i', $request_path, $m ) ) {
-				if ( ! empty( $m[1] ) ) {
+			if ( preg_match( '#^/he-dao-tao(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path, $m ) ) {
+				if ( ! empty( $m[1] ) && 'page' !== $m[1] ) {
 					$term     = get_term_by( 'slug', $m[1], 'training_type' );
 					$crumbs[] = [ 'label' => 'Hệ đào tạo', 'url' => home_url( '/he-dao-tao/' ) ];
 					$crumbs[] = [ 'label' => $term ? $term->name : esc_html( $m[1] ), 'url' => '' ];
@@ -710,14 +710,15 @@ function ltdh_get_program_admission_deadline_display(int $program_id): string {
 		foreach ($batches as $b) {
 			$status             = $b['batch_status'] ?? '';
 			$batch_name         = $b['batch_name'] ?? '';
+			$clean_name         = preg_replace('/^Tuyển sinh\s*/ui', '', $batch_name);
 			$application_period = $b['application_period'] ?? '';
 			
 			if ($status === 'dang-nhan') {
-				return esc_html($batch_name) . ': ' . esc_html($application_period);
+				return esc_html($clean_name) . ': ' . esc_html($application_period);
 			}
 			$sap_mo_batches[] = [
 				'status' => $status,
-				'name'   => $batch_name,
+				'name'   => $clean_name,
 				'period' => $application_period,
 			];
 		}

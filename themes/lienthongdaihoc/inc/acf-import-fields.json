@@ -271,6 +271,15 @@
                 "type": "wysiwyg"
             },
             {
+                "key": "field_program_admission_form",
+                "label": "Tải phiếu tuyển sinh (File/Mẫu đăng ký)",
+                "name": "admission_form_file",
+                "type": "file",
+                "instructions": "Tải lên file Mẫu phiếu đăng ký tuyển sinh (PDF/DOCX) để sinh viên tải về.",
+                "return_format": "array",
+                "library": "all"
+            },
+            {
                 "key": "field_program_period",
                 "label": "Hạn hồ sơ",
                 "name": "enrollment_period",

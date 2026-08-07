@@ -261,10 +261,10 @@ $hotline = ltdh_get_hotline();
 								?>
 								<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all p-4 md:p-5 flex flex-col gap-4">
 									<!-- School Primary Info Header -->
-									<div class="flex items-start sm:items-center gap-4">
-										<div class="h-16 w-16 bg-slate-200 bg-cover bg-center rounded-lg shrink-0 border border-slate-100" style="background-image: url('<?php echo esc_url( $school['thumb'] ); ?>'); font-size: 0;"></div>
-										<div class="space-y-1.5 flex-1 min-w-0">
-											<h4 class="font-extrabold text-slate-800 text-lg hover:text-[#00308b] transition-colors leading-snug">
+									<div class="flex items-center gap-3">
+										<div class="h-9 w-9 sm:h-11 sm:w-11 bg-slate-200 bg-cover bg-center rounded-lg shrink-0 border border-slate-100" style="background-image: url('<?php echo esc_url( $school['thumb'] ); ?>'); font-size: 0;"></div>
+										<div class="space-y-0.5 flex-1 min-w-0">
+											<h4 class="font-bold text-slate-800 text-xs sm:text-sm hover:text-[#00308b] transition-colors leading-snug">
 												<?php if ( $school['id'] ) : ?>
 													<a href="<?php echo esc_url( get_permalink( $school['id'] ) ); ?>">
 														<?php echo esc_html( $school['name'] ); ?><?php if ( $school['code'] ) { echo ' - ' . esc_html( $school['code'] ); } ?>
@@ -284,42 +284,42 @@ $hotline = ltdh_get_hotline();
 
 									<!-- Programs Offered by this School -->
 									<div class="border-t border-slate-100 pt-3">
-										<div class="flex items-center justify-between mb-2">
-											<div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chương trình đào tạo:</div>
+										<div class="flex items-center justify-between gap-2 mb-2.5">
+											<div class="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Hệ đào tạo:</div>
 											<?php 
 											$header_year = ! empty( $school['programs'][0]['academic_year'] ) ? $school['programs'][0]['academic_year'] : '2025 - 2026';
 											?>
-											<span class="text-[11px] font-semibold text-slate-500 bg-slate-100/90 px-2.5 py-0.5 rounded border border-slate-200/50">
-												Biểu phí Năm học <?php echo esc_html( $header_year ); ?>
+											<span class="text-[11px] font-semibold text-slate-500 bg-slate-100/90 px-2 py-0.5 rounded border border-slate-200/50 whitespace-nowrap shrink-0">
+												Biểu phí <?php echo esc_html( $header_year ); ?>
 											</span>
 										</div>
-										<div class="divide-y divide-slate-100">
+										<div class="divide-y divide-slate-100/80 space-y-1 sm:space-y-0">
 											<?php foreach ( $school['programs'] as $prog ) : ?>
-												<div class="flex items-center justify-between gap-3 py-2.5 sm:py-3 rounded-xl hover:bg-slate-50/90 transition-all text-xs sm:text-sm border-b border-slate-100/60 last:border-0 my-0.5">
-													<div class="flex items-center gap-4 sm:gap-6 min-w-0 flex-1">
+												<div class="flex items-center justify-between gap-2.5 py-2.5 sm:py-3 rounded-xl hover:bg-slate-50/90 transition-all text-xs sm:text-sm my-0.5">
+													<div class="flex items-center gap-2.5 sm:gap-5 min-w-0 flex-1">
 														<?php if ( $prog['type_name'] ) : ?>
-															<div class="w-[115px] sm:w-[125px] shrink-0">
+															<div class="w-[105px] sm:w-[125px] shrink-0">
 																<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> inline-block w-full text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider text-center">
 																	<?php echo esc_html( $prog['type_name'] ); ?>
 																</span>
 															</div>
 														<?php endif; ?>
-														<div class="flex items-center gap-x-4 sm:gap-x-6 gap-y-1 flex-wrap text-slate-600 min-w-0">
-															<span class="inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+														<div class="flex flex-col sm:flex-row sm:items-center gap-x-5 gap-y-0.5 text-slate-600 min-w-0 flex-1">
+															<span class="inline-flex items-center gap-1 shrink-0">
 																<span class="text-slate-400">⏱</span>
 																<span>Thời gian: <strong class="font-semibold text-slate-800"><?php echo esc_html( $prog['duration'] ); ?></strong></span>
 															</span>
 															<span class="hidden sm:inline text-slate-200">|</span>
-															<span class="inline-flex items-center gap-1.5 min-w-0 whitespace-nowrap">
+															<span class="inline-flex items-center gap-1 min-w-0">
 																<span>Học phí: <strong class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></strong></span>
 															</span>
 														</div>
 													</div>
-													<div class="shrink-0 ml-3">
+													<div class="shrink-0 ml-1 sm:ml-3">
 														<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
 															<span class="text-xs text-slate-400 font-medium">Tạm ngưng</span>
 														<?php else : ?>
-															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="text-xs font-bold text-[#00308b] hover:text-blue-700 hover:underline inline-flex items-center gap-1 py-1.5 px-2.5 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
+															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="text-xs font-bold text-[#00308b] hover:text-blue-700 hover:underline inline-flex items-center gap-0.5 py-1 px-1.5 sm:px-2.5 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
 																<span>Tìm hiểu</span>
 																<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
 																	<path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />

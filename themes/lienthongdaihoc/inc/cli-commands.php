@@ -440,6 +440,7 @@ class LTDH_CLI_Commands {
 				update_post_meta( $program_id, 'campus_info', $c_slug === 'ha-noi' ? 'Hà Nội' : ( $c_slug === 'ho-chi-minh' ? 'TP. Hồ Chí Minh' : 'Online' ) );
 				update_post_meta( $program_id, 'admission_requirements', 'Xét tuyển hồ sơ văn bằng đã có (THPT, Trung cấp, Cao đẳng).' );
 				update_post_meta( $program_id, 'required_documents', 'CCCD, Ảnh 3x4, Phiếu tuyển sinh, Bản sao công chứng Bằng tốt nghiệp.' );
+				update_post_meta( $program_id, 'admission_form_file', 'https://lienthongdaihoc.vn/phieu-dang-ky-tuyen-sinh-utc-2026.pdf' );
 				update_post_meta( $program_id, 'enrollment_period', $enrollment );
 				update_post_meta( $program_id, 'program_benefits', $variant['advantages'] );
 				update_post_meta( $program_id, LTDH_META_SCHEDULE, $variant['schedule'] );

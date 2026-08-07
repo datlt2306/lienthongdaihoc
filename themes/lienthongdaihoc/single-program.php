@@ -45,6 +45,30 @@ $global_zalo = ltdh_get_zalo_url();
 			<!-- Main Column -->
 			<div class="lg:col-span-2 space-y-6 md:space-y-8">
 				
+				<!-- MOBILE ONLY SCHOOL MINI BAR (< 1024px) -->
+				<?php if ( $school_id ) : ?>
+					<div class="block lg:hidden bg-white border border-slate-200/80 rounded-xl p-3 shadow-2xs">
+						<div class="flex items-center justify-between gap-3">
+							<div class="flex items-center gap-2.5 min-w-0">
+								<div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 p-0.5 shrink-0 flex items-center justify-center overflow-hidden">
+									<?php if ( $school_logo_url ) : ?>
+										<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain">
+									<?php else : ?>
+										<span class="text-xs font-black text-[#00308b]"><?php echo esc_html( $initials ?: 'ĐH' ); ?></span>
+									<?php endif; ?>
+								</div>
+								<div class="min-w-0">
+									<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none mb-0.5">Trường đào tạo</span>
+									<h4 class="font-extrabold text-slate-800 text-xs truncate leading-tight"><?php echo esc_html( $school_title ); ?></h4>
+								</div>
+							</div>
+							<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-lg transition-all shrink-0">
+								Chi tiết →
+							</a>
+						</div>
+					</div>
+				<?php endif; ?>
+
 				<!-- SECTION 2: PROGRAM OVERVIEW -->
 				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Tổng quan chương trình</h2>
@@ -62,34 +86,33 @@ $global_zalo = ltdh_get_zalo_url();
 
 					<?php
 					$learning_details = ltdh_get_program_learning_details( $program_id );
-					$grid_cols_class = $quota ? 'grid-cols-2 md:grid-cols-6' : 'grid-cols-2 md:grid-cols-5';
 					?>
-					<div class="grid <?php echo esc_attr( $grid_cols_class ); ?> gap-2.5 md:gap-3.5 py-4 border-t border-slate-100">
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí chỉ từ</span>
-							<span class="font-extrabold text-[#00308b] text-xs sm:text-sm leading-snug"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
+					<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
+						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí</span>
+							<span class="font-bold text-[#00308b] text-xs sm:text-sm leading-snug"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
 						</div>
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
-							<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
+							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
 						</div>
 						<?php if ( $quota ) : ?>
-							<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+							<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 								<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
-								<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
+								<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
 							</div>
 						<?php endif; ?>
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
-							<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['campus'] ); ?></span>
+							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['campus'] ); ?></span>
 						</div>
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
-							<span class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
+							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 						</div>
-						<div class="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-3.5 flex flex-col justify-center shadow-xs">
+						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
-							<span class="font-extrabold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
+							<span class="font-bold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
 					</div>
 
@@ -158,6 +181,7 @@ $global_zalo = ltdh_get_zalo_url();
 								<!-- Tab Content Cards -->
 								<?php foreach ( $batches_data as $b_idx => $b_item ) :
 									$batch_name     = $b_item['batch_name'] ?? '';
+									$clean_title    = preg_replace( '/^Tuyển sinh\s*/ui', '', $batch_name );
 									$release_period = $b_item['release_period'] ?? '';
 									$app_period     = $b_item['application_period'] ?? '';
 									$review_time    = $b_item['review_time'] ?? '';
@@ -166,13 +190,13 @@ $global_zalo = ltdh_get_zalo_url();
 									$status         = $b_item['batch_status'] ?? 'dang-nhan';
 									
 									$status_label = 'Đang nhận hồ sơ';
-									$status_class = 'bg-green-50 text-green-700 border-green-200';
+									$status_class = 'bg-emerald-50 text-emerald-700 border-0';
 									if ( $status === 'sap-mo' ) {
 										$status_label = 'Sắp mở';
-										$status_class = 'bg-amber-50 text-amber-700 border-amber-200';
+										$status_class = 'bg-amber-50 text-amber-700 border-0';
 									} elseif ( $status === 'da-dong' ) {
 										$status_label = 'Đã đóng';
-										$status_class = 'bg-slate-100 text-slate-600 border-slate-200';
+										$status_class = 'bg-slate-100 text-slate-600 border-0';
 									}
 
 									$eval_dates = array_filter([ $eval_time, $enrol_time ], function( $v ) {
@@ -182,10 +206,10 @@ $global_zalo = ltdh_get_zalo_url();
 									$eval_display = ! empty( $eval_dates ) ? implode(' | ', $eval_dates) : '';
 									$is_hidden = ( $b_idx !== 0 );
 								?>
-									<div class="ltdh-batch-tab-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3 <?php echo $is_hidden ? 'hidden' : ''; ?>" data-batch-card="<?php echo (int) $b_idx; ?>">
-										<div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-											<span class="font-extrabold text-slate-900 text-sm"><?php echo esc_html( $batch_name ); ?></span>
-											<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border <?php echo esc_attr( $status_class ); ?>">
+									<div class="ltdh-batch-tab-card bg-white border border-slate-200/80 hover:border-slate-400 rounded-xl p-3.5 shadow-2xs hover:shadow-xs transition-all space-y-3 <?php echo $is_hidden ? 'hidden' : ''; ?>" data-batch-card="<?php echo (int) $b_idx; ?>">
+										<div class="flex items-center justify-between border-b border-slate-100 pb-2.5 gap-2">
+											<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $clean_title ); ?></span>
+											<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border-0 shrink-0 <?php echo esc_attr( $status_class ); ?>">
 												<?php echo esc_html( $status_label ); ?>
 											</span>
 										</div>
@@ -235,80 +259,93 @@ $global_zalo = ltdh_get_zalo_url();
 								<?php endforeach; ?>
 							</div>
 
-							<!-- DESKTOP DATA TABLE VIEW (>= 768px) -->
-							<div class="hidden md:block rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs">
-								<table class="w-full text-xs text-left text-slate-500">
-									<thead class="text-[11px] text-slate-700 uppercase bg-slate-50/90 border-b border-slate-200/80">
-										<tr>
-											<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Đợt tuyển sinh</th>
-											<?php if ( $has_release ) : ?>
-												<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Phát hành hồ sơ</th>
+							<!-- DESKTOP BENTO GRID CARDS VIEW (>= 768px) -->
+							<div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+								<?php foreach ( $batches_data as $b_idx => $b_item ) :
+									$batch_name     = $b_item['batch_name'] ?? '';
+									$clean_title    = preg_replace( '/^Tuyển sinh\s*/ui', '', $batch_name );
+									$release_period = $b_item['release_period'] ?? '';
+									$app_period     = $b_item['application_period'] ?? '';
+									$review_time    = $b_item['review_time'] ?? '';
+									$eval_time      = $b_item['evaluation_time'] ?? '';
+									$enrol_time     = $b_item['enrollment_time'] ?? '';
+									$status         = $b_item['batch_status'] ?? 'dang-nhan';
+									
+									$status_label = 'Đang nhận hồ sơ';
+									$status_class = 'bg-emerald-50 text-emerald-700 border-0';
+									$card_style   = 'bg-white border border-slate-200/80 hover:border-slate-400 shadow-2xs hover:shadow-xs';
+									
+									if ( $status === 'dang-nhan' ) {
+										$status_label = 'Đang nhận hồ sơ';
+										$status_class = 'bg-emerald-600 text-white border-0 shadow-2xs';
+										$card_style   = 'bg-emerald-50/15 border border-emerald-400/80 hover:border-emerald-500 shadow-xs';
+									} elseif ( $status === 'sap-mo' ) {
+										$status_label = 'Sắp mở';
+										$status_class = 'bg-amber-50 text-amber-700 border-0';
+									} elseif ( $status === 'da-dong' ) {
+										$status_label = 'Đã đóng';
+										$status_class = 'bg-slate-100 text-slate-500 border-0';
+									}
+
+									$eval_dates = array_filter([ $eval_time, $enrol_time ], function( $v ) {
+										$v_clean = trim( $v );
+										return $v_clean !== '' && $v_clean !== '-';
+									});
+									$eval_display = ! empty( $eval_dates ) ? implode(' | ', $eval_dates) : '';
+								?>
+									<div class="rounded-xl p-3.5 sm:p-4 transition-all duration-200 flex flex-col justify-between space-y-3 <?php echo esc_attr( $card_style ); ?>">
+										<!-- Card Header -->
+										<div class="flex items-center justify-between pb-2.5 gap-2 border-b border-slate-100/80">
+											<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $clean_title ); ?></span>
+											<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 <?php echo esc_attr( $status_class ); ?>">
+												<?php echo esc_html( $status_label ); ?>
+											</span>
+										</div>
+
+										<!-- Card Content Timeline -->
+										<div class="space-y-3 flex-1">
+											<?php if ( ! empty( $release_period ) && $release_period !== '-' ) : ?>
+												<div class="flex items-start gap-x-2.5">
+													<div class="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 shrink-0"></div>
+													<div class="flex-1 min-w-0">
+														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phát hành hồ sơ</div>
+														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $release_period ); ?></div>
+													</div>
+												</div>
 											<?php endif; ?>
-											<?php if ( $has_app ) : ?>
-												<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Nhận hồ sơ</th>
+
+											<?php if ( ! empty( $app_period ) && $app_period !== '-' ) : ?>
+												<div class="flex items-start gap-x-2.5">
+													<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+													<div class="flex-1 min-w-0">
+														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hạn nhận hồ sơ</div>
+														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $app_period ); ?></div>
+													</div>
+												</div>
 											<?php endif; ?>
-											<?php if ( $has_review ) : ?>
-												<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Thời gian ôn tập</th>
+
+											<?php if ( ! empty( $review_time ) && $review_time !== '-' ) : ?>
+												<div class="flex items-start gap-x-2.5">
+													<div class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></div>
+													<div class="flex-1 min-w-0">
+														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Thời gian ôn tập</div>
+														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $review_time ); ?></div>
+													</div>
+												</div>
 											<?php endif; ?>
-											<?php if ( $has_eval ) : ?>
-												<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap">Xét tuyển / Thi tuyển</th>
+
+											<?php if ( ! empty( $eval_display ) ) : ?>
+												<div class="flex items-start gap-x-2.5 pt-1.5">
+													<div class="w-1.5 h-1.5 rounded-full bg-indigo-600 mt-1.5 shrink-0"></div>
+													<div class="flex-1 min-w-0">
+														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Xét tuyển / Thi tuyển</div>
+														<div class="text-xs font-bold text-[#00308b] mt-0.5"><?php echo esc_html( $eval_display ); ?></div>
+													</div>
+												</div>
 											<?php endif; ?>
-											<th scope="col" class="px-3 py-2.5 font-extrabold whitespace-nowrap text-right">Trạng thái</th>
-										</tr>
-									</thead>
-									<tbody class="divide-y divide-slate-100">
-										<?php foreach ( $batches_data as $b_item ) :
-											$batch_name     = $b_item['batch_name'] ?? '';
-											$release_period = $b_item['release_period'] ?? '';
-											$app_period     = $b_item['application_period'] ?? '';
-											$review_time    = $b_item['review_time'] ?? '';
-											$eval_time      = $b_item['evaluation_time'] ?? '';
-											$enrol_time     = $b_item['enrollment_time'] ?? '';
-											$status         = $b_item['batch_status'] ?? 'dang-nhan';
-											
-											$status_label = 'Đang nhận hồ sơ';
-											$status_class = 'bg-green-50 text-green-700 border-green-200';
-											if ( $status === 'sap-mo' ) {
-												$status_label = 'Sắp mở';
-												$status_class = 'bg-amber-50 text-amber-700 border-amber-200';
-											} elseif ( $status === 'da-dong' ) {
-												$status_label = 'Đã đóng';
-												$status_class = 'bg-slate-100 text-slate-600 border-slate-200';
-											}
-										?>
-											<tr class="bg-white hover:bg-slate-50/60 transition-colors">
-												<td class="px-3 py-2.5 font-bold text-slate-900 whitespace-nowrap"><?php echo esc_html( $batch_name ); ?></td>
-												<?php if ( $has_release ) : ?>
-													<td class="px-3 py-2.5 text-slate-600 whitespace-nowrap"><?php echo esc_html( $release_period ?: '-' ); ?></td>
-												<?php endif; ?>
-												<?php if ( $has_app ) : ?>
-													<td class="px-3 py-2.5 text-slate-600 whitespace-nowrap"><?php echo esc_html( $app_period ?: '-' ); ?></td>
-												<?php endif; ?>
-												<?php if ( $has_review ) : ?>
-													<td class="px-3 py-2.5 text-slate-600 whitespace-nowrap"><?php echo esc_html( $review_time ?: '-' ); ?></td>
-												<?php endif; ?>
-												<?php if ( $has_eval ) : ?>
-													<td class="px-3 py-2.5 text-slate-600">
-														<?php if ( ! empty( $eval_time ) && $eval_time !== '-' ) : ?>
-															<div class="whitespace-nowrap"><?php echo esc_html( $eval_time ); ?></div>
-														<?php endif; ?>
-														<?php if ( ! empty( $enrol_time ) && $enrol_time !== '-' ) : ?>
-															<div class="whitespace-nowrap text-[#00308b] font-semibold mt-0.5"><?php echo esc_html( $enrol_time ); ?></div>
-														<?php endif; ?>
-														<?php if ( ( empty( $eval_time ) || $eval_time === '-' ) && ( empty( $enrol_time ) || $enrol_time === '-' ) ) : ?>
-															<span>-</span>
-														<?php endif; ?>
-													</td>
-												<?php endif; ?>
-												<td class="px-3 py-2.5 whitespace-nowrap text-right">
-													<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold border <?php echo esc_attr( $status_class ); ?>">
-														<?php echo esc_html( $status_label ); ?>
-													</span>
-												</td>
-											</tr>
-										<?php endforeach; ?>
-									</tbody>
-								</table>
+										</div>
+									</div>
+								<?php endforeach; ?>
 							</div>
 						</div>
 
@@ -437,12 +474,41 @@ $global_zalo = ltdh_get_zalo_url();
 				</section>
 
 				<!-- SECTION 8: DOCUMENTS REQUIRED -->
-				<?php if ( $documents ) : ?>
+				<?php 
+				$admission_form = get_field( 'admission_form_file', $program_id );
+				$form_url = '';
+				if ( is_array( $admission_form ) && ! empty( $admission_form['url'] ) ) {
+					$form_url = $admission_form['url'];
+				} elseif ( is_string( $admission_form ) && ! empty( $admission_form ) ) {
+					$form_url = $admission_form;
+				}
+				?>
+				<?php if ( $documents || $form_url ) : ?>
 					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Hồ sơ xét tuyển cần thiết</h2>
-						<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
-							<?php echo wp_kses_post( $documents ); ?>
-						</div>
+						<?php if ( $documents ) : ?>
+							<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
+								<?php echo wp_kses_post( $documents ); ?>
+							</div>
+						<?php endif; ?>
+
+						<?php if ( $form_url ) : ?>
+							<div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-50/60 p-4 rounded-xl border border-blue-100/80">
+								<div class="flex items-center gap-3">
+									<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+										📄
+									</div>
+									<div>
+										<h4 class="font-bold text-slate-900 text-sm mb-0.5">Tải mẫu phiếu đăng ký tuyển sinh</h4>
+										<p class="text-xs text-slate-500">Mẫu phiếu đăng ký tuyển sinh chính thức để in và làm hồ sơ</p>
+									</div>
+								</div>
+								<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0">
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+									<span>Tải Phiếu Tuyển Sinh</span>
+								</a>
+							</div>
+						<?php endif; ?>
 					</section>
 				<?php endif; ?>
 
@@ -517,68 +583,77 @@ $global_zalo = ltdh_get_zalo_url();
 			<div class="lg:col-span-1">
 				<div class="sticky top-24 space-y-6">
 					
-					<!-- SCHOOL INFO CARD -->
+					<!-- SCHOOL INFO CARD (Desktop Only >= 1024px) -->
 					<?php if ( $school_id ) : 
 						$school_logo_id = get_field( 'logo', $school_id );
 						$school_logo_url = $school_logo_id ? wp_get_attachment_image_url( $school_logo_id, 'thumbnail' ) : '';
 						if ( ! $school_logo_url ) {
-							$school_logo_url = get_the_post_thumbnail_url( $school_id, 'thumbnail' ) ?: get_stylesheet_directory_uri() . '/assets/images/logo-placeholder.png';
+							$school_logo_url = get_the_post_thumbnail_url( $school_id, 'thumbnail' );
 						}
 						$school_cover_url = get_the_post_thumbnail_url( $school_id, 'medium' );
-						if ( ! $school_cover_url ) {
-							$school_cover_url = get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg';
-						}
 						$school_address = get_post_meta( $school_id, 'address', true ) ?: get_field( 'address', $school_id ) ?: 'Việt Nam';
 						$school_web = get_field( 'website', $school_id );
-						$school_desc = get_post_field( 'post_excerpt', $school_id ) ?: wp_trim_words( get_post_field( 'post_content', $school_id ), 25 );
+						
+						// Get initials for typographic logo fallback (e.g. UTC, ĐHGTVT)
+						$words = explode( ' ', $school_title );
+						$initials = '';
+						foreach ( array_slice( $words, -3 ) as $w ) {
+							$initials .= mb_substr( $w, 0, 1 );
+						}
+						$initials = mb_strtoupper( $initials );
 					?>
-						<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+						<div class="hidden lg:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-sm transition-all">
 							<!-- Banner Cover -->
-							<div class="h-28 bg-cover bg-center relative" style="background-image: url('<?php echo esc_url( $school_cover_url ); ?>');">
-								<div class="absolute inset-0 bg-blue-900/10"></div>
+							<div class="h-24 bg-gradient-to-r from-[#00308b] to-[#001a4d] bg-cover bg-center relative" <?php echo $school_cover_url ? 'style="background-image: url(\'' . esc_url( $school_cover_url ) . '\');"' : ''; ?>>
+								<div class="absolute inset-0 bg-blue-950/20"></div>
 							</div>
 							
 							<!-- Overlapping Logo Wrapper -->
-							<div class="relative flex justify-center -mt-10 mb-3">
-								<div class="w-20 h-20 bg-white p-1 rounded-xl shadow-md border border-slate-100 flex items-center justify-center overflow-hidden">
-									<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain" loading="lazy">
+							<div class="relative flex justify-center -mt-9 mb-3">
+								<div class="w-18 h-18 bg-white p-1 rounded-xl shadow-md border border-slate-100 flex items-center justify-center overflow-hidden shrink-0">
+									<?php if ( $school_logo_url ) : ?>
+										<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain" loading="lazy">
+									<?php else : ?>
+										<div class="w-full h-full bg-[#00308b] text-white flex items-center justify-center font-black text-base rounded-lg uppercase tracking-wider">
+											<?php echo esc_html( $initials ?: 'ĐH' ); ?>
+										</div>
+									<?php endif; ?>
 								</div>
 							</div>
 							
 							<!-- School Info details -->
-							<div class="px-6 pb-6 text-center">
+							<div class="px-5 pb-5 text-center">
 								<h4 class="font-extrabold text-slate-800 text-sm leading-snug uppercase tracking-tight mb-2">
 									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="hover:text-[#00308b] transition-colors"><?php echo esc_html( $school_title ); ?></a>
 								</h4>
 								
 								<?php if ( $school_web ) : ?>
-									<p class="text-sm text-slate-500 mb-2 font-medium">
+									<p class="text-xs text-slate-500 mb-2 font-medium">
 										Website: <a href="<?php echo esc_url( $school_web ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#00308b] hover:underline"><?php echo esc_html( $school_web ); ?></a>
 									</p>
 								<?php endif; ?>
 
-								<div class="flex items-start justify-center gap-2 text-sm text-slate-500 font-medium max-w-xs mx-auto mb-4">
+								<div class="flex items-start justify-center gap-1.5 text-xs text-slate-500 font-medium max-w-xs mx-auto mb-3.5">
 									<span class="text-[#00308b] shrink-0 mt-0.5">📍</span>
 									<span class="text-left leading-relaxed">
 										Địa chỉ: <?php echo esc_html( $school_address ); ?>
-										<a href="<?php echo esc_url( 'https://www.google.com/maps/search/?api=1&query=' . urlencode( $school_title . ' ' . $school_address ) ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#00308b] font-bold hover:underline mt-0.5 inline-block">(Xem bản đồ)</a>
+										<a href="<?php echo esc_url( 'https://www.google.com/maps/search/?api=1&query=' . urlencode( $school_title . ' ' . $school_address ) ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#00308b] font-bold hover:underline ml-0.5 inline-block">(Xem bản đồ)</a>
 									</span>
 								</div>
 								<div class="border-t border-slate-100 pt-3">
-									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="text-[#00308b] font-bold text-sm hover:underline flex items-center justify-center gap-1">
-										<span>Xem chi tiết về trường & các chương trình khác</span> <span>→</span>
+									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="text-[#00308b] font-bold text-xs sm:text-sm hover:underline flex items-center justify-center gap-1">
+										<span>Xem chi tiết trường</span> <span>→</span>
 									</a>
 								</div>
 							</div>
 						</div>
 					<?php endif; ?>
-					
-					<!-- SECTION 11: CONSULTATION FORM -->
+
+					<!-- SECTION 11: CONSULTATION FORM (Sidebar Form - Available on Mobile & Desktop) -->
 					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 						<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
 						<p class="text-sm text-slate-500 mb-4">Hãy để lại thông tin, ban tư vấn tuyển sinh sẽ liên hệ và giải đáp lộ trình cụ thể cho bạn trong vòng 15 phút.</p>
 						
-						<!-- Simple Dynamic form utilizing the CF7 dynamic layout if CF7 plugin exists, else native fallback -->
 						<?php 
 						$form_context = [
 							'current_program_id' => $program_id,
@@ -587,10 +662,12 @@ $global_zalo = ltdh_get_zalo_url();
 							'referral_source'    => get_permalink(),
 						];
 						ltdh_render_consultation_form( $form_context );
-					?>
+						?>
 					</section>
+					
 
-					<!-- RELATED NEWS & ANNOUNCEMENTS (Sidebar) -->
+
+					<!-- RELATED NEWS & ANNOUNCEMENTS (Sidebar - Desktop Only) -->
 					<?php
 					$related_news_query = new WP_Query( [
 						'post_type'      => [ 'post', 'guide' ],
@@ -608,7 +685,7 @@ $global_zalo = ltdh_get_zalo_url();
 					if ( $related_news_query->have_posts() ) :
 						$has_more = ( $related_news_query->post_count > 5 );
 					?>
-						<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 md:p-5">
+						<section class="hidden lg:block bg-white rounded-lg shadow-sm border border-slate-200 p-4 md:p-5">
 							<h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-3">Tin tức & Thông báo liên quan</h3>
 							<div class="space-y-3.5">
 								<?php
@@ -658,8 +735,8 @@ $global_zalo = ltdh_get_zalo_url();
 					endif;
 					?>
 
-					<!-- SECTION 13: PHONE CTA & SECTION 14: ZALO CTA sidebar cards -->
-					<div class="bg-brand-accent/5 border border-brand-primary/10 rounded-lg p-6 text-center">
+					<!-- SECTION 13: PHONE CTA & SECTION 14: ZALO CTA sidebar cards (Desktop Only) -->
+					<div class="hidden lg:block bg-brand-accent/5 border border-brand-primary/10 rounded-lg p-6 text-center">
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Cần hỗ trợ trực tiếp?</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $program_hotline ); ?></h4>
 						<div class="flex gap-2">
@@ -668,7 +745,7 @@ $global_zalo = ltdh_get_zalo_url();
 						</div>
 					</div>
 
-					<!-- COMPARE BUTTON ONLY -->
+					<!-- COMPARE BUTTON ONLY (Desktop Only) -->
 					<?php
 					$types = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
 					$type_slug = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->slug : '';
@@ -684,7 +761,7 @@ $global_zalo = ltdh_get_zalo_url();
 					$major_slug = $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '';
 					?>
 					<button type="button"
-							class="w-full text-center bg-white border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold shadow-xs hover:bg-slate-50 transition-all ltdh-compare-single-btn text-sm flex items-center justify-center gap-2 mt-4 min-h-[44px]"
+							class="hidden lg:flex w-full text-center bg-white border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold shadow-xs hover:bg-slate-50 transition-all ltdh-compare-single-btn text-sm flex items-center justify-center gap-2 mt-4 min-h-[44px]"
 							data-compare-type="program" data-compare-id="<?php echo esc_attr( $program_id ); ?>"
 							data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>"
@@ -701,14 +778,21 @@ $global_zalo = ltdh_get_zalo_url();
 </main>
 
 <!-- SECTION 12: STICKY CTA (Mobile Bottom Sticky Bar) -->
-<div class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 shadow-[0_-4px_10px_rgba(0,0,0,0.04)] py-3 px-4 flex items-center justify-between md:hidden">
-	<div class="flex-1 mr-3">
-		<span class="text-xs text-slate-400 block font-medium uppercase leading-none mb-1">Đăng ký lớp khai giảng</span>
-		<h4 class="font-bold text-slate-800 text-sm truncate leading-none"><?php the_title(); ?></h4>
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] py-2.5 px-4 flex items-center justify-between lg:hidden">
+	<div class="flex-1 mr-3 min-w-0">
+		<span class="text-[10px] text-slate-400 block font-bold uppercase tracking-wider truncate mb-0.5"><?php echo esc_html( $school_title ); ?></span>
+		<h4 class="font-bold text-slate-800 text-xs sm:text-sm truncate leading-tight"><?php the_title(); ?></h4>
 	</div>
-	<a href="#register" class="bg-brand-accent text-white px-5 py-3 rounded-lg text-sm font-extrabold shadow-md shadow-brand-primary/20 hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center">
-		Đăng Ký Học
-	</a>
+	<div class="flex items-center gap-2 shrink-0">
+		<?php if ( ! empty( $form_url ) ) : ?>
+			<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-2.5 rounded-lg text-xs font-bold transition-all shrink-0 flex items-center justify-center border border-slate-200/80 min-h-[40px]" title="Tải phiếu tuyển sinh">
+				📄 <span class="hidden sm:inline ml-1">Tải phiếu</span>
+			</a>
+		<?php endif; ?>
+		<a href="#register" class="bg-[#00308b] text-white px-4 py-2.5 rounded-lg text-xs font-extrabold shadow-sm hover:bg-[#002266] transition-all flex items-center justify-center shrink-0 min-h-[40px]">
+			Đăng Ký Học
+		</a>
+	</div>
 </div>
 
 <?php

@@ -19,7 +19,7 @@ if ( empty( $selected_nhom ) ) {
 }
 $selected_type     = '';
 $request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
-if ( preg_match( '#^/he-dao-tao/([^/]+)/?$#i', $request_path, $m ) ) {
+if ( preg_match( '#^/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
 	$selected_type = sanitize_text_field( $m[1] );
 }
 if ( empty( $selected_type ) ) {
@@ -34,9 +34,12 @@ if ( ! in_array( $selected_limit, $valid_limits, true ) ) {
 	$selected_limit = 12;
 }
 
+$paged = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
+
 $args = [
 	'post_type'      => 'program',
 	'posts_per_page' => $selected_limit,
+	'paged'          => $paged,
 	'post_status'    => 'publish',
 	'meta_query'     => [
 		'relation' => 'AND',
@@ -491,7 +494,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 					echo paginate_links( [
 						'base'      => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
 						'format'    => '?paged=%#%',
-						'current'   => max( 1, get_query_var( 'paged' ) ),
+						'current'   => $paged,
 						'total'     => $query->max_num_pages,
 						'prev_text' => '← Trước',
 						'next_text' => 'Sau →',

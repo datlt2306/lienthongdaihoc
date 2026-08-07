@@ -14,11 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 // ----------------------------------------------------
 function ltdh_register_training_type_rewrite() {
 	// Base archive pagination
-	add_rewrite_rule( 'he-dao-tao/page/([0-9]+)/?$', 'index.php?taxonomy=' . LTDH_TAX_TRAINING_TYPE . '&paged=$matches[1]', 'top' );
+	add_rewrite_rule( 'he-dao-tao/page/([0-9]+)/?$', 'index.php?post_type=' . LTDH_CPT_PROGRAM . '&paged=$matches[1]', 'top' );
 	// Term archive pagination
 	add_rewrite_rule( 'he-dao-tao/([^/]+)/page/([0-9]+)/?$', 'index.php?' . LTDH_TAX_TRAINING_TYPE . '=$matches[1]&paged=$matches[2]', 'top' );
 	// Base archive
-	add_rewrite_rule( 'he-dao-tao/?$', 'index.php?taxonomy=' . LTDH_TAX_TRAINING_TYPE, 'top' );
+	add_rewrite_rule( 'he-dao-tao/?$', 'index.php?post_type=' . LTDH_CPT_PROGRAM, 'top' );
 	// Term archive
 	add_rewrite_rule( 'he-dao-tao/([^/]+)/?$', 'index.php?' . LTDH_TAX_TRAINING_TYPE . '=$matches[1]', 'top' );
 }
@@ -168,6 +168,11 @@ add_action( 'template_redirect', 'ltdh_redirect_taxonomy_base' );
 function ltdh_template_include_he_dao_tao( $template ) {
 	$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
 	if ( preg_match( '#^/he-dao-tao(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path ) ) {
+		global $wp_query;
+		if ( $wp_query ) {
+			$wp_query->is_404 = false;
+			status_header( 200 );
+		}
 		$archive_template = locate_template( 'taxonomy-training_type.php' ) ?: locate_template( 'archive-program.php' );
 		if ( $archive_template ) {
 			return $archive_template;

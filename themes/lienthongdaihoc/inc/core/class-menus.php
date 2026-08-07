@@ -265,8 +265,8 @@ function ltdh_highlight_menu_parameters($classes, $item) {
 		return $classes;
 	}
 
-	if (preg_match('#/he-dao-tao/([^/]+)/?$#i', $item_parts['path'], $item_match)) {
-		if (preg_match('#/he-dao-tao/([^/]+)/?$#i', $current_parts['path'], $current_match)) {
+	if (preg_match('#/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $item_parts['path'], $item_match) && 'page' !== $item_match[1]) {
+		if (preg_match('#/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $current_match) && 'page' !== $current_match[1]) {
 			if ($item_match[1] === $current_match[1]) {
 				$classes[] = 'current-menu-item';
 			}
@@ -277,7 +277,7 @@ function ltdh_highlight_menu_parameters($classes, $item) {
 		parse_str($item_parts['query'], $item_query);
 		if (isset($item_query['he'])) {
 			$current_he = '';
-			if (preg_match('#/he-dao-tao/([^/]+)/?$#i', $current_parts['path'], $m)) {
+			if (preg_match('#/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $m) && 'page' !== $m[1]) {
 				$current_he = $m[1];
 			} elseif (isset($current_parts['query'])) {
 				parse_str($current_parts['query'], $current_query);

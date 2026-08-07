@@ -147,7 +147,7 @@ add_action( 'after_switch_theme', 'ltdh_flush_rewrite_rules_on_switch' );
  */
 add_action( 'init', function() {
 	$flushed = (int) get_option( LTDH_OPT_REWRITE_FLUSHED );
-	if ( ! $flushed || $flushed < 1752500000 ) {
+	if ( ! $flushed || $flushed < 1770460000 ) {
 		flush_rewrite_rules();
 		update_option( LTDH_OPT_REWRITE_FLUSHED, time() );
 	}

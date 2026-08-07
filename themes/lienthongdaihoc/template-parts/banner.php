@@ -22,7 +22,7 @@ $banner_subtitle = '';
 $type = get_query_var( 'ltdh_compare' );
 $request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
 
-if ( preg_match( '#^/he-dao-tao/?$#i', $request_path ) ) {
+if ( preg_match( '#^/he-dao-tao(?:/page/\d+)?/?$#i', $request_path ) ) {
 	$banner_title    = 'Hệ Đào Tạo';
 	$banner_subtitle = 'Tổng hợp các chương trình đào tạo từ xa, liên thông, văn bằng 2';
 } elseif ( $type === 'program' ) {
@@ -63,7 +63,7 @@ if ( preg_match( '#^/he-dao-tao/?$#i', $request_path ) ) {
 } elseif ( is_post_type_archive( 'program' ) ) {
 	$selected_he = '';
 	$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
-	if ( preg_match( '#^/he-dao-tao/([^/]+)/?$#i', $request_path, $m ) ) {
+	if ( preg_match( '#^/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
 		$selected_he = sanitize_text_field( $m[1] );
 	}
 	if ( empty( $selected_he ) ) {
@@ -98,8 +98,17 @@ if ( preg_match( '#^/he-dao-tao/?$#i', $request_path ) ) {
 	$banner_subtitle = '';
 	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } else {
-	$banner_title    = get_the_title() ?: wp_title( '', false );
-	$banner_subtitle = '';
+	if ( preg_match( '#^/he-dao-tao(?:/page/\d+)?/?$#i', $request_path ) ) {
+		$banner_title    = 'Hệ Đào Tạo';
+		$banner_subtitle = 'Tổng hợp các chương trình đào tạo từ xa, liên thông, văn bằng 2';
+	} elseif ( preg_match( '#^/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
+		$he_term = get_term_by( 'slug', $m[1], 'training_type' );
+		$banner_title    = $he_term ? 'Hệ ' . $he_term->name : 'Chương Trình Đào Tạo';
+		$banner_subtitle = $he_term ? ( $he_term->description ?: 'Các chương trình đào tạo thuộc hệ ' . $he_term->name ) : 'Tìm kiếm chương trình phù hợp với lộ trình học tập của bạn';
+	} else {
+		$banner_title    = get_the_title() ?: wp_title( '', false );
+		$banner_subtitle = '';
+	}
 }
 
 // Fallback banner images by context
