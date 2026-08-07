@@ -186,7 +186,7 @@ $zalo    = ltdh_get_zalo_url();
 
 	<!-- 2. HOT PROGRAMS SECTION -->
 	<section class="py-12 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
-		<div class="max-w-7xl mx-auto relative z-10">
+		<div class="max-w-7xl mx-auto relative z-10 sm:px-6 lg:px-8">
 			<div class="text-center max-w-2xl mx-auto mb-8 space-y-2 px-4">
 				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">KHÁM PHÁ NGÀNH HỌC</span>
 				<h2 class="text-xl md:text-4xl font-black text-slate-900">5 ngành đào tạo hot nhất</h2>
