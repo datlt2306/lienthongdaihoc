@@ -53,9 +53,86 @@ $hotline = ltdh_get_hotline();
 				<!-- OVERVIEW -->
 				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan về ngành</h2>
-					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
-						<?php the_content(); ?>
+					<div class="relative">
+						<div id="major-intro-content" class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base overflow-hidden transition-all duration-500 max-h-[350px] relative">
+							<?php the_content(); ?>
+							<!-- Gradient Overlay for fade-out effect -->
+							<div id="major-intro-overlay" class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none transition-opacity duration-300"></div>
+						</div>
+						
+						<div id="major-intro-btn-container" class="hidden justify-center mt-4 border-t border-slate-100 pt-4">
+							<button id="major-intro-toggle" class="flex items-center gap-2 px-5 py-2 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-brand-accent shadow-sm transition-all focus:outline-none">
+								<span id="major-intro-btn-text">Xem thêm tổng quan</span>
+								<svg id="major-intro-btn-icon" class="w-4 h-4 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+								</svg>
+							</button>
+						</div>
 					</div>
+
+					<script>
+					(function() {
+						var content = document.getElementById('major-intro-content');
+						var overlay = document.getElementById('major-intro-overlay');
+						var container = document.getElementById('major-intro-btn-container');
+						var button = document.getElementById('major-intro-toggle');
+						var btnText = document.getElementById('major-intro-btn-text');
+						var btnIcon = document.getElementById('major-intro-btn-icon');
+						
+						if (!content || !overlay || !container || !button) return;
+						
+						var limit = 350;
+						var isExpanded = false;
+						
+						function checkHeight() {
+							if (isExpanded) return;
+							if (content.scrollHeight > limit + 30) {
+								container.classList.remove('hidden');
+								container.classList.add('flex');
+								content.style.maxHeight = limit + 'px';
+								overlay.style.display = 'block';
+							} else {
+								container.classList.remove('flex');
+								container.classList.add('hidden');
+								content.style.maxHeight = 'none';
+								overlay.style.display = 'none';
+							}
+						}
+						
+						checkHeight();
+						window.addEventListener('load', checkHeight);
+						
+						button.addEventListener('click', function() {
+							isExpanded = !isExpanded;
+							if (isExpanded) {
+								content.style.maxHeight = content.scrollHeight + 'px';
+								overlay.classList.add('opacity-0');
+								setTimeout(function() {
+									if (isExpanded) {
+										content.style.maxHeight = 'none';
+									}
+								}, 500);
+								btnText.textContent = 'Thu gọn';
+								btnIcon.classList.add('rotate-180');
+							} else {
+								content.style.maxHeight = content.scrollHeight + 'px';
+								content.offsetHeight; // Force reflow
+								content.style.maxHeight = limit + 'px';
+								overlay.classList.remove('opacity-0');
+								btnText.textContent = 'Xem thêm tổng quan';
+								btnIcon.classList.remove('rotate-180');
+								
+								var rect = content.getBoundingClientRect();
+								if (rect.top < 0) {
+									window.scrollTo({
+										top: window.pageYOffset + rect.top - 20,
+										behavior: 'smooth'
+									});
+								}
+							}
+						});
+					})();
+					</script>
 				</section>
 
 				<!-- CAREER OPPORTUNITIES -->
