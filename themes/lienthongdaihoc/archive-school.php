@@ -135,207 +135,234 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 			</div>
 		<?php endif; ?>
 
-		<!-- Header with view toggle -->
-		<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-slate-200 gap-4">
-			<p class="text-sm font-medium text-slate-500">Hiển thị tất cả các trường đại học đối tác tuyển sinh chính thức.</p>
-			<a href="<?php echo esc_url( add_query_arg( 'view', 'list' === $view_mode ? 'card' : 'list' ) ); ?>"
-			   class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-brand-accent transition-all"
-			   title="<?php echo 'list' === $view_mode ? 'Chuyển sang Card' : 'Chuyển sang List'; ?>">
-				<?php if ( 'list' === $view_mode ) : ?>
-					<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
-				<?php else : ?>
-					<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-				<?php endif; ?>
-			</a>
-		</div>
+		<?php
+		// Count non-featured schools in the query
+		global $wp_query;
+		$non_featured_count = 0;
+		if ( have_posts() && ! empty( $wp_query->posts ) ) {
+			foreach ( $wp_query->posts as $p ) {
+				if ( empty( $featured_school_ids ) || ! in_array( $p->ID, $featured_school_ids, true ) ) {
+					$non_featured_count++;
+				}
+			}
+		}
+		$total_schools_count = count( $featured_posts ) + $non_featured_count;
 
-		<?php if ( 'card' === $view_mode ) : ?>
-		<!-- ============ CARD VIEW ============ -->
-		<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-			<?php
-			if ( have_posts() ) :
-				while ( have_posts() ) : the_post();
-					$school_id = get_the_ID();
-					if ( ! empty( $featured_school_ids ) && in_array( $school_id, $featured_school_ids, true ) ) {
-						continue;
-					}
-					$logo_id   = get_field( 'logo', $school_id );
-					$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
+		if ( $total_schools_count === 0 ) :
+		?>
+			<div class="text-center py-12">
+				<p class="text-slate-500 text-base">Chưa có trường đối tác nào.</p>
+			</div>
+		<?php
+		endif;
 
-					$prog_count = ltdh_get_school_unique_majors_count( $school_id );
+		if ( $non_featured_count > 0 ) :
+		?>
+			<!-- Header with view toggle -->
+			<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-slate-200 gap-4">
+				<p class="text-sm font-medium text-slate-500">Hiển thị tất cả các trường đại học đối tác tuyển sinh chính thức.</p>
+				<a href="<?php echo esc_url( add_query_arg( 'view', 'list' === $view_mode ? 'card' : 'list' ) ); ?>"
+				   class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-brand-accent transition-all"
+				   title="<?php echo 'list' === $view_mode ? 'Chuyển sang Card' : 'Chuyển sang List'; ?>">
+					<?php if ( 'list' === $view_mode ) : ?>
+						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+					<?php else : ?>
+						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+					<?php endif; ?>
+				</a>
+			</div>
 
-					$school_types = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => 'names' ] );
-					$systems_label = ( ! is_wp_error( $school_types ) && ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
-			?>
-				<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-					<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
+			<?php if ( 'card' === $view_mode ) : ?>
+			<!-- ============ CARD VIEW ============ -->
+			<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+				<?php
+				if ( have_posts() ) :
+					while ( have_posts() ) : the_post();
+						$school_id = get_the_ID();
+						if ( ! empty( $featured_school_ids ) && in_array( $school_id, $featured_school_ids, true ) ) {
+							continue;
+						}
+						$logo_id   = get_field( 'logo', $school_id );
+						$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
 
-					<div class="h-12 w-12 md:h-16 md:w-16 bg-white rounded-lg border-2 md:border-4 border-white shadow-md bg-white -mt-6 md:-mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
-						<?php if ( $logo_id ) : ?>
-							<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
-						<?php else : ?>
-							<span class="font-display font-extrabold text-brand-primary text-xs">UNI</span>
-						<?php endif; ?>
-					</div>
+						$prog_count = ltdh_get_school_unique_majors_count( $school_id );
 
-					<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
-						<div class="text-center">
-							<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
-							<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
-							<div class="mt-3 space-y-1 text-center text-xs md:text-sm">
-								<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
-									<div class="flex flex-wrap justify-center gap-1 mb-1.5">
-										<?php
-										foreach ( $school_types as $st_term ) {
-											echo ltdh_get_training_type_badge_html( $st_term );
-										}
-										?>
-									</div>
-								<?php endif; ?>
-								<p class="text-slate-500 font-semibold">📊 <?php echo esc_html( $prog_count ); ?> ngành đào tạo</p>
+						$school_types = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => 'names' ] );
+						$systems_label = ( ! is_wp_error( $school_types ) && ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
+				?>
+					<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+						<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
+
+						<div class="h-12 w-12 md:h-16 md:w-16 bg-white rounded-lg border-2 md:border-4 border-white shadow-md bg-white -mt-6 md:-mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
+							<?php if ( $logo_id ) : ?>
+								<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
+							<?php else : ?>
+								<span class="font-display font-extrabold text-brand-primary text-xs">UNI</span>
+							<?php endif; ?>
+						</div>
+
+						<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
+							<div class="text-center">
+								<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug uppercase min-h-[36px] line-clamp-2 mt-1"><?php the_title(); ?></h4>
+								<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html( $en_name ); ?></p>
+								<div class="mt-3 space-y-1 text-center text-xs md:text-sm">
+									<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
+										<div class="flex flex-wrap justify-center gap-1 mb-1.5">
+											<?php
+											foreach ( $school_types as $st_term ) {
+												echo ltdh_get_training_type_badge_html( $st_term );
+											}
+											?>
+										</div>
+									<?php endif; ?>
+									<p class="text-slate-500 font-semibold">📊 <?php echo esc_html( $prog_count ); ?> ngành đào tạo</p>
+								</div>
+							</div>
+							<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
+								<a href="<?php the_permalink(); ?>" class="w-full text-center py-2.5 rounded-lg text-sm uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
 							</div>
 						</div>
-						<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-							<a href="<?php the_permalink(); ?>" class="w-full text-center py-2.5 rounded-lg text-sm uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
-						</div>
 					</div>
-				</div>
-			<?php
-				endwhile;
-			else :
-				echo '<div class="col-span-4 text-center py-12"><p class="text-slate-500 text-base">Chưa có trường đối tác nào.</p></div>';
-			endif;
-			?>
-		</div>
+				<?php
+					endwhile;
+				else :
+					echo '<div class="col-span-4 text-center py-12"><p class="text-slate-500 text-base">Chưa có trường đối tác nào.</p></div>';
+				endif;
+				?>
+			</div>
 
-		<?php else : ?>
-		<!-- ============ LIST VIEW ============ -->
-		<div class="space-y-4">
-			<?php
-			if ( have_posts() ) :
-				while ( have_posts() ) : the_post();
-					$school_id = get_the_ID();
-					if ( ! empty( $featured_school_ids ) && in_array( $school_id, $featured_school_ids, true ) ) {
-						continue;
-					}
-					$address   = get_field( 'address', $school_id ) ?: 'Việt Nam';
-					$hotline   = ltdh_get_school_hotline( $school_id );
-					$logo_id   = get_field( 'logo', $school_id );
-					$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: '';
+			<?php else : ?>
+			<!-- ============ LIST VIEW ============ -->
+			<div class="space-y-4">
+				<?php
+				if ( have_posts() ) :
+					while ( have_posts() ) : the_post();
+						$school_id = get_the_ID();
+						if ( ! empty( $featured_school_ids ) && in_array( $school_id, $featured_school_ids, true ) ) {
+							continue;
+						}
+						$address   = get_field( 'address', $school_id ) ?: 'Việt Nam';
+						$hotline   = ltdh_get_school_hotline( $school_id );
+						$logo_id   = get_field( 'logo', $school_id );
+						$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: '';
 
-					$prog_count = ltdh_get_school_unique_majors_count( $school_id );
-					$offered_program_ids = get_posts( [
-						'post_type'   => 'program',
-						'numberposts' => -1,
-						'fields'      => 'ids',
-						'meta_query'  => [
-							[
-								'key'     => 'school_relationship',
-								'value'   => $school_id,
-								'compare' => '=',
+						$prog_count = ltdh_get_school_unique_majors_count( $school_id );
+						$offered_program_ids = get_posts( [
+							'post_type'   => 'program',
+							'numberposts' => -1,
+							'fields'      => 'ids',
+							'meta_query'  => [
+								[
+									'key'     => 'school_relationship',
+									'value'   => $school_id,
+									'compare' => '=',
+								],
 							],
-						],
-					] );
+						] );
 
-					$prog_tags = [];
-					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
-						$tag_ids = array_slice( $offered_program_ids, 0, 5 );
-						foreach ( $tag_ids as $tid ) {
-							$title = get_the_title( $tid );
-							if ( $title ) {
-								$prog_tags[] = [
-									'title' => $title,
-									'link'  => get_permalink( $tid ),
-								];
+						$prog_tags = [];
+						if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
+							$tag_ids = array_slice( $offered_program_ids, 0, 5 );
+							foreach ( $tag_ids as $tid ) {
+								$title = get_the_title( $tid );
+								if ( $title ) {
+									$prog_tags[] = [
+										'title' => $title,
+										'link'  => get_permalink( $tid ),
+									];
+								}
 							}
 						}
-					}
 
-					$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
-					$region = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
+						$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
+						$region = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
 
-					$training_modes = [];
-					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
-						foreach ( $offered_program_ids as $pid ) {
-							$terms = wp_get_post_terms( $pid, LTDH_TAX_TRAINING_TYPE );
-							if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-								foreach ( $terms as $term ) {
-									if ( ! in_array( $term->name, $training_modes ) ) {
-										$training_modes[] = $term->name;
+						$training_modes = [];
+						if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
+							foreach ( $offered_program_ids as $pid ) {
+								$terms = wp_get_post_terms( $pid, LTDH_TAX_TRAINING_TYPE );
+								if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+									foreach ( $terms as $term ) {
+										if ( ! in_array( $term->name, $training_modes ) ) {
+											$training_modes[] = $term->name;
+										}
 									}
 								}
 							}
 						}
-					}
-			?>
-			<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-				<div class="flex flex-col sm:flex-row items-stretch">
-					<div class="sm:w-36 h-32 sm:h-auto bg-cover bg-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-100" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
-					<div class="flex-1 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
-						<div class="flex-1 min-w-0">
-							<div class="flex items-center gap-2">
-								<?php if ( $logo_id ) : ?>
-									<div class="h-8 w-8 bg-white border border-slate-100 rounded shrink-0 flex items-center justify-center overflow-hidden p-0.5">
-										<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
-									</div>
+				?>
+				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+					<div class="flex flex-col sm:flex-row items-stretch">
+						<div class="sm:w-36 h-32 sm:h-auto bg-cover bg-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-100" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
+						<div class="flex-1 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+							<div class="flex-1 min-w-0">
+								<div class="flex items-center gap-2">
+									<?php if ( $logo_id ) : ?>
+										<div class="h-8 w-8 bg-white border border-slate-100 rounded shrink-0 flex items-center justify-center overflow-hidden p-0.5">
+											<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
+										</div>
+									<?php endif; ?>
+									<h3 class="font-extrabold text-slate-900 text-base sm:text-lg leading-tight">
+										<a href="<?php the_permalink(); ?>" class="hover:text-brand-accent transition-colors"><?php the_title(); ?></a>
+									</h3>
+								</div>
+								<?php if ( $en_name ) : ?>
+									<p class="text-sm text-slate-400 italic mt-0.5"><?php echo esc_html( $en_name ); ?></p>
 								<?php endif; ?>
-								<h3 class="font-extrabold text-slate-900 text-base sm:text-lg leading-tight">
-									<a href="<?php the_permalink(); ?>" class="hover:text-brand-accent transition-colors"><?php the_title(); ?></a>
-								</h3>
-							</div>
-							<?php if ( $en_name ) : ?>
-								<p class="text-sm text-slate-400 italic mt-0.5"><?php echo esc_html( $en_name ); ?></p>
-							<?php endif; ?>
-							<div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-500">
-								<span class="flex items-center gap-1"><span class="text-brand-primary">📍</span> <?php echo esc_html( $address ); ?></span>
-								<?php if ( $prog_count > 0 ) : ?>
-									<span class="flex items-center gap-1"><span class="text-brand-primary">📊</span> <?php echo esc_html( $prog_count ); ?> chương trình</span>
-								<?php endif; ?>
-								<?php if ( ! empty( $training_modes ) ) : ?>
-									<span class="flex items-center gap-1.5">
-										<span class="text-brand-primary">🎓</span>
-										<span class="flex flex-wrap gap-1">
-											<?php
-											foreach ( $training_modes as $mode ) {
-												echo ltdh_get_training_type_badge_html( $mode );
-											}
-											?>
+								<div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-500">
+									<span class="flex items-center gap-1"><span class="text-brand-primary">📍</span> <?php echo esc_html( $address ); ?></span>
+									<?php if ( $prog_count > 0 ) : ?>
+										<span class="flex items-center gap-1"><span class="text-brand-primary">📊</span> <?php echo esc_html( $prog_count ); ?> chương trình</span>
+									<?php endif; ?>
+									<?php if ( ! empty( $training_modes ) ) : ?>
+										<span class="flex items-center gap-1.5">
+											<span class="text-brand-primary">🎓</span>
+											<span class="flex flex-wrap gap-1">
+												<?php
+												foreach ( $training_modes as $mode ) {
+													echo ltdh_get_training_type_badge_html( $mode );
+												}
+												?>
+											</span>
 										</span>
-									</span>
-								<?php endif; ?>
-							</div>
-							<?php if ( ! empty( $prog_tags ) ) : ?>
-								<div class="flex flex-wrap gap-1.5 mt-2">
-									<?php foreach ( $prog_tags as $tag ) : ?>
-										<a href="<?php echo esc_url( $tag['link'] ); ?>" class="inline-block bg-blue-50 text-brand-primary text-xs font-bold px-2 py-0.5 rounded-full hover:bg-blue-100 transition-colors"><?php echo esc_html( $tag['title'] ); ?></a>
-									<?php endforeach; ?>
-									<?php if ( $prog_count > 5 ) : ?>
-										<a href="<?php the_permalink(); ?>" class="inline-block bg-slate-100 text-slate-500 text-xs font-bold px-2 py-0.5 rounded-full hover:bg-slate-200 transition-colors">+<?php echo esc_html( $prog_count - 5 ); ?> nữa</a>
 									<?php endif; ?>
 								</div>
-							<?php endif; ?>
-						</div>
-						<div class="flex items-center gap-2 shrink-0 w-full sm:w-auto mt-3 sm:mt-0">
-							<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-6 py-2.5 rounded-lg text-sm uppercase ltdh-btn-details min-h-[40px] flex items-center">Tìm hiểu chi tiết</a>
+								<?php if ( ! empty( $prog_tags ) ) : ?>
+									<div class="flex flex-wrap gap-1.5 mt-2">
+										<?php foreach ( $prog_tags as $tag ) : ?>
+											<a href="<?php echo esc_url( $tag['link'] ); ?>" class="inline-block bg-blue-50 text-brand-primary text-xs font-bold px-2 py-0.5 rounded-full hover:bg-blue-100 transition-colors"><?php echo esc_html( $tag['title'] ); ?></a>
+										<?php endforeach; ?>
+										<?php if ( $prog_count > 5 ) : ?>
+											<a href="<?php the_permalink(); ?>" class="inline-block bg-slate-100 text-slate-500 text-xs font-bold px-2 py-0.5 rounded-full hover:bg-slate-200 transition-colors">+<?php echo esc_html( $prog_count - 5 ); ?> nữa</a>
+										<?php endif; ?>
+									</div>
+								<?php endif; ?>
+							</div>
+							<div class="flex items-center gap-2 shrink-0 w-full sm:w-auto mt-3 sm:mt-0">
+								<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-6 py-2.5 rounded-lg text-sm uppercase ltdh-btn-details min-h-[40px] flex items-center">Tìm hiểu chi tiết</a>
+							</div>
 						</div>
 					</div>
 				</div>
+				<?php
+					endwhile;
+				else :
+					echo '<div class="text-center py-12"><p class="text-slate-500 text-base">Chưa có trường đối tác nào.</p></div>';
+				endif;
+				?>
 			</div>
-			<?php
-				endwhile;
-			else :
-				echo '<div class="text-center py-12"><p class="text-slate-500 text-base">Chưa có trường đối tác nào.</p></div>';
-			endif;
-			?>
-		</div>
-		<?php endif; ?>
+			<?php endif; ?>
 
-		<!-- Pagination -->
-		<?php if ( have_posts() && $wp_query->max_num_pages > 1 ) : ?>
-		<div class="mt-12 flex justify-center">
-			<?php the_posts_pagination( [ 'mid_size' => 2, 'prev_text' => '← Trước', 'next_text' => 'Sau →' ] ); ?>
-		</div>
-		<?php endif; ?>
+			<!-- Pagination -->
+			<?php if ( have_posts() && $wp_query->max_num_pages > 1 ) : ?>
+			<div class="mt-12 flex justify-center">
+				<?php the_posts_pagination( [ 'mid_size' => 2, 'prev_text' => '← Trước', 'next_text' => 'Sau →' ] ); ?>
+			</div>
+			<?php endif; ?>
+		<?php
+		endif;
+		?>
+
 
 	</div>
 </main>
