@@ -56,13 +56,13 @@ $zalo    = ltdh_get_zalo_url();
 							<a href="<?php echo esc_url($slide['link']); ?>" class="block w-full h-full">
 						<?php endif; ?>
 						
-						<div class="relative w-full h-auto md:h-[800px] max-h-[800px] overflow-hidden bg-[#f8fafc]">
+						<div class="relative w-full h-auto max-h-[800px] overflow-hidden bg-[#f8fafc]">
 							<!-- Main Banner Image -->
-							<picture class="relative z-10 flex w-full h-auto md:h-full">
+							<picture class="relative z-10 block w-full h-auto max-h-[800px]">
 								<?php if (!empty($slide['image_mobile'])) : ?>
 									<source media="(max-width: 768px)" srcset="<?php echo esc_url($slide['image_mobile']); ?>">
 								<?php endif; ?>
-								<img src="<?php echo esc_url($slide['image']); ?>" alt="Banner Hero" class="w-full h-auto md:h-full object-cover object-center pointer-events-none" loading="eager" decoding="async">
+								<img src="<?php echo esc_url($slide['image']); ?>" alt="Banner Hero" class="w-full h-auto max-h-[800px] object-cover object-center pointer-events-none" loading="eager" decoding="async">
 							</picture>
 						</div>
 
