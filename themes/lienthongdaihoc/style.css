@@ -21,9 +21,16 @@ Requires PHP: 8.0
     scrollbar-width: none;  /* Firefox */
 }
 
-/* Prevent Montserrat font weights from being too heavy */
-
-
+/* Prevent Montserrat font weights from being too heavy - Make all headings font-semibold (font-weight: 600) */
+h1, h2, h3, h4, h5, h6,
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
+h1 strong, h2 strong, h3 strong, h4 strong, h5 strong, h6 strong,
+h1 b, h2 b, h3 b, h4 b, h5 b, h6 b,
+h1 .font-bold, h2 .font-bold, h3 .font-bold, h4 .font-bold, h5 .font-bold, h6 .font-bold,
+h1 .font-extrabold, h2 .font-extrabold, h3 .font-extrabold, h4 .font-extrabold, h5 .font-extrabold, h6 .font-extrabold,
+h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, h6 .font-black {
+    font-weight: 600 !important;
+}
 /* Dropdown animation */
 .dropdown-panel {
 	opacity: 0;
