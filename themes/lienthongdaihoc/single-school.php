@@ -137,10 +137,10 @@ $global_zalo = ltdh_get_zalo_url();
 
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 			<!-- Main Column -->
-			<div class="lg:col-span-2 space-y-8">
+			<div class="lg:col-span-2 space-y-6 md:space-y-8">
 				
 				<!-- OVERVIEW -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Giới thiệu về trường</h2>
 					<div class="relative">
 						<div id="school-intro-content" class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base overflow-hidden transition-all duration-500 max-h-[350px] relative">
@@ -225,8 +225,8 @@ $global_zalo = ltdh_get_zalo_url();
 				</section>
 
 				<!-- PROGRAMS OFFERED -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Chương trình tuyển sinh đang mở</h2>
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Chương trình tuyển sinh đang mở</h2>
 					
 					<?php
 					$meta_status_filter = [
@@ -341,7 +341,7 @@ $global_zalo = ltdh_get_zalo_url();
 							if ( count( $major['programs'] ) > 1 ) :
 								// Grouped layout for majors with 2+ programs at this school
 								?>
-								<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all p-5 flex flex-col gap-4">
+								<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all p-4 md:p-5 flex flex-col gap-4">
 									<!-- Major Primary Info Header -->
 									<div class="flex items-start sm:items-center gap-4">
 										<div class="h-16 w-16 bg-slate-200 bg-cover bg-center rounded-lg shrink-0 border border-slate-100" style="background-image: url('<?php echo esc_url( $major['thumb'] ); ?>'); font-size: 0;"></div>
@@ -361,26 +361,28 @@ $global_zalo = ltdh_get_zalo_url();
 									<!-- Programs Offered under this Major -->
 									<div class="border-t border-slate-100 pt-3">
 										<div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hệ đào tạo tuyển sinh:</div>
-										<div class="grid grid-cols-1 gap-2.5">
+										<div class="divide-y divide-slate-100">
 											<?php foreach ( $major['programs'] as $prog ) : ?>
-												<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 hover:bg-slate-100/70 border border-slate-100 rounded-lg p-3 transition-colors">
-													<div class="flex items-center gap-3 flex-wrap">
-														<?php if ( $prog['type_name'] ) : ?>
-															<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs font-black px-2 py-0.5 rounded uppercase tracking-wider">
-																<?php echo esc_html( $prog['type_name'] ); ?>
-															</span>
-														<?php endif; ?>
-														<div class="flex flex-wrap gap-x-4 gap-y-0.5 text-sm text-slate-500">
+												<div class="flex items-center justify-between gap-3 py-3 sm:px-2 sm:-mx-2 sm:rounded-lg sm:hover:bg-slate-50 transition-colors">
+													<div class="flex-1 min-w-0 space-y-1">
+														<div class="flex items-center gap-2 flex-wrap">
+															<?php if ( $prog['type_name'] ) : ?>
+																<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">
+																	<?php echo esc_html( $prog['type_name'] ); ?>
+																</span>
+															<?php endif; ?>
+														</div>
+														<div class="flex flex-wrap gap-x-4 gap-y-0.5 text-xs sm:text-sm text-slate-500 pt-0.5">
 															<p>Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $prog['duration'] ); ?></span></p>
 															<p class="hidden sm:inline text-slate-300">|</p>
 															<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></span></p>
 														</div>
 													</div>
-													<div class="shrink-0 flex items-center justify-end w-full sm:w-auto">
+													<div class="shrink-0">
 														<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
-															<span class="text-sm text-slate-400 bg-slate-200 px-4 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
+															<span class="text-xs sm:text-sm text-slate-400 bg-slate-200 px-3 py-1.5 rounded-lg font-bold">Tạm ngưng</span>
 														<?php else : ?>
-															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-sm px-4 py-1.5 rounded-lg uppercase ltdh-btn-details min-h-[32px] flex items-center justify-center">Tìm hiểu</a>
+															<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="text-xs sm:text-sm px-4 py-1.5 rounded-lg uppercase ltdh-btn-details min-h-[32px] flex items-center justify-center">Tìm hiểu</a>
 														<?php endif; ?>
 													</div>
 												</div>
@@ -393,12 +395,12 @@ $global_zalo = ltdh_get_zalo_url();
 								// Single-row layout for majors with only 1 program
 								$prog = $major['programs'][0];
 								?>
-								<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-									<div class="flex items-center gap-4 flex-1 min-w-0">
+								<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+									<div class="flex items-start gap-4 flex-1 min-w-0">
 										<div class="h-16 w-16 bg-slate-200 bg-cover bg-center rounded-lg shrink-0 border border-slate-100" style="background-image: url('<?php echo esc_url( $major['thumb'] ); ?>'); font-size: 0;"></div>
-										<div class="space-y-1 flex-1 min-w-0">
+										<div class="space-y-1.5 flex-1 min-w-0">
 											<div class="flex items-center gap-2 flex-wrap">
-												<h4 class="font-extrabold text-slate-800 text-lg hover:text-[#00308b] transition-colors leading-snug">
+												<h4 class="font-extrabold text-slate-800 text-base sm:text-lg hover:text-[#00308b] transition-colors leading-snug">
 													<?php if ( $major['id'] ) : ?>
 														<a href="<?php echo esc_url( get_permalink( $major['id'] ) ); ?>">
 															<?php echo esc_html( $prog['title'] ); ?>
@@ -408,12 +410,12 @@ $global_zalo = ltdh_get_zalo_url();
 													<?php endif; ?>
 												</h4>
 												<?php if ( $prog['type_name'] ) : ?>
-													<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs font-black px-2.5 py-1 rounded uppercase tracking-wider">
+													<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">
 														<?php echo esc_html( $prog['type_name'] ); ?>
 													</span>
 												<?php endif; ?>
 											</div>
-											<div class="flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-500 pt-1">
+											<div class="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-slate-500 pt-0.5">
 												<p>Chuyên ngành: 
 													<?php if ( $major['id'] ) : ?>
 														<a href="<?php echo esc_url( get_permalink( $major['id'] ) ); ?>" class="font-bold text-brand-primary hover:underline"><?php echo esc_html( $major['name'] ); ?></a>
@@ -421,17 +423,19 @@ $global_zalo = ltdh_get_zalo_url();
 														<span class="font-semibold text-slate-700"><?php echo esc_html( $major['name'] ); ?></span>
 													<?php endif; ?>
 												</p>
+												<p class="hidden sm:inline text-slate-300">|</p>
 												<p>Thời gian: <span class="font-semibold text-slate-700"><?php echo esc_html( $prog['duration'] ); ?></span></p>
+												<p class="hidden sm:inline text-slate-300">|</p>
 												<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></span></p>
 											</div>
 										</div>
 									</div>
 
-									<div class="shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex items-center justify-end">
+									<div class="shrink-0 w-full sm:w-auto flex items-center justify-end">
 										<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
-											<span class="text-sm text-slate-400 bg-slate-150 px-4 py-2.5 rounded-lg font-bold">Tạm ngưng</span>
+											<span class="text-xs sm:text-sm text-slate-400 bg-slate-150 px-4 py-2 rounded-lg font-bold">Tạm ngưng</span>
 										<?php else : ?>
-											<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-sm px-6 py-2.5 rounded-lg uppercase ltdh-btn-details min-h-[40px] flex items-center justify-center">Tìm hiểu</a>
+											<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="w-full sm:w-auto text-xs sm:text-sm px-5 py-2.5 rounded-lg uppercase ltdh-btn-details min-h-[36px] flex items-center justify-center">Tìm hiểu</a>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -446,8 +450,8 @@ $global_zalo = ltdh_get_zalo_url();
 				</section>
 
 				<!-- MAJORS OFFERED -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Các ngành đào tạo phổ biến</h2>
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Các ngành đào tạo phổ biến</h2>
 					<?php
 					// Query distinct majors via the programs offered by this school
 					$distinct_major_ids = [];
@@ -530,8 +534,8 @@ $global_zalo = ltdh_get_zalo_url();
 				</section>
 				<!-- ADMISSION INFORMATION -->
 				<?php if ( $adm_info ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Phương thức tuyển sinh</h2>
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Phương thức tuyển sinh</h2>
 						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
 							<?php echo wp_kses_post( $adm_info ); ?>
 						</div>
@@ -540,8 +544,8 @@ $global_zalo = ltdh_get_zalo_url();
 
 				<!-- CONTACT INFO -->
 				<?php if ( $contact ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Thông tin liên hệ tuyển sinh</h2>
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Thông tin liên hệ tuyển sinh</h2>
 						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
 							<?php echo wp_kses_post( $contact ); ?>
 						</div>
