@@ -32,6 +32,30 @@ $opportunities   = get_field( 'career_opportunities', $program_id );
 $why_choose      = get_field( 'why_choose_us', $program_id );
 $faqs            = get_field( 'faq', $program_id );
 
+$curriculum_raw  = get_field( 'curriculum_file', $program_id );
+$curriculum_url  = '';
+$curriculum_type = 'file';
+
+if ( is_array( $curriculum_raw ) && ! empty( $curriculum_raw['url'] ) ) {
+	$curriculum_url = $curriculum_raw['url'];
+	$mime    = strtolower( $curriculum_raw['mime_type'] ?? '' );
+	$type    = strtolower( $curriculum_raw['type'] ?? '' );
+	$subtype = strtolower( $curriculum_raw['subtype'] ?? '' );
+	if ( strpos( $mime, 'image' ) !== false || in_array( $type, array( 'image', 'png', 'jpg', 'jpeg', 'webp' ), true ) || in_array( $subtype, array( 'png', 'jpg', 'jpeg', 'webp' ), true ) ) {
+		$curriculum_type = 'image';
+	} elseif ( strpos( $mime, 'pdf' ) !== false || $subtype === 'pdf' || strtolower( pathinfo( $curriculum_url, PATHINFO_EXTENSION ) ) === 'pdf' ) {
+		$curriculum_type = 'pdf';
+	}
+} elseif ( is_string( $curriculum_raw ) && ! empty( $curriculum_raw ) ) {
+	$curriculum_url = $curriculum_raw;
+	$ext = strtolower( pathinfo( $curriculum_url, PATHINFO_EXTENSION ) );
+	if ( in_array( $ext, array( 'png', 'jpg', 'jpeg', 'webp', 'gif' ), true ) ) {
+		$curriculum_type = 'image';
+	} elseif ( $ext === 'pdf' ) {
+		$curriculum_type = 'pdf';
+	}
+}
+
 $global_zalo = ltdh_get_zalo_url();
 ?>
 
@@ -472,6 +496,73 @@ $global_zalo = ltdh_get_zalo_url();
 						</div>
 					</div>
 				</section>
+
+				<!-- SECTION 7.5: CURRICULUM ROADMAP FILE/IMAGE -->
+				<?php if ( $curriculum_url ) : ?>
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="lo-trinh-hoc">
+						<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+							<div>
+								<h2 class="text-lg md:text-2xl font-bold text-slate-900">Lộ trình học & Khung chương trình</h2>
+								<p class="text-xs md:text-sm text-slate-500 mt-0.5">Khung chương trình đào tạo chính thức áp dụng cho khóa học này</p>
+							</div>
+							<?php if ( $curriculum_type === 'image' || $curriculum_type === 'pdf' ) : ?>
+								<a href="<?php echo esc_url( $curriculum_url ); ?>" download target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#00308b] hover:text-[#002266] bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-all shrink-0 self-start sm:self-auto">
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+									<span>Tải file gốc</span>
+								</a>
+							<?php endif; ?>
+						</div>
+
+						<?php if ( $curriculum_type === 'image' ) : ?>
+							<!-- Image Viewer with Lightbox Zoom -->
+							<div class="relative group bg-slate-900/5 rounded-xl border border-slate-200/80 overflow-hidden p-2 sm:p-3 text-center">
+								<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" class="inline-block relative overflow-hidden rounded-lg cursor-zoom-in group" title="Click để xem ảnh kích thước chuẩn">
+									<img src="<?php echo esc_url( $curriculum_url ); ?>" alt="Lộ trình đào tạo <?php echo esc_attr( get_the_title() ); ?>" class="max-w-full h-auto mx-auto rounded-lg shadow-2xs group-hover:scale-[1.01] transition-transform duration-300">
+									<div class="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+										<span class="bg-white/95 text-slate-900 text-xs font-bold px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
+											<svg class="w-4 h-4 text-[#00308b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+											Xem ảnh toàn màn hình
+										</span>
+									</div>
+								</a>
+								<p class="text-[11px] text-slate-400 mt-2 flex items-center justify-center gap-1">
+									<span>🔍</span> Click vào ảnh để phóng to xem chi tiết mã môn học và số tín chỉ
+								</p>
+							</div>
+						<?php else : ?>
+							<!-- PDF or File Download Box -->
+							<div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+								<div class="flex items-center gap-3.5 min-w-0">
+									<div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-black text-xl shrink-0 shadow-2xs">
+										PDF
+									</div>
+									<div class="min-w-0">
+										<h4 class="font-bold text-slate-900 text-sm sm:text-base mb-1 truncate">Khung chương trình đào tạo chi tiết</h4>
+										<p class="text-xs text-slate-500">Bản PDF chính thức từ nhà trường liệt kê lộ trình các học kỳ và danh sách môn học</p>
+									</div>
+								</div>
+								<a href="<?php echo esc_url( $curriculum_url ); ?>" download target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0">
+									<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+									<span>Tải Khung Chương Trình (PDF)</span>
+								</a>
+							</div>
+						<?php endif; ?>
+
+						<!-- CTA: Thẩm định miễn môn -->
+						<div class="mt-4 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+							<div class="flex items-center gap-3">
+								<span class="text-2xl shrink-0">💡</span>
+								<div>
+									<h4 class="font-extrabold text-amber-950 text-xs sm:text-sm">Bạn chưa rõ mình được miễn giảm những môn nào?</h4>
+									<p class="text-[11px] sm:text-xs text-amber-800 mt-0.5">Gửi ảnh bảng điểm tốt nghiệp CĐ/ĐH cũ của bạn, ban tuyển sinh sẽ đối chiếu lộ trình và tư vấn miễn môn cho bạn trong 15 phút.</p>
+								</div>
+							</div>
+							<a href="#dang-ky" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-2xs transition-all shrink-0">
+								Thẩm định miễn môn
+							</a>
+						</div>
+					</section>
+				<?php endif; ?>
 
 				<!-- SECTION 8: DOCUMENTS REQUIRED -->
 				<?php 

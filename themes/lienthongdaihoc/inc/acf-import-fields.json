@@ -280,6 +280,15 @@
                 "library": "all"
             },
             {
+                "key": "field_program_curriculum_file",
+                "label": "Tải lộ trình học / Khung chương trình (File/Ảnh)",
+                "name": "curriculum_file",
+                "type": "file",
+                "instructions": "Tải lên file Ảnh scan (PNG/JPG) hoặc tệp PDF Khung chương trình & Lộ trình học của nhà trường.",
+                "return_format": "array",
+                "library": "all"
+            },
+            {
                 "key": "field_program_period",
                 "label": "Hạn hồ sơ",
                 "name": "enrollment_period",

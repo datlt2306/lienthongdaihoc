@@ -673,7 +673,7 @@ class LTDH_CLI_Commands {
 		update_post_meta( $school_id, 'rating', '4.7' );
 		update_post_meta( $school_id, 'reviews_count', '98' );
 		update_post_meta( $school_id, 'admission_target', '1.500' );
-		update_post_meta( $school_id, 'admission_info', '<h4>Học phí & Lệ phí</h4><ul><li><strong>Học phí:</strong> 420.000 đ/tín chỉ</li><li><strong>Lệ phí xét tuyển:</strong> 200.000đ</li></ul>' );
+		update_post_meta( $school_id, 'admission_info', '<h4>Học phí & Lệ phí</h4><ul><li><strong>Mức học phí tham khảo:</strong> 420.000 - 684.000 đ/tín chỉ (tùy ngành & hệ)</li><li><strong>Lệ phí xét tuyển:</strong> 200.000đ/hồ sơ</li></ul>' );
 		update_post_meta( $school_id, 'contact_info', '<h4>Địa điểm khai giảng & thi</h4><p>Phòng Khảo thí và Đảm bảo chất lượng đào tạo - Trường Đại học Giao thông vận tải, Số 3 Cầu Giấy, Láng Thượng, Đống Đa, Hà Nội.</p>' );
 		wp_set_object_terms( $school_id, 'mien-bac', 'region' );
 
