@@ -122,9 +122,14 @@ class LTDH_Performance {
 		}
 
 		if ( ! empty( $lcp_image_url ) ) {
-			echo '<link rel="preload" as="image" href="' . esc_url( $lcp_image_url ) . '" fetchpriority="high">' . "\n";
+			if ( function_exists( 'ltdh_get_optimized_image_url' ) ) {
+				$lcp_image_url = ltdh_get_optimized_image_url( $lcp_image_url );
+			}
+			$type_attr = ( strpos( $lcp_image_url, '.webp' ) !== false ) ? ' type="image/webp"' : '';
+			echo '<link rel="preload" as="image" href="' . esc_url( $lcp_image_url ) . '"' . $type_attr . ' fetchpriority="high">' . "\n";
 		}
 	}
+
 
 	/**
 	 * 3. Defer Non-Critical JavaScript to eliminate render-blocking resources.

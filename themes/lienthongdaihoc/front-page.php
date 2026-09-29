@@ -53,9 +53,12 @@ $zalo    = ltdh_get_zalo_url();
 				$slide_idx = 0;
 				foreach ($hero_slides as $slide) : 
 					if (empty($slide['image'])) continue;
-					$is_lcp       = ( 0 === $slide_idx );
-					$loading_attr = $is_lcp ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" fetchpriority="low"';
+					$slide_img_desktop = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'] ) : $slide['image'];
+					$slide_img_mobile  = ! empty( $slide['image_mobile'] ) ? ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image_mobile'], true ) : $slide['image_mobile'] ) : ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'], true ) : '' );
+					$is_lcp            = ( 0 === $slide_idx );
+					$loading_attr      = $is_lcp ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" fetchpriority="low"';
 					?>
+
 					<div class="swiper-slide w-full">
 						<?php if (!empty($slide['link'])) : ?>
 							<a href="<?php echo esc_url($slide['link']); ?>" class="block w-full h-full">
@@ -64,12 +67,13 @@ $zalo    = ltdh_get_zalo_url();
 						<div class="relative w-full h-auto min-h-[220px] sm:min-h-[350px] md:min-h-[450px] max-h-[800px] overflow-hidden bg-[#f8fafc]">
 							<!-- Main Banner Image -->
 							<picture class="relative z-10 block w-full h-auto max-h-[800px]">
-								<?php if (!empty($slide['image_mobile'])) : ?>
-									<source media="(max-width: 768px)" srcset="<?php echo esc_url($slide['image_mobile']); ?>">
+								<?php if ( ! empty( $slide_img_mobile ) && $slide_img_mobile !== $slide_img_desktop ) : ?>
+									<source media="(max-width: 768px)" srcset="<?php echo esc_url( $slide_img_mobile ); ?>">
 								<?php endif; ?>
-								<img src="<?php echo esc_url($slide['image']); ?>" width="1920" height="600" alt="Banner Hero" class="w-full h-auto max-h-[800px] object-cover object-center pointer-events-none" <?php echo $loading_attr; ?> decoding="async">
+								<img src="<?php echo esc_url( $slide_img_desktop ); ?>" width="1942" height="809" alt="Banner Hero" class="w-full h-auto max-h-[800px] object-cover object-center pointer-events-none" <?php echo $loading_attr; ?> decoding="async">
 							</picture>
 						</div>
+
 
 						<?php if (!empty($slide['link'])) : ?>
 							</a>

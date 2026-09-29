@@ -230,14 +230,53 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 // ----------------------------------------------------
 
 /**
+ * Automatically resolve optimized image URL (e.g. serving optimized WebP replacements from assets/images/).
+ *
+ * @param string $url       Original image URL.
+ * @param bool   $is_mobile Whether mobile variant is requested.
+ * @return string
+ */
+function ltdh_get_optimized_image_url( string $url, bool $is_mobile = false ): string {
+	if ( empty( $url ) ) {
+		return '';
+	}
+
+	$parsed_path = parse_url( $url, PHP_URL_PATH );
+	if ( empty( $parsed_path ) ) {
+		return $url;
+	}
+
+	$filename         = basename( $parsed_path );
+	$name_without_ext = pathinfo( $filename, PATHINFO_FILENAME );
+
+	// Check if theme has an optimized WebP replacement in assets/images/
+	$suffix     = $is_mobile ? '-mobile.webp' : '.webp';
+	$theme_file = get_template_directory() . '/assets/images/' . $name_without_ext . $suffix;
+	if ( file_exists( $theme_file ) ) {
+		return get_template_directory_uri() . '/assets/images/' . $name_without_ext . $suffix;
+	}
+
+	// Also check standard webp as fallback for mobile if -mobile.webp doesn't exist
+	if ( $is_mobile ) {
+		$theme_desktop_file = get_template_directory() . '/assets/images/' . $name_without_ext . '.webp';
+		if ( file_exists( $theme_desktop_file ) ) {
+			return get_template_directory_uri() . '/assets/images/' . $name_without_ext . '.webp';
+		}
+	}
+
+	return $url;
+}
+
+/**
  * Get site logo data (URL, width, height) with Customizer → ACF fallback.
  */
 function ltdh_get_logo_data(): array {
+	$data = [ 'url' => '', 'width' => 0, 'height' => 0 ];
 	$logo_id = get_theme_mod('custom_logo');
 	if ($logo_id) {
 		$img_data = wp_get_attachment_image_src($logo_id, 'full');
 		if ($img_data && ! empty($img_data[0])) {
-			return [
+			$data = [
 				'url'    => $img_data[0],
 				'width'  => (int) $img_data[1],
 				'height' => (int) $img_data[2],
@@ -245,26 +284,26 @@ function ltdh_get_logo_data(): array {
 		}
 	}
 
-	if (function_exists('get_field')) {
+	if ( empty( $data['url'] ) && function_exists('get_field') ) {
 		$acf_logo = get_field('global_logo', 'options');
 		if ($acf_logo) {
 			if (is_numeric($acf_logo)) {
 				$img_data = wp_get_attachment_image_src((int) $acf_logo, 'full');
 				if ($img_data && ! empty($img_data[0])) {
-					return [
+					$data = [
 						'url'    => $img_data[0],
 						'width'  => (int) $img_data[1],
 						'height' => (int) $img_data[2],
 					];
 				}
 			} elseif (is_array($acf_logo) && isset($acf_logo['url'])) {
-				return [
+				$data = [
 					'url'    => $acf_logo['url'],
 					'width'  => (int) ($acf_logo['width'] ?? 200),
 					'height' => (int) ($acf_logo['height'] ?? 60),
 				];
 			} elseif (is_string($acf_logo)) {
-				return [
+				$data = [
 					'url'    => $acf_logo,
 					'width'  => 200,
 					'height' => 60,
@@ -273,8 +312,16 @@ function ltdh_get_logo_data(): array {
 		}
 	}
 
-	return [ 'url' => '', 'width' => 0, 'height' => 0 ];
+	if ( ! empty( $data['url'] ) ) {
+		$optimized = ltdh_get_optimized_image_url( $data['url'] );
+		if ( ! empty( $optimized ) && $optimized !== $data['url'] ) {
+			$data['url'] = $optimized;
+		}
+	}
+
+	return $data;
 }
+
 
 /**
  * Get site logo URL with Customizer → ACF fallback.
