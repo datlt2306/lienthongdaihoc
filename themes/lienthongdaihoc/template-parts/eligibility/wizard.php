@@ -27,7 +27,6 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 						<option value="thap-phan">THPT (Tốt nghiệp Phổ thông)</option>
 						<option value="trung-cap">Trung cấp (Bằng Trung cấp)</option>
 						<option value="cao-dang">Cao đẳng (Bằng Cao đẳng)</option>
-						<option value="dai-hoc">Đại học (Bằng Cử nhân)</option>
 					</select>
 				</div>
 

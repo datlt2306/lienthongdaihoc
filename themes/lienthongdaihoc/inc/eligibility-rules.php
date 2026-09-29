@@ -106,3 +106,55 @@ function ltdh_elig_get_scoring_weights() {
 		'schedule_match'     => 5,   // Max 5 points
 	];
 }
+
+// ----------------------------------------------------
+// CHECK IF MAJORS ARE RELATED
+// ----------------------------------------------------
+function ltdh_elig_are_majors_related( $major_id_1, $major_id_2 ) {
+	if ( ! $major_id_1 || ! $major_id_2 ) {
+		return false;
+	}
+	if ( (int) $major_id_1 === (int) $major_id_2 ) {
+		return true;
+	}
+
+	// 1. Check ACF relationship field `major_related` on major_id_1
+	if ( function_exists( 'get_field' ) ) {
+		$related_posts = get_field( 'major_related', $major_id_1 );
+		if ( ! empty( $related_posts ) ) {
+			foreach ( $related_posts as $p ) {
+				$related_id = is_object( $p ) ? $p->ID : ( is_array( $p ) ? $p['ID'] : intval( $p ) );
+				if ( $related_id === (int) $major_id_2 ) {
+					return true;
+				}
+			}
+		}
+
+		// Also check the other way around
+		$related_posts_2 = get_field( 'major_related', $major_id_2 );
+		if ( ! empty( $related_posts_2 ) ) {
+			foreach ( $related_posts_2 as $p ) {
+				$related_id = is_object( $p ) ? $p->ID : ( is_array( $p ) ? $p['ID'] : intval( $p ) );
+				if ( $related_id === (int) $major_id_1 ) {
+					return true;
+				}
+			}
+		}
+	}
+
+	// 2. Fallback: Slug-based check using ltdh_elig_get_major_relationships()
+	$slug_1 = get_post_field( 'post_name', $major_id_1 );
+	$slug_2 = get_post_field( 'post_name', $major_id_2 );
+	if ( $slug_1 && $slug_2 ) {
+		$relationships = ltdh_elig_get_major_relationships();
+		if ( isset( $relationships[ $slug_1 ] ) && in_array( $slug_2, $relationships[ $slug_1 ], true ) ) {
+			return true;
+		}
+		if ( isset( $relationships[ $slug_2 ] ) && in_array( $slug_1, $relationships[ $slug_2 ], true ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+

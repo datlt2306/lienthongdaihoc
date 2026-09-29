@@ -269,8 +269,14 @@ function ltdh_elig_ajax_check() {
 
 function ltdh_elig_validate_input( $input ) {
 	$valid_education = [ 'thap-phan', 'trung-cap', 'cao-dang', 'dai-hoc', 'thac-si' ];
-	$valid_training  = [ 'lien-thong', 'van-bang-2', 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ];
-	$valid_campus    = [ 'ha-noi', 'ho-chi-minh', 'da-nang', 'thai-nguyen', 'online' ];
+
+	// Dynamic fetch training types
+	$training_terms = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false, 'fields' => 'slugs' ] );
+	$valid_training = ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ? $training_terms : [ 'lien-thong', 'van-bang-2', 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ];
+
+	// Dynamic fetch campuses
+	$campus_terms = get_terms( [ 'taxonomy' => 'campus', 'hide_empty' => false, 'fields' => 'slugs' ] );
+	$valid_campus = ! is_wp_error( $campus_terms ) && ! empty( $campus_terms ) ? $campus_terms : [ 'ha-noi', 'ho-chi-minh', 'da-nang', 'thai-nguyen', 'online' ];
 	$valid_budget    = [ 'duoi-20-trieu', '20-30-trieu', '30-50-trieu', 'tren-50-trieu' ];
 
 	if ( empty( $input['education'] ) || ! in_array( $input['education'], $valid_education, true ) ) {
@@ -411,6 +417,9 @@ function ltdh_elig_run_check( $input ) {
 				if ( $prog_major_id && (int) $input['major_id'] === $prog_major_id ) {
 					$match_score += $weights['major_related'];
 					$match_reasons[] = 'Chuyên ngành muốn học trùng khớp với ngành bạn đã tốt nghiệp.';
+				} elseif ( $prog_major_id && ltdh_elig_are_majors_related( $input['major_id'], $prog_major_id ) ) {
+					$match_score += $weights['major_related'];
+					$match_reasons[] = 'Ngành bạn đã tốt nghiệp có liên quan mật thiết với ngành muốn học.';
 				} else {
 					if ( $preliminary_status !== 'not_compatible' ) {
 						$preliminary_status = 'needs_verification';
@@ -744,6 +753,27 @@ function ltdh_elig_ajax_lead() {
 	$school_id = $program_id ? intval( get_post_meta( $program_id, 'school_relationship', true ) ) : 0;
 	$major_id  = $program_id ? intval( get_post_meta( $program_id, 'major_relationship', true ) ) : 0;
 
+	// Query original eligibility checker survey responses to preserve context
+	$campus_val = '';
+	$training_val = '';
+	$ref_source = 'eligibility_checker_form';
+
+	if ( $check_id ) {
+		global $wpdb;
+		$check_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ltdh_eligibility_checks WHERE id = %d", $check_id ) );
+		if ( $check_row ) {
+			$campus_val = $check_row->input_campus;
+			$training_val = $check_row->input_training_type;
+			$is_verification_required = ($program_id && get_field( 'elig_min_education', $program_id )) ? '1' : '0';
+			$ref_source = 'eligibility_checker?education_level=' . urlencode( $check_row->input_education ) . 
+				'&current_major=' . urlencode( $check_row->input_major_id ) . 
+				'&previous_school=' . urlencode( $check_row->input_previous_school ) .
+				'&desired_major=' . urlencode( $check_row->input_desired_major ) . 
+				'&birth_year=' . urlencode( $check_row->input_graduation ) . 
+				'&verification_required=' . $is_verification_required;
+		}
+	}
+
 	if ( function_exists( 'ltdh_insert_lead' ) ) {
 		$lead_id = ltdh_insert_lead( [
 			'name'            => $name,
@@ -752,9 +782,9 @@ function ltdh_elig_ajax_lead() {
 			'program_id'      => $program_id,
 			'school_id'       => $school_id,
 			'major_id'        => $major_id,
-			'training_type'   => '',
-			'campus'          => '',
-			'referral_source' => 'eligibility_checker_form',
+			'training_type'   => $training_val,
+			'campus'          => $campus_val,
+			'referral_source' => $ref_source,
 		] );
 	} else {
 		global $wpdb;
@@ -765,7 +795,9 @@ function ltdh_elig_ajax_lead() {
 			'program_id'      => $program_id,
 			'school_id'       => $school_id,
 			'major_id'        => $major_id,
-			'referral_source' => 'eligibility_checker_form',
+			'training_type'   => $training_val,
+			'campus'          => $campus_val,
+			'referral_source' => $ref_source,
 			'created_at'      => current_time( 'mysql' ),
 		] );
 		$lead_id = $wpdb->insert_id;
