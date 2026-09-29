@@ -612,6 +612,33 @@ class LTDH_CLI_Commands {
 	}
 
 	/**
+	 * Sideload a local image file.
+	 */
+	private function sideload_local_image( $file_path, $post_id, $title ) {
+		if ( ! file_exists( $file_path ) ) {
+			return new WP_Error( 'file_not_found', 'Không tìm thấy file ảnh cục bộ: ' . $file_path );
+		}
+
+		$tmp_file = wp_tempnam( basename( $file_path ) );
+		if ( ! copy( $file_path, $tmp_file ) ) {
+			return new WP_Error( 'copy_failed', 'Không thể copy file tạm' );
+		}
+
+		$file_array = [
+			'name'     => sanitize_file_name( sanitize_title( $title ) ) . '.jpg',
+			'tmp_name' => $tmp_file,
+		];
+
+		$attachment_id = media_handle_sideload( $file_array, $post_id, $title );
+
+		if ( is_wp_error( $attachment_id ) ) {
+			@unlink( $tmp_file );
+		}
+
+		return $attachment_id;
+	}
+
+	/**
 	 * Run lead queue synchronization manually.
 	 *
 	 * ## EXAMPLES
@@ -737,33 +764,19 @@ class LTDH_CLI_Commands {
 				'tuition_amount' => 684026,
 				'tuition_unit' => 'tin-chi',
 				'tuition_year' => '2025 - 2026',
-				'total_credits' => 136,
-				'increase_roadmap' => 'Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước và lộ trình của nhà trường (tăng không quá 10%/năm).',
-				'duration' => '2.0 năm',
+				'total_credits' => 69,
+				'increase_roadmap' => 'Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước (tăng không quá 10%/năm). Lệ phí đăng ký xét tuyển/thi tuyển: 60.000đ/hồ sơ. Lệ phí xét tuyển/thi tuyển: 640.000đ/hồ sơ. Học phí ôn tập 3 môn: 1.500.000đ/3 môn.',
+				'duration' => 'Khoảng 2 năm',
 				'quota' => 200,
 				'schedule' => 'Tối thứ 2 - thứ 6 hoặc Thứ 7 & Chủ nhật',
-				'target' => 'Người đi làm, người muốn học liên thông từ Trung cấp/Cao đẳng lên Đại học',
-				'advantages' => 'Vừa học vừa đi làm tích lũy kinh nghiệm thực tế, lịch học linh hoạt ngoài giờ hành chính.',
-				'disadvantages' => 'Yêu cầu thời gian cam kết học tập đều đặn vào buổi tối hoặc cuối tuần.',
-				'batches' => [
-					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'release_period' => '20/04/2026 - 15/06/2026', 'application_period' => '20/04/2026 - 15/06/2026', 'review_time' => '-', 'evaluation_time' => 'Tháng 6/2026', 'enrollment_time' => 'Tháng 7/2026', 'batch_status' => 'dang-nhan' ],
-					[ 'batch_name' => 'Tuyển sinh Đợt 2', 'release_period' => '20/08/2026 - 15/09/2026', 'application_period' => '20/08/2026 - 15/09/2026', 'review_time' => '-', 'evaluation_time' => 'Tháng 9/2026', 'enrollment_time' => 'Tháng 10/2026', 'batch_status' => 'sap-mo' ]
-				]
-			],
-			'chinh-quy' => [
-				'title' => 'Cử nhân Công nghệ thông tin (Liên thông Chính quy)',
-				'tuition' => '526.174đ / tín chỉ',
-				'tuition_amount' => 526174,
-				'tuition_unit' => 'tin-chi',
-				'tuition_year' => '2025 - 2026',
-				'total_credits' => 136,
-				'increase_roadmap' => 'Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước và lộ trình của nhà trường (tăng không quá 10%/năm).',
-				'duration' => '2.0 năm',
-				'quota' => 700,
-				'schedule' => 'Học ban ngày tại giảng đường',
-				'target' => 'Sinh viên tốt nghiệp Cao đẳng muốn liên thông chính quy lên Đại học',
-				'advantages' => 'Bằng đại học chính quy danh giá, môi trường học tập tập trung chuyên sâu.',
-				'disadvantages' => 'Lịch học ban ngày cố định, khó sắp xếp đi làm thêm.',
+				'target' => 'Người đi làm, người muốn học liên thông lên Cử nhân/Kỹ sư tại UTC',
+				'advantages' => '<ul><li><strong>Linh hoạt thời gian:</strong> Học ngoài giờ hành chính (buổi tối hoặc cuối tuần), phù hợp cho người vừa học vừa làm.</li><li><strong>Linh hoạt lựa chọn hệ đào tạo:</strong> Học 2 năm nhận bằng Cử nhân hoặc 3 năm nhận bằng Kỹ sư (tương đương trình độ Thạc sĩ).</li><li><strong>Bằng cấp uy tín:</strong> Bằng tốt nghiệp đại học do Trường Đại học Giao thông Vận tải cấp.</li></ul>',
+				'disadvantages' => 'Yêu cầu tự sắp xếp thời gian ôn tập và tham gia đầy đủ lịch thi tuyển sinh.',
+				'requirements' => '<p>Nhà trường tuyển sinh theo 2 phương thức chính:</p><ul><li><strong>Phương thức 1: Xét tuyển</strong> (Áp dụng cho thí sinh liên thông đúng ngành đã tốt nghiệp bậc Cao đẳng):<ul><li>Tốt nghiệp Cao đẳng ngành Công nghệ thông tin (hoặc có quyết định công nhận tốt nghiệp).</li><li>Điểm trung bình chung tích lũy toàn khóa đạt từ <strong>5.0/10</strong> (thang điểm 10) hoặc từ <strong>2.0/4</strong> (thang điểm 4) trở lên.</li><li>Điểm các học phần Toán cao cấp không có học phần nào dưới <strong>5.0/10</strong>.</li><li><em>Tiêu chí phụ:</em> Ưu tiên thí sinh có điểm các học phần tốt nghiệp cao hơn nếu số lượng vượt chỉ tiêu.</li></ul></li><li><strong>Phương thức 2: Thi tuyển</strong> (Áp dụng cho thí sinh không đủ điều kiện xét tuyển hoặc không có nguyện vọng xét tuyển):<ul><li>Thi tuyển 3 môn: <strong>Toán (Cơ bản)</strong>, <strong>Toán rời rạc (Cơ sở ngành)</strong>, và <strong>Cấu trúc dữ liệu và giải thuật (Chuyên môn ngành)</strong>.</li><li>Ngưỡng đảm bảo chất lượng đầu vào: Tổng điểm thi của 3 môn phải thỏa mãn ngưỡng đảm bảo chất lượng theo Quy chế tuyển sinh hiện hành.</li></ul></li></ul>',
+				'documents' => '<ul><li>Phiếu tuyển sinh (theo mẫu của nhà trường).</li><li>Bản sao hợp lệ bằng tốt nghiệp Cao đẳng và bảng điểm học tập (mang theo bản chính để đối chiếu khi nộp).</li><li>Bản sao hợp lệ Giấy khai sinh.</li><li>Bản sao Căn cước công dân (CCCD).</li><li>Giấy chứng nhận đủ sức khỏe học tập từ bệnh viện đa khoa hoặc tương đương trở lên.</li><li>04 ảnh chân dung 4x6 cm (chụp trong vòng 6 tháng gần nhất).</li></ul><p><em>* Lưu ý: Hồ sơ do Nhà trường phát hành trực tiếp tại văn phòng tuyển sinh.</em></p>',
+				'degree_type' => 'Cử nhân / Kỹ sư Công nghệ thông tin',
+				'diploma_value' => 'Bằng tốt nghiệp Đại học (Cử nhân bậc 6 hoặc Kỹ sư bậc 7 tương đương trình độ Thạc sĩ) do Trường Đại học GTVT cấp, phôi bằng chuẩn Bộ GD&ĐT.',
+				'enrollment_period' => 'Tuyển sinh theo đợt',
 				'batches' => [
 					[ 
 						'batch_name' => 'Tuyển sinh Đợt 1',
@@ -781,7 +794,7 @@ class LTDH_CLI_Commands {
 						'review_time' => 'Dự kiến từ 12/04/2026',
 						'evaluation_time' => 'Xét tuyển 01-04/06/2026',
 						'enrollment_time' => 'Thi tuyển 06-07/06/2026',
-						'batch_status' => 'dang-nhan'
+						'batch_status' => 'da-dong'
 					],
 					[
 						'batch_name' => 'Tuyển sinh Đợt 3 (Bổ sung)',
@@ -790,7 +803,57 @@ class LTDH_CLI_Commands {
 						'review_time' => 'Dự kiến từ 12/07/2026',
 						'evaluation_time' => 'Xét tuyển 07-09/09/2026',
 						'enrollment_time' => 'Thi tuyển 12-13/09/2026',
-						'batch_status' => 'sap-mo'
+						'batch_status' => 'dang-nhan'
+					]
+				]
+			],
+			'chinh-quy' => [
+				'title' => 'Cử nhân Công nghệ thông tin (Liên thông Chính quy)',
+				'status' => LTDH_STATUS_PAUSED,
+				'tuition' => '526.174đ / tín chỉ',
+				'tuition_amount' => 526174,
+				'tuition_unit' => 'tin-chi',
+				'tuition_year' => '2025 - 2026',
+				'total_credits' => 69,
+				'increase_roadmap' => 'Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước (tăng không quá 10%/năm). Lệ phí đăng ký xét tuyển/thi tuyển: 60.000đ/hồ sơ. Lệ phí xét tuyển/thi tuyển: 640.000đ/hồ sơ. Học phí ôn tập 3 môn: 1.500.000đ/3 môn.',
+				'duration' => 'Khoảng 2 năm',
+				'quota' => 700,
+				'schedule' => 'Học ban ngày tại giảng đường',
+				'target' => 'Sinh viên tốt nghiệp Cao đẳng muốn liên thông lên Cử nhân/Kỹ sư chính quy',
+				'advantages' => '<ul><li><strong>Bằng đại học chính quy:</strong> Nhận bằng tốt nghiệp đại học chính quy từ Trường Đại học Giao thông Vận tải.</li><li><strong>Linh hoạt lựa chọn hệ đào tạo:</strong> Học 2 năm nhận bằng Cử nhân (bậc 6) hoặc 3 năm nhận bằng Kỹ sư (bậc 7, tương đương trình độ Thạc sĩ).</li><li><strong>Môi trường học tập chất lượng:</strong> Học trực tiếp tại giảng đường với các giảng viên đầu ngành giàu kinh nghiệm.</li></ul>',
+				'disadvantages' => 'Lịch học tập trung tại giảng đường cố định, yêu cầu ôn tập và thi tuyển 3 môn đối với thí sinh trái ngành hoặc thi tuyển.',
+				'requirements' => '<p>Nhà trường tuyển sinh theo 1 phương thức duy nhất đối với hệ Liên thông Chính quy:</p><ul><li><strong>Thi tuyển:</strong><ul><li>Thi tuyển 3 môn: <strong>Toán (Cơ bản)</strong>, <strong>Toán rời rạc (Cơ sở ngành)</strong>, và <strong>Cấu trúc dữ liệu và giải thuật (Chuyên môn ngành)</strong>.</li><li>Ngưỡng đảm bảo chất lượng đầu vào: Tổng điểm thi của 3 môn phải thỏa mãn ngưỡng đảm bảo chất lượng theo Quy chế tuyển sinh hiện hành của Trường và Bộ Giáo dục & Đào tạo.</li></ul></li></ul>',
+				'documents' => '<ul><li>Phiếu tuyển sinh (theo mẫu của nhà trường).</li><li>Bản sao hợp lệ bằng tốt nghiệp Cao đẳng và bảng điểm học tập (mang theo bản chính để đối chiếu khi nộp).</li><li>Bản sao hợp lệ Giấy khai sinh.</li><li>Bản sao Căn cước công dân (CCCD).</li><li>Giấy chứng nhận đủ sức khỏe học tập từ bệnh viện đa khoa hoặc tương đương trở lên.</li><li>04 ảnh chân dung 4x6 cm (chụp trong vòng 6 tháng gần nhất).</li></ul><p><em>* Lưu ý: Hồ sơ do Nhà trường phát hành trực tiếp tại văn phòng tuyển sinh.</em></p>',
+				'degree_type' => 'Cử nhân / Kỹ sư Công nghệ thông tin',
+				'diploma_value' => 'Bằng tốt nghiệp Đại học (Cử nhân bậc 6 hoặc Kỹ sư bậc 7 tương đương trình độ Thạc sĩ) do Trường Đại học GTVT cấp, phôi bằng chuẩn Bộ GD&ĐT.',
+				'enrollment_period' => 'Đã hết chỉ tiêu tuyển sinh',
+				'batches' => [
+					[ 
+						'batch_name' => 'Tuyển sinh Đợt 1',
+						'release_period' => '19/12/2025 - 05/01/2026',
+						'application_period' => '22/12/2025 - 07/01/2026',
+						'review_time' => 'Dự kiến từ 25/12/2025',
+						'evaluation_time' => 'Xét tuyển 09-14/01/2026',
+						'enrollment_time' => 'Thi tuyển 17-18/01/2026',
+						'batch_status' => 'da-dong'
+					],
+					[
+						'batch_name' => 'Tuyển sinh Đợt 2',
+						'release_period' => '24/03/2026 - 13/05/2026',
+						'application_period' => '25/03/2026 - 18/05/2026',
+						'review_time' => 'Dự kiến từ 12/04/2026',
+						'evaluation_time' => 'Xét tuyển 01-04/06/2026',
+						'enrollment_time' => 'Thi tuyển 06-07/06/2026',
+						'batch_status' => 'da-dong'
+					],
+					[
+						'batch_name' => 'Tuyển sinh Đợt 3 (Bổ sung)',
+						'release_period' => '06/07/2026 - 13/08/2026',
+						'application_period' => '07/07/2026 - 14/08/2026',
+						'review_time' => 'Dự kiến từ 12/07/2026',
+						'evaluation_time' => 'Xét tuyển 07-09/09/2026',
+						'enrollment_time' => 'Thi tuyển 12-13/09/2026',
+						'batch_status' => 'da-dong'
 					]
 				]
 			],
@@ -800,7 +863,7 @@ class LTDH_CLI_Commands {
 				'tuition_amount' => 606369,
 				'tuition_unit' => 'tin-chi',
 				'tuition_year' => '2025 - 2026',
-				'total_credits' => 136,
+				'total_credits' => 69,
 				'increase_roadmap' => 'Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước và lộ trình của nhà trường (tăng không quá 10%/năm).',
 				'duration' => 'Tối thiểu 1.5 năm',
 				'quota' => 800,
@@ -827,16 +890,23 @@ class LTDH_CLI_Commands {
 				'posts_per_page' => 1,
 			] );
 
+			$post_content = "Chương trình đào tạo Cử nhân & Kỹ sư ngành $major_title hệ " . ( $t_slug === 'tu-xa' ? 'Đào tạo từ xa' : ( $t_slug === 'chinh-quy' ? 'Chính quy' : 'Vừa học vừa làm' ) ) . " của $school_title.";
+
 			if ( ! empty( $existing_program ) ) {
 				$program_id = $existing_program[0]->ID;
-				WP_CLI::line( "Chương trình đã tồn tại: $program_title" );
+				wp_update_post( [
+					'ID'           => $program_id,
+					'post_title'   => $program_title,
+					'post_content' => $post_content,
+				] );
+				WP_CLI::line( "Chương trình đã tồn tại (đã cập nhật tiêu đề và nội dung): $program_title" );
 			} else {
 				$program_id = wp_insert_post( [
 					'post_title'   => $program_title,
 					'post_name'    => $program_name_slug,
 					'post_status'  => 'publish',
 					'post_type'    => LTDH_CPT_PROGRAM,
-					'post_content' => "Chương trình đào tạo Cử nhân ngành $major_title hệ " . ( $t_slug === 'tu-xa' ? 'Đào tạo từ xa' : ( $t_slug === 'chinh-quy' ? 'Chính quy' : 'Vừa học vừa làm' ) ) . " của $school_title.",
+					'post_content' => $post_content,
 				] );
 
 				if ( is_wp_error( $program_id ) ) {
@@ -858,17 +928,34 @@ class LTDH_CLI_Commands {
 			update_post_meta( $program_id, 'quota', $p_info['quota'] );
 			update_post_meta( $program_id, LTDH_META_DURATION, $p_info['duration'] );
 			update_post_meta( $program_id, 'campus_info', 'Hà Nội' );
-			update_post_meta( $program_id, 'admission_requirements', 'Xét tuyển học bạ hoặc hồ sơ văn bằng (THPT, Trung cấp, Cao đẳng, Đại học).' );
-			update_post_meta( $program_id, 'required_documents', 'Bản sao công chứng CCCD, Ảnh chân dung, Bằng tốt nghiệp cao nhất, Học bạ/Bảng điểm tương ứng.' );
-			update_post_meta( $program_id, 'enrollment_period', 'Tuyển sinh liên tục trong năm' );
+			update_post_meta( $program_id, 'admission_requirements', $p_info['requirements'] ?? 'Xét tuyển học bạ hoặc hồ sơ văn bằng (THPT, Trung cấp, Cao đẳng, Đại học).' );
+			update_post_meta( $program_id, 'required_documents', $p_info['documents'] ?? 'Bản sao công chứng CCCD, Ảnh chân dung, Bằng tốt nghiệp cao nhất, Học bạ/Bảng điểm tương ứng.' );
+			update_post_meta( $program_id, 'enrollment_period', $p_info['enrollment_period'] ?? 'Tuyển sinh liên tục trong năm' );
 			update_post_meta( $program_id, 'program_benefits', $p_info['advantages'] );
 			update_post_meta( $program_id, LTDH_META_SCHEDULE, $p_info['schedule'] );
 			update_post_meta( $program_id, 'target_students', $p_info['target'] );
-			update_post_meta( $program_id, 'degree_type', 'Cử nhân Công nghệ thông tin' );
-			update_post_meta( $program_id, 'diploma_value', 'Phôi bằng chuẩn Bộ GD&ĐT, đủ điều kiện học tiếp lên Thạc sĩ/Tiến sĩ hoặc thi công chức.' );
+			update_post_meta( $program_id, 'degree_type', $p_info['degree_type'] ?? 'Cử nhân Công nghệ thông tin' );
+			update_post_meta( $program_id, 'diploma_value', $p_info['diploma_value'] ?? 'Phôi bằng chuẩn Bộ GD&ĐT, đủ điều kiện học tiếp lên Thạc sĩ/Tiến sĩ hoặc thi công chức.' );
 			update_post_meta( $program_id, 'disadvantages', $p_info['disadvantages'] );
 
-			update_post_meta( $program_id, LTDH_META_ADMISSION_STATUS, LTDH_STATUS_OPEN );
+			update_post_meta( $program_id, LTDH_META_ADMISSION_STATUS, $p_info['status'] ?? LTDH_STATUS_OPEN );
+
+			// Sideload and set curriculum file (image)
+			$theme_dir = get_template_directory();
+			$local_curriculum_path = $theme_dir . '/assets/images/khung-chuong-trinh-cntt-utc.jpg';
+			if ( file_exists( $local_curriculum_path ) ) {
+				$existing_curriculum = get_post_meta( $program_id, 'curriculum_file', true );
+				if ( ! $existing_curriculum ) {
+					$attachment_id = $this->sideload_local_image( $local_curriculum_path, $program_id, $program_title . ' Curriculum' );
+					if ( ! is_wp_error( $attachment_id ) ) {
+						update_post_meta( $program_id, 'curriculum_file', (int) $attachment_id );
+						update_post_meta( $program_id, '_curriculum_file', 'field_program_curriculum_file' );
+						WP_CLI::line( "Đã gán khung chương trình cho: $program_title" );
+					} else {
+						WP_CLI::line( "Lỗi khi gán khung chương trình cho $program_title: " . $attachment_id->get_error_message() );
+					}
+				}
+			}
 			update_post_meta( $program_id, LTDH_META_AD_GROUPS, 'A00, A01, D01, D07' );
 
 			// Save Repeater field for batches

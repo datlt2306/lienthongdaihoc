@@ -23,7 +23,7 @@ $is_base_archive = ! isset( $term->term_id );
 		<?php if ( $is_base_archive && $taxonomy === 'training_type' ) : ?>
 			<!-- Base archive: List all programs -->
 			<div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
-				<h1 class="text-2xl md:text-4xl font-black text-slate-900">Hệ đào tạo</h1>
+				<h2 class="text-2xl md:text-4xl font-black text-slate-900">Hệ đào tạo</h2>
 				<p class="text-slate-500 text-sm">Tất cả chương trình đào tạo liên thông, văn bằng 2, đại học từ xa.</p>
 			</div>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">

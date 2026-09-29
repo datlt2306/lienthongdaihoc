@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => {
                 if (res.success) {
                     container.innerHTML = res.data.html;
+                    if (window.ltdhCompare && typeof window.ltdhCompare.syncButtonStates === 'function') {
+                        window.ltdhCompare.syncButtonStates();
+                    }
                 }
             })
             .catch(err => console.error('Filter error:', err))

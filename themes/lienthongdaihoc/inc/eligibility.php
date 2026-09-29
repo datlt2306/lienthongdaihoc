@@ -202,13 +202,31 @@ function ltdh_elig_ajax_check() {
 	// Process file upload if any
 	$degree_file_url = '';
 	if ( ! empty( $_FILES['degree_file'] ) && ! empty( $_FILES['degree_file']['name'] ) ) {
-		require_once( ABSPATH . 'wp-admin/includes/file.php' );
-		$uploadedfile = $_FILES['degree_file'];
-		$upload_overrides = array( 'test_form' => false );
-		$movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
+		$file = $_FILES['degree_file'];
+		$max_file_size = 5 * 1024 * 1024;
+		if ( isset( $file['size'] ) && $file['size'] > $max_file_size ) {
+			wp_send_json_error( [ 'message' => 'Dung lượng tệp vượt quá giới hạn 5MB cho phép.' ] );
+		}
+
+		$allowed_mimes = [
+			'jpg|jpeg|jpe' => 'image/jpeg',
+			'png'          => 'image/png',
+			'webp'         => 'image/webp',
+			'pdf'          => 'application/pdf',
+		];
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		$upload_overrides = [
+			'test_form' => false,
+			'mimes'     => $allowed_mimes,
+		];
+		$movefile = wp_handle_upload( $file, $upload_overrides );
 
 		if ( $movefile && ! isset( $movefile['error'] ) ) {
-			$degree_file_url = $movefile['url'];
+			$degree_file_url  = esc_url_raw( $movefile['url'] );
+			$degree_file_path = $movefile['file'] ?? '';
+		} else {
+			wp_send_json_error( [ 'message' => $movefile['error'] ?? 'Định dạng tệp không được hỗ trợ.' ] );
 		}
 	}
 
@@ -218,18 +236,19 @@ function ltdh_elig_ajax_check() {
 	}
 
 	$input = [
-		'name'            => sanitize_text_field( $_POST['name'] ?? '' ),
-		'education'       => sanitize_text_field( $_POST['education'] ?? '' ),
-		'major_id'        => intval( $_POST['major_id'] ?? 0 ),
-		'previous_school' => sanitize_text_field( $_POST['previous_school'] ?? '' ),
-		'graduation'      => intval( $_POST['graduation'] ?? 0 ),
-		'desired_major'   => intval( $_POST['desired_major'] ?? 0 ),
-		'training_type'   => sanitize_text_field( $_POST['training_type'] ?? '' ),
-		'campus'          => sanitize_text_field( $_POST['campus'] ?? '' ),
-		'budget'          => sanitize_text_field( $_POST['budget'] ?? '' ),
-		'phone'           => sanitize_text_field( $_POST['phone'] ?? '' ),
-		'email'           => sanitize_email( $_POST['email'] ?? '' ),
-		'degree_link'     => $degree_link,
+		'name'             => sanitize_text_field( $_POST['name'] ?? '' ),
+		'education'        => sanitize_text_field( $_POST['education'] ?? '' ),
+		'major_id'         => intval( $_POST['major_id'] ?? 0 ),
+		'previous_school'  => sanitize_text_field( $_POST['previous_school'] ?? '' ),
+		'graduation'       => intval( $_POST['graduation'] ?? 0 ),
+		'desired_major'    => intval( $_POST['desired_major'] ?? 0 ),
+		'training_type'    => sanitize_text_field( $_POST['training_type'] ?? '' ),
+		'campus'           => sanitize_text_field( $_POST['campus'] ?? '' ),
+		'budget'           => sanitize_text_field( $_POST['budget'] ?? '' ),
+		'phone'            => sanitize_text_field( $_POST['phone'] ?? '' ),
+		'email'            => sanitize_email( $_POST['email'] ?? '' ),
+		'degree_link'      => $degree_link,
+		'degree_file_path' => $degree_file_path ?? '',
 	];
 
 	// Validate required fields
@@ -268,9 +287,9 @@ function ltdh_elig_ajax_check() {
 // ----------------------------------------------------
 
 function ltdh_elig_validate_input( $input ) {
-	$valid_education = [ 'thap-phan', 'trung-cap', 'cao-dang', 'dai-hoc', 'thac-si' ];
+	$valid_education = [ 'thpt', 'thap-phan', 'trung-cap', 'cao-dang', 'dai-hoc', 'thac-si' ];
 
-	// Dynamic fetch training types
+	// Dynamic fetch training types - cho phép van-bang-2
 	$training_terms = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false, 'fields' => 'slugs' ] );
 	$valid_training = ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ? $training_terms : [ 'lien-thong', 'van-bang-2', 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ];
 
@@ -280,7 +299,7 @@ function ltdh_elig_validate_input( $input ) {
 	$valid_budget    = [ 'duoi-20-trieu', '20-30-trieu', '30-50-trieu', 'tren-50-trieu' ];
 
 	if ( empty( $input['education'] ) || ! in_array( $input['education'], $valid_education, true ) ) {
-		return new WP_Error( 'invalid_education', 'Vui lòng chọn trình độ học vấn.' );
+		return new WP_Error( 'invalid_education', 'Vui lòng chọn trình độ học vấn hợp lệ (THPT, Trung cấp, Cao đẳng, Đại học).' );
 	}
 
 	if ( ! empty( $input['training_type'] ) && ! in_array( $input['training_type'], $valid_training, true ) ) {
@@ -406,6 +425,26 @@ function ltdh_elig_run_check( $input ) {
 			}
 		}
 
+		// 2.1. Lệnh cấm Đào tạo từ xa ngành Y Dược & Sư phạm (Khoản 3 Điều 5 Thông tư 28/2023/TT-BGDĐT)
+		if ( ! $hard_fail ) {
+			$prog_training_types = wp_get_post_terms( $program_id, 'training_type', [ 'fields' => 'slugs' ] );
+			$is_distance_program = in_array( 'tu-xa', $prog_training_types, true ) || ( ! empty( $input['training_type'] ) && $input['training_type'] === 'tu-xa' );
+
+			if ( $is_distance_program ) {
+				$prohibited_slugs = function_exists( 'ltdh_elig_get_prohibited_distance_learning_categories' ) 
+					? ltdh_elig_get_prohibited_distance_learning_categories() 
+					: [ 'y-khoa', 'y-da-khoa', 'duoc-hoc', 'dieu-duong', 'su-pham-toan', 'su-pham-van', 'su-pham-tieng-anh', 'giao-duc-mam-non', 'giao-duc-tieu-hoc' ];
+				$prog_major_slug    = $prog_major_id ? get_post_field( 'post_name', $prog_major_id ) : '';
+				$desired_major_slug = ! empty( $input['desired_major'] ) ? get_post_field( 'post_name', intval( $input['desired_major'] ) ) : '';
+
+				if ( in_array( $prog_major_slug, $prohibited_slugs, true ) || in_array( $desired_major_slug, $prohibited_slugs, true ) ) {
+					$hard_fail = true;
+					$preliminary_status = 'not_compatible';
+					$mismatch_reasons[] = 'Theo Thông tư 28/2023/TT-BGDĐT, ngành Y Dược và Sư phạm KHÔNG ĐƯỢC PHÉP đào tạo từ xa. Vui lòng chọn hệ Vừa làm vừa học hoặc Chính quy để đảm bảo điều kiện thực hành lâm sàng và cấp Giấy phép hành nghề.';
+				}
+			}
+		}
+
 		// 3. User Current Major vs Desired Program Major
 		if ( ! $hard_fail ) {
 			if ( empty( $input['major_id'] ) ) {
@@ -466,7 +505,23 @@ function ltdh_elig_run_check( $input ) {
 			$tuition_str = get_post_meta( $program_id, 'tuition_fee', true ) ?: '';
 			$tuition_num = ltdh_elig_parse_tuition( $tuition_str );
 			$duration_num = ltdh_elig_parse_duration( get_post_meta( $program_id, 'duration', true ) ?: '' );
-			$total_cost = $tuition_num * 120 * $duration_num;
+
+			// Chuẩn hóa tính toán tổng học phí thực tế:
+			if ( $tuition_num > 0 ) {
+				if ( $tuition_num < 2000000 ) {
+					// Học phí theo tín chỉ (khoảng 400.000 - 800.000 VNĐ / tín chỉ x ~75 tín chỉ)
+					$total_cost = $tuition_num * 75;
+				} elseif ( $tuition_num <= 30000000 ) {
+					// Học phí theo học kỳ (khoảng 10.000.000 - 20.000.000 VNĐ / kỳ)
+					$semesters  = max( 2, (int) round( $duration_num * 2 ) );
+					$total_cost = $tuition_num * $semesters;
+				} else {
+					// Học phí trọn khóa
+					$total_cost = $tuition_num;
+				}
+			} else {
+				$total_cost = 0;
+			}
 
 			if ( $total_cost > 0 && $budget['max'] < PHP_INT_MAX ) {
 				if ( $total_cost <= $budget['max'] ) {
@@ -577,10 +632,11 @@ function ltdh_elig_parse_duration( $str ) {
 
 function ltdh_elig_get_education_label( $slug ) {
 	$map = [
+		'thpt'       => 'THPT',
 		'thap-phan'  => 'THPT',
 		'trung-cap'  => 'Trung cấp',
 		'cao-dang'   => 'Cao đẳng',
-		'dai-hoc'    => 'Đại học',
+		'dai-hoc'    => 'Đại học (VB2)',
 		'thac-si'    => 'Thạc sĩ',
 	];
 	return $map[ $slug ] ?? $slug;
@@ -686,10 +742,11 @@ function ltdh_elig_capture_lead( $input, $results, $check_id ) {
 			'program_id'      => $program_id,
 			'school_id'       => $school_id,
 			'major_id'        => $major_id,
-			'training_type'   => $input['training_type'],
-			'campus'          => $input['campus'],
-			'referral_source' => $ref_source,
-			'message'         => ! empty( $input['degree_link'] ) ? 'Ảnh bằng cấp đính kèm: ' . $input['degree_link'] : '',
+			'training_type'    => $input['training_type'],
+			'campus'           => $input['campus'],
+			'referral_source'  => $ref_source,
+			'message'          => ! empty( $input['degree_link'] ) ? 'Ảnh bằng cấp đính kèm: ' . $input['degree_link'] : '',
+			'degree_file_path' => $input['degree_file_path'] ?? '',
 		] );
 
 		if ( $lead_id ) {
@@ -812,7 +869,8 @@ function ltdh_elig_ajax_lead() {
 		);
 	}
 
-	wp_send_json_success( [ 'lead_id' => $lead_id ] );
+	$lead_token = hash_hmac( 'sha256', (string) $lead_id, wp_salt( 'auth' ) );
+	wp_send_json_success( [ 'lead_id' => $lead_id, 'lead_token' => $lead_token ] );
 }
 
 add_action( 'wp_ajax_ltdh_elig_advanced_verify', 'ltdh_elig_ajax_advanced_verify' );
@@ -821,9 +879,15 @@ add_action( 'wp_ajax_nopriv_ltdh_elig_advanced_verify', 'ltdh_elig_ajax_advanced
 function ltdh_elig_ajax_advanced_verify() {
 	check_ajax_referer( 'ltdh_elig_nonce', 'nonce' );
 
-	$lead_id = intval( $_POST['lead_id'] ?? 0 );
-	if ( ! $lead_id ) {
-		wp_send_json_error( [ 'message' => 'Yêu cầu không hợp lệ.' ] );
+	$lead_id    = intval( $_POST['lead_id'] ?? 0 );
+	$lead_token = sanitize_text_field( $_POST['lead_token'] ?? '' );
+	if ( ! $lead_id || empty( $lead_token ) ) {
+		wp_send_json_error( [ 'message' => 'Yêu cầu không hợp lệ hoặc thiếu mã xác thực phiên.' ] );
+	}
+
+	$expected_token = hash_hmac( 'sha256', (string) $lead_id, wp_salt( 'auth' ) );
+	if ( ! hash_equals( $expected_token, $lead_token ) ) {
+		wp_send_json_error( [ 'message' => 'Bạn không có quyền cập nhật hồ sơ này.' ] );
 	}
 
 	$previous_school = sanitize_text_field( $_POST['previous_school'] ?? '' );
@@ -833,13 +897,31 @@ function ltdh_elig_ajax_advanced_verify() {
 	// Handle file upload if any
 	$degree_file_url = '';
 	if ( ! empty( $_FILES['degree_file'] ) && ! empty( $_FILES['degree_file']['name'] ) ) {
-		require_once( ABSPATH . 'wp-admin/includes/file.php' );
-		$uploadedfile = $_FILES['degree_file'];
-		$upload_overrides = array( 'test_form' => false );
-		$movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
+		$file = $_FILES['degree_file'];
+		$max_file_size = 5 * 1024 * 1024;
+		if ( isset( $file['size'] ) && $file['size'] > $max_file_size ) {
+			wp_send_json_error( [ 'message' => 'Dung lượng tệp vượt quá giới hạn 5MB cho phép.' ] );
+		}
+
+		$allowed_mimes = [
+			'jpg|jpeg|jpe' => 'image/jpeg',
+			'png'          => 'image/png',
+			'webp'         => 'image/webp',
+			'pdf'          => 'application/pdf',
+		];
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		$upload_overrides = [
+			'test_form' => false,
+			'mimes'     => $allowed_mimes,
+		];
+		$movefile = wp_handle_upload( $file, $upload_overrides );
 
 		if ( $movefile && ! isset( $movefile['error'] ) ) {
-			$degree_file_url = $movefile['url'];
+			$degree_file_url  = esc_url_raw( $movefile['url'] );
+			$degree_file_path = $movefile['file'] ?? '';
+		} else {
+			wp_send_json_error( [ 'message' => $movefile['error'] ?? 'Định dạng tệp không được hỗ trợ.' ] );
 		}
 	}
 
@@ -891,14 +973,15 @@ function ltdh_elig_ajax_advanced_verify() {
 
 		// Send updated Telegram Notification
 		$telegram_data = [
-			'name'            => $lead->name,
-			'phone'           => $lead->phone,
-			'email'           => $lead->email,
-			'program_id'      => $lead->program_id,
-			'school_id'       => $lead->school_id,
-			'major_id'        => $lead->major_id,
-			'referral_source' => $ref_source,
-			'message'         => '📎 Gửi bổ sung hồ sơ xác minh nâng cao. ' . (!empty($previous_school) ? 'Trường cũ: ' . $previous_school . '. ' : '') . (!empty($graduation) ? 'Năm sinh: ' . $graduation . '. ' : ''),
+			'name'             => $lead->name,
+			'phone'            => $lead->phone,
+			'email'            => $lead->email,
+			'program_id'       => $lead->program_id,
+			'school_id'        => $lead->school_id,
+			'major_id'         => $lead->major_id,
+			'referral_source'  => $ref_source,
+			'message'          => '📎 Gửi bổ sung hồ sơ xác minh nâng cao. ' . (!empty($previous_school) ? 'Trường cũ: ' . $previous_school . '. ' : '') . (!empty($graduation) ? 'Năm sinh: ' . $graduation . '. ' : ''),
+			'degree_file_path' => $degree_file_path ?? '',
 		];
 		if ( function_exists( 'ltdh_trigger_telegram_notification' ) ) {
 			ltdh_trigger_telegram_notification( $telegram_data );

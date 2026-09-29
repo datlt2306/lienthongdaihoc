@@ -23,10 +23,10 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 				<div class="space-y-2">
 					<label class="block text-sm font-bold text-slate-700">Trình độ học vấn hiện tại *</label>
 					<select name="education" class="elig-select select-education">
-						<option value="">-- Chọn trình độ hiện tại --</option>
-						<option value="thap-phan">THPT (Tốt nghiệp Phổ thông)</option>
-						<option value="trung-cap">Trung cấp (Bằng Trung cấp)</option>
-						<option value="cao-dang">Cao đẳng (Bằng Cao đẳng)</option>
+						<option value="thpt">Tốt nghiệp THPT (Học ĐH Từ xa)</option>
+						<option value="trung-cap">Trung cấp / Trung cấp nghề</option>
+						<option value="cao-dang" selected>Cao đẳng / Cao đẳng nghề</option>
+						<option value="dai-hoc">Đã tốt nghiệp Đại học (Học Văn bằng 2)</option>
 					</select>
 				</div>
 

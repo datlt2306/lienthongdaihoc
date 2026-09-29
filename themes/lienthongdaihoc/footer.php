@@ -181,7 +181,7 @@ $messenger = ltdh_get_messenger_url();
 </div>
 
 <style>
-@media (max-w: 767px) {
+@media (max-width: 767px) {
   body {
     padding-bottom: 72px !important;
   }

@@ -106,4 +106,24 @@ function ltdh_register_post_types_and_taxonomies_from_json() {
 			register_taxonomy( $taxonomy, $object_type, $args );
 		}
 	}
+
+	// Đăng ký bổ sung CPT guide (Cẩm nang tuyển sinh) nếu chưa được khai báo trong JSON
+	if ( defined( 'LTDH_CPT_GUIDE' ) && ! post_type_exists( LTDH_CPT_GUIDE ) ) {
+		register_post_type( LTDH_CPT_GUIDE, [
+			'labels' => [
+				'name'          => 'Cẩm nang tuyển sinh',
+				'singular_name' => 'Cẩm nang',
+				'add_new'       => 'Thêm bài viết cẩm nang',
+				'add_new_item'  => 'Thêm bài viết cẩm nang mới',
+				'edit_item'     => 'Chỉnh sửa cẩm nang',
+				'all_items'     => 'Tất cả cẩm nang',
+			],
+			'public'       => true,
+			'has_archive'  => 'cam-nang',
+			'rewrite'      => [ 'slug' => 'huong-dan', 'with_front' => false ],
+			'supports'     => [ 'title', 'editor', 'thumbnail', 'excerpt' ],
+			'menu_icon'    => 'dashicons-book-alt',
+			'show_in_rest' => true,
+		] );
+	}
 }

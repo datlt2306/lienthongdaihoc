@@ -56,19 +56,32 @@ function ltdh_program_request_guard( $query_vars ) {
 		return $query_vars;
 	}
 
-	$slug = $query_vars['program'];
+	$slug = sanitize_title( $query_vars['program'] );
+	$cache_key = 'ltdh_slug_type_' . $slug;
+	$slug_type = wp_cache_get( $cache_key, 'ltdh_rewrites' );
 
-	// Check if a published program post with this slug exists.
-	$program_post = get_posts( [
-		'name'           => $slug,
-		'post_type'      => 'program',
-		'post_status'    => 'publish',
-		'posts_per_page' => 1,
-		'fields'         => 'ids',
-	] );
+	if ( false === $slug_type ) {
+		global $wpdb;
+		// Check if a published program post exists with this slug
+		$program_id = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'program' AND post_status = 'publish' LIMIT 1",
+			$slug
+		) );
 
-	if ( ! empty( $program_post ) ) {
-		// Valid program slug — keep query var as-is.
+		if ( $program_id > 0 ) {
+			$slug_type = 'program';
+		} else {
+			// Check if a regular post exists with this slug
+			$post_id = (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'post' AND post_status = 'publish' LIMIT 1",
+				$slug
+			) );
+			$slug_type = ( $post_id > 0 ) ? 'post' : 'page';
+		}
+		wp_cache_set( $cache_key, $slug_type, 'ltdh_rewrites', 3600 );
+	}
+
+	if ( 'program' === $slug_type ) {
 		return $query_vars;
 	}
 
@@ -78,17 +91,8 @@ function ltdh_program_request_guard( $query_vars ) {
 	unset( $query_vars['post_type'] );
 	unset( $query_vars['name'] );
 
-	// Check if it's a regular post (post type = post).
-	$regular_post = get_posts( [
-		'name'           => $slug,
-		'post_type'      => 'post',
-		'post_status'    => 'publish',
-		'posts_per_page' => 1,
-		'fields'         => 'ids',
-	] );
-
-	if ( ! empty( $regular_post ) ) {
-		$query_vars['name'] = $slug;
+	if ( 'post' === $slug_type ) {
+		$query_vars['name']      = $slug;
 		$query_vars['post_type'] = 'post';
 		return $query_vars;
 	}

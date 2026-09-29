@@ -13,7 +13,6 @@ if (! defined('ABSPATH')) {
 get_header();
 
 // Cache queries for schools
-delete_transient( 'ltdh_featured_schools_data' );
 $featured_schools = ltdh_get_cached_featured_schools();
 
 $news_query = ltdh_get_cached_query('ltdh_homepage_news', [
@@ -28,6 +27,8 @@ $zalo    = ltdh_get_zalo_url();
 ?>
 
 <main id="primary" class="site-main bg-white">
+	<!-- H1 Semantic Heading for SEO & Screen Readers -->
+	<h1 class="sr-only">Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học, Văn Bằng 2 & Đại Học Từ Xa</h1>
 
 	<!-- 1. HERO SECTION (Swiper Banner Slider) -->
 	<?php
@@ -428,8 +429,8 @@ $zalo    = ltdh_get_zalo_url();
 									</svg>
 								</div>
 								<div>
-									<h4 class="font-bold text-slate-900 text-base">Bằng đỏ</h4>
-									<p class="text-slate-500 text-sm leading-relaxed">Sau khi hoàn thành chương trình, học viên sẽ được trường Đại học cấp bằng Cử nhân (Bằng đỏ), được Bộ GD&ĐT công nhận.</p>
+									<h4 class="font-bold text-slate-900 text-base">Bằng Cử nhân / Kỹ sư chính thức</h4>
+									<p class="text-slate-500 text-sm leading-relaxed">Sau khi hoàn thành chương trình, học viên sẽ được trường Đại học cấp bằng Cử nhân/Kỹ sư theo quy định của Bộ GD&ĐT, có giá trị pháp lý trên toàn quốc.</p>
 								</div>
 							</div>
 
@@ -523,9 +524,9 @@ $zalo    = ltdh_get_zalo_url();
 						</div>
 
 						<!-- Orange badge -->
-						<div class="absolute bottom-6 left-6 bg-[#f97316] text-white p-5 rounded-2xl shadow-xl flex flex-col justify-center max-w-[150px] z-20 hover:scale-105 transition-transform duration-300 pointer-events-none">
+						<div class="absolute bottom-6 left-6 bg-[#f97316] text-white p-5 rounded-2xl shadow-xl flex flex-col justify-center max-w-[160px] z-20 hover:scale-105 transition-transform duration-300 pointer-events-none">
 							<span class="text-3xl font-black leading-none">100%</span>
-							<span class="text-xs font-extrabold tracking-wider uppercase mt-2 leading-tight">BẰNG CỬ NHÂN<br>CHÍNH QUY</span>
+							<span class="text-xs font-extrabold tracking-wider uppercase mt-2 leading-tight">VĂN BẰNG CHUẨN<br>BỘ GD&ĐT</span>
 						</div>
 					</div>
 				</div>
@@ -893,7 +894,7 @@ $zalo    = ltdh_get_zalo_url();
 			<!-- Graduate photo column -->
 			<div class="lg:col-span-5 hidden lg:block">
 				<div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-md">
-					<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('http://localhost:10028/wp-content/uploads/2026/07/banner-contact.png');"></div>
+					<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo esc_url( home_url( '/wp-content/uploads/2026/07/banner-contact.png' ) ); ?>');"></div>
 				</div>
 			</div>
 

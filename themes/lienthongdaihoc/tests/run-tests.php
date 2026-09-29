@@ -4,6 +4,13 @@
  * lienthongdaihoc Theme
  */
 
+// Chặn tuyệt đối mọi truy cập qua HTTP/Web Server - Chỉ cho phép thực thi qua dòng lệnh CLI
+if ( php_sapi_name() !== 'cli' ) {
+	http_response_code( 403 );
+	header( 'Content-Type: text/plain; charset=utf-8' );
+	die( 'Forbidden: Automated test runner can only be executed via the command-line interface (CLI).' );
+}
+
 // 1. Boot WordPress
 $wp_load_path = dirname(__DIR__, 4) . '/wp-load.php';
 if ( ! file_exists( $wp_load_path ) ) {

@@ -351,7 +351,7 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 				</div>
 
 				<!-- 3-Column Grid -->
-				<div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+				<div id="program-results-container" class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
 					<?php
 					if ( $query->have_posts() ) :
 						while ( $query->have_posts() ) : $query->the_post();

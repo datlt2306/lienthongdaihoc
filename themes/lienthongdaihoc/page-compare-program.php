@@ -29,10 +29,10 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-		<!-- SEO H1 -->
-		<h1 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
+		<!-- Page Section Heading -->
+		<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
 			<?php echo esc_html( $seo_title ); ?>
-		</h1>
+		</h2>
 		<p class="text-slate-500 text-sm mb-8"><?php echo esc_html( $seo_desc ); ?></p>
 
 		<?php if ( count( $items ) < 2 ) : ?>

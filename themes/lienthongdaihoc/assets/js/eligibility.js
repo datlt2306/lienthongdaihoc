@@ -11,6 +11,8 @@
 	// ----------------------------------------------------
 	var form = {};
 	var results = null;
+	var currentLeadId = null;
+	var currentLeadToken = '';
 
 	// ----------------------------------------------------
 	// DOM Ready
@@ -75,6 +77,8 @@
 			var hidden = container.querySelector('.elig-search-value');
 			var dropdown = container.querySelector('.elig-search-dropdown');
 			var items = container.querySelectorAll('.elig-search-option-item');
+
+			if (!input || !dropdown) return;
 
 			// Focus input -> show dropdown
 			input.addEventListener('focus', function () {
@@ -297,12 +301,18 @@
 		data.append('action', 'ltdh_elig_check');
 		data.append('nonce', ltdh_elig.nonce);
 		
-		data.append('education', document.querySelector('select[name="education"]').value);
-		data.append('major_id', document.querySelector('input[name="major_id"]').value || 0);
+		var eduEl          = document.querySelector('select[name="education"]');
+		var majorIdEl      = document.querySelector('input[name="major_id"]');
+		var desiredMajorEl = document.querySelector('input[name="desired_major"]');
+		var trainEl        = document.querySelector('select[name="training_type"]');
+		var campusEl       = document.querySelector('select[name="campus"]');
+
+		data.append('education', eduEl ? eduEl.value : '');
+		data.append('major_id', majorIdEl ? (majorIdEl.value || 0) : 0);
 		data.append('graduation', 0);
-		data.append('desired_major', document.querySelector('input[name="desired_major"]').value || 0);
-		data.append('training_type', document.querySelector('select[name="training_type"]').value);
-		data.append('campus', document.querySelector('select[name="campus"]').value);
+		data.append('desired_major', desiredMajorEl ? (desiredMajorEl.value || 0) : 0);
+		data.append('training_type', trainEl ? trainEl.value : '');
+		data.append('campus', campusEl ? campusEl.value : '');
 		data.append('budget', '');
 		data.append('previous_school', '');
 		data.append('name', '');
@@ -424,8 +434,8 @@
 		tags.innerHTML = '';
 
 		var labels = {
-			education: { 'thap-phan': 'THPT', 'trung-cap': 'Trung cấp', 'cao-dang': 'Cao đẳng', 'dai-hoc': 'Đại học', 'thac-si': 'Thạc sĩ' },
-			training_type: { 'lien-thong': 'Liên thông', 'van-bang-2': 'Văn bằng 2', 'tu-xa': 'Từ xa', 'vua-hoc-vua-lam': 'Vừa học vừa làm', 'chinh-quy': 'Chính quy' },
+			education: { 'thpt': 'THPT', 'thap-phan': 'THPT', 'trung-cap': 'Trung cấp', 'cao-dang': 'Cao đẳng', 'dai-hoc': 'Đại học', 'thac-si': 'Thạc sĩ' },
+			training_type: { 'lien-thong': 'Liên thông', 'tu-xa': 'Từ xa', 'vua-hoc-vua-lam': 'Vừa học vừa làm', 'chinh-quy': 'Chính quy', 'van-bang-2': 'Văn bằng 2' },
 			campus: { 'ha-noi': 'Hà Nội', 'ho-chi-minh': 'TP.HCM', 'da-nang': 'Đà Nẵng', 'thai-nguyen': 'Thái Nguyên', 'online': 'Online' }
 		};
 
@@ -510,7 +520,8 @@
 
 	function initLeadForm() {
 		var formEl = document.getElementById('elig-consultation-form');
-		if (!formEl) return;
+		if (!formEl || formEl.dataset.bound === 'true') return;
+		formEl.dataset.bound = 'true';
 
 		// Reset form HTML state if it was replaced previously
 		formEl.style.display = 'block';
@@ -533,6 +544,7 @@
 			.then(function (json) {
 				if (json.success) {
 					currentLeadId = json.data.lead_id;
+					currentLeadToken = json.data.lead_token || '';
 					
 					// Hide standard form elements and show success
 					formEl.innerHTML = '<div class="elig-lead-success bg-emerald-50 text-emerald-700 p-4 rounded-xl border border-emerald-100 font-bold mb-4">✅ Gửi yêu cầu thành công! Tư vấn viên sẽ liên hệ với bạn trong 24 giờ.</div>';
@@ -558,7 +570,8 @@
 
 	function initAdvancedVerificationForm() {
 		var advForm = document.getElementById('elig-advanced-verify-form');
-		if (!advForm) return;
+		if (!advForm || advForm.dataset.bound === 'true') return;
+		advForm.dataset.bound = 'true';
 
 		advForm.addEventListener('submit', function (e) {
 			e.preventDefault();
@@ -574,6 +587,7 @@
 			data.append('action', 'ltdh_elig_advanced_verify');
 			data.append('nonce', ltdh_elig.nonce);
 			data.append('lead_id', currentLeadId);
+			data.append('lead_token', currentLeadToken);
 
 			// Append file manually if selected
 			var fileInput = document.getElementById('degree-file-input');

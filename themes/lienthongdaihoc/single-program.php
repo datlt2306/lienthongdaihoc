@@ -36,7 +36,23 @@ $curriculum_raw  = get_field( 'curriculum_file', $program_id );
 $curriculum_url  = '';
 $curriculum_type = 'file';
 
-if ( is_array( $curriculum_raw ) && ! empty( $curriculum_raw['url'] ) ) {
+if ( is_numeric( $curriculum_raw ) ) {
+	$attachment_id = intval( $curriculum_raw );
+	$curriculum_url = wp_get_attachment_url( $attachment_id );
+	$mime = get_post_mime_type( $attachment_id );
+	if ( strpos( $mime, 'image' ) !== false ) {
+		$curriculum_type = 'image';
+	} elseif ( strpos( $mime, 'pdf' ) !== false ) {
+		$curriculum_type = 'pdf';
+	} else {
+		$ext = strtolower( pathinfo( $curriculum_url, PATHINFO_EXTENSION ) );
+		if ( in_array( $ext, array( 'png', 'jpg', 'jpeg', 'webp', 'gif' ), true ) ) {
+			$curriculum_type = 'image';
+		} elseif ( $ext === 'pdf' ) {
+			$curriculum_type = 'pdf';
+		}
+	}
+} elseif ( is_array( $curriculum_raw ) && ! empty( $curriculum_raw['url'] ) ) {
 	$curriculum_url = $curriculum_raw['url'];
 	$mime    = strtolower( $curriculum_raw['mime_type'] ?? '' );
 	$type    = strtolower( $curriculum_raw['type'] ?? '' );
@@ -68,6 +84,19 @@ $global_zalo = ltdh_get_zalo_url();
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 			<!-- Main Column -->
 			<div class="lg:col-span-2 space-y-6 md:space-y-8">
+				
+				<?php 
+				$admission_status = get_post_meta( $program_id, 'admission_status', true ) ?: 'tuyen-sinh';
+				if ( $admission_status === 'tam-ngung' ) :
+				?>
+					<div class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 flex items-start gap-3 shadow-2xs">
+						<svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+						<div>
+							<h4 class="font-bold text-red-900 text-sm">Đã hết chỉ tiêu tuyển sinh năm nay</h4>
+							<p class="text-xs text-red-700 mt-1">Chương trình tuyển sinh hệ Chính quy của trường năm nay hiện đã nhận đủ chỉ tiêu. Quý học viên vui lòng tham khảo các chương trình liên quan hoặc để lại thông tin đăng ký tư vấn để được hướng dẫn lộ trình phù hợp.</p>
+						</div>
+					</div>
+				<?php endif; ?>
 				
 				<!-- MOBILE ONLY SCHOOL MINI BAR (< 1024px) -->
 				<?php if ( $school_id ) : ?>
@@ -110,11 +139,19 @@ $global_zalo = ltdh_get_zalo_url();
 
 					<?php
 					$learning_details = ltdh_get_program_learning_details( $program_id );
+					$tuition_year = get_field( 'tuition_academic_year', $program_id );
 					?>
 					<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
 						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí</span>
-							<span class="font-bold text-[#00308b] text-xs sm:text-sm leading-snug"><?php echo esc_html( $tuition ?: 'Liên hệ' ); ?></span>
+							<span class="font-bold text-[#00308b] text-xs sm:text-sm leading-snug">
+								<?php 
+								echo esc_html( $tuition ?: 'Liên hệ' ); 
+								if ( $tuition_year ) {
+									echo ' <span class="text-[9px] font-normal text-slate-400 block sm:inline">(' . esc_html( $tuition_year ) . ')</span>';
+								}
+								?>
+							</span>
 						</div>
 						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
@@ -406,7 +443,220 @@ $global_zalo = ltdh_get_zalo_url();
 
 				</section>
 
+				<!-- SECTION 3: INTERACTIVE TUITION ESTIMATOR WIDGET -->
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="du-toan-hoc-phi">
+					<div class="border-b border-slate-100 pb-3 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+						<div>
+							<div class="flex items-center gap-2">
+								<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wide bg-blue-100 text-[#00308b]">Công cụ tiện ích</span>
+								<h2 class="text-lg md:text-2xl font-bold text-slate-900">Dự toán học phí theo trình độ đầu vào</h2>
+							</div>
+							<p class="text-xs md:text-sm text-slate-500 mt-1">Chọn văn bằng hiện có của bạn để xem thời gian đào tạo rút gọn và ước tính học phí toàn khóa</p>
+						</div>
+						<?php 
+						$tuition_academic_year = get_field( 'tuition_academic_year', $program_id );
+						if ( $tuition_academic_year ) : 
+						?>
+							<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 shrink-0 self-start sm:self-auto">
+								Niên giám <?php echo esc_html( $tuition_academic_year ); ?>
+							</span>
+						<?php endif; ?>
+					</div>
 
+					<?php
+					$base_amount  = (float) get_field( 'tuition_amount', $program_id );
+					$base_unit    = get_field( 'tuition_unit', $program_id ) ?: 'tin-chi';
+					$total_cr     = (int) get_field( 'tuition_total_credits', $program_id ) ?: 130;
+					$roadmap_note = get_field( 'tuition_increase_roadmap', $program_id );
+
+					// Default unit cost if amount not specified
+					$unit_cost = $base_amount > 0 ? $base_amount : 450000;
+					?>
+
+					<!-- Level Selector Tabs -->
+					<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6" id="ltdh-tuition-tabs">
+						<button type="button" data-level="thpt" onclick="ltdhSwitchTuitionLevel('thpt')" class="ltdh-tuition-tab-btn py-2.5 px-3 rounded-xl border text-xs font-bold transition-all text-center flex flex-col items-center justify-center gap-1 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer">
+							<span>Tốt nghiệp THPT</span>
+							<span class="text-[10px] font-normal text-slate-400">Đào tạo từ đầu</span>
+						</button>
+						<button type="button" data-level="trung-cap" onclick="ltdhSwitchTuitionLevel('trung-cap')" class="ltdh-tuition-tab-btn py-2.5 px-3 rounded-xl border text-xs font-bold transition-all text-center flex flex-col items-center justify-center gap-1 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer">
+							<span>Tốt nghiệp Trung cấp</span>
+							<span class="text-[10px] font-normal text-slate-400">Liên thông</span>
+						</button>
+						<button type="button" data-level="cao-dang" onclick="ltdhSwitchTuitionLevel('cao-dang')" class="ltdh-tuition-tab-btn py-2.5 px-3 rounded-xl border text-xs font-bold transition-all text-center flex flex-col items-center justify-center gap-1 bg-[#00308b] border-[#00308b] text-white shadow-xs cursor-pointer">
+							<span>Tốt nghiệp Cao đẳng</span>
+							<span class="text-[10px] font-normal text-blue-200">Liên thông (Phổ biến)</span>
+						</button>
+						<button type="button" data-level="dai-hoc" onclick="ltdhSwitchTuitionLevel('dai-hoc')" class="ltdh-tuition-tab-btn py-2.5 px-3 rounded-xl border text-xs font-bold transition-all text-center flex flex-col items-center justify-center gap-1 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer">
+							<span>Đã có bằng Đại học</span>
+							<span class="text-[10px] font-normal text-slate-400">Văn bằng 2</span>
+						</button>
+					</div>
+
+					<!-- Calculator Result Display Cards -->
+					<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-5">
+						<!-- Total Tuition Estimate -->
+						<div class="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 border border-blue-200/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-2xs">
+							<div>
+								<span class="text-[11px] font-bold text-blue-700 uppercase tracking-wider block mb-1">Dự toán tổng học phí</span>
+								<div class="text-xl sm:text-2xl font-black text-[#00308b] tracking-tight" id="ltdh-est-total">-- VNĐ</div>
+							</div>
+							<div class="text-[11px] text-slate-500 mt-2 pt-2 border-t border-blue-200/60 flex items-center justify-between">
+								<span>Đơn giá cơ sở:</span>
+								<span class="font-bold text-slate-700" id="ltdh-est-rate">
+									<?php echo number_format($unit_cost, 0, ',', '.') . ' ' . ( $base_unit === 'tin-chi' ? 'đ/tín chỉ' : ($base_unit === 'hoc-ky' ? 'đ/kỳ' : 'đ/năm') ); ?>
+								</span>
+							</div>
+						</div>
+
+						<!-- Credits Required & Exempted -->
+						<div class="bg-slate-50/90 border border-slate-200/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-2xs">
+							<div>
+								<span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Khối lượng học tập</span>
+								<div class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight" id="ltdh-est-credits">55 tín chỉ</div>
+							</div>
+							<div class="text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
+								<span>Miễn giảm ước tính:</span>
+								<span class="font-bold text-emerald-600" id="ltdh-est-exempt">~75 tín chỉ</span>
+							</div>
+						</div>
+
+						<!-- Study Duration & Semesters -->
+						<div class="bg-slate-50/90 border border-slate-200/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-2xs">
+							<div>
+								<span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Thời gian hoàn thành</span>
+								<div class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight" id="ltdh-est-duration">1.5 - 2 năm</div>
+							</div>
+							<div class="text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
+								<span>Số học kỳ dự kiến:</span>
+								<span class="font-bold text-slate-700" id="ltdh-est-semesters">4 học kỳ</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Explanatory description card -->
+					<div class="bg-slate-50 border border-slate-200/70 rounded-xl p-3.5 sm:p-4 text-xs text-slate-600 flex items-start gap-3 mb-4">
+						<span class="text-base shrink-0 mt-0.5">ℹ️</span>
+						<div class="flex-1">
+							<span class="font-bold text-slate-800 block mb-0.5" id="ltdh-est-policy-title">Lộ trình dành cho tốt nghiệp Cao đẳng:</span>
+							<p id="ltdh-est-policy-desc" class="text-slate-600 leading-relaxed">Được chuyển đổi và công nhận tương đương các học phần đại cương và cơ sở ngành đã hoàn thành. Khối lượng học tập thực tế phụ thuộc vào việc thẩm định bảng điểm gốc bởi Hội đồng chuyên môn của nhà trường.</p>
+							<?php if ( $roadmap_note ) : ?>
+								<p class="mt-2 pt-2 border-t border-slate-200 text-slate-500 text-[11px]">
+									📌 <strong>Chính sách trường:</strong> <?php echo esc_html( $roadmap_note ); ?>
+								</p>
+							<?php endif; ?>
+						</div>
+					</div>
+
+					<div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+						<span class="text-[11px] text-slate-400 italic">
+							* Học phí nộp theo từng kỳ trực tiếp vào tài khoản ngân hàng chính thức của trường.
+						</span>
+						<a href="#register" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg transition-all shrink-0 shadow-2xs">
+							<span>Nhận kế hoạch đóng học phí chi tiết</span>
+							<span>→</span>
+						</a>
+					</div>
+				</section>
+
+				<script>
+				const ltdhTuitionData = {
+					unit: <?php echo wp_json_encode( $base_unit ); ?>,
+					unitCost: <?php echo (float) $unit_cost; ?>,
+					totalCredits: <?php echo (int) $total_cr; ?>,
+					levels: {
+						'thpt': {
+							name: 'Tốt nghiệp THPT',
+							credits: <?php echo (int) $total_cr; ?>,
+							exemptCredits: 0,
+							semesters: 8,
+							duration: '3.5 - 4 năm',
+							policyTitle: 'Lộ trình cử nhân chuẩn từ đầu (Tốt nghiệp THPT):',
+							desc: 'Người học theo học toàn bộ khung chương trình chuẩn gồm khối kiến thức đại cương, cơ sở ngành và chuyên ngành.'
+						},
+						'trung-cap': {
+							name: 'Tốt nghiệp Trung cấp',
+							credits: <?php echo (int) round( $total_cr * 0.70 ); ?>,
+							exemptCredits: <?php echo (int) round( $total_cr * 0.30 ); ?>,
+							semesters: 5,
+							duration: '2 - 2.5 năm',
+							policyTitle: 'Lộ trình liên thông từ Trung cấp:',
+							desc: 'Được xét chuyển đổi các môn đại cương và văn hóa đã hoàn thành ở bậc trung cấp theo quy định của Bộ GD&ĐT.'
+						},
+						'cao-dang': {
+							name: 'Tốt nghiệp Cao đẳng',
+							credits: <?php echo (int) round( $total_cr * 0.42 ); ?>,
+							exemptCredits: <?php echo (int) round( $total_cr * 0.58 ); ?>,
+							semesters: 4,
+							duration: '1.5 - 2 năm',
+							policyTitle: 'Lộ trình liên thông từ Cao đẳng (Đúng / Gần ngành):',
+							desc: 'Được công nhận và miễn giảm toàn bộ khối kiến thức đại cương và cơ sở khối. Chỉ cần tích lũy các môn chuyên ngành và làm khóa luận/đồ án tốt nghiệp.'
+						},
+						'dai-hoc': {
+							name: 'Đại học (Văn bằng 2)',
+							credits: <?php echo (int) round( $total_cr * 0.38 ); ?>,
+							exemptCredits: <?php echo (int) round( $total_cr * 0.62 ); ?>,
+							semesters: 3,
+							duration: '1.5 - 2 năm',
+							policyTitle: 'Lộ trình học Văn bằng 2 đại học:',
+							desc: 'Được miễn toàn bộ các học phần đại cương, giáo dục thể chất, giáo dục quốc phòng an ninh và các môn tương đương từ bằng 1.'
+						}
+					}
+				};
+
+				function ltdhFormatVND(num) {
+					return new Intl.NumberFormat('vi-VN').format(Math.round(num)) + ' đ';
+				}
+
+				function ltdhSwitchTuitionLevel(levelKey) {
+					const data = ltdhTuitionData.levels[levelKey];
+					if (!data) return;
+
+					// Update active tab buttons
+					document.querySelectorAll('.ltdh-tuition-tab-btn').forEach(btn => {
+						const isCurrent = btn.getAttribute('data-level') === levelKey;
+						if (isCurrent) {
+							btn.className = 'ltdh-tuition-tab-btn py-2.5 px-3 rounded-xl border text-xs font-bold transition-all text-center flex flex-col items-center justify-center gap-1 bg-[#00308b] border-[#00308b] text-white shadow-xs cursor-pointer';
+							const sub = btn.querySelector('span:last-child');
+							if (sub) sub.className = 'text-[10px] font-normal text-blue-200';
+						} else {
+							btn.className = 'ltdh-tuition-tab-btn py-2.5 px-3 rounded-xl border text-xs font-bold transition-all text-center flex flex-col items-center justify-center gap-1 bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer';
+							const sub = btn.querySelector('span:last-child');
+							if (sub) sub.className = 'text-[10px] font-normal text-slate-400';
+						}
+					});
+
+					// Compute total cost
+					let totalCost = 0;
+					if (ltdhTuitionData.unit === 'hoc-ky') {
+						totalCost = data.semesters * ltdhTuitionData.unitCost;
+					} else if (ltdhTuitionData.unit === 'nam') {
+						totalCost = (data.semesters / 2) * ltdhTuitionData.unitCost;
+					} else {
+						// per credit
+						totalCost = data.credits * ltdhTuitionData.unitCost;
+					}
+
+					const totalEl = document.getElementById('ltdh-est-total');
+					if (totalEl) totalEl.textContent = ltdhFormatVND(totalCost);
+					const crEl = document.getElementById('ltdh-est-credits');
+					if (crEl) crEl.textContent = data.credits + ' tín chỉ';
+					const exEl = document.getElementById('ltdh-est-exempt');
+					if (exEl) exEl.textContent = '~' + data.exemptCredits + ' tín chỉ';
+					const durEl = document.getElementById('ltdh-est-duration');
+					if (durEl) durEl.textContent = data.duration;
+					const semEl = document.getElementById('ltdh-est-semesters');
+					if (semEl) semEl.textContent = data.semesters + ' học kỳ';
+					const pTitleEl = document.getElementById('ltdh-est-policy-title');
+					if (pTitleEl) pTitleEl.textContent = data.policyTitle;
+					const pDescEl = document.getElementById('ltdh-est-policy-desc');
+					if (pDescEl) pDescEl.textContent = data.desc;
+				}
+
+				document.addEventListener('DOMContentLoaded', () => {
+					ltdhSwitchTuitionLevel('cao-dang');
+				});
+				</script>
 
 				<!-- SECTION 4: MAJOR INFORMATION -->
 				<?php if ( $major_id ) : ?>
@@ -433,10 +683,79 @@ $global_zalo = ltdh_get_zalo_url();
 				<!-- SECTION 5: ADMISSION REQUIREMENTS -->
 				<?php if ( $requirements ) : ?>
 					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Điều kiện xét tuyển</h2>
-						<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
-							<?php echo wp_kses_post( $requirements ); ?>
+						<div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Điều kiện xét tuyển</h2>
+							<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#00308b] border border-blue-100 text-xs font-bold rounded-full">
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+								Phương thức: Thi tuyển
+							</span>
 						</div>
+
+						<?php if ( strpos( strtolower($requirements), 'thi tuyển 3 môn' ) !== false || strpos( strtolower($requirements), 'thi tuyển' ) !== false ) : ?>
+							<!-- Structured High-End Admission Cards View -->
+							<div class="space-y-4">
+								<!-- Intro Box -->
+								<div class="bg-slate-50/80 border border-slate-200/80 rounded-xl p-4 flex items-center gap-3">
+									<div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+									</div>
+									<div>
+										<h4 class="font-extrabold text-slate-900 text-sm md:text-base">Phương thức tuyển sinh duy nhất: Thi tuyển 3 môn</h4>
+										<p class="text-xs md:text-sm text-slate-600 mt-0.5">Áp dụng chính thức cho thí sinh đăng ký hệ Liên thông Chính quy ngành Công nghệ thông tin.</p>
+									</div>
+								</div>
+
+								<!-- 3 Exam Subject Cards Grid -->
+								<div>
+									<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">Danh mục 3 môn thi tuyển:</span>
+									<div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+										<!-- Môn 1 -->
+										<div class="bg-white border border-slate-200/80 rounded-xl p-4 shadow-2xs hover:border-blue-300 transition-all">
+											<div class="flex items-center justify-between mb-2">
+												<span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-black rounded-md">Môn 1</span>
+												<span class="text-[11px] font-semibold text-slate-400">Cơ bản</span>
+											</div>
+											<h5 class="font-black text-slate-900 text-base md:text-lg mb-1">Toán</h5>
+											<p class="text-xs text-slate-500 leading-relaxed">Phần thi kiến thức Toán học cơ bản.</p>
+										</div>
+
+										<!-- Môn 2 -->
+										<div class="bg-white border border-slate-200/80 rounded-xl p-4 shadow-2xs hover:border-blue-300 transition-all">
+											<div class="flex items-center justify-between mb-2">
+												<span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-black rounded-md">Môn 2</span>
+												<span class="text-[11px] font-semibold text-slate-400">Cơ sở ngành</span>
+											</div>
+											<h5 class="font-black text-slate-900 text-base md:text-lg mb-1">Toán rời rạc</h5>
+											<p class="text-xs text-slate-500 leading-relaxed">Phần thi kiến thức Cơ sở ngành CNTT.</p>
+										</div>
+
+										<!-- Môn 3 -->
+										<div class="bg-white border border-slate-200/80 rounded-xl p-4 shadow-2xs hover:border-blue-300 transition-all">
+											<div class="flex items-center justify-between mb-2">
+												<span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-md">Môn 3</span>
+												<span class="text-[11px] font-semibold text-slate-400">Chuyên môn</span>
+											</div>
+											<h5 class="font-black text-slate-900 text-base md:text-lg mb-1">Cấu trúc dữ liệu & Giải thuật</h5>
+											<p class="text-xs text-slate-500 leading-relaxed">Phần thi kiến thức Lập trình chuyên ngành.</p>
+										</div>
+									</div>
+								</div>
+
+								<!-- Quality Threshold Alert Box -->
+								<div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-4 flex items-start gap-3 text-xs md:text-sm text-amber-950 leading-relaxed">
+									<svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+									<div>
+										<strong class="font-extrabold text-amber-950 block mb-0.5">Ngưỡng đảm bảo chất lượng đầu vào:</strong>
+										<p class="text-amber-900">Tổng điểm thi của 3 môn phải thỏa mãn ngưỡng đảm bảo chất lượng theo Quy chế tuyển sinh hiện hành của Trường Đại học Giao thông Vận tải và Bộ Giáo dục & Đào tạo.</p>
+									</div>
+								</div>
+							</div>
+						<?php else : ?>
+							<!-- Fallback formatted view -->
+							<div class="bg-slate-50/60 border border-slate-200/80 rounded-xl p-4 sm:p-5 text-slate-800 text-sm md:text-base leading-relaxed">
+								<?php echo wp_kses_post( $requirements ); ?>
+							</div>
+						<?php endif; ?>
 					</section>
 				<?php endif; ?>
 
@@ -444,91 +763,186 @@ $global_zalo = ltdh_get_zalo_url();
 				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Học phí & Thời gian học</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-						<div class="bg-slate-50 p-3.5 md:p-4 rounded-lg flex flex-col justify-between">
-							<div>
-								<h3 class="font-extrabold text-sm md:text-base text-slate-800 mb-2.5">Học phí chi tiết</h3>
-								<p class="text-slate-800 text-sm font-semibold mb-3">
-									<?php echo esc_html( $tuition ?: 'Liên hệ ban tuyển sinh để nhận biểu phí và chính sách đóng học phí theo đợt.' ); ?>
-								</p>
+						<!-- Column 1: Tuition Details -->
+						<div class="bg-white border border-slate-200/80 p-5 rounded-2xl flex flex-col justify-between shadow-2xs hover:shadow-xs transition-all duration-300">
+							<div class="space-y-3.5">
+								<div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-1">
+									<svg class="w-5.5 h-5.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+									<h3 class="font-extrabold text-base md:text-lg text-slate-900">Thông tin học phí</h3>
+								</div>
 								
+								<!-- Học phí per credit -->
+								<div class="bg-slate-50 border border-slate-100/80 rounded-xl p-3.5">
+									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Đơn giá học phí</span>
+									<div class="flex items-baseline flex-wrap gap-1">
+										<span class="text-base md:text-lg font-black text-slate-900">
+											<?php echo esc_html( $tuition ?: 'Liên hệ ban tuyển sinh' ); ?>
+										</span>
+										<?php if ( isset($tuition_year) && $tuition_year ) : ?>
+											<span class="text-xs font-semibold text-slate-600">(Năm học <?php echo esc_html( $tuition_year ); ?>)</span>
+										<?php endif; ?>
+									</div>
+								</div>
+
+								<!-- Total credits -->
 								<?php 
-								$tuition_amount   = get_field( 'tuition_amount', $program_id );
-								$tuition_unit     = get_field( 'tuition_unit', $program_id );
-								$total_credits    = get_field( 'tuition_total_credits', $program_id );
-								$increase_roadmap = get_field( 'tuition_increase_roadmap', $program_id );
-								
-								if ( $tuition_amount && $tuition_unit === 'tin-chi' && $total_credits ) : 
-									$estimated_total = floatval( $tuition_amount ) * intval( $total_credits );
+								$total_credits = get_field( 'tuition_total_credits', $program_id );
+								if ( $total_credits ) : 
 								?>
-									<div class="mt-3 pt-3 border-t border-slate-200/60 text-xs md:text-sm space-y-1.5 text-slate-600">
-										<div class="flex justify-between">
-											<span>Tổng số tín chỉ toàn khóa:</span>
-											<span class="font-bold text-slate-800"><?php echo esc_html( $total_credits ); ?> tín chỉ</span>
-										</div>
-										<div class="flex justify-between">
-											<span>Tổng học phí tạm tính:</span>
-											<span class="font-bold text-brand-primary"><?php echo number_format( $estimated_total, 0, ',', '.' ); ?> đ</span>
+									<div class="bg-slate-50 border border-slate-100/80 rounded-xl p-3.5">
+										<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tổng số tín chỉ toàn khóa</span>
+										<div class="flex items-baseline flex-wrap gap-1">
+											<span class="text-base font-black text-slate-900">
+												<?php echo esc_html( $total_credits ); ?> tín chỉ
+											</span>
+											<?php if ( isset($tuition_year) && $tuition_year ) : ?>
+												<span class="text-xs font-semibold text-slate-600">(Năm học <?php echo esc_html( $tuition_year ); ?>)</span>
+											<?php endif; ?>
 										</div>
 									</div>
 								<?php endif; ?>
 							</div>
 
-							<?php if ( $increase_roadmap ) : ?>
-								<div class="mt-4 pt-3 border-t border-slate-200/60 text-[11px] text-slate-400 leading-normal">
-									<span class="font-bold text-slate-500 block mb-0.5">Lộ trình học phí / Ghi chú:</span>
-									<?php echo esc_html( $increase_roadmap ); ?>
+							<?php 
+							$increase_roadmap = get_field( 'tuition_increase_roadmap', $program_id );
+							if ( $increase_roadmap ) : 
+							?>
+								<div class="mt-4 pt-3.5 border-t border-slate-100 text-xs md:text-sm text-slate-600 leading-relaxed">
+									<span class="font-bold text-slate-700 block mb-1">Lộ trình học phí / Ghi chú:</span>
+									<p class="text-slate-600"><?php echo esc_html( $increase_roadmap ); ?></p>
 								</div>
 							<?php endif; ?>
 						</div>
 
-						<div class="bg-slate-50 p-3.5 md:p-4 rounded-lg flex flex-col justify-between">
-							<div>
-								<h3 class="font-extrabold text-sm md:text-base text-slate-800 mb-2.5">Thời gian học tập</h3>
-								<p class="text-slate-800 text-sm font-semibold mb-2">Lộ trình chuẩn: <?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></p>
-								<p class="text-slate-500 text-xs md:text-sm leading-relaxed">
-									Thời gian đào tạo thực tế có thể được rút ngắn hoặc kéo dài tùy thuộc vào số lượng học phần học viên được miễn giảm (chuyển đổi tín chỉ từ văn bằng trước đó) hoặc tiến độ đăng ký học phần học tập.
-								</p>
+						<!-- Column 2: Study Duration -->
+						<div class="bg-white border border-slate-200/80 p-5 rounded-2xl flex flex-col justify-between shadow-2xs hover:shadow-xs transition-all duration-300">
+							<div class="space-y-3.5">
+								<div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-1">
+									<svg class="w-5.5 h-5.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+									<h3 class="font-extrabold text-base md:text-lg text-slate-900">Thời gian học tập</h3>
+								</div>
+								
+								<!-- Card 1: Standard Duration -->
+								<div class="bg-slate-50 border border-slate-100/80 rounded-xl p-3.5">
+									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Lộ trình chuẩn</span>
+									<div class="flex items-baseline flex-wrap gap-1">
+										<span class="text-base font-black text-slate-900"><?php echo esc_html( $duration ?: '2.0 - 3.0 năm' ); ?></span>
+									</div>
+								</div>
+
+								<!-- Card 2: Exemption Scope -->
+								<div class="bg-slate-50 border border-slate-100/80 rounded-xl p-3.5">
+									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Phạm vi miễn giảm môn</span>
+									<div class="flex items-baseline flex-wrap gap-1">
+										<span class="text-base font-black text-slate-900">Tối đa 2 môn (GDQP & Tiếng Anh)</span>
+									</div>
+								</div>
 							</div>
-							<div class="mt-4 pt-3 border-t border-slate-200/60 text-[11px] text-slate-400 leading-normal">
-								<span class="font-bold text-slate-500 block mb-0.5">Lưu ý:</span>
-								Thời gian đào tạo thực tế sẽ do hội đồng xét miễn giảm môn quyết định dựa trên bảng điểm tốt nghiệp bậc học trước đó của học viên.
+							
+							<div class="mt-4 pt-3.5 border-t border-slate-100 text-xs md:text-sm text-slate-600 leading-relaxed">
+								<span class="font-bold text-slate-700 block mb-1">Lưu ý quan trọng:</span>
+								<p class="text-slate-600">Nhà trường chỉ xem xét miễn trừ 2 môn (GDQP-AN và Tiếng Anh B1) nếu đủ điều kiện chứng chỉ. Tất cả các môn học khác học viên bắt buộc phải hoàn thành theo khung chương trình.</p>
 							</div>
 						</div>
 					</div>
+					<?php 
+					$school_slug = $school_id ? get_post_field( 'post_name', $school_id ) : '';
+					if ( strpos( $school_slug, 'giao-thong-van-tai' ) !== false ) :
+					?>
+						<div class="mt-5 border-t border-slate-100 pt-5">
+							<div class="bg-blue-50/40 border border-blue-100 rounded-2xl p-5 shadow-3xs">
+								<div class="flex items-center gap-2 border-b border-blue-100 pb-3 mb-3">
+									<svg class="w-6 h-6 text-blue-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222M12 14v8"></path></svg>
+									<h4 class="font-extrabold text-blue-950 text-base md:text-lg">
+										Quy định miễn môn đối với Đại học GTVT (UTC)
+									</h4>
+								</div>
+								<p class="text-xs md:text-sm text-blue-950 font-medium mb-4 leading-relaxed">
+									Chương trình đào tạo hệ liên thông của UTC chỉ xem xét miễn trừ tối đa đối với <strong class="text-blue-900 font-bold">2 môn học</strong> dưới đây nếu học viên đáp ứng đủ điều kiện:
+								</p>
+								
+								<div class="space-y-4">
+									<!-- Môn 1: GDQP -->
+									<div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-4.5 shadow-3xs hover:border-blue-300 transition-all duration-300">
+										<div class="flex items-center gap-2.5 mb-2">
+											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-700 text-xs font-black shrink-0">1</span>
+											<h5 class="font-extrabold text-slate-900 text-sm md:text-base">Giáo dục quốc phòng an ninh</h5>
+										</div>
+										<p class="text-slate-700 text-xs md:text-sm leading-relaxed pl-8">
+											Chỉ được xét miễn giảm khi học viên nộp chứng chỉ do <strong class="text-red-700 font-bold">Bộ Giáo dục và Đào tạo cấp theo phôi mẫu chuẩn (màu đỏ)</strong>. Các loại phôi khác (kể cả phôi của các trường tự cấp) đều không được chấp nhận.
+										</p>
+									</div>
+									
+									<!-- Môn 2: Tiếng Anh B1 -->
+									<div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-4.5 shadow-3xs flex flex-col gap-3.5 hover:border-blue-300 transition-all duration-300">
+										<div>
+											<div class="flex items-center gap-2.5 mb-2">
+												<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-black shrink-0">2</span>
+												<h5 class="font-extrabold text-slate-900 text-sm md:text-base">Tiếng Anh B1</h5>
+											</div>
+											
+											<div class="pl-8">
+												<p class="text-slate-700 text-xs md:text-sm font-medium mb-3 leading-relaxed">Được xem xét quy đổi điểm khi sở hữu một trong các chứng chỉ quốc tế/quốc gia còn hiệu lực:</p>
+												<div class="grid grid-cols-3 gap-2.5 sm:gap-3 mb-3.5">
+													<div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 sm:p-3 text-center hover:border-blue-400 hover:shadow-xs transition-all duration-200 cursor-pointer">
+														<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">IELTS</span>
+														<span class="text-sm md:text-base font-black text-blue-900">≥ 4.5</span>
+													</div>
+													<div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 sm:p-3 text-center hover:border-blue-400 hover:shadow-xs transition-all duration-200 cursor-pointer">
+														<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">TOEIC</span>
+														<span class="text-sm md:text-base font-black text-blue-900">≥ 450</span>
+													</div>
+													<div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 sm:p-3 text-center hover:border-blue-400 hover:shadow-xs transition-all duration-200 cursor-pointer">
+														<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">VSTEP</span>
+														<span class="text-sm md:text-base font-black text-blue-900">≥ 5.0</span>
+													</div>
+												</div>
+												<div class="flex items-start gap-2 text-xs md:text-sm text-slate-600 leading-relaxed mb-1">
+													<svg class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+													<p>
+														* Riêng VSTEP: <strong class="text-slate-800 font-bold">Chỉ nhận chứng chỉ</strong> do 1 trong 3 cơ sở đào tạo cấp: ĐH Quốc gia HN, ĐH Sư phạm HN, và ĐH Hà Nội.
+													</p>
+												</div>
+											</div>
+										</div>
+										<div class="bg-amber-50 border border-amber-200/70 rounded-xl p-3.5 text-xs md:text-sm text-amber-900 leading-relaxed pl-8 flex items-start gap-2.5">
+											<svg class="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+											<p>
+												<strong class="text-amber-950 font-extrabold block mb-0.5">Quy trình thẩm định & Quy đổi điểm:</strong> Sinh viên bắt buộc phải tham gia và vượt qua bài kiểm tra năng lực do bộ môn tổ chức. Nếu đạt yêu cầu, điểm số sẽ được quy đổi sang <strong class="text-amber-950 font-black">điểm 5</strong> trên hệ thống.
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					<?php endif; ?>
 				</section>
 
 				<!-- SECTION 7.5: CURRICULUM ROADMAP FILE/IMAGE -->
 				<?php if ( $curriculum_url ) : ?>
 					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="lo-trinh-hoc">
-						<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
-							<div>
-								<h2 class="text-lg md:text-2xl font-bold text-slate-900">Lộ trình học & Khung chương trình</h2>
-								<p class="text-xs md:text-sm text-slate-500 mt-0.5">Khung chương trình đào tạo chính thức áp dụng cho khóa học này</p>
-							</div>
-							<?php if ( $curriculum_type === 'image' || $curriculum_type === 'pdf' ) : ?>
-								<a href="<?php echo esc_url( $curriculum_url ); ?>" download target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#00308b] hover:text-[#002266] bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-all shrink-0 self-start sm:self-auto">
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-									<span>Tải file gốc</span>
-								</a>
-							<?php endif; ?>
+						<div class="border-b border-slate-100 pb-3 mb-4">
+							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Lộ trình học & Khung chương trình</h2>
+							<p class="text-xs md:text-sm text-slate-500 mt-0.5">Khung chương trình đào tạo chính thức áp dụng cho khóa học này</p>
 						</div>
 
 						<?php if ( $curriculum_type === 'image' ) : ?>
-							<!-- Image Viewer with Lightbox Zoom -->
-							<div class="relative group bg-slate-900/5 rounded-xl border border-slate-200/80 overflow-hidden p-2 sm:p-3 text-center">
-								<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" class="inline-block relative overflow-hidden rounded-lg cursor-zoom-in group" title="Click để xem ảnh kích thước chuẩn">
-									<img src="<?php echo esc_url( $curriculum_url ); ?>" alt="Lộ trình đào tạo <?php echo esc_attr( get_the_title() ); ?>" class="max-w-full h-auto mx-auto rounded-lg shadow-2xs group-hover:scale-[1.01] transition-transform duration-300">
-									<div class="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-										<span class="bg-white/95 text-slate-900 text-xs font-bold px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
-											<svg class="w-4 h-4 text-[#00308b]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
-											Xem ảnh toàn màn hình
-										</span>
+							<!-- Clickable Label Card for Image -->
+							<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" class="flex items-center justify-between p-4 bg-slate-50 hover:bg-blue-50/60 border border-slate-200/80 hover:border-blue-300 rounded-xl transition-all duration-200 group shadow-2xs">
+								<div class="flex items-center gap-3.5">
+									<div class="w-10 h-10 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center shrink-0">
+										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
 									</div>
-								</a>
-								<p class="text-[11px] text-slate-400 mt-2 flex items-center justify-center gap-1">
-									<span>🔍</span> Click vào ảnh để phóng to xem chi tiết mã môn học và số tín chỉ
-								</p>
-							</div>
+									<div>
+										<h4 class="font-extrabold text-slate-900 text-sm group-hover:text-blue-900 transition-colors">Xem ảnh Khung chương trình đào tạo chi tiết</h4>
+										<p class="text-xs text-slate-500 mt-0.5">Click để mở xem ảnh lộ trình các học kỳ & môn học kích thước chuẩn</p>
+									</div>
+								</div>
+								<span class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-white border border-slate-200 group-hover:border-blue-300 px-3.5 py-2 rounded-lg shadow-2xs group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
+									<span>Xem chi tiết</span>
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+								</span>
+							</a>
 						<?php else : ?>
 							<!-- PDF or File Download Box -->
 							<div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -541,26 +955,12 @@ $global_zalo = ltdh_get_zalo_url();
 										<p class="text-xs text-slate-500">Bản PDF chính thức từ nhà trường liệt kê lộ trình các học kỳ và danh sách môn học</p>
 									</div>
 								</div>
-								<a href="<?php echo esc_url( $curriculum_url ); ?>" download target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0">
+								<a href="<?php echo esc_url( $curriculum_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $curriculum_url ); ?>" data-file-title="Khung chương trình: <?php echo esc_attr( get_the_title() ); ?>">
 									<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 									<span>Tải Khung Chương Trình (PDF)</span>
 								</a>
 							</div>
 						<?php endif; ?>
-
-						<!-- CTA: Thẩm định miễn môn -->
-						<div class="mt-4 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-							<div class="flex items-center gap-3">
-								<span class="text-2xl shrink-0">💡</span>
-								<div>
-									<h4 class="font-extrabold text-amber-950 text-xs sm:text-sm">Bạn chưa rõ mình được miễn giảm những môn nào?</h4>
-									<p class="text-[11px] sm:text-xs text-amber-800 mt-0.5">Gửi ảnh bảng điểm tốt nghiệp CĐ/ĐH cũ của bạn, ban tuyển sinh sẽ đối chiếu lộ trình và tư vấn miễn môn cho bạn trong 15 phút.</p>
-								</div>
-							</div>
-							<a href="#dang-ky" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-2xs transition-all shrink-0">
-								Thẩm định miễn môn
-							</a>
-						</div>
 					</section>
 				<?php endif; ?>
 
@@ -594,7 +994,7 @@ $global_zalo = ltdh_get_zalo_url();
 										<p class="text-xs text-slate-500">Mẫu phiếu đăng ký tuyển sinh chính thức để in và làm hồ sơ</p>
 									</div>
 								</div>
-								<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0">
+								<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="Phiếu tuyển sinh: <?php echo esc_attr( get_the_title() ); ?>">
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 									<span>Tải Phiếu Tuyển Sinh</span>
 								</a>
@@ -876,7 +1276,7 @@ $global_zalo = ltdh_get_zalo_url();
 	</div>
 	<div class="flex items-center gap-2 shrink-0">
 		<?php if ( ! empty( $form_url ) ) : ?>
-			<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-2.5 rounded-lg text-xs font-bold transition-all shrink-0 flex items-center justify-center border border-slate-200/80 min-h-[40px]" title="Tải phiếu tuyển sinh">
+			<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn bg-slate-100 hover:bg-slate-200 text-slate-700 p-2.5 rounded-lg text-xs font-bold transition-all shrink-0 flex items-center justify-center border border-slate-200/80 min-h-[40px] cursor-pointer" title="Tải phiếu tuyển sinh" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="Phiếu tuyển sinh: <?php echo esc_attr( get_the_title() ); ?>">
 				📄 <span class="hidden sm:inline ml-1">Tải phiếu</span>
 			</a>
 		<?php endif; ?>
@@ -885,6 +1285,175 @@ $global_zalo = ltdh_get_zalo_url();
 		</a>
 	</div>
 </div>
+
+<!-- LEAD MAGNET MODAL COMPONENT -->
+<div id="ltdh-lead-magnet-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+	<div class="relative bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+		<!-- Header -->
+		<div class="bg-gradient-to-r from-[#00308b] to-[#002266] px-5 py-4 text-white flex items-center justify-between">
+			<div class="flex items-center gap-2.5">
+				<span class="text-xl">📥</span>
+				<div>
+					<h3 class="font-extrabold text-sm sm:text-base leading-tight">Tải Tài Liệu Tuyển Sinh</h3>
+					<p class="text-[11px] text-blue-200 mt-0.5">Mẫu đơn đăng ký & Khung chương trình đào tạo</p>
+				</div>
+			</div>
+			<button type="button" onclick="ltdhCloseLeadMagnetModal()" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer" aria-label="Đóng">
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+			</button>
+		</div>
+
+		<!-- Form Body -->
+		<form id="ltdh-lead-magnet-form" class="p-5 sm:p-6 space-y-4" onsubmit="ltdhSubmitLeadMagnet(event)">
+			<input type="hidden" name="action" value="ltdh_lead_magnet_download">
+			<input type="hidden" name="security" value="<?php echo esc_attr( wp_create_nonce( 'ltdh_lead_magnet_nonce' ) ); ?>">
+			<input type="hidden" name="program_id" value="<?php echo (int) $program_id; ?>">
+			<input type="hidden" name="school_id" value="<?php echo (int) $school_id; ?>">
+			<input type="hidden" name="major_id" value="<?php echo (int) $major_id; ?>">
+			<input type="hidden" id="ltdh-lm-file-url" name="doc_url" value="">
+			<input type="hidden" id="ltdh-lm-file-title" name="doc_title" value="">
+
+			<!-- Honeypot -->
+			<div class="hidden" style="display:none !important;" aria-hidden="true">
+				<label for="lm_hp_website">Website URL</label>
+				<input type="text" name="hp_website" id="lm_hp_website" tabindex="-1" autocomplete="off" value="">
+			</div>
+
+			<div class="p-3 bg-blue-50/60 rounded-xl border border-blue-100 flex items-start gap-2.5">
+				<span class="text-base text-blue-600 shrink-0">📄</span>
+				<div class="text-xs text-slate-700 min-w-0">
+					<span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Tài liệu bạn chọn:</span>
+					<strong id="ltdh-lm-doc-name-label" class="text-slate-900 truncate block">Khung chương trình đào tạo</strong>
+				</div>
+			</div>
+
+			<div>
+				<label class="block text-xs font-bold text-slate-700 mb-1">Họ và tên của bạn <span class="text-red-500">*</span></label>
+				<input type="text" name="name" required class="w-full border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b] focus:outline-none" placeholder="Nguyễn Văn A">
+			</div>
+
+			<div>
+				<label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại nhận tài liệu (Zalo) <span class="text-red-500">*</span></label>
+				<input type="tel" name="phone" required class="w-full border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b] focus:outline-none" placeholder="0912 345 678">
+				<p class="text-[11px] text-slate-400 mt-1">Hệ thống sẽ mở file trực tiếp và gửi bản dự phòng qua Zalo cho bạn.</p>
+			</div>
+
+			<div id="ltdh-lm-error" class="hidden text-xs text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-200"></div>
+
+			<button type="submit" id="ltdh-lm-submit-btn" class="w-full bg-[#00308b] hover:bg-[#002266] text-white py-3 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+				<span>Tải Tài Liệu Miễn Phí</span>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+			</button>
+
+			<p class="text-[10px] text-slate-400 text-center">
+				🔒 Cam kết bảo mật thông tin 100% theo Nghị định 13/2023/NĐ-CP.
+			</p>
+		</form>
+	</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	const modal          = document.getElementById('ltdh-lead-magnet-modal');
+	const fileUrlInput   = document.getElementById('ltdh-lm-file-url');
+	const fileTitleInput = document.getElementById('ltdh-lm-file-title');
+	const docLabel       = document.getElementById('ltdh-lm-doc-name-label');
+	const errorEl        = document.getElementById('ltdh-lm-error');
+	const submitBtn      = document.getElementById('ltdh-lm-submit-btn');
+
+	// Attach click handlers to all .ltdh-lead-magnet-btn elements
+	document.querySelectorAll('.ltdh-lead-magnet-btn').forEach(btn => {
+		btn.addEventListener('click', function(e) {
+			const isUnlocked  = sessionStorage.getItem('ltdh_lead_magnet_unlocked');
+			const targetUrl   = this.getAttribute('data-file-url') || this.getAttribute('href');
+			const targetTitle = this.getAttribute('data-file-title') || 'Tài liệu tuyển sinh';
+
+			if (isUnlocked === '1') {
+				// Already unlocked in this session, allow default download
+				return true;
+			}
+
+			// Intercept and open modal
+			e.preventDefault();
+			if (fileUrlInput) fileUrlInput.value = targetUrl;
+			if (fileTitleInput) fileTitleInput.value = targetTitle;
+			if (docLabel) docLabel.textContent = targetTitle;
+			if (errorEl) {
+				errorEl.textContent = '';
+				errorEl.classList.add('hidden');
+			}
+			if (modal) {
+				modal.classList.remove('hidden');
+				modal.classList.add('flex');
+				document.body.style.overflow = 'hidden';
+			}
+		});
+	});
+
+	window.ltdhCloseLeadMagnetModal = function() {
+		if (modal) {
+			modal.classList.add('hidden');
+			modal.classList.remove('flex');
+			document.body.style.overflow = '';
+		}
+	};
+
+	window.ltdhSubmitLeadMagnet = function(e) {
+		e.preventDefault();
+		const form = document.getElementById('ltdh-lead-magnet-form');
+		if (!form) return;
+
+		const formData  = new FormData(form);
+		const targetUrl = fileUrlInput ? fileUrlInput.value : '';
+
+		if (submitBtn) {
+			submitBtn.disabled = true;
+			submitBtn.innerHTML = '<span>Đang gửi thông tin...</span>';
+		}
+		if (errorEl) errorEl.classList.add('hidden');
+
+		fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', {
+			method: 'POST',
+			body: formData
+		})
+		.then(res => res.json())
+		.then(data => {
+			if (submitBtn) {
+				submitBtn.disabled = false;
+				submitBtn.innerHTML = '<span>Tải Tài Liệu Miễn Phí</span>';
+			}
+
+			if (data.success) {
+				sessionStorage.setItem('ltdh_lead_magnet_unlocked', '1');
+				ltdhCloseLeadMagnetModal();
+
+				// Automatically trigger download or open file in new window
+				if (targetUrl) {
+					const win = window.open(targetUrl, '_blank');
+					if (!win || win.closed || typeof win.closed === 'undefined') {
+						window.location.href = targetUrl;
+					}
+				}
+			} else {
+				if (errorEl) {
+					errorEl.textContent = data.data && data.data.message ? data.data.message : 'Có lỗi xảy ra, vui lòng thử lại.';
+					errorEl.classList.remove('hidden');
+				}
+			}
+		})
+		.catch(err => {
+			if (submitBtn) {
+				submitBtn.disabled = false;
+				submitBtn.innerHTML = '<span>Tải Tài Liệu Miễn Phí</span>';
+			}
+			if (errorEl) {
+				errorEl.textContent = 'Lỗi kết nối mạng. Vui lòng thử lại sau.';
+				errorEl.classList.remove('hidden');
+			}
+		});
+	};
+});
+</script>
 
 <?php
 get_footer();

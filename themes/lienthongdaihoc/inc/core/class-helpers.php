@@ -196,6 +196,11 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 			<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>">
 		<?php endforeach; ?>
 
+		<div class="hidden" style="display:none !important;" aria-hidden="true">
+			<label for="hp_website">Website URL</label>
+			<input type="text" name="hp_website" id="hp_website" tabindex="-1" autocomplete="off" value="">
+		</div>
+
 		<div>
 			<label class="block text-sm font-semibold text-slate-600 mb-1"><?php esc_html_e('Họ và tên *'); ?></label>
 			<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="<?php esc_attr_e('Họ và tên của bạn'); ?>">
@@ -338,7 +343,7 @@ function ltdh_breadcrumb(): void {
 				$crumbs[] = [ 'label' => 'Hệ đào tạo', 'url' => home_url( '/he-dao-tao/' ) ];
 				$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
 			} elseif ( $post_type === 'school' ) {
-				$crumbs[] = [ 'label' => 'Trường đối tác', 'url' => home_url( '/truong-hoc/' ) ];
+				$crumbs[] = [ 'label' => 'Trường đối tác', 'url' => get_post_type_archive_link( 'school' ) ?: home_url( '/truong-doi-tac/' ) ];
 				$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
 			} elseif ( $post_type === 'major' ) {
 				$crumbs[] = [ 'label' => 'Chuyên ngành', 'url' => home_url( '/nganh-hoc/' ) ];
@@ -618,11 +623,18 @@ function ltdh_get_fallback_image(string $context = 'program'): string {
 }
 
 function ltdh_get_school_unique_majors_count( int $school_id ): int {
+	$cache_key = 'ltdh_school_majors_count_' . $school_id;
+	$cached    = wp_cache_get( $cache_key, 'ltdh' );
+	if ( false !== $cached ) {
+		return (int) $cached;
+	}
+
 	$programs = get_posts( [
 		'post_type'      => 'program',
-		'posts_per_page' => -1,
+		'posts_per_page' => 100,
 		'post_status'    => 'publish',
 		'fields'         => 'ids',
+		'no_found_rows'  => true,
 		'meta_query'     => [
 			[
 				'key'     => 'school_relationship',
@@ -633,12 +645,13 @@ function ltdh_get_school_unique_majors_count( int $school_id ): int {
 	] );
 
 	if ( empty( $programs ) ) {
+		wp_cache_set( $cache_key, 0, 'ltdh', HOUR_IN_SECONDS );
 		return 0;
 	}
 
 	$major_ids = [];
 	foreach ( $programs as $prog_id ) {
-		$major_rel = get_field( 'major_relationship', $prog_id );
+		$major_rel = get_post_meta( $prog_id, 'major_relationship', true );
 		if ( is_array( $major_rel ) ) {
 			$major_rel = ! empty( $major_rel ) ? ( is_object( $major_rel[0] ) ? $major_rel[0]->ID : $major_rel[0] ) : 0;
 		} elseif ( is_object( $major_rel ) ) {
@@ -650,7 +663,9 @@ function ltdh_get_school_unique_majors_count( int $school_id ): int {
 		}
 	}
 
-	return count( $major_ids );
+	$count = count( $major_ids );
+	wp_cache_set( $cache_key, $count, 'ltdh', HOUR_IN_SECONDS );
+	return $count;
 }
 
 function ltdh_get_training_type_badge_html( string $type_name ): string {
@@ -738,3 +753,66 @@ function ltdh_get_program_admission_deadline_display(int $program_id): string {
 
 
 // Hot majors helper has been moved to inc/core/class-menus.php
+
+/**
+ * Get active training types for a school (with caching and automatic rollup from programs).
+ *
+ * @param int    $school_id      School post ID.
+ * @param string $output_format  'names' or 'slugs'.
+ * @return array
+ */
+function ltdh_get_school_training_types( int $school_id, string $output_format = 'names' ): array {
+	if ( ! $school_id ) {
+		return [];
+	}
+
+	$cache_key = 'ltdh_school_tt_' . $school_id . '_' . $output_format;
+	$cached    = wp_cache_get( $cache_key, 'ltdh' );
+	if ( false !== $cached ) {
+		return (array) $cached;
+	}
+
+	// 1. Check if school has directly assigned taxonomy terms
+	$terms = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => $output_format ] );
+	if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+		wp_cache_set( $cache_key, $terms, 'ltdh', HOUR_IN_SECONDS );
+		return $terms;
+	}
+
+	// 2. Otherwise rollup from its published programs
+	$programs = get_posts( [
+		'post_type'      => 'program',
+		'posts_per_page' => 100,
+		'post_status'    => 'publish',
+		'fields'         => 'ids',
+		'no_found_rows'  => true,
+		'meta_query'     => [
+			[
+				'key'     => 'school_relationship',
+				'value'   => $school_id,
+				'compare' => '=',
+			],
+		],
+	] );
+
+	if ( empty( $programs ) ) {
+		wp_cache_set( $cache_key, [], 'ltdh', HOUR_IN_SECONDS );
+		return [];
+	}
+
+	$school_types = [];
+	foreach ( $programs as $prog_id ) {
+		$prog_terms = wp_get_post_terms( $prog_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => $output_format ] );
+		if ( ! is_wp_error( $prog_terms ) && ! empty( $prog_terms ) ) {
+			foreach ( $prog_terms as $t ) {
+				$val = is_object( $t ) ? ( 'names' === $output_format ? $t->name : $t->slug ) : $t;
+				if ( ! in_array( $val, $school_types, true ) ) {
+					$school_types[] = $val;
+				}
+			}
+		}
+	}
+
+	wp_cache_set( $cache_key, $school_types, 'ltdh', HOUR_IN_SECONDS );
+	return $school_types;
+}

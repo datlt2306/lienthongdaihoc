@@ -33,9 +33,9 @@ $hotline = ltdh_get_hotline();
 					<span class="inline-block bg-teal-50 text-brand-primary text-sm font-bold px-3 py-1 rounded-lg uppercase tracking-wider">
 						Thông tin Ngành học
 					</span>
-					<h1 class="text-2xl md:text-4xl font-black text-slate-900 leading-tight">
+					<h2 class="text-2xl md:text-4xl font-black text-slate-900 leading-tight">
 						Ngành <?php the_title(); ?>
-					</h1>
+					</h2>
 					<p class="text-slate-500 text-sm font-medium">Mã ngành: <?php echo esc_html( $major_code ?: 'Đang cập nhật' ); ?></p>
 				</div>
 				<div class="flex flex-col gap-2 w-full md:w-auto">

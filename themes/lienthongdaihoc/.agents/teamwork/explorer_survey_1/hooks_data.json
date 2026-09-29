@@ -1,0 +1,645 @@
+{
+  "actions_registered": [
+    {
+      "file": "inc/acf-fields.php",
+      "line": 12,
+      "hook": "'acf/init'",
+      "callback": "'ltdh_load_acf_field_groups_from_json'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/comparison.php",
+      "line": 18,
+      "hook": "'init'",
+      "callback": "'ltdh_compare_register_rewrite_rules'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/comparison.php",
+      "line": 20,
+      "hook": "'template_redirect'",
+      "callback": "'ltdh_compare_template_redirect'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/comparison.php",
+      "line": 489,
+      "hook": "'rest_api_init'",
+      "callback": "'ltdh_compare_register_rest_routes'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/comparison.php",
+      "line": 556,
+      "hook": "'wp_ajax_ltdh_compare_add'",
+      "callback": "'ltdh_compare_ajax_add'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/comparison.php",
+      "line": 557,
+      "hook": "'wp_ajax_ltdh_compare_remove'",
+      "callback": "'ltdh_compare_ajax_remove'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/comparison.php",
+      "line": 558,
+      "hook": "'wp_ajax_nopriv_ltdh_compare_add'",
+      "callback": "'ltdh_compare_ajax_add'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/comparison.php",
+      "line": 559,
+      "hook": "'wp_ajax_nopriv_ltdh_compare_remove'",
+      "callback": "'ltdh_compare_ajax_remove'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/crm-adapters.php",
+      "line": 24,
+      "hook": "'admin_init'",
+      "callback": "'ltdh_schedule_crm_sync'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/crm-adapters.php",
+      "line": 32,
+      "hook": "'switch_theme'",
+      "callback": "'ltdh_clear_crm_sync_schedule'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/crm-adapters.php",
+      "line": 37,
+      "hook": "'ltdh_cron_sync_leads'",
+      "callback": "'ltdh_process_lead_queue'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 56,
+      "hook": "'after_switch_theme'",
+      "callback": "'ltdh_elig_create_table'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 57,
+      "hook": "'after_switch_theme'",
+      "callback": "'ltdh_elig_ensure_page'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 60,
+      "hook": "'init'",
+      "callback": "function(",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 177,
+      "hook": "'wp_enqueue_scripts'",
+      "callback": "'ltdh_elig_enqueue_assets'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 183,
+      "hook": "'wp_ajax_ltdh_elig_check'",
+      "callback": "'ltdh_elig_ajax_check'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 184,
+      "hook": "'wp_ajax_nopriv_ltdh_elig_check'",
+      "callback": "'ltdh_elig_ajax_check'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 186,
+      "hook": "'wp_ajax_ltdh_elig_lead'",
+      "callback": "'ltdh_elig_ajax_lead'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 187,
+      "hook": "'wp_ajax_nopriv_ltdh_elig_lead'",
+      "callback": "'ltdh_elig_ajax_lead'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 818,
+      "hook": "'wp_ajax_ltdh_elig_advanced_verify'",
+      "callback": "'ltdh_elig_ajax_advanced_verify'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 819,
+      "hook": "'wp_ajax_nopriv_ltdh_elig_advanced_verify'",
+      "callback": "'ltdh_elig_ajax_advanced_verify'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 917,
+      "hook": "'rest_api_init'",
+      "callback": "function(",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 979,
+      "hook": "'manage_program_posts_custom_column'",
+      "callback": "function( $column",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 1025,
+      "hook": "'admin_menu'",
+      "callback": "'ltdh_elig_register_admin_menu'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/lead-capture.php",
+      "line": 15,
+      "hook": "'after_switch_theme'",
+      "callback": "'ltdh_create_leads_table'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/lead-capture.php",
+      "line": 286,
+      "hook": "'wpcf7_before_send_mail'",
+      "callback": "'ltdh_capture_cf7_lead'",
+      "priority": "10",
+      "args": "3"
+    },
+    {
+      "file": "inc/lead-capture.php",
+      "line": 331,
+      "hook": "'template_redirect'",
+      "callback": "'ltdh_handle_native_form_submit'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/post-types.php",
+      "line": 15,
+      "hook": "'init'",
+      "callback": "'ltdh_register_post_types_and_taxonomies_from_json'",
+      "priority": "0",
+      "args": "1"
+    },
+    {
+      "file": "inc/relationship-hooks.php",
+      "line": 12,
+      "hook": "'acf/save_post'",
+      "callback": "'ltdh_sync_program_relationships'",
+      "priority": "20",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-helpers.php",
+      "line": 514,
+      "hook": "'save_post'",
+      "callback": "'ltdh_clear_transients_on_save'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-query-filters.php",
+      "line": 58,
+      "hook": "'pre_get_posts'",
+      "callback": "'ltdh_customize_archive_queries'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-rewrite-rules.php",
+      "line": 25,
+      "hook": "'init'",
+      "callback": "'ltdh_register_training_type_rewrite'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-rewrite-rules.php",
+      "line": 44,
+      "hook": "'init'",
+      "callback": "'ltdh_register_program_rewrite'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-rewrite-rules.php",
+      "line": 163,
+      "hook": "'template_redirect'",
+      "callback": "'ltdh_redirect_taxonomy_base'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-theme-setup.php",
+      "line": 41,
+      "hook": "'after_setup_theme'",
+      "callback": "'ltdh_theme_setup'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-theme-setup.php",
+      "line": 84,
+      "hook": "'wp_enqueue_scripts'",
+      "callback": "'ltdh_enqueue_assets'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-theme-setup.php",
+      "line": 109,
+      "hook": "'wp_footer'",
+      "callback": "'ltdh_compare_output_tray'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-theme-setup.php",
+      "line": 138,
+      "hook": "'after_switch_theme'",
+      "callback": "'ltdh_flush_rewrite_rules_on_switch'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-theme-setup.php",
+      "line": 148,
+      "hook": "'init'",
+      "callback": "function(",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 314,
+      "hook": "'wp_head'",
+      "callback": "function(",
+      "priority": "10",
+      "args": "1"
+    }
+  ],
+  "filters_registered": [
+    {
+      "file": "functions.php",
+      "line": 209,
+      "hook": "'ai1wm_exclude_content_from_export'",
+      "callback": "function ( $exclude_filters",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 72,
+      "hook": "'acf/load_field/key=field_program_tuition'",
+      "callback": "'ltdh_override_field_program_tuition_label'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 78,
+      "hook": "'acf/load_field/key=field_program_duration'",
+      "callback": "'ltdh_override_field_program_duration_label'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 84,
+      "hook": "'acf/load_field/key=field_program_period'",
+      "callback": "'ltdh_override_field_program_period_label'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 90,
+      "hook": "'acf/load_field/key=field_program_benefits'",
+      "callback": "'ltdh_override_field_program_benefits_label'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 96,
+      "hook": "'acf/load_field/key=field_program_faq'",
+      "callback": "'ltdh_override_field_program_faq_label'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 103,
+      "hook": "'acf/prepare_field/key=field_program_why_choose'",
+      "callback": "'__return_false'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 104,
+      "hook": "'acf/prepare_field/key=field_program_schedule'",
+      "callback": "'__return_false'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 105,
+      "hook": "'acf/prepare_field/key=field_program_target_students'",
+      "callback": "'__return_false'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 106,
+      "hook": "'acf/prepare_field/key=field_program_degree_type'",
+      "callback": "'__return_false'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 107,
+      "hook": "'acf/prepare_field/key=field_program_diploma_value'",
+      "callback": "'__return_false'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/acf-fields.php",
+      "line": 108,
+      "hook": "'acf/prepare_field/key=field_program_disadvantages'",
+      "callback": "'__return_false'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/comparison.php",
+      "line": 19,
+      "hook": "'query_vars'",
+      "callback": "'ltdh_compare_register_query_vars'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/crm-adapters.php",
+      "line": 15,
+      "hook": "'cron_schedules'",
+      "callback": "'ltdh_add_cron_intervals'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 106,
+      "hook": "'theme_page_templates'",
+      "callback": "'ltdh_elig_register_page_template'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 123,
+      "hook": "'template_include'",
+      "callback": "'ltdh_elig_template_redirect'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/eligibility.php",
+      "line": 974,
+      "hook": "'manage_edit-program_columns'",
+      "callback": "function( $columns",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/search-engine.php",
+      "line": 7,
+      "hook": "'pre_get_posts_args_ltdh'",
+      "callback": "'ltdh_filter_program_search_query'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-helpers.php",
+      "line": 600,
+      "hook": "'wpcf7_form_tag'",
+      "callback": "'ltdh_cf7_dynamic_programs'",
+      "priority": "10",
+      "args": "2"
+    },
+    {
+      "file": "inc/core/class-menus.php",
+      "line": 114,
+      "hook": "'wp_nav_menu_objects'",
+      "callback": "'ltdh_menu_add_active_classes'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-menus.php",
+      "line": 248,
+      "hook": "'wp_nav_menu_objects'",
+      "callback": "'ltdh_dynamic_menu_submenu_injection'",
+      "priority": "10",
+      "args": "2"
+    },
+    {
+      "file": "inc/core/class-menus.php",
+      "line": 294,
+      "hook": "'nav_menu_css_class'",
+      "callback": "'ltdh_highlight_menu_parameters'",
+      "priority": "10",
+      "args": "2"
+    },
+    {
+      "file": "inc/core/class-rewrite-rules.php",
+      "line": 101,
+      "hook": "'request'",
+      "callback": "'ltdh_program_request_guard'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-rewrite-rules.php",
+      "line": 116,
+      "hook": "'post_type_link'",
+      "callback": "'ltdh_program_permalink'",
+      "priority": "10",
+      "args": "2"
+    },
+    {
+      "file": "inc/core/class-rewrite-rules.php",
+      "line": 133,
+      "hook": "'template_include'",
+      "callback": "'ltdh_template_include_program'",
+      "priority": "5",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-rewrite-rules.php",
+      "line": 183,
+      "hook": "'template_include'",
+      "callback": "'ltdh_template_include_he_dao_tao'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-theme-setup.php",
+      "line": 118,
+      "hook": "'upload_mimes'",
+      "callback": "'ltdh_enable_webp_upload'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/core/class-theme-setup.php",
+      "line": 129,
+      "hook": "'wp_check_filetype_and_ext'",
+      "callback": "'ltdh_allow_webp_upload_check'",
+      "priority": "10",
+      "args": "4"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 32,
+      "hook": "'rank_math/frontend/title'",
+      "callback": "'ltdh_seo_dynamic_title'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 62,
+      "hook": "'rank_math/frontend/description'",
+      "callback": "'ltdh_seo_dynamic_description'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 124,
+      "hook": "'rank_math/json_ld'",
+      "callback": "'ltdh_seo_inject_custom_schema'",
+      "priority": "99",
+      "args": "2"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 210,
+      "hook": "'rank_math/frontend/breadcrumb/items'",
+      "callback": "'ltdh_seo_override_breadcrumb_items'",
+      "priority": "10",
+      "args": "2"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 232,
+      "hook": "'rank_math/frontend/title'",
+      "callback": "'ltdh_seo_compare_title'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 251,
+      "hook": "'rank_math/frontend/description'",
+      "callback": "'ltdh_seo_compare_description'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 286,
+      "hook": "'rank_math/json_ld'",
+      "callback": "'ltdh_seo_compare_schema'",
+      "priority": "99",
+      "args": "2"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 295,
+      "hook": "'rank_math/opengraph/facebook/image'",
+      "callback": "'ltdh_seo_fallback_og_image'",
+      "priority": "10",
+      "args": "1"
+    },
+    {
+      "file": "inc/seo/class-rankmath-integration.php",
+      "line": 296,
+      "hook": "'rank_math/opengraph/twitter/image'",
+      "callback": "'ltdh_seo_fallback_og_image'",
+      "priority": "10",
+      "args": "1"
+    }
+  ],
+  "actions_fired": [],
+  "filters_applied": [
+    {
+      "file": "archive-program.php",
+      "line": 127,
+      "hook": "'pre_get_posts_args_ltdh'"
+    },
+    {
+      "file": "functions.php",
+      "line": 139,
+      "hook": "'pre_get_posts_args_ltdh'"
+    },
+    {
+      "file": "taxonomy-training_type.php",
+      "line": 127,
+      "hook": "'pre_get_posts_args_ltdh'"
+    },
+    {
+      "file": "tests/run-tests.php",
+      "line": 128,
+      "hook": "'pre_get_posts_args_ltdh'"
+    }
+  ]
+}

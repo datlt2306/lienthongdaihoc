@@ -88,12 +88,53 @@
                 "media_upload": 1
             },
             {
-                "key": "field_school_support_services",
-                "label": "Dịch vụ hỗ trợ",
-                "name": "support_services",
-                "type": "wysiwyg",
-                "toolbar": "full",
-                "media_upload": 1
+                "key": "field_school_crm_provider",
+                "label": "Kênh đẩy CRM tuyển sinh",
+                "name": "crm_provider",
+                "type": "select",
+                "instructions": "Chọn hệ thống CRM đối tác nhận lead cho trường này",
+                "choices": {
+                    "default": "Kế thừa mặc định hệ thống",
+                    "internal": "Chỉ lưu nội bộ & Telegram (Không gửi CRM ngoài)",
+                    "onschool": "OnSchool API",
+                    "aum": "AUM CRM API",
+                    "erpnext": "ERPNext Webhook",
+                    "custom_webhook": "Custom Webhook JSON"
+                },
+                "default_value": "default",
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 1,
+                "ajax": 0
+            },
+            {
+                "key": "field_school_crm_endpoint",
+                "label": "API Endpoint CRM riêng (Tùy chọn)",
+                "name": "crm_endpoint",
+                "type": "text",
+                "instructions": "Để trống nếu sử dụng Endpoint chung của hệ thống",
+                "placeholder": "https://api.partner.edu.vn/lead"
+            },
+            {
+                "key": "field_school_crm_token",
+                "label": "API Token / Key riêng (Tùy chọn)",
+                "name": "crm_token",
+                "type": "text",
+                "instructions": "Bearer Token hoặc API Key riêng của trường"
+            },
+            {
+                "key": "field_school_telegram_bot_token",
+                "label": "Telegram Bot Token riêng của trường (Tùy chọn)",
+                "name": "school_telegram_bot_token",
+                "type": "text",
+                "instructions": "Để trống nếu dùng Bot mặc định của hệ thống"
+            },
+            {
+                "key": "field_school_telegram_chat_id",
+                "label": "Telegram Chat ID tuyển sinh của trường (Tùy chọn)",
+                "name": "school_telegram_chat_id",
+                "type": "text",
+                "instructions": "Chat ID kênh/nhóm tư vấn viên tuyển sinh riêng của trường này"
             }
         ],
         "location": [

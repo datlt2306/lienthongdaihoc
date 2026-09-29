@@ -77,8 +77,8 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 						$prog_count = ltdh_get_school_unique_majors_count( $school_id );
 
-						$school_types = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => 'names' ] );
-						$systems_label = ( ! is_wp_error( $school_types ) && ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
+						$school_types = ltdh_get_school_training_types( $school_id );
+						$systems_label = ( ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
 						
 						$address = get_field( 'address', $school_id ) ?: 'Việt Nam';
 						$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
@@ -196,8 +196,8 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 						$prog_count = ltdh_get_school_unique_majors_count( $school_id );
 
-						$school_types = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => 'names' ] );
-						$systems_label = ( ! is_wp_error( $school_types ) && ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
+						$school_types = ltdh_get_school_training_types( $school_id );
+						$systems_label = ( ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
 
 						$grid_span_class = '';
 						if ( $non_featured_count % 2 !== 0 && $regular_index === $non_featured_count - 1 ) {
@@ -263,10 +263,12 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 						$prog_count = ltdh_get_school_unique_majors_count( $school_id );
 						$offered_program_ids = get_posts( [
-							'post_type'   => 'program',
-							'numberposts' => -1,
-							'fields'      => 'ids',
-							'meta_query'  => [
+							'post_type'      => 'program',
+							'posts_per_page' => 5,
+							'post_status'    => 'publish',
+							'fields'         => 'ids',
+							'no_found_rows'  => true,
+							'meta_query'     => [
 								[
 									'key'     => 'school_relationship',
 									'value'   => $school_id,
@@ -277,8 +279,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 						$prog_tags = [];
 						if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
-							$tag_ids = array_slice( $offered_program_ids, 0, 5 );
-							foreach ( $tag_ids as $tid ) {
+							foreach ( $offered_program_ids as $tid ) {
 								$title = get_the_title( $tid );
 								if ( $title ) {
 									$prog_tags[] = [
@@ -292,19 +293,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
 						$region = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
 
-						$training_modes = [];
-						if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
-							foreach ( $offered_program_ids as $pid ) {
-								$terms = wp_get_post_terms( $pid, LTDH_TAX_TRAINING_TYPE );
-								if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-									foreach ( $terms as $term ) {
-										if ( ! in_array( $term->name, $training_modes ) ) {
-											$training_modes[] = $term->name;
-										}
-									}
-								}
-							}
-						}
+						$training_modes = ltdh_get_school_training_types( $school_id );
 				?>
 				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
 					<div class="flex flex-col sm:flex-row items-stretch">

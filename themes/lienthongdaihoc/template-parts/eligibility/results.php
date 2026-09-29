@@ -4,9 +4,9 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// Years range for Advanced Verification
+// Years range for Advanced Verification (Graduation year: current down to 25 years ago)
 $current_year = (int) date( 'Y' );
-$years = range( $current_year - 18, $current_year - 70 );
+$years = range( $current_year, $current_year - 25 );
 ?>
 
 <!-- Summary Header -->
@@ -75,6 +75,11 @@ $years = range( $current_year - 18, $current_year - 70 );
 			<input type="email" name="cf_email" id="elig-lead-email" class="elig-input" placeholder="Ví dụ: name@example.com">
 		</div>
 
+		<div class="flex items-start gap-2 pt-1 text-xs text-slate-500">
+			<input type="checkbox" name="consent_data" id="elig-consent-data" checked required class="mt-0.5 rounded border-slate-300 text-brand-primary focus:ring-brand-primary">
+			<label for="elig-consent-data">Tôi đồng ý cho phép xử lý dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP để nhận thông tin tư vấn tuyển sinh.</label>
+		</div>
+
 		<button type="submit" id="elig-lead-submit-btn" class="elig-btn elig-btn-primary elig-btn-full w-full py-3.5 text-sm font-bold flex justify-center items-center gap-2">
 			<span>GỬI YÊU CẦU KIỂM TRA HỒ SƠ</span>
 		</button>
@@ -96,15 +101,15 @@ $years = range( $current_year - 18, $current_year - 70 );
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<!-- Trường học trước đây -->
 				<div class="space-y-2">
-					<label class="block text-sm font-bold text-slate-700">Trường học trước đây (THPT / Cao đẳng / Đại học cũ)</label>
-					<input type="text" name="previous_school" class="elig-input" placeholder="Ví dụ: Cao đẳng Kinh tế, THPT Chu Văn An...">
+					<label class="block text-sm font-bold text-slate-700">Trường đã học / tốt nghiệp trước đây</label>
+					<input type="text" name="previous_school" class="elig-input" placeholder="Ví dụ: THPT Lê Quý Đôn, CĐ Kinh Tế, ĐH Bách Khoa...">
 				</div>
 
-				<!-- Năm sinh / Năm tốt nghiệp -->
+				<!-- Năm tốt nghiệp -->
 				<div class="space-y-2">
-					<label class="block text-sm font-bold text-slate-700">Năm sinh</label>
+					<label class="block text-sm font-bold text-slate-700">Năm tốt nghiệp</label>
 					<select name="graduation" class="elig-select">
-						<option value="">-- Chọn năm sinh --</option>
+						<option value="">-- Chọn năm tốt nghiệp --</option>
 						<?php foreach ( $years as $y ) : ?>
 							<option value="<?php echo esc_attr( $y ); ?>"><?php echo esc_html( $y ); ?></option>
 						<?php endforeach; ?>

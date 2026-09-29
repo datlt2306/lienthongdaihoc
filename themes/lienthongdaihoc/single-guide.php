@@ -59,6 +59,10 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 						?>
 							<form action="#" method="POST" class="space-y-4">
 								<input type="hidden" name="referral_source" value="<?php echo esc_attr( get_permalink() ); ?>">
+								<div class="hidden" style="display:none !important;" aria-hidden="true">
+									<label for="hp_website_guide">Website</label>
+									<input type="text" name="hp_website" id="hp_website_guide" tabindex="-1" autocomplete="off" value="">
+								</div>
 
 								<div>
 									<label class="block text-sm font-semibold text-slate-600 mb-1">Họ và tên *</label>

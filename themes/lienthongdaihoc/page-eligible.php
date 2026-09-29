@@ -17,8 +17,8 @@ get_header();
 		<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-accent/20 rounded-full blur-3xl"></div>
 		
 		<div class="relative max-w-4xl mx-auto px-4 text-center z-10 space-y-2 animate-fade-in">
-			<h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight leading-tight">KIỂM TRA ĐIỀU KIỆN TUYỂN SINH</h1>
-			<p class="text-blue-100 text-sm md:text-base font-semibold max-w-md mx-auto">Chỉ với 60 giây trả lời câu hỏi để tìm đúng lộ trình và trường học phù hợp nhất cho bạn.</p>
+			<h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight leading-tight">KIỂM TRA ĐIỀU KIỆN LIÊN THÔNG ĐẠI HỌC</h1>
+			<p class="text-blue-100 text-sm md:text-base font-semibold max-w-md mx-auto">Chỉ với 60 giây trả lời câu hỏi để tìm đúng lộ trình liên thông từ Cao đẳng lên Đại học phù hợp nhất cho bạn.</p>
 		</div>
 	</section>
 

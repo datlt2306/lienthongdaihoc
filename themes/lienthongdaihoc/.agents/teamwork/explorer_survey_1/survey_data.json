@@ -1,0 +1,1509 @@
+[
+  {
+    "file": "404.php",
+    "line_count": 36,
+    "size_bytes": 1436,
+    "purpose": "404 Page Template",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/404.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "archive-major.php",
+    "line_count": 173,
+    "size_bytes": 9818,
+    "purpose": "Archive Major Directory Template",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/archive-major.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "archive-program.php",
+    "line_count": 540,
+    "size_bytes": 26515,
+    "purpose": "Archive Program Template (with Sidebar + 3-Column Grid)",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/archive-program.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [
+      "pre_get_posts_args_ltdh"
+    ],
+    "php8_issues": [
+      {
+        "line": 79,
+        "type": "WP Core Deprecation Risk",
+        "code": "$school_post = get_page_by_path( $selected_school, OBJECT, 'school' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 94,
+        "type": "WP Core Deprecation Risk",
+        "code": "$major_post = get_page_by_path( $selected_nhom, OBJECT, 'major' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 381,
+        "type": "Null Safety / String Function",
+        "code": "$type_name_lower = mb_strtolower( trim( $type_name ), 'UTF-8' );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 382,
+        "type": "Null Safety / String Function",
+        "code": "if ( false !== strpos( $type_name_lower, 'chính quy' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 384,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 386,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      }
+    ]
+  },
+  {
+    "file": "archive-school.php",
+    "line_count": 385,
+    "size_bytes": 18387,
+    "purpose": "Archive School Directory Template — List/Card Toggle",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/archive-school.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "footer.php",
+    "line_count": 227,
+    "size_bytes": 14210,
+    "purpose": "Theme footer template",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/footer.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "front-page.php",
+    "line_count": 988,
+    "size_bytes": 46746,
+    "purpose": "Main index template (Homepage fully optimized to match Mockup UI/UX)",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/front-page.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "functions.php",
+    "line_count": 212,
+    "size_bytes": 9050,
+    "purpose": "Theme functions and definitions — Bootstrap file.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/functions.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [
+      [
+        "ai1wm_exclude_content_from_export",
+        "function ( $exclude_filters",
+        8845
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [
+      "pre_get_posts_args_ltdh"
+    ],
+    "php8_issues": [
+      {
+        "line": 103,
+        "type": "WP Core Deprecation Risk",
+        "code": "$school_post = get_page_by_path( $selected_school, OBJECT, LTDH_CPT_SCHOOL );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 117,
+        "type": "WP Core Deprecation Risk",
+        "code": "$major_post = get_page_by_path( $selected_major, OBJECT, LTDH_CPT_MAJOR );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      }
+    ]
+  },
+  {
+    "file": "header.php",
+    "line_count": 147,
+    "size_bytes": 6796,
+    "purpose": "Site header template & head tags",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/header.php",
+    "has_abspath": false,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "inc/acf-fields.php",
+    "line_count": 110,
+    "size_bytes": 3662,
+    "purpose": "ACF Field Groups — loaded from theme JSON.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/acf-fields.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "acf/init",
+        "'ltdh_load_acf_field_groups_from_json'",
+        134
+      ]
+    ],
+    "filters_registered": [
+      [
+        "acf/load_field/key=field_program_tuition",
+        "'ltdh_override_field_program_tuition_label'",
+        1957
+      ],
+      [
+        "acf/load_field/key=field_program_duration",
+        "'ltdh_override_field_program_duration_label'",
+        2179
+      ],
+      [
+        "acf/load_field/key=field_program_period",
+        "'ltdh_override_field_program_period_label'",
+        2403
+      ],
+      [
+        "acf/load_field/key=field_program_benefits",
+        "'ltdh_override_field_program_benefits_label'",
+        2617
+      ],
+      [
+        "acf/load_field/key=field_program_faq",
+        "'ltdh_override_field_program_faq_label'",
+        2845
+      ],
+      [
+        "acf/prepare_field/key=field_program_why_choose",
+        "'__return_false'",
+        3124
+      ],
+      [
+        "acf/prepare_field/key=field_program_schedule",
+        "'__return_false'",
+        3206
+      ],
+      [
+        "acf/prepare_field/key=field_program_target_students",
+        "'__return_false'",
+        3286
+      ],
+      [
+        "acf/prepare_field/key=field_program_degree_type",
+        "'__return_false'",
+        3373
+      ],
+      [
+        "acf/prepare_field/key=field_program_diploma_value",
+        "'__return_false'",
+        3456
+      ],
+      [
+        "acf/prepare_field/key=field_program_disadvantages",
+        "'__return_false'",
+        3541
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line_count": 1115,
+    "size_bytes": 56729,
+    "purpose": "Custom WP-CLI Commands",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/cli-commands.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 42,
+        "type": "WP Core Deprecation Risk",
+        "code": "$page = get_page_by_path( $slug );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 225,
+        "type": "WP Core Deprecation Risk",
+        "code": "$school = get_page_by_path( sanitize_title( $title ), OBJECT, 'school' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 323,
+        "type": "Null Safety / String Function",
+        "code": "$m_name = trim( $m_name );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 329,
+        "type": "WP Core Deprecation Risk",
+        "code": "$major = get_page_by_path( sanitize_title( $m_name ), OBJECT, 'major' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 530,
+        "type": "WP Core Deprecation Risk",
+        "code": "$existing = get_page_by_path( sanitize_title( $g['title'] ), OBJECT, 'post' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 674,
+        "type": "WP Core Deprecation Risk",
+        "code": "$school = get_page_by_path( $school_slug, OBJECT, 'school' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 710,
+        "type": "WP Core Deprecation Risk",
+        "code": "$major = get_page_by_path( $major_slug, OBJECT, LTDH_CPT_MAJOR );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 1061,
+        "type": "WP Core Deprecation Risk",
+        "code": "$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 1078,
+        "type": "WP Core Deprecation Risk",
+        "code": "$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 1095,
+        "type": "WP Core Deprecation Risk",
+        "code": "$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      }
+    ]
+  },
+  {
+    "file": "inc/comparison.php",
+    "line_count": 660,
+    "size_bytes": 19373,
+    "purpose": "Comparison System — Core Engine",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/comparison.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "init",
+        "'ltdh_compare_register_rewrite_rules'",
+        391
+      ],
+      [
+        "template_redirect",
+        "'ltdh_compare_template_redirect'",
+        516
+      ],
+      [
+        "rest_api_init",
+        "'ltdh_compare_register_rest_routes'",
+        14322
+      ],
+      [
+        "wp_ajax_ltdh_compare_add",
+        "'ltdh_compare_ajax_add'",
+        16187
+      ],
+      [
+        "wp_ajax_ltdh_compare_remove",
+        "'ltdh_compare_ajax_remove'",
+        16254
+      ],
+      [
+        "wp_ajax_nopriv_ltdh_compare_add",
+        "'ltdh_compare_ajax_add'",
+        16327
+      ],
+      [
+        "wp_ajax_nopriv_ltdh_compare_remove",
+        "'ltdh_compare_ajax_remove'",
+        16401
+      ]
+    ],
+    "filters_registered": [
+      [
+        "query_vars",
+        "'ltdh_compare_register_query_vars'",
+        452
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 88,
+        "type": "Null Safety / String Function",
+        "code": "$part = sanitize_text_field( trim( $part ) );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 110,
+        "type": "WP Core Deprecation Risk",
+        "code": "$post = get_page_by_path( $part, OBJECT, $post_type );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 268,
+        "type": "Null Safety / String Function",
+        "code": "$clean = trim( $clean );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      }
+    ]
+  },
+  {
+    "file": "inc/config/class-defaults.php",
+    "line_count": 122,
+    "size_bytes": 5627,
+    "purpose": "Default Values — Centralized fallbacks for all configurable data.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/config/class-defaults.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "inc/config/constants.php",
+    "line_count": 84,
+    "size_bytes": 2846,
+    "purpose": "Theme Constants — Single source of truth for keys, slugs, and identifiers.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/config/constants.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "inc/core/class-helpers.php",
+    "line_count": 740,
+    "size_bytes": 25002,
+    "purpose": "Helper Functions — Logo, breadcrumb, thumbnails, contact info, form shortcodes.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/core/class-helpers.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "save_post",
+        "'ltdh_clear_transients_on_save'",
+        17087
+      ]
+    ],
+    "filters_registered": [
+      [
+        "wpcf7_form_tag",
+        "'ltdh_cf7_dynamic_programs'",
+        19907
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 330,
+        "type": "Null Safety / String Function",
+        "code": "if ( empty( trim( $html ) ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 661,
+        "type": "Null Safety / String Function",
+        "code": "$type_name_lower = mb_strtolower( trim( $type_name ), 'UTF-8' );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 662,
+        "type": "Null Safety / String Function",
+        "code": "if ( false !== strpos( $type_name_lower, 'chính quy' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 664,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 666,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      }
+    ]
+  },
+  {
+    "file": "inc/core/class-menus.php",
+    "line_count": 329,
+    "size_bytes": 10159,
+    "purpose": "Navigation Menu Helpers and Filters.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/core/class-menus.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [
+      [
+        "wp_nav_menu_objects",
+        "'ltdh_menu_add_active_classes'",
+        3237
+      ],
+      [
+        "wp_nav_menu_objects",
+        "'ltdh_dynamic_menu_submenu_injection'",
+        7593
+      ],
+      [
+        "nav_menu_css_class",
+        "'ltdh_highlight_menu_parameters'",
+        9124
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 45,
+        "type": "Null Safety / String Function",
+        "code": "if ($current_path === $item_path || strpos($current_path, $item_path) === 0) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 107,
+        "type": "Null Safety / String Function",
+        "code": "if ($item_url && $current_url !== '/' && strpos($current_url, $item_url) === 0) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 321,
+        "type": "WP Core Deprecation Risk",
+        "code": "$post = get_page_by_path($slug, OBJECT, LTDH_CPT_MAJOR);",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      }
+    ]
+  },
+  {
+    "file": "inc/core/class-query-filters.php",
+    "line_count": 58,
+    "size_bytes": 1606,
+    "purpose": "Query Filters — Customize main queries for archives and search.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/core/class-query-filters.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "pre_get_posts",
+        "'ltdh_customize_archive_queries'",
+        1539
+      ]
+    ],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 40,
+        "type": "Undefined Array Key Risk",
+        "code": "'terms'    => sanitize_text_field( $_GET['nhom_nganh'] ),",
+        "note": "Unchecked direct access $_GET['nhom_nganh'] without ?? or isset() in PHP 8.0+ causes E_WARNING"
+      }
+    ]
+  },
+  {
+    "file": "inc/core/class-rewrite-rules.php",
+    "line_count": 183,
+    "size_bytes": 6139,
+    "purpose": "Rewrite Rules — Custom URL routing for training types, programs, and comparison.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/core/class-rewrite-rules.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "init",
+        "'ltdh_register_training_type_rewrite'",
+        931
+      ],
+      [
+        "init",
+        "'ltdh_register_program_rewrite'",
+        1771
+      ],
+      [
+        "template_redirect",
+        "'ltdh_redirect_taxonomy_base'",
+        5279
+      ]
+    ],
+    "filters_registered": [
+      [
+        "request",
+        "'ltdh_program_request_guard'",
+        3410
+      ],
+      [
+        "post_type_link",
+        "'ltdh_program_permalink'",
+        3850
+      ],
+      [
+        "template_include",
+        "'ltdh_template_include_program'",
+        4325
+      ],
+      [
+        "template_include",
+        "'ltdh_template_include_he_dao_tao'",
+        6055
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "inc/core/class-theme-setup.php",
+    "line_count": 160,
+    "size_bytes": 5207,
+    "purpose": "Theme Setup — Supports, menus, asset enqueuing, and core initializations.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/core/class-theme-setup.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "after_setup_theme",
+        "'ltdh_theme_setup'",
+        844
+      ],
+      [
+        "wp_enqueue_scripts",
+        "'ltdh_enqueue_assets'",
+        2780
+      ],
+      [
+        "wp_footer",
+        "'ltdh_compare_output_tray'",
+        3601
+      ],
+      [
+        "after_switch_theme",
+        "'ltdh_flush_rewrite_rules_on_switch'",
+        4373
+      ],
+      [
+        "init",
+        "function(",
+        4796
+      ]
+    ],
+    "filters_registered": [
+      [
+        "upload_mimes",
+        "'ltdh_enable_webp_upload'",
+        3791
+      ],
+      [
+        "wp_check_filetype_and_ext",
+        "'ltdh_allow_webp_upload_check'",
+        4112
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 94,
+        "type": "Null Safety / String Function",
+        "code": "if ( strpos( $request_uri, '/he-dao-tao' ) !== false || strpos( $request_uri, '/so-sanh' ) !== false ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      }
+    ]
+  },
+  {
+    "file": "inc/crm-adapters.php",
+    "line_count": 253,
+    "size_bytes": 7250,
+    "purpose": "CRM Integration Sync Queue and Adapters",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/crm-adapters.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "admin_init",
+        "'ltdh_schedule_crm_sync'",
+        498
+      ],
+      [
+        "switch_theme",
+        "'ltdh_clear_crm_sync_schedule'",
+        766
+      ],
+      [
+        "ltdh_cron_sync_leads",
+        "'ltdh_process_lead_queue'",
+        925
+      ]
+    ],
+    "filters_registered": [
+      [
+        "cron_schedules",
+        "'ltdh_add_cron_intervals'",
+        260
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "inc/eligibility-rules.php",
+    "line_count": 160,
+    "size_bytes": 5498,
+    "purpose": "Eligibility Checker — Rule Definitions",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/eligibility-rules.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "inc/eligibility.php",
+    "line_count": 1668,
+    "size_bytes": 65535,
+    "purpose": "Eligibility Checker — Core Engine",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/eligibility.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "after_switch_theme",
+        "'ltdh_elig_create_table'",
+        1706
+      ],
+      [
+        "after_switch_theme",
+        "'ltdh_elig_ensure_page'",
+        1768
+      ],
+      [
+        "init",
+        "function(",
+        1891
+      ],
+      [
+        "wp_enqueue_scripts",
+        "'ltdh_elig_enqueue_assets'",
+        5220
+      ],
+      [
+        "wp_ajax_ltdh_elig_check",
+        "'ltdh_elig_ajax_check'",
+        5437
+      ],
+      [
+        "wp_ajax_nopriv_ltdh_elig_check",
+        "'ltdh_elig_ajax_check'",
+        5502
+      ],
+      [
+        "wp_ajax_ltdh_elig_lead",
+        "'ltdh_elig_ajax_lead'",
+        5575
+      ],
+      [
+        "wp_ajax_nopriv_ltdh_elig_lead",
+        "'ltdh_elig_ajax_lead'",
+        5638
+      ],
+      [
+        "wp_ajax_ltdh_elig_advanced_verify",
+        "'ltdh_elig_ajax_advanced_verify'",
+        29107
+      ],
+      [
+        "wp_ajax_nopriv_ltdh_elig_advanced_verify",
+        "'ltdh_elig_ajax_advanced_verify'",
+        29192
+      ],
+      [
+        "rest_api_init",
+        "function(",
+        32535
+      ],
+      [
+        "manage_program_posts_custom_column",
+        "function( $column",
+        35007
+      ],
+      [
+        "admin_menu",
+        "'ltdh_elig_register_admin_menu'",
+        36455
+      ]
+    ],
+    "filters_registered": [
+      [
+        "theme_page_templates",
+        "'ltdh_elig_register_page_template'",
+        3087
+      ],
+      [
+        "template_include",
+        "'ltdh_elig_template_redirect'",
+        3524
+      ],
+      [
+        "manage_edit-program_columns",
+        "function( $columns",
+        34875
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 75,
+        "type": "WP Core Deprecation Risk",
+        "code": "$page = get_page_by_path( $slug );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 569,
+        "type": "Null Safety / String Function",
+        "code": "$str = trim( $str );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 858,
+        "type": "Null Safety / String Function",
+        "code": "$ref_source .= (strpos($ref_source, '?') !== false ? '&' : '?') . 'previous_school=' . urlencode( $previous_school );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 861,
+        "type": "Null Safety / String Function",
+        "code": "$ref_source .= (strpos($ref_source, '?') !== false ? '&' : '?') . 'birth_year=' . $graduation;",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 864,
+        "type": "Null Safety / String Function",
+        "code": "$ref_source .= (strpos($ref_source, '?') !== false ? '&' : '?') . 'degree_link=' . urlencode( $degree_link );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 1068,
+        "type": "Undefined Array Key Risk",
+        "code": "$wpdb->delete( $table, [ 'id' => intval( $_GET['lead_id'] ) ] );",
+        "note": "Unchecked direct access $_GET['lead_id'] without ?? or isset() in PHP 8.0+ causes E_WARNING"
+      },
+      {
+        "line": 1080,
+        "type": "Undefined Array Key Risk",
+        "code": "$lead_ids = array_map( 'intval', $_POST['lead_ids'] );",
+        "note": "Unchecked direct access $_POST['lead_ids'] without ?? or isset() in PHP 8.0+ causes E_WARNING"
+      },
+      {
+        "line": 1385,
+        "type": "Undefined Array Key Risk",
+        "code": "$check_ids = array_map( 'intval', $_POST['check_ids'] );",
+        "note": "Unchecked direct access $_POST['check_ids'] without ?? or isset() in PHP 8.0+ causes E_WARNING"
+      }
+    ]
+  },
+  {
+    "file": "inc/lead-capture.php",
+    "line_count": 381,
+    "size_bytes": 13957,
+    "purpose": "Lead Capture Custom DB Table and CF7 Integration",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/lead-capture.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "after_switch_theme",
+        "'ltdh_create_leads_table'",
+        301
+      ],
+      [
+        "wpcf7_before_send_mail",
+        "'ltdh_capture_cf7_lead'",
+        9901
+      ],
+      [
+        "template_redirect",
+        "'ltdh_handle_native_form_submit'",
+        11804
+      ]
+    ],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 71,
+        "type": "Null Safety / String Function",
+        "code": "if ( strlen( $clean_phone ) < 8 || strlen( $clean_phone ) > 15 ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 342,
+        "type": "Undefined Array Key Risk",
+        "code": "$name    = sanitize_text_field( wp_unslash( $_POST['your-name'] ) );",
+        "note": "Unchecked direct access $_POST['your-name'] without ?? or isset() in PHP 8.0+ causes E_WARNING"
+      },
+      {
+        "line": 343,
+        "type": "Undefined Array Key Risk",
+        "code": "$phone   = sanitize_text_field( wp_unslash( $_POST['your-phone'] ) );",
+        "note": "Unchecked direct access $_POST['your-phone'] without ?? or isset() in PHP 8.0+ causes E_WARNING"
+      }
+    ]
+  },
+  {
+    "file": "inc/post-types.php",
+    "line_count": 109,
+    "size_bytes": 4832,
+    "purpose": "Custom Post Types & Taxonomies Handler",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/post-types.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "init",
+        "'ltdh_register_post_types_and_taxonomies_from_json'",
+        243
+      ]
+    ],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "inc/relationship-hooks.php",
+    "line_count": 74,
+    "size_bytes": 2409,
+    "purpose": "Bi-directional relationship hooks for Schools, Majors, and Programs",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/relationship-hooks.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "acf/save_post",
+        "'ltdh_sync_program_relationships'",
+        159
+      ]
+    ],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "inc/search-engine.php",
+    "line_count": 152,
+    "size_bytes": 3805,
+    "purpose": "Program Search Engine Filters and Logic",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/search-engine.php",
+    "has_abspath": false,
+    "actions_registered": [],
+    "filters_registered": [
+      [
+        "pre_get_posts_args_ltdh",
+        "'ltdh_filter_program_search_query'",
+        83
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 138,
+        "type": "Null Safety / String Function",
+        "code": "$s_lower = mb_strtolower( trim( $s ), 'UTF-8' );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      }
+    ]
+  },
+  {
+    "file": "inc/seo/class-rankmath-integration.php",
+    "line_count": 339,
+    "size_bytes": 10964,
+    "purpose": "Rank Math SEO Integration — Dynamic titles, descriptions, schema, and breadcrumbs.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/seo/class-rankmath-integration.php",
+    "has_abspath": true,
+    "actions_registered": [
+      [
+        "wp_head",
+        "function(",
+        9901
+      ]
+    ],
+    "filters_registered": [
+      [
+        "rank_math/frontend/title",
+        "'ltdh_seo_dynamic_title'",
+        934
+      ],
+      [
+        "rank_math/frontend/description",
+        "'ltdh_seo_dynamic_description'",
+        2032
+      ],
+      [
+        "rank_math/json_ld",
+        "'ltdh_seo_inject_custom_schema'",
+        3993
+      ],
+      [
+        "rank_math/frontend/breadcrumb/items",
+        "'ltdh_seo_override_breadcrumb_items'",
+        6566
+      ],
+      [
+        "rank_math/frontend/title",
+        "'ltdh_seo_compare_title'",
+        7348
+      ],
+      [
+        "rank_math/frontend/description",
+        "'ltdh_seo_compare_description'",
+        7894
+      ],
+      [
+        "rank_math/json_ld",
+        "'ltdh_seo_compare_schema'",
+        9009
+      ],
+      [
+        "rank_math/opengraph/facebook/image",
+        "'ltdh_seo_fallback_og_image'",
+        9275
+      ],
+      [
+        "rank_math/opengraph/twitter/image",
+        "'ltdh_seo_fallback_og_image'",
+        9357
+      ]
+    ],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "index.php",
+    "line_count": 369,
+    "size_bytes": 17609,
+    "purpose": "Blog Archive Template - Tin tức tuyển sinh",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/index.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "page-about.php",
+    "line_count": 77,
+    "size_bytes": 3616,
+    "purpose": "Template Name: Giới thiệu",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/page-about.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "page-compare-program.php",
+    "line_count": 117,
+    "size_bytes": 4515,
+    "purpose": "Program Comparison Page Template",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/page-compare-program.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "page-contact.php",
+    "line_count": 105,
+    "size_bytes": 4376,
+    "purpose": "Template Name: Liên hệ",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/page-contact.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "page-eligible.php",
+    "line_count": 44,
+    "size_bytes": 1624,
+    "purpose": "Template Name: Kiểm tra điều kiện",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/page-eligible.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "page-faq.php",
+    "line_count": 57,
+    "size_bytes": 3572,
+    "purpose": "Template Name: Câu hỏi thường gặp",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/page-faq.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "page-register.php",
+    "line_count": 35,
+    "size_bytes": 867,
+    "purpose": "Template Name: Đăng ký tư vấn",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/page-register.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "page.php",
+    "line_count": 41,
+    "size_bytes": 938,
+    "purpose": "Default Page Template - Fallback template for WordPress pages that don't have",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/page.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "single-guide.php",
+    "line_count": 97,
+    "size_bytes": 4348,
+    "purpose": "Single Guide Template",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/single-guide.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "single-major.php",
+    "line_count": 498,
+    "size_bytes": 22910,
+    "purpose": "Single Major Template",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/single-major.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 230,
+        "type": "Null Safety / String Function",
+        "code": "$type_name_lower = mb_strtolower( trim( $type_name ), 'UTF-8' );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 231,
+        "type": "Null Safety / String Function",
+        "code": "if ( false !== strpos( $type_name_lower, 'chính quy' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 233,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 235,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      }
+    ]
+  },
+  {
+    "file": "single-program.php",
+    "line_count": 1077,
+    "size_bytes": 61687,
+    "purpose": "Single Program Template",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/single-program.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 43,
+        "type": "Null Safety / String Function",
+        "code": "if ( strpos( $mime, 'image' ) !== false ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 45,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( strpos( $mime, 'pdf' ) !== false ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 60,
+        "type": "Null Safety / String Function",
+        "code": "if ( strpos( $mime, 'image' ) !== false || in_array( $type, array( 'image', 'png', 'jpg', 'jpeg', 'webp' ), true ) || in_array( $subtype, array( 'png', 'jpg', 'jpeg', 'webp' ), true ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 62,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( strpos( $mime, 'pdf' ) !== false || $subtype === 'pdf' || strtolower( pathinfo( $curriculum_url, PATHINFO_EXTENSION ) ) === 'pdf' ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 264,
+        "type": "Null Safety / String Function",
+        "code": "$v_clean = trim( $v );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 352,
+        "type": "Null Safety / String Function",
+        "code": "$v_clean = trim( $v );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 481,
+        "type": "Null Safety / String Function",
+        "code": "<?php if ( strpos( strtolower($requirements), 'thi tuyển 3 môn' ) !== false || strpos( strtolower($requirements), 'thi tuyển' ) !== false ) : ?>",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 637,
+        "type": "Null Safety / String Function",
+        "code": "if ( strpos( $school_slug, 'giao-thong-van-tai' ) !== false ) :",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      }
+    ]
+  },
+  {
+    "file": "single-school.php",
+    "line_count": 682,
+    "size_bytes": 30340,
+    "purpose": "Single School Template",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/single-school.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": [
+      {
+        "line": 408,
+        "type": "Null Safety / String Function",
+        "code": "$type_name_lower = mb_strtolower( trim( $type_name ), 'UTF-8' );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 409,
+        "type": "Null Safety / String Function",
+        "code": "if ( false !== strpos( $type_name_lower, 'chính quy' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 411,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 413,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      }
+    ]
+  },
+  {
+    "file": "single.php",
+    "line_count": 273,
+    "size_bytes": 13124,
+    "purpose": "Single Post Template - Chi tiết bài viết",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/single.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "taxonomy-training_type.php",
+    "line_count": 537,
+    "size_bytes": 26392,
+    "purpose": "Taxonomy Training Type Archive Template (handles /he-dao-tao/)",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/taxonomy-training_type.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [
+      "pre_get_posts_args_ltdh"
+    ],
+    "php8_issues": [
+      {
+        "line": 79,
+        "type": "WP Core Deprecation Risk",
+        "code": "$school_post = get_page_by_path( $selected_school, OBJECT, 'school' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 94,
+        "type": "WP Core Deprecation Risk",
+        "code": "$major_post = get_page_by_path( $selected_nhom, OBJECT, 'major' );",
+        "note": "get_page_by_path() is discouraged/deprecated in WP 6.2+, WP_Query or get_posts() should be used"
+      },
+      {
+        "line": 379,
+        "type": "Null Safety / String Function",
+        "code": "$type_name_lower = mb_strtolower( trim( $type_name ), 'UTF-8' );",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 380,
+        "type": "Null Safety / String Function",
+        "code": "if ( false !== strpos( $type_name_lower, 'chính quy' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 382,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      },
+      {
+        "line": 384,
+        "type": "Null Safety / String Function",
+        "code": "} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {",
+        "note": "Possible null passed to string function in PHP 8.1+ (causes Deprecation notice or TypeError if null)"
+      }
+    ]
+  },
+  {
+    "file": "taxonomy.php",
+    "line_count": 237,
+    "size_bytes": 13500,
+    "purpose": "Taxonomy Archive Template (Handles Training Types, Campuses, and Regions)",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/taxonomy.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "template-parts/banner.php",
+    "line_count": 150,
+    "size_bytes": 7228,
+    "purpose": "Reusable Banner Partial - Usage: get_template_part( 'template-parts/banner' );",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/template-parts/banner.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "template-parts/compare/cta-bar.php",
+    "line_count": 57,
+    "size_bytes": 2794,
+    "purpose": "Comparison CTA Bar — shown on all comparison pages.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/template-parts/compare/cta-bar.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "template-parts/compare/program-cards.php",
+    "line_count": 136,
+    "size_bytes": 6593,
+    "purpose": "Program Comparison — Mobile Stacked Cards View",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/template-parts/compare/program-cards.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "template-parts/compare/program-table.php",
+    "line_count": 199,
+    "size_bytes": 7916,
+    "purpose": "Program Comparison — Desktop Table View",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/template-parts/compare/program-table.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "template-parts/compare/tray.php",
+    "line_count": 34,
+    "size_bytes": 1512,
+    "purpose": "Floating Compare Tray — appears on listing and detail pages.",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/template-parts/compare/tray.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "template-parts/eligibility/results.php",
+    "line_count": 168,
+    "size_bytes": 9290,
+    "purpose": "Eligibility Checker — Results Display (Progressive Flow)",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/template-parts/eligibility/results.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "template-parts/eligibility/wizard.php",
+    "line_count": 121,
+    "size_bytes": 6134,
+    "purpose": "Eligibility Checker — Unified Single-Page Form (Quick Check Only)",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/template-parts/eligibility/wizard.php",
+    "has_abspath": true,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [],
+    "php8_issues": []
+  },
+  {
+    "file": "tests/run-tests.php",
+    "line_count": 264,
+    "size_bytes": 9261,
+    "purpose": "Automated Search Test Runner - lienthongdaihoc Theme",
+    "syntax_ok": true,
+    "syntax_msg": "No syntax errors detected in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/tests/run-tests.php",
+    "has_abspath": false,
+    "actions_registered": [],
+    "filters_registered": [],
+    "actions_fired": [],
+    "filters_applied": [
+      "pre_get_posts_args_ltdh"
+    ],
+    "php8_issues": []
+  }
+]

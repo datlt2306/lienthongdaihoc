@@ -15,16 +15,17 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // ----------------------------------------------------
 function ltdh_elig_get_training_type_compatibility() {
 	return [
+		'thpt'         => [ 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
 		'thap-phan'    => [ 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
-		'trung-cap'    => [ 'lien-thong', 'van-bang-2', 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
-		'cao-dang'     => [ 'lien-thong', 'van-bang-2', 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
+		'trung-cap'    => [ 'lien-thong', 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
+		'cao-dang'     => [ 'lien-thong', 'tu-xa', 'van-bang-2', 'vua-hoc-vua-lam', 'chinh-quy' ],
 		'dai-hoc'      => [ 'van-bang-2', 'tu-xa', 'vua-hoc-vua-lam' ],
 		'thac-si'      => [ 'van-bang-2', 'tu-xa' ],
 	];
 
 	/*
 	 * Liên thông: requires same-level or lower degree (Trung cấp/Cao đẳng)
-	 * VB2: requires existing degree (Cao đẳng+)
+	 * VB2: requires existing degree (Cao đẳng/Đại học)
 	 * Từ xa/Vừa học vừa làm: compatible with all levels
 	 * Chính quy: THPT/Trung cấp/Cao đẳng only
 	 */
@@ -72,11 +73,24 @@ function ltdh_elig_get_budget_ranges() {
 // ----------------------------------------------------
 function ltdh_elig_get_education_hierarchy() {
 	return [
+		'thpt'       => 1,
 		'thap-phan'  => 1,
 		'trung-cap'  => 2,
 		'cao-dang'   => 3,
 		'dai-hoc'    => 4,
 		'thac-si'    => 5,
+	];
+}
+
+/**
+ * Danh mục nhóm ngành cấm đào tạo từ xa theo Khoản 3 Điều 5 Thông tư 28/2023/TT-BGDĐT.
+ */
+function ltdh_elig_get_prohibited_distance_learning_categories() {
+	return [
+		// Khối ngành Sức khỏe
+		'y-khoa', 'y-da-khoa', 'duoc-hoc', 'dieu-duong', 'rang-ham-mat', 'y-hoc-co-truyen', 'ky-thuat-xet-nghiem-y-hoc', 'ky-thuat-hinh-anh-y-hoc',
+		// Khối ngành Đào tạo giáo viên (Sư phạm)
+		'su-pham-toan', 'su-pham-van', 'su-pham-tieng-anh', 'giao-duc-mam-non', 'giao-duc-tieu-hoc', 'giao-duc-the-chat'
 	];
 }
 

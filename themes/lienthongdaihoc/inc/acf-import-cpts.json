@@ -172,7 +172,8 @@
         "active": true,
         "taxonomy": "training_type",
         "object_type": [
-            "program"
+            "program",
+            "school"
         ],
         "label": "Hệ đào tạo",
         "singular_label": "Hệ đào tạo",
@@ -211,7 +212,8 @@
         "active": true,
         "taxonomy": "campus",
         "object_type": [
-            "program"
+            "program",
+            "school"
         ],
         "label": "Cơ sở đào tạo",
         "singular_label": "Cơ sở đào tạo",

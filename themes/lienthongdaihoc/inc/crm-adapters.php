@@ -89,7 +89,25 @@ function ltdh_process_lead_queue() {
 // 3. CRM Sync Router & Adapters
 // ----------------------------------------------------
 function ltdh_sync_lead_to_crm( $lead ) {
-	$crm_type = get_field( 'default_crm_type', 'options' );
+	// [CBR-02]: General leads without a designated school are stored locally and notified to master Telegram only.
+	// They must NEVER be dispatched to third-party partner CRMs.
+	if ( empty( $lead->school_id ) ) {
+		return true; // Handled internally
+	}
+
+	$school_id  = intval( $lead->school_id );
+	$school_crm = function_exists( 'get_field' ) ? get_field( 'crm_provider', $school_id ) : '';
+
+	// Determine CRM provider: school override or global default
+	if ( ! empty( $school_crm ) && $school_crm !== 'default' ) {
+		$crm_type = $school_crm;
+		$endpoint = get_field( 'crm_endpoint', $school_id );
+		$token    = get_field( 'crm_token', $school_id );
+	} else {
+		$crm_type = function_exists( 'get_field' ) ? get_field( 'default_crm_type', 'options' ) : '';
+		$endpoint = '';
+		$token    = '';
+	}
 
 	if ( ! $crm_type || $crm_type === 'internal' ) {
 		return true; // No third-party CRM sync needed
@@ -97,7 +115,7 @@ function ltdh_sync_lead_to_crm( $lead ) {
 
 	// Fetch related entity titles for richer payload context
 	$program_name = $lead->program_id ? get_the_title( $lead->program_id ) : 'Không xác định';
-	$school_name  = $lead->school_id ? get_the_title( $lead->school_id ) : 'Không xác định';
+	$school_name  = $school_id ? get_the_title( $school_id ) : 'Không xác định';
 	$major_name   = $lead->major_id ? get_the_title( $lead->major_id ) : 'Không xác định';
 
 	$payload = [
@@ -110,14 +128,17 @@ function ltdh_sync_lead_to_crm( $lead ) {
 		'training_type' => $lead->training_type,
 		'campus'        => $lead->campus,
 		'referrer'      => $lead->referral_source,
+		'message'       => $lead->message ?? '',
 	];
 
 	if ( $crm_type === 'onschool' ) {
-		return ltdh_sync_onschool_adapter( $payload );
+		return ltdh_sync_onschool_adapter( $payload, $endpoint, $token );
 	} elseif ( $crm_type === 'aum' ) {
-		return ltdh_sync_aum_adapter( $payload );
+		return ltdh_sync_aum_adapter( $payload, $endpoint, $token );
 	} elseif ( $crm_type === 'erpnext' ) {
-		return ltdh_sync_erpnext_adapter( $payload );
+		return ltdh_sync_erpnext_adapter( $payload, $endpoint, $token );
+	} elseif ( $crm_type === 'custom_webhook' ) {
+		return ltdh_sync_custom_webhook_adapter( $payload, $endpoint, $token );
 	}
 
 	return new WP_Error( 'invalid_crm', 'Hệ thống CRM cấu hình không hợp lệ.' );
@@ -126,9 +147,13 @@ function ltdh_sync_lead_to_crm( $lead ) {
 /**
  * OnSchool API Adapter
  */
-function ltdh_sync_onschool_adapter( $payload ) {
-	$endpoint = get_field( 'onschool_endpoint', 'options' );
-	$token    = get_field( 'onschool_token', 'options' );
+function ltdh_sync_onschool_adapter( $payload, $endpoint = '', $token = '' ) {
+	if ( empty( $endpoint ) && function_exists( 'get_field' ) ) {
+		$endpoint = get_field( 'onschool_endpoint', 'options' );
+	}
+	if ( empty( $token ) && function_exists( 'get_field' ) ) {
+		$token = get_field( 'onschool_token', 'options' );
+	}
 
 	if ( empty( $endpoint ) ) {
 		return new WP_Error( 'missing_config', 'Thiếu OnSchool API Endpoint.' );
@@ -149,6 +174,7 @@ function ltdh_sync_onschool_adapter( $payload ) {
 			'course_type'  => $payload['training_type'],
 			'site_location'=> $payload['campus'],
 			'source_url'   => $payload['referrer'],
+			'note'         => $payload['message'],
 		] ),
 		'timeout' => 15,
 	] );
@@ -168,9 +194,13 @@ function ltdh_sync_onschool_adapter( $payload ) {
 /**
  * AUM CRM API Adapter
  */
-function ltdh_sync_aum_adapter( $payload ) {
-	$endpoint = get_field( 'aum_endpoint', 'options' );
-	$token    = get_field( 'aum_token', 'options' );
+function ltdh_sync_aum_adapter( $payload, $endpoint = '', $token = '' ) {
+	if ( empty( $endpoint ) && function_exists( 'get_field' ) ) {
+		$endpoint = get_field( 'aum_endpoint', 'options' );
+	}
+	if ( empty( $token ) && function_exists( 'get_field' ) ) {
+		$token = get_field( 'aum_token', 'options' );
+	}
 
 	if ( empty( $endpoint ) ) {
 		return new WP_Error( 'missing_config', 'Thiếu AUM API Endpoint.' );
@@ -192,6 +222,7 @@ function ltdh_sync_aum_adapter( $payload ) {
 			'location'      => $payload['campus'],
 			'utm_source'    => 'lienthongdaihoc.com',
 			'url_referer'   => $payload['referrer'],
+			'note'          => $payload['message'],
 		] ),
 		'timeout' => 15,
 	] );
@@ -209,11 +240,15 @@ function ltdh_sync_aum_adapter( $payload ) {
 }
 
 /**
- * ERPNext Webhook API Adapter (Prepared for future integration)
+ * ERPNext Webhook API Adapter
  */
-function ltdh_sync_erpnext_adapter( $payload ) {
-	$endpoint = get_field( 'erpnext_endpoint', 'options' );
-	$token    = get_field( 'erpnext_token', 'options' ); // Token key:secret format
+function ltdh_sync_erpnext_adapter( $payload, $endpoint = '', $token = '' ) {
+	if ( empty( $endpoint ) && function_exists( 'get_field' ) ) {
+		$endpoint = get_field( 'erpnext_endpoint', 'options' );
+	}
+	if ( empty( $token ) && function_exists( 'get_field' ) ) {
+		$token = get_field( 'erpnext_token', 'options' );
+	}
 
 	if ( empty( $endpoint ) ) {
 		return new WP_Error( 'missing_config', 'Thiếu ERPNext Webhook Endpoint.' );
@@ -236,6 +271,7 @@ function ltdh_sync_erpnext_adapter( $payload ) {
 			'custom_campus'   => $payload['campus'],
 			'source'          => 'lienthongdaihoc.com',
 			'custom_referrer' => $payload['referrer'],
+			'notes'           => $payload['message'],
 		] ),
 		'timeout' => 15,
 	] );
@@ -247,6 +283,38 @@ function ltdh_sync_erpnext_adapter( $payload ) {
 	$code = wp_remote_retrieve_response_code( $response );
 	if ( $code < 200 || $code >= 300 ) {
 		return new WP_Error( 'api_error', 'ERPNext Webhook returned HTTP code ' . $code );
+	}
+
+	return true;
+}
+
+/**
+ * Custom Webhook Adapter
+ */
+function ltdh_sync_custom_webhook_adapter( $payload, $endpoint = '', $token = '' ) {
+	if ( empty( $endpoint ) ) {
+		return new WP_Error( 'missing_config', 'Thiếu Custom Webhook Endpoint.' );
+	}
+
+	$headers = [ 'Content-Type' => 'application/json' ];
+	if ( ! empty( $token ) ) {
+		$headers['Authorization'] = 'Bearer ' . $token;
+		$headers['X-API-Key']     = $token;
+	}
+
+	$response = wp_safe_remote_post( $endpoint, [
+		'headers' => $headers,
+		'body'    => wp_json_encode( $payload ),
+		'timeout' => 15,
+	] );
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$code = wp_remote_retrieve_response_code( $response );
+	if ( $code < 200 || $code >= 300 ) {
+		return new WP_Error( 'api_error', 'Custom Webhook returned HTTP code ' . $code );
 	}
 
 	return true;

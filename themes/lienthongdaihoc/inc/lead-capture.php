@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // 1. Database Table Creation (Theme Activation)
 // ----------------------------------------------------
 add_action( 'after_switch_theme', 'ltdh_create_leads_table' );
+add_action( 'admin_init', 'ltdh_check_leads_table_schema' );
 
 function ltdh_create_leads_table() {
 	global $wpdb;
@@ -30,6 +31,7 @@ function ltdh_create_leads_table() {
 		training_type varchar(100) DEFAULT '',
 		campus varchar(100) DEFAULT '',
 		referral_source text DEFAULT '',
+		message text DEFAULT NULL,
 		sync_status varchar(50) DEFAULT 'pending',
 		retry_count int(11) DEFAULT 0,
 		error_message text DEFAULT '',
@@ -43,29 +45,80 @@ function ltdh_create_leads_table() {
 	dbDelta( $sql );
 }
 
+function ltdh_check_leads_table_schema() {
+	global $wpdb;
+	$table_name = $wpdb->prefix . LTDH_TABLE_LEADS;
+	$col_check  = $wpdb->get_results( $wpdb->prepare(
+		"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = 'message'",
+		DB_NAME,
+		$table_name
+	) );
+
+	if ( empty( $col_check ) ) {
+		$wpdb->query( "ALTER TABLE {$table_name} ADD COLUMN message text DEFAULT NULL AFTER referral_source" );
+	}
+}
+
+/**
+ * Check if current IP address has exceeded the rate limit (3 submissions per 10 minutes).
+ */
+function ltdh_is_ip_rate_limited(): bool {
+	$ip = $_SERVER['REMOTE_ADDR'] ?? '';
+	if ( empty( $ip ) || $ip === '127.0.0.1' || $ip === '::1' ) {
+		return false;
+	}
+	$transient_key = 'ltdh_rl_' . md5( $ip );
+	$count         = (int) get_transient( $transient_key );
+	return ( $count >= 3 );
+}
+
+/**
+ * Increment the submission counter for current IP.
+ */
+function ltdh_increment_ip_rate_limit(): void {
+	$ip = $_SERVER['REMOTE_ADDR'] ?? '';
+	if ( empty( $ip ) || $ip === '127.0.0.1' || $ip === '::1' ) {
+		return;
+	}
+	$transient_key = 'ltdh_rl_' . md5( $ip );
+	$count         = (int) get_transient( $transient_key );
+	set_transient( $transient_key, $count + 1, 600 ); // 10 minutes window
+}
+
 /**
  * Check if the submission contains indicators of spam.
  */
 function ltdh_is_spam_submission( array $data ): bool {
+	// 1. Invisible Honeypot check
+	$hp_val = $data['hp_website'] ?? $data['website_url_hp'] ?? $data['fax_hp'] ?? '';
+	if ( ! empty( $hp_val ) ) {
+		return true; // Bot filled the invisible honeypot field
+	}
+
+	// 2. IP Rate Limit check (max 3 submissions / 10 mins)
+	if ( ltdh_is_ip_rate_limited() ) {
+		return true;
+	}
+
 	$name    = isset( $data['name'] ) ? $data['name'] : '';
 	$phone   = isset( $data['phone'] ) ? $data['phone'] : '';
 	$email   = isset( $data['email'] ) ? $data['email'] : '';
 	$message = isset( $data['message'] ) ? $data['message'] : '';
 
-	// 1. Check for Cyrillic (Russian/Ukrainian/etc.) characters in any field
+	// 3. Check for Cyrillic (Russian/Ukrainian/etc.) characters in any field
 	if ( preg_match( '/[\p{Cyrillic}]/u', $name ) || 
 	     preg_match( '/[\p{Cyrillic}]/u', $phone ) || 
 	     preg_match( '/[\p{Cyrillic}]/u', $message ) ) {
 		return true;
 	}
 
-	// 2. Check for links/URLs in the message or name
+	// 4. Check for links/URLs in the message or name
 	if ( preg_match( '/https?:\/\//i', $message ) || preg_match( '/www\./i', $message ) ||
 	     preg_match( '/https?:\/\//i', $name ) || preg_match( '/www\./i', $name ) ) {
 		return true;
 	}
 
-	// 3. Validate Phone Number length and format (must start with 0, 84, or +84)
+	// 5. Validate Phone Number length and format (must start with 0, 84, or +84)
 	$clean_phone = preg_replace( '/[^\d+]/', '', $phone );
 	if ( ! empty( $phone ) ) {
 		if ( strlen( $clean_phone ) < 8 || strlen( $clean_phone ) > 15 ) {
@@ -134,12 +187,13 @@ function ltdh_insert_lead( array $data ): int {
 			'training_type'   => $training_type,
 			'campus'          => $campus,
 			'referral_source' => $referral_source,
+			'message'         => $message,
 			'sync_status'     => 'pending',
 			'retry_count'     => 0,
-			'error_message'   => $message,
+			'error_message'   => '',
 			'created_at'      => current_time( 'mysql' ),
 		],
-		[ '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' ]
+		[ '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' ]
 	);
 
 	if ( $inserted ) {
@@ -155,10 +209,12 @@ function ltdh_insert_lead( array $data ): int {
 			'major_id'        => $major_id,
 			'training_type'   => $training_type,
 			'campus'          => $campus,
-			'referral_source' => $referral_source,
-			'message'         => $message,
+			'referral_source'  => $referral_source,
+			'message'          => $message,
+			'degree_file_path' => $data['degree_file_path'] ?? '',
 		];
 		ltdh_trigger_telegram_notification( $notification_data );
+		ltdh_increment_ip_rate_limit();
 
 		return $lead_id;
 	}
@@ -241,11 +297,30 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 			$msg_text .= "📎 <b>Ảnh bằng cấp:</b> " . esc_url( $degree_link ) . "\n";
 		}
 	} else {
-		// Simple notification for Free Consultation forms
-		$msg_text  = "🔔 <b>YÊU CẦU TƯ VẤN MIỄN PHÍ MỚI</b> 🔔\n\n";
+		// Notification for Free & Program Consultation forms
+		$school_title = ! empty( $data['school_id'] ) ? get_the_title( $data['school_id'] ) : '';
+		$major_title  = ! empty( $data['major_id'] ) ? get_the_title( $data['major_id'] ) : '';
+		$training_val = ! empty( $data['training_type'] ) && $data['training_type'] !== 'N/A' ? $data['training_type'] : '';
+		$campus_val   = ! empty( $data['campus'] ) && $data['campus'] !== 'N/A' ? $data['campus'] : '';
+
+		$msg_text  = "🔔 <b>YÊU CẦU TƯ VẤN TUYỂN SINH MỚI</b> 🔔\n\n";
 		$msg_text .= "👤 <b>Họ và tên:</b> " . esc_html( $name ) . "\n";
 		$msg_text .= "📞 <b>Số điện thoại:</b> " . esc_html( $phone ) . "\n";
-		$msg_text .= "✉ <b>Email:</b> " . esc_html( $email ) . "\n";
+		if ( ! empty( $email ) && $email !== 'N/A' ) {
+			$msg_text .= "✉ <b>Email:</b> " . esc_html( $email ) . "\n";
+		}
+		if ( ! empty( $school_title ) && $school_title !== 'N/A' ) {
+			$msg_text .= "🏫 <b>Trường đăng ký:</b> " . esc_html( $school_title ) . "\n";
+		}
+		if ( ! empty( $major_title ) && $major_title !== 'N/A' ) {
+			$msg_text .= "🎓 <b>Ngành quan tâm:</b> " . esc_html( $major_title ) . "\n";
+		}
+		if ( ! empty( $training_val ) ) {
+			$msg_text .= "🏷 <b>Hệ học:</b> " . esc_html( $training_val ) . "\n";
+		}
+		if ( ! empty( $campus_val ) ) {
+			$msg_text .= "📍 <b>Cơ sở:</b> " . esc_html( $campus_val ) . "\n";
+		}
 		if ( ! empty( $message ) ) {
 			$msg_text .= "💬 <b>Nội dung yêu cầu:</b> " . esc_html( $message ) . "\n";
 		}
@@ -264,7 +339,8 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		return;
 	}
 
-	$api_url = "https://api.telegram.org/bot" . urlencode( $bot_token ) . "/sendMessage";
+	$clean_token = trim( $bot_token );
+	$api_url     = "https://api.telegram.org/bot{$clean_token}/sendMessage";
 
 	foreach ( $chat_ids as $single_chat_id ) {
 		// Use non-blocking wp_remote_post
@@ -278,6 +354,104 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 			'blocking' => false,
 		] );
 	}
+
+	// Dispatch to School's private Telegram group if configured
+	if ( ! empty( $data['school_id'] ) && function_exists( 'get_field' ) ) {
+		$school_id        = intval( $data['school_id'] );
+		$school_chat_id   = get_field( 'school_telegram_chat_id', $school_id );
+		$school_bot_token = get_field( 'school_telegram_bot_token', $school_id );
+		$dispatch_token   = ! empty( $school_bot_token ) ? trim( $school_bot_token ) : $clean_token;
+
+		if ( ! empty( $school_chat_id ) && ! empty( $dispatch_token ) ) {
+			$school_chat_ids = preg_split( '/[\s,;]+/', $school_chat_id );
+			$school_chat_ids = array_filter( array_map( 'trim', $school_chat_ids ) );
+			$school_api_url  = "https://api.telegram.org/bot{$dispatch_token}/sendMessage";
+
+			foreach ( $school_chat_ids as $s_chat_id ) {
+				// Avoid duplicate dispatch if already sent in master list with same token
+				if ( in_array( $s_chat_id, $chat_ids, true ) && $dispatch_token === $clean_token ) {
+					continue;
+				}
+				wp_remote_post( $school_api_url, [
+					'body' => [
+						'chat_id'    => $s_chat_id,
+						'text'       => $msg_text,
+						'parse_mode' => 'HTML',
+					],
+					'timeout'  => 10,
+					'blocking' => false,
+				] );
+			}
+		}
+	}
+
+	// [CBR-10]: Ephemeral Degree File forwarding & cleanup (Decree 13/2023/ND-CP)
+	if ( ! empty( $data['degree_file_path'] ) && file_exists( $data['degree_file_path'] ) ) {
+		$caption = '📎 Hồ sơ văn bằng đính kèm: ' . esc_html( $name ) . ' (' . esc_html( $phone ) . ')';
+		foreach ( $chat_ids as $m_chat_id ) {
+			ltdh_telegram_send_document( $clean_token, $m_chat_id, $data['degree_file_path'], $caption );
+		}
+		if ( ! empty( $school_chat_id ) && ! empty( $dispatch_token ) && ! empty( $school_chat_ids ) ) {
+			foreach ( $school_chat_ids as $s_chat_id ) {
+				if ( in_array( $s_chat_id, $chat_ids, true ) && $dispatch_token === $clean_token ) {
+					continue;
+				}
+				ltdh_telegram_send_document( $dispatch_token, $s_chat_id, $data['degree_file_path'], $caption );
+			}
+		}
+		// Unlink file from local disk immediately after transmission
+		@unlink( $data['degree_file_path'] );
+	}
+}
+
+/**
+ * Send document attachment to Telegram via multipart/form-data.
+ */
+function ltdh_telegram_send_document( string $bot_token, string $chat_id, string $file_path, string $caption = '' ): bool {
+	if ( empty( $bot_token ) || empty( $chat_id ) || ! file_exists( $file_path ) ) {
+		return false;
+	}
+
+	$url      = "https://api.telegram.org/bot" . trim( $bot_token ) . "/sendDocument";
+	$boundary = wp_generate_password( 24, false );
+	$headers  = [
+		'content-type' => 'multipart/form-data; boundary=' . $boundary,
+	];
+	$filename = basename( $file_path );
+	$file_data = file_get_contents( $file_path );
+	if ( false === $file_data ) {
+		return false;
+	}
+
+	$payload  = '';
+
+	// chat_id field
+	$payload .= '--' . $boundary . "\r\n";
+	$payload .= 'Content-Disposition: form-data; name="chat_id"' . "\r\n\r\n";
+	$payload .= $chat_id . "\r\n";
+
+	// caption field
+	if ( ! empty( $caption ) ) {
+		$payload .= '--' . $boundary . "\r\n";
+		$payload .= 'Content-Disposition: form-data; name="caption"' . "\r\n\r\n";
+		$payload .= $caption . "\r\n";
+	}
+
+	// document field
+	$mime_type = function_exists( 'mime_content_type' ) ? mime_content_type( $file_path ) : 'application/octet-stream';
+	$payload .= '--' . $boundary . "\r\n";
+	$payload .= 'Content-Disposition: form-data; name="document"; filename="' . $filename . '"' . "\r\n";
+	$payload .= 'Content-Type: ' . $mime_type . "\r\n\r\n";
+	$payload .= $file_data . "\r\n";
+	$payload .= '--' . $boundary . '--' . "\r\n";
+
+	$response = wp_remote_post( $url, [
+		'headers' => $headers,
+		'body'    => $payload,
+		'timeout' => 20,
+	] );
+
+	return ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 );
 }
 
 // ----------------------------------------------------
@@ -378,4 +552,56 @@ function ltdh_handle_native_form_submit() {
 		wp_safe_redirect( $redirect_url );
 		exit;
 	}
+}
+
+// ----------------------------------------------------
+// 6. Lead Magnet Download AJAX Handler
+// ----------------------------------------------------
+add_action( 'wp_ajax_ltdh_lead_magnet_download', 'ltdh_handle_lead_magnet_download' );
+add_action( 'wp_ajax_nopriv_ltdh_lead_magnet_download', 'ltdh_handle_lead_magnet_download' );
+
+function ltdh_handle_lead_magnet_download() {
+	check_ajax_referer( 'ltdh_lead_magnet_nonce', 'security' );
+
+	$name       = sanitize_text_field( wp_unslash( $_POST['name'] ?? '' ) );
+	$phone      = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
+	$doc_title  = sanitize_text_field( wp_unslash( $_POST['doc_title'] ?? 'Tài liệu tuyển sinh' ) );
+	$doc_url    = esc_url_raw( wp_unslash( $_POST['doc_url'] ?? '' ) );
+	$program_id = intval( $_POST['program_id'] ?? 0 );
+	$school_id  = intval( $_POST['school_id'] ?? 0 );
+	$major_id   = intval( $_POST['major_id'] ?? 0 );
+	$hp_val     = sanitize_text_field( wp_unslash( $_POST['hp_website'] ?? '' ) );
+
+	if ( ! empty( $hp_val ) || ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'hp_website' => $hp_val ] ) ) {
+		wp_send_json_error( [ 'message' => 'Yêu cầu không hợp lệ hoặc bị nghi ngờ là spam.' ] );
+	}
+
+	if ( empty( $name ) || empty( $phone ) ) {
+		wp_send_json_error( [ 'message' => 'Vui lòng cung cấp đầy đủ họ tên và số điện thoại.' ] );
+	}
+
+	$referral_source = 'lead_magnet: ' . $doc_title;
+	if ( ! empty( $_SERVER['HTTP_REFERER'] ) ) {
+		$referral_source .= ' (' . esc_url_raw( $_SERVER['HTTP_REFERER'] ) . ')';
+	}
+
+	$lead_id = ltdh_insert_lead( [
+		'name'            => $name,
+		'phone'           => $phone,
+		'email'           => '',
+		'program_id'      => $program_id,
+		'school_id'       => $school_id,
+		'major_id'        => $major_id,
+		'referral_source' => $referral_source,
+		'message'         => 'Ứng viên yêu cầu tải tài liệu: ' . $doc_title,
+	] );
+
+	if ( $lead_id ) {
+		wp_send_json_success( [
+			'message'  => 'Cảm ơn bạn! Đang mở tài liệu tuyển sinh.',
+			'file_url' => $doc_url,
+		] );
+	}
+
+	wp_send_json_error( [ 'message' => 'Không thể ghi nhận thông tin. Vui lòng liên hệ hotline hỗ trợ.' ] );
 }

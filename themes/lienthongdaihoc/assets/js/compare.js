@@ -127,9 +127,9 @@
 	}
 
 	// ----------------------------------------------------
-	// 2. Compare Button Toggle
+	// 2. Compare Button Toggle (Event Delegation)
 	// ----------------------------------------------------
-	function initCompareButtons() {
+	function syncCompareButtonStates() {
 		var buttons = document.querySelectorAll('.ltdh-compare-toggle, .ltdh-compare-single-btn');
 		buttons.forEach(function (btn) {
 			var type = btn.getAttribute('data-compare-type');
@@ -139,65 +139,77 @@
 			if (hasItem(type, id)) {
 				btn.classList.add('is-compared');
 				btn.textContent = '✓ Đã thêm';
+			} else {
+				btn.classList.remove('is-compared');
+				btn.textContent = btn.classList.contains('ltdh-compare-single-btn') ? '📊 Thêm vào so sánh' : 'So sánh';
 			}
+		});
+	}
 
-			btn.addEventListener('click', function (e) {
-				e.preventDefault();
-				e.stopPropagation();
+	function initCompareDelegation() {
+		document.addEventListener('click', function (e) {
+			var btn = e.target.closest('.ltdh-compare-toggle, .ltdh-compare-single-btn');
+			if (!btn) return;
 
-				if (hasItem(type, id)) {
-					removeItem(type, id);
-					btn.classList.remove('is-compared');
-					btn.textContent = btn.classList.contains('ltdh-compare-single-btn') ? '📊 Thêm vào so sánh' : 'So sánh';
-				} else {
-					var items = getItems();
-					var total = Object.values(items).reduce(function (s, a) { return s + a.length; }, 0);
-					if (total >= MAX_ITEMS) {
-						showToast('Chỉ so sánh tối đa ' + MAX_ITEMS + ' mục.', 'warning');
-						return;
-					}
+			e.preventDefault();
+			e.stopPropagation();
 
-					// Validation: Same major (nganh)
-					var btnHe = btn.getAttribute('data-compare-he');
-					var btnNganh = btn.getAttribute('data-compare-nganh');
-					var activeIds = items[type] || [];
+			var type = btn.getAttribute('data-compare-type');
+			var id   = parseInt(btn.getAttribute('data-compare-id'), 10);
+			if (!type || !id) return;
 
-					if (activeIds.length > 0 && btnNganh) {
-						var meta = getMetadata();
-						for (var idx = 0; idx < activeIds.length; idx++) {
-							var existingId = activeIds[idx];
-							var existingMeta = meta[existingId];
-							if (existingMeta) {
-								if (existingMeta.nganh && existingMeta.nganh !== btnNganh) {
-									showToast('Chỉ được so sánh các chương trình CÙNG NGÀNH ĐÀO TẠO.', 'error');
-									return;
-								}
+			if (hasItem(type, id)) {
+				removeItem(type, id);
+				btn.classList.remove('is-compared');
+				btn.textContent = btn.classList.contains('ltdh-compare-single-btn') ? '📊 Thêm vào so sánh' : 'So sánh';
+			} else {
+				var items = getItems();
+				var total = Object.values(items).reduce(function (s, a) { return s + a.length; }, 0);
+				if (total >= MAX_ITEMS) {
+					showToast('Chỉ so sánh tối đa ' + MAX_ITEMS + ' mục.', 'warning');
+					return;
+				}
+
+				// Validation: Same major (nganh)
+				var btnHe = btn.getAttribute('data-compare-he');
+				var btnNganh = btn.getAttribute('data-compare-nganh');
+				var activeIds = items[type] || [];
+
+				if (activeIds.length > 0 && btnNganh) {
+					var meta = getMetadata();
+					for (var idx = 0; idx < activeIds.length; idx++) {
+						var existingId = activeIds[idx];
+						var existingMeta = meta[existingId];
+						if (existingMeta) {
+							if (existingMeta.nganh && existingMeta.nganh !== btnNganh) {
+								showToast('Chỉ được so sánh các chương trình CÙNG NGÀNH ĐÀO TẠO.', 'error');
+								return;
 							}
 						}
 					}
-
-					var btnTitle = btn.getAttribute('data-compare-title') || '';
-					var btnThumb = btn.getAttribute('data-compare-thumb') || '';
-					if (!btnThumb) {
-						var cardEl = document.querySelector('[data-compare-id="' + id + '"][data-compare-thumb]');
-						if (cardEl) {
-							btnThumb = cardEl.getAttribute('data-compare-thumb') || '';
-						}
-					}
-					if (!btnTitle) {
-						var cardEl = document.querySelector('[data-compare-id="' + id + '"][data-compare-title]');
-						if (cardEl) {
-							btnTitle = cardEl.getAttribute('data-compare-title') || '';
-						}
-					}
-
-					addItem(type, id, btnHe, btnNganh, btnTitle, btnThumb);
-					btn.classList.add('is-compared');
-					btn.textContent = '✓ Đã thêm';
-					showToast('Đã thêm vào danh sách so sánh (' + (total + 1) + '/' + MAX_ITEMS + ')', 'success');
 				}
-				updateTray();
-			});
+
+				var btnTitle = btn.getAttribute('data-compare-title') || '';
+				var btnThumb = btn.getAttribute('data-compare-thumb') || '';
+				if (!btnThumb) {
+					var cardEl = document.querySelector('[data-compare-id="' + id + '"][data-compare-thumb]');
+					if (cardEl) {
+						btnThumb = cardEl.getAttribute('data-compare-thumb') || '';
+					}
+				}
+				if (!btnTitle) {
+					var cardEl = document.querySelector('[data-compare-id="' + id + '"][data-compare-title]');
+					if (cardEl) {
+						btnTitle = cardEl.getAttribute('data-compare-title') || '';
+					}
+				}
+
+				addItem(type, id, btnHe, btnNganh, btnTitle, btnThumb);
+				btn.classList.add('is-compared');
+				btn.textContent = '✓ Đã thêm';
+				showToast('Đã thêm vào danh sách so sánh (' + (total + 1) + '/' + MAX_ITEMS + ')', 'success');
+			}
+			updateTray();
 		});
 	}
 
@@ -348,19 +360,21 @@
 			return;
 		}
 
-		initCompareButtons();
+		initCompareDelegation();
+		syncCompareButtonStates();
 		updateTray();
 	});
 
 	// Expose for external use
 	window.ltdhCompare = {
-		add: function (type, id, he, nganh, title, thumb) { addItem(type, id, he, nganh, title, thumb); updateTray(); },
-		remove: function (type, id) { removeItem(type, id); updateTray(); },
+		add: function (type, id, he, nganh, title, thumb) { addItem(type, id, he, nganh, title, thumb); updateTray(); syncCompareButtonStates(); },
+		remove: function (type, id) { removeItem(type, id); updateTray(); syncCompareButtonStates(); },
 		clearAll: clearAll,
 		getItems: getItems,
 		getCount: getCount,
 		hasItem: hasItem,
 		updateTray: updateTray,
-		showToast: showToast
+		showToast: showToast,
+		syncButtonStates: syncCompareButtonStates
 	};
 })();

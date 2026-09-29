@@ -1,0 +1,194 @@
+[
+  {
+    "file": "archive-program.php",
+    "line": 79,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$school_post = get_page_by_path( $selected_school, OBJECT, 'school' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "archive-program.php",
+    "line": 94,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$major_post = get_page_by_path( $selected_nhom, OBJECT, 'major' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "functions.php",
+    "line": 103,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$school_post = get_page_by_path( $selected_school, OBJECT, LTDH_CPT_SCHOOL );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "functions.php",
+    "line": 117,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$major_post = get_page_by_path( $selected_major, OBJECT, LTDH_CPT_MAJOR );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line": 42,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$page = get_page_by_path( $slug );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line": 225,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$school = get_page_by_path( sanitize_title( $title ), OBJECT, 'school' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line": 329,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$major = get_page_by_path( sanitize_title( $m_name ), OBJECT, 'major' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line": 530,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$existing = get_page_by_path( sanitize_title( $g['title'] ), OBJECT, 'post' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line": 674,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$school = get_page_by_path( $school_slug, OBJECT, 'school' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line": 710,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$major = get_page_by_path( $major_slug, OBJECT, LTDH_CPT_MAJOR );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line": 1061,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line": 1078,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/cli-commands.php",
+    "line": 1095,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$existing = get_page_by_path( sanitize_title( $title ), OBJECT, 'post' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/comparison.php",
+    "line": 110,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$post = get_page_by_path( $part, OBJECT, $post_type );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/core/class-menus.php",
+    "line": 321,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$post = get_page_by_path($slug, OBJECT, LTDH_CPT_MAJOR);",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/core/class-query-filters.php",
+    "line": 40,
+    "category": "Undefined Array Key",
+    "severity": "Medium",
+    "code": "'terms'    => sanitize_text_field( $_GET['nhom_nganh'] ),",
+    "description": "Direct access to $_GET['nhom_nganh'] without prior isset(), empty() or ?? fallback. In PHP 8.0+, missing array key emits E_WARNING (previously E_NOTICE)."
+  },
+  {
+    "file": "inc/eligibility.php",
+    "line": 75,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$page = get_page_by_path( $slug );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "inc/eligibility.php",
+    "line": 1068,
+    "category": "Undefined Array Key",
+    "severity": "Medium",
+    "code": "$wpdb->delete( $table, [ 'id' => intval( $_GET['lead_id'] ) ] );",
+    "description": "Direct access to $_GET['lead_id'] without prior isset(), empty() or ?? fallback. In PHP 8.0+, missing array key emits E_WARNING (previously E_NOTICE)."
+  },
+  {
+    "file": "inc/eligibility.php",
+    "line": 1080,
+    "category": "Undefined Array Key",
+    "severity": "Medium",
+    "code": "$lead_ids = array_map( 'intval', $_POST['lead_ids'] );",
+    "description": "Direct access to $_POST['lead_ids'] without prior isset(), empty() or ?? fallback. In PHP 8.0+, missing array key emits E_WARNING (previously E_NOTICE)."
+  },
+  {
+    "file": "inc/eligibility.php",
+    "line": 1385,
+    "category": "Undefined Array Key",
+    "severity": "Medium",
+    "code": "$check_ids = array_map( 'intval', $_POST['check_ids'] );",
+    "description": "Direct access to $_POST['check_ids'] without prior isset(), empty() or ?? fallback. In PHP 8.0+, missing array key emits E_WARNING (previously E_NOTICE)."
+  },
+  {
+    "file": "inc/lead-capture.php",
+    "line": 342,
+    "category": "Undefined Array Key",
+    "severity": "Medium",
+    "code": "$name    = sanitize_text_field( wp_unslash( $_POST['your-name'] ) );",
+    "description": "Direct access to $_POST['your-name'] without prior isset(), empty() or ?? fallback. In PHP 8.0+, missing array key emits E_WARNING (previously E_NOTICE)."
+  },
+  {
+    "file": "inc/lead-capture.php",
+    "line": 343,
+    "category": "Undefined Array Key",
+    "severity": "Medium",
+    "code": "$phone   = sanitize_text_field( wp_unslash( $_POST['your-phone'] ) );",
+    "description": "Direct access to $_POST['your-phone'] without prior isset(), empty() or ?? fallback. In PHP 8.0+, missing array key emits E_WARNING (previously E_NOTICE)."
+  },
+  {
+    "file": "taxonomy-training_type.php",
+    "line": 79,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$school_post = get_page_by_path( $selected_school, OBJECT, 'school' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  },
+  {
+    "file": "taxonomy-training_type.php",
+    "line": 94,
+    "category": "WP Core 6.2+ Deprecation",
+    "severity": "Low",
+    "code": "$major_post = get_page_by_path( $selected_nhom, OBJECT, 'major' );",
+    "description": "get_page_by_path() is deprecated/discouraged since WP 6.2.0 in favor of WP_Query or get_posts()."
+  }
+]

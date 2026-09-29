@@ -224,6 +224,100 @@ $global_zalo = ltdh_get_zalo_url();
 					</script>
 				</section>
 
+				<!-- MAJORS OFFERED -->
+				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Các ngành đào tạo phổ biến</h2>
+					<?php
+					// Query distinct majors via the programs offered by this school
+					$distinct_major_ids = [];
+					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
+						foreach ( $offered_program_ids as $p_id ) {
+							$m_id = get_post_meta( $p_id, 'major_relationship', true );
+							if ( is_array( $m_id ) ) {
+								$m_id = ! empty( $m_id ) ? $m_id[0] : 0;
+							}
+							$m_id = intval( $m_id );
+							if ( $m_id && ! in_array( $m_id, $distinct_major_ids ) ) {
+								$distinct_major_ids[] = $m_id;
+							}
+						}
+					}
+					
+					if ( empty( $distinct_major_ids ) ) {
+						$linked_programs = get_posts( [
+							'post_type'      => 'program',
+							'posts_per_page' => -1,
+							'meta_query'     => [
+								[
+									'key'     => LTDH_META_SCHOOL_REL,
+									'value'   => $school_id,
+									'compare' => '=',
+								],
+							],
+							'fields'         => 'ids',
+						] );
+						if ( ! empty( $linked_programs ) ) {
+							update_meta_cache( 'post', $linked_programs );
+							foreach ( $linked_programs as $p_id ) {
+								$m_id = get_post_meta( $p_id, 'major_relationship', true );
+								if ( is_array( $m_id ) ) {
+									$m_id = ! empty( $m_id ) ? $m_id[0] : 0;
+								}
+								$m_id = intval( $m_id );
+								if ( $m_id && ! in_array( $m_id, $distinct_major_ids ) ) {
+									$distinct_major_ids[] = $m_id;
+								}
+							}
+						}
+					}
+					
+					if ( ! empty( $distinct_major_ids ) ) {
+						$majors_query = new WP_Query( [
+							'post_type' => 'major',
+							'post__in'  => $distinct_major_ids,
+							'post_status' => 'publish'
+						] );
+					} else {
+						$majors_query = false;
+					}
+
+					if ( $majors_query && $majors_query->have_posts() ) :
+						echo '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">';
+						while ( $majors_query->have_posts() ) : $majors_query->the_post();
+						?>
+							<a href="<?php the_permalink(); ?>" class="flex items-center gap-3 p-3 border border-slate-100 rounded-lg hover:border-brand-primary hover:shadow-sm transition-all bg-white">
+								<?php 
+								$major_thumb = get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' );
+								if ( ! $major_thumb ) {
+									$major_thumb = ltdh_get_fallback_image( 'program' );
+								}
+								?>
+								<img src="<?php echo esc_url( $major_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="h-12 w-12 rounded-lg object-cover shrink-0 bg-slate-50 border border-slate-100" loading="lazy">
+								<div class="min-w-0 flex-1">
+									<h4 class="font-bold text-slate-800 text-sm mb-0.5 truncate"><?php the_title(); ?></h4>
+									<span class="text-sm text-slate-400 block">Mã ngành: <?php echo esc_html( get_field( 'major_code' ) ?: 'Đang cập nhật' ); ?></span>
+								</div>
+							</a>
+						<?php
+						endwhile;
+						echo '</div>';
+						wp_reset_postdata();
+					else :
+						echo '<p class="text-sm text-slate-500">Các chuyên ngành chính của trường đang được cập nhật.</p>';
+					endif;
+					?>
+				</section>
+
+				<!-- ADMISSION INFORMATION -->
+				<?php if ( $adm_info ) : ?>
+					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Phương thức tuyển sinh</h2>
+						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
+							<?php echo wp_kses_post( $adm_info ); ?>
+						</div>
+					</section>
+				<?php endif; ?>
+
 				<!-- PROGRAMS OFFERED -->
 				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Chương trình tuyển sinh đang mở</h2>
@@ -469,99 +563,6 @@ $global_zalo = ltdh_get_zalo_url();
 					endif;
 					?>
 				</section>
-
-				<!-- MAJORS OFFERED -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Các ngành đào tạo phổ biến</h2>
-					<?php
-					// Query distinct majors via the programs offered by this school
-					$distinct_major_ids = [];
-					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
-						foreach ( $offered_program_ids as $p_id ) {
-							$m_id = get_post_meta( $p_id, 'major_relationship', true );
-							if ( is_array( $m_id ) ) {
-								$m_id = ! empty( $m_id ) ? $m_id[0] : 0;
-							}
-							$m_id = intval( $m_id );
-							if ( $m_id && ! in_array( $m_id, $distinct_major_ids ) ) {
-								$distinct_major_ids[] = $m_id;
-							}
-						}
-					}
-					
-					if ( empty( $distinct_major_ids ) ) {
-						$linked_programs = get_posts( [
-							'post_type'      => 'program',
-							'posts_per_page' => -1,
-							'meta_query'     => [
-								[
-									'key'     => LTDH_META_SCHOOL_REL,
-									'value'   => $school_id,
-									'compare' => '=',
-								],
-							],
-							'fields'         => 'ids',
-						] );
-						if ( ! empty( $linked_programs ) ) {
-							update_meta_cache( 'post', $linked_programs );
-							foreach ( $linked_programs as $p_id ) {
-								$m_id = get_post_meta( $p_id, 'major_relationship', true );
-								if ( is_array( $m_id ) ) {
-									$m_id = ! empty( $m_id ) ? $m_id[0] : 0;
-								}
-								$m_id = intval( $m_id );
-								if ( $m_id && ! in_array( $m_id, $distinct_major_ids ) ) {
-									$distinct_major_ids[] = $m_id;
-								}
-							}
-						}
-					}
-					
-					if ( ! empty( $distinct_major_ids ) ) {
-						$majors_query = new WP_Query( [
-							'post_type' => 'major',
-							'post__in'  => $distinct_major_ids,
-							'post_status' => 'publish'
-						] );
-					} else {
-						$majors_query = false;
-					}
-
-					if ( $majors_query && $majors_query->have_posts() ) :
-						echo '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">';
-						while ( $majors_query->have_posts() ) : $majors_query->the_post();
-						?>
-							<a href="<?php the_permalink(); ?>" class="flex items-center gap-3 p-3 border border-slate-100 rounded-lg hover:border-brand-primary hover:shadow-sm transition-all bg-white">
-								<?php 
-								$major_thumb = get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' );
-								if ( ! $major_thumb ) {
-									$major_thumb = ltdh_get_fallback_image( 'program' );
-								}
-								?>
-								<img src="<?php echo esc_url( $major_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="h-12 w-12 rounded-lg object-cover shrink-0 bg-slate-50 border border-slate-100" loading="lazy">
-								<div class="min-w-0 flex-1">
-									<h4 class="font-bold text-slate-800 text-sm mb-0.5 truncate"><?php the_title(); ?></h4>
-									<span class="text-sm text-slate-400 block">Mã ngành: <?php echo esc_html( get_field( 'major_code' ) ?: 'Đang cập nhật' ); ?></span>
-								</div>
-							</a>
-						<?php
-						endwhile;
-						echo '</div>';
-						wp_reset_postdata();
-					else :
-						echo '<p class="text-sm text-slate-500">Các chuyên ngành chính của trường đang được cập nhật.</p>';
-					endif;
-					?>
-				</section>
-				<!-- ADMISSION INFORMATION -->
-				<?php if ( $adm_info ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Phương thức tuyển sinh</h2>
-						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
-							<?php echo wp_kses_post( $adm_info ); ?>
-						</div>
-					</section>
-				<?php endif; ?>
 
 				<!-- CONTACT INFO -->
 				<?php if ( $contact ) : ?>
