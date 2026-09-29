@@ -162,23 +162,28 @@ $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'train
 				</summary>
 				<div class="p-4 lg:p-0 pt-0 lg:pt-0 border-t lg:border-0 border-slate-100 space-y-6 sticky top-24">
 					<?php
-					global $wpdb;
-					$t_results = $wpdb->get_results( "
-						SELECT t.slug, COUNT(p.ID) as count
-						FROM {$wpdb->posts} p
-						INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
-						INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
-						INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
-						WHERE p.post_type = 'program' AND p.post_status = 'publish' AND tt.taxonomy = 'training_type'
-						GROUP BY t.slug
-					" );
+					$t_counts = get_transient( 'ltdh_training_type_counts' );
+					if ( false === $t_counts || ! is_array( $t_counts ) ) {
+						global $wpdb;
+						$t_results = $wpdb->get_results( "
+							SELECT t.slug, COUNT(p.ID) as count
+							FROM {$wpdb->posts} p
+							INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+							INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+							INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+							WHERE p.post_type = 'program' AND p.post_status = 'publish' AND tt.taxonomy = 'training_type'
+							GROUP BY t.slug
+						" );
 
-					$t_counts = [];
-					if ( ! is_wp_error( $t_results ) && ! empty( $t_results ) ) {
-						foreach ( $t_results as $row ) {
-							$t_counts[ $row->slug ] = intval( $row->count );
+						$t_counts = [];
+						if ( ! is_wp_error( $t_results ) && ! empty( $t_results ) ) {
+							foreach ( $t_results as $row ) {
+								$t_counts[ $row->slug ] = intval( $row->count );
+							}
 						}
+						set_transient( 'ltdh_training_type_counts', $t_counts, 2 * HOUR_IN_SECONDS );
 					}
+
 
 					$m_counts = [];
 

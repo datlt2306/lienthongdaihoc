@@ -47,23 +47,27 @@ $zalo    = ltdh_get_zalo_url();
 	}
 	?>
 	<section class="relative w-full overflow-hidden bg-slate-50 border-b border-slate-100">
-		<div class="swiper hero-swiper w-full">
+		<div class="swiper hero-swiper w-full min-h-[220px] sm:min-h-[350px] md:min-h-[450px]">
 			<div class="swiper-wrapper">
-				<?php foreach ($hero_slides as $slide) : 
+				<?php 
+				$slide_idx = 0;
+				foreach ($hero_slides as $slide) : 
 					if (empty($slide['image'])) continue;
+					$is_lcp       = ( 0 === $slide_idx );
+					$loading_attr = $is_lcp ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" fetchpriority="low"';
 					?>
 					<div class="swiper-slide w-full">
 						<?php if (!empty($slide['link'])) : ?>
 							<a href="<?php echo esc_url($slide['link']); ?>" class="block w-full h-full">
 						<?php endif; ?>
 						
-						<div class="relative w-full h-auto max-h-[800px] overflow-hidden bg-[#f8fafc]">
+						<div class="relative w-full h-auto min-h-[220px] sm:min-h-[350px] md:min-h-[450px] max-h-[800px] overflow-hidden bg-[#f8fafc]">
 							<!-- Main Banner Image -->
 							<picture class="relative z-10 block w-full h-auto max-h-[800px]">
 								<?php if (!empty($slide['image_mobile'])) : ?>
 									<source media="(max-width: 768px)" srcset="<?php echo esc_url($slide['image_mobile']); ?>">
 								<?php endif; ?>
-								<img src="<?php echo esc_url($slide['image']); ?>" alt="Banner Hero" class="w-full h-auto max-h-[800px] object-cover object-center pointer-events-none" loading="eager" decoding="async">
+								<img src="<?php echo esc_url($slide['image']); ?>" width="1920" height="600" alt="Banner Hero" class="w-full h-auto max-h-[800px] object-cover object-center pointer-events-none" <?php echo $loading_attr; ?> decoding="async">
 							</picture>
 						</div>
 
@@ -71,7 +75,10 @@ $zalo    = ltdh_get_zalo_url();
 							</a>
 						<?php endif; ?>
 					</div>
-				<?php endforeach; ?>
+				<?php 
+					$slide_idx++;
+				endforeach; 
+				?>
 			</div>
 			<!-- Add Pagination -->
 			<div class="swiper-pagination"></div>
@@ -81,28 +88,6 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			if (typeof Swiper !== 'undefined') {
-				new Swiper('.hero-swiper', {
-					loop: true,
-					autoplay: {
-						delay: 5000,
-						disableOnInteraction: false,
-					},
-					pagination: {
-						el: '.swiper-pagination',
-						clickable: true,
-					},
-					navigation: {
-						nextEl: '.swiper-button-next',
-						prevEl: '.swiper-button-prev',
-					},
-					speed: 800,
-				});
-			}
-		});
-	</script>
 
 	<!-- Styling specifically for pagination position and arrows -->
 	<style>
@@ -141,9 +126,10 @@ $zalo    = ltdh_get_zalo_url();
 				</div>
 
 				<?php
-				$schools = get_posts(['post_type' => 'school', 'numberposts' => -1]);
-				$majors  = get_posts(['post_type' => 'major', 'numberposts' => -1]);
-				$types   = get_terms(['taxonomy' => LTDH_TAX_TRAINING_TYPE, 'hide_empty' => false]);
+				$filter_opts = ltdh_get_cached_filter_options();
+				$schools     = $filter_opts['schools'] ?? [];
+				$majors      = $filter_opts['majors'] ?? [];
+				$types       = $filter_opts['types'] ?? [];
 				?>
 
 				<!-- Filters: stacked on mobile, inline on desktop -->
@@ -152,7 +138,7 @@ $zalo    = ltdh_get_zalo_url();
 						<select name="truong" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
 							<option value="">-- Chọn trường --</option>
 							<?php foreach ($schools as $sc) : ?>
-								<option value="<?php echo esc_attr($sc->post_name); ?>"><?php echo esc_html($sc->post_title); ?></option>
+								<option value="<?php echo esc_attr($sc['slug']); ?>"><?php echo esc_html($sc['title']); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</div>
@@ -160,7 +146,7 @@ $zalo    = ltdh_get_zalo_url();
 						<select name="nganh" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
 							<option value="">-- Chọn ngành học --</option>
 							<?php foreach ($majors as $mj) : ?>
-								<option value="<?php echo esc_attr($mj->post_name); ?>"><?php echo esc_html($mj->post_title); ?></option>
+								<option value="<?php echo esc_attr($mj['slug']); ?>"><?php echo esc_html($mj['title']); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</div>
@@ -168,10 +154,11 @@ $zalo    = ltdh_get_zalo_url();
 						<select name="he" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
 							<option value="">-- Chọn hệ học --</option>
 							<?php foreach ($types as $tp) : ?>
-								<option value="<?php echo esc_attr($tp->slug); ?>"><?php echo esc_html($tp->name); ?></option>
+								<option value="<?php echo esc_attr($tp['slug']); ?>"><?php echo esc_html($tp['name']); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</div>
+
 					<div class="flex gap-2 md:shrink-0">
 						<button type="submit" class="flex-1 md:flex-none bg-brand-primary hover:bg-brand-darkBlue text-white font-extrabold text-sm px-5 py-2.5 rounded-lg transition-all uppercase tracking-wider min-h-[40px] md:min-h-[38px]">
 							Tìm kiếm

@@ -128,9 +128,10 @@ if ( empty( $banner_image ) ) {
 	<?php if ( ! empty( $banner_image ) ) : ?>
 		<!-- Banner Background Image with Overlay -->
 		<div class="absolute inset-0 z-0">
-			<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center" alt="<?php echo esc_attr( $banner_title ); ?>">
+			<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center" alt="<?php echo esc_attr( $banner_title ); ?>" width="1920" height="400" loading="eager" fetchpriority="high" decoding="async">
 			<div class="absolute inset-0 bg-gradient-to-r from-[#0c1b30]/90 to-brand-primary/85 mix-blend-multiply"></div>
 		</div>
+
 	<?php endif; ?>
 
 	<!-- Dot Grid Pattern -->

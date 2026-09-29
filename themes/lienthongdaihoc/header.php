@@ -6,8 +6,7 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;850;900&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
-	
+	<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
 
 	<?php wp_head(); ?>
 </head>
@@ -96,52 +95,7 @@
 		</div>
 	</header>
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			const toggleBtn = document.getElementById('mobile-menu-toggle');
-			const closeBtn = document.getElementById('mobile-menu-close');
-			const menu = document.getElementById('mobile-menu');
-			const overlay = document.getElementById('mobile-menu-overlay');
-
-			function openMenu() {
-				menu.classList.remove('translate-x-full');
-				overlay.classList.remove('opacity-0', 'pointer-events-none');
-				overlay.classList.add('opacity-100');
-				document.body.classList.add('overflow-hidden');
-			}
-
-			function closeMenu() {
-				menu.classList.add('translate-x-full');
-				overlay.classList.remove('opacity-100');
-				overlay.classList.add('opacity-0', 'pointer-events-none');
-				document.body.classList.remove('overflow-hidden');
-			}
-
-			if (toggleBtn && menu && overlay) {
-				toggleBtn.addEventListener('click', function(e) {
-					e.preventDefault();
-					openMenu();
-				});
-			}
-
-			if (closeBtn) {
-				closeBtn.addEventListener('click', closeMenu);
-			}
-
-			if (overlay) {
-				overlay.addEventListener('click', closeMenu);
-			}
-
-			// Smooth scroll to register section from mobile menu
-			const mobileLinks = document.querySelectorAll('#mobile-menu a');
-			mobileLinks.forEach(link => {
-				link.addEventListener('click', function() {
-					closeMenu();
-				});
-			});
-		});
-	</script>
-
 	<?php if ( ! is_front_page() ) : ?>
+
 		<?php ltdh_breadcrumb(); ?>
 	<?php endif; ?>

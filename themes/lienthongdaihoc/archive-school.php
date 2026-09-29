@@ -19,34 +19,40 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
 		<?php
-		// Query featured schools
-		$featured_args = [
-			'post_type'      => 'school',
-			'posts_per_page' => 4,
-			'post_status'    => 'publish',
-			'meta_query'     => [
-				[
-					'key'     => 'is_featured',
-					'value'   => '1',
-					'compare' => '='
-				]
-			]
-		];
-		$featured_query = new WP_Query( $featured_args );
-		$featured_posts = $featured_query->posts;
-
-		// If less than 4, query latest schools to fill the remaining slots
-		if ( count( $featured_posts ) < 4 ) {
-			$exclude_ids = wp_list_pluck( $featured_posts, 'ID' );
-			$fallback_args = [
+		// Query featured schools (Cached for performance)
+		$cache_key = 'ltdh_archive_school_featured';
+		$featured_posts = get_transient( $cache_key );
+		if ( false === $featured_posts || ! is_array( $featured_posts ) ) {
+			$featured_args = [
 				'post_type'      => 'school',
-				'posts_per_page' => 4 - count( $featured_posts ),
+				'posts_per_page' => 4,
 				'post_status'    => 'publish',
-				'post__not_in'   => ! empty( $exclude_ids ) ? $exclude_ids : [],
+				'meta_query'     => [
+					[
+						'key'     => 'is_featured',
+						'value'   => '1',
+						'compare' => '='
+					]
+				]
 			];
-			$fallback_query = new WP_Query( $fallback_args );
-			$featured_posts = array_merge( $featured_posts, $fallback_query->posts );
+			$featured_query = new WP_Query( $featured_args );
+			$featured_posts = $featured_query->posts;
+
+			// If less than 4, query latest schools to fill the remaining slots
+			if ( count( $featured_posts ) < 4 ) {
+				$exclude_ids = wp_list_pluck( $featured_posts, 'ID' );
+				$fallback_args = [
+					'post_type'      => 'school',
+					'posts_per_page' => 4 - count( $featured_posts ),
+					'post_status'    => 'publish',
+					'post__not_in'   => ! empty( $exclude_ids ) ? $exclude_ids : [],
+				];
+				$fallback_query = new WP_Query( $fallback_args );
+				$featured_posts = array_merge( $featured_posts, $fallback_query->posts );
+			}
+			set_transient( $cache_key, $featured_posts, 2 * HOUR_IN_SECONDS );
 		}
+
 
 		$featured_school_ids = wp_list_pluck( $featured_posts, 'ID' );
 

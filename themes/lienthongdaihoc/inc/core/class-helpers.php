@@ -230,14 +230,18 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 // ----------------------------------------------------
 
 /**
- * Get site logo URL with Customizer → ACF fallback.
+ * Get site logo data (URL, width, height) with Customizer → ACF fallback.
  */
-function ltdh_get_logo_url(): string {
+function ltdh_get_logo_data(): array {
 	$logo_id = get_theme_mod('custom_logo');
 	if ($logo_id) {
-		$url = wp_get_attachment_image_url($logo_id, 'full');
-		if ($url) {
-			return $url;
+		$img_data = wp_get_attachment_image_src($logo_id, 'full');
+		if ($img_data && ! empty($img_data[0])) {
+			return [
+				'url'    => $img_data[0],
+				'width'  => (int) $img_data[1],
+				'height' => (int) $img_data[2],
+			];
 		}
 	}
 
@@ -245,34 +249,65 @@ function ltdh_get_logo_url(): string {
 		$acf_logo = get_field('global_logo', 'options');
 		if ($acf_logo) {
 			if (is_numeric($acf_logo)) {
-				return wp_get_attachment_image_url((int) $acf_logo, 'full') ?: '';
+				$img_data = wp_get_attachment_image_src((int) $acf_logo, 'full');
+				if ($img_data && ! empty($img_data[0])) {
+					return [
+						'url'    => $img_data[0],
+						'width'  => (int) $img_data[1],
+						'height' => (int) $img_data[2],
+					];
+				}
 			} elseif (is_array($acf_logo) && isset($acf_logo['url'])) {
-				return $acf_logo['url'];
+				return [
+					'url'    => $acf_logo['url'],
+					'width'  => (int) ($acf_logo['width'] ?? 200),
+					'height' => (int) ($acf_logo['height'] ?? 60),
+				];
 			} elseif (is_string($acf_logo)) {
-				return $acf_logo;
+				return [
+					'url'    => $acf_logo,
+					'width'  => 200,
+					'height' => 60,
+				];
 			}
 		}
 	}
 
-	return '';
+	return [ 'url' => '', 'width' => 0, 'height' => 0 ];
 }
 
 /**
- * Output site logo HTML.
+ * Get site logo URL with Customizer → ACF fallback.
+ */
+function ltdh_get_logo_url(): string {
+	$data = ltdh_get_logo_data();
+	return $data['url'] ?? '';
+}
+
+/**
+ * Output site logo HTML with explicit dimensions & aspect-ratio (Zero CLS).
  */
 function ltdh_site_logo(int $max_height = 48): void {
-	$logo_url = ltdh_get_logo_url();
-	if ($logo_url) :
+	$logo_data = ltdh_get_logo_data();
+	if (! empty($logo_data['url'])) :
 		$site_name = get_bloginfo('name');
+		$orig_w = $logo_data['width'] ?: 200;
+		$orig_h = $logo_data['height'] ?: 60;
+		$calc_w = $orig_h > 0 ? round(($orig_w / $orig_h) * $max_height) : $orig_w;
 	?>
-		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center">
-			<img src="<?php echo esc_url($logo_url); ?>"
+		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center" aria-label="<?php echo esc_attr($site_name); ?>">
+			<img src="<?php echo esc_url($logo_data['url']); ?>"
 				alt="<?php echo esc_attr($site_name); ?>"
+				width="<?php echo esc_attr($calc_w); ?>"
+				height="<?php echo esc_attr($max_height); ?>"
 				class="h-auto object-contain"
-				style="max-height: <?php echo esc_attr($max_height); ?>px; width: auto;">
+				loading="eager"
+				fetchpriority="high"
+				decoding="async"
+				style="max-height: <?php echo esc_attr($max_height); ?>px; width: auto; aspect-ratio: <?php echo esc_attr($calc_w); ?> / <?php echo esc_attr($max_height); ?>;">
 		</a>
 	<?php else : ?>
-		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary">
+		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary" aria-label="<?php echo esc_attr(get_bloginfo('name')); ?>">
 			<div class="flex flex-col leading-none">
 				<span class="text-sm font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
 				<span class="text-xl font-extrabold text-brand-primary">ĐẠI HỌC</span>
@@ -282,21 +317,28 @@ function ltdh_site_logo(int $max_height = 48): void {
 }
 
 /**
- * Output site logo for mobile.
+ * Output site logo for mobile with explicit dimensions & aspect-ratio (Zero CLS).
  */
 function ltdh_site_logo_mobile(int $max_height = 36): void {
-	$logo_url = ltdh_get_logo_url();
-	if ($logo_url) :
+	$logo_data = ltdh_get_logo_data();
+	if (! empty($logo_data['url'])) :
 		$site_name = get_bloginfo('name');
+		$orig_w = $logo_data['width'] ?: 200;
+		$orig_h = $logo_data['height'] ?: 60;
+		$calc_w = $orig_h > 0 ? round(($orig_w / $orig_h) * $max_height) : $orig_w;
 	?>
-		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center">
-			<img src="<?php echo esc_url($logo_url); ?>"
+		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center" aria-label="<?php echo esc_attr($site_name); ?>">
+			<img src="<?php echo esc_url($logo_data['url']); ?>"
 				alt="<?php echo esc_attr($site_name); ?>"
+				width="<?php echo esc_attr($calc_w); ?>"
+				height="<?php echo esc_attr($max_height); ?>"
 				class="h-auto object-contain"
-				style="max-height: <?php echo esc_attr($max_height); ?>px; width: auto;">
+				loading="eager"
+				decoding="async"
+				style="max-height: <?php echo esc_attr($max_height); ?>px; width: auto; aspect-ratio: <?php echo esc_attr($calc_w); ?> / <?php echo esc_attr($max_height); ?>;">
 		</a>
 	<?php else : ?>
-		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary">
+		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center gap-2 font-display font-black text-2xl text-brand-primary" aria-label="<?php echo esc_attr(get_bloginfo('name')); ?>">
 			<div class="flex flex-col leading-none">
 				<span class="text-xs font-semibold text-slate-400 tracking-wider">LIÊN THÔNG</span>
 				<span class="text-lg font-extrabold text-brand-primary">ĐẠI HỌC</span>
@@ -501,6 +543,81 @@ function ltdh_get_cached_featured_schools() {
 	return $data;
 }
 
+/**
+ * Cached filter dropdown options for Homepage & Search Bar.
+ *
+ * Avoids executing get_posts( -1 ) on every page request.
+ *
+ * @return array
+ */
+function ltdh_get_cached_filter_options(): array {
+	$cache_key = 'ltdh_filter_options';
+	$cached    = get_transient( $cache_key );
+	if ( false !== $cached && is_array( $cached ) ) {
+		return $cached;
+	}
+
+	$schools = get_posts([
+		'post_type'      => 'school',
+		'posts_per_page' => 100,
+		'post_status'    => 'publish',
+		'orderby'        => 'title',
+		'order'          => 'ASC',
+		'fields'         => 'ids',
+		'no_found_rows'  => true,
+	]);
+
+	$school_list = [];
+	foreach ( $schools as $sid ) {
+		$school_list[] = [
+			'slug'  => get_post_field( 'post_name', $sid ),
+			'title' => get_the_title( $sid ),
+		];
+	}
+
+	$majors = get_posts([
+		'post_type'      => 'major',
+		'posts_per_page' => 100,
+		'post_status'    => 'publish',
+		'orderby'        => 'title',
+		'order'          => 'ASC',
+		'fields'         => 'ids',
+		'no_found_rows'  => true,
+	]);
+
+	$major_list = [];
+	foreach ( $majors as $mid ) {
+		$major_list[] = [
+			'slug'  => get_post_field( 'post_name', $mid ),
+			'title' => get_the_title( $mid ),
+		];
+	}
+
+	$types_terms = get_terms([
+		'taxonomy'   => LTDH_TAX_TRAINING_TYPE,
+		'hide_empty' => false,
+	]);
+
+	$type_list = [];
+	if ( ! is_wp_error( $types_terms ) && ! empty( $types_terms ) ) {
+		foreach ( $types_terms as $tt ) {
+			$type_list[] = [
+				'slug' => $tt->slug,
+				'name' => $tt->name,
+			];
+		}
+	}
+
+	$data = [
+		'schools' => $school_list,
+		'majors'  => $major_list,
+		'types'   => $type_list,
+	];
+
+	set_transient( $cache_key, $data, 12 * HOUR_IN_SECONDS );
+	return $data;
+}
+
 function ltdh_clear_transients_on_save($post_id) {
 	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
 		return;
@@ -511,6 +628,9 @@ function ltdh_clear_transients_on_save($post_id) {
 		delete_transient('ltdh_featured_schools_data');
 		delete_transient('ltdh_hot_majors_data');
 		delete_transient('ltdh_combinations_data');
+		delete_transient('ltdh_filter_options');
+		delete_transient('ltdh_archive_school_featured');
+		delete_transient('ltdh_training_type_counts');
 	}
 	if ('post' === $post_type) {
 		delete_transient('ltdh_homepage_news');
@@ -519,6 +639,7 @@ function ltdh_clear_transients_on_save($post_id) {
 add_action('save_post', 'ltdh_clear_transients_on_save');
 
 // ----------------------------------------------------
+
 // 6. School Thumbnail Helpers
 // ----------------------------------------------------
 
