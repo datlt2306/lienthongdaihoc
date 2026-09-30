@@ -20,7 +20,7 @@ $messenger = ltdh_get_messenger_url();
 			<div>
 				<h2 class="font-display font-extrabold text-2xl text-white mb-4 tracking-tight">lienthongdaihoc<span style="color: #f97316;">.com</span></h2>
 				<p class="text-sm text-slate-400 mb-6 leading-relaxed">
-					lienthongdaihoc.com – Đơn vị tư vấn chuyên sâu về liên thông Đại học chính quy. Chúng tôi đồng hành cùng bạn trên hành trình chinh phục tấm bằng đại học và kiến tạo sự nghiệp tương lai.
+					lienthongdaihoc.com – Đơn vị tư vấn chuyên sâu về liên thông Đại học. Chúng tôi đồng hành cùng bạn trên hành trình chinh phục tấm bằng đại học và kiến tạo sự nghiệp tương lai.
 				</p>
 				<!-- Social links circles -->
 				<div class="flex items-center gap-3">
@@ -97,10 +97,6 @@ $messenger = ltdh_get_messenger_url();
 					<li class="flex items-center">
 						<span style="display: inline-block; width: 6px; height: 6px; background-color: #00a2f4; border-radius: 50%; margin-right: 8px; flex-shrink: 0;"></span>
 						<a href="#" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Đại học tại chức / VLVH</a>
-					</li>
-					<li class="flex items-center">
-						<span style="display: inline-block; width: 6px; height: 6px; background-color: #00a2f4; border-radius: 50%; margin-right: 8px; flex-shrink: 0;"></span>
-						<a href="#" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Liên thông Đại Học Offline</a>
 					</li>
 				</ul>
 			</div>

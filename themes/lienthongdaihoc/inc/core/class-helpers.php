@@ -781,10 +781,15 @@ function ltdh_get_fallback_image(string $context = 'program'): string {
 	if ( $context === 'school' ) {
 		return $theme_uri . '/assets/images/banner-school.jpg';
 	}
+	if ( $context === 'news' ) {
+		if ( file_exists( get_template_directory() . '/assets/images/banner-fallback.webp' ) ) {
+			return $theme_uri . '/assets/images/banner-fallback.webp';
+		}
+	}
 	if ( function_exists( 'get_field' ) ) {
 		$custom_share_image = get_field( 'global_share_image', 'options' );
 		if ( ! empty( $custom_share_image ) ) {
-			return $custom_share_image;
+			return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $custom_share_image ) : $custom_share_image;
 		}
 	}
 	return $theme_uri . '/assets/images/banner-program.jpg';

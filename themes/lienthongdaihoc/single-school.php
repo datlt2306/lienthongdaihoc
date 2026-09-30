@@ -29,72 +29,6 @@ if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 $global_zalo = ltdh_get_zalo_url();
 ?>
 
-<style>
-/* Custom styled Admission info & Contact info cards */
-.prose-card-list h4 {
-	font-size: 0.95rem;
-	font-weight: 800;
-	color: #1e293b;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	margin-top: 1.5rem;
-	margin-bottom: 0.75rem;
-	padding-left: 0.75rem;
-	border-left: 4px solid #2563eb;
-	display: flex;
-	align-items: center;
-}
-.prose-card-list ul {
-	list-style-type: none !important;
-	padding-left: 0 !important;
-	margin-bottom: 1.5rem;
-	border: 1px solid #f1f5f9;
-	border-radius: 8px;
-	overflow: hidden;
-	background-color: #ffffff;
-}
-.prose-card-list ul li {
-	padding: 0.75rem 1rem !important;
-	border-bottom: 1px solid #f1f5f9;
-	margin: 0 !important;
-	font-size: 0.875rem;
-	color: #475569;
-	display: flex;
-	flex-direction: column;
-}
-@media (min-width: 640px) {
-	.prose-card-list ul li {
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		gap: 1.5rem;
-	}
-}
-.prose-card-list ul li:last-child {
-	border-bottom: none;
-}
-.prose-card-list ul li:nth-child(even) {
-	background-color: #f8fafc;
-}
-.prose-card-list ul li strong {
-	color: #0f172a;
-	font-weight: 700;
-	min-width: 180px;
-	flex-shrink: 0;
-}
-.bank-info-box {
-	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-	border: 1px solid #cbd5e1 !important;
-	border-left: 5px solid #2563eb !important;
-	padding: 1.25rem !important;
-	border-radius: 8px !important;
-	color: #334155 !important;
-	font-size: 0.875rem !important;
-	line-height: 1.6 !important;
-	margin-top: 0.75rem !important;
-	box-shadow: inset 0 1px 2px rgba(0,0,0,0.02) !important;
-}
-</style>
 
 <main id="primary" class="site-main bg-slate-50">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
@@ -171,39 +105,64 @@ $global_zalo = ltdh_get_zalo_url();
 						if (!content || !overlay || !container || !button) return;
 						
 						var limit = 350;
+						var storageKey = 'ltdh_school_intro_expanded_<?php echo $school_id; ?>';
 						var isExpanded = false;
 						
-						function checkHeight() {
-							if (isExpanded) return;
-							if (content.scrollHeight > limit + 30) {
-								container.classList.remove('hidden');
-								container.classList.add('flex');
-								content.style.maxHeight = limit + 'px';
-								overlay.style.display = 'block';
-							} else {
+						try {
+							isExpanded = localStorage.getItem(storageKey) === 'true';
+						} catch (e) {}
+
+						function applyState() {
+							var needsToggle = content.scrollHeight > limit + 30;
+							if (!needsToggle) {
 								container.classList.remove('flex');
 								container.classList.add('hidden');
 								content.style.maxHeight = 'none';
 								overlay.style.display = 'none';
+								return;
+							}
+							
+							container.classList.remove('hidden');
+							container.classList.add('flex');
+							
+							if (isExpanded) {
+								content.style.maxHeight = 'none';
+								overlay.style.display = 'none';
+								overlay.classList.add('opacity-0');
+								btnText.textContent = 'Thu gọn';
+								btnIcon.classList.add('rotate-180');
+							} else {
+								content.style.maxHeight = limit + 'px';
+								overlay.style.display = 'block';
+								overlay.classList.remove('opacity-0');
+								btnText.textContent = 'Xem thêm giới thiệu';
+								btnIcon.classList.remove('rotate-180');
 							}
 						}
 						
-						checkHeight();
-						window.addEventListener('load', checkHeight);
+						applyState();
+						window.addEventListener('load', applyState);
 						
 						button.addEventListener('click', function() {
 							isExpanded = !isExpanded;
+							try {
+								localStorage.setItem(storageKey, isExpanded);
+							} catch (e) {}
+
 							if (isExpanded) {
 								content.style.maxHeight = content.scrollHeight + 'px';
+								overlay.style.display = 'block';
 								overlay.classList.add('opacity-0');
 								setTimeout(function() {
 									if (isExpanded) {
 										content.style.maxHeight = 'none';
+										overlay.style.display = 'none';
 									}
 								}, 500);
 								btnText.textContent = 'Thu gọn';
 								btnIcon.classList.add('rotate-180');
 							} else {
+								overlay.style.display = 'block';
 								content.style.maxHeight = content.scrollHeight + 'px';
 								content.offsetHeight; // Force reflow
 								content.style.maxHeight = limit + 'px';

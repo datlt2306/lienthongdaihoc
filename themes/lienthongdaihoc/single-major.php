@@ -82,39 +82,64 @@ $hotline = ltdh_get_hotline();
 						if (!content || !overlay || !container || !button) return;
 						
 						var limit = 350;
+						var storageKey = 'ltdh_major_intro_expanded_<?php echo $major_id; ?>';
 						var isExpanded = false;
 						
-						function checkHeight() {
-							if (isExpanded) return;
-							if (content.scrollHeight > limit + 30) {
-								container.classList.remove('hidden');
-								container.classList.add('flex');
-								content.style.maxHeight = limit + 'px';
-								overlay.style.display = 'block';
-							} else {
+						try {
+							isExpanded = localStorage.getItem(storageKey) === 'true';
+						} catch (e) {}
+
+						function applyState() {
+							var needsToggle = content.scrollHeight > limit + 30;
+							if (!needsToggle) {
 								container.classList.remove('flex');
 								container.classList.add('hidden');
 								content.style.maxHeight = 'none';
 								overlay.style.display = 'none';
+								return;
+							}
+							
+							container.classList.remove('hidden');
+							container.classList.add('flex');
+							
+							if (isExpanded) {
+								content.style.maxHeight = 'none';
+								overlay.style.display = 'none';
+								overlay.classList.add('opacity-0');
+								btnText.textContent = 'Thu gọn';
+								btnIcon.classList.add('rotate-180');
+							} else {
+								content.style.maxHeight = limit + 'px';
+								overlay.style.display = 'block';
+								overlay.classList.remove('opacity-0');
+								btnText.textContent = 'Xem thêm tổng quan';
+								btnIcon.classList.remove('rotate-180');
 							}
 						}
 						
-						checkHeight();
-						window.addEventListener('load', checkHeight);
+						applyState();
+						window.addEventListener('load', applyState);
 						
 						button.addEventListener('click', function() {
 							isExpanded = !isExpanded;
+							try {
+								localStorage.setItem(storageKey, isExpanded);
+							} catch (e) {}
+
 							if (isExpanded) {
 								content.style.maxHeight = content.scrollHeight + 'px';
+								overlay.style.display = 'block';
 								overlay.classList.add('opacity-0');
 								setTimeout(function() {
 									if (isExpanded) {
 										content.style.maxHeight = 'none';
+										overlay.style.display = 'none';
 									}
 								}, 500);
 								btnText.textContent = 'Thu gọn';
 								btnIcon.classList.add('rotate-180');
 							} else {
+								overlay.style.display = 'block';
 								content.style.maxHeight = content.scrollHeight + 'px';
 								content.offsetHeight; // Force reflow
 								content.style.maxHeight = limit + 'px';

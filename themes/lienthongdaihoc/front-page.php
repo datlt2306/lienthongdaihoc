@@ -313,8 +313,11 @@ $zalo    = ltdh_get_zalo_url();
 					$e_desc = get_field('hp_elig_desc', 'options') ?: '';
 					$e_items = get_field('hp_elig_items', 'options') ?: [];
 					$e_cta_text = get_field('hp_elig_cta_text', 'options') ?: '';
-					$e_cta_url = get_field('hp_elig_cta_url', 'options') ?: '';
+					$e_cta_raw  = get_field('hp_elig_cta_url', 'options') ?: '/kiem-tra-dieu-kien/';
+				} else {
+					$e_cta_raw = '/kiem-tra-dieu-kien/';
 				}
+				$e_cta_url = ( preg_match( '#^(https?:)?//#i', $e_cta_raw ) ) ? $e_cta_raw : home_url( $e_cta_raw );
 				$e_heading = str_replace('\n', '<br>', $e_heading);
 				?>
 				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">
@@ -343,7 +346,7 @@ $zalo    = ltdh_get_zalo_url();
 					<?php endforeach; ?>
 				</div>
 				<div class="flex flex-wrap justify-center gap-3 pt-6">
-					<a href="<?php echo esc_url($e_cta_url ? home_url($e_cta_url) : home_url('/kiem-tra-dieu-kien/')); ?>" class="bg-brand-accent text-white px-6 py-3.5 rounded-lg font-bold text-sm hover:bg-[#e06e00] transition-all shadow-md shadow-brand-primary/10">
+					<a href="<?php echo esc_url($e_cta_url); ?>" class="bg-brand-accent text-white px-6 py-3.5 rounded-lg font-bold text-sm hover:bg-[#e06e00] transition-all shadow-md shadow-brand-primary/10">
 						<?php echo esc_html($e_cta_text ?: 'Bắt đầu kiểm tra ngay ➔'); ?>
 					</a>
 					<a href="#register-section" class="bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all">
@@ -501,9 +504,10 @@ $zalo    = ltdh_get_zalo_url();
 								}
 								
 								foreach ( $slides as $index => $slide_url ) :
+									$opt_slide_url = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide_url ) : $slide_url;
 								?>
 									<div class="swiper-slide w-full h-full">
-										<img src="<?php echo esc_url($slide_url); ?>" alt="Students Graduation Slide">
+										<img src="<?php echo esc_url($opt_slide_url); ?>" alt="Students Graduation Slide" loading="lazy" decoding="async" class="w-full h-full object-cover">
 									</div>
 								<?php endforeach; ?>
 							</div>
@@ -527,7 +531,11 @@ $zalo    = ltdh_get_zalo_url();
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 				<!-- Left column: Video Card -->
 				<div class="rounded-2xl relative overflow-hidden rounded-3xl shadow-lg aspect-video group bg-slate-800 flex items-center justify-center <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
-					<img src="<?php echo esc_url($c_left_image ?: home_url('wp-content/uploads/2026/07/vtv-news-thumb.png')); ?>" alt="VTV24 Video Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+					<?php
+					$video_raw_thumb = $c_left_image ?: home_url('wp-content/uploads/2026/07/vtv-news-thumb.png');
+					$video_opt_thumb = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $video_raw_thumb ) : $video_raw_thumb;
+					?>
+					<img src="<?php echo esc_url($video_opt_thumb); ?>" alt="VTV24 Video Thumbnail" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
 					
 					<?php if (!empty($c_left_youtube)): ?>
 						<!-- Play button overlay -->
@@ -687,20 +695,28 @@ $zalo    = ltdh_get_zalo_url();
 				});
 			}
 
-			// Certificate Swiper Slider Logic
-			if (typeof Swiper !== 'undefined') {
-				new Swiper('.cert-swiper', {
-					loop: true,
-					autoplay: {
-						delay: 4000,
-						disableOnInteraction: false,
-					},
-					pagination: {
-						el: '.cert-swiper .swiper-pagination',
-						clickable: true,
-					},
-					speed: 600,
-				});
+			// Certificate Swiper Slider Logic (Lazy Hydration)
+			const initCertSwiper = () => {
+				if (typeof Swiper !== 'undefined' && document.querySelector('.cert-swiper')) {
+					new Swiper('.cert-swiper', {
+						loop: true,
+						autoplay: {
+							delay: 4000,
+							disableOnInteraction: false,
+						},
+						pagination: {
+							el: '.cert-swiper .swiper-pagination',
+							clickable: true,
+						},
+						speed: 600,
+					});
+				}
+			};
+
+			if ('requestIdleCallback' in window) {
+				requestIdleCallback(initCertSwiper, { timeout: 3000 });
+			} else {
+				setTimeout(initCertSwiper, 1000);
 			}
 		});
 	</script>
@@ -885,7 +901,11 @@ $zalo    = ltdh_get_zalo_url();
 			<!-- Graduate photo column -->
 			<div class="lg:col-span-5 hidden lg:block">
 				<div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-md">
-					<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo esc_url( home_url( '/wp-content/uploads/2026/07/banner-contact.png' ) ); ?>');"></div>
+					<?php
+					$raw_contact_banner = home_url( '/wp-content/uploads/2026/07/banner-contact.png' );
+					$opt_contact_banner = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $raw_contact_banner ) : $raw_contact_banner;
+					?>
+					<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $opt_contact_banner ); ?>');"></div>
 				</div>
 			</div>
 
@@ -933,7 +953,8 @@ $zalo    = ltdh_get_zalo_url();
 					$index = 0;
 					while ($news_query->have_posts()) : $news_query->the_post();
 						$post_id = get_the_ID();
-						$thumb_url = get_the_post_thumbnail_url($post_id, 'medium') ?: ltdh_get_fallback_image('news');
+						$raw_thumb = get_the_post_thumbnail_url($post_id, 'medium') ?: ltdh_get_fallback_image('news');
+						$thumb_url = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $raw_thumb ) : $raw_thumb;
 						$categories = get_the_category($post_id);
 						$category_name = ! empty($categories) ? $categories[0]->name : 'Tin tuyển sinh';
 				?>

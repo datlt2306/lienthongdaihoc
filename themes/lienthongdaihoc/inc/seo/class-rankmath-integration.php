@@ -62,10 +62,10 @@ function ltdh_seo_dynamic_description( $desc ) {
 add_filter( 'rank_math/frontend/description', 'ltdh_seo_dynamic_description' );
 
 /**
- * Enforce flat Canonical URL for program posts (/%slug%/)
+ * Enforce flat Canonical URL for program and school posts (/%slug%/)
  */
 function ltdh_seo_enforce_canonical_url( $canonical ) {
-	if ( is_singular( 'program' ) ) {
+	if ( is_singular( 'program' ) || is_singular( 'school' ) ) {
 		$post_id = get_the_ID();
 		if ( $post_id ) {
 			return home_url( '/' . get_post_field( 'post_name', $post_id ) . '/' );
@@ -74,6 +74,18 @@ function ltdh_seo_enforce_canonical_url( $canonical ) {
 	return $canonical;
 }
 add_filter( 'rank_math/frontend/canonical', 'ltdh_seo_enforce_canonical_url' );
+add_filter( 'rank_math/paper/canonical_url', 'ltdh_seo_enforce_canonical_url' );
+
+/**
+ * Ensure Rank Math XML Sitemaps use flat URLs for school posts
+ */
+function ltdh_seo_rankmath_sitemap_school_url( $url, $post ) {
+	if ( isset( $post->post_type ) && 'school' === $post->post_type ) {
+		return home_url( '/' . $post->post_name . '/' );
+	}
+	return $url;
+}
+add_filter( 'rank_math/sitemap/entry', 'ltdh_seo_rankmath_sitemap_school_url', 10, 2 );
 
 // ----------------------------------------------------
 // 3. Schema JSON-LD Injection

@@ -47,6 +47,11 @@ class LTDH_Performance {
 
 		// 7. Security & HTTP Caching Headers
 		add_action( 'send_headers', [ __CLASS__, 'send_performance_headers' ] );
+
+		// 8. Auto-rewrite Attachment Images & URLs to Optimized WebP
+		add_filter( 'wp_get_attachment_image_src', [ __CLASS__, 'filter_attachment_image_src' ], 10, 4 );
+		add_filter( 'wp_get_attachment_url', [ __CLASS__, 'filter_attachment_url' ], 10, 2 );
+		add_filter( 'post_thumbnail_html', [ __CLASS__, 'filter_image_html' ], 10, 5 );
 	}
 
 	/**
@@ -154,7 +159,7 @@ class LTDH_Performance {
 
 		if ( in_array( $handle, $defer_handles, true ) ) {
 			if ( false === strpos( $tag, 'defer' ) && false === strpos( $tag, 'async' ) ) {
-				$tag = str_replace( ' src', ' defer src', $tag );
+				$tag = str_replace( ' src', ' defer fetchpriority="low" src', $tag );
 			}
 		}
 
@@ -260,6 +265,43 @@ class LTDH_Performance {
 		header( 'X-Frame-Options: SAMEORIGIN' );
 		header( 'X-XSS-Protection: 1; mode=block' );
 		header( 'Referrer-Policy: strict-origin-when-cross-origin' );
+	}
+
+	/**
+	 * 8. Automatically rewrite image attachment src to WebP if an optimized version exists.
+	 */
+	public static function filter_attachment_image_src( $image, $attachment_id, $size, $icon ) {
+		if ( ! empty( $image[0] ) && function_exists( 'ltdh_get_optimized_image_url' ) ) {
+			$image[0] = ltdh_get_optimized_image_url( $image[0] );
+		}
+		return $image;
+	}
+
+	/**
+	 * Automatically rewrite attachment URL to WebP if an optimized version exists.
+	 */
+	public static function filter_attachment_url( $url, $attachment_id ) {
+		if ( ! empty( $url ) && function_exists( 'ltdh_get_optimized_image_url' ) ) {
+			return ltdh_get_optimized_image_url( $url );
+		}
+		return $url;
+	}
+
+	/**
+	 * Rewrite any huge image URLs in rendered HTML to WebP.
+	 */
+	public static function filter_image_html( $html ) {
+		if ( empty( $html ) || ! function_exists( 'ltdh_get_optimized_image_url' ) ) {
+			return $html;
+		}
+		return preg_replace_callback( '/(src|srcset)=["\']([^"\']+)["\']/i', function( $matches ) {
+			$attr = $matches[1];
+			$val = $matches[2];
+			if ( strpos( $val, '.png' ) !== false || strpos( $val, '.jpg' ) !== false || strpos( $val, '.jpeg' ) !== false ) {
+				$val = ltdh_get_optimized_image_url( $val );
+			}
+			return $attr . '="' . $val . '"';
+		}, $html );
 	}
 }
 

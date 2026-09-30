@@ -71,12 +71,22 @@ function ltdh_program_request_guard( $query_vars ) {
 		if ( $program_id > 0 ) {
 			$slug_type = 'program';
 		} else {
-			// Check if a regular post exists with this slug
-			$post_id = (int) $wpdb->get_var( $wpdb->prepare(
-				"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'post' AND post_status = 'publish' LIMIT 1",
+			// Check if a published school post exists with this slug
+			$school_id = (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'school' AND post_status = 'publish' LIMIT 1",
 				$slug
 			) );
-			$slug_type = ( $post_id > 0 ) ? 'post' : 'page';
+
+			if ( $school_id > 0 ) {
+				$slug_type = 'school';
+			} else {
+				// Check if a regular post exists with this slug
+				$post_id = (int) $wpdb->get_var( $wpdb->prepare(
+					"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'post' AND post_status = 'publish' LIMIT 1",
+					$slug
+				) );
+				$slug_type = ( $post_id > 0 ) ? 'post' : 'page';
+			}
 		}
 		wp_cache_set( $cache_key, $slug_type, 'ltdh_rewrites', 3600 );
 	}
@@ -90,6 +100,13 @@ function ltdh_program_request_guard( $query_vars ) {
 	unset( $query_vars['program'] );
 	unset( $query_vars['post_type'] );
 	unset( $query_vars['name'] );
+
+	if ( 'school' === $slug_type ) {
+		$query_vars['school']    = $slug;
+		$query_vars['name']      = $slug;
+		$query_vars['post_type'] = 'school';
+		return $query_vars;
+	}
 
 	if ( 'post' === $slug_type ) {
 		$query_vars['name']      = $slug;
@@ -105,14 +122,14 @@ function ltdh_program_request_guard( $query_vars ) {
 add_filter( 'request', 'ltdh_program_request_guard' );
 
 /**
- * Override get_permalink() for program posts → /slug/ (no /program/ prefix).
+ * Override get_permalink() for program and school posts → /slug/ (no /program/ or /truong-doi-tac/ prefix).
  *
  * @param string  $url  Original URL.
  * @param WP_Post $post Post object.
  * @return string Modified URL.
  */
 function ltdh_program_permalink( $url, $post ) {
-	if ( $post instanceof WP_Post && 'program' === $post->post_type ) {
+	if ( $post instanceof WP_Post && in_array( $post->post_type, [ 'program', 'school' ], true ) ) {
 		return home_url( '/' . $post->post_name . '/' );
 	}
 	return $url;
@@ -137,7 +154,7 @@ function ltdh_template_include_program( $template ) {
 add_filter( 'template_include', 'ltdh_template_include_program', 5 );
 
 // ----------------------------------------------------
-// 3. Redirect Empty Taxonomy Base URLs
+// 3. Redirect Empty Taxonomy Base URLs & Legacy CPT Prefixes
 // ----------------------------------------------------
 function ltdh_redirect_taxonomy_base() {
 	if ( is_tax( LTDH_TAX_CAMPUS ) ) {
@@ -149,6 +166,15 @@ function ltdh_redirect_taxonomy_base() {
 	if ( preg_match( '#^/program/([^/]+)/?$#i', $request_path, $matches ) ) {
 		wp_redirect( home_url( '/' . $matches[1] . '/' ), 301 );
 		exit;
+	}
+
+	// 301 redirect: /truong-doi-tac/slug/ → /slug/ (except archive base /truong-doi-tac/ and paginated /truong-doi-tac/page/X/)
+	if ( preg_match( '#^/truong-doi-tac/([^/]+)/?$#i', $request_path, $matches ) ) {
+		$sub_slug = $matches[1];
+		if ( 'page' !== $sub_slug && ! empty( $sub_slug ) ) {
+			wp_redirect( home_url( '/' . $sub_slug . '/' ), 301 );
+			exit;
+		}
 	}
 
 	if ( preg_match( '#^/co-so/?$#i', $request_path ) ) {

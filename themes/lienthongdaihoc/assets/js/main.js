@@ -51,27 +51,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------
-    // 2. Hero Swiper Slider Initialization
+    // 2. Hero Swiper Slider Initialization (Idle Hydration)
     // ----------------------------------------------------
-    const heroSwiperEl = document.querySelector('.hero-swiper');
-    if (heroSwiperEl && typeof Swiper !== 'undefined') {
-        new Swiper('.hero-swiper', {
-            loop: true,
-            autoplay: {
-                delay: 5000,
-                disableOnInteraction: false,
-            },
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            speed: 800,
-            watchSlidesProgress: true,
-        });
+    const initHeroSwiper = () => {
+        const heroSwiperEl = document.querySelector('.hero-swiper');
+        if (heroSwiperEl && typeof Swiper !== 'undefined') {
+            new Swiper('.hero-swiper', {
+                loop: true,
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                speed: 800,
+                watchSlidesProgress: true,
+            });
+        }
+    };
+
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(initHeroSwiper, { timeout: 2000 });
+    } else {
+        setTimeout(initHeroSwiper, 300);
     }
 
     // ----------------------------------------------------

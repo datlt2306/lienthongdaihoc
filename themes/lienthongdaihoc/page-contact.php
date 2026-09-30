@@ -37,7 +37,11 @@ $address = ltdh_get_address();
 			<!-- Left Side Graphic (Uses the banner-contact image from homepage) -->
 			<div class="lg:col-span-5 relative min-h-[350px] md:min-h-[450px] lg:min-h-[550px] bg-slate-50">
 				<!-- The custom contact banner image containing the counselor illustration and pathway -->
-				<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/wp-content/uploads/2026/07/banner-contact.png');"></div>
+				<?php
+				$raw_contact_banner = home_url( '/wp-content/uploads/2026/07/banner-contact.png' );
+				$opt_contact_banner = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $raw_contact_banner ) : $raw_contact_banner;
+				?>
+				<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $opt_contact_banner ); ?>');"></div>
 			</div>
 
 			<!-- Right Side Form (Matches Mockup exact copy and style) -->
