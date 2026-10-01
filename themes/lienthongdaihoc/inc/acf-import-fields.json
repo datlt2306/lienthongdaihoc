@@ -42,7 +42,7 @@
             },
             {
                 "key": "field_school_code",
-                "label": "Mã trường \/ Viết tắt",
+                "label": "Mã trường / Viết tắt",
                 "name": "school_code",
                 "type": "text",
                 "placeholder": "Ví dụ: NEU, TMU, PTIT..."
@@ -160,20 +160,132 @@
         "title": "Thông tin Ngành học",
         "fields": [
             {
+                "key": "field_tab_major_roadmap",
+                "label": "Tổng quan & Lộ trình đào tạo",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
                 "key": "field_major_code",
                 "label": "Mã ngành",
                 "name": "major_code",
-                "type": "text"
+                "type": "text",
+                "instructions": "Mã ngành đào tạo chuẩn của Bộ GD&ĐT (Hiển thị tại Banner đầu trang, ví dụ: 7480201)"
+            },
+            {
+                "key": "field_major_entry_roadmaps",
+                "label": "Bảng lộ trình đào tạo theo đối tượng đầu vào",
+                "name": "major_entry_roadmaps",
+                "type": "repeater",
+                "instructions": "Thiết lập lộ trình đào tạo riêng cho từng văn bằng đầu vào (Tự động hiển thị thành Bảng lộ trình chuẩn UI)",
+                "layout": "table",
+                "button_label": "+ Thêm đối tượng đầu vào",
+                "sub_fields": [
+                    {
+                        "key": "field_roadmap_entry_level",
+                        "label": "Trình độ đầu vào",
+                        "name": "entry_level",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Từ Cao đẳng CNTT"
+                    },
+                    {
+                        "key": "field_roadmap_study_time",
+                        "label": "Thời gian học",
+                        "name": "study_time",
+                        "type": "text",
+                        "placeholder": "Ví dụ: 1.5 - 2 năm"
+                    },
+                    {
+                        "key": "field_roadmap_study_mode",
+                        "label": "Hình thức học",
+                        "name": "study_mode",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Online từ xa / Tối & Cuối tuần"
+                    },
+                    {
+                        "key": "field_roadmap_degree_output",
+                        "label": "Bằng cấp nhận được",
+                        "name": "degree_output",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Cử nhân / Kỹ sư CNTT"
+                    }
+                ]
+            },
+            {
+                "key": "field_tab_major_specializations",
+                "label": "Các mảng đào tạo chuyên sâu",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_major_specializations",
+                "label": "Danh mục mảng chuyên sâu / Chuyên ngành hẹp",
+                "name": "major_specializations",
+                "type": "repeater",
+                "instructions": "Các khối chuyên môn trong ngành (Tự động render thành các Cards chuyên sâu có icon)",
+                "layout": "block",
+                "button_label": "+ Thêm mảng chuyên sâu",
+                "sub_fields": [
+                    {
+                        "key": "field_spec_icon",
+                        "label": "Biểu tượng / Emoji",
+                        "name": "spec_icon",
+                        "type": "text",
+                        "placeholder": "Ví dụ: 💻, 📊, 🔒, ☁️",
+                        "wrapper": {
+                            "width": "20"
+                        }
+                    },
+                    {
+                        "key": "field_spec_name",
+                        "label": "Tên mảng chuyên sâu",
+                        "name": "spec_name",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Phát triển Phần mềm",
+                        "wrapper": {
+                            "width": "80"
+                        }
+                    },
+                    {
+                        "key": "field_spec_desc",
+                        "label": "Mô tả nội dung đào tạo",
+                        "name": "spec_desc",
+                        "type": "textarea",
+                        "rows": 3,
+                        "placeholder": "Ví dụ: Đào tạo lập trình Web, App di động, hệ thống quản trị..."
+                    }
+                ]
+            },
+            {
+                "key": "field_tab_major_career",
+                "label": "Cơ hội nghề nghiệp & Định hướng",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
             },
             {
                 "key": "field_major_opportunities",
                 "label": "Cơ hội nghề nghiệp & Định hướng",
                 "name": "career_opportunities",
-                "type": "wysiwyg"
+                "type": "wysiwyg",
+                "instructions": "Chi tiết về cơ hội việc làm, vị trí công tác và định hướng nghề nghiệp sau tốt nghiệp (Hiển thị tại Section Cơ hội nghề nghiệp ngoài website)"
+            },
+            {
+                "key": "field_tab_major_related",
+                "label": "Ngành đào tạo liên quan",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
             },
             {
                 "key": "field_major_related",
-                "label": "Ngành liên quan",
+                "label": "Ngành đào tạo liên quan",
                 "name": "major_related",
                 "type": "relationship",
                 "post_type": [
@@ -183,7 +295,7 @@
                 "multiple": 1,
                 "return_format": "id",
                 "ui": 1,
-                "instructions": "Các ngành liên quan dùng cho Eligibility Checker scoring"
+                "instructions": "Chọn các ngành học liên quan (Hiển thị tại Section 'Ngành đào tạo liên quan' ngoài website & dùng cho thuật toán xét tuyển liên thông)"
             }
         ],
         "location": [
@@ -208,6 +320,14 @@
         "key": "group_program_details",
         "title": "Thông tin Chương trình tuyển sinh",
         "fields": [
+            {
+                "key": "field_tab_prog_overview",
+                "label": "Tổng quan chương trình",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
             {
                 "key": "field_program_school",
                 "label": "Trường đào tạo (Liên kết)",
@@ -235,54 +355,10 @@
                 "ui": 1
             },
             {
-                "key": "field_program_tuition",
-                "label": "Học phí chỉ từ",
-                "name": "tuition_fee",
-                "type": "text",
-                "placeholder": "Ví dụ: 450,000đ \/ tín chỉ hoặc 15,000,000đ \/ học kỳ"
-            },
-            {
-                "key": "field_program_tuition_amount",
-                "label": "Mức học phí định mức (số tiền)",
-                "name": "tuition_amount",
-                "type": "number",
-                "instructions": "Ví dụ: 684026 (không nhập dấu phẩy hoặc chữ đ)",
-                "placeholder": "684026"
-            },
-            {
-                "key": "field_program_tuition_unit",
-                "label": "Đơn vị tính học phí",
-                "name": "tuition_unit",
-                "type": "select",
-                "choices": {
-                    "tin-chi": "đồng / tín chỉ",
-                    "hoc-ky": "đồng / học kỳ",
-                    "nam": "đồng / năm học"
-                },
-                "default_value": "tin-chi"
-            },
-            {
-                "key": "field_program_tuition_academic_year",
-                "label": "Năm học áp dụng",
-                "name": "tuition_academic_year",
-                "type": "text",
-                "placeholder": "Ví dụ: 2025 - 2026"
-            },
-            {
-                "key": "field_program_tuition_total_credits",
-                "label": "Tổng số tín chỉ toàn khóa (Nếu có)",
-                "name": "tuition_total_credits",
-                "type": "number",
-                "instructions": "Dùng để tạm tính tổng học phí toàn khóa",
-                "placeholder": "136"
-            },
-            {
-                "key": "field_program_tuition_increase_roadmap",
-                "label": "Lộ trình tăng học phí / Ghi chú học phí",
-                "name": "tuition_increase_roadmap",
-                "type": "textarea",
-                "rows": 3,
-                "placeholder": "Ví dụ: Học phí có thể tăng hàng năm theo quy định..."
+                "key": "field_program_benefits",
+                "label": "Quyền lợi nổi bật",
+                "name": "program_benefits",
+                "type": "wysiwyg"
             },
             {
                 "key": "field_program_quota",
@@ -291,50 +367,27 @@
                 "type": "number",
                 "placeholder": "Ví dụ: 50"
             },
-
-            {
-                "key": "field_program_duration",
-                "label": "Thời gian học",
-                "name": "duration",
-                "type": "text",
-                "placeholder": "Ví dụ: 1.5 - 2 năm"
-            },
-            {
-                "key": "field_program_requirements",
-                "label": "Điều kiện xét tuyển",
-                "name": "admission_requirements",
-                "type": "wysiwyg"
-            },
-            {
-                "key": "field_program_documents",
-                "label": "Hồ sơ xét tuyển cần thiết",
-                "name": "required_documents",
-                "type": "wysiwyg"
-            },
-            {
-                "key": "field_program_admission_form",
-                "label": "Tải phiếu tuyển sinh (File/Mẫu đăng ký)",
-                "name": "admission_form_file",
-                "type": "file",
-                "instructions": "Tải lên file Mẫu phiếu đăng ký tuyển sinh (PDF/DOCX) để sinh viên tải về.",
-                "return_format": "array",
-                "library": "all"
-            },
-            {
-                "key": "field_program_curriculum_file",
-                "label": "Tải lộ trình học / Khung chương trình (File/Ảnh)",
-                "name": "curriculum_file",
-                "type": "file",
-                "instructions": "Tải lên file Ảnh scan (PNG/JPG) hoặc tệp PDF Khung chương trình & Lộ trình học của nhà trường.",
-                "return_format": "array",
-                "library": "all"
-            },
             {
                 "key": "field_program_period",
                 "label": "Hạn hồ sơ",
                 "name": "enrollment_period",
                 "type": "text",
-                "placeholder": "Ví dụ: Đợt 1 đến hết 30\/11\/2026"
+                "placeholder": "Ví dụ: Đợt 1 đến hết 30/11/2026"
+            },
+            {
+                "key": "field_program_hotline",
+                "label": "Hotline riêng chương trình (Nếu có)",
+                "name": "hotline_override",
+                "type": "text",
+                "placeholder": "Bỏ trống để dùng Hotline chung của trường"
+            },
+            {
+                "key": "field_tab_prog_batches",
+                "label": "Lịch trình các đợt tuyển sinh",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
             },
             {
                 "key": "field_program_admission_batches",
@@ -401,19 +454,211 @@
                     }
                 ]
             },
-
             {
-                "key": "field_program_hotline",
-                "label": "Hotline riêng chương trình (Nếu có)",
-                "name": "hotline_override",
-                "type": "text",
-                "placeholder": "Bỏ trống để dùng Hotline chung của trường"
+                "key": "field_tab_prog_requirements",
+                "label": "Điều kiện xét tuyển",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
             },
             {
-                "key": "field_program_benefits",
-                "label": "Quyền lợi nổi bật",
-                "name": "program_benefits",
+                "key": "field_program_requirements",
+                "label": "Điều kiện xét tuyển",
+                "name": "admission_requirements",
                 "type": "wysiwyg"
+            },
+            {
+                "key": "field_tab_prog_tuition",
+                "label": "Học phí & Thời gian học",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_program_tuition",
+                "label": "Học phí chỉ từ",
+                "name": "tuition_fee",
+                "type": "text",
+                "placeholder": "Ví dụ: 450,000đ / tín chỉ hoặc 15,000,000đ / học kỳ"
+            },
+            {
+                "key": "field_program_tuition_amount",
+                "label": "Mức học phí định mức (số tiền)",
+                "name": "tuition_amount",
+                "type": "number",
+                "instructions": "Ví dụ: 684026 (không nhập dấu phẩy hoặc chữ đ)",
+                "placeholder": "684026"
+            },
+            {
+                "key": "field_program_tuition_unit",
+                "label": "Đơn vị tính học phí",
+                "name": "tuition_unit",
+                "type": "select",
+                "choices": {
+                    "tin-chi": "đồng / tín chỉ",
+                    "hoc-ky": "đồng / học kỳ",
+                    "nam": "đồng / năm học"
+                },
+                "default_value": "tin-chi"
+            },
+            {
+                "key": "field_program_tuition_academic_year",
+                "label": "Năm học áp dụng",
+                "name": "tuition_academic_year",
+                "type": "text",
+                "placeholder": "Ví dụ: 2025 - 2026"
+            },
+            {
+                "key": "field_program_tuition_total_credits",
+                "label": "Tổng số tín chỉ toàn khóa (Nếu có)",
+                "name": "tuition_total_credits",
+                "type": "number",
+                "instructions": "Dùng để tạm tính tổng học phí toàn khóa",
+                "placeholder": "136"
+            },
+            {
+                "key": "field_program_tuition_increase_roadmap",
+                "label": "Lộ trình tăng học phí / Ghi chú học phí",
+                "name": "tuition_increase_roadmap",
+                "type": "textarea",
+                "rows": 3,
+                "placeholder": "Ví dụ: Học phí có thể tăng hàng năm theo quy định..."
+            },
+            {
+                "key": "field_program_duration",
+                "label": "Thời gian học",
+                "name": "duration",
+                "type": "text",
+                "placeholder": "Ví dụ: 1.5 - 2 năm"
+            },
+            {
+                "key": "field_program_exemption_title",
+                "label": "Tiêu đề khối quy định miễn môn",
+                "name": "exemption_title",
+                "type": "text",
+                "placeholder": "Ví dụ: Quy định miễn môn đối với Đại học GTVT (UTC)"
+            },
+            {
+                "key": "field_program_exemption_intro",
+                "label": "Mô tả / Lời mở đầu quy định miễn môn",
+                "name": "exemption_intro",
+                "type": "textarea",
+                "rows": 2,
+                "placeholder": "Ví dụ: Chương trình đào tạo hệ liên thông chỉ xem xét miễn trừ tối đa đối với các môn học dưới đây nếu học viên đáp ứng đủ điều kiện:"
+            },
+            {
+                "key": "field_program_exemption_items",
+                "label": "Danh sách các môn được xét miễn giảm",
+                "name": "exemption_items",
+                "type": "repeater",
+                "layout": "block",
+                "button_label": "+ Thêm môn được miễn",
+                "sub_fields": [
+                    {
+                        "key": "field_exemption_subject_name",
+                        "label": "1. Tên môn học",
+                        "name": "subject_name",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Giáo dục quốc phòng an ninh"
+                    },
+                    {
+                        "key": "field_exemption_condition_note",
+                        "label": "2. Điều kiện & Yêu cầu xét miễn môn",
+                        "name": "condition_note",
+                        "type": "textarea",
+                        "rows": 3,
+                        "placeholder": "Ví dụ: Chỉ được xét miễn giảm khi học viên nộp chứng chỉ do Bộ Giáo dục và Đào tạo cấp..."
+                    },
+                    {
+                        "key": "field_exemption_cert_scores",
+                        "label": "3. Danh sách chứng chỉ quy đổi (Tùy chọn)",
+                        "name": "cert_scores",
+                        "type": "repeater",
+                        "layout": "table",
+                        "button_label": "+ Thêm chứng chỉ",
+                        "sub_fields": [
+                            {
+                                "key": "field_cert_name",
+                                "label": "Tên chứng chỉ",
+                                "name": "cert_name",
+                                "type": "text",
+                                "placeholder": "IELTS"
+                            },
+                            {
+                                "key": "field_cert_score",
+                                "label": "Mức điểm tối thiểu",
+                                "name": "min_score",
+                                "type": "text",
+                                "placeholder": "≥ 4.5"
+                            }
+                        ]
+                    },
+                    {
+                        "key": "field_exemption_cert_note",
+                        "label": "4. Ghi chú điều kiện chứng chỉ (Tùy chọn)",
+                        "name": "cert_note",
+                        "type": "text",
+                        "placeholder": "Ví dụ: * Riêng VSTEP: Chỉ nhận chứng chỉ do 1 trong 3 cơ sở đào tạo cấp..."
+                    },
+                    {
+                        "key": "field_exemption_assessment_process",
+                        "label": "5. Quy trình thẩm định / Box lưu ý màu vàng (Tùy chọn)",
+                        "name": "assessment_process",
+                        "type": "textarea",
+                        "rows": 2,
+                        "placeholder": "Ví dụ: Quy trình thẩm định & Quy đổi điểm: Sinh viên bắt buộc phải tham gia bài kiểm tra..."
+                    }
+                ]
+            },
+            {
+                "key": "field_tab_prog_curriculum",
+                "label": "Lộ trình học & Khung chương trình",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_program_curriculum_file",
+                "label": "Tải lộ trình học / Khung chương trình (File/Ảnh)",
+                "name": "curriculum_file",
+                "type": "file",
+                "instructions": "Tải lên file Ảnh scan (PNG/JPG) hoặc tệp PDF Khung chương trình & Lộ trình học của nhà trường.",
+                "return_format": "array",
+                "library": "all"
+            },
+            {
+                "key": "field_tab_prog_documents",
+                "label": "Hồ sơ xét tuyển cần thiết",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_program_documents",
+                "label": "Hồ sơ xét tuyển cần thiết",
+                "name": "required_documents",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_admission_form",
+                "label": "Tải phiếu tuyển sinh (File/Mẫu đăng ký)",
+                "name": "admission_form_file",
+                "type": "file",
+                "instructions": "Tải lên file Mẫu phiếu đăng ký tuyển sinh (PDF/DOCX) để sinh viên tải về.",
+                "return_format": "array",
+                "library": "all"
+            },
+            {
+                "key": "field_tab_prog_faq",
+                "label": "Câu hỏi thường gặp",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
             },
             {
                 "key": "field_program_faq",
@@ -480,7 +725,7 @@
             },
             {
                 "key": "field_global_favicon",
-                "label": "Favicon \/ Site Icon",
+                "label": "Favicon / Site Icon",
                 "name": "global_favicon",
                 "type": "image",
                 "return_format": "url",
@@ -490,13 +735,13 @@
             },
             {
                 "key": "field_global_share_image",
-                "label": "Ảnh chia sẻ mặc định (OG Image \/ Fallback Banner)",
+                "label": "Ảnh chia sẻ mặc định (OG Image / Fallback Banner)",
                 "name": "global_share_image",
                 "type": "image",
                 "return_format": "url",
                 "preview_size": "medium",
                 "library": "all",
-                "instructions": "Kích thước khuyên dùng: 1200x630px. Sẽ được dùng làm ảnh đại diện khi chia sẻ liên kết (Facebook, Zalo) hoặc banner mặc định khi bài viết\/chương trình không có ảnh đại diện."
+                "instructions": "Kích thước khuyên dùng: 1200x630px. Sẽ được dùng làm ảnh đại diện khi chia sẻ liên kết (Facebook, Zalo) hoặc banner mặc định khi bài viết/chương trình không có ảnh đại diện."
             },
             {
                 "key": "field_global_hotline",
@@ -506,7 +751,7 @@
             },
             {
                 "key": "field_global_zalo",
-                "label": "Đường dẫn Zalo OA \/ Zalo cá nhân",
+                "label": "Đường dẫn Zalo OA / Zalo cá nhân",
                 "name": "global_zalo_url",
                 "type": "url"
             },
@@ -612,7 +857,7 @@
             },
             {
                 "key": "field_telegram_chat_id",
-                "label": "Telegram Chat ID \/ Group ID",
+                "label": "Telegram Chat ID / Group ID",
                 "name": "telegram_chat_id",
                 "type": "text",
                 "instructions": "Nhập Chat ID hoặc ID của Group nhận thông báo. Hệ thống sẽ ưu tiên nếu hằng số constants.php không khai báo.",
@@ -720,7 +965,7 @@
         "style": "default",
         "label_placement": "top",
         "instruction_placement": "label",
-        "active": true,
+        "active": false,
         "description": "Điều kiện tuyển sinh cho Eligibility Checker",
         "show_in_rest": 0
     },
@@ -1031,7 +1276,7 @@
                 "label": "CTA chính - Link",
                 "name": "hero_cta_primary_url",
                 "type": "url",
-                "default_value": "\/he-dao-tao\/tu-xa\/"
+                "default_value": "/he-dao-tao/tu-xa/"
             },
             {
                 "key": "field_hero_cta_secondary_text",
@@ -1104,7 +1349,7 @@
                 "label": "CTA URL",
                 "name": "hp_elig_cta_url",
                 "type": "url",
-                "default_value": "\/kiem-tra-dieu-kien\/"
+                "default_value": "/kiem-tra-dieu-kien/"
             },
             {
                 "key": "field_hp_tab_certificate",
@@ -1160,8 +1405,8 @@
                 "label": "Link Video YouTube trái",
                 "name": "hp_cert_left_youtube",
                 "type": "text",
-                "instructions": "Gắn link YouTube (ví dụ: https:\/\/www.youtube.com\/watch?v=...). Khi click sẽ mở video dạng popup.",
-                "placeholder": "https:\/\/www.youtube.com\/watch?v=..."
+                "instructions": "Gắn link YouTube (ví dụ: https://www.youtube.com/watch?v=...). Khi click sẽ mở video dạng popup.",
+                "placeholder": "https://www.youtube.com/watch?v=..."
             },
             {
                 "key": "field_hp_cert_right_content",
@@ -1172,7 +1417,7 @@
                 "tabs": "all",
                 "toolbar": "full",
                 "media_upload": 1,
-                "default_value": "\n<p><span style=\"color: #0284c7; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;\">Bạn có thể sử dụng văn bằng để làm gì?<\/span><\/p>\n<h2>VĂN BẰNG SAU TỐT NGHIỆP<\/h2>\n<h3>Giá trị sử dụng của văn bằng<\/h3>\n<p>Sau khi tốt nghiệp, người học được cấp văn bằng theo quy định hiện hành và có thể sử dụng để phục vụ các mục tiêu học tập, nghề nghiệp theo điều kiện của từng đơn vị tiếp nhận.<\/p>\n<ul>\n<li><strong>🎓 Học tiếp lên trình độ cao hơn<\/strong><br>Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.<\/li>\n<li><strong>💼 Bổ sung và hoàn thiện hồ sơ nghề nghiệp<\/strong><br>Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.<\/li>\n<li><strong>📋 Tham gia tuyển dụng, thi tuyển<\/strong><br>Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.<\/li>\n<\/ul>\n"
+                "default_value": "\n<p><span style=\"color: #0284c7; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;\">Bạn có thể sử dụng văn bằng để làm gì?</span></p>\n<h2>VĂN BẰNG SAU TỐT NGHIỆP</h2>\n<h3>Giá trị sử dụng của văn bằng</h3>\n<p>Sau khi tốt nghiệp, người học được cấp văn bằng theo quy định hiện hành và có thể sử dụng để phục vụ các mục tiêu học tập, nghề nghiệp theo điều kiện của từng đơn vị tiếp nhận.</p>\n<ul>\n<li><strong>🎓 Học tiếp lên trình độ cao hơn</strong><br>Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.</li>\n<li><strong>💼 Bổ sung và hoàn thiện hồ sơ nghề nghiệp</strong><br>Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.</li>\n<li><strong>📋 Tham gia tuyển dụng, thi tuyển</strong><br>Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.</li>\n</ul>\n"
             },
             {
                 "key": "field_hp_tab_benefits",

@@ -27,13 +27,62 @@ if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 }
 
 $global_zalo = ltdh_get_zalo_url();
+
+// Dynamically construct sticky navigation tabs for School
+$school_tabs = [];
+$school_tabs[] = [
+	'id'       => 'gioi-thieu',
+	'title'    => 'Giới thiệu',
+	'subtitle' => 'Thông tin về trường',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
+];
+
+$school_tabs[] = [
+	'id'       => 'nganh-dao-tao',
+	'title'    => 'Ngành đào tạo',
+	'subtitle' => 'Chuyên ngành nổi bật',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3" /></svg>',
+];
+
+if ( ! empty( $adm_info ) ) {
+	$school_tabs[] = [
+		'id'       => 'phuong-thuc-tuyen-sinh',
+		'title'    => 'Xét tuyển',
+		'subtitle' => 'Phương thức tuyển sinh',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+	];
+}
+
+$school_tabs[] = [
+	'id'       => 'chuong-trinh-tuyen-sinh',
+	'title'    => 'Lớp tuyển sinh',
+	'subtitle' => 'Chương trình đang mở',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>',
+];
+
+if ( ! empty( $contact ) ) {
+	$school_tabs[] = [
+		'id'       => 'thong-tin-lien-he',
+		'title'    => 'Liên hệ',
+		'subtitle' => 'Văn phòng tuyển sinh',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>',
+	];
+}
 ?>
 
 
 <main id="primary" class="site-main bg-slate-50">
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
 		<?php 
 		$banner_image = get_field( 'school_banner', $school_id ) ?: get_the_post_thumbnail_url( $school_id, 'full' );
+		if ( empty( $banner_image ) ) {
+			$post_slug = get_post_field( 'post_name', $school_id );
+			if ( false !== strpos( $post_slug, 'giao-thong' ) || false !== strpos( $post_slug, 'gtvt' ) || false !== stripos( $school_title, 'giao thông' ) ) {
+				$banner_image = get_template_directory_uri() . '/assets/images/banner-hero-03-dhgtvt.webp';
+			} else {
+				$banner_image = get_template_directory_uri() . '/assets/images/banner-school.jpg';
+			}
+		}
 		if ( $banner_image ) : 
 		?>
 			<!-- School Cover/Banner Image inside container -->
@@ -43,7 +92,7 @@ $global_zalo = ltdh_get_zalo_url();
 		<?php endif; ?>
 		
 		<!-- HERO SECTION -->
-		<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
+		<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8 mb-6">
 			<div class="flex flex-col md:flex-row gap-6 items-center md:items-start text-center md:text-left">
 				<?php ltdh_render_school_thumbnail( $school_id, 'medium', 'h-24 w-24 object-cover shrink-0 rounded-lg border border-slate-100 bg-white' ); ?>
 				
@@ -69,12 +118,44 @@ $global_zalo = ltdh_get_zalo_url();
 			</div>
 		</section>
 
+		<!-- STICKY SECTION TAB NAVIGATION (Inside Container, Floating Rounded Card) -->
+		<div id="ltdh-school-sticky-nav" class="ltdh-sticky-nav sticky top-20 z-40 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] mb-6 transition-all duration-200">
+			<nav class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-1.5 sm:p-2" aria-label="Điều hướng các mục của trường">
+				<?php foreach ( $school_tabs as $tab_idx => $tab ) : 
+					$is_active = ( 0 === $tab_idx );
+				?>
+					<a href="#<?php echo esc_attr( $tab['id'] ); ?>" 
+					   data-tab-target="<?php echo esc_attr( $tab['id'] ); ?>"
+					   class="ltdh-section-tab-link group relative inline-flex items-center gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition-all duration-200 shrink-0 select-none cursor-pointer no-underline <?php echo $is_active ? 'bg-blue-50/90 text-[#00308b] font-bold shadow-2xs is-active' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'; ?>">
+						
+						<!-- Icon Box -->
+						<div class="ltdh-tab-icon w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 <?php echo $is_active ? 'bg-[#00308b] text-white shadow-xs shadow-blue-900/20' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-800'; ?>">
+							<?php echo $tab['icon']; ?>
+						</div>
+
+						<!-- Text Column -->
+						<div class="flex flex-col text-left">
+							<span class="ltdh-tab-title text-xs sm:text-[13px] font-bold leading-tight transition-colors <?php echo $is_active ? 'text-[#00308b]' : 'text-slate-700 group-hover:text-slate-900'; ?>">
+								<?php echo esc_html( $tab['title'] ); ?>
+							</span>
+							<span class="ltdh-tab-sub text-[10px] leading-tight mt-0.5 hidden md:block transition-colors <?php echo $is_active ? 'text-blue-700/80 font-medium' : 'text-slate-400 group-hover:text-slate-500'; ?>">
+								<?php echo esc_html( $tab['subtitle'] ); ?>
+							</span>
+						</div>
+
+						<!-- Subtle Active Accent Indicator (Bottom pill) -->
+						<span class="ltdh-tab-indicator absolute -bottom-0.5 left-3 right-3 h-[2px] rounded-full transition-all duration-200 <?php echo $is_active ? 'bg-[#EA580C] opacity-100' : 'bg-transparent opacity-0'; ?>"></span>
+					</a>
+				<?php endforeach; ?>
+			</nav>
+		</div>
+
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 			<!-- Main Column -->
 			<div class="lg:col-span-2 space-y-6 md:space-y-8">
 				
 				<!-- OVERVIEW -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="gioi-thieu" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Giới thiệu về trường</h2>
 					<div class="relative">
 						<div id="school-intro-content" class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base overflow-hidden transition-all duration-500 max-h-[350px] relative">
@@ -184,7 +265,7 @@ $global_zalo = ltdh_get_zalo_url();
 				</section>
 
 				<!-- MAJORS OFFERED -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="nganh-dao-tao" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Các ngành đào tạo phổ biến</h2>
 					<?php
 					// Query distinct majors via the programs offered by this school
@@ -269,7 +350,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 				<!-- ADMISSION INFORMATION -->
 				<?php if ( $adm_info ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section id="phuong-thuc-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Phương thức tuyển sinh</h2>
 						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
 							<?php echo wp_kses_post( $adm_info ); ?>
@@ -278,7 +359,7 @@ $global_zalo = ltdh_get_zalo_url();
 				<?php endif; ?>
 
 				<!-- PROGRAMS OFFERED -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="chuong-trinh-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Chương trình tuyển sinh đang mở</h2>
 					
 					<?php
@@ -525,7 +606,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 				<!-- CONTACT INFO -->
 				<?php if ( $contact ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Thông tin liên hệ tuyển sinh</h2>
 						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
 							<?php echo wp_kses_post( $contact ); ?>
@@ -536,7 +617,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 			<!-- Sidebar Column -->
 			<div class="lg:col-span-1">
-				<div class="sticky top-24 space-y-6">
+				<div class="sticky top-36 md:top-40 space-y-6">
 					
 					<!-- CONSULTATION FORM -->
 					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
@@ -633,9 +714,197 @@ $global_zalo = ltdh_get_zalo_url();
 				</div>
 			</div>
 		</div>
-
 	</div>
 </main>
+
+<!-- SCROLLSPY & SMOOTH SCROLL SCRIPT -->
+<script>
+(function() {
+	document.addEventListener('DOMContentLoaded', function() {
+		var stickyNav = document.getElementById('ltdh-school-sticky-nav');
+		if (!stickyNav) return;
+
+		var navContainer = stickyNav.querySelector('nav');
+		var tabLinks = Array.prototype.slice.call(stickyNav.querySelectorAll('.ltdh-section-tab-link'));
+		if (!tabLinks.length) return;
+
+		var sectionMap = [];
+		tabLinks.forEach(function(link) {
+			var id = link.getAttribute('data-tab-target');
+			var sec = document.getElementById(id);
+			if (sec) {
+				sectionMap.push({
+					id: id,
+					link: link,
+					section: sec
+				});
+			}
+		});
+
+		if (!sectionMap.length) return;
+
+		var isClickScrolling = false;
+		var scrollTimeout = null;
+
+		function getStickyOffset() {
+			var header = document.getElementById('masthead');
+			var headerHeight = header ? header.offsetHeight : 80;
+			var navHeight = stickyNav.offsetHeight || 54;
+			var adminBar = document.getElementById('wpadminbar');
+			var adminBarHeight = (adminBar && window.getComputedStyle(adminBar).position === 'fixed') ? adminBar.offsetHeight : 0;
+			return headerHeight + navHeight + adminBarHeight;
+		}
+
+		function setActiveTab(targetId, shouldScrollNav) {
+			sectionMap.forEach(function(item) {
+				var link = item.link;
+				var iconEl = link.querySelector('.ltdh-tab-icon');
+				var titleEl = link.querySelector('.ltdh-tab-title');
+				var subEl = link.querySelector('.ltdh-tab-sub');
+				var indicatorEl = link.querySelector('.ltdh-tab-indicator');
+
+				if (item.id === targetId) {
+					link.classList.add('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
+					link.classList.remove('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
+					if (iconEl) {
+						iconEl.classList.add('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
+						iconEl.classList.remove('bg-slate-100', 'text-slate-500');
+					}
+					if (titleEl) {
+						titleEl.classList.add('text-[#00308b]', 'font-extrabold');
+						titleEl.classList.remove('text-slate-700');
+					}
+					if (subEl) {
+						subEl.classList.add('text-blue-700/80', 'font-medium');
+						subEl.classList.remove('text-slate-400');
+					}
+					if (indicatorEl) {
+						indicatorEl.classList.add('bg-[#EA580C]', 'opacity-100');
+						indicatorEl.classList.remove('bg-transparent', 'opacity-0');
+					}
+
+					if (shouldScrollNav && navContainer && navContainer.scrollWidth > navContainer.clientWidth) {
+						var tabLeft = link.offsetLeft;
+						var tabWidth = link.offsetWidth;
+						var containerWidth = navContainer.clientWidth;
+						navContainer.scrollTo({
+							left: tabLeft - (containerWidth / 2) + (tabWidth / 2),
+							behavior: 'smooth'
+						});
+					}
+				} else {
+					link.classList.remove('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
+					link.classList.add('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
+					if (iconEl) {
+						iconEl.classList.remove('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
+						iconEl.classList.add('bg-slate-100', 'text-slate-500');
+					}
+					if (titleEl) {
+						titleEl.classList.remove('text-[#00308b]', 'font-extrabold');
+						titleEl.classList.add('text-slate-700');
+					}
+					if (subEl) {
+						subEl.classList.remove('text-blue-700/80', 'font-medium');
+						subEl.classList.add('text-slate-400');
+					}
+					if (indicatorEl) {
+						indicatorEl.classList.remove('bg-[#EA580C]', 'opacity-100');
+						indicatorEl.classList.add('bg-transparent', 'opacity-0');
+					}
+				}
+			});
+		}
+
+		// Handle Click on Tabs
+		tabLinks.forEach(function(link) {
+			link.addEventListener('click', function(e) {
+				e.preventDefault();
+				var targetId = this.getAttribute('data-tab-target');
+				var targetItem = sectionMap.find(function(item) { return item.id === targetId; });
+				if (!targetItem) return;
+
+				isClickScrolling = true;
+				clearTimeout(scrollTimeout);
+				setActiveTab(targetId, true);
+
+				var totalOffset = getStickyOffset();
+				var elementPosition = targetItem.section.getBoundingClientRect().top + window.pageYOffset;
+				var offsetPosition = elementPosition - totalOffset + 8; // gentle breathing room
+
+				window.scrollTo({
+					top: offsetPosition,
+					behavior: 'smooth'
+				});
+
+				if (history.replaceState) {
+					history.replaceState(null, '', '#' + targetId);
+				}
+
+				scrollTimeout = setTimeout(function() {
+					isClickScrolling = false;
+				}, 750);
+			});
+		});
+
+		// Scrollspy with requestAnimationFrame
+		var ticking = false;
+		function onScroll() {
+			if (isClickScrolling) return;
+
+			var totalOffset = getStickyOffset();
+			var scrollPos = window.pageYOffset + totalOffset + 50;
+			var currentId = sectionMap[0].id;
+
+			var atPageBottom = (window.innerHeight + window.pageYOffset) >= (document.documentElement.scrollHeight - 60);
+
+			if (atPageBottom) {
+				currentId = sectionMap[sectionMap.length - 1].id;
+			} else {
+				for (var i = 0; i < sectionMap.length; i++) {
+					var item = sectionMap[i];
+					var secTop = item.section.offsetTop;
+					var secHeight = item.section.offsetHeight;
+					if (scrollPos >= secTop && scrollPos < secTop + secHeight) {
+						currentId = item.id;
+						break;
+					} else if (scrollPos >= secTop) {
+						currentId = item.id;
+					}
+				}
+			}
+
+			if (currentId) {
+				setActiveTab(currentId, true);
+			}
+		}
+
+		window.addEventListener('scroll', function() {
+			if (!ticking) {
+				window.requestAnimationFrame(function() {
+					onScroll();
+					ticking = false;
+				});
+				ticking = true;
+			}
+		}, { passive: true });
+
+		// Handle initial hash in URL
+		if (window.location.hash) {
+			var initialHash = window.location.hash.replace('#', '');
+			var match = sectionMap.find(function(item) { return item.id === initialHash; });
+			if (match) {
+				setTimeout(function() {
+					match.link.click();
+				}, 250);
+			} else {
+				setTimeout(onScroll, 100);
+			}
+		} else {
+			setTimeout(onScroll, 100);
+		}
+	});
+})();
+</script>
 
 <?php
 get_footer();

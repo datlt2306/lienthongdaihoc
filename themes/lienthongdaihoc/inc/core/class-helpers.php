@@ -728,7 +728,7 @@ function ltdh_render_school_thumbnail(int $school_id, string $size = 'thumbnail'
 
 function ltdh_get_program_learning_details(int $program_id): array {
 	$campuses    = wp_get_post_terms($program_id, LTDH_TAX_CAMPUS);
-	$campus_name = ! empty($campuses) && ! is_wp_error($campuses) ? $campuses[0]->name : 'Hà Nội';
+	$campus_name = ! empty($campuses) && ! is_wp_error($campuses) ? implode(', ', wp_list_pluck($campuses, 'name')) : 'Hà Nội';
 
 	$types      = wp_get_post_terms($program_id, LTDH_TAX_TRAINING_TYPE);
 	$type_slug  = ! empty($types) && ! is_wp_error($types) ? $types[0]->slug : '';

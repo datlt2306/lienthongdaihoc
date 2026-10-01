@@ -73,10 +73,109 @@ if ( is_numeric( $curriculum_raw ) ) {
 }
 
 $global_zalo = ltdh_get_zalo_url();
+
+// Dynamically construct sticky navigation tabs for Program (UI/UX Pro Max)
+$admission_batches_list = get_field( 'admission_batches', $program_id );
+$admission_form_file    = get_field( 'admission_form_file', $program_id );
+
+$program_tabs = [];
+$program_tabs[] = [
+	'id'       => 'tong-quan',
+	'title'    => 'Tổng quan',
+	'subtitle' => 'Thông tin chương trình',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
+];
+
+if ( ! empty( $admission_batches_list ) && is_array( $admission_batches_list ) ) {
+	$program_tabs[] = [
+		'id'       => 'lich-tuyen-sinh',
+		'title'    => 'Lịch tuyển sinh',
+		'subtitle' => 'Các đợt nhận hồ sơ',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.253M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" /></svg>',
+	];
+}
+
+if ( ! empty( $requirements ) ) {
+	$program_tabs[] = [
+		'id'       => 'dieu-kien-xet-tuyen',
+		'title'    => 'Điều kiện',
+		'subtitle' => 'Đối tượng & tiêu chuẩn',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+	];
+}
+
+$program_tabs[] = [
+	'id'       => 'hoc-phi-thoi-gian',
+	'title'    => 'Học phí',
+	'subtitle' => 'Chi phí & thời gian',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+];
+
+if ( ! empty( $curriculum_url ) ) {
+	$program_tabs[] = [
+		'id'       => 'lo-trinh-hoc',
+		'title'    => 'Lộ trình học',
+		'subtitle' => 'Khung chương trình',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /></svg>',
+	];
+}
+
+if ( ! empty( $documents ) || ! empty( $admission_form_file ) ) {
+	$program_tabs[] = [
+		'id'       => 'ho-so-can-nop',
+		'title'    => 'Hồ sơ',
+		'subtitle' => 'Thủ tục đăng ký',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>',
+	];
+}
+
+if ( ! empty( $faqs ) ) {
+	$program_tabs[] = [
+		'id'       => 'hoi-dap',
+		'title'    => 'Hỏi đáp',
+		'subtitle' => 'Thắc mắc thường gặp',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>',
+	];
+}
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
+
+	<!-- STICKY SECTION TAB NAVIGATION (Redesigned with UI/UX Pro Max) -->
+	<div id="ltdh-program-sticky-nav" class="ltdh-sticky-nav sticky top-20 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-all duration-200">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<nav class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-2" aria-label="Điều hướng các mục chương trình đào tạo">
+				<?php foreach ( $program_tabs as $tab_idx => $tab ) : 
+					$is_active = ( 0 === $tab_idx );
+				?>
+					<a href="#<?php echo esc_attr( $tab['id'] ); ?>" 
+					   data-tab-target="<?php echo esc_attr( $tab['id'] ); ?>"
+					   class="ltdh-section-tab-link group relative inline-flex items-center gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition-all duration-200 shrink-0 select-none cursor-pointer no-underline <?php echo $is_active ? 'bg-blue-50/90 text-[#00308b] font-bold shadow-2xs is-active' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'; ?>">
+						
+						<!-- Icon Box -->
+						<div class="ltdh-tab-icon w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 <?php echo $is_active ? 'bg-[#00308b] text-white shadow-xs shadow-blue-900/20' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-800'; ?>">
+							<?php echo $tab['icon']; ?>
+						</div>
+
+						<!-- Text Column -->
+						<div class="flex flex-col text-left">
+							<span class="ltdh-tab-title text-xs sm:text-[13px] font-bold leading-tight transition-colors <?php echo $is_active ? 'text-[#00308b]' : 'text-slate-700 group-hover:text-slate-900'; ?>">
+								<?php echo esc_html( $tab['title'] ); ?>
+							</span>
+							<span class="ltdh-tab-sub text-[10px] leading-tight mt-0.5 hidden md:block transition-colors <?php echo $is_active ? 'text-blue-700/80 font-medium' : 'text-slate-400 group-hover:text-slate-500'; ?>">
+								<?php echo esc_html( $tab['subtitle'] ); ?>
+							</span>
+						</div>
+
+						<!-- Subtle Active Accent Indicator (Bottom pill) -->
+						<span class="ltdh-tab-indicator absolute -bottom-0.5 left-3 right-3 h-[2px] rounded-full transition-all duration-200 <?php echo $is_active ? 'bg-[#EA580C] opacity-100' : 'bg-transparent opacity-0'; ?>"></span>
+					</a>
+				<?php endforeach; ?>
+			</nav>
+		</div>
+	</div>
+
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
 		
 
@@ -123,7 +222,7 @@ $global_zalo = ltdh_get_zalo_url();
 				<?php endif; ?>
 
 				<!-- SECTION 2: PROGRAM OVERVIEW -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Tổng quan chương trình</h2>
 					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 						<?php the_content(); ?>
@@ -176,38 +275,40 @@ $global_zalo = ltdh_get_zalo_url();
 							<span class="font-bold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
 					</div>
+				</section>
 
-					<?php 
-					$batches_data = get_field( 'admission_batches', $program_id );
-					if ( ! empty( $batches_data ) && is_array( $batches_data ) ) : 
-						$has_release = false;
-						$has_app     = false;
-						$has_review  = false;
-						$has_eval    = false;
+				<!-- SECTION: ADMISSION BATCHES -->
+				<?php 
+				$batches_data = get_field( 'admission_batches', $program_id );
+				if ( ! empty( $batches_data ) && is_array( $batches_data ) ) : 
+					$has_release = false;
+					$has_app     = false;
+					$has_review  = false;
+					$has_eval    = false;
 
-						foreach ( $batches_data as $b_item ) {
-							$rel = trim( $b_item['release_period'] ?? '' );
-							$app = trim( $b_item['application_period'] ?? '' );
-							$rev = trim( $b_item['review_time'] ?? '' );
-							$ev1 = trim( $b_item['evaluation_time'] ?? '' );
-							$ev2 = trim( $b_item['enrollment_time'] ?? '' );
+					foreach ( $batches_data as $b_item ) {
+						$rel = trim( $b_item['release_period'] ?? '' );
+						$app = trim( $b_item['application_period'] ?? '' );
+						$rev = trim( $b_item['review_time'] ?? '' );
+						$ev1 = trim( $b_item['evaluation_time'] ?? '' );
+						$ev2 = trim( $b_item['enrollment_time'] ?? '' );
 
-							if ( $rel !== '' && $rel !== '-' ) {
-								$has_release = true;
-							}
-							if ( $app !== '' && $app !== '-' ) {
-								$has_app = true;
-							}
-							if ( $rev !== '' && $rev !== '-' ) {
-								$has_review = true;
-							}
-							if ( ( $ev1 !== '' && $ev1 !== '-' ) || ( $ev2 !== '' && $ev2 !== '-' ) ) {
-								$has_eval = true;
-							}
+						if ( $rel !== '' && $rel !== '-' ) {
+							$has_release = true;
 						}
-					?>
-						<div class="mt-6 pt-6 border-t border-slate-100 space-y-3">
-							<h3 class="font-bold text-slate-800 text-xs tracking-wider uppercase">Lịch trình các đợt tuyển sinh</h3>
+						if ( $app !== '' && $app !== '-' ) {
+							$has_app = true;
+						}
+						if ( $rev !== '' && $rev !== '-' ) {
+							$has_review = true;
+						}
+						if ( ( $ev1 !== '' && $ev1 !== '-' ) || ( $ev2 !== '' && $ev2 !== '-' ) ) {
+							$has_eval = true;
+						}
+					}
+				?>
+				<section id="lich-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6 mb-8">
+					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Lịch trình các đợt tuyển sinh</h2>
 
 							<!-- MOBILE TABBED CARD VIEW (< 768px) -->
 							<div class="block md:hidden admission-batches-mobile">
@@ -408,7 +509,6 @@ $global_zalo = ltdh_get_zalo_url();
 									</div>
 								<?php endforeach; ?>
 							</div>
-						</div>
 
 						<script>
 						function ltdhSwitchBatchTab(btn, idx) {
@@ -439,41 +539,18 @@ $global_zalo = ltdh_get_zalo_url();
 							});
 						}
 						</script>
-					<?php endif; ?>
-
-				</section>
-
-				<!-- SECTION 3: MAJOR INFORMATION -->
-
-				<?php if ( $major_id ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Thông tin ngành học</h2>
-						<h3 class="font-bold text-base md:text-lg text-slate-900 mb-2"><?php echo esc_html( $major_title ); ?> (Mã ngành: <?php echo esc_html( get_field( 'major_code', $major_id ) ); ?>)</h3>
-						<div class="prose prose-slate max-w-none text-sm text-slate-600 mb-4">
-							<?php echo wp_kses_post( get_post_field( 'post_content', $major_id ) ); ?>
-						</div>
-						<?php if ( $opportunities ) : ?>
-							<h4 class="font-semibold text-slate-800 text-sm mt-4 mb-1">Cơ hội nghề nghiệp</h4>
-							<div class="prose prose-slate max-w-none text-sm text-slate-500">
-								<?php echo wp_kses_post( $opportunities ); ?>
-							</div>
-						<?php endif; ?>
-						<div class="mt-4 pt-4 border-t border-slate-100">
-							<a href="<?php echo esc_url( get_permalink( $major_id ) ); ?>" class="text-brand-primary font-semibold text-sm hover:underline">
-								Tìm hiểu thêm định hướng ngành <?php echo esc_html( $major_title ); ?> →
-							</a>
-						</div>
 					</section>
 				<?php endif; ?>
 
+
 				<!-- SECTION 5: ADMISSION REQUIREMENTS -->
 				<?php if ( $requirements ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section id="dieu-kien-xet-tuyen" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 						<div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
 							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Điều kiện xét tuyển</h2>
 							<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#00308b] border border-blue-100 text-xs font-bold rounded-full">
 								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-								Phương thức: Thi tuyển
+								Phương thức: <?php echo ( strpos( mb_strtolower( $requirements ), 'thi tuyển' ) !== false ) ? 'Thi tuyển' : 'Xét tuyển'; ?>
 							</span>
 						</div>
 
@@ -546,7 +623,7 @@ $global_zalo = ltdh_get_zalo_url();
 				<?php endif; ?>
 
 				<!-- SECTION 6: TUITION & SECTION 7: DURATION -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="hoc-phi-thoi-gian" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Học phí & Thời gian học</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
 						<!-- Column 1: Tuition Details -->
@@ -617,87 +694,119 @@ $global_zalo = ltdh_get_zalo_url();
 								</div>
 
 								<!-- Card 2: Exemption Scope -->
+								<?php
+								$exemption_title = get_field( 'exemption_title', $program_id );
+								$exemption_intro = get_field( 'exemption_intro', $program_id );
+								$exemption_items = get_field( 'exemption_items', $program_id );
+
+								$school_slug = $school_id ? get_post_field( 'post_name', $school_id ) : '';
+								$is_utc      = ( false !== strpos( $school_slug, 'giao-thong-van-tai' ) );
+
+								if ( empty( $exemption_items ) && $is_utc ) {
+									$exemption_title = 'Quy định miễn môn đối với Đại học GTVT (UTC)';
+									$exemption_intro = 'Chương trình đào tạo hệ liên thông của UTC chỉ xem xét miễn trừ tối đa đối với 2 môn học dưới đây nếu học viên đáp ứng đủ điều kiện:';
+									$exemption_items = [
+										[
+											'subject_name'       => 'Giáo dục quốc phòng an ninh',
+											'condition_note'     => 'Chỉ được xét miễn giảm khi học viên nộp chứng chỉ do Bộ Giáo dục và Đào tạo cấp theo phôi mẫu chuẩn (màu đỏ). Các loại phôi khác (kể cả phôi của các trường tự cấp) đều không được chấp nhận.',
+											'cert_scores'        => [],
+											'cert_note'          => '',
+											'assessment_process' => '',
+										],
+										[
+											'subject_name'       => 'Tiếng Anh B1',
+											'condition_note'     => 'Được xem xét quy đổi điểm khi sở hữu một trong các chứng chỉ quốc tế/quốc gia còn hiệu lực:',
+											'cert_scores'        => [
+												[ 'cert_name' => 'IELTS', 'min_score' => '≥ 4.5' ],
+												[ 'cert_name' => 'TOEIC', 'min_score' => '≥ 450' ],
+												[ 'cert_name' => 'VSTEP', 'min_score' => '≥ 5.0' ],
+											],
+											'cert_note'          => '* Riêng VSTEP: Chỉ nhận chứng chỉ do 1 trong 3 cơ sở đào tạo cấp: ĐH Quốc gia HN, ĐH Sư phạm HN, và ĐH Hà Nội.',
+											'assessment_process' => 'Quy trình thẩm định & Quy đổi điểm: Sinh viên bắt buộc phải tham gia và vượt qua bài kiểm tra năng lực do bộ môn tổ chức. Nếu đạt yêu cầu, điểm số sẽ được quy đổi sang điểm 5 trên hệ thống.',
+										],
+									];
+								}
+
+								$scope_text = ! empty( $exemption_items ) ? 'Theo quy định nhà trường' : ( $is_utc ? 'Tối đa 2 môn (GDQP & Tiếng Anh)' : 'Xét theo bảng điểm cũ' );
+								?>
 								<div class="bg-slate-50 border border-slate-100/80 rounded-xl p-3.5">
 									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Phạm vi miễn giảm môn</span>
 									<div class="flex items-baseline flex-wrap gap-1">
-										<span class="text-base font-black text-slate-900">Tối đa 2 môn (GDQP & Tiếng Anh)</span>
+										<span class="text-base font-black text-slate-900"><?php echo esc_html( $scope_text ); ?></span>
 									</div>
 								</div>
 							</div>
 							
 							<div class="mt-4 pt-3.5 border-t border-slate-100 text-xs md:text-sm text-slate-600 leading-relaxed">
 								<span class="font-bold text-slate-700 block mb-1">Lưu ý quan trọng:</span>
-								<p class="text-slate-600">Nhà trường chỉ xem xét miễn trừ 2 môn (GDQP-AN và Tiếng Anh B1) nếu đủ điều kiện chứng chỉ. Tất cả các môn học khác học viên bắt buộc phải hoàn thành theo khung chương trình.</p>
+								<?php if ( ! empty( $exemption_items ) ) : ?>
+									<p class="text-slate-600">Quy định miễn trừ học phần và quy đổi tín chỉ được thực hiện theo đúng hướng dẫn của Nhà trường.</p>
+								<?php elseif ( $is_utc ) : ?>
+									<p class="text-slate-600">Nhà trường chỉ xem xét miễn trừ 2 môn (GDQP-AN và Tiếng Anh B1) nếu đủ điều kiện chứng chỉ. Tất cả các môn học khác học viên bắt buộc phải hoàn thành theo khung chương trình.</p>
+								<?php else : ?>
+									<p class="text-slate-600">Học viên được xem xét miễn giảm các môn đại cương và môn chuyên ngành dựa trên bảng điểm tốt nghiệp trung cấp, cao đẳng hoặc văn bằng 1 đã có.</p>
+								<?php endif; ?>
 							</div>
 						</div>
 					</div>
 					<?php 
-					$school_slug = $school_id ? get_post_field( 'post_name', $school_id ) : '';
-					if ( strpos( $school_slug, 'giao-thong-van-tai' ) !== false ) :
+					if ( ! empty( $exemption_items ) && is_array( $exemption_items ) ) :
 					?>
 						<div class="mt-5 border-t border-slate-100 pt-5">
 							<div class="bg-blue-50/40 border border-blue-100 rounded-2xl p-5 shadow-3xs">
 								<div class="flex items-center gap-2 border-b border-blue-100 pb-3 mb-3">
 									<svg class="w-6 h-6 text-blue-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222M12 14v8"></path></svg>
 									<h4 class="font-extrabold text-blue-950 text-base md:text-lg">
-										Quy định miễn môn đối với Đại học GTVT (UTC)
+										<?php echo esc_html( $exemption_title ?: 'Quy định miễn môn & Chuyển đổi tín chỉ' ); ?>
 									</h4>
 								</div>
-								<p class="text-xs md:text-sm text-blue-950 font-medium mb-4 leading-relaxed">
-									Chương trình đào tạo hệ liên thông của UTC chỉ xem xét miễn trừ tối đa đối với <strong class="text-blue-900 font-bold">2 môn học</strong> dưới đây nếu học viên đáp ứng đủ điều kiện:
-								</p>
-								
+								<?php if ( $exemption_intro ) : ?>
+									<p class="text-xs md:text-sm text-blue-950 font-medium mb-4 leading-relaxed">
+										<?php echo esc_html( $exemption_intro ); ?>
+									</p>
+								<?php endif; ?>
+
 								<div class="space-y-4">
-									<!-- Môn 1: GDQP -->
-									<div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-4.5 shadow-3xs hover:border-blue-300 transition-all duration-300">
-										<div class="flex items-center gap-2.5 mb-2">
-											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-700 text-xs font-black shrink-0">1</span>
-											<h5 class="font-extrabold text-slate-900 text-sm md:text-base">Giáo dục quốc phòng an ninh</h5>
-										</div>
-										<p class="text-slate-700 text-xs md:text-sm leading-relaxed pl-8">
-											Chỉ được xét miễn giảm khi học viên nộp chứng chỉ do <strong class="text-red-700 font-bold">Bộ Giáo dục và Đào tạo cấp theo phôi mẫu chuẩn (màu đỏ)</strong>. Các loại phôi khác (kể cả phôi của các trường tự cấp) đều không được chấp nhận.
-										</p>
-									</div>
-									
-									<!-- Môn 2: Tiếng Anh B1 -->
-									<div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-4.5 shadow-3xs flex flex-col gap-3.5 hover:border-blue-300 transition-all duration-300">
-										<div>
+									<?php foreach ( $exemption_items as $index => $item ) : ?>
+										<div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-4.5 shadow-3xs hover:border-blue-300 transition-all duration-300">
 											<div class="flex items-center gap-2.5 mb-2">
-												<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-black shrink-0">2</span>
-												<h5 class="font-extrabold text-slate-900 text-sm md:text-base">Tiếng Anh B1</h5>
+												<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-black shrink-0"><?php echo esc_html( $index + 1 ); ?></span>
+												<h5 class="font-extrabold text-slate-900 text-sm md:text-base"><?php echo esc_html( $item['subject_name'] ?? '' ); ?></h5>
 											</div>
-											
-											<div class="pl-8">
-												<p class="text-slate-700 text-xs md:text-sm font-medium mb-3 leading-relaxed">Được xem xét quy đổi điểm khi sở hữu một trong các chứng chỉ quốc tế/quốc gia còn hiệu lực:</p>
-												<div class="grid grid-cols-3 gap-2.5 sm:gap-3 mb-3.5">
-													<div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 sm:p-3 text-center hover:border-blue-400 hover:shadow-xs transition-all duration-200 cursor-pointer">
-														<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">IELTS</span>
-														<span class="text-sm md:text-base font-black text-blue-900">≥ 4.5</span>
-													</div>
-													<div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 sm:p-3 text-center hover:border-blue-400 hover:shadow-xs transition-all duration-200 cursor-pointer">
-														<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">TOEIC</span>
-														<span class="text-sm md:text-base font-black text-blue-900">≥ 450</span>
-													</div>
-													<div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 sm:p-3 text-center hover:border-blue-400 hover:shadow-xs transition-all duration-200 cursor-pointer">
-														<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">VSTEP</span>
-														<span class="text-sm md:text-base font-black text-blue-900">≥ 5.0</span>
+											<?php if ( ! empty( $item['condition_note'] ) ) : ?>
+												<p class="text-slate-700 text-xs md:text-sm leading-relaxed pl-8">
+													<?php echo nl2br( esc_html( $item['condition_note'] ) ); ?>
+												</p>
+											<?php endif; ?>
+
+											<?php if ( ! empty( $item['cert_scores'] ) && is_array( $item['cert_scores'] ) ) : ?>
+												<div class="pl-8 mt-3">
+													<div class="grid grid-cols-3 gap-2.5 sm:gap-3 mb-3">
+														<?php foreach ( $item['cert_scores'] as $cert ) : ?>
+															<div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 sm:p-3 text-center hover:border-blue-400 hover:shadow-xs transition-all duration-200 cursor-pointer">
+																<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1"><?php echo esc_html( $cert['cert_name'] ?? '' ); ?></span>
+																<span class="text-sm md:text-base font-black text-blue-900"><?php echo esc_html( $cert['min_score'] ?? '' ); ?></span>
+															</div>
+														<?php endforeach; ?>
 													</div>
 												</div>
-												<div class="flex items-start gap-2 text-xs md:text-sm text-slate-600 leading-relaxed mb-1">
+											<?php endif; ?>
+
+											<?php if ( ! empty( $item['cert_note'] ) ) : ?>
+												<div class="pl-8 mt-2 flex items-start gap-2 text-xs md:text-sm text-slate-600 leading-relaxed">
 													<svg class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-													<p>
-														* Riêng VSTEP: <strong class="text-slate-800 font-bold">Chỉ nhận chứng chỉ</strong> do 1 trong 3 cơ sở đào tạo cấp: ĐH Quốc gia HN, ĐH Sư phạm HN, và ĐH Hà Nội.
-													</p>
+													<p><?php echo esc_html( $item['cert_note'] ); ?></p>
 												</div>
-											</div>
+											<?php endif; ?>
+
+											<?php if ( ! empty( $item['assessment_process'] ) ) : ?>
+												<div class="mt-3 bg-amber-50 border border-amber-200/70 rounded-xl p-3.5 text-xs md:text-sm text-amber-900 leading-relaxed flex items-start gap-2.5">
+													<svg class="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+													<p><?php echo esc_html( $item['assessment_process'] ); ?></p>
+												</div>
+											<?php endif; ?>
 										</div>
-										<div class="bg-amber-50 border border-amber-200/70 rounded-xl p-3.5 text-xs md:text-sm text-amber-900 leading-relaxed pl-8 flex items-start gap-2.5">
-											<svg class="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-											<p>
-												<strong class="text-amber-950 font-extrabold block mb-0.5">Quy trình thẩm định & Quy đổi điểm:</strong> Sinh viên bắt buộc phải tham gia và vượt qua bài kiểm tra năng lực do bộ môn tổ chức. Nếu đạt yêu cầu, điểm số sẽ được quy đổi sang <strong class="text-amber-950 font-black">điểm 5</strong> trên hệ thống.
-											</p>
-										</div>
-									</div>
+									<?php endforeach; ?>
 								</div>
 							</div>
 						</div>
@@ -706,7 +815,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 				<!-- SECTION 7.5: CURRICULUM ROADMAP FILE/IMAGE -->
 				<?php if ( $curriculum_url ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="lo-trinh-hoc">
+					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="lo-trinh-hoc">
 						<div class="border-b border-slate-100 pb-3 mb-4">
 							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Lộ trình học & Khung chương trình</h2>
 							<p class="text-xs md:text-sm text-slate-500 mt-0.5">Khung chương trình đào tạo chính thức áp dụng cho khóa học này</p>
@@ -761,7 +870,7 @@ $global_zalo = ltdh_get_zalo_url();
 				}
 				?>
 				<?php if ( $documents || $form_url ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="ho-so-can-nop">
 						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Hồ sơ xét tuyển cần thiết</h2>
 						<?php if ( $documents ) : ?>
 							<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
@@ -791,7 +900,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 				<!-- SECTION 9: FAQ -->
 				<?php if ( ! empty( $faqs ) ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="hoi-dap">
 						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Câu hỏi thường gặp</h2>
 						<div class="space-y-4">
 							<?php foreach ( $faqs as $index => $item ) : ?>
@@ -830,7 +939,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 				if ( $related_query->have_posts() ) :
 				?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="chuong-trinh-lien-quan">
 						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Chương trình liên quan</h2>
 						<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 							<?php 
@@ -858,7 +967,7 @@ $global_zalo = ltdh_get_zalo_url();
 
 			<!-- Sidebar Column -->
 			<div class="lg:col-span-1">
-				<div class="sticky top-24 space-y-6">
+				<div class="sticky top-36 md:top-40 space-y-6">
 					
 					<!-- SCHOOL INFO CARD (Desktop Only >= 1024px) -->
 					<?php if ( $school_id ) : 
@@ -927,7 +1036,7 @@ $global_zalo = ltdh_get_zalo_url();
 					<?php endif; ?>
 
 					<!-- SECTION 11: CONSULTATION FORM (Sidebar Form - Available on Mobile & Desktop) -->
-					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 						<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
 						<p class="text-sm text-slate-500 mb-4">Hãy để lại thông tin, ban tư vấn tuyển sinh sẽ liên hệ và giải đáp lộ trình cụ thể cho bạn trong vòng 15 phút.</p>
 						
@@ -1239,6 +1348,195 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	};
 });
+</script>
+
+<!-- SCROLLSPY & SMOOTH SCROLL SCRIPT (UI/UX Pro Max) -->
+<script>
+(function() {
+	document.addEventListener('DOMContentLoaded', function() {
+		var stickyNav = document.getElementById('ltdh-program-sticky-nav');
+		if (!stickyNav) return;
+
+		var navContainer = stickyNav.querySelector('nav');
+		var tabLinks = Array.prototype.slice.call(stickyNav.querySelectorAll('.ltdh-section-tab-link'));
+		if (!tabLinks.length) return;
+
+		var sectionMap = [];
+		tabLinks.forEach(function(link) {
+			var id = link.getAttribute('data-tab-target');
+			var sec = document.getElementById(id);
+			if (sec) {
+				sectionMap.push({
+					id: id,
+					link: link,
+					section: sec
+				});
+			}
+		});
+
+		if (!sectionMap.length) return;
+
+		var isClickScrolling = false;
+		var scrollTimeout = null;
+
+		function getStickyOffset() {
+			var header = document.getElementById('masthead');
+			var headerHeight = header ? header.offsetHeight : 80;
+			var navHeight = stickyNav.offsetHeight || 54;
+			var adminBar = document.getElementById('wpadminbar');
+			var adminBarHeight = (adminBar && window.getComputedStyle(adminBar).position === 'fixed') ? adminBar.offsetHeight : 0;
+			return headerHeight + navHeight + adminBarHeight;
+		}
+
+		function setActiveTab(targetId, shouldScrollNav) {
+			sectionMap.forEach(function(item) {
+				var link = item.link;
+				var iconEl = link.querySelector('.ltdh-tab-icon');
+				var titleEl = link.querySelector('.ltdh-tab-title');
+				var subEl = link.querySelector('.ltdh-tab-sub');
+				var indicatorEl = link.querySelector('.ltdh-tab-indicator');
+
+				if (item.id === targetId) {
+					link.classList.add('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
+					link.classList.remove('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
+					if (iconEl) {
+						iconEl.classList.add('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
+						iconEl.classList.remove('bg-slate-100', 'text-slate-500');
+					}
+					if (titleEl) {
+						titleEl.classList.add('text-[#00308b]', 'font-extrabold');
+						titleEl.classList.remove('text-slate-700');
+					}
+					if (subEl) {
+						subEl.classList.add('text-blue-700/80', 'font-medium');
+						subEl.classList.remove('text-slate-400');
+					}
+					if (indicatorEl) {
+						indicatorEl.classList.add('bg-[#EA580C]', 'opacity-100');
+						indicatorEl.classList.remove('bg-transparent', 'opacity-0');
+					}
+
+					if (shouldScrollNav && navContainer && navContainer.scrollWidth > navContainer.clientWidth) {
+						var tabLeft = link.offsetLeft;
+						var tabWidth = link.offsetWidth;
+						var containerWidth = navContainer.clientWidth;
+						navContainer.scrollTo({
+							left: tabLeft - (containerWidth / 2) + (tabWidth / 2),
+							behavior: 'smooth'
+						});
+					}
+				} else {
+					link.classList.remove('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
+					link.classList.add('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
+					if (iconEl) {
+						iconEl.classList.remove('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
+						iconEl.classList.add('bg-slate-100', 'text-slate-500');
+					}
+					if (titleEl) {
+						titleEl.classList.remove('text-[#00308b]', 'font-extrabold');
+						titleEl.classList.add('text-slate-700');
+					}
+					if (subEl) {
+						subEl.classList.remove('text-blue-700/80', 'font-medium');
+						subEl.classList.add('text-slate-400');
+					}
+					if (indicatorEl) {
+						indicatorEl.classList.remove('bg-[#EA580C]', 'opacity-100');
+						indicatorEl.classList.add('bg-transparent', 'opacity-0');
+					}
+				}
+			});
+		}
+
+		// Handle Click on Tabs
+		tabLinks.forEach(function(link) {
+			link.addEventListener('click', function(e) {
+				e.preventDefault();
+				var targetId = this.getAttribute('data-tab-target');
+				var targetItem = sectionMap.find(function(item) { return item.id === targetId; });
+				if (!targetItem) return;
+
+				isClickScrolling = true;
+				clearTimeout(scrollTimeout);
+				setActiveTab(targetId, true);
+
+				var totalOffset = getStickyOffset();
+				var elementPosition = targetItem.section.getBoundingClientRect().top + window.pageYOffset;
+				var offsetPosition = elementPosition - totalOffset + 8; // gentle breathing room
+
+				window.scrollTo({
+					top: offsetPosition,
+					behavior: 'smooth'
+				});
+
+				if (history.replaceState) {
+					history.replaceState(null, '', '#' + targetId);
+				}
+
+				scrollTimeout = setTimeout(function() {
+					isClickScrolling = false;
+				}, 750);
+			});
+		});
+
+		// Scrollspy with requestAnimationFrame
+		var ticking = false;
+		function onScroll() {
+			if (isClickScrolling) return;
+
+			var totalOffset = getStickyOffset();
+			var scrollPos = window.pageYOffset + totalOffset + 50;
+			var currentId = sectionMap[0].id;
+
+			var atPageBottom = (window.innerHeight + window.pageYOffset) >= (document.documentElement.scrollHeight - 60);
+
+			if (atPageBottom) {
+				currentId = sectionMap[sectionMap.length - 1].id;
+			} else {
+				for (var i = 0; i < sectionMap.length; i++) {
+					var item = sectionMap[i];
+					var secTop = item.section.offsetTop;
+					var secHeight = item.section.offsetHeight;
+					if (scrollPos >= secTop && scrollPos < secTop + secHeight) {
+						currentId = item.id;
+						break;
+					} else if (scrollPos >= secTop) {
+						currentId = item.id;
+					}
+				}
+			}
+
+			if (currentId) {
+				setActiveTab(currentId, true);
+			}
+		}
+
+		window.addEventListener('scroll', function() {
+			if (!ticking) {
+				window.requestAnimationFrame(function() {
+					onScroll();
+					ticking = false;
+				});
+				ticking = true;
+			}
+		}, { passive: true });
+
+		// Handle initial hash in URL
+		if (window.location.hash) {
+			var initialHash = window.location.hash.replace('#', '');
+			var match = sectionMap.find(function(item) { return item.id === initialHash; });
+			if (match) {
+				setTimeout(function() {
+					match.link.click();
+				}, 250);
+			} else {
+				setTimeout(onScroll, 100);
+			}
+		} else {
+			setTimeout(onScroll, 100);
+		}
+	});
+})();
 </script>
 
 <?php

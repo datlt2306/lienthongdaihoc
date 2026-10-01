@@ -38,8 +38,11 @@ if ( preg_match( '#^/he-dao-tao(?:/page/\d+)?/?$#i', $request_path ) ) {
 	$banner_subtitle = 'Thông tin chi tiết về trường đào tạo đối tác';
 	$banner_image    = get_field( 'school_banner' ) ?: get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'major' ) ) {
-	$banner_title    = 'Ngành ' . get_the_title();
-	$banner_subtitle = 'Tìm hiểu chương trình đào tạo, cơ hội nghề nghiệp và thông tin tuyển sinh';
+	$raw_title       = get_the_title();
+	$banner_title    = ( 0 === stripos( trim( $raw_title ), 'ngành' ) ) ? $raw_title : 'Ngành ' . $raw_title;
+	$major_code      = get_field( 'major_code', get_the_ID() );
+	$code_suffix     = $major_code ? ' • Mã ngành: ' . $major_code : '';
+	$banner_subtitle = 'Tìm hiểu chương trình đào tạo, cơ hội nghề nghiệp và thông tin tuyển sinh' . $code_suffix;
 	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'program' ) ) {
 	$banner_title    = get_the_title();

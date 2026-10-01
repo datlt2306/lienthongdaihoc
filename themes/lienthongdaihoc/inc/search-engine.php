@@ -46,20 +46,6 @@ function ltdh_filter_program_search_query( $args ) {
 			'post_status'    => 'publish',
 		] );
 
-		// Define status exclusion filter
-		$meta_status_filter = [
-			'relation' => 'OR',
-			[
-				'key'     => LTDH_META_ADMISSION_STATUS,
-				'value'   => LTDH_STATUS_PAUSED,
-				'compare' => '!=',
-			],
-			[
-				'key'     => LTDH_META_ADMISSION_STATUS,
-				'compare' => 'NOT EXISTS',
-			],
-		];
-
 		// 5. Query matching program IDs by keyword directly
 		$program_ids_direct = get_posts( [
 			'post_type'      => LTDH_CPT_PROGRAM,
@@ -67,10 +53,6 @@ function ltdh_filter_program_search_query( $args ) {
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
 			'post_status'    => 'publish',
-			'meta_query'     => [
-				'relation' => 'AND',
-				$meta_status_filter,
-			],
 		] );
 
 		// 6. Query program IDs linked to matched schools
@@ -88,7 +70,6 @@ function ltdh_filter_program_search_query( $args ) {
 						'value'   => $school_ids,
 						'compare' => 'IN',
 					],
-					$meta_status_filter,
 				],
 			] );
 		}
@@ -108,7 +89,6 @@ function ltdh_filter_program_search_query( $args ) {
 						'value'   => $major_ids,
 						'compare' => 'IN',
 					],
-					$meta_status_filter,
 				],
 			] );
 		}

@@ -39,6 +39,7 @@ add_action( 'init', 'ltdh_register_training_type_rewrite' );
  * Register rewrite rule: /slug/ → index.php?program=slug (top priority).
  */
 function ltdh_register_program_rewrite() {
+	add_rewrite_rule( '^nganh-([^/]+)/?$', 'index.php?post_type=' . LTDH_CPT_MAJOR . '&name=$matches[1]', 'top' );
 	add_rewrite_rule( '([^/]+)/?$', 'index.php?program=$matches[1]', 'top' );
 }
 add_action( 'init', 'ltdh_register_program_rewrite' );
@@ -56,36 +57,69 @@ function ltdh_program_request_guard( $query_vars ) {
 		return $query_vars;
 	}
 
-	$slug = sanitize_title( $query_vars['program'] );
-	$cache_key = 'ltdh_slug_type_' . $slug;
+	$raw_slug = sanitize_title( $query_vars['program'] );
+	$slug     = $raw_slug;
+
+	// Check if URL has /nganh-{slug}/ prefix
+	$is_nganh_prefix = false;
+	if ( 0 === strpos( $raw_slug, 'nganh-' ) ) {
+		$slug            = substr( $raw_slug, 6 ); // strip 'nganh-'
+		$is_nganh_prefix = true;
+	}
+
+	$cache_key = 'ltdh_slug_type_' . $raw_slug;
 	$slug_type = wp_cache_get( $cache_key, 'ltdh_rewrites' );
 
 	if ( false === $slug_type ) {
 		global $wpdb;
-		// Check if a published program post exists with this slug
-		$program_id = (int) $wpdb->get_var( $wpdb->prepare(
-			"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'program' AND post_status = 'publish' LIMIT 1",
-			$slug
-		) );
 
-		if ( $program_id > 0 ) {
-			$slug_type = 'program';
-		} else {
-			// Check if a published school post exists with this slug
-			$school_id = (int) $wpdb->get_var( $wpdb->prepare(
-				"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'school' AND post_status = 'publish' LIMIT 1",
-				$slug
+		// 1. If prefix is 'nganh-', check if major post exists with stripped slug or raw slug
+		if ( $is_nganh_prefix ) {
+			$major_id = (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT ID FROM {$wpdb->posts} WHERE post_name IN (%s, %s) AND post_type = 'major' AND post_status = 'publish' LIMIT 1",
+				$slug,
+				$raw_slug
+			) );
+			if ( $major_id > 0 ) {
+				$slug_type = 'major';
+			}
+		}
+
+		// 2. Check program post
+		if ( ! $slug_type ) {
+			$program_id = (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'program' AND post_status = 'publish' LIMIT 1",
+				$raw_slug
 			) );
 
-			if ( $school_id > 0 ) {
-				$slug_type = 'school';
+			if ( $program_id > 0 ) {
+				$slug_type = 'program';
 			} else {
-				// Check if a regular post exists with this slug
-				$post_id = (int) $wpdb->get_var( $wpdb->prepare(
-					"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'post' AND post_status = 'publish' LIMIT 1",
-					$slug
+				// 3. Check school post
+				$school_id = (int) $wpdb->get_var( $wpdb->prepare(
+					"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'school' AND post_status = 'publish' LIMIT 1",
+					$raw_slug
 				) );
-				$slug_type = ( $post_id > 0 ) ? 'post' : 'page';
+
+				if ( $school_id > 0 ) {
+					$slug_type = 'school';
+				} else {
+					// 4. Check major post directly without prefix
+					$major_id = (int) $wpdb->get_var( $wpdb->prepare(
+						"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'major' AND post_status = 'publish' LIMIT 1",
+						$raw_slug
+					) );
+					if ( $major_id > 0 ) {
+						$slug_type = 'major';
+					} else {
+						// 5. Check regular post
+						$post_id = (int) $wpdb->get_var( $wpdb->prepare(
+							"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'post' AND post_status = 'publish' LIMIT 1",
+							$raw_slug
+						) );
+						$slug_type = ( $post_id > 0 ) ? 'post' : 'page';
+					}
+				}
 			}
 		}
 		wp_cache_set( $cache_key, $slug_type, 'ltdh_rewrites', 3600 );
@@ -95,27 +129,41 @@ function ltdh_program_request_guard( $query_vars ) {
 		return $query_vars;
 	}
 
-	// Not a program slug. Clean up all CPT-injected vars so WordPress
-	// falls through to pagename-based resolution for pages, posts, etc.
+	// Clean up generic program query vars
 	unset( $query_vars['program'] );
 	unset( $query_vars['post_type'] );
 	unset( $query_vars['name'] );
 
+	if ( 'major' === $slug_type ) {
+		global $wpdb;
+		$real_post_name = $wpdb->get_var( $wpdb->prepare(
+			"SELECT post_name FROM {$wpdb->posts} WHERE post_name IN (%s, %s) AND post_type = 'major' AND post_status = 'publish' LIMIT 1",
+			$slug,
+			$raw_slug
+		) );
+		$target_slug = $real_post_name ?: $slug;
+
+		$query_vars['major']     = $target_slug;
+		$query_vars['name']      = $target_slug;
+		$query_vars['post_type'] = 'major';
+		return $query_vars;
+	}
+
 	if ( 'school' === $slug_type ) {
-		$query_vars['school']    = $slug;
-		$query_vars['name']      = $slug;
+		$query_vars['school']    = $raw_slug;
+		$query_vars['name']      = $raw_slug;
 		$query_vars['post_type'] = 'school';
 		return $query_vars;
 	}
 
 	if ( 'post' === $slug_type ) {
-		$query_vars['name']      = $slug;
+		$query_vars['name']      = $raw_slug;
 		$query_vars['post_type'] = 'post';
 		return $query_vars;
 	}
 
 	// Fall back to pagename so WordPress resolves pages, guides, etc.
-	$query_vars['pagename'] = $slug;
+	$query_vars['pagename'] = $raw_slug;
 
 	return $query_vars;
 }
@@ -129,8 +177,13 @@ add_filter( 'request', 'ltdh_program_request_guard' );
  * @return string Modified URL.
  */
 function ltdh_program_permalink( $url, $post ) {
-	if ( $post instanceof WP_Post && in_array( $post->post_type, [ 'program', 'school' ], true ) ) {
-		return home_url( '/' . $post->post_name . '/' );
+	if ( $post instanceof WP_Post ) {
+		if ( in_array( $post->post_type, [ 'program', 'school' ], true ) ) {
+			return home_url( '/' . $post->post_name . '/' );
+		}
+		if ( 'major' === $post->post_type ) {
+			return home_url( '/nganh-' . $post->post_name . '/' );
+		}
 	}
 	return $url;
 }
@@ -176,6 +229,16 @@ function ltdh_redirect_taxonomy_base() {
 			exit;
 		}
 	}
+
+	// 301 redirect: /nganh-hoc/slug/ → /nganh-slug/ (except archive base /nganh-hoc/ and paginated /nganh-hoc/page/X/)
+	if ( preg_match( '#^/nganh-hoc/([^/]+)/?$#i', $request_path, $matches ) ) {
+		$sub_slug = $matches[1];
+		if ( 'page' !== $sub_slug && ! empty( $sub_slug ) ) {
+			wp_redirect( home_url( '/nganh-' . $sub_slug . '/' ), 301 );
+			exit;
+		}
+	}
+
 
 	if ( preg_match( '#^/co-so/?$#i', $request_path ) ) {
 		wp_redirect( home_url( '/he-dao-tao/tu-xa/' ), 301 );

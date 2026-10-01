@@ -15,47 +15,131 @@ $major_id   = get_the_ID();
 $major_code = get_field( 'major_code', $major_id );
 $career     = get_field( 'career_opportunities', $major_id );
 
+$entry_roadmaps   = get_field( 'major_entry_roadmaps', $major_id );
+$specializations  = get_field( 'major_specializations', $major_id );
+$related_majors   = get_field( 'major_related', $major_id );
+
 // Retrieve pre-calculated list of programs matching this major
 $offered_program_ids = get_post_meta( $major_id, LTDH_META_OFFERED_PROGRAMS, true );
 
 $global_zalo = ltdh_get_zalo_url();
 $hotline = ltdh_get_hotline();
+
+// Dynamically construct sticky navigation tabs matching reference mockup
+$major_tabs = [];
+$major_tabs[] = [
+	'id'       => 'tong-quan',
+	'title'    => 'Tổng quan',
+	'subtitle' => 'Giới thiệu ngành',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
+];
+
+if ( ! empty( $specializations ) && is_array( $specializations ) ) {
+	$major_tabs[] = [
+		'id'       => 'chuyen-sau',
+		'title'    => 'Chuyên ngành',
+		'subtitle' => 'Định hướng đào tạo',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3" /></svg>',
+	];
+}
+
+if ( ! empty( $entry_roadmaps ) && is_array( $entry_roadmaps ) ) {
+	$major_tabs[] = [
+		'id'       => 'lo-trinh-hoc',
+		'title'    => 'Lộ trình học',
+		'subtitle' => 'Thời gian & hình thức',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+	];
+}
+
+if ( ! empty( $career ) ) {
+	$major_tabs[] = [
+		'id'       => 'co-hoi-nghe-nghiep',
+		'title'    => 'Cơ hội việc làm',
+		'subtitle' => 'Vị trí & thu nhập',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" /></svg>',
+	];
+}
+
+$major_tabs[] = [
+	'id'       => 'truong-tuyen-sinh',
+	'title'    => 'Trường tuyển sinh',
+	'subtitle' => 'Điểm chuẩn & học phí',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>',
+];
+
+if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
+	$major_tabs[] = [
+		'id'       => 'nganh-lien-quan',
+		'title'    => 'Ngành liên quan',
+		'subtitle' => 'Ngành đào tạo gần',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>',
+	];
+}
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
+
+	<!-- STICKY SECTION TAB NAVIGATION (Redesigned with UI/UX Pro Max) -->
+	<div id="ltdh-major-sticky-nav" class="ltdh-sticky-nav sticky top-20 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-all duration-200">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<nav class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-2" aria-label="Điều hướng các mục ngành đào tạo">
+				<?php foreach ( $major_tabs as $tab_idx => $tab ) : 
+					$is_active = ( 0 === $tab_idx );
+				?>
+					<a href="#<?php echo esc_attr( $tab['id'] ); ?>" 
+					   data-tab-target="<?php echo esc_attr( $tab['id'] ); ?>"
+					   class="ltdh-major-tab-link group relative inline-flex items-center gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition-all duration-200 shrink-0 select-none cursor-pointer no-underline <?php echo $is_active ? 'bg-blue-50/90 text-[#00308b] font-bold shadow-2xs is-active' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'; ?>">
+						
+						<!-- Icon Box -->
+						<div class="ltdh-tab-icon w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 <?php echo $is_active ? 'bg-[#00308b] text-white shadow-xs shadow-blue-900/20' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-800'; ?>">
+							<?php echo $tab['icon']; ?>
+						</div>
+
+						<!-- Text Column -->
+						<div class="flex flex-col text-left">
+							<span class="ltdh-tab-title text-xs sm:text-[13px] font-bold leading-tight transition-colors <?php echo $is_active ? 'text-[#00308b]' : 'text-slate-700 group-hover:text-slate-900'; ?>">
+								<?php echo esc_html( $tab['title'] ); ?>
+							</span>
+							<span class="ltdh-tab-sub text-[10px] leading-tight mt-0.5 hidden md:block transition-colors <?php echo $is_active ? 'text-blue-700/80 font-medium' : 'text-slate-400 group-hover:text-slate-500'; ?>">
+								<?php echo esc_html( $tab['subtitle'] ); ?>
+							</span>
+						</div>
+
+						<!-- Subtle Active Accent Indicator (Bottom pill) -->
+						<span class="ltdh-tab-indicator absolute -bottom-0.5 left-3 right-3 h-[2px] rounded-full transition-all duration-200 <?php echo $is_active ? 'bg-[#EA580C] opacity-100' : 'bg-transparent opacity-0'; ?>"></span>
+					</a>
+				<?php endforeach; ?>
+			</nav>
+		</div>
+	</div>
+
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 		
-		<!-- HERO SECTION -->
-		<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
-			<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-				<div class="space-y-2">
-					<span class="inline-block bg-teal-50 text-brand-primary text-sm font-bold px-3 py-1 rounded-lg uppercase tracking-wider">
-						Thông tin Ngành học
-					</span>
-					<h2 class="text-2xl md:text-4xl font-black text-slate-900 leading-tight">
-						Ngành <?php the_title(); ?>
-					</h2>
-					<p class="text-slate-500 text-sm font-medium">Mã ngành: <?php echo esc_html( $major_code ?: 'Đang cập nhật' ); ?></p>
-				</div>
-				<div class="flex flex-col gap-2 w-full md:w-auto">
-					<a href="#register" class="w-full md:w-auto bg-brand-accent text-white text-center px-6 py-3 rounded-lg font-bold shadow-md hover:bg-[#e06e00] transition-all text-sm min-h-[44px] flex items-center justify-center">
-						Tư Vấn Hướng Nghiệp
-					</a>
-				</div>
-			</div>
-		</section>
 
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 			<!-- Main Column -->
 			<div class="lg:col-span-2 space-y-6 md:space-y-8">
 				
 				<!-- OVERVIEW -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan về ngành</h2>
 					<div class="relative">
 						<div id="major-intro-content" class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base overflow-hidden transition-all duration-500 max-h-[350px] relative">
-							<?php the_content(); ?>
+							<?php 
+							$raw_content = get_the_content();
+							if ( ! empty( $specializations ) && ( false !== strpos( $raw_content, 'Các mảng đào tạo chuyên sâu' ) || false !== strpos( $raw_content, 'Tóm tắt thông tin' ) ) ) {
+								$parts = preg_split( '/(1\.\s*Các mảng đào tạo chuyên sâu|⚡\s*Tóm tắt thông tin)/ui', $raw_content );
+								$cleaned = ! empty( $parts[0] ) ? trim( $parts[0] ) : '';
+								if ( empty( $cleaned ) ) {
+									$cleaned = '<p>Ngành <strong>Công nghệ thông tin (CNTT)</strong> là ngành học đào tạo chuyên sâu về việc thiết kế, xây dựng, vận hành và tối ưu hóa hệ thống phần mềm, cơ sở dữ liệu và hạ tầng mạng máy tính trong kỷ nguyên chuyển đổi số.</p><p>Chương trình <strong>Liên thông Đại học ngành Công nghệ thông tin</strong> được thiết kế linh hoạt, tạo điều kiện thuận lợi nhất cho người đã tốt nghiệp Trung cấp, Cao đẳng hoặc đã có một văn bằng Đại học khác nhanh chóng hoàn thiện văn bằng Cử nhân / Kỹ sư chính quy chuẩn Bộ GD&ĐT, nâng bậc lương và mở rộng lộ trình thăng tiến sự nghiệp.</p>';
+								}
+								echo apply_filters( 'the_content', $cleaned );
+							} else {
+								the_content();
+							}
+							?>
 							<!-- Gradient Overlay for fade-out effect -->
 							<div id="major-intro-overlay" class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none transition-opacity duration-300"></div>
 						</div>
@@ -160,9 +244,82 @@ $hotline = ltdh_get_hotline();
 					</script>
 				</section>
 
+				<!-- SPECIALIZATIONS SECTION -->
+				<?php if ( ! empty( $specializations ) && is_array( $specializations ) ) : ?>
+					<section id="chuyen-sau" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<div class="border-b border-slate-100 pb-3 md:pb-4 mb-4">
+							<h2 class="text-xl md:text-2xl font-bold text-slate-900">Các mảng đào tạo chuyên sâu trong ngành <?php the_title(); ?></h2>
+							<p class="text-xs md:text-sm text-slate-500 mt-1">Các định hướng chuyên môn mũi nhọn giúp sinh viên phát huy thế mạnh nghề nghiệp</p>
+						</div>
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+							<?php foreach ( $specializations as $spec ) : ?>
+								<div class="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 sm:p-5 hover:border-[#00308b] hover:shadow-xs transition-all space-y-2">
+									<div class="flex items-center gap-2.5">
+										<span class="text-2xl shrink-0"><?php echo esc_html( $spec['spec_icon'] ?: '💻' ); ?></span>
+										<h4 class="font-extrabold text-slate-900 text-sm sm:text-base"><?php echo esc_html( $spec['spec_name'] ); ?></h4>
+									</div>
+									<p class="text-xs sm:text-sm text-slate-600 leading-relaxed"><?php echo esc_html( $spec['spec_desc'] ); ?></p>
+								</div>
+							<?php endforeach; ?>
+						</div>
+					</section>
+				<?php endif; ?>
+
+				<!-- ENTRY ROADMAPS SECTION -->
+				<?php if ( ! empty( $entry_roadmaps ) && is_array( $entry_roadmaps ) ) : ?>
+					<section id="lo-trinh-hoc" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<div class="border-b border-slate-100 pb-3 md:pb-4 mb-4">
+							<h2 class="text-xl md:text-2xl font-bold text-slate-900">Lộ trình đào tạo Liên thông ngành <?php the_title(); ?></h2>
+							<p class="text-xs md:text-sm text-slate-500 mt-1">Thời gian và hình thức đào tạo được tối ưu linh hoạt theo từng văn bằng đầu vào</p>
+						</div>
+
+						<!-- Desktop Table View (>= 768px) -->
+						<div class="hidden md:block overflow-x-auto rounded-xl border border-slate-200/80 shadow-2xs">
+							<table class="w-full text-left border-collapse text-xs sm:text-sm">
+								<thead>
+									<tr class="bg-slate-100/90 text-slate-700 font-extrabold border-b border-slate-200">
+										<th class="py-3.5 px-4 font-bold">Trình độ đầu vào</th>
+										<th class="py-3.5 px-4 font-bold">Thời gian học</th>
+										<th class="py-3.5 px-4 font-bold">Hình thức học</th>
+										<th class="py-3.5 px-4 font-bold">Bằng cấp nhận được</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-slate-100 bg-white">
+									<?php foreach ( $entry_roadmaps as $roadmap ) : ?>
+										<tr class="hover:bg-slate-50/80 transition-colors">
+											<td class="py-3.5 px-4 font-bold text-slate-900"><?php echo esc_html( $roadmap['entry_level'] ); ?></td>
+											<td class="py-3.5 px-4 font-bold text-[#00308b]"><?php echo esc_html( $roadmap['study_time'] ); ?></td>
+											<td class="py-3.5 px-4 text-slate-700"><?php echo esc_html( $roadmap['study_mode'] ); ?></td>
+											<td class="py-3.5 px-4 font-bold text-emerald-700"><?php echo esc_html( $roadmap['degree_output'] ); ?></td>
+										</tr>
+									<?php endforeach; ?>
+								</tbody>
+							</table>
+						</div>
+
+						<!-- Mobile Card View (< 768px) -->
+						<div class="grid grid-cols-1 gap-3 md:hidden">
+							<?php foreach ( $entry_roadmaps as $roadmap ) : ?>
+								<div class="bg-white border border-slate-200/80 rounded-xl p-3.5 shadow-2xs space-y-2">
+									<div class="flex items-center justify-between border-b border-slate-100 pb-2">
+										<span class="text-xs font-bold text-slate-900"><?php echo esc_html( $roadmap['entry_level'] ); ?></span>
+										<span class="px-2 py-0.5 rounded text-[11px] font-black bg-blue-50 text-[#00308b] border border-blue-100">
+											<?php echo esc_html( $roadmap['study_time'] ); ?>
+										</span>
+									</div>
+									<div class="text-xs space-y-1 text-slate-600">
+										<p><span class="text-slate-400 font-medium">Hình thức:</span> <strong class="text-slate-800"><?php echo esc_html( $roadmap['study_mode'] ); ?></strong></p>
+										<p><span class="text-slate-400 font-medium">Bằng cấp:</span> <strong class="text-emerald-700 font-bold"><?php echo esc_html( $roadmap['degree_output'] ); ?></strong></p>
+									</div>
+								</div>
+							<?php endforeach; ?>
+						</div>
+					</section>
+				<?php endif; ?>
+
 				<!-- CAREER OPPORTUNITIES -->
 				<?php if ( $career ) : ?>
-					<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section id="co-hoi-nghe-nghiep" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Cơ hội nghề nghiệp & Định hướng</h2>
 						<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 							<?php echo wp_kses_post( $career ); ?>
@@ -171,7 +328,7 @@ $hotline = ltdh_get_hotline();
 				<?php endif; ?>
 
 				<!-- PROGRAMS FOR THIS MAJOR -->
-				<section class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="truong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Các trường tuyển sinh ngành <?php the_title(); ?></h2>
 					
 					<?php
@@ -415,11 +572,40 @@ $hotline = ltdh_get_hotline();
 					?>
 				</section>
 
+				<!-- RELATED MAJORS -->
+				<?php 
+				if ( ! empty( $related_majors ) && is_array( $related_majors ) ) :
+				?>
+					<section id="nganh-lien-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Ngành đào tạo liên quan</h2>
+						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
+							<?php foreach ( $related_majors as $rel_major ) : 
+								$rel_id    = is_object( $rel_major ) ? $rel_major->ID : (int) $rel_major;
+								$rel_title = get_the_title( $rel_id );
+								$rel_code  = get_field( 'major_code', $rel_id );
+								$rel_url   = get_permalink( $rel_id );
+							?>
+								<a href="<?php echo esc_url( $rel_url ); ?>" class="group p-3.5 rounded-xl border border-slate-200/80 hover:border-[#00308b] hover:shadow-xs transition-all bg-slate-50/50 flex items-center gap-3">
+									<div class="w-10 h-10 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center font-bold text-base shrink-0 group-hover:bg-[#00308b] group-hover:text-white transition-colors">
+										🎓
+									</div>
+									<div class="min-w-0 flex-1">
+										<h4 class="font-bold text-slate-800 text-xs sm:text-sm group-hover:text-[#00308b] transition-colors truncate"><?php echo esc_html( $rel_title ); ?></h4>
+										<?php if ( $rel_code ) : ?>
+											<span class="text-[10px] text-slate-400 font-medium">Mã ngành: <?php echo esc_html( $rel_code ); ?></span>
+										<?php endif; ?>
+									</div>
+								</a>
+							<?php endforeach; ?>
+						</div>
+					</section>
+				<?php endif; ?>
+
 			</div>
 
 			<!-- Sidebar Column -->
 			<div class="lg:col-span-1">
-				<div class="sticky top-24 space-y-6">
+				<div class="sticky top-36 md:top-40 space-y-6">
 					
 					<!-- CONSULTATION FORM -->
 					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
@@ -518,6 +704,246 @@ $hotline = ltdh_get_hotline();
 
 	</div>
 </main>
+
+<!-- STICKY SECTION NAV STYLES & SCROLLSPY -->
+<style>
+/* Header & Sticky Nav Positioning */
+#masthead {
+	transition: top 0.2s ease;
+}
+#ltdh-major-sticky-nav {
+	transition: top 0.2s ease, box-shadow 0.2s ease;
+}
+body.admin-bar #masthead {
+	top: 32px !important;
+}
+body.admin-bar #ltdh-major-sticky-nav {
+	top: calc(80px + 32px) !important;
+}
+@media screen and (max-width: 782px) {
+	body.admin-bar #masthead {
+		top: 46px !important;
+	}
+	body.admin-bar #ltdh-major-sticky-nav {
+		top: calc(80px + 46px) !important;
+	}
+}
+
+/* Active tab style matching UI/UX Pro Max standards */
+.ltdh-major-tab-link {
+	border: 1px solid transparent;
+}
+.ltdh-major-tab-link.is-active {
+	background-color: rgba(239, 246, 255, 0.95) !important;
+	border-color: rgba(191, 219, 254, 0.85) !important;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+.ltdh-major-tab-link.is-active .ltdh-tab-icon {
+	background-color: #00308b !important;
+	color: #ffffff !important;
+	box-shadow: 0 2px 6px rgba(0, 48, 139, 0.25) !important;
+}
+.ltdh-major-tab-link.is-active .ltdh-tab-title {
+	color: #00308b !important;
+	font-weight: 800 !important;
+}
+.ltdh-major-tab-link.is-active .ltdh-tab-sub {
+	color: #1d4ed8 !important;
+	font-weight: 600 !important;
+}
+.ltdh-major-tab-link.is-active .ltdh-tab-indicator {
+	background-color: #EA580C !important;
+	opacity: 1 !important;
+}
+</style>
+
+<script>
+(function() {
+	document.addEventListener('DOMContentLoaded', function() {
+		var stickyNav = document.getElementById('ltdh-major-sticky-nav');
+		if (!stickyNav) return;
+
+		var navContainer = stickyNav.querySelector('nav');
+		var tabLinks = Array.prototype.slice.call(stickyNav.querySelectorAll('.ltdh-major-tab-link'));
+		if (!tabLinks.length) return;
+
+		var sectionMap = [];
+		tabLinks.forEach(function(link) {
+			var id = link.getAttribute('data-tab-target');
+			var sec = document.getElementById(id);
+			if (sec) {
+				sectionMap.push({
+					id: id,
+					link: link,
+					section: sec
+				});
+			}
+		});
+
+		if (!sectionMap.length) return;
+
+		var isClickScrolling = false;
+		var scrollTimeout = null;
+
+		function getStickyOffset() {
+			var header = document.getElementById('masthead');
+			var headerHeight = header ? header.offsetHeight : 80;
+			var navHeight = stickyNav.offsetHeight || 54;
+			var adminBar = document.getElementById('wpadminbar');
+			var adminBarHeight = (adminBar && window.getComputedStyle(adminBar).position === 'fixed') ? adminBar.offsetHeight : 0;
+			return headerHeight + navHeight + adminBarHeight;
+		}
+
+		function setActiveTab(targetId, shouldScrollNav) {
+			sectionMap.forEach(function(item) {
+				var link = item.link;
+				var iconEl = link.querySelector('.ltdh-tab-icon');
+				var titleEl = link.querySelector('.ltdh-tab-title');
+				var subEl = link.querySelector('.ltdh-tab-sub');
+				var indicatorEl = link.querySelector('.ltdh-tab-indicator');
+
+				if (item.id === targetId) {
+					link.classList.add('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
+					link.classList.remove('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
+					if (iconEl) {
+						iconEl.classList.add('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
+						iconEl.classList.remove('bg-slate-100', 'text-slate-500');
+					}
+					if (titleEl) {
+						titleEl.classList.add('text-[#00308b]', 'font-extrabold');
+						titleEl.classList.remove('text-slate-700');
+					}
+					if (subEl) {
+						subEl.classList.add('text-blue-700/80', 'font-medium');
+						subEl.classList.remove('text-slate-400');
+					}
+					if (indicatorEl) {
+						indicatorEl.classList.add('bg-[#EA580C]', 'opacity-100');
+						indicatorEl.classList.remove('bg-transparent', 'opacity-0');
+					}
+
+					if (shouldScrollNav && navContainer && navContainer.scrollWidth > navContainer.clientWidth) {
+						var tabLeft = link.offsetLeft;
+						var tabWidth = link.offsetWidth;
+						var containerWidth = navContainer.clientWidth;
+						navContainer.scrollTo({
+							left: tabLeft - (containerWidth / 2) + (tabWidth / 2),
+							behavior: 'smooth'
+						});
+					}
+				} else {
+					link.classList.remove('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
+					link.classList.add('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
+					if (iconEl) {
+						iconEl.classList.remove('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
+						iconEl.classList.add('bg-slate-100', 'text-slate-500');
+					}
+					if (titleEl) {
+						titleEl.classList.remove('text-[#00308b]', 'font-extrabold');
+						titleEl.classList.add('text-slate-700');
+					}
+					if (subEl) {
+						subEl.classList.remove('text-blue-700/80', 'font-medium');
+						subEl.classList.add('text-slate-400');
+					}
+					if (indicatorEl) {
+						indicatorEl.classList.remove('bg-[#EA580C]', 'opacity-100');
+						indicatorEl.classList.add('bg-transparent', 'opacity-0');
+					}
+				}
+			});
+		}
+
+		// Handle Click on Tabs
+		tabLinks.forEach(function(link) {
+			link.addEventListener('click', function(e) {
+				e.preventDefault();
+				var targetId = this.getAttribute('data-tab-target');
+				var targetItem = sectionMap.find(function(item) { return item.id === targetId; });
+				if (!targetItem) return;
+
+				isClickScrolling = true;
+				clearTimeout(scrollTimeout);
+				setActiveTab(targetId, true);
+
+				var totalOffset = getStickyOffset();
+				var elementPosition = targetItem.section.getBoundingClientRect().top + window.pageYOffset;
+				var offsetPosition = elementPosition - totalOffset + 8; // gentle padding
+
+				window.scrollTo({
+					top: offsetPosition,
+					behavior: 'smooth'
+				});
+
+				if (history.replaceState) {
+					history.replaceState(null, '', '#' + targetId);
+				}
+
+				scrollTimeout = setTimeout(function() {
+					isClickScrolling = false;
+				}, 750);
+			});
+		});
+
+		// Scrollspy with requestAnimationFrame
+		var ticking = false;
+		function onScroll() {
+			if (isClickScrolling) return;
+
+			var totalOffset = getStickyOffset();
+			var scrollPos = window.pageYOffset + totalOffset + 50;
+			var currentId = sectionMap[0].id;
+
+			var atPageBottom = (window.innerHeight + window.pageYOffset) >= (document.documentElement.scrollHeight - 60);
+
+			if (atPageBottom) {
+				currentId = sectionMap[sectionMap.length - 1].id;
+			} else {
+				for (var i = 0; i < sectionMap.length; i++) {
+					var item = sectionMap[i];
+					var secTop = item.section.offsetTop;
+					var secHeight = item.section.offsetHeight;
+					if (scrollPos >= secTop && scrollPos < secTop + secHeight) {
+						currentId = item.id;
+						break;
+					} else if (scrollPos >= secTop) {
+						currentId = item.id;
+					}
+				}
+			}
+
+			if (currentId) {
+				setActiveTab(currentId, true);
+			}
+		}
+
+		window.addEventListener('scroll', function() {
+			if (!ticking) {
+				window.requestAnimationFrame(function() {
+					onScroll();
+					ticking = false;
+				});
+				ticking = true;
+			}
+		}, { passive: true });
+
+		// Handle initial hash in URL
+		if (window.location.hash) {
+			var initialHash = window.location.hash.replace('#', '');
+			var match = sectionMap.find(function(item) { return item.id === initialHash; });
+			if (match) {
+				setTimeout(function() {
+					match.link.click();
+				}, 250);
+			} else {
+				setTimeout(onScroll, 100);
+			}
+		} else {
+			setTimeout(onScroll, 100);
+		}
+	});
+})();
+</script>
 
 <?php
 get_footer();

@@ -188,6 +188,7 @@ function ltdh_ajax_filter_programs() {
 			$prog_types = wp_get_post_terms( $prog_id, 'training_type' );
 			$t_name     = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->name : '';
 			$t_slug     = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->slug : '';
+			$admission_status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
 
 			$badge_class = 'bg-orange-50 text-orange-600 border border-orange-100';
 			if ( $t_name ) {
@@ -218,6 +219,17 @@ function ltdh_ajax_filter_programs() {
 				<div>
 					<div class="h-24 w-full bg-slate-200 bg-cover bg-center relative" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');">
 						<div class="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent"></div>
+						<?php if ( 'tam-ngung' === $admission_status ) : ?>
+							<span class="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm z-10 flex items-center gap-1">
+								<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+								Đã hết chỉ tiêu
+							</span>
+						<?php elseif ( 'sap-mo' === $admission_status ) : ?>
+							<span class="absolute top-2.5 left-2.5 bg-amber-500 text-white text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm z-10">
+								Sắp mở
+							</span>
+						<?php endif; ?>
+
 						<?php if ( $t_name ) : ?>
 							<span class="absolute top-2.5 right-2.5 <?php echo esc_attr( $badge_class ); ?> text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide border shadow-sm z-10">
 								Hệ <?php echo esc_html( $t_name ); ?>
@@ -243,7 +255,14 @@ function ltdh_ajax_filter_programs() {
 							<h3 class="font-extrabold text-slate-950 text-sm md:text-base hover:text-brand-primary mb-1 leading-snug line-clamp-2 min-h-[40px]">
 								<a href="<?php the_permalink(); ?>"><?php echo esc_html( $school_name ); ?></a>
 							</h3>
-							<span class="text-xs text-slate-500 font-semibold bg-slate-50 px-1.5 py-0.5 rounded inline-block mb-3 border border-slate-200/50"><?php the_title(); ?></span>
+							<div class="flex flex-wrap items-center gap-1.5 mb-3">
+								<span class="text-xs text-slate-500 font-semibold bg-slate-50 px-1.5 py-0.5 rounded inline-block border border-slate-200/50"><?php the_title(); ?></span>
+								<?php if ( 'tam-ngung' === $admission_status ) : ?>
+									<span class="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200/80 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+										<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Tạm dừng tuyển sinh
+									</span>
+								<?php endif; ?>
+							</div>
 						</div>
 
 						<div class="space-y-0.5 md:space-y-1 text-sm text-slate-500 py-2 md:py-3 border-t border-slate-100">
