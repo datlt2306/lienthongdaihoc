@@ -130,6 +130,7 @@
     --text-7xl--line-height: 1;
     --text-8xl: 6rem;
     --text-8xl--line-height: 1;
+    --font-weight-light: 300;
     --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
@@ -587,6 +588,9 @@
   }
   .-mx-5 {
     margin-inline: calc(var(--spacing) * -5);
+  }
+  .mx-1 {
+    margin-inline: var(--spacing);
   }
   .mx-2 {
     margin-inline: calc(var(--spacing) * 2);
@@ -2028,6 +2032,9 @@
   .\[scrollbar-width\:none\] {
     scrollbar-width: none;
   }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
   .list-none {
     list-style-type: none;
   }
@@ -3070,6 +3077,9 @@
   .stroke-current {
     stroke: currentcolor;
   }
+  .stroke-\[2\] {
+    stroke-width: 2;
+  }
   .object-contain {
     object-fit: contain;
   }
@@ -3404,6 +3414,10 @@
   .font-extrabold {
     --tw-font-weight: var(--font-weight-extrabold);
     font-weight: var(--font-weight-extrabold);
+  }
+  .font-light {
+    --tw-font-weight: var(--font-weight-light);
+    font-weight: var(--font-weight-light);
   }
   .font-medium {
     --tw-font-weight: var(--font-weight-medium);
@@ -4436,6 +4450,18 @@
     --tw-outline-style: none;
     outline-style: none;
   }
+  .active\:scale-95:active {
+    --tw-scale-x: 95%;
+    --tw-scale-y: 95%;
+    --tw-scale-z: 95%;
+    scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
+  .active\:scale-98:active {
+    --tw-scale-x: 98%;
+    --tw-scale-y: 98%;
+    --tw-scale-z: 98%;
+    scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
   .active\:scale-\[0\.98\]:active {
     scale: 0.98;
   }
@@ -4448,6 +4474,9 @@
     }
     .sm\:block {
       display: block;
+    }
+    .sm\:hidden {
+      display: none;
     }
     .sm\:inline {
       display: inline;
@@ -4463,6 +4492,9 @@
     }
     .sm\:h-12 {
       height: calc(var(--spacing) * 12);
+    }
+    .sm\:h-20 {
+      height: calc(var(--spacing) * 20);
     }
     .sm\:h-24 {
       height: calc(var(--spacing) * 24);
@@ -4576,11 +4608,17 @@
     .sm\:px-3\.5 {
       padding-inline: calc(var(--spacing) * 3.5);
     }
+    .sm\:px-4 {
+      padding-inline: calc(var(--spacing) * 4);
+    }
     .sm\:px-6 {
       padding-inline: calc(var(--spacing) * 6);
     }
     .sm\:py-2 {
       padding-block: calc(var(--spacing) * 2);
+    }
+    .sm\:py-2\.5 {
+      padding-block: calc(var(--spacing) * 2.5);
     }
     .sm\:py-3 {
       padding-block: calc(var(--spacing) * 3);

@@ -401,12 +401,12 @@ function ltdh_site_logo_mobile(int $max_height = 36): void {
 function ltdh_breadcrumb(): void {
 	$type = get_query_var( 'ltdh_compare' );
 	if ( $type ) {
-		echo '<div class="ltdh-breadcrumb max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-sm text-slate-400">';
-		echo '<a href="' . esc_url( home_url( '/' ) ) . '" class="hover:text-brand-primary">Trang chủ</a>';
-		echo ' <span class="mx-2 text-slate-300">/</span> ';
-		echo '<a href="' . esc_url( home_url( '/hinh-thuc-dao-tao/' ) ) . '" class="hover:text-brand-primary">Hình thức đào tạo</a>';
-		echo ' <span class="mx-2 text-slate-300">/</span> ';
-		echo '<span class="text-slate-600 font-medium">So sánh chương trình</span>';
+		echo '<div class="ltdh-breadcrumb bg-slate-50/60 border-b border-slate-100 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-1.5">';
+		echo '<a href="' . esc_url( home_url( '/' ) ) . '" class="hover:text-brand-primary transition-colors font-medium">Trang chủ</a>';
+		echo ' <span class="mx-1 text-slate-300 font-light">/</span> ';
+		echo '<a href="' . esc_url( home_url( '/hinh-thuc-dao-tao/' ) ) . '" class="hover:text-brand-primary transition-colors font-medium">Hình thức đào tạo</a>';
+		echo ' <span class="mx-1 text-slate-300 font-light">/</span> ';
+		echo '<span class="text-slate-700 font-semibold">So sánh chương trình</span>';
 		echo '</div>';
 		return;
 	}
@@ -481,16 +481,16 @@ function ltdh_breadcrumb(): void {
 		$html_parts = [];
 		foreach ( $crumbs as $crumb ) {
 			if ( ! empty( $crumb['url'] ) ) {
-				$html_parts[] = '<a href="' . esc_url( $crumb['url'] ) . '" class="hover:text-brand-primary transition-colors">' . esc_html( $crumb['label'] ) . '</a>';
+				$html_parts[] = '<a href="' . esc_url( $crumb['url'] ) . '" class="hover:text-brand-primary transition-colors font-medium shrink-0">' . esc_html( $crumb['label'] ) . '</a>';
 			} else {
-				$html_parts[] = '<span class="text-slate-500 font-medium">' . esc_html( $crumb['label'] ) . '</span>';
+				$html_parts[] = '<span class="text-slate-700 font-semibold shrink-0">' . esc_html( $crumb['label'] ) . '</span>';
 			}
 		}
-		$html = implode( ' <span class="mx-2 text-slate-300">/</span> ', $html_parts );
+		$html = implode( ' <span class="mx-1 text-slate-300 font-light shrink-0">/</span> ', $html_parts );
 	}
 
 	if ( ! empty( $html ) ) {
-		echo '<div class="ltdh-breadcrumb max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-sm text-slate-400">';
+		echo '<div class="ltdh-breadcrumb bg-slate-50/60 border-b border-slate-100 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-1.5">';
 		echo $html;
 		echo '</div>';
 	}

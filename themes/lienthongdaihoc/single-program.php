@@ -1056,19 +1056,69 @@ if ( ! empty( $faqs ) ) {
 					
 
 
+					<!-- ZALO GROUP COMMUNITY WIDGET (Sidebar - Desktop Only) -->
+					<?php
+					$program_school_zalo = ( $school_id ? ( get_field( 'zalo_group_url', $school_id ) ?: get_field( 'school_zalo_group', $school_id ) ) : '' ) ?: $global_zalo;
+					$program_school_name = $school_title ?: 'chương trình';
+					?>
+					<div class="hidden lg:block bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-xl p-5 shadow-md relative overflow-hidden border border-blue-500/30">
+						<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+
+						<div class="flex items-center gap-3 mb-3 relative z-10">
+							<div class="w-10 h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center font-black text-xl shadow-xs shrink-0">
+								💬
+							</div>
+							<div>
+								<span class="text-[11px] uppercase font-bold tracking-wider text-blue-200 block">Cộng đồng sinh viên</span>
+								<h3 class="font-extrabold text-base text-white leading-tight">Nhóm Zalo Trao Đổi</h3>
+							</div>
+						</div>
+
+						<p class="text-xs text-blue-100 leading-relaxed mb-4 relative z-10">
+							Tham gia nhóm Zalo trao đổi thông tin tuyển sinh, lịch học và đề án cùng sinh viên <?php echo esc_html( $program_school_name ); ?>.
+						</p>
+
+						<ul class="space-y-1.5 text-xs text-blue-50 font-medium mb-4 relative z-10">
+							<li class="flex items-center gap-2">
+								<span class="text-emerald-300 font-bold">✓</span>
+								<span>Cập nhật lịch thi & đề án mới nhất</span>
+							</li>
+							<li class="flex items-center gap-2">
+								<span class="text-emerald-300 font-bold">✓</span>
+								<span>Giải đáp thắc mắc hồ sơ 24/7</span>
+							</li>
+						</ul>
+
+						<a href="<?php echo esc_url( $program_school_zalo ); ?>"
+						   target="_blank"
+						   rel="noopener noreferrer"
+						   class="w-full bg-white hover:bg-blue-50 text-blue-700 font-extrabold text-sm py-3 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] relative z-10 hover:scale-[1.02]">
+							<span>💬 Tham gia Nhóm Zalo</span>
+							<span class="text-xs">→</span>
+						</a>
+					</div>
+
 					<!-- RELATED NEWS & ANNOUNCEMENTS (Sidebar - Desktop Only) -->
 					<?php
+					$program_news_meta = [ 'relation' => 'OR' ];
+					$program_news_meta[] = [
+						'key'     => 'related_programs',
+						'value'   => '"' . $program_id . '"',
+						'compare' => 'LIKE',
+					];
+					if ( $school_id ) {
+						$program_news_meta[] = [
+							'key'     => 'related_schools',
+							'value'   => '"' . $school_id . '"',
+							'compare' => 'LIKE',
+						];
+					}
+
 					$related_news_query = new WP_Query( [
 						'post_type'      => [ 'post', 'guide' ],
 						'posts_per_page' => 6,
 						'post_status'    => 'publish',
-						'meta_query'     => [
-							[
-								'key'     => 'related_programs',
-								'value'   => '"' . $program_id . '"',
-								'compare' => 'LIKE',
-							],
-						],
+						'meta_query'     => $program_news_meta,
 					] );
 
 					if ( $related_news_query->have_posts() ) :
