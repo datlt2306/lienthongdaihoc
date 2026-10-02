@@ -72,6 +72,22 @@
                 "type": "text"
             },
             {
+                "key": "field_school_zalo_group_url",
+                "label": "Link Nhóm Zalo Trao Đổi (Cộng đồng)",
+                "name": "zalo_group_url",
+                "type": "url",
+                "instructions": "Nhập đường dẫn tham gia nhóm Zalo dành riêng cho sinh viên / tuyển sinh của trường này (Ví dụ: https://zalo.me/g/...)",
+                "placeholder": "https://zalo.me/g/..."
+            },
+            {
+                "key": "field_school_zalo_group",
+                "label": "Link Nhóm Zalo (Dự phòng)",
+                "name": "school_zalo_group",
+                "type": "url",
+                "instructions": "Nhập link nhóm Zalo dự phòng nếu có",
+                "placeholder": "https://zalo.me/g/..."
+            },
+            {
                 "key": "field_school_admission_info",
                 "label": "Phương thức tuyển sinh",
                 "name": "admission_info",
