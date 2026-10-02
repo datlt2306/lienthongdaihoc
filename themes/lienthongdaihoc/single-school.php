@@ -719,6 +719,44 @@ if ( ! empty( $contact ) ) {
 					endif;
 					?>
  
+					<!-- ZALO GROUP DISCUSSION COMMUNITY CARD -->
+					<div class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-xl p-5 shadow-md relative overflow-hidden border border-blue-500/30">
+						<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+
+						<div class="flex items-center gap-3 mb-3 relative z-10">
+							<div class="w-10 h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center font-black text-xl shadow-xs shrink-0">
+								💬
+							</div>
+							<div>
+								<span class="text-[11px] uppercase font-bold tracking-wider text-blue-200 block">Cộng đồng sinh viên</span>
+								<h3 class="font-extrabold text-base text-white leading-tight">Nhóm Zalo Trao Đổi</h3>
+							</div>
+						</div>
+
+						<p class="text-xs text-blue-100 leading-relaxed mb-4 relative z-10">
+							Tham gia nhóm Zalo trao đổi thông tin tuyển sinh, lịch học và chia sẻ kinh nghiệm cùng cựu sinh viên <?php echo esc_html( $school_title ); ?>.
+						</p>
+
+						<ul class="space-y-1.5 text-xs text-blue-50 font-medium mb-4 relative z-10">
+							<li class="flex items-center gap-2">
+								<span class="text-emerald-300 font-bold">✓</span>
+								<span>Cập nhật thông báo tuyển sinh mới nhất</span>
+							</li>
+							<li class="flex items-center gap-2">
+								<span class="text-emerald-300 font-bold">✓</span>
+								<span>Giải đáp thắc mắc hồ sơ 24/7</span>
+							</li>
+						</ul>
+
+						<a href="<?php echo esc_url( $zalo_group ); ?>"
+						   target="_blank"
+						   rel="noopener noreferrer"
+						   class="w-full bg-white hover:bg-blue-50 text-blue-700 font-extrabold text-sm py-3 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] relative z-10 hover:scale-[1.02]">
+							<span>💬 Tham gia Nhóm Zalo</span>
+							<span class="text-xs">→</span>
+						</a>
+					</div>
+
 					<!-- CONTACT INFO CARD -->
 					<div class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white rounded-lg p-6 text-center shadow-lg overflow-hidden border border-slate-800">
 						<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 16px 16px;"></div>
