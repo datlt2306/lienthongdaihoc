@@ -452,61 +452,92 @@
 	}
 
 	function renderProgramCard(prog, idx) {
+		var isTopPick = (idx === 0);
 		var statusClass = prog.preliminary_status === 'compatible' ? 'elig-status-compatible' : (prog.preliminary_status === 'needs_verification' ? 'elig-status-verification' : 'elig-status-incompatible');
 		var statusLabel = prog.preliminary_status === 'compatible' ? 'Độ tương thích tốt' : (prog.preliminary_status === 'needs_verification' ? 'Cần xác minh hồ sơ' : 'Chưa tương thích');
 		var matchPriorityLabel = prog.score >= 80 ? 'Ưu tiên cao' : (prog.score >= 50 ? 'Phù hợp tốt' : 'Lựa chọn tham khảo');
 
-		var schoolHtml = '';
-		if (prog.school) {
-			schoolHtml = '<div class="elig-card-school">';
-			if (prog.school.logo) {
-				schoolHtml += '<img src="' + escAttr(prog.school.logo) + '" alt="" class="elig-card-school-logo">';
-			}
-			schoolHtml += '<span>' + escHtml(prog.school.title) + '</span></div>';
+		var schoolCode = (prog.school && prog.school.code) ? prog.school.code.toUpperCase() : '';
+		var schoolTitle = (prog.school && prog.school.title) ? prog.school.title : 'Trường Đại học';
+		var schoolLogo = (prog.school && prog.school.logo) ? prog.school.logo : '';
+
+		var topPickBannerHtml = '';
+		if (isTopPick) {
+			topPickBannerHtml =
+				'<div class="elig-top-pick-banner" style="background: linear-gradient(135deg, #0e2038 0%, #1e3a8a 100%); color: #ffffff; padding: 8px 16px; font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">' +
+					'<span>🏆 Gợi ý hàng đầu phù hợp nhất cho bạn</span>' +
+					'<span style="background: #d97706; color: #ffffff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 900;">#1 TOP PICK</span>' +
+				'</div>';
 		}
 
-		var reasonsHtml = '<div class="elig-reasons-container" style="margin-top: 10px; font-size: 0.85rem; line-height: 1.4;">';
+		var schoolHeaderHtml =
+			'<div class="elig-card-school-bar" style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; gap: 12px;">' +
+				'<div style="display: flex; align-items: center; gap: 12px;">' +
+					(schoolLogo
+						? '<div style="width: 44px; height: 44px; min-width: 44px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 2px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">' +
+								'<img src="' + escAttr(schoolLogo) + '" alt="' + escAttr(schoolTitle) + '" style="max-width: 100%; max-height: 100%; object-fit: contain;">' +
+						  '</div>'
+						: '<div style="width: 44px; height: 44px; min-width: 44px; background: #0e2038; color: #ffffff; border-radius: 10px; font-weight: 900; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">' +
+								escHtml(schoolCode || 'UNI') +
+						  '</div>'
+					) +
+					'<div>' +
+						'<div style="font-weight: 900; font-size: 0.95rem; color: #0e2038; line-height: 1.3; text-transform: uppercase;">' + escHtml(schoolTitle) + '</div>' +
+						(schoolCode ? '<span style="display: inline-block; margin-top: 2px; font-size: 0.75rem; font-weight: 800; background: #e0f2fe; color: #0369a1; padding: 1px 6px; border-radius: 4px;">[' + escHtml(schoolCode) + ']</span>' : '') +
+					'</div>' +
+				'</div>' +
+				'<div class="elig-rank-pill" style="' + (isTopPick ? 'background: #fef3c7; color: #d97706; border: 1px solid #fcd34d;' : 'background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;') + ' padding: 4px 10px; border-radius: 999px; font-weight: 900; font-size: 0.8rem; flex-shrink: 0;">' +
+					(isTopPick ? '👑 Top 1' : '#' + (idx + 1)) +
+				'</div>' +
+			'</div>';
+
+		var reasonsHtml = '<div class="elig-reasons-container" style="margin-top: 14px; background: #f8fafc; border-radius: 8px; padding: 12px; border: 1px solid #f1f5f9; font-size: 0.85rem;">';
 		if (prog.match_reasons && prog.match_reasons.length > 0) {
 			prog.match_reasons.forEach(function (reason) {
-				reasonsHtml += '<div class="elig-reason-item text-emerald-600" style="color: #059669; margin-bottom: 3px;">✓ ' + escHtml(reason) + '</div>';
+				reasonsHtml += '<div class="elig-reason-item" style="color: #059669; margin-bottom: 4px; font-weight: 600; display: flex; align-items: flex-start; gap: 6px;"><span style="font-weight: 800;">✓</span><span>' + escHtml(reason) + '</span></div>';
 			});
 		}
 		if (prog.verification_items && prog.verification_items.length > 0) {
 			prog.verification_items.forEach(function (item) {
-				reasonsHtml += '<div class="elig-reason-item text-amber-600" style="color: #d97706; margin-bottom: 3px;">⚠ ' + escHtml(item) + '</div>';
+				reasonsHtml += '<div class="elig-reason-item" style="color: #d97706; margin-bottom: 4px; font-weight: 600; display: flex; align-items: flex-start; gap: 6px;"><span style="font-weight: 800;">⚠️</span><span>' + escHtml(item) + '</span></div>';
 			});
 		}
 		if (prog.mismatch_reasons && prog.mismatch_reasons.length > 0) {
 			prog.mismatch_reasons.forEach(function (reason) {
-				reasonsHtml += '<div class="elig-reason-item text-rose-600" style="color: #e11d48; margin-bottom: 3px;">✗ ' + escHtml(reason) + '</div>';
+				reasonsHtml += '<div class="elig-reason-item" style="color: #e11d48; margin-bottom: 4px; font-weight: 600; display: flex; align-items: flex-start; gap: 6px;"><span style="font-weight: 800;">✕</span><span>' + escHtml(reason) + '</span></div>';
 			});
 		}
 		reasonsHtml += '</div>';
 
 		var card = document.createElement('div');
-		card.className = 'elig-card';
+		card.className = 'elig-card' + (isTopPick ? ' elig-card-top-pick' : '');
+		if (isTopPick) {
+			card.style.border = '2px solid #3b82f6';
+			card.style.boxShadow = '0 10px 25px -5px rgba(59, 130, 246, 0.15), 0 4px 6px -2px rgba(0,0,0,0.05)';
+		}
+
 		card.innerHTML =
-			'<div class="elig-card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">' +
-				'<div class="elig-card-rank">#' + (idx + 1) + '</div>' +
-				'<div class="elig-card-status ' + statusClass + '" style="font-weight: bold; font-size: 0.85rem;">' +
-					'<span class="elig-score-label" style="display: inline-block; padding: 4px 8px; border-radius: 4px;">' + statusLabel + ' (' + matchPriorityLabel + ')</span>' +
-				'</div>' +
-			'</div>' +
-			'<div class="elig-card-body">' +
-				'<div class="elig-card-info">' +
-					schoolHtml +
-					'<h3 class="elig-card-title" style="margin-top: 8px; font-weight: 800; font-size: 1.1rem;"><a href="' + escAttr(prog.permalink) + '" style="text-decoration: none; color: #1e293b;">' + escHtml(prog.title) + '</a></h3>' +
-					'<div class="elig-card-meta" style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.85rem; color: #64748b;">' +
-						'<span class="elig-meta-item">💰 ' + escHtml(prog.tuition_fee || 'Liên hệ') + '</span>' +
-						'<span class="elig-meta-item">⏱ ' + escHtml(prog.duration || '—') + '</span>' +
-						'<span class="elig-meta-item">📅 ' + escHtml(prog.schedule || 'Linh hoạt') + '</span>' +
-						'<span class="elig-meta-item">📍 ' + escHtml(prog.campus_info || '—') + '</span>' +
+			topPickBannerHtml +
+			schoolHeaderHtml +
+			'<div class="elig-card-body" style="padding: 16px;">' +
+				'<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">' +
+					'<h3 class="elig-card-title" style="margin: 0; font-weight: 800; font-size: 1.15rem; line-height: 1.35; flex: 1; min-width: 220px;">' +
+						'<a href="' + escAttr(prog.permalink) + '" style="text-decoration: none; color: #0e2038;">' + escHtml(prog.title) + '</a>' +
+					'</h3>' +
+					'<div class="elig-card-status ' + statusClass + '" style="white-space: nowrap; font-weight: 800; font-size: 0.8rem;">' +
+						'<span class="elig-score-label" style="display: inline-block; padding: 4px 10px; border-radius: 6px;">' + statusLabel + ' (' + matchPriorityLabel + ')</span>' +
 					'</div>' +
 				'</div>' +
+				'<div class="elig-card-meta-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 0.85rem; color: #475569;">' +
+					'<div class="elig-meta-item"><strong>💰 Học phí:</strong> <span style="color: #0e2038; font-weight: 700;">' + escHtml(prog.tuition_fee || 'Liên hệ') + '</span></div>' +
+					'<div class="elig-meta-item"><strong>⏱ Thời gian:</strong> <span style="color: #0e2038; font-weight: 700;">' + escHtml(prog.duration || '—') + '</span></div>' +
+					'<div class="elig-meta-item"><strong>📅 Lịch học:</strong> <span style="color: #0e2038; font-weight: 700;">' + escHtml(prog.schedule || 'Linh hoạt') + '</span></div>' +
+					'<div class="elig-meta-item"><strong>📍 Trạm thi:</strong> <span style="color: #0e2038; font-weight: 700;">' + escHtml(prog.campus_info || '—') + '</span></div>' +
+				'</div>' +
 				reasonsHtml +
-				'<div class="elig-card-actions" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;">' +
-					'<a href="' + escAttr(prog.permalink) + '" class="elig-btn elig-btn-primary elig-btn-sm" style="flex: 1; text-align: center; text-decoration: none; min-width: 120px;">Xem chương trình</a>' +
-					'<a href="#elig-lead-section" class="elig-btn elig-btn-secondary elig-btn-sm elig-verify-card-btn" data-program-id="' + prog.program_id + '" style="flex: 1; text-align: center; text-decoration: none; min-width: 120px; font-weight: bold;">Kiểm tra hồ sơ 📞</a>' +
+				'<div class="elig-card-actions" style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px;">' +
+					'<a href="' + escAttr(prog.permalink) + '" class="elig-btn elig-btn-secondary elig-btn-sm" style="flex: 1; text-align: center; text-decoration: none; min-width: 130px; border-color: #cbd5e1; font-weight: 700;">Xem chi tiết</a>' +
+					'<a href="#elig-lead-section" class="elig-btn elig-btn-primary elig-btn-sm elig-verify-card-btn" data-program-id="' + prog.program_id + '" style="flex: 1; text-align: center; text-decoration: none; min-width: 140px; font-weight: 800; background: #d97706; border-color: #d97706;">Xác minh hồ sơ 1:1 📞</a>' +
 				'</div>' +
 			'</div>';
 

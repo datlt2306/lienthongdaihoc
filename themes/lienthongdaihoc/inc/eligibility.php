@@ -568,6 +568,7 @@ function ltdh_elig_run_check( $input ) {
 			'school'             => $school_id ? [
 				'id'     => $school_id,
 				'title'  => get_the_title( $school_id ),
+				'code'   => get_post_meta( $school_id, 'school_code', true ) ?: '',
 				'logo'   => $school_logo_id ? wp_get_attachment_image_url( $school_logo_id, 'thumbnail' ) : '',
 			] : null,
 			'major'              => $prog_major_id ? get_the_title( $prog_major_id ) : '',

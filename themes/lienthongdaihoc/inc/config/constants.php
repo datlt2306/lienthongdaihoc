@@ -16,7 +16,7 @@ define( 'LTDH_TABLE_LEADS', 'ltdh_leads' );
 define( 'LTDH_TABLE_ELIGIBILITY', 'ltdh_eligibility_checks' );
 
 // Option keys stored via update_option / get_option.
-define( 'LTDH_OPT_REWRITE_FLUSHED', 'ltdh_rewrite_flushed_v2' );
+define( 'LTDH_OPT_REWRITE_FLUSHED', 'ltdh_rewrite_flushed_v3' );
 define( 'LTDH_OPT_ELIG_TABLE_VERSION', 'ltdh_elig_table_version' );
 
 // ACF Options Page slug.
