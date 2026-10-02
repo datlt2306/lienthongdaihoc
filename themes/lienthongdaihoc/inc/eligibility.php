@@ -303,7 +303,7 @@ function ltdh_elig_validate_input( $input ) {
 	}
 
 	if ( ! empty( $input['training_type'] ) && ! in_array( $input['training_type'], $valid_training, true ) ) {
-		return new WP_Error( 'invalid_training', 'Hệ đào tạo không hợp lệ.' );
+		return new WP_Error( 'invalid_training', 'Hình thức đào tạo không hợp lệ.' );
 	}
 
 	if ( ! empty( $input['campus'] ) && ! in_array( $input['campus'], $valid_campus, true ) ) {
@@ -476,10 +476,10 @@ function ltdh_elig_run_check( $input ) {
 				if ( $preliminary_status !== 'not_compatible' ) {
 					$preliminary_status = 'needs_verification';
 				}
-				$verification_items[] = 'Hệ đào tạo ' . ltdh_elig_get_training_label( $input['training_type'] ) . ' cần được nhà trường xác nhận với trình độ hiện tại.';
+				$verification_items[] = 'Hình thức đào tạo ' . ltdh_elig_get_training_label( $input['training_type'] ) . ' cần được nhà trường xác nhận với trình độ hiện tại.';
 			} else {
 				$match_score += $weights['schedule_match'];
-				$match_reasons[] = 'Hỗ trợ hệ đào tạo ' . ltdh_elig_get_training_label( $input['training_type'] ) . ' phù hợp.';
+				$match_reasons[] = 'Hỗ trợ hình thức học ' . ltdh_elig_get_training_label( $input['training_type'] ) . ' phù hợp.';
 			}
 		}
 
@@ -620,12 +620,18 @@ function ltdh_elig_run_check( $input ) {
 // ----------------------------------------------------
 
 function ltdh_elig_parse_tuition( $str ) {
+	if ( function_exists( 'ltdh_compare_parse_tuition' ) ) {
+		return (int) ltdh_compare_parse_tuition( $str );
+	}
 	$str = str_replace( [ '.', ',', 'đ', '₫', '/tín chỉ', '/hoc ky', '/học kỳ' ], '', $str );
 	$str = trim( $str );
 	return intval( $str );
 }
 
 function ltdh_elig_parse_duration( $str ) {
+	if ( function_exists( 'ltdh_compare_parse_duration' ) ) {
+		return (float) ltdh_compare_parse_duration( $str );
+	}
 	preg_match( '/[\d.]+/', $str, $m );
 	return $m ? floatval( $m[0] ) : 1;
 }

@@ -199,7 +199,7 @@
                     },
                     {
                         "key": "field_roadmap_study_mode",
-                        "label": "Hình thức học",
+                        "label": "Hình thức đào tạo",
                         "name": "study_mode",
                         "type": "text",
                         "placeholder": "Ví dụ: Online từ xa / Tối & Cuối tuần"

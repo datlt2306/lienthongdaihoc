@@ -12,9 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
 		<div class="flex items-center justify-between gap-4">
 			<div class="flex items-center gap-3 min-w-0 flex-1">
-				<div class="flex items-center gap-1.5 shrink-0">
+				<div class="flex items-center gap-2 shrink-0">
 					<span class="text-lg">📊</span>
-					<span class="text-sm font-bold text-slate-800">So sánh</span>
+					<div class="flex items-center gap-1.5">
+						<span class="text-sm font-bold text-slate-800">So sánh</span>
+						<span class="ltdh-tray-major hidden sm:inline-flex items-center text-xs font-bold bg-brand-primary/10 text-brand-primary px-2 py-0.5 rounded-md max-w-[200px] truncate" title=""></span>
+					</div>
 					<span class="ltdh-tray-count text-xs font-bold bg-brand-primary text-white px-1.5 py-0.5 rounded-lg">0/4</span>
 				</div>
 				<div class="ltdh-tray-items flex items-center gap-2 overflow-x-auto min-w-0"></div>

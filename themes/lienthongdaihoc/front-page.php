@@ -28,7 +28,7 @@ $zalo    = ltdh_get_zalo_url();
 
 <main id="primary" class="site-main bg-white">
 	<!-- H1 Semantic Heading for SEO & Screen Readers -->
-	<h1 class="sr-only">Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học, Văn Bằng 2 & Đại Học Từ Xa</h1>
+	<h1 class="sr-only">Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hình Thức Từ Xa & Vừa Học Vừa Làm</h1>
 
 	<!-- 1. HERO SECTION (Swiper Banner Slider) -->
 	<?php
@@ -123,7 +123,7 @@ $zalo    = ltdh_get_zalo_url();
 	<!-- Search & Filters Container (Compact Single-Row Bar) -->
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-30 hidden">
 		<div class="bg-white rounded-xl shadow-xl border border-slate-100 p-4 md:p-5">
-			<form action="<?php echo esc_url(home_url('/he-dao-tao/tu-xa/')); ?>" method="GET" class="space-y-3 md:space-y-0">
+			<form action="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" method="GET" class="space-y-3 md:space-y-0">
 				<!-- Keyword (always visible) -->
 				<div class="flex-grow min-w-[20%]">
 					<input type="text" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[40px] md:min-h-[38px]" />
@@ -156,7 +156,7 @@ $zalo    = ltdh_get_zalo_url();
 					</div>
 					<div class="flex-1">
 						<select name="he" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
-							<option value="">-- Chọn hệ học --</option>
+							<option value="">-- Chọn hình thức đào tạo --</option>
 							<?php foreach ($types as $tp) : ?>
 								<option value="<?php echo esc_attr($tp['slug']); ?>"><?php echo esc_html($tp['name']); ?></option>
 							<?php endforeach; ?>
@@ -167,7 +167,7 @@ $zalo    = ltdh_get_zalo_url();
 						<button type="submit" class="flex-1 md:flex-none bg-brand-primary hover:bg-brand-darkBlue text-white font-extrabold text-sm px-5 py-2.5 rounded-lg transition-all uppercase tracking-wider min-h-[40px] md:min-h-[38px]">
 							Tìm kiếm
 						</button>
-						<a href="<?php echo esc_url(home_url('/he-dao-tao/tu-xa/')); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition-all flex items-center justify-center min-h-[40px] md:min-h-[38px]" title="Reset bộ lọc">
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition-all flex items-center justify-center min-h-[40px] md:min-h-[38px]" title="Reset bộ lọc">
 							🔄
 						</a>
 					</div>
@@ -254,14 +254,14 @@ $zalo    = ltdh_get_zalo_url();
 				<?php
 				if ( ! empty( $featured_schools ) ) {
 					foreach ( $featured_schools as $school ) :
-						$school_id = $school['id'];
-						$address = $school['address'];
-						$hotline = $school['hotline'];
-						$thumb_url = $school['thumb_url'];
-						$logo_id = $school['logo_id'];
-						$en_name = $school['en_name'];
+						$school_id     = $school['id'];
+						$address       = $school['address'];
+						$hotline       = $school['hotline'];
+						$thumb_url     = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : $school['thumb_url'];
+						$logo_id       = $school['logo_id'];
+						$en_name       = $school['en_name'];
 						$systems_label = $school['systems_label'];
-						$prog_count = $school['prog_count'];
+						$prog_count    = $school['prog_count'];
 				?>
 						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[45vw] sm:w-[250px] lg:w-auto snap-center">
 							<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url($thumb_url); ?>');"></div>
@@ -324,16 +324,16 @@ $zalo    = ltdh_get_zalo_url();
 					<?php echo esc_html($e_badge ?: 'Điều kiện tuyển sinh'); ?>
 				</span>
 				<h2 class="text-2xl sm:text-3xl lg:text-4xl font-black font-display text-slate-900 leading-tight">
-					<?php echo $e_heading ?: 'Bạn có đủ điều kiện học<br>Liên thông & Đại học từ xa?'; ?>
+					<?php echo $e_heading ?: 'Bạn có đủ điều kiện học<br>Liên thông Đại học?'; ?>
 				</h2>
 				<p class="text-slate-500 text-sm leading-relaxed max-w-2xl mx-auto">
-					<?php echo esc_html($e_desc ?: 'Chương trình tuyển sinh mở rộng cho nhiều đối tượng. Chỉ mất 1 phút để kiểm tra tự động.'); ?>
+					<?php echo esc_html($e_desc ?: 'Chương trình tuyển sinh mở rộng cho người tốt nghiệp Trung cấp, Cao đẳng, Đại học. Chỉ mất 1 phút để kiểm tra tự động.'); ?>
 				</p>
 				<?php
 				$e_items_default = [
-					['title' => 'Người đi làm', 'desc' => 'Học trực tuyến linh hoạt'],
-					['title' => 'Đã tốt nghiệp TC/CĐ', 'desc' => 'Liên thông miễn giảm tín'],
-					['title' => 'Học sinh tốt nghiệp THPT', 'desc' => 'Xét học bạ tuyển thẳng'],
+					['title' => 'Tốt nghiệp Trung cấp', 'desc' => 'Liên thông lên Đại học'],
+					['title' => 'Tốt nghiệp Cao đẳng', 'desc' => 'Liên thông miễn giảm tín chỉ'],
+					['title' => 'Đã có bằng Đại học', 'desc' => 'Liên thông văn bằng thứ hai'],
 				];
 				$e_items_render = !empty($e_items) ? $e_items : $e_items_default;
 				?>
@@ -848,10 +848,10 @@ $zalo    = ltdh_get_zalo_url();
 					$fallback_testimonials = [
 						[
 							'name' => 'Nguyễn Hương',
-							'role' => 'VB2 Công nghệ thông tin',
+							'role' => 'Liên thông Công nghệ thông tin',
 							'initials' => 'NH',
 							'image' => get_template_directory_uri() . '/assets/images/student-huong.jpg',
-							'content' => 'Mình đã học Văn bằng 2 CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
+							'content' => 'Mình đã học Liên thông CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
 						],
 						[
 							'name' => 'Trần Minh',
@@ -942,7 +942,7 @@ $zalo    = ltdh_get_zalo_url();
 				<?php
 				$mock_news = [
 					['title' => 'Tuyển sinh Đại học Từ xa khóa mới nhất', 'date' => '10/07/2026', 'desc' => 'Thông tin chi tiết các ngành đào tạo từ xa hệ Đại học được bộ GD&ĐT công nhận tốt nghiệp chính quy.'],
-					['title' => 'Điều kiện học Văn bằng 2 đại học năm 2026', 'date' => '08/07/2026', 'desc' => 'Giải đáp những thắc mắc thường gặp về điều kiện tuyển sinh học văn bằng 2 cho học viên tốt nghiệp các ngành.'],
+					['title' => 'Hướng dẫn quy trình xét tuyển Liên thông đại học mới nhất 2026', 'date' => '08/07/2026', 'desc' => 'Quy trình và hồ sơ xét tuyển liên thông đại học từ trung cấp, cao đẳng lên đại học theo hình thức từ xa và vừa học vừa làm.'],
 					['title' => 'Quy chế tuyển sinh Liên thông Cao đẳng lên Đại học', 'date' => '05/07/2026', 'desc' => 'Quy định rút ngắn chương trình đào tạo khi thi liên thông và các hồ sơ chuẩn bị nhập học.'],
 					['title' => 'Học đại học vừa học vừa làm có giá trị như thế nào?', 'date' => '02/07/2026', 'desc' => 'Giá trị pháp lý của tấm bằng đại học vừa học vừa làm đối với cơ hội thăng tiến nghề nghiệp.'],
 				];
@@ -994,6 +994,60 @@ $zalo    = ltdh_get_zalo_url();
 			</div>
 		</div>
 	</section>
+
+	<!-- 11. FAQ SECTION (SECTION CUỐI TRANG CHỦ) -->
+	<?php
+	$homepage_faqs = [];
+	if ( function_exists( 'get_field' ) ) {
+		$homepage_faqs = get_field( 'faq_items', 'options' ) ?: [];
+	}
+
+	if ( ! empty( $homepage_faqs ) && is_array( $homepage_faqs ) ) :
+	?>
+	<section id="faq-section" class="py-16 md:py-20 bg-white border-t border-slate-100">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+			<!-- Section Header -->
+			<div class="text-center max-w-2xl mx-auto mb-10 space-y-3">
+				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">HỎI ĐÁP TUYỂN SINH</span>
+				<h2 class="text-2xl md:text-4xl font-black text-slate-900 tracking-tight">Câu hỏi thường gặp</h2>
+				<p class="text-slate-500 text-sm md:text-base">Giải đáp thắc mắc về điều kiện tuyển sinh liên thông, hình thức học trực tuyến, bằng cấp và học phí.</p>
+			</div>
+
+			<!-- FAQ Accordion List -->
+			<div class="space-y-3 md:space-y-4">
+				<?php
+				foreach ( $homepage_faqs as $faq ) :
+					$q_text = $faq['question'] ?? '';
+					$a_text = $faq['answer'] ?? '';
+					if ( empty( $q_text ) || empty( $a_text ) ) continue;
+				?>
+					<details class="bg-slate-50/70 border border-slate-100/90 rounded-2xl overflow-hidden group transition-all hover:bg-slate-50 hover:border-slate-200/60 shadow-2xs">
+						<summary class="flex justify-between items-center font-bold text-slate-900 p-5 md:p-6 cursor-pointer list-none select-none text-base md:text-lg [&::-webkit-details-marker]:hidden gap-4">
+							<span class="flex items-center gap-3">
+								<span class="w-7 h-7 rounded-full bg-blue-50 text-brand-primary font-black text-xs flex items-center justify-center shrink-0">?</span>
+								<span><?php echo esc_html( $q_text ); ?></span>
+							</span>
+							<span class="text-slate-400 group-open:rotate-180 transition-transform duration-300 shrink-0">
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+							</span>
+						</summary>
+						<div class="px-5 md:px-6 pb-6 pt-1 text-slate-600 text-sm md:text-base leading-relaxed border-t border-slate-100/60 bg-white">
+							<p><?php echo esc_html( $a_text ); ?></p>
+						</div>
+					</details>
+				<?php endforeach; ?>
+			</div>
+
+			<!-- View All FAQs Button -->
+			<div class="mt-8 text-center">
+				<a href="<?php echo esc_url( home_url( '/cau-hoi-thuong-gap/' ) ); ?>" class="inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-darkBlue bg-blue-50 hover:bg-blue-100 px-5 py-3 rounded-xl transition-colors min-h-[44px]">
+					<span>Xem tất cả câu hỏi thường gặp</span>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+				</a>
+			</div>
+		</div>
+	</section>
+	<?php endif; ?>
 
 </main>
 

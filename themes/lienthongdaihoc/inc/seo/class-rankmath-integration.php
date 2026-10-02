@@ -31,6 +31,65 @@ function ltdh_seo_dynamic_title( $title ) {
 }
 add_filter( 'rank_math/frontend/title', 'ltdh_seo_dynamic_title' );
 
+/**
+ * Dynamic Document Title for Archive & Virtual Route Listings
+ */
+function ltdh_seo_archive_document_title( $title ) {
+	$request_uri  = $_SERVER['REQUEST_URI'] ?? '';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+	$site_name    = get_bloginfo( 'name' );
+
+	if (
+		is_post_type_archive( 'program' ) ||
+		is_tax( 'training_type' ) ||
+		is_tax( 'major_cat' ) ||
+		is_tax( 'region' ) ||
+		( ! empty( $request_path ) && preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao|chuong-trinh)/?#i', $request_path ) )
+	) {
+		$page_title = 'Hình thức đào tạo';
+
+		if ( is_tax( 'training_type' ) ) {
+			$term = get_queried_object();
+			if ( $term && isset( $term->name ) ) {
+				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
+				$page_title = 'Hình thức đào tạo: ' . $clean_term_name;
+			}
+		} elseif ( ! empty( $request_path ) && preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
+			$slug = sanitize_text_field( $m[1] );
+			$term = get_term_by( 'slug', $slug, 'training_type' );
+			if ( $term && ! is_wp_error( $term ) && isset( $term->name ) ) {
+				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
+				$page_title = 'Hình thức đào tạo: ' . $clean_term_name;
+			}
+		} elseif ( is_tax( 'major_cat' ) ) {
+			$term = get_queried_object();
+			if ( $term && isset( $term->name ) ) {
+				$page_title = 'Ngành học: ' . $term->name;
+			}
+		} elseif ( is_tax( 'region' ) ) {
+			$term = get_queried_object();
+			if ( $term && isset( $term->name ) ) {
+				$page_title = 'Tuyển sinh Liên thông Đại học ' . $term->name;
+			}
+		}
+
+		return $page_title . ' | ' . $site_name;
+	}
+
+	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/nganh-hoc/?#i', $request_path ) ) ) {
+		return 'Ngành học | ' . $site_name;
+	}
+
+	if ( is_post_type_archive( 'school' ) || ( ! empty( $request_path ) && preg_match( '#^/truong-da-hoc/?#i', $request_path ) ) ) {
+		return 'Trường đối tác | ' . $site_name;
+	}
+
+	return $title;
+}
+add_filter( 'rank_math/frontend/title', 'ltdh_seo_archive_document_title', 20 );
+add_filter( 'pre_get_document_title', 'ltdh_seo_archive_document_title', 20 );
+add_filter( 'wp_title', 'ltdh_seo_archive_document_title', 20 );
+
 // ----------------------------------------------------
 // 2. Dynamic Meta Description for Programs
 // ----------------------------------------------------
@@ -62,7 +121,8 @@ function ltdh_seo_dynamic_description( $desc ) {
 add_filter( 'rank_math/frontend/description', 'ltdh_seo_dynamic_description' );
 
 /**
- * Enforce flat Canonical URL for program and school posts (/%slug%/)
+ * Enforce flat Canonical URL for program and school posts (/%slug%/),
+ * and point program archive canonical cleanly to /hinh-thuc-dao-tao/ to eliminate redirect loops.
  */
 function ltdh_seo_enforce_canonical_url( $canonical ) {
 	if ( is_singular( 'program' ) || is_singular( 'school' ) ) {
@@ -71,10 +131,56 @@ function ltdh_seo_enforce_canonical_url( $canonical ) {
 			return home_url( '/' . get_post_field( 'post_name', $post_id ) . '/' );
 		}
 	}
+
+	$request_uri  = $_SERVER['REQUEST_URI'] ?? '';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+
+	if ( is_post_type_archive( 'program' ) || is_tax( 'training_type' ) || preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao|chuong-trinh)/?#i', $request_path ) ) {
+		// Clean parameter mapping
+		$truong = isset( $_GET['truong'] ) ? sanitize_text_field( $_GET['truong'] ) : '';
+		$nganh  = isset( $_GET['nganh'] ) ? sanitize_text_field( $_GET['nganh'] ) : '';
+		$sort   = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
+		$search = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
+
+		// If single school filter only, point canonical to clean school page
+		if ( ! empty( $truong ) && empty( $nganh ) && empty( $search ) && empty( $sort ) ) {
+			$school_post = get_page_by_path( $truong, OBJECT, 'school' );
+			if ( $school_post ) {
+				return home_url( '/' . $school_post->post_name . '/' );
+			}
+		}
+
+		// If single major filter only, point canonical to clean major page
+		if ( ! empty( $nganh ) && empty( $truong ) && empty( $search ) && empty( $sort ) ) {
+			$major_post = get_page_by_path( $nganh, OBJECT, 'major' );
+			if ( $major_post ) {
+				return home_url( '/nganh-' . $major_post->post_name . '/' );
+			}
+		}
+
+		// Default clean base canonical for filter combinations
+		return home_url( '/hinh-thuc-dao-tao/' );
+	}
+
 	return $canonical;
 }
 add_filter( 'rank_math/frontend/canonical', 'ltdh_seo_enforce_canonical_url' );
 add_filter( 'rank_math/paper/canonical_url', 'ltdh_seo_enforce_canonical_url' );
+
+/**
+ * Set noindex, follow on dynamic sorting and search filter combinations to prevent crawl bloat
+ */
+function ltdh_seo_robots_filter( $robots ) {
+	if ( ! is_array( $robots ) ) {
+		$robots = [];
+	}
+	if ( ! empty( $_GET['s'] ) || ! empty( $_GET['sort'] ) || ( ! empty( $_GET['truong'] ) && ! empty( $_GET['nganh'] ) ) ) {
+		$robots['index']  = 'noindex';
+		$robots['follow'] = 'follow';
+	}
+	return $robots;
+}
+add_filter( 'rank_math/frontend/robots', 'ltdh_seo_robots_filter' );
 
 /**
  * Ensure Rank Math XML Sitemaps use flat URLs for school posts
@@ -245,7 +351,7 @@ function ltdh_seo_compare_title( $title ) {
 	}
 
 	$items = function_exists( 'ltdh_compare_get_items' ) ? ltdh_compare_get_items() : [];
-	if ( count( $items ) < 2 ) {
+	if ( count( $items ) < 1 ) {
 		return $title;
 	}
 
@@ -264,7 +370,7 @@ function ltdh_seo_compare_description( $desc ) {
 	}
 
 	$items = function_exists( 'ltdh_compare_get_items' ) ? ltdh_compare_get_items() : [];
-	if ( count( $items ) < 2 ) {
+	if ( count( $items ) < 1 ) {
 		return $desc;
 	}
 
@@ -286,7 +392,7 @@ function ltdh_seo_compare_schema( $data, $json_ld ) {
 	}
 
 	$items = function_exists( 'ltdh_compare_get_items' ) ? ltdh_compare_get_items() : [];
-	if ( count( $items ) < 2 ) {
+	if ( count( $items ) < 1 ) {
 		return $data;
 	}
 

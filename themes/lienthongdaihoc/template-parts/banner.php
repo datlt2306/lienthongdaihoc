@@ -22,9 +22,9 @@ $banner_subtitle = '';
 $type = get_query_var( 'ltdh_compare' );
 $request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
 
-if ( preg_match( '#^/he-dao-tao(?:/page/\d+)?/?$#i', $request_path ) ) {
-	$banner_title    = 'Hệ Đào Tạo';
-	$banner_subtitle = 'Tổng hợp các chương trình đào tạo từ xa, liên thông, văn bằng 2';
+if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $request_path ) ) {
+	$banner_title    = 'Hình thức đào tạo';
+	$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
 } elseif ( $type === 'program' ) {
 	$banner_title    = 'So sánh chương trình đào tạo';
 	$banner_subtitle = 'So sánh chi tiết học phí, thời gian học, điều kiện tuyển sinh của các chương trình học.';
@@ -66,29 +66,32 @@ if ( preg_match( '#^/he-dao-tao(?:/page/\d+)?/?$#i', $request_path ) ) {
 } elseif ( is_post_type_archive( 'program' ) ) {
 	$selected_he = '';
 	$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
-	if ( preg_match( '#^/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
+	if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
 		$selected_he = sanitize_text_field( $m[1] );
 	}
 	if ( empty( $selected_he ) ) {
 		$selected_he = isset( $_GET['he'] ) ? sanitize_text_field( $_GET['he'] ) : '';
 	}
 	if ( $selected_he ) {
-		$he_term = get_term_by( 'slug', $selected_he, 'training_type' );
+		$slug_lookup = ( 'tu-xa' === $selected_he ) ? 'dao-tao-tu-xa' : $selected_he;
+		$he_term     = get_term_by( 'slug', $slug_lookup, 'training_type' ) ?: get_term_by( 'slug', $selected_he, 'training_type' );
 		if ( $he_term ) {
-			$banner_title    = 'Hệ ' . $he_term->name;
-			$banner_subtitle = $he_term->description ?: 'Các chương trình đào tạo thuộc hệ ' . $he_term->name;
+			$clean_he_name   = preg_replace( '/^hệ\s+/iu', '', $he_term->name );
+			$banner_title    = 'Hình thức đào tạo: ' . $clean_he_name;
+			$banner_subtitle = $he_term->description ?: 'Danh sách chương trình thuộc hình thức đào tạo ' . $clean_he_name;
 		} else {
-			$banner_title    = 'Chương Trình Đào Tạo';
-			$banner_subtitle = 'Tìm kiếm chương trình phù hợp với lộ trình học tập của bạn';
+			$banner_title    = 'Chương Trình Tuyển Sinh Liên Thông Đại Học';
+			$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
 		}
 	} else {
-		$banner_title    = 'Chương Trình Đào Tạo';
-		$banner_subtitle = 'Tìm kiếm chương trình phù hợp với lộ trình học tập của bạn';
+		$banner_title    = 'Chương Trình Tuyển Sinh Liên Thông Đại Học';
+		$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
 	}
 } elseif ( is_tax( 'training_type' ) ) {
-	$term = get_queried_object();
-	$banner_title    = 'Hệ đào tạo: ' . $term->name;
-	$banner_subtitle = $term->description ?: 'Danh sách chương trình thuộc hệ đào tạo ' . $term->name;
+	$term            = get_queried_object();
+	$clean_term_name = ( $term && ! empty( $term->name ) ) ? preg_replace( '/^hệ\s+/iu', '', $term->name ) : '';
+	$banner_title    = 'Hình thức đào tạo: ' . $clean_term_name;
+	$banner_subtitle = ( $term && ! empty( $term->description ) ) ? $term->description : ( 'Danh sách chương trình thuộc hình thức đào tạo ' . $clean_term_name );
 } elseif ( is_tax( 'campus' ) ) {
 	$term = get_queried_object();
 	$banner_title    = 'Cơ sở: ' . $term->name;
@@ -101,13 +104,15 @@ if ( preg_match( '#^/he-dao-tao(?:/page/\d+)?/?$#i', $request_path ) ) {
 	$banner_subtitle = '';
 	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } else {
-	if ( preg_match( '#^/he-dao-tao(?:/page/\d+)?/?$#i', $request_path ) ) {
-		$banner_title    = 'Hệ Đào Tạo';
-		$banner_subtitle = 'Tổng hợp các chương trình đào tạo từ xa, liên thông, văn bằng 2';
-	} elseif ( preg_match( '#^/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
-		$he_term = get_term_by( 'slug', $m[1], 'training_type' );
-		$banner_title    = $he_term ? 'Hệ ' . $he_term->name : 'Chương Trình Đào Tạo';
-		$banner_subtitle = $he_term ? ( $he_term->description ?: 'Các chương trình đào tạo thuộc hệ ' . $he_term->name ) : 'Tìm kiếm chương trình phù hợp với lộ trình học tập của bạn';
+	if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $request_path ) ) {
+		$banner_title    = 'Hình thức đào tạo';
+		$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
+	} elseif ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
+		$slug_lookup     = ( 'tu-xa' === $m[1] ) ? 'dao-tao-tu-xa' : $m[1];
+		$he_term         = get_term_by( 'slug', $slug_lookup, 'training_type' ) ?: get_term_by( 'slug', $m[1], 'training_type' );
+		$clean_he_name   = $he_term ? preg_replace( '/^hệ\s+/iu', '', $he_term->name ) : '';
+		$banner_title    = $he_term ? 'Hình thức đào tạo: ' . $clean_he_name : 'Chương Trình Tuyển Sinh Liên Thông Đại Học';
+		$banner_subtitle = $he_term ? ( $he_term->description ?: 'Danh sách chương trình thuộc hình thức đào tạo ' . $clean_he_name ) : 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
 	} else {
 		$banner_title    = get_the_title() ?: wp_title( '', false );
 		$banner_subtitle = '';
@@ -127,26 +132,32 @@ if ( empty( $banner_image ) ) {
 }
 ?>
 
-	<section class="relative w-full bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white py-14 md:py-20 overflow-hidden">
+	<section class="relative w-full bg-gradient-to-tr from-[#0F172A] via-[#1E293B] to-brand-primary text-white py-12 md:py-16 overflow-hidden">
 	<?php if ( ! empty( $banner_image ) ) : ?>
-		<!-- Banner Background Image with Overlay -->
+		<!-- Banner Background Image with Gradient Overlay -->
 		<div class="absolute inset-0 z-0">
-			<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center" alt="<?php echo esc_attr( $banner_title ); ?>" width="1920" height="400" loading="eager" fetchpriority="high" decoding="async">
-			<div class="absolute inset-0 bg-gradient-to-r from-[#0c1b30]/90 to-brand-primary/85 mix-blend-multiply"></div>
+			<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center scale-105 opacity-30 blur-[1px]" alt="<?php echo esc_attr( $banner_title ); ?>" width="1920" height="400" loading="eager" fetchpriority="high" decoding="async">
+			<div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/80 to-brand-primary/80"></div>
 		</div>
-
 	<?php endif; ?>
 
-	<!-- Dot Grid Pattern -->
-	<div class="absolute inset-0 opacity-10 pointer-events-none z-0" style="background-image: radial-gradient(white 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
-	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+	<!-- Ambient Grid Pattern & Glow -->
+	<div class="absolute inset-0 opacity-15 pointer-events-none z-0" style="background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 24px 24px;"></div>
+	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-primary/20 rounded-full blur-3xl pointer-events-none"></div>
 
 	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-		<h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight leading-tight">
+		<!-- Breadcrumbs -->
+		<nav class="flex items-center gap-2 text-xs text-slate-300 font-semibold mb-3">
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-white transition-colors">Trang chủ</a>
+			<span class="text-slate-500">/</span>
+			<span class="text-brand-accent font-bold truncate max-w-xs"><?php echo esc_html( $banner_title ); ?></span>
+		</nav>
+
+		<h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
 			<?php echo esc_html( $banner_title ); ?>
 		</h1>
 		<?php if ( ! empty( $banner_subtitle ) ) : ?>
-			<p class="text-blue-100 text-sm md:text-base font-semibold max-w-2xl mt-2">
+			<p class="text-slate-200/90 text-sm md:text-base font-medium max-w-2xl mt-2.5 leading-relaxed">
 				<?php echo esc_html( $banner_subtitle ); ?>
 			</p>
 		<?php endif; ?>

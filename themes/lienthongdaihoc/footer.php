@@ -80,23 +80,23 @@ $messenger = ltdh_get_messenger_url();
 				<ul class="space-y-2.5 text-sm">
 					<li class="flex items-center">
 						<span style="display: inline-block; width: 6px; height: 6px; background-color: #00a2f4; border-radius: 50%; margin-right: 8px; flex-shrink: 0;"></span>
-						<a href="<?php echo esc_url( home_url('/he-dao-tao/tu-xa/') ); ?>" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Học đại học từ xa</a>
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/dao-tao-tu-xa/' ) ); ?>" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Liên thông Đại học Từ xa</a>
 					</li>
 					<li class="flex items-center">
 						<span style="display: inline-block; width: 6px; height: 6px; background-color: #00a2f4; border-radius: 50%; margin-right: 8px; flex-shrink: 0;"></span>
-						<a href="#" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Cao đẳng online / VB2</a>
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/vua-hoc-vua-lam/' ) ); ?>" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Liên thông Vừa học vừa làm</a>
 					</li>
 					<li class="flex items-center">
 						<span style="display: inline-block; width: 6px; height: 6px; background-color: #00a2f4; border-radius: 50%; margin-right: 8px; flex-shrink: 0;"></span>
-						<a href="#" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Liên thông Đại Học chính quy</a>
+						<a href="<?php echo esc_url( home_url( '/truong-doi-tac/' ) ); ?>" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Trường đối tác</a>
 					</li>
 					<li class="flex items-center">
 						<span style="display: inline-block; width: 6px; height: 6px; background-color: #00a2f4; border-radius: 50%; margin-right: 8px; flex-shrink: 0;"></span>
-						<a href="#" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Trung Cấp lên Đại học</a>
+						<a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Ngành học liên thông</a>
 					</li>
 					<li class="flex items-center">
 						<span style="display: inline-block; width: 6px; height: 6px; background-color: #00a2f4; border-radius: 50%; margin-right: 8px; flex-shrink: 0;"></span>
-						<a href="#" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Đại học tại chức / VLVH</a>
+						<a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Kiểm tra điều kiện</a>
 					</li>
 				</ul>
 			</div>
@@ -125,8 +125,8 @@ $messenger = ltdh_get_messenger_url();
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 font-semibold uppercase tracking-wider gap-4">
 			<p>© 2026 lienthongdaihoc.com. Tất cả các quyền được bảo hộ.</p>
 			<div class="flex items-center gap-6">
-				<a href="#" class="hover:text-white transition-colors">Chính sách bảo mật</a>
-				<a href="#" class="hover:text-white transition-colors">Điều khoản dịch vụ</a>
+				<a href="<?php echo esc_url( home_url( '/chinh-sach-bao-mat/' ) ); ?>" class="hover:text-white transition-colors">Chính sách bảo mật</a>
+				<a href="<?php echo esc_url( home_url( '/dieu-khoan/' ) ); ?>" class="hover:text-white transition-colors">Điều khoản dịch vụ</a>
 			</div>
 		</div>
 	</footer>

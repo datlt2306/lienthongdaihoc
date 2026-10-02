@@ -18,10 +18,30 @@ $ids = ltdh_compare_get_ids();
 $hotline = ltdh_compare_get_global_hotline();
 $zalo = ltdh_compare_get_zalo_url();
 
-// Build SEO title
-$titles = array_map( function( $item ) { return $item['title']; }, $items );
-$seo_title = 'So sánh ' . implode( ' vs ', $titles );
-$seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí, thời gian, điều kiện tuyển sinh.';
+// Build concise, minimalist SEO title
+$major_titles = [];
+$school_items = [];
+
+foreach ( $items as $item ) {
+	$m_title = ! empty( $item['major']['title'] ) ? $item['major']['title'] : preg_replace( '/^(Cử nhân|Kỹ sư|Đại học)\s+/iu', '', $item['title'] );
+	$m_title = preg_replace( '/\s*\([^)]*\)$/u', '', $m_title );
+	$major_titles[] = trim( $m_title );
+
+	$s_name = ! empty( $item['school']['title'] ) ? $item['school']['title'] : '';
+	$s_name = preg_replace( '/^(Trường\s+)?(Đại\s+học|Học\s+viện|Cao\s+đẳng)\s+/iu', '', $s_name );
+	$t_type = $item['training_type'] ? '(' . $item['training_type'] . ')' : '';
+	$school_items[] = trim( ( $s_name ?: $item['title'] ) . ' ' . $t_type );
+}
+
+$unique_majors = array_values( array_unique( array_filter( $major_titles ) ) );
+
+if ( count( $unique_majors ) === 1 ) {
+	$seo_title = 'So sánh chương trình ' . $unique_majors[0];
+	$seo_desc  = implode( '  •  ', $school_items );
+} else {
+	$seo_title = 'So sánh các chương trình đào tạo';
+	$seo_desc  = implode( '  •  ', array_slice( $school_items, 0, 4 ) );
+}
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
@@ -30,15 +50,17 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
 		<!-- Page Section Heading -->
-		<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
+		<h1 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
 			<?php echo esc_html( $seo_title ); ?>
-		</h2>
-		<p class="text-slate-500 text-sm mb-8"><?php echo esc_html( $seo_desc ); ?></p>
+		</h1>
+		<p class="text-slate-500 text-sm mb-8 flex flex-wrap items-center gap-1 font-medium">
+			<?php echo esc_html( $seo_desc ); ?>
+		</p>
 
-		<?php if ( count( $items ) < 2 ) : ?>
+		<?php if ( count( $items ) < 1 ) : ?>
 			<div class="bg-white rounded-lg p-12 text-center shadow-sm border border-slate-100">
-				<p class="text-slate-500 text-lg mb-4">Vui lòng chọn ít nhất 2 chương trình để so sánh.</p>
-				<a href="<?php echo esc_url( home_url( '/he-dao-tao/tu-xa/' ) ); ?>" class="inline-flex items-center gap-2 bg-brand-primary text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-darkBlue transition-all">
+				<p class="text-slate-500 text-lg mb-4">Vui lòng chọn chương trình để so sánh.</p>
+				<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="inline-flex items-center gap-2 bg-brand-primary text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-darkBlue transition-all">
 					Xem danh sách chương trình →
 				</a>
 			</div>
@@ -103,7 +125,7 @@ $seo_desc = 'So sánh chi tiết ' . implode( ', ', $titles ) . ' — học phí
 			<section class="mt-8 text-center">
 				<h3 class="text-lg font-bold text-slate-800 mb-4">So sánh tương tự</h3>
 				<div class="flex flex-wrap justify-center gap-2">
-					<a href="<?php echo esc_url( home_url( '/he-dao-tao/tu-xa/' ) ); ?>" class="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-slate-600 text-sm font-semibold px-4 py-2 rounded-lg hover:border-brand-primary hover:text-brand-primary transition-all">
+					<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-slate-600 text-sm font-semibold px-4 py-2 rounded-lg hover:border-brand-primary hover:text-brand-primary transition-all">
 						Xem tất cả chương trình →
 					</a>
 				</div>

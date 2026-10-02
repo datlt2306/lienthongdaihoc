@@ -192,7 +192,7 @@ if ( ! empty( $faqs ) ) {
 						<svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
 						<div>
 							<h4 class="font-bold text-red-900 text-sm">Đã hết chỉ tiêu tuyển sinh năm nay</h4>
-							<p class="text-xs text-red-700 mt-1">Chương trình tuyển sinh hệ Chính quy của trường năm nay hiện đã nhận đủ chỉ tiêu. Quý học viên vui lòng tham khảo các chương trình liên quan hoặc để lại thông tin đăng ký tư vấn để được hướng dẫn lộ trình phù hợp.</p>
+							<p class="text-xs text-red-700 mt-1">Chương trình tuyển sinh Liên thông của trường hiện đã nhận đủ chỉ tiêu cho đợt này. Quý học viên vui lòng tham khảo các chương trình liên quan hoặc để lại thông tin đăng ký tư vấn để được hướng dẫn lộ trình phù hợp.</p>
 						</div>
 					</div>
 				<?php endif; ?>
@@ -264,10 +264,16 @@ if ( ! empty( $faqs ) ) {
 						<?php endif; ?>
 						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['campus'] ); ?></span>
+							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php 
+								$display_campus = $learning_details['campus'] ?? '';
+								if ( empty( $display_campus ) || 'online' === strtolower( trim( $display_campus ) ) ) {
+									$display_campus = 'Toàn quốc';
+								}
+								echo esc_html( $display_campus ); 
+							?></span>
 						</div>
 						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức đào tạo</span>
 							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 						</div>
 						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
@@ -564,7 +570,7 @@ if ( ! empty( $faqs ) ) {
 									</div>
 									<div>
 										<h4 class="font-extrabold text-slate-900 text-sm md:text-base">Phương thức tuyển sinh duy nhất: Thi tuyển 3 môn</h4>
-										<p class="text-xs md:text-sm text-slate-600 mt-0.5">Áp dụng chính thức cho thí sinh đăng ký hệ Liên thông Chính quy ngành Công nghệ thông tin.</p>
+										<p class="text-xs md:text-sm text-slate-600 mt-0.5">Áp dụng chính thức cho thí sinh đăng ký chương trình Liên thông ngành Công nghệ thông tin.</p>
 									</div>
 								</div>
 
@@ -971,12 +977,9 @@ if ( ! empty( $faqs ) ) {
 					
 					<!-- SCHOOL INFO CARD (Desktop Only >= 1024px) -->
 					<?php if ( $school_id ) : 
-						$school_logo_id = get_field( 'logo', $school_id );
-						$school_logo_url = $school_logo_id ? wp_get_attachment_image_url( $school_logo_id, 'thumbnail' ) : '';
-						if ( ! $school_logo_url ) {
-							$school_logo_url = get_the_post_thumbnail_url( $school_id, 'thumbnail' );
-						}
-						$school_cover_url = get_the_post_thumbnail_url( $school_id, 'medium' );
+						$school_logo_id  = function_exists( 'ltdh_get_school_image_id' ) ? ltdh_get_school_image_id( $school_id ) : 0;
+						$school_logo_url = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'thumbnail' ) : get_stylesheet_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp';
+						$school_cover_url = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ltdh_get_fallback_image( 'school' );
 						$school_address = get_post_meta( $school_id, 'address', true ) ?: get_field( 'address', $school_id ) ?: 'Việt Nam';
 						$school_web = get_field( 'website', $school_id );
 						
@@ -1152,7 +1155,9 @@ if ( ! empty( $faqs ) ) {
 							data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>"
 							data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
-							data-compare-nganh="<?php echo esc_attr( $major_slug ); ?>">
+							data-compare-nganh="<?php echo esc_attr( $major_slug ); ?>"
+							data-compare-major-name="<?php echo esc_attr( preg_replace( '/^ngành\s+/iu', '', trim( $major_title ) ) ); ?>"
+							data-compare-school-name="<?php echo esc_attr( $school_title ); ?>">
 						<span>📊</span> <span>Thêm vào so sánh</span>
 					</button>
 

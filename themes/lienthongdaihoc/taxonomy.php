@@ -23,8 +23,8 @@ $is_base_archive = ! isset( $term->term_id );
 		<?php if ( $is_base_archive && $taxonomy === 'training_type' ) : ?>
 			<!-- Base archive: List all programs -->
 			<div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
-				<h2 class="text-2xl md:text-4xl font-black text-slate-900">Hệ đào tạo</h2>
-				<p class="text-slate-500 text-sm">Tất cả chương trình đào tạo liên thông, văn bằng 2, đại học từ xa.</p>
+				<h2 class="text-2xl md:text-4xl font-black text-slate-900">Hình thức đào tạo</h2>
+				<p class="text-slate-500 text-sm">Tất cả chương trình đào tạo liên thông theo hình thức học.</p>
 			</div>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<?php
@@ -37,11 +37,18 @@ $is_base_archive = ! isset( $term->term_id );
 					while ( $all_programs->have_posts() ) : $all_programs->the_post();
 						$prog_id = get_the_ID();
 						$school_rel_id = get_field( 'school_relationship', $prog_id );
+						if ( is_array( $school_rel_id ) ) {
+							$school_rel_id = ! empty( $school_rel_id ) ? ( is_object( $school_rel_id[0] ) ? $school_rel_id[0]->ID : $school_rel_id[0] ) : 0;
+						} elseif ( is_object( $school_rel_id ) ) {
+							$school_rel_id = $school_rel_id->ID;
+						}
+						$school_rel_id = intval( $school_rel_id );
+
 						$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Đại học đối tác';
 						$major_rel_id = get_field( 'major_relationship', $prog_id );
 						$major_thumb = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium' ) : '';
 						if ( ! $major_thumb ) {
-							$major_thumb = 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=300';
+							$major_thumb = function_exists( 'ltdh_get_fallback_image' ) ? ltdh_get_fallback_image( 'program' ) : get_template_directory_uri() . '/assets/images/banner-program.jpg';
 						}
 						$types = wp_get_post_terms( $prog_id, 'training_type' );
 						$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : 'Chưa xác định';
@@ -59,7 +66,7 @@ $is_base_archive = ! isset( $term->term_id );
 										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 									</h3>
 									<div class="space-y-1.5 text-sm text-slate-500 py-3 border-t border-slate-100">
-										<p>Hệ đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
+										<p>Hình thức đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
 										<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ' ); ?></span></p>
 										<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
 										<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
@@ -101,18 +108,21 @@ $is_base_archive = ! isset( $term->term_id );
 						$address = get_field( 'address', $school_id ) ?: 'Việt Nam';
 						$hotline = get_field( 'hotline', $school_id ) ?: get_field( 'global_hotline', 'options' );
 						$thumb_url = get_the_post_thumbnail_url( $school_id, 'medium' ) ?: $fallback_images[$index % 5];
-						$logo_id = ltdh_get_school_image_id( $school_id );
-						$en_name = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
-						$rating  = get_post_meta( $school_id, 'rating', true ) ?: '4.8';
-						$reviews = get_post_meta( $school_id, 'reviews_count', true ) ?: '256';
-						$target  = get_post_meta( $school_id, 'admission_target', true ) ?: '3.000';
+						$logo_id  = ltdh_get_school_image_id( $school_id );
+						$logo_url = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'thumbnail' ) : '';
+						$en_name  = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
+						$rating   = get_post_meta( $school_id, 'rating', true ) ?: '4.8';
+						$reviews  = get_post_meta( $school_id, 'reviews_count', true ) ?: '256';
+						$target   = get_post_meta( $school_id, 'admission_target', true ) ?: '3.000';
 				?>
 						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 							<div class="h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $thumb_url ); ?>');"></div>
 							
 							<!-- Logo Overlay -->
 							<div class="h-16 w-16 bg-white rounded-lg border-4 border-white shadow-md bg-white -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
-								<?php if ( $logo_id ) : ?>
+								<?php if ( ! empty( $logo_url ) ) : ?>
+									<img src="<?php echo esc_url( $logo_url ); ?>" alt="<?php echo esc_attr( get_the_title( $school_id ) ); ?>" class="h-full w-full object-contain p-1">
+								<?php elseif ( $logo_id ) : ?>
 									<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
 								<?php else : ?>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-brand-primary/80"><path d="M11.7 2.805a.75.75 0 0 1 .6 0l9.3 4.25a.75.75 0 0 1 0 1.39l-9.3 4.25a.75.75 0 0 1-.6 0L2.4 8.445a.75.75 0 0 1 0-1.39l9.3-4.25ZM2.84 10.74l6.735 3.08a2.25 2.25 0 0 0 1.85 0l6.735-3.08v3.42c0 .532-.244 1.026-.642 1.378L12.5 19.544a1.25 1.25 0 0 1-1.6 0l-5.023-3.97a1.75 1.75 0 0 1-.642-1.378v-3.456Z" /><path d="M20.25 10.32v5.43a3.25 3.25 0 0 1-3.25 3.25h-.5a.75.75 0 0 0 0 1.5h.5a4.75 4.75 0 0 0 4.75-4.75v-5.43a.75.75 0 0 0-1.5 0Z" /></svg>
@@ -152,6 +162,13 @@ $is_base_archive = ! isset( $term->term_id );
 					while ( have_posts() ) : the_post();
 						$prog_id = get_the_ID();
 						$school_rel_id = get_field( 'school_relationship', $prog_id );
+						if ( is_array( $school_rel_id ) ) {
+							$school_rel_id = ! empty( $school_rel_id ) ? ( is_object( $school_rel_id[0] ) ? $school_rel_id[0]->ID : $school_rel_id[0] ) : 0;
+						} elseif ( is_object( $school_rel_id ) ) {
+							$school_rel_id = $school_rel_id->ID;
+						}
+						$school_rel_id = intval( $school_rel_id );
+
 						$school_name = $school_rel_id ? get_the_title( $school_rel_id ) : 'Đại học đối tác';
 				?>
 					<?php
@@ -165,17 +182,21 @@ $is_base_archive = ! isset( $term->term_id );
 
 					$major_thumb = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium' ) : '';
 					if ( ! $major_thumb ) {
-						$major_thumb = 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=300';
+						$major_thumb = function_exists( 'ltdh_get_fallback_image' ) ? ltdh_get_fallback_image( 'program' ) : get_template_directory_uri() . '/assets/images/banner-program.jpg';
 					}
 					$types = wp_get_post_terms( $prog_id, 'training_type' );
 					$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : 'Chưa xác định';
 					$type_slug = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->slug : '';
+					$school_logo_id  = $school_rel_id ? ltdh_get_school_image_id( $school_rel_id ) : 0;
+					$school_logo_url = $school_rel_id && function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_rel_id, 'thumbnail' ) : get_stylesheet_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp';
 					?>
 				<div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
 					 data-compare-btn data-compare-type="program" data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 					 data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 					 data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
-					 data-compare-thumb="<?php echo esc_url( $major_thumb ); ?>">
+					 data-compare-thumb="<?php echo esc_url( $school_logo_url ); ?>"
+					 data-compare-major-name="<?php echo esc_attr( $major_rel_id ? preg_replace( '/^ngành\s+/iu', '', trim( get_the_title( $major_rel_id ) ) ) : '' ); ?>"
+					 data-compare-school-name="<?php echo esc_attr( $school_name ); ?>">
 					<div class="h-44 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $major_thumb ); ?>');"></div>
 						<div class="p-6 flex-1 flex flex-col justify-between">
 							<?php
@@ -194,7 +215,7 @@ $is_base_archive = ! isset( $term->term_id );
 								$learning_details = ltdh_get_program_learning_details( get_the_ID() );
 								?>
 								<div class="space-y-1.5 text-sm text-slate-500 py-3 border-t border-slate-100">
-									<p>Hệ đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
+									<p>Hình thức đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
 									<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee' ) ?: 'Liên hệ' ); ?></span></p>
 									<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration' ) ?: '1.5 - 2 năm' ); ?></span></p>
 									<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
@@ -217,7 +238,7 @@ $is_base_archive = ! isset( $term->term_id );
 										So sánh
 									</button>
 								</div>
-								<a href="<"'?php the_permalink(); ?>"'>" class="bg-brand-accent text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-[#e06e00] shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
+								<a href="<?php the_permalink(); ?>" class="bg-brand-accent text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-[#e06e00] shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
 							</div>
 						</div>
 					</div>

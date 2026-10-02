@@ -19,7 +19,7 @@ $sections = [
 	],
 	'Thông tin chương trình' => [
 		['label' => 'Ngành học', 'key' => 'major', 'render' => 'major'],
-		['label' => 'Hệ đào tạo', 'key' => 'training_type'],
+		['label' => 'Hình thức đào tạo', 'key' => 'training_type'],
 		['label' => 'Cơ sở', 'key' => 'campus_info'],
 		['label' => 'Bằng cấp', 'key' => 'degree_type'],
 		['label' => 'Lịch học', 'key' => 'schedule'],
@@ -31,7 +31,6 @@ $sections = [
 		['label' => 'Đối tượng', 'key' => 'target_students'],
 	],
 	'Nghề nghiệp' => [
-		['label' => 'Việc làm', 'key' => 'career_opportunities'],
 		['label' => 'Giá trị bằng', 'key' => 'diploma_value'],
 		['label' => 'Ưu điểm', 'key' => 'advantages'],
 		['label' => 'Nhược điểm', 'key' => 'disadvantages'],
@@ -45,33 +44,61 @@ $sections = [
 		$school_logo = $item['school'] ? ( $item['school']['logo'] ?? '' ) : '';
 		$item_hotline = ! empty( $item['hotline'] ) ? $item['hotline'] : $hotline_val;
 	?>
-		<div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 space-y-4">
+		<div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 space-y-4 relative group">
+			<button type="button"
+					class="ltdh-compare-page-remove absolute top-3 right-3 text-slate-400 hover:text-red-600 bg-white hover:bg-red-50 border border-slate-200 rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold transition-all shadow-xs z-10"
+					data-id="<?php echo esc_attr( $item['id'] ); ?>"
+					title="Xóa khỏi so sánh">
+				&times;
+			</button>
 			
 			<!-- Card Header: Title + Image + School -->
-			<div class="flex items-start gap-4">
-				<img src="<?php echo esc_url( $item['thumbnail'] ); ?>"
-					 alt="<?php echo esc_attr( $item['title'] ); ?>"
-					 class="h-16 w-24 object-cover rounded-lg border border-slate-200 shrink-0">
+			<div class="flex items-start gap-4 pr-6">
+				<a href="<?php echo esc_url( $item['permalink'] ); ?>" class="shrink-0">
+					<img src="<?php echo esc_url( $item['thumbnail'] ); ?>"
+						 alt="<?php echo esc_attr( $item['title'] ); ?>"
+						 onerror="this.onerror=null; this.src='<?php echo esc_url( function_exists( 'ltdh_get_fallback_image' ) ? ltdh_get_fallback_image( 'program' ) : get_template_directory_uri() . '/assets/images/banner-program.jpg' ); ?>';"
+						 class="h-20 w-28 sm:h-24 sm:w-36 object-cover rounded-xl border border-slate-200 shadow-xs">
+				</a>
 				<div class="min-w-0 flex-1">
 					<?php if ( $school_name ) : ?>
 						<div class="flex items-center gap-1.5 mb-1">
 							<?php if ( $school_logo ) : ?>
 								<img src="<?php echo esc_url( $school_logo ); ?>"
 									 alt="<?php echo esc_attr( $school_name ); ?>"
-									 class="h-4 w-4 object-cover rounded border border-slate-200">
+									 onerror="this.style.display='none';"
+									 class="h-4 w-4 object-cover rounded border border-slate-200 shrink-0">
 							<?php endif; ?>
-							<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block truncate"><?php echo esc_html( $school_name ); ?></span>
+							<?php if ( ! empty( $item['school'] ) && ! empty( $item['school']['permalink'] ) ) : ?>
+								<a href="<?php echo esc_url( $item['school']['permalink'] ); ?>"
+								   class="text-xs font-bold text-slate-500 hover:text-brand-primary uppercase tracking-wider block truncate hover:underline">
+									<?php echo esc_html( $school_name ); ?>
+								</a>
+							<?php else : ?>
+								<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block truncate"><?php echo esc_html( $school_name ); ?></span>
+							<?php endif; ?>
 						</div>
 					<?php endif; ?>
+					<?php
+					$item_major_name = ! empty( $item['major'] ) && ! empty( $item['major']['title'] ) ? $item['major']['title'] : '';
+					if ( empty( $item_major_name ) ) {
+						$raw_prog_title  = $item['title'] ?? '';
+						$item_major_name = preg_replace( '/^(Cử nhân|Kỹ sư|Đại học)\s+/iu', '', $raw_prog_title );
+						$item_major_name = preg_replace( '/\s*\([^)]*\)$/u', '', $item_major_name );
+					}
+					$clean_item_major = preg_replace( '/^ngành\s+/iu', '', trim( $item_major_name ) );
+					$clean_item_type  = preg_replace( '/^hệ\s+/iu', '', trim( $item['training_type'] ?? '' ) );
+					$card_title       = 'Liên thông ngành ' . $clean_item_major . ( $clean_item_type ? ' - ' . $clean_item_type : '' );
+					?>
 					<h3 class="font-extrabold text-slate-900 text-sm leading-snug line-clamp-2">
 						<a href="<?php echo esc_url( $item['permalink'] ); ?>" class="hover:text-brand-primary transition-colors">
-							<?php echo esc_html( $item['title'] ); ?>
+							<?php echo esc_html( $card_title ); ?>
 						</a>
 					</h3>
 					<div class="flex items-center gap-1.5 mt-1.5">
 						<?php 
-						if ( function_exists( 'ltdh_get_training_type_badge_html' ) && ! empty( $item['training_type'] ) ) {
-							echo ltdh_get_training_type_badge_html( $item['training_type'] );
+						if ( function_exists( 'ltdh_get_training_type_badge_html' ) && ! empty( $clean_item_type ) ) {
+							echo ltdh_get_training_type_badge_html( $clean_item_type );
 						}
 						?>
 					</div>
@@ -90,9 +117,9 @@ $sections = [
 								// Resolve value
 								if ( $attr['key'] === 'major' ) {
 									$value = $item['major'] ? esc_html( $item['major']['title'] . ' (' . $item['major']['code'] . ')' ) : '<span class="text-slate-300 italic text-xs">Chưa cập nhật</span>';
-								} elseif ( in_array( $attr['key'], [ 'admission_requirements', 'required_documents', 'target_students', 'career_opportunities', 'diploma_value', 'advantages', 'disadvantages' ], true ) ) {
+								} elseif ( in_array( $attr['key'], [ 'admission_requirements', 'required_documents', 'target_students', 'diploma_value', 'advantages', 'disadvantages' ], true ) ) {
 									$val = $item[ $attr['key'] ] ?? '';
-									$value = ltdh_compare_field( wp_strip_all_tags( $val ) );
+									$value = ltdh_compare_format_checklist( $val );
 								} else {
 									$val = $item[ $attr['key'] ] ?? '';
 									$value = $val ? esc_html( $val ) : '<span class="text-slate-300 italic text-xs">Chưa cập nhật</span>';

@@ -140,3 +140,190 @@ Integrity mode: development
 ### Báo cáo bàn giao
 - [ ] Xuất tài liệu đánh giá hoàn chỉnh `SCHOOLS_AND_TRAINING_SYSTEMS_AUDIT.md` tại thư mục làm việc với các giải pháp / schema kiến trúc nâng cấp tối ưu.
 - [ ] Không tự ý sửa đổi code gốc của theme trong quá trình đánh giá.
+
+## 2026-10-01T08:50:13Z
+
+# Nhiệm vụ: Tái cấu trúc Kiến trúc thông tin (Information Architecture), Thuật ngữ & Templates dự án lienthongdaihoc.com
+
+Working directory: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc`
+Integrity mode: development
+
+Bạn đang làm việc trên một dự án phần mềm ĐÃ XÂY DỰNG HOÀN THIỆN: `lienthongdaihoc.com` (WordPress theme).
+Nhiệm vụ KHÔNG PHẢI là đập đi xây lại trang web, mà là:
+1. Hiểu sâu kiến trúc hiện tại, mô hình nội dung, taxonomy, templates, URLs, cấu trúc SEO, UI và mã nguồn thực tế.
+2. Thực hiện tái cấu trúc có kiểm soát Kiến trúc Thông tin (IA) xoay quanh PHẠM VI NGHIỆP VỤ DUY NHẤT của website: **LIÊN THÔNG ĐẠI HỌC**.
+
+---
+
+## 1. PHẠM VI NGHIỆP VỤ CỐT LÕI (CRITICAL)
+Website CHỈ TẬP TRUNG DUY NHẤT vào:
+> **LIÊN THÔNG ĐẠI HỌC**
+
+TUYỆT ĐỐI KHÔNG đưa vào hoặc duy trì các loại hình tuyển sinh không liên quan như:
+- Văn bằng 2
+- Đại học mới
+- Đại học chính quy như một sản phẩm tuyển sinh riêng biệt độc lập
+- Các loại tuyển sinh đại học chung khác
+
+Trang web KHÔNG PHẢI là cổng thông tin tuyển sinh đại học tổng hợp. Mục đích cốt lõi:
+> Giúp người học tìm kiếm, khám phá và so sánh các cơ hội/chương trình liên thông đại học.
+
+---
+
+## 2. MÔ HÌNH NGHIỆP VỤ MỤC TIÊU
+```text
+Trường Đại học (University)
+    ↓
+Thông tin tuyển sinh Liên thông
+    ↓
+Hình thức học (Study Mode)
+    ├── Chính quy
+    ├── Vừa học vừa làm
+    └── Từ xa
+    ↓
+Ngành học (Major / Field)
+    ↓
+Cơ hội / Chương trình tuyển sinh Liên thông cụ thể (Specific Liên thông admission offering)
+```
+
+Phân biệt then chốt:
+- **"Liên thông"**: Là loại hình tuyển sinh tổng thể / phạm vi bao trùm toàn bộ website.
+- **"Chính quy / Vừa học vừa làm / Từ xa"**: Là các hình thức học / phương thức đào tạo BÊN TRONG tuyển sinh liên thông. KHÔNG được coi là các sản phẩm tuyển sinh độc lập tương đương với "Liên thông".
+
+---
+
+## 3. THUẬT NGỮ & THỰC THỂ
+Khảo sát toàn bộ thuật ngữ hiện có trong dự án:
+- Hệ đào tạo, Chương trình, Chương trình đào tạo, Loại chương trình, Hình thức đào tạo, Hình thức học, Loại tuyển sinh, v.v.
+- Đơn vị hữu ích nhỏ nhất hiển thị ra công chúng là một CƠ HỘI TUYỂN SINH CỤ THỂ, ví dụ:
+  > Đại học ABC — Liên thông ngành Kế toán — Từ xa
+- Không nhầm lẫn giữa "Chương trình đào tạo học thuật" (curriculum) với "Cơ hội tuyển sinh liên thông cụ thể" (admission offering).
+- Giữ nguyên thực thể nếu cấu trúc hiện tại (`program`, `school`, `major`) đã phản ánh đúng, chỉ hiệu chỉnh nhãn, phân cấp ngữ nghĩa và quan hệ.
+
+---
+
+## 4. QUY TRÌNH THỰC HIỆN BẮT BUỘC (PHASE 1: AUDIT ONLY)
+Tuyệt đối KHÔNG sửa code ngay lập tức.
+Quy trình:
+```text
+1. Khảo sát & Đọc hiểu (toàn bộ code, *.md, taxonomy, CPTs, templates, URLs, breadcrumbs)
+2. Kiểm toán (Audit) & Lập bảng ánh xạ Current → Target
+3. Nhận diện rủi ro (đặc biệt là SEO, URL, template break)
+4. Đề xuất phương án can thiệp tối thiểu an toàn nhất
+5. Triển khai sửa đổi có kiểm soát
+6. Kiểm thử cú pháp (php -l), query loops, giao diện
+7. Xác minh SEO, URLs, Canonicals, 301 Redirects
+8. Hoàn thiện Báo cáo tổng kết đầy đủ (Mục A đến H)
+```
+
+Bảng ánh xạ kiểm toán bắt buộc:
+```text
+CURRENT ENTITY
+CURRENT NAME
+CURRENT PURPOSE
+CURRENT TAXONOMY
+CURRENT RELATIONSHIPS
+CURRENT URL
+CURRENT TEMPLATE
+TARGET CONCEPT
+REQUIRED CHANGE
+```
+
+---
+
+## 5. BẢO TOÀN SEO & URLS (CỰC KỲ QUAN TRỌNG)
+- Website đã hoàn thiện và có thể đã lập chỉ mục URLs.
+- Không tự ý thay đổi slug / URLs công khai.
+- Nếu bắt buộc phải đổi URL: Phải có 301 Redirect tương ứng (`OLD URL → 301 REDIRECT → NEW URL`), cập nhật canonical, sitemap, breadcrumbs và liên kết nội bộ.
+- Chuẩn hóa SEO Title / H1 / Meta Description:
+  - `Liên thông [Hình thức học]` (ví dụ: Liên thông từ xa, Liên thông chính quy)
+  - `Liên thông [Ngành]`
+  - `Liên thông [Trường]`
+
+---
+
+## 6. TEMPLATES, UI & ĐIỀU HƯỚNG
+- **Menu điều hướng**:
+  Trang chủ → Liên thông (Chính quy, Vừa học vừa làm, Từ xa) → Ngành học → Trường đại học → Kiến thức liên thông → Tư vấn.
+  Không tạo các lối vào trùng lặp trỏ về cùng nội dung.
+- **Trang Archive Hình thức học** (`taxonomy-training_type.php` hoặc tương đương):
+  Tiêu đề & nội dung phải thể hiện rõ: "Liên thông từ xa", "Liên thông vừa học vừa làm", "Liên thông chính quy". Danh sách hiển thị các cơ hội tuyển sinh cụ thể.
+- **Trang Single Program** (`single-program.php`):
+  Hiển thị chuẩn: Trường, Ngành, Hình thức học, Đối tượng, Điều kiện, Thời gian học, Học phí, Địa điểm/Phương thức, Bằng cấp, Hồ sơ, Thời gian tuyển sinh, Form đăng ký tư vấn.
+- **Trang Ngành & Trang Trường**: Gom nhóm các cơ hội tuyển sinh liên thông tương ứng.
+- **Bộ lọc**: Loại bỏ các bộ lọc vô nghĩa (ví dụ lọc "Loại chương trình: Liên thông"). Chỉ giữ các bộ lọc thực tế: Hình thức học, Ngành, Trường, v.v.
+- **Giữ nguyên thiết kế UI**: Không thay đổi CSS/layout một cách vô cớ.
+
+---
+
+## 7. BÁO CÁO NGHIỆM THU CUỐI CÙNG (CÁC MỤC A ĐẾN H)
+Sau khi hoàn thành, xuất báo cáo đầy đủ:
+- **A. Current architecture**: Entity, Taxonomy, Relationship, URL, Template.
+- **B. Problems found**: Các xung đột thực tế phát hiện trong mã nguồn.
+- **C. Target architecture**: Sơ đồ kiến trúc và phân cấp chuẩn hóa.
+- **D. Files changed**: Từng tệp đã sửa và lý do.
+- **E. Database/content changes**: Migration, taxonomies, fields.
+- **F. URL changes**: Danh sách chuyển hướng 301 (hoặc ghi rõ không đổi URL công khai nào).
+- **G. SEO impact**: Canonicals, redirects, sitemaps, breadcrumbs, internal links.
+- **H. Verification**: Kết quả kiểm thử toàn diện từng trang, bộ lọc, navigation và mã PHP.
+
+## 2026-10-01T09:08:12Z
+
+Thực hiện đợt refactor có kiểm soát kiến trúc thông tin, taxonomy, routing và dữ liệu hiển thị cho website WordPress `lienthongdaihoc.com` nhằm chuẩn hoá 100% phạm vi phục vụ duy nhất là **Liên thông đại học**, tuyệt đối bảo toàn 3 CPT cốt lõi (`school`, `major`, `program`), đổi thuật ngữ hiển thị thành **Hình thức học** (`Từ xa`, `Vừa học vừa làm`), và xử lý an toàn dữ liệu ngoài phạm vi không làm hỏng SEO hay mất dữ liệu.
+
+Working directory: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc`
+Integrity mode: development
+
+## Requirements
+
+### R1. Kiểm toán Dữ liệu CPT & Xử lý An toàn Ngoài Phạm Vi
+- Chạy script PHP/WP-CLI kiểm toán (Audit Script) để scan và phân loại toàn bộ record của CPT `program`, `school`, `major` và xuất file báo cáo (`audit_report.json` hoặc log chi tiết).
+- Với từng record `program`:
+  - Record thuộc **Liên thông**: Giữ nguyên public, chuẩn hoá taxonomy `training_type` thành một trong hai hình thức: `Từ xa` hoặc `Vừa học vừa làm`.
+  - Record **NGOÀI phạm vi** (Văn bằng 2, Chính quy, Tuyển sinh mới THPT, Cao đẳng online...): Chuyển `post_status` sang `draft` (hoặc `private`), tuyệt đối không xóa cứng (hard-delete) khỏi database.
+  - Record không chắc chắn: Đưa vào danh sách "cần review thủ công", tạm thời không hiển thị ở luồng tuyển sinh liên thông chính.
+
+### R2. Bảo toàn Cốt lõi 3 CPT & Data Flow Chuẩn
+- Giữ nguyên 3 CPT: `school`, `major`, `program`. Tuyệt đối không tạo thêm CPT mới (`course`, `admission`, `intake`, v.v.).
+- Chuẩn hoá quan hệ dữ liệu:
+  - Trường (`school`) → Các `program` tuyển sinh Liên thông thực tế → Thuộc tính (`major`, `training_type`).
+  - Trang trường và trang ngành phải query các chương trình Liên thông thực tế thay vì dựa vào term gắn trực tiếp trên `school`.
+- Taxonomy `campus`: kiểm tra và cô lập term `Online` không để xuất hiện như một cơ sở vật lý trong bộ lọc hay giao diện.
+
+### R3. Chuẩn hoá Thuật ngữ Taxonomy & Routing
+- Taxonomy `training_type`: Đổi nhãn hiển thị frontend từ "Hệ đào tạo" thành **"Hình thức học"** (gồm `Từ xa` và `Vừa học vừa làm`). Giữ nguyên slug URL `/he-dao-tao/` nếu cần để bảo vệ URL đã index SEO.
+- Tuyệt đối không tạo thêm taxonomy "Loại tuyển sinh" hay bộ lọc thừa "Liên thông".
+- Rà soát route `/chuong-trinh/`: Không giữ 301 gượng ép sang `/he-dao-tao/tu-xa/` nếu không có lý do SEO legacy; xử lý routing sạch và an toàn cho các URL đang index.
+
+### R4. Tinh chỉnh Trang Chủ, Navigation & Bộ lọc
+- Trang chủ: Điều chỉnh hero, sections, cards và CTAs để toàn bộ thông điệp hướng về tìm kiếm chương trình Liên thông theo Hình thức học, Ngành và Trường. Loại bỏ mọi yếu tố quảng bá ngoài phạm vi.
+- Navigation Header & Footer: Chuẩn hoá cấu trúc menu:
+  - Trang chủ
+  - Liên thông (Từ xa, Vừa học vừa làm)
+  - Ngành học
+  - Trường đại học
+  - Kiến thức liên thông
+  - Tư vấn
+  Xoá bỏ các link trùng lặp cùng trỏ về một archive.
+- Bộ lọc Search/Filter: Chỉ lọc theo Hình thức học (`Từ xa`, `Vừa học vừa làm`), Ngành, Trường và thuộc tính tuyển sinh liên quan.
+
+### R5. Template & Card Presentation
+- Card `program` và template `single-program.php`: Giữ nguyên kiến trúc file hiện có, hiển thị rõ ràng cơ hội tuyển sinh "Liên thông ngành [Tên ngành] - [Hình thức học] tại [Trường]", kèm điều kiện, học phí, đối tượng, thời gian học và trạng thái tuyển sinh.
+- Các trang archive Hình thức học (`/he-dao-tao/tu-xa/`, `/he-dao-tao/vua-hoc-vua-lam/`): Chỉ query các `program` Liên thông hợp lệ.
+
+## Acceptance Criteria
+
+### Data & Scope Integrity
+- [ ] Không có record nào không phải Liên thông xuất hiện trên frontend public (homepage, archives, search, related).
+- [ ] 100% record ngoài phạm vi được chuyển `post_status` an toàn sang draft/private; không có record nào bị xoá vĩnh viễn khỏi database. Có file log phân loại minh bạch.
+
+### CPT & Taxonomy Architecture
+- [ ] Số lượng CPT giữ nguyên đúng 3 (`school`, `major`, `program`), không phát sinh CPT thừa.
+- [ ] Nhãn frontend hiển thị của `training_type` là "Hình thức học" trên toàn hệ thống UI.
+- [ ] Không có taxonomy "Loại tuyển sinh" hay filter thừa.
+
+### Navigation, Routing & Frontend
+- [ ] Cây menu điều hướng thống nhất, không còn 2 link khác nhau cùng trỏ về một archive.
+- [ ] Trang chủ 100% đồng nhất thông điệp tuyển sinh Liên thông.
+- [ ] Không có lỗi 301 bất hợp lý từ `/chuong-trinh/` sang `/he-dao-tao/tu-xa/`.
+- [ ] Toàn bộ trang web (Single, Archive, Homepage, Search) không phát sinh lỗi PHP (Notice/Warning/Fatal) hay JS Console error.

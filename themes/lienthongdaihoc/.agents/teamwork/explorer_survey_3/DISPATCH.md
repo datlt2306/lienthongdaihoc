@@ -1,27 +1,27 @@
-## 2026-09-25T05:03:18Z
+# Task Assignment: Survey & Codebase Audit - SEO, URLs, Canonicals, Breadcrumbs & Redirects
 
-Received dispatch from parent orchestrator:
-Role: Frontend, SEO & Schema Surveyor (explorer_survey_3)
-Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/explorer_survey_3
-Target project root: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc
-Authoritative original request: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md
+## 2026-10-01T08:52:36Z
 
-Task Objective:
-Map the asset management, SEO on-page, Schema markup, and frontend integrity:
-1. Asset Management (CSS / JS):
-   - Enumerate all `wp_enqueue_script` and `wp_enqueue_style` calls.
-   - Check for hardcoded script/style tags in template files.
-   - Check asset versioning (`wp_get_theme()->get('Version')` vs hardcoded vs filemtime).
-   - Check asset dependencies, duplicates, render-blocking scripts, and async/defer usage.
-2. SEO On-Page & Semantic HTML:
-   - Check heading hierarchy (H1 through H6) across all page templates, archive templates, single templates.
-   - Check for missing alt attributes on images (`<img>` tags, `wp_get_attachment_image`).
-   - Check semantic HTML5 usage (`<header>`, `<nav>`, `<main>`, `<article>`, `<section>`, `<footer>`).
-   - Check meta tags, OpenGraph, title tag support, and canonical links.
-3. Schema.org Structured Data:
-   - Identify all JSON-LD or microdata generation in the theme.
-   - Verify compliance and completeness for educational themes: EducationalOrganization, Course, Program, BreadcrumbList, FAQPage, Article, etc.
-   - Identify syntax errors or missing required Schema properties.
-4. Frontend & Client-side Script Integrity:
-   - Analyze all JavaScript files in the theme for syntax errors, deprecations, undefined global references, or console error risks.
-   - Evaluate responsive design structure (CSS breakpoints, viewport meta, container overflows).
+Working Directory: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/explorer_survey_3/`
+Project Root: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc`
+
+Read:
+1. `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md` (specifically section `## 2026-10-01T08:50:13Z`).
+2. `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/explorer_survey_3/DISPATCH.md`.
+
+Your focus:
+1. Inspect URL structures, rewrites, slugs, permalinks for all CPTs, taxonomies, and pages:
+   - CPT slugs: `chuong-trinh`, `truong`, `nganh`, etc.
+   - Taxonomy slugs: `he-dao-tao` (or `hinh-thuc-dao-tao`), `co-so`, `nhom-nganh`, etc.
+2. Audit Breadcrumbs implementation (Yoast / RankMath / Custom breadcrumb walker / Schema BreadcrumbList).
+3. Audit SEO titles, H1 tags, meta descriptions across archive and single templates:
+   - Standard format required: `Liên thông [Hình thức học]`, `Liên thông [Ngành]`, `Liên thông [Trường]`.
+4. Identify risks of URL breakage, changes needed, and define exact 301 Redirect strategy (`OLD URL -> 301 REDIRECT -> NEW URL`).
+5. Audit Canonical URL generation and Schema JSON-LD markup.
+6. Produce the Current -> Target mapping table for URLs, SEO metadata, Breadcrumbs, and Redirects according to the required schema:
+   `CURRENT ENTITY | CURRENT NAME | CURRENT PURPOSE | CURRENT TAXONOMY | CURRENT RELATIONSHIPS | CURRENT URL | CURRENT TEMPLATE | TARGET CONCEPT | REQUIRED CHANGE`
+7. Propose a minimal safe intervention plan for SEO & URLs.
+
+Write your complete findings and report to `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/explorer_survey_3/handoff.md`.
+Then notify the orchestrator with `send_message`.
+

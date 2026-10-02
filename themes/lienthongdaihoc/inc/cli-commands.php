@@ -1110,6 +1110,542 @@ class LTDH_CLI_Commands {
 
 		WP_CLI::success( "Đã gieo thành công $posts_seeded bài viết mới vào 3 danh mục tin tức!" );
 	}
+
+	/**
+	 * Audit database records for Liên thông scope compliance and prune orphaned data.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--dry-run]
+	 * : Perform audit simulation without modifying database.
+	 *
+	 * [--apply]
+	 * : Apply changes: transition out-of-scope programs and schools to draft, prune orphaned metadata, flush transients.
+	 *
+	 * [--output-file=<file>]
+	 * : Path to output JSON report file (default: theme root audit_report.json).
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp ltdh audit-data --dry-run
+	 *     wp ltdh audit-data --apply
+	 *     wp ltdh audit-data --apply --output-file=audit_report.json
+	 *
+	 * @param array $args
+	 * @param array $assoc_args
+	 */
+	public function audit_data( $args, $assoc_args ) {
+		$is_dry_run = isset( $assoc_args['dry-run'] );
+		$is_apply   = isset( $assoc_args['apply'] );
+
+		if ( $is_dry_run || ! $is_apply ) {
+			$mode     = 'dry-run';
+			$is_apply = false;
+			WP_CLI::log( '=== LTDH DATA AUDIT (DRY-RUN SIMULATION) ===' );
+			WP_CLI::log( 'Mô phỏng kiểm toán - Không có thay đổi nào được ghi vào cơ sở dữ liệu.' );
+		} else {
+			$mode = 'apply';
+			WP_CLI::log( '=== LTDH DATA AUDIT (APPLY CHANGES) ===' );
+			WP_CLI::log( 'Đang thực thi kiểm toán và áp dụng thay đổi vào cơ sở dữ liệu...' );
+		}
+
+		$theme_root = realpath( get_stylesheet_directory() ) ?: get_stylesheet_directory();
+		$output_file = ! empty( $assoc_args['output-file'] ) ? $assoc_args['output-file'] : '';
+		if ( empty( $output_file ) ) {
+			$output_file = $theme_root . '/audit_report.json';
+		} elseif ( ! str_starts_with( $output_file, '/' ) ) {
+			$output_file = $theme_root . '/' . $output_file;
+		}
+
+		$audit_timestamp = gmdate( 'Y-m-d H:i:s' );
+
+		// ----------------------------------------------------
+		// 1. Initial State Snapshot
+		// ----------------------------------------------------
+		$prog_counts_before   = (array) wp_count_posts( 'program' );
+		$school_counts_before = (array) wp_count_posts( 'school' );
+		$major_counts_before  = (array) wp_count_posts( 'major' );
+
+		// ----------------------------------------------------
+		// 2. Scan and Categorize Programs
+		// ----------------------------------------------------
+		WP_CLI::log( "\n1. Đang quét toàn bộ danh mục CPT Program..." );
+
+		$all_programs = get_posts( [
+			'post_type'   => 'program',
+			'post_status' => 'any',
+			'numberposts' => -1,
+			'orderby'     => 'ID',
+			'order'       => 'ASC',
+		] );
+
+		$total_programs_scanned = count( $all_programs );
+
+		$in_scope_programs      = [];
+		$out_of_scope_programs  = [];
+		$manual_review_programs = [];
+
+		$count_tu_xa            = 0;
+		$count_vhvl             = 0;
+		$count_college          = 0;
+		$count_fulltime         = 0;
+		$count_vb2              = 0;
+
+		foreach ( $all_programs as $program ) {
+			$p_id = $program->ID;
+
+			// Resolve School
+			$school_id   = (int) get_post_meta( $p_id, 'school_relationship', true );
+			$school_post = $school_id ? get_post( $school_id ) : null;
+			$school_name = $school_post ? $school_post->post_title : 'Không xác định';
+			$school_slug = $school_post ? $school_post->post_name : '';
+			$school_code = $school_id ? get_post_meta( $school_id, 'school_code', true ) : '';
+
+			// Check if School is College (Cao đẳng)
+			$is_college = false;
+			if ( 1662 === $school_id
+				|| false !== stripos( $school_name, 'Cao đẳng' )
+				|| false !== stripos( $school_slug, 'cao-dang' )
+				|| 'HCCT' === strtoupper( (string) $school_code )
+			) {
+				$is_college = true;
+			}
+
+			// Resolve Major
+			$major_id   = (int) get_post_meta( $p_id, 'major_relationship', true );
+			$major_post = $major_id ? get_post( $major_id ) : null;
+			$major_name = $major_post ? $major_post->post_title : 'Không xác định';
+
+			// Resolve Training Types
+			$tt_terms = wp_get_post_terms( $p_id, 'training_type', [ 'fields' => 'all' ] );
+			$tt_slugs = ! is_wp_error( $tt_terms ) ? wp_list_pluck( $tt_terms, 'slug' ) : [];
+			$tt_names = ! is_wp_error( $tt_terms ) ? wp_list_pluck( $tt_terms, 'name' ) : [];
+
+			// Resolve Campuses
+			$cp_terms = wp_get_post_terms( $p_id, 'campus', [ 'fields' => 'all' ] );
+			$cp_slugs = ! is_wp_error( $cp_terms ) ? wp_list_pluck( $cp_terms, 'slug' ) : [];
+
+			$program_info = [
+				'id'                   => $p_id,
+				'title'                => $program->post_title,
+				'slug'                 => $program->post_name,
+				'current_status'       => $program->post_status,
+				'school_id'            => $school_id,
+				'school_name'          => $school_name,
+				'school_is_college'    => $is_college,
+				'major_id'             => $major_id,
+				'major_name'           => $major_name,
+				'training_type_slugs'  => $tt_slugs,
+				'training_type_names'  => $tt_names,
+				'campus_slugs'         => $cp_slugs,
+			];
+
+			// Categorization
+			if ( $is_college ) {
+				$count_college++;
+				$program_info['scope']         = 'out_of_scope';
+				$program_info['category']      = 'out_of_scope_college';
+				$program_info['reason']        = sprintf( 'Chương trình thuộc trường Cao đẳng (%s), ngoài phạm vi Liên thông Đại học.', $school_name );
+				$program_info['target_status'] = 'draft';
+				$out_of_scope_programs[]       = $program_info;
+			} elseif ( in_array( 'chinh-quy', $tt_slugs, true ) ) {
+				$count_fulltime++;
+				$program_info['scope']         = 'out_of_scope';
+				$program_info['category']      = 'out_of_scope_fulltime';
+				$program_info['reason']        = 'Hình thức đào tạo Chính quy nằm ngoài phạm vi Liên thông (Từ xa / Vừa học vừa làm).';
+				$program_info['target_status'] = 'draft';
+				$out_of_scope_programs[]       = $program_info;
+			} elseif ( in_array( 'van-bang-2', $tt_slugs, true ) ) {
+				$count_vb2++;
+				$program_info['scope']         = 'out_of_scope';
+				$program_info['category']      = 'out_of_scope_vb2';
+				$program_info['reason']        = 'Hệ Văn bằng 2 nằm ngoài phạm vi tuyển sinh Liên thông Đại học.';
+				$program_info['target_status'] = 'draft';
+				$out_of_scope_programs[]       = $program_info;
+			} elseif ( in_array( 'tu-xa', $tt_slugs, true ) ) {
+				$count_tu_xa++;
+				$program_info['scope']         = 'in_scope';
+				$program_info['category']      = 'in_scope_tu_xa';
+				$program_info['reason']        = 'Chương trình Liên thông Đại học hình thức Từ xa hợp lệ.';
+				$program_info['target_status'] = 'publish';
+				$in_scope_programs[]           = $program_info;
+			} elseif ( in_array( 'vua-hoc-vua-lam', $tt_slugs, true ) ) {
+				$count_vhvl++;
+				$program_info['scope']         = 'in_scope';
+				$program_info['category']      = 'in_scope_vua_hoc_vua_lam';
+				$program_info['reason']        = 'Chương trình Liên thông Đại học hình thức Vừa học vừa làm hợp lệ.';
+				$program_info['target_status'] = 'publish';
+				$in_scope_programs[]           = $program_info;
+			} else {
+				$program_info['scope']         = 'uncertain';
+				$program_info['category']      = 'manual_review';
+				$program_info['reason']        = 'Chưa xác định được hình thức đào tạo hoặc trường liên kết.';
+				$program_info['target_status'] = 'draft';
+				$manual_review_programs[]      = $program_info;
+			}
+		}
+
+		WP_CLI::line( sprintf( ' - Tổng số program đã quét: %d', $total_programs_scanned ) );
+		WP_CLI::line( sprintf( '   * In-scope (Hợp lệ): %d (Từ xa: %d, Vừa học vừa làm: %d)', count( $in_scope_programs ), $count_tu_xa, $count_vhvl ) );
+		WP_CLI::line( sprintf( '   * Out-of-scope (Ngoài phạm vi): %d (Cao đẳng: %d, Chính quy: %d, VB2: %d)', count( $out_of_scope_programs ), $count_college, $count_fulltime, $count_vb2 ) );
+		WP_CLI::line( sprintf( '   * Cần xem xét thủ công: %d', count( $manual_review_programs ) ) );
+
+		// ----------------------------------------------------
+		// 3. Scan and Categorize Schools
+		// ----------------------------------------------------
+		WP_CLI::log( "\n2. Đang quét toàn bộ danh mục CPT School..." );
+
+		$all_schools = get_posts( [
+			'post_type'   => 'school',
+			'post_status' => 'any',
+			'numberposts' => -1,
+			'orderby'     => 'ID',
+			'order'       => 'ASC',
+		] );
+
+		$total_schools_scanned = count( $all_schools );
+		$in_scope_schools      = [];
+		$out_of_scope_schools  = [];
+
+		$in_scope_prog_ids = wp_list_pluck( $in_scope_programs, 'id' );
+
+		foreach ( $all_schools as $school ) {
+			$s_id        = $school->ID;
+			$s_code      = get_post_meta( $s_id, 'school_code', true );
+			$s_offered   = get_post_meta( $s_id, '_offered_programs', true );
+			if ( ! is_array( $s_offered ) ) {
+				$s_offered = [];
+			}
+
+			// In-scope programs offering count
+			$active_offered = array_intersect( $s_offered, $in_scope_prog_ids );
+
+			$is_college = ( 1662 === $s_id
+				|| false !== stripos( $school->post_title, 'Cao đẳng' )
+				|| false !== stripos( $school->post_name, 'cao-dang' )
+				|| 'HCCT' === strtoupper( (string) $s_code )
+			);
+
+			$school_info = [
+				'id'                    => $s_id,
+				'title'                 => $school->post_title,
+				'slug'                  => $school->post_name,
+				'code'                  => $s_code,
+				'current_status'        => $school->post_status,
+				'is_college'            => $is_college,
+				'total_offered_count'   => count( $s_offered ),
+				'in_scope_offered_count'=> count( $active_offered ),
+			];
+
+			if ( $is_college || 0 === count( $active_offered ) ) {
+				$school_info['scope']         = 'out_of_scope';
+				$school_info['category']      = 'out_of_scope_institution';
+				$school_info['reason']        = 'Cơ sở đào tạo bậc Cao đẳng (HCCT), không cấp bằng Cử nhân đại học.';
+				$school_info['target_status'] = 'draft';
+				$out_of_scope_schools[]       = $school_info;
+			} else {
+				$school_info['scope']         = 'in_scope';
+				$school_info['category']      = 'in_scope_university';
+				$school_info['reason']        = 'Trường Đại học đào tạo Liên thông hợp lệ.';
+				$school_info['target_status'] = 'publish';
+				$in_scope_schools[]           = $school_info;
+			}
+		}
+
+		WP_CLI::line( sprintf( ' - Tổng số trường đã quét: %d', $total_schools_scanned ) );
+		WP_CLI::line( sprintf( '   * Trường Đại học hợp lệ: %d', count( $in_scope_schools ) ) );
+		WP_CLI::line( sprintf( '   * Trường ngoài phạm vi (Cao đẳng): %d (HCCT ID: 1662)', count( $out_of_scope_schools ) ) );
+
+		// ----------------------------------------------------
+		// 4. Scan Majors
+		// ----------------------------------------------------
+		WP_CLI::log( "\n3. Đang quét toàn bộ danh mục CPT Major..." );
+
+		$all_majors = get_posts( [
+			'post_type'   => 'major',
+			'post_status' => 'any',
+			'numberposts' => -1,
+			'orderby'     => 'ID',
+			'order'       => 'ASC',
+		] );
+
+		$total_majors_scanned = count( $all_majors );
+		$in_scope_majors      = [];
+
+		foreach ( $all_majors as $major ) {
+			$m_id      = $major->ID;
+			$m_offered = get_post_meta( $m_id, '_offered_programs', true );
+			if ( ! is_array( $m_offered ) ) {
+				$m_offered = [];
+			}
+			$active_m_offered = array_intersect( $m_offered, $in_scope_prog_ids );
+
+			$in_scope_majors[] = [
+				'id'                    => $m_id,
+				'title'                 => $major->post_title,
+				'slug'                  => $major->post_name,
+				'current_status'        => $major->post_status,
+				'total_offered_count'   => count( $m_offered ),
+				'in_scope_offered_count'=> count( $active_m_offered ),
+				'scope'                 => 'in_scope',
+				'target_status'         => 'publish',
+			];
+		}
+
+		WP_CLI::line( sprintf( ' - Tổng số ngành học đã quét: %d (100%% ngành đều có chương trình đại học hợp lệ)', $total_majors_scanned ) );
+
+		// ----------------------------------------------------
+		// 5. Inspect & Prune _offered_programs Metadata
+		// ----------------------------------------------------
+		WP_CLI::log( "\n4. Đang kiểm tra tính toàn vẹn quan hệ _offered_programs (Orphaned Ghost IDs & Drafted IDs)..." );
+
+		$out_of_scope_prog_ids = wp_list_pluck( $out_of_scope_programs, 'id' );
+		$metadata_modifications = [];
+		$all_entities = array_merge( $all_schools, $all_majors );
+
+		$pruned_ghost_ids_all   = [];
+		$pruned_drafted_ids_all = [];
+
+		foreach ( $all_entities as $entity ) {
+			$e_id         = $entity->ID;
+			$e_type       = $entity->post_type;
+			$current_meta = get_post_meta( $e_id, '_offered_programs', true );
+
+			if ( ! is_array( $current_meta ) ) {
+				continue;
+			}
+
+			$clean_ids       = [];
+			$removed_ghost   = [];
+			$removed_drafted = [];
+
+			foreach ( $current_meta as $pid ) {
+				$pid = (int) $pid;
+				$post_obj = get_post( $pid );
+
+				// Check 1: Ghost/Orphan ID (post does not exist in DB)
+				if ( ! $post_obj ) {
+					$removed_ghost[] = $pid;
+					$pruned_ghost_ids_all[] = $pid;
+					continue;
+				}
+
+				// Check 2: Out of scope program ID (to be drafted / drafted)
+				if ( in_array( $pid, $out_of_scope_prog_ids, true ) || ( $is_apply && 'draft' === $post_obj->post_status ) ) {
+					$removed_drafted[] = $pid;
+					$pruned_drafted_ids_all[] = $pid;
+					continue;
+				}
+
+				// Check 3: Post type must be program and status must be publish
+				if ( 'program' === $post_obj->post_type && ( ! $is_apply || 'publish' === $post_obj->post_status ) ) {
+					$clean_ids[] = $pid;
+				}
+			}
+
+			$clean_ids = array_values( array_unique( $clean_ids ) );
+
+			if ( $clean_ids !== $current_meta ) {
+				$metadata_modifications[] = [
+					'entity_id'       => $e_id,
+					'entity_title'    => $entity->post_title,
+					'entity_type'     => $e_type,
+					'before_count'    => count( $current_meta ),
+					'after_count'     => count( $clean_ids ),
+					'before_ids'      => $current_meta,
+					'after_ids'       => $clean_ids,
+					'removed_ghost'   => $removed_ghost,
+					'removed_drafted' => $removed_drafted,
+				];
+
+				if ( $is_apply ) {
+					update_post_meta( $e_id, '_offered_programs', $clean_ids );
+				}
+			}
+		}
+
+		$pruned_ghost_ids_unique   = array_values( array_unique( $pruned_ghost_ids_all ) );
+		$pruned_drafted_ids_unique = array_values( array_unique( $pruned_drafted_ids_all ) );
+
+		WP_CLI::line( sprintf( ' - Số thực thể cần làm sạch _offered_programs: %d', count( $metadata_modifications ) ) );
+		WP_CLI::line( sprintf( ' - Ghost IDs bị loại bỏ: %s', implode( ', ', $pruned_ghost_ids_unique ) ) );
+		WP_CLI::line( sprintf( ' - Drafted IDs bị loại bỏ khỏi danh sách công khai: %s', implode( ', ', $pruned_drafted_ids_unique ) ) );
+
+		// ----------------------------------------------------
+		// 6. Apply Changes (If in apply mode)
+		// ----------------------------------------------------
+		$flushed_transients = [
+			'ltdh_filter_options',
+			'ltdh_featured_schools',
+			'ltdh_featured_schools_data',
+			'ltdh_hot_majors_data',
+			'ltdh_combinations_data',
+			'ltdh_archive_school_featured',
+			'ltdh_training_type_counts',
+			'ltdh_rewrite_flushed_v2',
+		];
+
+		if ( $is_apply ) {
+			WP_CLI::log( "\n5. Đang chuyển đổi trạng thái bản ghi out-of-scope sang 'draft'..." );
+
+			// Programs transition (Safely transition to draft, ZERO hard deletes)
+			foreach ( $out_of_scope_programs as $p_item ) {
+				wp_update_post( [
+					'ID'          => $p_item['id'],
+					'post_status' => 'draft',
+				] );
+				update_post_meta( $p_item['id'], '_ltdh_audit_status', 'out_of_scope' );
+				update_post_meta( $p_item['id'], '_ltdh_audit_reason', $p_item['reason'] );
+				update_post_meta( $p_item['id'], '_ltdh_audited_at', $audit_timestamp );
+				WP_CLI::line( sprintf( '   [DRAFTED] Program ID %d: %s (%s)', $p_item['id'], $p_item['title'], $p_item['category'] ) );
+			}
+
+			// School transition (HCCT)
+			foreach ( $out_of_scope_schools as $s_item ) {
+				wp_update_post( [
+					'ID'          => $s_item['id'],
+					'post_status' => 'draft',
+				] );
+				update_post_meta( $s_item['id'], '_ltdh_audit_status', 'out_of_scope_institution' );
+				update_post_meta( $s_item['id'], '_ltdh_audit_reason', $s_item['reason'] );
+				update_post_meta( $s_item['id'], '_ltdh_audited_at', $audit_timestamp );
+				WP_CLI::line( sprintf( '   [DRAFTED] School ID %d: %s (%s)', $s_item['id'], $s_item['title'], $s_item['category'] ) );
+			}
+
+			// Flush transients
+			WP_CLI::log( "\n6. Đang làm mới Transients và bộ nhớ đệm..." );
+			foreach ( $flushed_transients as $transient_key ) {
+				delete_transient( $transient_key );
+			}
+			delete_option( 'ltdh_rewrite_flushed_v2' );
+			WP_CLI::line( '   Đã xoá transients: ' . implode( ', ', $flushed_transients ) );
+		} else {
+			WP_CLI::log( "\n5. [DRY-RUN] Sẽ chuyển đổi 5 program và 1 trường sang draft (chưa thực hiện)." );
+			WP_CLI::log( "6. [DRY-RUN] Sẽ làm mới transients sau khi áp dụng." );
+		}
+
+		// ----------------------------------------------------
+		// 7. Verify Database Counts After Action
+		// ----------------------------------------------------
+		$prog_counts_after   = (array) wp_count_posts( 'program' );
+		$school_counts_after = (array) wp_count_posts( 'school' );
+		$major_counts_after  = (array) wp_count_posts( 'major' );
+
+		// ----------------------------------------------------
+		// 8. Generate and Write Audit Report JSON
+		// ----------------------------------------------------
+		WP_CLI::log( "\n7. Đang xuất tài liệu báo cáo kiểm toán JSON..." );
+
+		$report_data = [
+			'audit_version'       => '1.0.0',
+			'generated_at'        => $audit_timestamp,
+			'mode'                => $mode,
+			'output_file'         => $output_file,
+			'summary'             => [
+				'programs' => [
+					'total_scanned'            => $total_programs_scanned,
+					'in_scope_total'           => count( $in_scope_programs ),
+					'in_scope_tu_xa'           => $count_tu_xa,
+					'in_scope_vua_hoc_vua_lam' => $count_vhvl,
+					'out_of_scope_total'       => count( $out_of_scope_programs ),
+					'out_of_scope_college'     => $count_college,
+					'out_of_scope_fulltime'    => $count_fulltime,
+					'out_of_scope_vb2'         => $count_vb2,
+					'manual_review'            => count( $manual_review_programs ),
+					'post_status_before'       => [
+						'publish' => (int) ( $prog_counts_before['publish'] ?? 0 ),
+						'draft'   => (int) ( $prog_counts_before['draft'] ?? 0 ),
+						'trash'   => (int) ( $prog_counts_before['trash'] ?? 0 ),
+					],
+					'post_status_target'       => [
+						'publish' => count( $in_scope_programs ),
+						'draft'   => count( $out_of_scope_programs ),
+						'trash'   => 0,
+					],
+					'post_status_after'        => [
+						'publish' => (int) ( $prog_counts_after['publish'] ?? 0 ),
+						'draft'   => (int) ( $prog_counts_after['draft'] ?? 0 ),
+						'trash'   => (int) ( $prog_counts_after['trash'] ?? 0 ),
+					],
+				],
+				'schools'  => [
+					'total_scanned'      => $total_schools_scanned,
+					'in_scope_total'     => count( $in_scope_schools ),
+					'out_of_scope_total' => count( $out_of_scope_schools ),
+					'post_status_before' => [
+						'publish' => (int) ( $school_counts_before['publish'] ?? 0 ),
+						'draft'   => (int) ( $school_counts_before['draft'] ?? 0 ),
+						'trash'   => (int) ( $school_counts_before['trash'] ?? 0 ),
+					],
+					'post_status_target' => [
+						'publish' => count( $in_scope_schools ),
+						'draft'   => count( $out_of_scope_schools ),
+						'trash'   => 0,
+					],
+					'post_status_after'  => [
+						'publish' => (int) ( $school_counts_after['publish'] ?? 0 ),
+						'draft'   => (int) ( $school_counts_after['draft'] ?? 0 ),
+						'trash'   => (int) ( $school_counts_after['trash'] ?? 0 ),
+					],
+				],
+				'majors'   => [
+					'total_scanned'      => $total_majors_scanned,
+					'in_scope_total'     => count( $in_scope_majors ),
+					'out_of_scope_total' => 0,
+					'post_status_before' => [
+						'publish' => (int) ( $major_counts_before['publish'] ?? 0 ),
+						'draft'   => (int) ( $major_counts_before['draft'] ?? 0 ),
+						'trash'   => (int) ( $major_counts_before['trash'] ?? 0 ),
+					],
+					'post_status_target' => [
+						'publish' => count( $in_scope_majors ),
+						'draft'   => 0,
+						'trash'   => 0,
+					],
+					'post_status_after'  => [
+						'publish' => (int) ( $major_counts_after['publish'] ?? 0 ),
+						'draft'   => (int) ( $major_counts_after['draft'] ?? 0 ),
+						'trash'   => (int) ( $major_counts_after['trash'] ?? 0 ),
+					],
+				],
+				'metadata_cleanup' => [
+					'entities_scanned'          => count( $all_entities ),
+					'entities_modified'         => count( $metadata_modifications ),
+					'orphaned_ghost_ids_pruned' => $pruned_ghost_ids_unique,
+					'drafted_prog_ids_pruned'   => $pruned_drafted_ids_unique,
+				],
+				'transients_flushed' => $flushed_transients,
+			],
+			'out_of_scope_programs' => $out_of_scope_programs,
+			'out_of_scope_schools'  => $out_of_scope_schools,
+			'metadata_modifications'=> $metadata_modifications,
+			'in_scope_programs'     => array_map( function( $p ) {
+				return [
+					'id'            => $p['id'],
+					'title'         => $p['title'],
+					'school'        => $p['school_name'],
+					'major'         => $p['major_name'],
+					'category'      => $p['category'],
+					'training_types'=> $p['training_type_names'],
+				];
+			}, $in_scope_programs ),
+		];
+
+		$json_content = wp_json_encode( $report_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		if ( false !== file_put_contents( $output_file, $json_content ) ) {
+			WP_CLI::success( sprintf( 'Báo cáo kiểm toán đã được lưu thành công tại: %s', $output_file ) );
+		} else {
+			WP_CLI::warning( sprintf( 'Không thể ghi file báo cáo tại: %s', $output_file ) );
+		}
+
+		if ( $is_apply ) {
+			WP_CLI::success( 'Hoàn tất áp dụng kiểm toán dữ liệu và chuẩn hoá phạm vi Liên thông thành công!' );
+		} else {
+			WP_CLI::success( 'Hoàn tất mô phỏng kiểm toán! Hãy chạy với cờ --apply để thực thi thay đổi.' );
+		}
+	}
 }
 
 WP_CLI::add_command( 'ltdh', 'LTDH_CLI_Commands' );
+WP_CLI::add_command( 'ltdh audit-data', [ new LTDH_CLI_Commands(), 'audit_data' ] );
+

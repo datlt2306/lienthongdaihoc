@@ -27,6 +27,7 @@ if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 }
 
 $global_zalo = ltdh_get_zalo_url();
+$zalo_group  = get_field( 'zalo_group_url', $school_id ) ?: get_field( 'school_zalo_group', $school_id ) ?: $global_zalo;
 
 // Dynamically construct sticky navigation tabs for School
 $school_tabs = [];
@@ -74,15 +75,7 @@ if ( ! empty( $contact ) ) {
 <main id="primary" class="site-main bg-slate-50">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
 		<?php 
-		$banner_image = get_field( 'school_banner', $school_id ) ?: get_the_post_thumbnail_url( $school_id, 'full' );
-		if ( empty( $banner_image ) ) {
-			$post_slug = get_post_field( 'post_name', $school_id );
-			if ( false !== strpos( $post_slug, 'giao-thong' ) || false !== strpos( $post_slug, 'gtvt' ) || false !== stripos( $school_title, 'giao thông' ) ) {
-				$banner_image = get_template_directory_uri() . '/assets/images/banner-hero-03-dhgtvt.webp';
-			} else {
-				$banner_image = get_template_directory_uri() . '/assets/images/banner-school.jpg';
-			}
-		}
+		$banner_image = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'full' ) : ( get_field( 'school_banner', $school_id ) ?: get_template_directory_uri() . '/assets/images/banner-school.jpg' );
 		if ( $banner_image ) : 
 		?>
 			<!-- School Cover/Banner Image inside container -->
@@ -376,30 +369,49 @@ if ( ! empty( $contact ) ) {
 						],
 					];
 
+					$tax_training_type_filter = [
+						'taxonomy' => LTDH_TAX_TRAINING_TYPE,
+						'field'    => 'slug',
+						'terms'    => [ 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ],
+						'operator' => 'IN',
+					];
+
 					if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 						$programs_query = new WP_Query( [
-							'post_type' => 'program',
-							'post__in'  => $offered_program_ids,
-							'post_status' => 'publish',
-							'meta_query' => [
+							'post_type'      => 'program',
+							'post__in'       => $offered_program_ids,
+							'post_status'    => 'publish',
+							'posts_per_page' => -1,
+							'no_found_rows'  => true,
+							'tax_query'      => [
+								$tax_training_type_filter,
+							],
+							'meta_query'     => [
 								'relation' => 'AND',
 								$meta_status_filter,
 							],
 						] );
-					} else {
-						// Fallback query if meta relationships don't exist yet
+					}
+
+					if ( empty( $programs_query ) || ! $programs_query->have_posts() ) {
+						// Fallback query if meta relationships don't exist yet or yielded no published programs
 						$programs_query = new WP_Query( [
-							'post_type' => 'program',
-							'meta_query' => [
+							'post_type'      => 'program',
+							'post_status'    => 'publish',
+							'posts_per_page' => -1,
+							'no_found_rows'  => true,
+							'tax_query'      => [
+								$tax_training_type_filter,
+							],
+							'meta_query'     => [
 								'relation' => 'AND',
 								[
-									'key' => LTDH_META_SCHOOL_REL,
-									'value' => $school_id,
-									'compare' => '='
+									'key'     => LTDH_META_SCHOOL_REL,
+									'value'   => $school_id,
+									'compare' => '=',
 								],
 								$meta_status_filter,
 							],
-							'posts_per_page' => 10
 						] );
 					}
 
@@ -438,14 +450,17 @@ if ( ! empty( $contact ) ) {
 							}
 							$types = wp_get_post_terms( $prog_id, 'training_type' );
 							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
+							$clean_type_name = preg_replace( '/^hệ\s+/iu', '', trim( $type_name ) );
+							$clean_major_name = preg_replace( '/^ngành\s+/iu', '', trim( $major_name ) );
+							$opportunity_title = 'Liên thông ngành ' . $clean_major_name . ( $clean_type_name ? ' - ' . $clean_type_name : '' );
 							$tuition_fee = ltdh_get_program_tuition_display( $prog_id );
 							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
 							$permalink = get_permalink( $prog_id );
 
 							// Determine badge classes based on training type name
 							$badge_class = 'bg-orange-50 text-orange-600 border border-orange-100';
-							if ( $type_name ) {
-								$type_name_lower = mb_strtolower( trim( $type_name ), 'UTF-8' );
+							if ( $clean_type_name ) {
+								$type_name_lower = mb_strtolower( trim( $clean_type_name ), 'UTF-8' );
 								if ( false !== strpos( $type_name_lower, 'chính quy' ) ) {
 									$badge_class = 'bg-blue-50 text-blue-600 border border-blue-100';
 								} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
@@ -458,15 +473,16 @@ if ( ! empty( $contact ) ) {
 							$academic_year = get_field( 'tuition_academic_year', $prog_id ) ?: '2025 - 2026';
 
 							$majors_data[ $major_key ]['programs'][] = [
-								'id'            => $prog_id,
-								'title'         => $clean_title,
-								'status'        => $status,
-								'type_name'     => $type_name,
-								'badge_class'   => $badge_class,
-								'tuition_fee'   => $tuition_fee,
-								'academic_year' => $academic_year,
-								'duration'      => $duration,
-								'permalink'     => $permalink,
+								'id'                => $prog_id,
+								'title'             => $clean_title,
+								'opportunity_title' => $opportunity_title,
+								'status'            => $status,
+								'type_name'         => $clean_type_name,
+								'badge_class'       => $badge_class,
+								'tuition_fee'       => $tuition_fee,
+								'academic_year'     => $academic_year,
+								'duration'          => $duration,
+								'permalink'         => $permalink,
 							];
 						}
 						wp_reset_postdata();
@@ -498,7 +514,7 @@ if ( ! empty( $contact ) ) {
 									<!-- Programs Offered under this Major -->
 									<div class="border-t border-slate-100 pt-3">
 										<div class="flex items-center justify-between gap-2 mb-2.5">
-											<div class="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Hệ đào tạo:</div>
+											<div class="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Hình thức đào tạo:</div>
 											<?php 
 											$header_year = ! empty( $major['programs'][0]['academic_year'] ) ? $major['programs'][0]['academic_year'] : '2025 - 2026';
 											?>
@@ -517,15 +533,22 @@ if ( ! empty( $contact ) ) {
 																</span>
 															</div>
 														<?php endif; ?>
-														<div class="flex flex-col sm:flex-row sm:items-center gap-x-5 gap-y-0.5 text-slate-600 min-w-0 flex-1">
-															<span class="inline-flex items-center gap-1 shrink-0">
-																<span class="text-slate-400">⏱</span>
-																<span>Thời gian: <strong class="font-semibold text-slate-800"><?php echo esc_html( $prog['duration'] ); ?></strong></span>
-															</span>
-															<span class="hidden sm:inline text-slate-200">|</span>
-															<span class="inline-flex items-center gap-1 min-w-0">
-																<span>Học phí: <strong class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></strong></span>
-															</span>
+														<div class="min-w-0 flex-1">
+															<h5 class="font-bold text-slate-800 text-xs sm:text-sm hover:text-brand-primary truncate leading-snug">
+																<a href="<?php echo esc_url( $prog['permalink'] ); ?>">
+																	<?php echo esc_html( $prog['opportunity_title'] ); ?>
+																</a>
+															</h5>
+															<div class="flex flex-col sm:flex-row sm:items-center gap-x-5 gap-y-0.5 text-slate-600 min-w-0 flex-1 mt-0.5">
+																<span class="inline-flex items-center gap-1 shrink-0">
+																	<span class="text-slate-400">⏱</span>
+																	<span>Thời gian: <strong class="font-semibold text-slate-800"><?php echo esc_html( $prog['duration'] ); ?></strong></span>
+																</span>
+																<span class="hidden sm:inline text-slate-200">|</span>
+																<span class="inline-flex items-center gap-1 min-w-0">
+																	<span>Học phí: <strong class="font-bold text-brand-primary"><?php echo esc_html( $prog['tuition_fee'] ); ?></strong></span>
+																</span>
+															</div>
 														</div>
 													</div>
 													<div class="shrink-0 ml-1 sm:ml-3">
@@ -556,13 +579,9 @@ if ( ! empty( $contact ) ) {
 										<div class="space-y-1 flex-1 min-w-0">
 											<div class="flex items-center gap-2 flex-wrap">
 												<h4 class="font-bold text-slate-800 text-sm sm:text-base hover:text-[#00308b] transition-colors leading-snug">
-													<?php if ( $major['id'] ) : ?>
-														<a href="<?php echo esc_url( get_permalink( $major['id'] ) ); ?>">
-															<?php echo esc_html( $prog['title'] ); ?>
-														</a>
-													<?php else : ?>
-														<span class="font-semibold text-slate-700"><?php echo esc_html( $prog['title'] ); ?></span>
-													<?php endif; ?>
+													<a href="<?php echo esc_url( $prog['permalink'] ); ?>">
+														<?php echo esc_html( $prog['opportunity_title'] ); ?>
+													</a>
 												</h4>
 												<?php if ( $prog['type_name'] ) : ?>
 													<span class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">

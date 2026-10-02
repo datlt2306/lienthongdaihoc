@@ -71,9 +71,9 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 					</div>
 				</div>
 
-				<!-- Hệ đào tạo mong muốn -->
+				<!-- Hình thức đào tạo mong muốn -->
 				<div class="space-y-2">
-					<label class="block text-sm font-bold text-slate-700">Hệ đào tạo mong muốn</label>
+					<label class="block text-sm font-bold text-slate-700">Hình thức đào tạo mong muốn</label>
 					<select name="training_type" class="elig-select">
 						<option value="">Chưa xác định / Gợi ý cho tôi</option>
 						<?php 

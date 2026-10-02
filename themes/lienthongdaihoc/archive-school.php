@@ -67,7 +67,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						</svg>
 					</span>
 					<div>
-						<h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Trường đại học nổi bật</h2>
+						<h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Trường đối tác nổi bật</h2>
 						<p class="text-sm text-slate-500 mt-0.5">Các trường đại học đối tác tuyển sinh hàng đầu với chất lượng đào tạo vượt trội.</p>
 					</div>
 				</div>
@@ -96,7 +96,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						}
 					?>
 						<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group<?php echo $grid_span_class ? ' ' . esc_attr( $grid_span_class ) : ''; ?>">
-							<div class="relative h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'large' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');">
+							<div class="relative h-40 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'large' ) : ( get_the_post_thumbnail_url( $school_id, 'large' ) ?: ltdh_get_fallback_image( 'school' ) ) ); ?>');">
 								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-slate-900/20 to-transparent"></div>
 								<span class="absolute top-3 left-3 bg-brand-accent text-white text-xs font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider shadow-sm z-10 flex items-center gap-1">
 									⭐️ Nổi bật
@@ -105,7 +105,12 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 							<!-- Floating Logo -->
 							<div class="h-16 w-16 bg-white rounded-xl border-4 border-white shadow-md -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden p-1 transition-transform group-hover:scale-105 duration-300">
-								<?php if ( $logo_id ) : ?>
+								<?php
+								$school_logo_url = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'thumbnail' ) : '';
+								if ( ! empty( $school_logo_url ) ) :
+								?>
+									<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( get_the_title( $school_id ) ); ?>" class="h-full w-full object-contain p-0.5">
+								<?php elseif ( $logo_id ) : ?>
 									<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
 								<?php else : ?>
 									<span class="font-display font-extrabold text-brand-primary text-sm">UNI</span>
@@ -211,10 +216,15 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						}
 				?>
 					<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between<?php echo $grid_span_class ? ' ' . esc_attr( $grid_span_class ) : ''; ?>">
-						<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
+						<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ) ); ?>');"></div>
 
 						<div class="h-12 w-12 md:h-16 md:w-16 bg-white rounded-lg border-2 md:border-4 border-white shadow-md bg-white -mt-6 md:-mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
-							<?php if ( $logo_id ) : ?>
+							<?php
+							$school_logo_url = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'thumbnail' ) : '';
+							if ( ! empty( $school_logo_url ) ) :
+							?>
+								<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( get_the_title( $school_id ) ); ?>" class="h-full w-full object-contain p-0.5">
+							<?php elseif ( $logo_id ) : ?>
 								<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
 							<?php else : ?>
 								<span class="font-display font-extrabold text-brand-primary text-xs">UNI</span>
@@ -303,7 +313,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 				?>
 				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
 					<div class="flex flex-col sm:flex-row items-stretch">
-						<div class="sm:w-36 h-32 sm:h-auto bg-cover bg-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-100" style="background-image: url('<?php echo esc_url( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
+						<div class="sm:w-36 h-32 sm:h-auto bg-cover bg-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-100" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
 						<div class="flex-1 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
 							<div class="flex-1 min-w-0">
 								<div class="flex items-center gap-2">

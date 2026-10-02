@@ -91,10 +91,10 @@ function ltdh_compare_should_load() {
 		return false;
 	}
 	$request_uri = $_SERVER['REQUEST_URI'] ?? '';
-	if ( strpos( $request_uri, '/he-dao-tao' ) !== false || strpos( $request_uri, '/so-sanh' ) !== false ) {
+	if ( strpos( $request_uri, '/hinh-thuc-dao-tao' ) !== false || strpos( $request_uri, '/he-dao-tao' ) !== false || strpos( $request_uri, '/so-sanh' ) !== false ) {
 		return true;
 	}
-	return is_post_type_archive( 'program' ) || is_singular( 'program' ) || is_tax( 'training_type' ) || is_tax( 'major' ) || is_search() || is_page_template( 'template-search.php' ) || is_page( 'he-dao-tao' );
+	return is_post_type_archive( 'program' ) || is_singular( 'program' ) || is_tax( 'training_type' ) || is_tax( 'major' ) || is_search() || is_page_template( 'template-search.php' ) || is_page( 'hinh-thuc-dao-tao' ) || is_page( 'he-dao-tao' );
 }
 
 /**

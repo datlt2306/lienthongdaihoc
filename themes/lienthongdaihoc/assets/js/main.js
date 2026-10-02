@@ -85,7 +85,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
     // 3. Program Search & AJAX Filtering
     // ----------------------------------------------------
-    const filterForm = document.querySelector('form[action*="/chuong-trinh/"], form[action*="/he-dao-tao/"]');
+    // Clean empty GET form controls on submit to prevent dirty URLs like ?s=&truong=abc&nganh=&sort=
+    document.querySelectorAll('form[method="GET"], form[method="get"]').forEach(form => {
+        form.addEventListener('submit', () => {
+            form.querySelectorAll('input, select').forEach(input => {
+                if (!input.value || input.value.trim() === '') {
+                    input.disabled = true;
+                }
+            });
+        });
+    });
+
+    const filterForm = document.querySelector('form[action*="/chuong-trinh/"], form[action*="/he-dao-tao/"], form[action*="/hinh-thuc-dao-tao/"]');
     const container = document.getElementById('program-results-container');
 
     if (filterForm && container) {
@@ -111,14 +122,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Intercept Reset button clicks
-        const resetBtn = filterForm.querySelector('a[href*="/chuong-trinh/"], a[href*="/he-dao-tao/"]');
+        const resetBtn = document.querySelector('.js-ltdh-reset-filter');
         if (resetBtn) {
             resetBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 filterForm.reset();
                 filterForm.querySelectorAll('input').forEach(el => el.value = '');
                 filterForm.querySelectorAll('select').forEach(el => el.value = '');
-                triggerFilter();
+                window.location.href = resetBtn.href;
             });
         }
 

@@ -49,7 +49,7 @@ function ltdh_compare_template_redirect() {
 	}
 
 	$ids = ltdh_compare_resolve_ids_from_slug( $type, $slug );
-	if ( empty( $ids ) || count( $ids ) < 2 ) {
+	if ( empty( $ids ) || count( $ids ) < 1 ) {
 		global $wp_query;
 		$wp_query->set_404();
 		status_header( 404 );
@@ -74,7 +74,7 @@ function ltdh_compare_template_redirect() {
 function ltdh_compare_resolve_ids_from_slug( $type, $slug ) {
 	// Split on -vs- separator
 	$parts = preg_split( '/-vs-/', $slug, -1, PREG_SPLIT_NO_EMPTY );
-	if ( count( $parts ) < 2 ) {
+	if ( count( $parts ) < 1 ) {
 		return [];
 	}
 
@@ -165,16 +165,19 @@ function ltdh_compare_resolve_program( $program_id ) {
 	$training_terms = wp_get_post_terms( $program_id, 'training_type' );
 	$training_type  = ( ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ) ? $training_terms[0]->name : '';
 
+	$learning_details = ltdh_get_program_learning_details( $program_id );
+
 	$campus_terms = wp_get_post_terms( $program_id, 'campus' );
 	$campus_names = [];
 	if ( ! is_wp_error( $campus_terms ) && ! empty( $campus_terms ) ) {
 		foreach ( $campus_terms as $term ) {
+			if ( 'online' === strtolower( $term->slug ) || 'online' === strtolower( trim( $term->name ) ) ) {
+				continue;
+			}
 			$campus_names[] = $term->name;
 		}
 	}
-	$campus_name = ! empty( $campus_names ) ? implode( ', ', $campus_names ) : '';
-
-	$learning_details = ltdh_get_program_learning_details( $program_id );
+	$campus_name = ! empty( $campus_names ) ? implode( ', ', $campus_names ) : $learning_details['campus'];
 
 	$tuition_str  = get_field( 'tuition_fee', $program_id ) ?: '';
 	$duration_str = get_field( 'duration', $program_id ) ?: '';
@@ -249,25 +252,24 @@ function ltdh_compare_parse_tuition( $str ) {
 		return 0;
 	}
 
-	// Remove non-numeric chars except dots, commas, hyphens
-	$clean = preg_replace( '/[^\d.,\-]/', '', $str );
+	$lower = mb_strtolower( $str, 'UTF-8' );
 
-	// If it's a range like "900,000 - 1,500,000", take the min
-	if ( preg_match( '/(\d[\d.,]*)\s*-\s*(\d[\d.,]*)/', $clean, $m ) ) {
-		$clean = $m[1];
+	// If it's a range like "900,000 - 1,500,000", take the min part
+	if ( preg_match( '/([0-9.,\s]+(?:triệu|tr)?)\s*-\s*([0-9.,\s]+(?:triệu|tr)?)/i', $str, $m ) ) {
+		$lower = mb_strtolower( trim( $m[1] ), 'UTF-8' );
+		$str   = trim( $m[1] );
 	}
 
-	// Handle Vietnamese number format: 1.200.000 (dots as thousands separator)
-	// Remove dots if there are multiple (thousands separator)
-	if ( preg_match_all( '/\./', $clean ) > 1 ) {
-		$clean = str_replace( '.', '', $clean );
+	// Handle "triệu" or "tr" multiplier (e.g. 1.5 triệu, 1,5tr)
+	if ( preg_match( '/(\d+(?:[.,]\d+)?)\s*(?:triệu|tr)/u', $lower, $m ) ) {
+		$num = str_replace( ',', '.', $m[1] );
+		return (float) $num * 1000000;
 	}
 
-	// Remove commas
-	$clean = str_replace( ',', '', $clean );
-	$clean = trim( $clean );
+	// In Vietnamese VND tuition strings, dots and commas are thousands separators
+	$clean = preg_replace( '/[^\d]/', '', $str );
 
-	if ( is_numeric( $clean ) ) {
+	if ( is_numeric( $clean ) && $clean !== '' ) {
 		return (float) $clean;
 	}
 
@@ -276,7 +278,7 @@ function ltdh_compare_parse_tuition( $str ) {
 
 /**
  * Parse duration string to numeric years for comparison.
- * Handles: "1.5 - 2 năm", "2 năm", "18 tháng"
+ * Handles: "1.5 - 3 năm", "Tối thiểu 1.5 năm", "Khoảng 2 năm", "18 tháng", "18 - 24 tháng"
  */
 function ltdh_compare_parse_duration( $str ) {
 	if ( empty( $str ) ) {
@@ -285,26 +287,28 @@ function ltdh_compare_parse_duration( $str ) {
 
 	$lower = mb_strtolower( $str, 'UTF-8' );
 
-	// Check for months
+	// Month range "18 - 24 tháng"
+	if ( preg_match( '/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*tháng/', $lower, $m ) ) {
+		$avg_m = ( (float) $m[1] + (float) $m[2] ) / 2;
+		return round( $avg_m / 12, 2 );
+	}
+
+	// Single month "18 tháng"
 	if ( preg_match( '/(\d+(?:\.\d+)?)\s*tháng/', $lower, $m ) ) {
-		$months = (float) $m[1];
-		if ( preg_match( '/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*tháng/', $lower, $r ) ) {
-			$months = (float) $r[1];
-		}
-		return round( $months / 12, 1 );
+		return round( (float) $m[1] / 12, 2 );
 	}
 
-	// Check for range "1.5 - 2 năm"
+	// Year range "1.5 - 3 năm" -> calculate midpoint / average duration
 	if ( preg_match( '/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*năm/', $lower, $m ) ) {
-		return (float) $m[1];
+		return ( (float) $m[1] + (float) $m[2] ) / 2;
 	}
 
-	// Single year value
+	// Single year value "Tối thiểu 1.5 năm", "Khoảng 2 năm", "2.0 năm"
 	if ( preg_match( '/(\d+(?:\.\d+)?)\s*năm/', $lower, $m ) ) {
 		return (float) $m[1];
 	}
 
-	// Plain number
+	// Plain number fallback
 	if ( preg_match( '/(\d+(?:\.\d+)?)/', $str, $m ) ) {
 		return (float) $m[1];
 	}
@@ -357,11 +361,13 @@ function ltdh_compare_compute_highlights( $type, $items ) {
 		if ( count( $tuitions ) >= 2 ) {
 			$min = min( $tuitions );
 			$best = array_keys( $tuitions, $min, true );
-			$highlights['tuition_fee'] = [
-				'best_ids' => $best,
-				'value'    => $min,
-				'label'    => 'Học phí thấp nhất',
-			];
+			if ( count( $best ) < count( $tuitions ) ) {
+				$highlights['tuition_fee'] = [
+					'best_ids' => $best,
+					'value'    => $min,
+					'label'    => 'Học phí thấp nhất',
+				];
+			}
 		}
 
 		// Shortest duration
@@ -374,11 +380,13 @@ function ltdh_compare_compute_highlights( $type, $items ) {
 		if ( count( $durations ) >= 2 ) {
 			$min = min( $durations );
 			$best = array_keys( $durations, $min, true );
-			$highlights['duration'] = [
-				'best_ids' => $best,
-				'value'    => $min,
-				'label'    => 'Thời gian ngắn nhất',
-			];
+			if ( count( $best ) < count( $durations ) ) {
+				$highlights['duration'] = [
+					'best_ids' => $best,
+					'value'    => $min,
+					'label'    => 'Thời gian ngắn nhất',
+				];
+			}
 		}
 
 		// Latest enrollment deadline
@@ -391,11 +399,13 @@ function ltdh_compare_compute_highlights( $type, $items ) {
 		if ( count( $deadlines ) >= 2 ) {
 			$max = max( $deadlines );
 			$best = array_keys( $deadlines, $max, true );
-			$highlights['enrollment_period'] = [
-				'best_ids' => $best,
-				'value'    => $max,
-				'label'    => 'Hạn muộn nhất',
-			];
+			if ( count( $best ) < count( $deadlines ) ) {
+				$highlights['enrollment_period'] = [
+					'best_ids' => $best,
+					'value'    => $max,
+					'label'    => 'Hạn muộn nhất',
+				];
+			}
 		}
 	}
 
@@ -411,11 +421,13 @@ function ltdh_compare_compute_highlights( $type, $items ) {
 		if ( count( $ratings ) >= 2 ) {
 			$max = max( $ratings );
 			$best = array_keys( $ratings, $max, true );
-			$highlights['rating'] = [
-				'best_ids' => $best,
-				'value'    => $max,
-				'label'    => 'Đánh giá cao nhất',
-			];
+			if ( count( $best ) < count( $ratings ) ) {
+				$highlights['rating'] = [
+					'best_ids' => $best,
+					'value'    => $max,
+					'label'    => 'Đánh giá cao nhất',
+				];
+			}
 		}
 
 		// Most programs
@@ -428,11 +440,13 @@ function ltdh_compare_compute_highlights( $type, $items ) {
 		if ( count( $counts ) >= 2 ) {
 			$max = max( $counts );
 			$best = array_keys( $counts, $max, true );
-			$highlights['programs_count'] = [
-				'best_ids' => $best,
-				'value'    => $max,
-				'label'    => 'Nhiều chương trình nhất',
-			];
+			if ( count( $best ) < count( $counts ) ) {
+				$highlights['programs_count'] = [
+					'best_ids' => $best,
+					'value'    => $max,
+					'label'    => 'Nhiều chương trình nhất',
+				];
+			}
 		}
 
 		// Lowest starting tuition
@@ -445,11 +459,13 @@ function ltdh_compare_compute_highlights( $type, $items ) {
 		if ( count( $tuitions ) >= 2 ) {
 			$min = min( $tuitions );
 			$best = array_keys( $tuitions, $min, true );
-			$highlights['tuition_min'] = [
-				'best_ids' => $best,
-				'value'    => $min,
-				'label'    => 'Học phí thấp nhất',
-			];
+			if ( count( $best ) < count( $tuitions ) ) {
+				$highlights['tuition_min'] = [
+					'best_ids' => $best,
+					'value'    => $min,
+					'label'    => 'Học phí thấp nhất',
+				];
+			}
 		}
 	}
 
@@ -481,6 +497,89 @@ function ltdh_compare_field( $value, $is_html = false ) {
 		return '<div class="prose prose-sm prose-slate max-w-none">' . wp_kses_post( $value ) . '</div>';
 	}
 	return esc_html( $value );
+}
+
+/**
+ * Render text or HTML content as a clean, minimalist checklist with checkmarks.
+ */
+function ltdh_compare_format_checklist( $value ) {
+	if ( empty( $value ) || $value === '<p></p>' || $value === '<p>\n</p>' ) {
+		return '<span class="text-slate-300 italic text-xs">Chưa cập nhật</span>';
+	}
+
+	// 1. If HTML, replace block endings with newlines
+	if ( strpos( $value, '<' ) !== false ) {
+		$value = preg_replace( '/<\/(p|li|div|tr|h[1-6])>/i', "\n", $value );
+		$value = preg_replace( '/<br\s*\/?>/i', "\n", $value );
+		$value = wp_strip_all_tags( $value );
+	}
+
+	// 2. Separate sentences ending with dot followed immediately by uppercase letter
+	$value = preg_replace_callback( '/\.\s*([A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴÝỶỸ])/u', function( $m ) {
+		return ".\n" . $m[1];
+	}, $value );
+
+	// 3. Split by newlines, semi-colons
+	$raw_lines = preg_split( '/[\r\n;]+/', $value );
+	$items = [];
+
+	foreach ( $raw_lines as $line ) {
+		$line = trim( $line );
+		if ( empty( $line ) ) {
+			continue;
+		}
+
+		// Check if line is a comma-separated list of short items (not inside parens)
+		if ( strpos( $line, ',' ) !== false && ! preg_match( '/\b(và|hoặc|trong|thông|theo|nếu|tại)\b/ui', $line ) && strpos( $line, '(' ) === false ) {
+			$sub_parts = explode( ',', $line );
+			$is_short_list = true;
+			foreach ( $sub_parts as $sp ) {
+				if ( mb_strlen( trim( $sp ) ) > 45 ) {
+					$is_short_list = false;
+					break;
+				}
+			}
+			if ( $is_short_list && count( $sub_parts ) >= 2 ) {
+				foreach ( $sub_parts as $sp ) {
+					$clean_sp = trim( $sp, " \t\n\r\0\x0B.,•-*+:" );
+					if ( ! empty( $clean_sp ) ) {
+						$items[] = $clean_sp;
+					}
+				}
+				continue;
+			}
+		}
+
+		// Clean leading bullets/numbers/dashes
+		$clean_line = preg_replace( '/^[\s•\-*+✓✔\d+\.\)\:]+/u', '', $line );
+		$clean_line = trim( $clean_line );
+
+		if ( ! empty( $clean_line ) ) {
+			$items[] = $clean_line;
+		}
+	}
+
+	if ( empty( $items ) ) {
+		return '<span class="text-slate-300 italic text-xs">Chưa cập nhật</span>';
+	}
+
+	// Limit items to max 5 for a minimalist clean look
+	$display_items = array_slice( $items, 0, 5 );
+
+	$html = '<ul class="space-y-1.5 text-left text-xs leading-relaxed text-slate-700 font-medium">';
+	foreach ( $display_items as $item ) {
+		$item_text = esc_html( rtrim( $item, '.' ) );
+		$html .= '<li class="flex items-start gap-1.5">';
+		$html .= '<span class="text-emerald-500 font-bold shrink-0 mt-0.5 text-xs">✓</span>';
+		$html .= '<span class="flex-1">' . $item_text . '</span>';
+		$html .= '</li>';
+	}
+	if ( count( $items ) > 5 ) {
+		$html .= '<li class="text-[11px] text-slate-400 italic pt-0.5">+ ' . ( count( $items ) - 5 ) . ' chi tiết khác</li>';
+	}
+	$html .= '</ul>';
+
+	return $html;
 }
 
 // ----------------------------------------------------
@@ -537,7 +636,7 @@ function ltdh_compare_rest_get_items( $request ) {
 		}
 	}
 
-	if ( count( $items ) < 2 ) {
+	if ( count( $items ) < 1 ) {
 		return new WP_Error( 'not_found', 'Could not find enough valid items', [ 'status' => 404 ] );
 	}
 

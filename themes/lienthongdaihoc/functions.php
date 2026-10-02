@@ -49,10 +49,9 @@ require_once __DIR__ . '/inc/comparison.php';
 require_once __DIR__ . '/inc/eligibility.php';
 require_once __DIR__ . '/inc/eligibility-rules.php';
 
-// ----------------------------------------------------
-// 6. SEO: Rank Math Integration
-// ----------------------------------------------------
-require_once __DIR__ . '/inc/seo/class-rankmath-integration.php';
+if ( file_exists( __DIR__ . '/inc/seo/class-rankmath-integration.php' ) ) {
+	require_once __DIR__ . '/inc/seo/class-rankmath-integration.php';
+}
 
 // ----------------------------------------------------
 // 7. CLI: WP-CLI Commands

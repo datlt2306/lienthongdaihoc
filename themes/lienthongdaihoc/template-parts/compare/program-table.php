@@ -21,15 +21,34 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 				<?php foreach ( $items as $item ) :
 					$school_name = $item['school'] ? $item['school']['title'] : '';
 				?>
-				<th class="<?php echo esc_attr( $col_width ); ?> p-4 text-center border-b border-slate-100 bg-slate-50">
-					<div class="flex flex-col items-center gap-2">
-						<img src="<?php echo esc_url( $item['thumbnail'] ); ?>"
-							 alt="<?php echo esc_attr( $item['title'] ); ?>"
-							 class="h-16 w-24 object-cover rounded-lg border border-slate-200">
-						<?php if ( $item['school'] && $item['school']['logo'] ) : ?>
-							<img src="<?php echo esc_url( $item['school']['logo'] ); ?>"
-								 alt="<?php echo esc_attr( $school_name ); ?>"
-								 class="h-8 w-8 object-cover rounded-lg border border-slate-200 -mt-4 relative z-10">
+				<th class="<?php echo esc_attr( $col_width ); ?> p-4 text-center border-b border-slate-100 bg-slate-50 relative group">
+					<button type="button"
+							class="ltdh-compare-page-remove absolute top-2 right-2 text-slate-400 hover:text-red-600 bg-white hover:bg-red-50 border border-slate-200 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-all shadow-xs z-20"
+							data-id="<?php echo esc_attr( $item['id'] ); ?>"
+							title="Xóa khỏi so sánh">
+						&times;
+					</button>
+					<div class="flex flex-col items-center gap-2 pt-2">
+						<a href="<?php echo esc_url( $item['permalink'] ); ?>" class="block group/img">
+							<img src="<?php echo esc_url( $item['thumbnail'] ); ?>"
+								 alt="<?php echo esc_attr( $item['title'] ); ?>"
+								 onerror="this.onerror=null; this.src='<?php echo esc_url( function_exists( 'ltdh_get_fallback_image' ) ? ltdh_get_fallback_image( 'program' ) : get_template_directory_uri() . '/assets/images/banner-program.jpg' ); ?>';"
+								 class="h-28 w-44 object-cover rounded-xl border border-slate-200 shadow-xs group-hover/img:shadow-md group-hover/img:scale-[1.02] transition-all">
+						</a>
+						<?php if ( $item['school'] && ! empty( $item['school']['logo'] ) ) : ?>
+							<?php if ( ! empty( $item['school']['permalink'] ) ) : ?>
+								<a href="<?php echo esc_url( $item['school']['permalink'] ); ?>" class="block relative z-10 -mt-5" title="<?php echo esc_attr( $school_name ); ?>">
+									<img src="<?php echo esc_url( $item['school']['logo'] ); ?>"
+										 alt="<?php echo esc_attr( $school_name ); ?>"
+										 onerror="this.style.display='none';"
+										 class="h-9 w-9 object-cover rounded-lg border-2 border-white bg-white shadow-xs p-0.5 hover:scale-110 transition-transform">
+								</a>
+							<?php else : ?>
+								<img src="<?php echo esc_url( $item['school']['logo'] ); ?>"
+									 alt="<?php echo esc_attr( $school_name ); ?>"
+									 onerror="this.style.display='none';"
+									 class="h-9 w-9 object-cover rounded-lg border-2 border-white bg-white shadow-xs p-0.5 -mt-5 relative z-10">
+							<?php endif; ?>
 						<?php endif; ?>
 						<div>
 							<a href="<?php echo esc_url( $item['permalink'] ); ?>" class="font-bold text-slate-900 text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
@@ -43,7 +62,15 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 								?>
 							</div>
 							<?php if ( $school_name ) : ?>
-								<span class="text-xs text-slate-400 mt-1 block"><?php echo esc_html( $school_name ); ?></span>
+								<?php if ( ! empty( $item['school'] ) && ! empty( $item['school']['permalink'] ) ) : ?>
+									<a href="<?php echo esc_url( $item['school']['permalink'] ); ?>"
+									   class="text-xs font-semibold text-slate-500 hover:text-brand-primary hover:underline mt-1.5 block transition-colors truncate max-w-[200px] mx-auto"
+									   title="<?php echo esc_attr( $school_name ); ?>">
+										🏛️ <?php echo esc_html( $school_name ); ?>
+									</a>
+								<?php else : ?>
+									<span class="text-xs text-slate-400 mt-1 block truncate max-w-[200px] mx-auto"><?php echo esc_html( $school_name ); ?></span>
+								<?php endif; ?>
 							<?php endif; ?>
 						</div>
 					</div>
@@ -63,7 +90,7 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 					}
 				],
 				[
-					'label' => 'Hệ đào tạo',
+					'label' => 'Hình thức đào tạo',
 					'key' => 'training_type',
 					'render' => function( $item ) { return esc_html( $item['training_type'] ?: 'Chưa cập nhật' ); }
 				],
@@ -93,7 +120,7 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 					'render' => function( $item ) { return esc_html( $item['schedule'] ?: 'Chưa cập nhật' ); }
 				],
 				[
-					'label' => 'Hình thức học',
+					'label' => 'Hình thức đào tạo',
 					'key' => 'learning_mode',
 					'render' => function( $item ) { return esc_html( $item['learning_mode'] ); }
 				],
@@ -105,38 +132,38 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 				[
 					'label' => 'Điều kiện xét tuyển',
 					'key' => 'admission_requirements',
-					'render' => function( $item ) { return ltdh_compare_field( wp_strip_all_tags( $item['admission_requirements'] ) ); },
-					'is_html' => false,
+					'render' => function( $item ) { return ltdh_compare_format_checklist( $item['admission_requirements'] ); },
+					'is_html' => true,
 				],
 				[
 					'label' => 'Hồ sơ cần thiết',
 					'key' => 'required_documents',
-					'render' => function( $item ) { return ltdh_compare_field( wp_strip_all_tags( $item['required_documents'] ) ); },
+					'render' => function( $item ) { return ltdh_compare_format_checklist( $item['required_documents'] ); },
+					'is_html' => true,
 				],
 				[
 					'label' => 'Đối tượng tuyển sinh',
 					'key' => 'target_students',
-					'render' => function( $item ) { return ltdh_compare_field( wp_strip_all_tags( $item['target_students'] ) ); },
+					'render' => function( $item ) { return ltdh_compare_format_checklist( $item['target_students'] ); },
+					'is_html' => true,
 				],
 				[
 					'label' => 'Giá trị bằng cấp',
 					'key' => 'diploma_value',
-					'render' => function( $item ) { return ltdh_compare_field( wp_strip_all_tags( $item['diploma_value'] ) ); },
-				],
-				[
-					'label' => 'Cơ hội việc làm',
-					'key' => 'career_opportunities',
-					'render' => function( $item ) { return ltdh_compare_field( wp_strip_all_tags( $item['career_opportunities'] ) ); },
+					'render' => function( $item ) { return ltdh_compare_format_checklist( $item['diploma_value'] ); },
+					'is_html' => true,
 				],
 				[
 					'label' => 'Ưu điểm',
 					'key' => 'advantages',
-					'render' => function( $item ) { return ltdh_compare_field( wp_strip_all_tags( $item['advantages'] ) ); },
+					'render' => function( $item ) { return ltdh_compare_format_checklist( $item['advantages'] ); },
+					'is_html' => true,
 				],
 				[
 					'label' => 'Nhược điểm',
 					'key' => 'disadvantages',
-					'render' => function( $item ) { return ltdh_compare_field( wp_strip_all_tags( $item['disadvantages'] ) ); },
+					'render' => function( $item ) { return ltdh_compare_format_checklist( $item['disadvantages'] ); },
+					'is_html' => true,
 				],
 				[
 					'label' => 'Hotline',
@@ -154,8 +181,8 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 				'Thông tin cơ bản' => array_slice( $rows, 0, 3 ),
 				'Học phí & Thời gian' => array_slice( $rows, 3, 3 ),
 				'Lịch học & Hình thức' => array_slice( $rows, 6, 3 ),
-				'Tuyển sinh' => array_slice( $rows, 9, 2 ),
-				'Nghề nghiệp & Bằng cấp' => array_slice( $rows, 11, 4 ),
+				'Tuyển sinh' => array_slice( $rows, 9, 3 ),
+				'Nghề nghiệp & Bằng cấp' => array_slice( $rows, 12, 3 ),
 				'Liên hệ' => array_slice( $rows, 15, 1 ),
 			];
 

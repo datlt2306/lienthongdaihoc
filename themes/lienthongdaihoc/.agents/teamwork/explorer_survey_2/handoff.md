@@ -1,500 +1,341 @@
-# Báo cáo Khảo sát An ninh & Tối ưu Hóa Truy vấn Cơ sở dữ liệu (Security & DB Query Audit Report)
+# BÁO CÁO KIỂM TOÁN & KHẢO SÁT TOÀN DIỆN
+# TEMPLATES, NAVIGATION, UI & FILTER ENGINE DỰ ÁN LIENTHONGDAIHOC.COM
 
-**Auditor:** teamwork_preview_explorer_survey_2 (Role: Security & DB Query Surveyor)  
-**Target Theme:** Liên Thông Đại Học (`lienthongdaihoc`)  
-**Workspace:** `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc`  
-**Report Date:** 2026-09-25  
-**Evaluation Mode:** Read-only Source Code Audit & Static Analysis  
-
----
-
-## 1. Observation (Các quan sát và Bằng chứng thực nghiệm)
-
-Toàn bộ 49 file `.php` trong theme đã được quét và phân tích tĩnh chuyên sâu. Dưới đây là bằng chứng thực tế được trích xuất trực tiếp từ mã nguồn.
-
-### 1.1. Checklist Bảo vệ Truy cập Trực tiếp (Direct File Access Guards)
-
-- **Tổng số file PHP trong theme:** 49 file (48 file giao diện/logic + 1 file script test).
-- **Số file tuân thủ guard (`defined('ABSPATH') || exit;`):** 46 file.
-- **Số file vi phạm hoặc thiếu bảo vệ:** 3 file:
-  1. `header.php:1` — Hoàn toàn không có guard `defined('ABSPATH') || exit;`. Bắt đầu trực tiếp bằng thẻ HTML:
-     ```php
-     1: <!DOCTYPE html>
-     2: <html <?php language_attributes(); ?>>
-     ```
-  2. `inc/search-engine.php:1-7` — Hoàn toàn không có guard `defined('ABSPATH') || exit;`. Bắt đầu trực tiếp bằng logic hook:
-     ```php
-     1: <?php
-     2: /**
-     3:  * Program Search Engine Filters and Logic
-     ...
-     7: add_filter( 'pre_get_posts_args_ltdh', 'ltdh_filter_program_search_query' );
-     ```
-     *Hậu quả:* Khi truy cập trực tiếp qua HTTP URL `/wp-content/themes/lienthongdaihoc/inc/search-engine.php`, PHP ném lỗi nghiêm trọng `Fatal error: Uncaught Error: Call to undefined function add_filter()`, để lộ đường dẫn file vật lý (Full Path Disclosure) và phiên bản máy chủ.
-  3. `tests/run-tests.php:1-14` — Tự động boot WordPress thông qua nạp file core `wp-load.php` mà không kiểm tra môi trường thực thi CLI:
-     ```php
-     8: $wp_load_path = dirname(__DIR__, 4) . '/wp-load.php';
-     9: if ( ! file_exists( $wp_load_path ) ) {
-     10: 	die( "Error: wp-load.php not found at $wp_load_path\n" );
-     11: }
-     12: define( 'WP_USE_THEMES', false );
-     13: require_once $wp_load_path;
-     ```
-     *Hậu quả:* Không có kiểm tra `php_sapi_name() === 'cli'` hoặc `current_user_can('manage_options')`. Bất kỳ người dùng ẩn danh nào truy cập đường dẫn web `/wp-content/themes/lienthongdaihoc/tests/run-tests.php` đều kích hoạt quá trình tự động thêm bài viết test (Post, Trường, Ngành), can thiệp taxonomy và xóa dữ liệu fixture trong database thật.
+**Người thực hiện**: Templates & UI Explorer (`explorer_survey_2`)  
+**Ngày thực hiện**: 2026-10-01  
+**Mục tiêu**: Tái cấu trúc Kiến trúc thông tin (Information Architecture), Thuật ngữ & Templates dự án `lienthongdaihoc.com` xoay quanh phạm vi duy nhất: **LIÊN THÔNG ĐẠI HỌC**.
 
 ---
 
-### 1.2. Danh mục Toàn bộ Truy vấn `$wpdb` & Đánh giá Nguy cơ SQL Injection
+## 1. OBSERVATION (Quan sát trực tiếp & Dẫn chứng mã nguồn)
 
-Hệ thống có tổng cộng 22 vị trí gọi `$wpdb` tập trung ở 5 file:
+Toàn bộ 50 file mã nguồn PHP và các tài nguyên frontend (CSS, JS) của theme đã được rà soát trực tiếp. Dưới đây là các quan sát thực tế kèm đường dẫn file và số dòng code cụ thể:
 
-| STT | File & Dòng | Phương thức gọi `$wpdb` | Nội dung câu lệnh / Mục đích | Đánh giá Nguy cơ SQLi |
-|---|---|---|---|---|
-| 1 | `inc/lead-capture.php:40` | `dbDelta( $sql )` | Tạo bảng `wp_ltdh_leads` khi active theme | **An toàn** (Schema tĩnh) |
-| 2 | `inc/lead-capture.php:125-143` | `$wpdb->insert( $table_name, [...], [formats] )` | Thêm mới lead vào CSDL | **An toàn** (Có format mapping `%s`, `%d`) |
-| 3 | `inc/eligibility.php:631-650` | `$wpdb->insert( $table, [...], [formats] )` | Lưu lượt kiểm tra điều kiện vào bảng `wp_ltdh_eligibility_checks` | **An toàn** (Có format mapping) |
-| 4 | `inc/eligibility.php:697-702` | `$wpdb->update( $table, [...], ['id' => $check_id] )` | Đánh dấu lead đã capture trong bảng checks | **An toàn** (Sử dụng API update chuẩn) |
-| 5 | `inc/eligibility.php:709-722` | `$wpdb->insert( $table, [...] )` | Fallback thêm lead mới | **An toàn** (Prepared bởi insert API) |
-| 6 | `inc/eligibility.php:763` | `$wpdb->get_row( $wpdb->prepare(...) )` | Lấy chi tiết lượt kiểm tra theo ID | **An toàn** (Prepared với `%d`) |
-| 7 | `inc/eligibility.php:791-802` | `$wpdb->insert( $table, [...] )` | Fallback tạo lead từ AJAX | **An toàn** |
-| 8 | `inc/eligibility.php:808-812` | `$wpdb->update( $table, [...], ['id' => $check_id] )` | Cập nhật trạng thái lead trong checks | **An toàn** |
-| 9 | `inc/eligibility.php:853` | `$wpdb->get_row( $wpdb->prepare(...) )` | Lấy dữ liệu lead theo `lead_id` | **An toàn** (Prepared với `%d`) |
-| 10 | `inc/eligibility.php:883-890` | `$wpdb->update( $table, [...], ['id' => $lead_id] )` | Cập nhật ghi chú và file bằng cấp | **An toàn** về SQLi, nhưng có lỗi IDOR (xem 1.3) |
-| 11 | `inc/eligibility.php:1068` | `$wpdb->delete( $table, ['id' => intval($_GET['lead_id'])] )` | Xóa đơn lẻ lead trong trang quản trị | **An toàn** (Ép kiểu `intval`) |
-| 12 | `inc/eligibility.php:1083` | `$wpdb->query( $wpdb->prepare(...) )` | Xóa hàng loạt lead | **An toàn** (Tạo mảng placeholder `%d`) |
-| 13 | `inc/eligibility.php:1129-1131` | `$wpdb->prepare( $count_query, $where_params )` | Đếm tổng số lead theo bộ lọc | **An toàn** (Sử dụng `$wpdb->esc_like()`) |
-| 14 | `inc/eligibility.php:1145` | `$wpdb->prepare( $query, $query_params )` | Truy vấn phân trang danh sách lead | **An toàn** (Placeholders đầy đủ) |
-| 15 | `inc/eligibility.php:1373` | `$wpdb->query( "TRUNCATE TABLE $table" )` | Xóa sạch toàn bộ log lượt kiểm tra | **An toàn** về SQLi (Tên bảng hardcoded, có kiểm tra nonce và quyền admin) |
-| 16 | `inc/eligibility.php:1388` | `$wpdb->query( $wpdb->prepare(...) )` | Xóa hàng loạt lượt kiểm tra | **An toàn** (Placeholders `%d`) |
-| 17 | `inc/eligibility.php:1440-1442` | `$wpdb->prepare( $count_query, $where_params )` | Đếm tổng lượt kiểm tra | **An toàn** |
-| 18 | `inc/eligibility.php:1456` | `$wpdb->prepare( $query, $query_params )` | Truy vấn danh sách lượt kiểm tra | **An toàn** |
-| 19 | `inc/crm-adapters.php:47-52` | `$wpdb->get_results(...)` | Lấy danh sách lead chờ đồng bộ CRM (LIMIT 10) | **An toàn** (SQL tĩnh, không có tham số ngoài) |
-| 20 | `inc/crm-adapters.php:60, 65, 75` | `$wpdb->update(...)` | Cập nhật trạng thái đồng bộ CRM | **An toàn** |
-| 21 | `archive-program.php:166-174` | `$wpdb->get_results(...)` | Đếm số lượng chương trình theo hệ đào tạo | **An toàn về SQLi** (SQL tĩnh), **Vấn đề Hiệu năng:** Query SQL sống trực tiếp trong template không cache! |
-| 22 | `taxonomy-training_type.php:164-172` | `$wpdb->get_results(...)` | Đếm số lượng chương trình theo hệ đào tạo | **An toàn về SQLi** (SQL tĩnh), **Vấn đề Hiệu năng:** Trùng lặp query template không cache! |
+### 1.1. Menu Điều hướng & Cấu hình Defaults
+- **File**: `inc/config/class-defaults.php`
+  - **Dòng 33–49**: Menu mặc định primary và mobile sử dụng các nhãn không chuẩn:
+    ```php
+    'primary' => [
+        [ 'url' => '/',                   'label' => 'Trang chủ' ],
+        [ 'url' => '/truong-doi-tac/',   'label' => 'Trường đối tác' ],
+        [ 'url' => '/nganh-hoc/',         'label' => 'Chuyên ngành' ],
+        [ 'url' => '/he-dao-tao/',        'label' => 'Hệ đào tạo' ],
+        [ 'url' => '/tin-tuyen-sinh/',    'label' => 'Tin tức' ],
+        [ 'url' => '/lien-he/',           'label' => 'Liên hệ' ],
+    ],
+    'mobile' => [
+        ...
+        [ 'url' => '/he-dao-tao/tu-xa/',  'label' => 'Chương trình' ],
+    ```
+    *Dẫn chứng*: Menu primary dùng `"Hệ đào tạo"`, `"Chuyên ngành"`, `"Trường đối tác"`, `"Tin tức"`. Mobile menu trỏ link `/he-dao-tao/tu-xa/` nhưng lại gán nhãn `"Chương trình"`.
+  - **Dòng 64–68**: Hero badge mặc định chứa thuật ngữ ngoài phạm vi:
+    ```php
+    'hero_badges' => [
+        [ 'text' => '50+ chương trình', 'subtext' => 'Liên thông, VB2, Từ xa' ],
+        [ 'text' => '30+ trường ĐH',     'subtext' => 'Đối tác uy tín toàn quốc' ],
+        [ 'text' => 'Miễn giảm tín chỉ', 'subtext' => 'Rút ngắn thời gian học' ],
+    ],
+    ```
+    *Dẫn chứng*: Xuất hiện cụm từ `"VB2"` và đặt `"Từ xa"` ngang hàng với `"Liên thông"`.
+- **File**: `inc/core/class-menus.php`
+  - **Dòng 137 & Dòng 180**: Logic inject menu con phụ thuộc vào chuỗi tên cứng:
+    ```php
+    if ($title === 'hệ đào tạo') { ... }
+    if ($title === 'chuyên ngành') { ... }
+    ```
+    *Dẫn chứng*: Nếu đổi tiêu đề menu trong WordPress Admin mà không cập nhật hook, submenu hệ đào tạo và ngành hot sẽ không được inject.
+- **File**: `footer.php`
+  - **Dòng 81–101**: Cột 3 footer chứa link chết và thuật ngữ sai phạm vi:
+    ```html
+    <a href="<?php echo esc_url( home_url('/he-dao-tao/tu-xa/') ); ?>" ...>Học đại học từ xa</a>
+    <a href="#" ...>Cao đẳng online / VB2</a>
+    <a href="#" ...>Liên thông Đại Học chính quy</a>
+    <a href="#" ...>Trung Cấp lên Đại học</a>
+    <a href="#" ...>Đại học tại chức / VLVH</a>
+    ```
+    *Dẫn chứng*: Xuất hiện 4 liên kết `href="#"` (dead links), xuất hiện `"VB2"` và `"Cao đẳng online"`.
 
----
-
-### 1.3. Lỗ hổng Xác thực, CSRF Nonce & Kiểm soát Dữ liệu Nhập
-
-#### (A) Lỗ hổng Tải lên File Trực tiếp Không Ràng buộc Mime-Type (Unrestricted File Upload)
-- **Vị trí 1:** `inc/eligibility.php:204-213` (trong AJAX handler `ltdh_elig_ajax_check`):
-  ```php
-  204: if ( ! empty( $_FILES['degree_file'] ) && ! empty( $_FILES['degree_file']['name'] ) ) {
-  205:     require_once( ABSPATH . 'wp-admin/includes/file.php' );
-  206:     $uploadedfile = $_FILES['degree_file'];
-  207:     $upload_overrides = array( 'test_form' => false );
-  208:     $movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
-  ```
-- **Vị trí 2:** `inc/eligibility.php:835-845` (trong AJAX handler `ltdh_elig_ajax_advanced_verify`):
-  ```php
-  835: if ( ! empty( $_FILES['degree_file'] ) && ! empty( $_FILES['degree_file']['name'] ) ) {
-  836:     require_once( ABSPATH . 'wp-admin/includes/file.php' );
-  837:     $uploadedfile = $_FILES['degree_file'];
-  838:     $upload_overrides = array( 'test_form' => false );
-  839:     $movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
-  ```
-- **Rủi ro:** `$upload_overrides` không định nghĩa danh sách mime-types cho phép (`'mimes' => ['jpg|jpeg' => 'image/jpeg', 'png' => 'image/png', 'pdf' => 'application/pdf']`), không giới hạn dung lượng file tối đa (max file size). Mặc dù WordPress lọc các file `.php` cơ bản, nhưng người dùng nặc danh (endpoint `wp_ajax_nopriv_`) có thể tải lên các định dạng nguy hại như `.html`, `.svg` (chứa stored XSS payload), `.phar`, hoặc file dung lượng cực lớn làm tràn bộ nhớ server.
-
-#### (B) Lỗ hổng IDOR (Insecure Direct Object Reference) trong AJAX Xác minh Nâng cao
-- **Vị trí:** `inc/eligibility.php:824-855`
-  ```php
-  824: $lead_id = intval( $_POST['lead_id'] ?? 0 );
-  ...
-  853: $lead = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ltdh_leads WHERE id = %d", $lead_id ) );
-  ...
-  883: $wpdb->update(
-  884:     $wpdb->prefix . 'ltdh_leads',
-  885:     [ 'referral_source' => $ref_source, 'error_message' => $current_msg ],
-  886:     [ 'id' => $lead_id ]
-  887: );
-  ```
-- **Rủi ro:** Endpoint này mở cho khách vãng lai (`nopriv`). Một kẻ tấn công có thể gửi yêu cầu với bất kỳ ID nào (`lead_id=1, 2, 3...`) kèm file hoặc thông tin giả mạo để ghi đè ghi chú và lịch sử khảo sát của khách hàng khác trong CSDL và kích hoạt bot Telegram bắn tin nhắn rác với dữ liệu của nạn nhân.
-
-#### (C) Thiếu Kiểm tra CSRF Nonce trên Form Gửi Dữ liệu & AJAX
-- **Vị trí 1 (AJAX Filter):** `functions.php:69-75` (`ltdh_ajax_filter_programs`):
-  Hoàn toàn không có `check_ajax_referer()` xác thực token nguồn gốc yêu cầu.
-- **Vị trí 2 (Native Form Submit):** `inc/lead-capture.php:333-345` (`ltdh_handle_native_form_submit`):
-  Hooked vào `template_redirect`, xử lý `$_POST['your-name']`, nhưng không có `wp_verify_nonce()` hay `check_admin_referer()`.
-- **Vị trí 3 (Form Generator & Template):** 
-  - `inc/core/class-helpers.php:186-198` (`ltdh_render_native_form`): Form không chèn `wp_nonce_field()`.
-  - `single-guide.php:60-75`: Hardcoded HTML form gửi trực tiếp mà không có trường nonce.
-
----
-
-### 1.4. Đánh giá Render Đầu ra & Nguy cơ XSS
-
-- Toàn bộ các giá trị từ database và tham số URL đã được lọc qua `sanitize_text_field`, `esc_html`, `esc_attr`, `esc_url` ở đại đa số các vị trí.
-- **Vấn đề Chuẩn hóa Output Escaping trong HTML Attributes:**
-  Tại 43 vị trí trên các template (`archive-major.php:127, 134`, `archive-program.php:436, 455`, `archive-school.php:236, 357`, `functions.php:170, 185`, `taxonomy.php:59, 72`), thẻ liên kết sử dụng:
-  `<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>`
-  thay vì chuẩn khuyến nghị của WordPress VIP:
-  `<a href="<?php echo esc_url( get_permalink() ); ?>" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a>`.
-
----
-
-### 1.5. Khảo sát Hiệu năng & Vấn đề N+1 Query / Query Loops
-
-#### (A) Lỗi Nghiêm trọng: Tự Động Xóa Transient Cực Nặng trên Mỗi Lượt Tải Trang Chủ
-- **Vị trí:** `front-page.php:16`
-  ```php
-  15: // Cache queries for schools
-  16: delete_transient( 'ltdh_featured_schools_data' );
-  17: $featured_schools = ltdh_get_cached_featured_schools();
-  ```
-- **Hậu quả:** Dòng code này chạy **mỗi khi có bất kỳ ai truy cập trang chủ**, lập tức xóa cache transient vừa lưu, biến toàn bộ cơ chế cache trở nên vô nghĩa. Mỗi lượt tải trang chủ buộc hệ thống phải tính toán lại từ đầu toàn bộ dữ liệu trường học và các chương trình liên kết.
-
-#### (B) Thiết lập Mặc định Nguy hiểm `posts_per_page => -1` trên Trang Lưu trữ
-- **Vị trí:** `inc/core/class-query-filters.php:24-32`
-  ```php
-  24: if ( $query->is_post_type_archive( LTDH_CPT_SCHOOL ) || $query->is_post_type_archive( LTDH_CPT_MAJOR ) ) {
-  25:     $limit        = isset( $_GET['limit'] ) ? intval( $_GET['limit'] ) : -1;
-  26:     $valid_limits = [ 10, 20, 30, 50, 100, -1 ];
-  27:     if ( in_array( $limit, $valid_limits, true ) ) {
-  28:         $query->set( 'posts_per_page', $limit );
-  29:     } else {
-  30:         $query->set( 'posts_per_page', -1 );
-  31:     }
-  32: }
-  ```
-- **Hậu quả:** Nếu người dùng vào `/truong/` hoặc `/nganh/` mà không có tham số `?limit=...`, hệ thống **mặc định gán `posts_per_page = -1`**, tải toàn bộ hàng trăm trường và ngành vào bộ nhớ cùng lúc.
-- Ngoài ra, `archive-program.php:32` và `taxonomy-training_type.php:29` cho phép `$valid_limits` chứa `-1`, cho phép người dùng bên ngoài cố tình gửi `?limit=-1` để gây quá tải CPU/RAM máy chủ (Denial of Service).
-
-#### (C) Vấn nạn N+1 Query Nghiêm Trọng tại Trang Danh Sách Trường (`archive-school.php`)
-- **Vị trí:** `archive-school.php:78, 197, 264` và `inc/core/class-helpers.php:620-654`:
-  ```php
-  264: $prog_count = ltdh_get_school_unique_majors_count( $school_id );
-  265: $offered_program_ids = get_posts( [
-  266:     'post_type'   => 'program',
-  267:     'numberposts' => -1,
-  268:     'fields'      => 'ids',
-  269:     'meta_query'  => [ [ 'key' => 'school_relationship', 'value' => $school_id, 'compare' => '=' ] ],
-  270: ] );
-  ```
-  Và bên trong hàm `ltdh_get_school_unique_majors_count`:
-  ```php
-  621: $programs = get_posts( [ 'post_type' => 'program', 'posts_per_page' => -1, 'fields' => 'ids', ... ] );
-  640: foreach ( $programs as $prog_id ) {
-  641:     $major_rel = get_field( 'major_relationship', $prog_id );
-  ...
-  ```
-- **Hậu quả:** Đối với mỗi trường học hiển thị trên danh sách:
-  1. Chạy 1 query `get_posts` lấy toàn bộ chương trình của trường.
-  2. Lặp qua từng chương trình để gọi `get_field('major_relationship')` (thêm N query meta).
-  3. Ngay sau đó lại chạy tiếp 1 query `get_posts` thứ hai với `numberposts => -1` chỉ để lấy 5 tag!
-  *Nghịch lý:* Hệ thống đã có hook `inc/relationship-hooks.php:36` tự động đồng bộ sẵn mảng `_offered_programs` vào post meta của từng trường, nhưng các template lại bỏ qua dữ liệu cache này và truy vấn database lặp đi lặp lại.
-
-#### (D) Lưu Đối Tượng `WP_Query` Nguyên Bản Vào Transient
-- **Vị trí:** `inc/core/class-helpers.php:408-416` (`ltdh_get_cached_query`):
-  Hàm lưu trực tiếp instance object `WP_Query` vào transient cache. Việc serialize một object PHP phức tạp chứa con trỏ DB, mảng bài viết và method vào bảng `wp_options` làm phình to dung lượng CSDL và dễ phát sinh lỗi deserialization khi cấu trúc lớp thay đổi.
-
----
-
-## 2. Logic Chain (Chuỗi Lập Luận Suy Luận Từ Quan Sát Đến Kết Luận)
-
-```
-[QUAN SÁT 1: tests/run-tests.php nạp wp-load.php trực tiếp không có guard CLI]
-  │
-  ├─> Trình duyệt có thể gửi GET request trực tiếp tới file qua đường dẫn công khai
-  │
-  └─> KẾT LUẬN 1 (Critical): Bất kỳ ai cũng có thể kích hoạt chạy suite test và xóa post trên CSDL production.
-
-[QUAN SÁT 2: ltdh_elig_ajax_advanced_verify và ltdh_elig_ajax_check dùng wp_handle_upload không có mimes override]
-  │
-  ├─> Khách vãng lai gọi AJAX kèm file bất kỳ
-  │
-  └─> KẾT LUẬN 2 (High): Nguy cơ tải lên file chứa mã độc, file kích thước khổng lồ làm đầy ổ cứng hoặc file SVG chứa Stored XSS.
-
-[QUAN SÁT 3: ltdh_elig_ajax_advanced_verify nhận lead_id từ client và update DB trực tiếp]
-  │
-  ├─> Không kiểm tra quyền sở hữu hay session token của lead_id đó
-  │
-  └─> KẾT LUẬN 3 (High): Lỗ hổng IDOR cho phép một người sửa đổi thông tin đăng ký của người khác.
-
-[QUAN SÁT 4: front-page.php:16 gọi delete_transient trên mỗi request]
-  │
-  ├─> Mọi lượt truy cập trang chủ đều làm mất cache ngay lập tức
-  │
-  └─> KẾT LUẬN 4 (High Performance): Tê liệt cơ chế cache trang chủ, nhân số lượng query lên gấp nhiều lần.
-
-[QUAN SÁT 5: class-query-filters.php đặt mặc định posts_per_page = -1 khi không có tham số limit]
-  │
-  ├─> Tất cả khách truy cập /truong/ và /nganh/ đều ép CSDL tải 100% dữ liệu không phân trang
-  │
-  └─> KẾT LUẬN 5 (High Performance): Gây nghẽn cổ chai database và tiêu tốn RAM khi số lượng bài viết tăng lên.
-
-[QUAN SÁT 6: archive-school.php chạy 2 query get_posts(-1) + vòng lặp get_field cho mỗi trường]
-  │
-  ├─> N+1 query bùng nổ cấp số nhân (20 trường = 40+ query phụ)
-  │
-  └─> KẾT LUẬN 6 (Medium Performance): Tốc độ tải trang lưu trữ bị chậm đáng kể, lãng phí tài nguyên máy chủ.
-```
-
----
-
-## 3. Caveats (Các Điểm Giới Hạn & Giả Định)
-
-1. **Phạm vi Audit:** Báo cáo dựa trên việc kiểm tra mã nguồn tĩnh (Static Code Analysis) của theme `lienthongdaihoc`. Không thực hiện các hành vi khai thác xâm nhập động (dynamic penetration testing) trên website đang hoạt động để đảm bảo tính toàn vẹn dữ liệu.
-2. **Cấu hình Máy chủ & Nginx/Apache:** Nếu máy chủ production đã cấu hình chặn thực thi file trong thư mục `tests/` hoặc thư mục `inc/` từ tầng Nginx/Apache, thì nguy cơ Direct File Access ở các file này sẽ được giảm thiểu ở tầng hạ tầng. Tuy nhiên, ở tầng mã nguồn ứng dụng (defense-in-depth), theme vẫn phải tự bảo vệ.
-3. **Contact Form 7 Dependency:** Một số logic phụ thuộc vào các plugin ngoài như Contact Form 7 và ACF PRO. Báo cáo đánh giá dựa trên hành vi code khi các plugin này hoạt động bình thường hoặc khi fallback về code thuần của theme.
-
----
-
-## 4. Conclusion & Actionable Fix Plan (Kết Luận & Giải Pháp Khắc Phục Cụ Thể)
-
-Dưới đây là bảng tổng hợp các vấn đề phát hiện và đoạn mã sửa chữa (fix snippet) chi tiết sẵn sàng để đội ngũ phát triển áp dụng.
-
-### Bảng Tổng Hợp Vấn Đề Theo Mức Độ Nghiêm Trọng
-
-| Mã Vấn Đề | Vị Trí File & Dòng | Mức Độ | Tóm Tắt Vấn Đề |
-|---|---|---|---|
-| **SEC-CRIT-01** | `tests/run-tests.php:1-14` | **CRITICAL** | File test nạp WordPress trực tiếp, thiếu kiểm tra môi trường CLI, mở cho web công khai |
-| **SEC-HIGH-01** | `inc/eligibility.php:204-213, 835-845` | **HIGH** | Tải lên file công khai không có whitelist định dạng MIME và không kiểm tra dung lượng |
-| **SEC-HIGH-02** | `inc/eligibility.php:824-855` | **HIGH** | Lỗ hổng IDOR cho phép cập nhật dữ liệu của bất kỳ `lead_id` nào qua AJAX |
-| **PERF-HIGH-01**| `front-page.php:16` | **HIGH** | Gọi `delete_transient()` ngay đầu template trang chủ, phá hỏng toàn bộ bộ nhớ đệm |
-| **PERF-HIGH-02**| `inc/core/class-query-filters.php:25-31` | **HIGH** | Mặc định `posts_per_page => -1` trên archive trường học và ngành học khi thiếu param `limit` |
-| **SEC-MED-01**  | `functions.php:69-75` | **MEDIUM** | AJAX Filter `ltdh_ajax_filter_programs` thiếu xác thực nonce CSRF |
-| **SEC-MED-02**  | `inc/lead-capture.php:333-380` & `inc/core/class-helpers.php:186-220` | **MEDIUM** | Form tư vấn gốc thiếu CSRF Nonce cả phía hiển thị lẫn phía xử lý submit |
-| **PERF-MED-01** | `archive-school.php:264-276` & `inc/core/class-helpers.php:620` | **MEDIUM** | Vòng lặp N+1 query nặng nề trên danh sách trường học, bỏ qua meta `_offered_programs` có sẵn |
-| **SEC-LOW-01**  | `header.php:1` & `inc/search-engine.php:1` | **LOW** | Thiếu guard bảo vệ truy cập file trực tiếp `defined('ABSPATH') \|\| exit;` |
-| **PERF-LOW-01** | `inc/core/class-helpers.php:414` | **LOW** | Lưu trữ toàn bộ instance object `WP_Query` vào transient cache |
-
----
-
-### Chi Tiết Kế Hoạch Khắc Phục & Code Snippet Chuẩn Hóa
-
-#### 1. Khắc phục [SEC-CRIT-01]: Khóa Chặt File `tests/run-tests.php` Chỉ Cho Phép Chạy Qua CLI
-- **File:** `tests/run-tests.php` (dòng 6-14)
-- **Giải pháp:** Thêm kiểm tra `php_sapi_name() === 'cli'` ngay trên đầu file trước khi boot WordPress.
-```php
-// BEFORE:
-$wp_load_path = dirname(__DIR__, 4) . '/wp-load.php';
-if ( ! file_exists( $wp_load_path ) ) {
-	die( "Error: wp-load.php not found at $wp_load_path\n" );
-}
-define( 'WP_USE_THEMES', false );
-require_once $wp_load_path;
-
-// AFTER:
-if ( php_sapi_name() !== 'cli' ) {
-	http_response_code( 403 );
-	die( 'Forbidden: CLI access only.' );
-}
-
-$wp_load_path = dirname(__DIR__, 4) . '/wp-load.php';
-if ( ! file_exists( $wp_load_path ) ) {
-	die( "Error: wp-load.php not found at $wp_load_path\n" );
-}
-define( 'WP_USE_THEMES', false );
-require_once $wp_load_path;
-```
-
----
-
-#### 2. Khắc phục [SEC-HIGH-01]: Thêm Whitelist MIME Types & Giới Hạn File Size Cho Upload
-- **File:** `inc/eligibility.php` (tại cả 2 vị trí: dòng 204-213 và 835-845)
-- **Giải pháp:** Định nghĩa whitelist MIME mảng ảnh và PDF, kiểm tra kích thước tối đa (ví dụ 5MB).
-```php
-// AFTER:
-if ( ! empty( $_FILES['degree_file'] ) && ! empty( $_FILES['degree_file']['name'] ) ) {
-    $file = $_FILES['degree_file'];
-
-    // 1. Kiểm tra kích thước tối đa 5MB
-    $max_size = 5 * 1024 * 1024;
-    if ( $file['size'] > $max_size ) {
-        wp_send_json_error( [ 'message' => 'Dung lượng file không được vượt quá 5MB.' ] );
+### 1.2. Taxonomy Archive `taxonomy-training_type.php` & Routing
+- **File**: `taxonomy-training_type.php`
+  - **Dòng 171–173**: H1 trang lưu trữ hệ đào tạo:
+    ```php
+    <h1 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+        <?php echo $active_type_term ? 'Hệ đào tạo: ' . esc_html( $active_type_term->name ) : 'Tất cả chương trình đào tạo'; ?>
+    </h1>
+    ```
+    *Dẫn chứng*: Render `"Hệ đào tạo: Từ xa"`, `"Hệ đào tạo: Chính quy"`, không phản ánh đúng chuẩn SEO `"Liên thông từ xa"`, `"Liên thông chính quy"`.
+  - **Dòng 250**: Nhãn hàng filter pills:
+    ```html
+    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1 shrink-0">Hệ đào tạo:</span>
+    ```
+  - **Dòng 338**: Logic gán class badge:
+    ```php
+    } elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {
+    ```
+    *Dẫn chứng*: Coi `"liên thông"` và `"văn bằng 2"` là các term con của `training_type`.
+- **File**: `inc/core/class-rewrite-rules.php`
+  - **Dòng 247–254**: Redirect cứng `/chuong-trinh/` sang `/he-dao-tao/tu-xa/`:
+    ```php
+    if ( preg_match( '#^/chuong-trinh/?$#i', $request_path ) ) {
+        $redirect_url = home_url( '/he-dao-tao/tu-xa/' );
+        ...
+        wp_redirect( $redirect_url, 301 );
+        exit;
     }
+    ```
+    *Dẫn chứng*: Mọi lượt truy cập `/chuong-trinh/` đều bị ép sang một hình thức duy nhất là `/he-dao-tao/tu-xa/`, làm méo mó cấu trúc điều hướng.
 
-    // 2. Chỉ cho phép các định dạng ảnh thông dụng và PDF
-    $allowed_mimes = [
-        'jpg|jpeg|jpe' => 'image/jpeg',
-        'png'          => 'image/png',
-        'webp'         => 'image/webp',
-        'pdf'          => 'application/pdf',
+### 1.3. Single Program Template `single-program.php`
+- **File**: `single-program.php`
+  - **Rà soát 12 mục bắt buộc**:
+    1. *Trường*: Có (Banner, logo, mini bar dòng 201-222, sidebar card dòng 973-1036).
+    2. *Ngành*: Yếu. Không có block/thẻ riêng thể hiện rõ mã ngành, nhóm ngành, link về trang ngành học cha.
+    3. *Hình thức học*: Có (`$learning_details['mode']`, badge), nhưng nhãn còn dùng "Hệ đào tạo".
+    4. *Đối tượng tuyển sinh*: **THIẾU BLOCK RIÊNG**. Tab subtitle dòng 102 ghi "Đối tượng & tiêu chuẩn", nhưng section `#dieu-kien-xet-tuyen` (dòng 548) chỉ render `$requirements` (nội dung môn thi/xét tuyển). Không có khung rõ ràng về đối tượng: Tốt nghiệp Trung cấp, Cao đẳng (đúng ngành / gần ngành / khác ngành).
+    5. *Điều kiện*: Có (Môn thi tuyển Toán, Toán rời rạc, Cấu trúc dữ liệu hoặc xét tuyển, dòng 557-615).
+    6. *Thời gian học*: Có (Khung thời gian chuẩn, quy định miễn giảm môn, dòng 680-814).
+    7. *Học phí*: Có (Đơn giá, số tín chỉ, lộ trình học phí, dòng 626-678).
+    8. *Địa điểm/Phương thức*: Có (Campus, chế độ học online/cuối tuần, dòng 265-272).
+    9. *Bằng cấp*: **HOÀN TOÀN THIẾU**. Tìm kiếm chuỗi `"bằng cấp"` trong file trả về 0 kết quả! Người học không thấy thông tin cấp bằng Cử nhân/Kỹ sư, Thông tư 27/2019/TT-BGDĐT không ghi hình thức đào tạo, giá trị thi cao học/công chức.
+    10. *Hồ sơ*: Có (`#ho-so-can-nop`, tải mẫu phiếu tuyển sinh, dòng 863-899).
+    11. *Thời gian tuyển sinh*: Có (`#lich-tuyen-sinh`, timeline các đợt tuyển sinh, dòng 280-543).
+    12. *Form đăng ký*: Có (Sidebar form dòng 1039-1053, modal tải tài liệu dòng 1185-1248, fixed CTA bar dòng 1167-1182).
+  - **Dòng 195**: Cảnh báo tạm ngưng bị hardcode chữ "hệ Chính quy":
+    ```html
+    <p class="text-xs text-red-700 mt-1">Chương trình tuyển sinh hệ Chính quy của trường năm nay hiện đã nhận đủ chỉ tiêu...</p>
+    ```
+    *Dẫn chứng*: Chương trình Từ xa hoặc Vừa học vừa làm nếu bị đóng chỉ tiêu vẫn hiển thị câu thông báo "hệ Chính quy"!
+  - **Dòng 747**: Ghi chú miễn môn đề cập văn bằng 1:
+    ```html
+    <p class="text-slate-600">Học viên được xem xét miễn giảm các môn đại cương và môn chuyên ngành dựa trên bảng điểm tốt nghiệp trung cấp, cao đẳng hoặc văn bằng 1 đã có.</p>
+    ```
+
+### 1.4. Template Trường & Ngành
+- **File**: `archive-school.php`
+  - **Dòng 61 & 70**: Tiêu đề banner và section:
+    Banner: `"Trường Đại học Đối tác"` (từ `template-parts/banner.php:61`).  
+    Section: `"Trường đại học nổi bật"` -> Thiếu ngữ cảnh trọng tâm: "Trường đại học tuyển sinh Liên thông".
+- **File**: `single-school.php`
+  - **Dòng 58–59**: Tab navigation:
+    ```php
+    'id'       => 'chuong-trinh-tuyen-sinh',
+    'title'    => 'Lớp tuyển sinh',
+    'subtitle' => 'Chương trình đang mở',
+    ```
+    *Dẫn chứng*: Dùng từ `"Lớp tuyển sinh"` thay vì `"Tuyển sinh liên thông"` / `"Chương trình liên thông"`.
+  - **Dòng 501**: Nhãn nhóm:
+    ```html
+    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Hệ đào tạo:</div>
+    ```
+- **File**: `archive-major.php`
+  - **Dòng 25**: Banner H1 là `"Chuyên Ngành"` (từ `template-parts/banner.php:64`).
+  - **Dòng 86**: Mô tả:
+    ```html
+    <p class="text-sm font-medium text-slate-500">Danh sách các ngành đào tạo tuyển sinh đại học trực tuyến và liên thông.</p>
+    ```
+    *Dẫn chứng*: Tách rời "đại học trực tuyến" và "liên thông" như 2 loại hình tuyển sinh độc lập.
+- **File**: `single-major.php`
+  - **Dòng 470**: Nhãn nhóm dùng `"Hệ đào tạo:"`.
+  - Cấu trúc gom nhóm theo trường và hình thức học rất tốt: Ngành -> Trường tuyển sinh -> Hình thức học (Từ xa, VLVH, Chính quy) -> Offerings cụ thể.
+
+### 1.5. Bộ lọc & AJAX Filter Engine
+- **File**: `front-page.php`
+  - **Dòng 31**: H1 ẩn cho SEO:
+    ```html
+    <h1 class="sr-only">Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học, Văn Bằng 2 & Đại Học Từ Xa</h1>
+    ```
+    *Dẫn chứng*: Chứa trực tiếp cụm `"Văn Bằng 2 & Đại Học Từ Xa"`.
+  - **Dòng 126**: Search form action trỏ cứng về `/he-dao-tao/tu-xa/`:
+    ```html
+    <form action="<?php echo esc_url(home_url('/he-dao-tao/tu-xa/')); ?>" method="GET" class="space-y-3 md:space-y-0">
+    ```
+  - **Dòng 159**: Select option: `<option value="">-- Chọn hệ học --</option>`.
+- **File**: `inc/core/class-helpers.php`
+  - **Dòng 736–742**: Ánh xạ hình thức học:
+    ```php
+    $mode_map = [
+        'tu-xa'           => 'Học online 100%',
+        'vua-hoc-vua-lam' => 'Học tập trung cuối tuần',
+        'van-bang-2'      => 'Học tập trung / Online linh hoạt',
     ];
-
-    require_once( ABSPATH . 'wp-admin/includes/file.php' );
-    $upload_overrides = [
-        'test_form' => false,
-        'mimes'     => $allowed_mimes,
-    ];
-    $movefile = wp_handle_upload( $file, $upload_overrides );
-
-    if ( $movefile && ! isset( $movefile['error'] ) ) {
-        $degree_file_url = esc_url_raw( $movefile['url'] );
-    } else {
-        wp_send_json_error( [ 'message' => $movefile['error'] ?? 'Lỗi khi tải file lên.' ] );
-    }
-}
-```
+    ```
+    *Dẫn chứng*: Đưa `'van-bang-2'` vào danh mục hình thức học (`learning_mode`).
+- **File**: `inc/eligibility-rules.php`
+  - **Dòng 18–24**: Ma trận đào tạo chứa đồng thời `'lien-thong'`, `'van-bang-2'`, và `'thpt'`:
+    ```php
+    'thpt'      => [ 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
+    'trung-cap' => [ 'lien-thong', 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
+    'cao-dang'  => [ 'lien-thong', 'tu-xa', 'van-bang-2', 'vua-hoc-vua-lam', 'chinh-quy' ],
+    'dai-hoc'   => [ 'van-bang-2', 'tu-xa', 'vua-hoc-vua-lam' ],
+    ```
+    *Dẫn chứng*: Coi Liên thông là một nhánh con cùng cấp với Từ xa và Văn bằng 2, đồng thời cho phép đầu vào THPT học Chính quy/VLVH/Từ xa (đây là Đại học mới, không phải Liên thông).
 
 ---
 
-#### 3. Khắc phục [SEC-HIGH-02]: Vá Lỗ Hổng IDOR trong `ltdh_elig_ajax_advanced_verify`
-- **File:** `inc/eligibility.php` (dòng 824-855)
-- **Giải pháp:** Khi tạo lead trong session, cấp một `lead_token` (UUID/Hash ngẫu nhiên) trả về cho client. Khi client gọi xác minh nâng cao, bắt buộc gửi kèm token này để đối chiếu với CSDL thay vì chỉ nhận mỗi số `lead_id` thô.
-```php
-// AFTER:
-$lead_id = intval( $_POST['lead_id'] ?? 0 );
-$lead_token = sanitize_text_field( $_POST['lead_token'] ?? '' );
+## 2. LOGIC CHAIN (Chuỗi suy luận từ quan sát đến kết luận)
 
-if ( ! $lead_id || empty( $lead_token ) ) {
-    wp_send_json_error( [ 'message' => 'Yêu cầu không hợp lệ.' ] );
-}
-
-global $wpdb;
-$lead = $wpdb->get_row( $wpdb->prepare( 
-    "SELECT * FROM {$wpdb->prefix}ltdh_leads WHERE id = %d AND referral_source LIKE %s", 
-    $lead_id, 
-    '%' . $wpdb->esc_like( $lead_token ) . '%' 
-) );
-
-if ( ! $lead ) {
-    wp_send_json_error( [ 'message' => 'Bạn không có quyền cập nhật hồ sơ này.' ] );
-}
-```
+1. **Từ Quan sát 1.1, 1.2, 1.5**: Mã nguồn hiện tại chứa nhiều dấu vết của mô hình "Cổng thông tin tuyển sinh tổng hợp" (từng bao gồm cả Văn bằng 2, Đại học từ xa độc lập, và thậm chí tuyển sinh từ THPT).
+2. **Đối chiếu với Yêu cầu Nghiệp vụ Cốt lõi**:
+   - Tên miền và định vị thương hiệu là `lienthongdaihoc.com`.
+   - Quy chuẩn Bộ GD&ĐT (Luật Giáo dục Đại học, Quyết định 18/2017/QĐ-TTg, Thông tư 08/2021/TT-BGDĐT): **Liên thông đại học** là hình thức đào tạo dành cho người đã có bằng tốt nghiệp Trung cấp hoặc Cao đẳng (hoặc người đã có bằng ĐH muốn liên thông sang ngành khác) để học tiếp lên trình độ đại học.
+   - Các phương thức: **Chính quy**, **Vừa học vừa làm**, **Từ xa** là các *hình thức tổ chức đào tạo (Study Mode)* BÊN TRONG liên thông đại học, KHÔNG PHẢI các sản phẩm tuyển sinh cạnh tranh ngang hàng với liên thông.
+3. **Từ Quan sát 1.2 & 1.3**:
+   - Khi coi "Liên thông" là 1 term ngang hàng với "Từ xa" trong taxonomy `training_type`, hệ thống xuất hiện các lỗi nghịch lý:
+     * Bộ lọc có nút lọc "Hệ Liên thông" bên cạnh "Hệ Từ xa" -> Khiến người dùng hiểu nhầm rằng các chương trình "Từ xa" không phải là "Liên thông", và ngược lại.
+     * Trang `/chuong-trinh/` bị redirect cứng 301 sang `/he-dao-tao/tu-xa/` -> Tước đoạt cơ hội tiếp cận các chương trình liên thông Vừa học vừa làm và Chính quy.
+4. **Từ Quan sát 1.3**:
+   - Trong tuyển sinh liên thông tại Việt Nam, **Văn bằng tốt nghiệp (Bằng cấp)** là mối quan tâm hàng đầu của người học (lo ngại bằng có ghi chữ "Từ xa", "Tại chức", bằng có được thi công chức hay học thạc sĩ không). Trang chủ đã giải thích rất tốt về Thông tư 27/2019/TT-BGDĐT (Quan sát 1.5, dòng 387-444), nhưng trang `single-program.php` lại **thiếu hoàn toàn** mục Bằng cấp. Đây là lỗ hổng chuyển đổi (CRO) và thông tin rất nghiêm trọng.
+5. **Kết luận suy luận**: Cần chuẩn hóa toàn diện từ vựng, nhãn điều hướng, taxonomy terms và các section của templates về đúng mô hình phân cấp:
+   `Trường Đại học -> Tuyển sinh Liên thông -> Hình thức học (Chính quy, VLVH, Từ xa) -> Ngành đào tạo -> Cơ hội tuyển sinh cụ thể`.
 
 ---
 
-#### 4. Khắc phục [PERF-HIGH-01]: Xóa Dòng Code Tự Hủy Transient trên Trang Chủ
-- **File:** `front-page.php` (dòng 16)
-- **Giải pháp:** Xóa bỏ lệnh `delete_transient( 'ltdh_featured_schools_data' );` vì hàm `ltdh_clear_transients_on_save()` trong `inc/core/class-helpers.php:499` đã tự động dọn dẹp cache khi có thao tác lưu bài viết.
-```php
-// BEFORE (front-page.php:15-18):
-// Cache queries for schools
-delete_transient( 'ltdh_featured_schools_data' );
-$featured_schools = ltdh_get_cached_featured_schools();
+## 3. CAVEATS (Phạm vi giới hạn & Giả định)
 
-// AFTER:
-// Cache queries for schools
-$featured_schools = ltdh_get_cached_featured_schools();
-```
+1. **Mã nguồn nguyên bản không bị sửa đổi**: Đây là giai đoạn khảo sát (Phase 1: Read-only Audit). Chưa có file mã nguồn nào bị chỉnh sửa trong đợt khảo sát này.
+2. **Bảo tồn URLs công khai**: Do website đã hoàn thiện và có thể đã được lập chỉ mục SEO (Google Index), kế hoạch can thiệp tuyệt đối KHÔNG đổi cấu trúc URL công khai:
+   - Trường: `/{slug}/` (giữ nguyên)
+   - Ngành: `/nganh-{slug}/` (giữ nguyên)
+   - Chương trình: `/{slug}/` (giữ nguyên)
+   - Hình thức học: `/he-dao-tao/{slug}/` (giữ nguyên URL path, chỉ đổi nhãn hiển thị và nội dung)
+3. **Giả định về dữ liệu CSDL**: Giả định taxonomy `training_type` trong CSDL hiện có các terms: `tu-xa`, `vua-hoc-vua-lam`, `chinh-quy`. Bất kỳ term nào thừa như `van-bang-2` hoặc `lien-thong` cần được dọn dẹp hoặc gỡ liên kết trong giai đoạn thực thi CSDL.
 
 ---
 
-#### 5. Khắc phục [PERF-HIGH-02]: Đặt Phân Trang Mặc Định Hợp Lý cho Danh Mục Lưu Trữ
-- **File:** `inc/core/class-query-filters.php` (dòng 24-32)
-- **Giải pháp:** Mặc định phân trang là 12 bài/trang (thay vì `-1`). Giới hạn trần số lượng bản ghi tối đa (tối đa 50 hoặc 100), loại bỏ hoàn toàn tùy chọn `-1` khỏi tham số công khai.
-```php
-// BEFORE:
-if ( $query->is_post_type_archive( LTDH_CPT_SCHOOL ) || $query->is_post_type_archive( LTDH_CPT_MAJOR ) ) {
-    $limit        = isset( $_GET['limit'] ) ? intval( $_GET['limit'] ) : -1;
-    $valid_limits = [ 10, 20, 30, 50, 100, -1 ];
-    if ( in_array( $limit, $valid_limits, true ) ) {
-        $query->set( 'posts_per_page', $limit );
-    } else {
-        $query->set( 'posts_per_page', -1 );
-    }
-}
+## 4. CONCLUSION (Bảng ánh xạ Current -> Target & Đánh giá)
 
-// AFTER:
-if ( $query->is_post_type_archive( LTDH_CPT_SCHOOL ) || $query->is_post_type_archive( LTDH_CPT_MAJOR ) ) {
-    $limit        = isset( $_GET['limit'] ) ? intval( $_GET['limit'] ) : 12;
-    $valid_limits = [ 10, 12, 20, 30, 50 ];
-    if ( in_array( $limit, $valid_limits, true ) ) {
-        $query->set( 'posts_per_page', $limit );
-    } else {
-        $query->set( 'posts_per_page', 12 );
-    }
-}
-```
+### 4.1. Bảng Ánh Xạ Kiểm Toán Theo Schema Bắt Buộc
+
+| CURRENT ENTITY | CURRENT NAME | CURRENT PURPOSE | CURRENT TAXONOMY | CURRENT RELATIONSHIPS | CURRENT URL | CURRENT TEMPLATE | TARGET CONCEPT | REQUIRED CHANGE |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Primary Menu: Hệ đào tạo** | Hệ đào tạo | Lối vào trang archive hệ đào tạo & inject menu con | `training_type` | Cha của các terms: `tu-xa`, `chinh-quy`, `vua-hoc-vua-lam` | `/he-dao-tao/` | `header.php`, `class-menus.php:137`, `class-defaults.php:37` | **Hình thức học** (hoặc **Liên thông**) | Đổi label thành "Hình thức học" (hoặc "Liên thông"). Submenu gồm: "Liên thông từ xa", "Liên thông vừa học vừa làm", "Liên thông chính quy". Sửa hook `ltdh_dynamic_menu_submenu_injection` nhận diện title mới. |
+| **Primary Menu: Chuyên ngành** | Chuyên ngành | Lối vào danh bạ ngành & inject 5 ngành hot | CPT `major` | Trỏ tới archive major & 5 bài viết major hot | `/nganh-hoc/` | `header.php`, `class-menus.php:180`, `class-defaults.php:36` | **Ngành học** (Ngành đào tạo) | Đổi label thành "Ngành học" chuẩn quy chế tuyển sinh. Cập nhật hook `class-menus.php` nhận diện nhãn mới. |
+| **Primary Menu: Trường đối tác** | Trường đối tác | Lối vào danh bạ trường đại học | CPT `school` | Trỏ tới archive school | `/truong-doi-tac/` | `header.php`, `class-defaults.php:35` | **Trường đại học** | Đổi label thành "Trường đại học" (nhất quán với thực thể cấp 1). Giữ nguyên URL `/truong-doi-tac/`. |
+| **Primary Menu: Tin tức** | Tin tức | Lối vào bài viết cẩm nang & tin tức | Post / Guide | Trỏ tới archive post/guide | `/tin-tuyen-sinh/` | `header.php`, `class-defaults.php:38` | **Kiến thức liên thông** | Đổi label thành "Kiến thức liên thông" hoặc "Cẩm nang tuyển sinh" để tập trung đúng vào tệp người học liên thông. |
+| **Mobile Menu: Chương trình** | Chương trình | Lối tắt trên menu di động | `training_type:tu-xa` | Trỏ cứng về term từ xa | `/he-dao-tao/tu-xa/` | `class-defaults.php:45` | **Hình thức học** | Xóa link trỏ cứng lệch khái niệm (`/he-dao-tao/tu-xa/` dán nhãn "Chương trình"). Thay bằng lối vào chuẩn tới "Hình thức học" (`/he-dao-tao/`). |
+| **Footer Column 3** | Chương trình đào tạo | Danh sách link chân trang | `training_type` | Chứa 4 link chết `href="#"` và nhãn VB2 | `/he-dao-tao/tu-xa/`, `href="#"` | `footer.php:75-102` | **Hình thức học Liên thông** | Xóa bỏ "Cao đẳng online / VB2", "Trung Cấp lên Đại học". Thay bằng link sống: Liên thông từ xa (`/he-dao-tao/tu-xa/`), Liên thông VLVH (`/he-dao-tao/vua-hoc-vua-lam/`), Liên thông chính quy (`/he-dao-tao/chinh-quy/`), Ngành học (`/nganh-hoc/`), Trường ĐH (`/truong-doi-tac/`). |
+| **Taxonomy Archive Template** | `taxonomy-training_type.php` | Archive hiển thị chương trình theo hệ | `training_type` | `program` ⟷ `training_type`, `school`, `major` | `/he-dao-tao/[slug]/` & `/he-dao-tao/` | `taxonomy-training_type.php` | **Trang lưu trữ Hình thức học Liên thông** | 1. Sửa H1: `Liên thông [Tên hình thức]` (VD: Liên thông từ xa, Liên thông chính quy). Base archive: "Các chương trình tuyển sinh Liên thông Đại học".<br>2. Sửa nhãn "Hệ đào tạo:" thành "Hình thức học:".<br>3. Bỏ badge/filter "Liên thông" và "Văn bằng 2". |
+| **Program Archive Template** | `archive-program.php` | Archive post type `program` | `training_type` | `program` CPT | `/chuong-trinh/` (bị 301 sang `/he-dao-tao/tu-xa/`) | `archive-program.php`, `class-rewrite-rules.php:247` | **Danh mục Chương trình Tuyển sinh** | 1. Hủy bỏ redirect cứng sang `/he-dao-tao/tu-xa/` tại `class-rewrite-rules.php:247`. Cho phép `/chuong-trinh/` 301 về `/he-dao-tao/` (tổng thể mọi hình thức).<br>2. Sửa form action sang `/he-dao-tao/`. |
+| **Single Program Template** | `single-program.php` | Trang chi tiết cơ hội tuyển sinh cụ thể | `training_type`, `campus` | `program` ⟷ `school`, `major` | `/{slug}/` | `single-program.php` | **Chi tiết cơ hội tuyển sinh Liên thông** | 1. **Bổ sung mục Bằng cấp**: Hiển thị giá trị văn bằng theo Thông tư 27/2019/TT-BGDĐT.<br>2. **Bổ sung/Làm rõ mục Đối tượng tuyển sinh**: Phân định rõ đối tượng có bằng Trung cấp/Cao đẳng/ĐH.<br>3. Sửa câu cảnh báo dòng 195 (bỏ chữ "hệ Chính quy" bị gắn cứng).<br>4. Thêm hiển thị thông tin Ngành đào tạo cha.<br>5. Chuẩn hóa Breadcrumbs. |
+| **School Archive Template** | `archive-school.php` | Danh bạ các trường đại học đối tác | `region` | `school` ⟷ `program` | `/truong-doi-tac/` | `archive-school.php`, `banner.php:61` | **Danh bạ Trường Đại học tuyển sinh Liên thông** | 1. Banner H1: "Trường Đại học tuyển sinh Liên thông".<br>2. Subtitle: Nhấn mạnh mạng lưới các trường đại học đào tạo liên thông uy tín.<br>3. Card: Thể hiện các hình thức học liên thông trường đang mở. |
+| **Single School Template** | `single-school.php` | Hồ sơ tuyển sinh của 1 trường đại học | `region`, `training_type` | `school` ⟷ `program`, `major` | `/{slug}/` | `single-school.php` | **Trang tuyển sinh Liên thông của Trường** | 1. Sửa Tab "Lớp tuyển sinh" -> "Tuyển sinh liên thông".<br>2. Sửa nhãn "Hệ đào tạo:" -> "Hình thức học:".<br>3. Khẳng định trường tuyển sinh các ngành liên thông đại học. |
+| **Major Archive Template** | `archive-major.php` | Danh bạ ngành học | `major_cat` | `major` ⟷ `program` | `/nganh-hoc/` | `archive-major.php`, `banner.php:64` | **Danh bạ Ngành đào tạo Liên thông Đại học** | 1. Banner H1: Sửa "Chuyên Ngành" thành "Ngành đào tạo Liên thông Đại học".<br>2. Sửa mô tả dòng 86 (bỏ cụm từ tách rời "đại học trực tuyến và liên thông"). |
+| **Single Major Template** | `single-major.php` | Chi tiết ngành học & các trường tuyển sinh | `major_cat` | `major` ⟷ `school`, `program` | `/nganh-{slug}/` | `single-major.php` | **Chi tiết Ngành đào tạo Liên thông Đại học** | 1. Sửa nhãn "Hệ đào tạo:" -> "Hình thức học:" tại dòng 470.<br>2. Khẳng định đối tượng người học liên thông trong tổng quan ngành. |
+| **Homepage Hero & H1** | `front-page.php` | Hero banner & Tiêu đề SEO trang chủ | Không | Toàn trang chủ | `/` | `front-page.php:31, 126`, `class-defaults.php:65` | **Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học** | 1. Sửa H1 ẩn: Xóa bỏ `"Văn Bằng 2 & Đại Học Từ Xa"`, đặt thành `"Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học Toàn Quốc"`.<br>2. Sửa hero badge: Thay `'Liên thông, VB2, Từ xa'` thành `'Chính quy, VLVH, Từ xa'`.<br>3. Sửa form action: Từ `/he-dao-tao/tu-xa/` thành `/he-dao-tao/`. |
+| **Eligibility Wizard** | `wizard.php` | Form trắc nghiệm điều kiện tuyển sinh | `training_type`, `campus` | Form kiểm tra tương thích chương trình | `/kiem-tra-dieu-kien/` | `template-parts/eligibility/wizard.php`, `inc/eligibility-rules.php` | **Công cụ kiểm tra điều kiện Liên thông** | 1. Đổi option `dai-hoc` từ "Học Văn bằng 2" sang "Liên thông ngành thứ hai".<br>2. Sửa `inc/eligibility-rules.php`: Bỏ `van-bang-2` và `lien-thong` khỏi compatibility matrix; chỉ giữ 3 hình thức học: `tu-xa`, `vua-hoc-vua-lam`, `chinh-quy`. |
+| **Program Comparison** | `page-compare-program.php` | Bảng so sánh 2-3 chương trình | `training_type` | So sánh thông số các `program` | `/so-sanh-chuong-trinh/` | `page-compare-program.php`, `program-table.php` | **So sánh Chương trình Liên thông** | 1. Sửa link nút trống từ `/he-dao-tao/tu-xa/` thành `/he-dao-tao/`.<br>2. Xóa bỏ chữ "văn bằng 2" trong FAQ so sánh.<br>3. Hợp nhất hàng "Hệ đào tạo" và "Hình thức học" trong bảng so sánh thành 1 hàng "Hình thức học". |
+| **Dynamic SEO & Schema Engine** | `class-rankmath-integration.php` | Tự động tạo title, description, schema | `training_type`, `school`, `major` | Hooks vào Rank Math & native `wp_head` | Toàn bộ URL | `inc/seo/class-rankmath-integration.php` | **Chuẩn hóa SEO Title / Schema Liên thông** | 1. Thêm hook tạo dynamic title cho taxonomy `training_type`: `Liên thông [Hình thức học] | Tuyển sinh [Năm]`.<br>2. Dynamic title cho major: `Liên thông ngành [Tên ngành] | Tuyển sinh [Năm]`.<br>3. Dynamic title cho school: `Tuyển sinh Liên thông [Tên trường] | [Năm]`.<br>4. Schema Course: bổ sung `educationalCredentialAwarded` là Bằng Cử nhân/Kỹ sư. |
 
 ---
 
-#### 6. Khắc phục [SEC-MED-01 & SEC-MED-02]: Bổ Sung CSRF Nonce Vào Toàn Bộ Form và AJAX
-1. **Trong `functions.php:69`:**
-   ```php
-   function ltdh_ajax_filter_programs() {
-       check_ajax_referer( 'ltdh_filter_nonce', 'nonce' );
-       ...
-   }
-   ```
-2. **Trong `inc/core/class-helpers.php:186` (`ltdh_render_native_form`):**
-   ```php
-   <form action="" method="POST" class="space-y-4">
-       <?php wp_nonce_field( 'ltdh_native_form_action', 'ltdh_native_nonce' ); ?>
-       ...
-   ```
-3. **Trong `inc/lead-capture.php:333` (`ltdh_handle_native_form_submit`):**
-   ```php
-   if ( ! isset( $_POST['ltdh_native_nonce'] ) || ! wp_verify_nonce( $_POST['ltdh_native_nonce'], 'ltdh_native_form_action' ) ) {
-       wp_die( 'Yêu cầu không hợp lệ hoặc phiên làm việc đã hết hạn.', 'Bảo mật', [ 'response' => 403 ] );
-   }
-   ```
+### 4.2. Danh Sách Các Bộ Lọc Dư Thừa Cần Loại Bỏ & Chuẩn Hóa
+1. **Loại bỏ bộ lọc "Hệ đào tạo: Liên thông"**:
+   - *Lý do*: 100% chương trình trên website đều là chương trình Liên thông. Việc tồn tại term `lien-thong` bên trong taxonomy `training_type` (ngang hàng với `tu-xa`, `chinh-quy`) là sai lệch bản chất nghiệp vụ.
+   - *Giải pháp*: Không render pill tab hoặc dropdown option có tên "Liên thông". Danh mục hình thức học chỉ bao gồm 3 phương thức: **Từ xa**, **Vừa học vừa làm**, **Chính quy**.
+2. **Loại bỏ bộ lọc / nhãn "Văn bằng 2"**:
+   - *Lý do*: Yêu cầu nghiệp vụ cốt lõi cấm đưa Văn bằng 2 vào như một sản phẩm tuyển sinh độc lập.
+   - *Giải pháp*: Xóa bỏ term `van-bang-2` khỏi badge matching trong `taxonomy-training_type.php:338`, `archive-program.php:338`, `class-query-filters.php:200` và `class-helpers.php:739`.
 
 ---
 
-#### 7. Khắc phục [PERF-MED-01]: Tận Dụng Metadata `_offered_programs` Đã Được Đồng Bộ Sẵn
-- **File:** `archive-school.php:264-276` và `inc/core/class-helpers.php:620-654`
-- **Giải pháp:** Thay vì chạy `get_posts` lặp đi lặp lại với `posts_per_page => -1`, đọc trực tiếp mảng ID từ post meta `_offered_programs` đã được tạo sẵn qua hook `ltdh_sync_program_relationships`.
-```php
-// Tối ưu hàm ltdh_get_school_unique_majors_count:
-function ltdh_get_school_unique_majors_count( int $school_id ): int {
-    $program_ids = get_post_meta( $school_id, LTDH_META_OFFERED_PROGRAMS, true );
-    if ( empty( $program_ids ) || ! is_array( $program_ids ) ) {
-        return 0;
-    }
+### 4.3. Đánh Giá Khuyết Thiếu 12 Mục Của Template `single-program.php`
 
-    $major_ids = [];
-    foreach ( $program_ids as $prog_id ) {
-        $m_id = intval( get_post_meta( $prog_id, 'major_relationship', true ) );
-        if ( $m_id && ! in_array( $m_id, $major_ids, true ) ) {
-            $major_ids[] = $m_id;
-        }
-    }
-    return count( $major_ids );
-}
-```
+| Hạng mục nghiệp vụ | Trạng thái hiện tại | Vị trí code hiện tại | Đánh giá & Yêu cầu can thiệp |
+| :--- | :--- | :--- | :--- |
+| **1. Trường** | Đạt | Dòng 201–222 (Mobile), Dòng 973–1036 (Desktop sidebar) | Đầy đủ logo, tên trường, địa chỉ, link chi tiết trường. |
+| **2. Ngành** | Yếu | Lấy từ `major_relationship` nhưng thiếu block trực quan | Cần hiển thị rõ Mã ngành, Nhóm ngành và đường link trỏ về trang ngành học cha ngay tại phần thông tin cốt lõi. |
+| **3. Hình thức học** | Đạt (Cần chỉnh nhãn) | Dòng 270–272 (`$learning_details['mode']`) | Cần bỏ chữ "Hệ" trong badge ("Hệ Từ xa" -> "Từ xa"). |
+| **4. Đối tượng tuyển sinh** | **THIẾU** | Không có block riêng (bị gộp vào điều kiện) | **Bổ sung block Đối tượng tuyển sinh**: Phân định rõ tiêu chuẩn đầu vào: Đã tốt nghiệp Trung cấp (1.5 - 2 năm), Tốt nghiệp Cao đẳng (1 - 1.5 năm), Đã có bằng ĐH khác (1 - 1.5 năm). Khẳng định không tuyển sinh trực tiếp từ THPT. |
+| **5. Điều kiện xét tuyển** | Đạt | Dòng 548–622 (`#dieu-kien-xet-tuyen`) | Rõ ràng về phương thức (Thi tuyển 3 môn hoặc Xét tuyển học bạ/bảng điểm). |
+| **6. Thời gian học** | Đạt | Dòng 680–814 (`#hoc-phi-thoi-gian`) | Lộ trình chuẩn, quy định miễn giảm môn học phần. |
+| **7. Học phí** | Đạt | Dòng 626–678 (`#hoc-phi-thoi-gian`) | Đơn giá tín chỉ, tổng số tín chỉ, niên khóa, lộ trình tăng học phí. |
+| **8. Địa điểm / Phương thức** | Đạt | Dòng 265–272 (`campus` & `learning_mode`) | Rõ ràng về cơ sở học và phương thức học online/cuối tuần. |
+| **9. Bằng cấp** | **HOÀN TOÀN THIẾU** | Không có trong file | **Bổ sung section Bằng cấp**: Trích dẫn Thông tư 27/2019/TT-BGDĐT: Bằng Cử nhân / Kỹ sư chính quy do Trường Đại học cấp, không phân biệt hình thức đào tạo, có giá trị học lên Thạc sĩ/Tiến sĩ, thi tuyển công chức nhà nước và nâng bậc lương. |
+| **10. Hồ sơ tuyển sinh** | Đạt | Dòng 863–899 (`#ho-so-can-nop`) | Danh mục giấy tờ cần nộp + Nút tải mẫu phiếu đăng ký tuyển sinh chính thức (PDF). |
+| **11. Thời gian tuyển sinh** | Đạt | Dòng 280–543 (`#lich-tuyen-sinh`) | Timeline các đợt phát hành, hạn nộp, ôn tập, xét tuyển/thi tuyển. |
+| **12. Form đăng ký tư vấn** | Đạt | Dòng 1039–1053 (`#register`), dòng 1167–1182 (Mobile bar), dòng 1185–1248 (Modal) | Đầy đủ form tư vấn và tải tài liệu. |
 
 ---
 
-#### 8. Khắc phục [SEC-LOW-01]: Bổ Sung Direct Access Guard ở `header.php` & `inc/search-engine.php`
-- Đặt đoạn code này ở dòng 1 của cả 2 file:
-```php
-<?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-```
+## 5. MINIMAL SAFE INTERVENTION PLAN (Kế hoạch Can thiệp Tối thiểu An toàn)
+
+Kế hoạch can thiệp được chia làm 4 giai đoạn độc lập, đảm bảo **không làm thay đổi layout CSS/Tailwind**, **không phá vỡ URLs/SEO**, và **dễ dàng kiểm tra ngược**:
+
+### Giai đoạn 1: Chuẩn hóa Thuật ngữ, Defaults & Navigation
+1. **File `inc/config/class-defaults.php`**:
+   - Đổi nhãn menu primary: `"Trường đối tác"` -> `"Trường đại học"`, `"Chuyên ngành"` -> `"Ngành học"`, `"Hệ đào tạo"` -> `"Hình thức học"`, `"Tin tức"` -> `"Kiến thức liên thông"`.
+   - Sửa mobile menu default: thay `/he-dao-tao/tu-xa/` nhãn "Chương trình" bằng link hợp lệ.
+   - Sửa `hero_badges` default: Thay `'Liên thông, VB2, Từ xa'` thành `'Chính quy, VLVH, Từ xa'`.
+2. **File `inc/core/class-menus.php`**:
+   - Cập nhật dòng 137: `if ( in_array( $title, [ 'hệ đào tạo', 'hình thức học', 'liên thông' ], true ) )`.
+   - Cập nhật dòng 180: `if ( in_array( $title, [ 'chuyên ngành', 'ngành học', 'ngành đào tạo' ], true ) )`.
+3. **File `footer.php`**:
+   - Thay thế các link `href="#"` tại Cột 3 bằng các liên kết chuẩn của 3 hình thức học liên thông và danh bạ ngành/trường. Xóa thuật ngữ `"VB2"` và `"Cao đẳng online"`.
+
+### Giai đoạn 2: Bổ sung & Chuẩn hóa Templates
+1. **File `single-program.php`**:
+   - **Thêm Tab & Section Bằng cấp (`#van-bang-tot-nghiep`)**: Bố trí thẻ UI card đồng bộ phong cách Tailwind hiện tại, giải thích giá trị văn bằng theo Thông tư 27/2019/TT-BGDĐT.
+   - **Tách bạch Đối tượng tuyển sinh**: Làm rõ đối tượng có bằng Trung cấp/Cao đẳng/ĐH ngay trong phần tổng quan hoặc điều kiện.
+   - **Sửa câu cảnh báo tạm ngưng (dòng 195)**: Bỏ chữ "hệ Chính quy" bị hardcode, thay bằng tên hình thức học thực tế của chương trình (`$learning_details['mode']`).
+   - **Hiển thị thông tin Ngành cha**: Thêm link rõ ràng về CPT `major` tương ứng.
+2. **File `taxonomy-training_type.php`**:
+   - Chuẩn hóa H1 (dòng 171): Hiển thị `"Liên thông từ xa"`, `"Liên thông chính quy"`, `"Liên thông vừa học vừa làm"` khi chọn term; hiển thị `"Các chương trình tuyển sinh Liên thông Đại học"` khi ở base archive.
+   - Sửa nhãn filter pills: `"Hệ đào tạo:"` -> `"Hình thức học:"`.
+   - Loại trừ term `lien-thong` và `van-bang-2` nếu xuất hiện trong vòng lặp pills.
+3. **File `single-school.php` & `single-major.php`**:
+   - Sửa nhãn `"Lớp tuyển sinh"` -> `"Tuyển sinh liên thông"`.
+   - Sửa nhãn `"Hệ đào tạo:"` -> `"Hình thức học:"`.
+
+### Giai đoạn 3: Tối ưu Bộ Lọc & Rewrite Routing
+1. **File `inc/core/class-rewrite-rules.php`**:
+   - Tại dòng 247-254: Sửa redirect `/chuong-trinh/` trỏ về `/he-dao-tao/` (tổng thể mọi hình thức) thay vì ép sang `/he-dao-tao/tu-xa/`.
+2. **File `front-page.php`**:
+   - Sửa H1 ẩn (dòng 31): Đổi thành `"Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học Toàn Quốc"`.
+   - Sửa form search hero (dòng 126): Sửa action trỏ về `/he-dao-tao/`; sửa option `-- Chọn hệ học --` thành `-- Chọn hình thức học --`.
+3. **File `inc/core/class-helpers.php`**:
+   - Sửa `$mode_map` tại dòng 736: Loại bỏ `'van-bang-2'`, thêm tường minh `'chinh-quy' => 'Học chính quy tập trung'`.
+   - Sửa `ltdh_breadcrumb()`: Cập nhật nhãn ngữ nghĩa cho breadcrumbs.
+
+### Giai đoạn 4: SEO On-page & Schema
+1. **File `inc/seo/class-rankmath-integration.php`**:
+   - Bổ sung filter title cho taxonomy `training_type`: `Liên thông [Tên hình thức] | Tuyển sinh [Năm]`.
+   - Bổ sung filter title cho `school`: `Tuyển sinh Liên thông [Tên trường] | [Năm]`.
+   - Bổ sung filter title cho `major`: `Liên thông ngành [Tên ngành] | Tuyển sinh [Năm]`.
+   - Bổ sung filter description cho từng trang archive tương ứng.
+   - Bổ sung thuộc tính `educationalCredentialAwarded` trong schema JSON-LD.
 
 ---
 
-## 5. Verification Method (Phương Pháp Độc Lập Để Xác Minh Báo Cáo)
+## 6. VERIFICATION METHOD (Phương pháp Kiểm chứng Độc lập)
 
-Người nhận bàn giao hoặc kiểm toán viên độc lập có thể kiểm chứng lại các quan sát trên bằng các bước sau:
+Để kiểm chứng tính chính xác của các phát hiện và phương án can thiệp:
 
-1. **Xác minh thiếu Guard File:**
+1. **Kiểm tra trực tiếp các dòng mã nguồn**:
+   - Kiểm tra `class-defaults.php:33-49, 64-68` để xác nhận menu mặc định và subtext có chứa `"VB2"`.
+   - Kiểm tra `footer.php:75-102` để xác nhận 4 link `href="#"` và nhãn `"Cao đẳng online / VB2"`.
+   - Kiểm tra `single-program.php` để xác nhận không có bất kỳ dòng nào về "bằng cấp" và dòng 195 bị hardcode chữ "hệ Chính quy".
+   - Kiểm tra `class-rewrite-rules.php:247-254` để xác nhận redirect 301 cứng từ `/chuong-trinh/` sang `/he-dao-tao/tu-xa/`.
+   - Kiểm tra `front-page.php:31` để xác nhận H1 chứa `"Văn Bằng 2 & Đại Học Từ Xa"`.
+
+2. **Kiểm tra cú pháp PHP (Syntax Check)**:
+   Sau bất kỳ chỉnh sửa nào trong Phase 2, thực thi lệnh lint trên toàn bộ các file liên quan:
    ```bash
-   head -n 5 "header.php"
-   head -n 5 "inc/search-engine.php"
-   head -n 15 "tests/run-tests.php"
+   php -l inc/config/class-defaults.php
+   php -l inc/core/class-menus.php
+   php -l inc/core/class-helpers.php
+   php -l inc/core/class-rewrite-rules.php
+   php -l inc/seo/class-rankmath-integration.php
+   php -l single-program.php
+   php -l single-school.php
+   php -l single-major.php
+   php -l archive-school.php
+   php -l archive-major.php
+   php -l taxonomy-training_type.php
+   php -l footer.php
+   php -l front-page.php
    ```
-   *Kết quả mong đợi:* Thấy ngay `header.php` bắt đầu bằng `<!DOCTYPE html>`, `search-engine.php` bắt đầu bằng `add_filter`, và `run-tests.php` require `wp-load.php` mà không kiểm tra CLI.
 
-2. **Xác minh Bug Tự Hủy Transient Trang Chủ:**
-   ```bash
-   grep -n "delete_transient" front-page.php
-   ```
-   *Kết quả mong đợi:* Xác nhận dòng 16 gọi `delete_transient( 'ltdh_featured_schools_data' );`.
-
-3. **Xác minh Mặc Định `posts_per_page => -1`:**
-   ```bash
-   grep -n -C 5 "valid_limits" inc/core/class-query-filters.php
-   ```
-   *Kết quả mong đợi:* Xác nhận dòng 25 và dòng 30 gán `-1` khi không có tham số `limit`.
-
-4. **Xác minh Thiếu Nonce trong Form & AJAX:**
-   ```bash
-   grep -n "ltdh_ajax_filter_programs" functions.php
-   grep -n "ltdh_handle_native_form_submit" inc/lead-capture.php
-   ```
-   *Kết quả mong đợi:* Không có bất kỳ dòng nào gọi `check_ajax_referer` hay `wp_verify_nonce`.
-
-5. **Xác minh Thiếu Mime-type Upload:**
-   ```bash
-   grep -n -C 5 "wp_handle_upload" inc/eligibility.php
-   ```
-   *Kết quả mong đợi:* Xác nhận dòng 207 và dòng 838 chỉ truyền `$upload_overrides = array( 'test_form' => false );` mà không có mảng `'mimes'`.
-
----
-*Báo cáo được hoàn thành độc lập và toàn diện, không thay đổi bất kỳ file mã nguồn nào của dự án.*
+3. **Điều kiện vô hiệu hóa (Invalidation Conditions)**:
+   - Nếu phát hiện bất kỳ URL công khai nào bị đổi dẫn tới lỗi 404 hoặc mất index trên Google Search Console mà không có 301 redirect tương ứng.
+   - Nếu giao diện responsive hoặc layout grid/card bị vỡ cấu trúc CSS do thay đổi class Tailwind.
+   - Nếu bất kỳ bộ lọc AJAX nào trong `ltdh_ajax_filter_programs` bị mất tham số truy vấn.

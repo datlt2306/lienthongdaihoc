@@ -50,12 +50,26 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 	?>
 	<ul class="<?php echo esc_attr($ul_class); ?>">
 		<?php foreach ($menu_items as $mi) :
-			$url_path  = untrailingslashit($mi['url']);
-			$is_active = ($current_path === $url_path || $active_parent === $mi['url']);
-			$active_class = $is_active ? ' current-menu-item' : '';
+			$url_path   = untrailingslashit($mi['url']);
+			$is_active  = ($current_path === $url_path || $active_parent === $mi['url']);
+			$has_sub    = ! empty($mi['sub']) && is_array($mi['sub']);
+			$li_classes = 'menu-item' . ($is_active ? ' current-menu-item' : '') . ($has_sub ? ' menu-item-has-children' : '');
 		?>
-			<li class="menu-item<?php echo esc_attr($active_class); ?>">
+			<li class="<?php echo esc_attr(trim($li_classes)); ?>">
 				<a href="<?php echo esc_url(home_url($mi['url'])); ?>"><?php echo esc_html($mi['label']); ?></a>
+				<?php if ($has_sub) : ?>
+					<ul class="sub-menu">
+						<?php foreach ($mi['sub'] as $sub) :
+							$sub_path     = untrailingslashit($sub['url']);
+							$is_sub_active = ($current_path === $sub_path);
+							$sub_class    = $is_sub_active ? ' current-menu-item' : '';
+						?>
+							<li class="menu-item<?php echo esc_attr($sub_class); ?>">
+								<a href="<?php echo esc_url(home_url($sub['url'])); ?>"><?php echo esc_html($sub['label']); ?></a>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
 			</li>
 		<?php endforeach; ?>
 	</ul>
@@ -134,7 +148,7 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 		$new_items[] = $item;
 		$title = mb_strtolower(trim($item->title), 'UTF-8');
 
-		if ($title === 'hệ đào tạo') {
+		if ( in_array( $title, [ 'liên thông đại học', 'liên thông' ], true ) || in_array( $title, [ 'hình thức học', 'hệ đào tạo', 'hình thức đào tạo' ], true ) ) {
 			$filtered_items = [];
 			foreach ($new_items as $ni) {
 				if ((int) $ni->menu_item_parent === (int) $item->ID) {
@@ -145,15 +159,27 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 			$new_items = $filtered_items;
 
 			$item->classes[] = 'menu-item-has-children';
-			$types = get_terms(['taxonomy' => LTDH_TAX_TRAINING_TYPE, 'hide_empty' => false]);
-			if (! is_wp_error($types)) {
+
+			$allowed_training_types = ['dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam'];
+			$types = get_terms([
+				'taxonomy'   => LTDH_TAX_TRAINING_TYPE,
+				'slug'       => $allowed_training_types,
+				'hide_empty' => false,
+			]);
+			if (! is_wp_error($types) && is_array($types)) {
+				$types = array_values(array_filter($types, function($t) use ($allowed_training_types) {
+					return in_array($t->slug, $allowed_training_types, true);
+				}));
 				foreach ($types as $t) {
+					$term_link = get_term_link( $t );
+					$url = ( ! is_wp_error( $term_link ) && ! empty( $term_link ) ) ? $term_link : home_url( '/hinh-thuc-dao-tao/' . $t->slug . '/' );
+
 					$max_db_id++;
 					$sub_item                = new stdClass();
 					$sub_item->ID            = $max_db_id;
 					$sub_item->db_id         = $max_db_id;
 					$sub_item->title         = $t->name;
-					$sub_item->url           = home_url('/he-dao-tao/' . $t->slug . '/');
+					$sub_item->url           = $url;
 					$sub_item->menu_item_parent = $item->ID;
 					$sub_item->classes       = ['menu-item', 'menu-item-type-taxonomy', 'menu-item-object-training_type'];
 					$sub_item->type          = 'taxonomy';
@@ -177,7 +203,7 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 			}
 		}
 
-		if ($title === 'chuyên ngành') {
+		if ( in_array( $title, [ 'chuyên ngành', 'ngành học' ], true ) ) {
 			$filtered_items = [];
 			foreach ($new_items as $ni) {
 				if ((int) $ni->menu_item_parent === (int) $item->ID) {
@@ -265,8 +291,8 @@ function ltdh_highlight_menu_parameters($classes, $item) {
 		return $classes;
 	}
 
-	if (preg_match('#/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $item_parts['path'], $item_match) && 'page' !== $item_match[1]) {
-		if (preg_match('#/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $current_match) && 'page' !== $current_match[1]) {
+	if (preg_match('#/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $item_parts['path'], $item_match) && 'page' !== $item_match[1]) {
+		if (preg_match('#/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $current_match) && 'page' !== $current_match[1]) {
 			if ($item_match[1] === $current_match[1]) {
 				$classes[] = 'current-menu-item';
 			}
@@ -277,7 +303,7 @@ function ltdh_highlight_menu_parameters($classes, $item) {
 		parse_str($item_parts['query'], $item_query);
 		if (isset($item_query['he'])) {
 			$current_he = '';
-			if (preg_match('#/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $m) && 'page' !== $m[1]) {
+			if (preg_match('#/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $m) && 'page' !== $m[1]) {
 				$current_he = $m[1];
 			} elseif (isset($current_parts['query'])) {
 				parse_str($current_parts['query'], $current_query);

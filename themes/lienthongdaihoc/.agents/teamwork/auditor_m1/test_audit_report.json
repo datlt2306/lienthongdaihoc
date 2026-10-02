@@ -1,0 +1,1181 @@
+{
+    "audit_version": "1.0.0",
+    "generated_at": "2026-10-01 09:31:46",
+    "mode": "dry-run",
+    "output_file": "/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/auditor_m1/test_audit_report.json",
+    "summary": {
+        "programs": {
+            "total_scanned": 100,
+            "in_scope_total": 95,
+            "in_scope_tu_xa": 94,
+            "in_scope_vua_hoc_vua_lam": 1,
+            "out_of_scope_total": 5,
+            "out_of_scope_college": 4,
+            "out_of_scope_fulltime": 1,
+            "out_of_scope_vb2": 0,
+            "manual_review": 0,
+            "post_status_before": {
+                "publish": 95,
+                "draft": 5,
+                "trash": 0
+            },
+            "post_status_target": {
+                "publish": 95,
+                "draft": 5,
+                "trash": 0
+            },
+            "post_status_after": {
+                "publish": 95,
+                "draft": 5,
+                "trash": 0
+            }
+        },
+        "schools": {
+            "total_scanned": 21,
+            "in_scope_total": 20,
+            "out_of_scope_total": 1,
+            "post_status_before": {
+                "publish": 20,
+                "draft": 1,
+                "trash": 0
+            },
+            "post_status_target": {
+                "publish": 20,
+                "draft": 1,
+                "trash": 0
+            },
+            "post_status_after": {
+                "publish": 20,
+                "draft": 1,
+                "trash": 0
+            }
+        },
+        "majors": {
+            "total_scanned": 34,
+            "in_scope_total": 34,
+            "out_of_scope_total": 0,
+            "post_status_before": {
+                "publish": 34,
+                "draft": 0,
+                "trash": 0
+            },
+            "post_status_target": {
+                "publish": 34,
+                "draft": 0,
+                "trash": 0
+            },
+            "post_status_after": {
+                "publish": 34,
+                "draft": 0,
+                "trash": 0
+            }
+        },
+        "metadata_cleanup": {
+            "entities_scanned": 55,
+            "entities_modified": 0,
+            "orphaned_ghost_ids_pruned": [],
+            "drafted_prog_ids_pruned": []
+        },
+        "transients_flushed": [
+            "ltdh_filter_options",
+            "ltdh_featured_schools",
+            "ltdh_featured_schools_data",
+            "ltdh_hot_majors_data",
+            "ltdh_combinations_data",
+            "ltdh_archive_school_featured",
+            "ltdh_training_type_counts",
+            "ltdh_rewrite_flushed_v2"
+        ]
+    },
+    "out_of_scope_programs": [
+        {
+            "id": 1786,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "slug": "cu-nhan-quan-tri-kinh-doanh-tu-xa-truong-cao-dang-thuong-mai-va-du-lich-ha-noi",
+            "current_status": "draft",
+            "school_id": 1662,
+            "school_name": "Trường Cao đẳng Thương mại và Du lịch Hà Nội",
+            "school_is_college": true,
+            "major_id": 1671,
+            "major_name": "Quản trị kinh doanh",
+            "training_type_slugs": [
+                "tu-xa"
+            ],
+            "training_type_names": [
+                "Từ xa"
+            ],
+            "campus_slugs": [
+                "ha-noi"
+            ],
+            "scope": "out_of_scope",
+            "category": "out_of_scope_college",
+            "reason": "Chương trình thuộc trường Cao đẳng (Trường Cao đẳng Thương mại và Du lịch Hà Nội), ngoài phạm vi Liên thông Đại học.",
+            "target_status": "draft"
+        },
+        {
+            "id": 1787,
+            "title": "Cử nhân Kế toán",
+            "slug": "cu-nhan-ke-toan-tu-xa-truong-cao-dang-thuong-mai-va-du-lich-ha-noi",
+            "current_status": "draft",
+            "school_id": 1662,
+            "school_name": "Trường Cao đẳng Thương mại và Du lịch Hà Nội",
+            "school_is_college": true,
+            "major_id": 1673,
+            "major_name": "Kế toán",
+            "training_type_slugs": [
+                "tu-xa"
+            ],
+            "training_type_names": [
+                "Từ xa"
+            ],
+            "campus_slugs": [
+                "ho-chi-minh"
+            ],
+            "scope": "out_of_scope",
+            "category": "out_of_scope_college",
+            "reason": "Chương trình thuộc trường Cao đẳng (Trường Cao đẳng Thương mại và Du lịch Hà Nội), ngoài phạm vi Liên thông Đại học.",
+            "target_status": "draft"
+        },
+        {
+            "id": 1788,
+            "title": "Cử nhân Thương mại điện tử",
+            "slug": "cu-nhan-thuong-mai-dien-tu-tu-xa-truong-cao-dang-thuong-mai-va-du-lich-ha-noi",
+            "current_status": "draft",
+            "school_id": 1662,
+            "school_name": "Trường Cao đẳng Thương mại và Du lịch Hà Nội",
+            "school_is_college": true,
+            "major_id": 1681,
+            "major_name": "Thương mại điện tử",
+            "training_type_slugs": [
+                "tu-xa"
+            ],
+            "training_type_names": [
+                "Từ xa"
+            ],
+            "campus_slugs": [
+                "online"
+            ],
+            "scope": "out_of_scope",
+            "category": "out_of_scope_college",
+            "reason": "Chương trình thuộc trường Cao đẳng (Trường Cao đẳng Thương mại và Du lịch Hà Nội), ngoài phạm vi Liên thông Đại học.",
+            "target_status": "draft"
+        },
+        {
+            "id": 1789,
+            "title": "Cử nhân Quản trị khách sạn",
+            "slug": "cu-nhan-quan-tri-khach-san-tu-xa-truong-cao-dang-thuong-mai-va-du-lich-ha-noi",
+            "current_status": "draft",
+            "school_id": 1662,
+            "school_name": "Trường Cao đẳng Thương mại và Du lịch Hà Nội",
+            "school_is_college": true,
+            "major_id": 1753,
+            "major_name": "Quản trị khách sạn",
+            "training_type_slugs": [
+                "tu-xa"
+            ],
+            "training_type_names": [
+                "Từ xa"
+            ],
+            "campus_slugs": [
+                "ha-noi"
+            ],
+            "scope": "out_of_scope",
+            "category": "out_of_scope_college",
+            "reason": "Chương trình thuộc trường Cao đẳng (Trường Cao đẳng Thương mại và Du lịch Hà Nội), ngoài phạm vi Liên thông Đại học.",
+            "target_status": "draft"
+        },
+        {
+            "id": 2013,
+            "title": "Cử nhân Công nghệ thông tin (Liên thông Chính quy)",
+            "slug": "cu-nhan-cong-nghe-thong-tin-lien-thong-chinh-quy-chinh-quy-utc",
+            "current_status": "draft",
+            "school_id": 1853,
+            "school_name": "Trường Đại học Giao thông Vận tải",
+            "school_is_college": false,
+            "major_id": 1677,
+            "major_name": "Công nghệ thông tin",
+            "training_type_slugs": [
+                "chinh-quy"
+            ],
+            "training_type_names": [
+                "Chính quy"
+            ],
+            "campus_slugs": [
+                "ha-noi"
+            ],
+            "scope": "out_of_scope",
+            "category": "out_of_scope_fulltime",
+            "reason": "Hình thức đào tạo Chính quy nằm ngoài phạm vi Liên thông (Từ xa / Vừa học vừa làm).",
+            "target_status": "draft"
+        }
+    ],
+    "out_of_scope_schools": [
+        {
+            "id": 1662,
+            "title": "Trường Cao đẳng Thương mại và Du lịch Hà Nội",
+            "slug": "truong-cao-dang-thuong-mai-va-du-lich-ha-noi",
+            "code": "HCCT",
+            "current_status": "draft",
+            "is_college": true,
+            "total_offered_count": 0,
+            "in_scope_offered_count": 0,
+            "scope": "out_of_scope",
+            "category": "out_of_scope_institution",
+            "reason": "Cơ sở đào tạo bậc Cao đẳng (HCCT), không cấp bằng Cử nhân đại học.",
+            "target_status": "draft"
+        }
+    ],
+    "metadata_modifications": [],
+    "in_scope_programs": [
+        {
+            "id": 1672,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "TVU",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1674,
+            "title": "Cử nhân Kế toán",
+            "school": "TVU",
+            "major": "Kế toán",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1676,
+            "title": "Cử nhân Luật",
+            "school": "TVU",
+            "major": "Luật",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1678,
+            "title": "Cử nhân Công nghệ thông tin",
+            "school": "TVU",
+            "major": "Công nghệ thông tin",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1680,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "TVU",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1682,
+            "title": "Cử nhân Thương mại điện tử",
+            "school": "TVU",
+            "major": "Thương mại điện tử",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1683,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "UNETI",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1684,
+            "title": "Cử nhân Kế toán",
+            "school": "UNETI",
+            "major": "Kế toán",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1685,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "UNETI",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1687,
+            "title": "Cử nhân Marketing",
+            "school": "UNETI",
+            "major": "Marketing",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1689,
+            "title": "Cử nhân Kinh doanh thương mại -Tạm ngưng cho đến khi mở",
+            "school": "UNETI",
+            "major": "Kinh doanh thương mại -Tạm ngưng cho đến khi mở",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1690,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "TMU",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1691,
+            "title": "Cử nhân Marketing",
+            "school": "TMU",
+            "major": "Marketing",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1693,
+            "title": "Cử nhân Logistics",
+            "school": "TMU",
+            "major": "Logistics",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1695,
+            "title": "Cử nhân Luật kinh tế",
+            "school": "TMU",
+            "major": "Luật kinh tế",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1696,
+            "title": "Cử nhân Thương mại điện tử",
+            "school": "TMU",
+            "major": "Thương mại điện tử",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1697,
+            "title": "Cử nhân Kế toán",
+            "school": "NAU",
+            "major": "Kế toán",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1698,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "NAU",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1699,
+            "title": "Cử nhân Luật kinh tế",
+            "school": "INTRACOM",
+            "major": "Luật kinh tế",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1700,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "INTRACOM",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1701,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "INTRACOM",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1702,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "QBU",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1703,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "QBU",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1704,
+            "title": "Cử nhân Kế toán",
+            "school": "QBU",
+            "major": "Kế toán",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1705,
+            "title": "Cử nhân Công nghệ thông tin",
+            "school": "QBU",
+            "major": "Công nghệ thông tin",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1707,
+            "title": "Cử nhân Ngôn ngữ Trung",
+            "school": "QBU",
+            "major": "Ngôn ngữ Trung",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1708,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "HAUI",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1709,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "HAUI",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1710,
+            "title": "Cử nhân Kế toán",
+            "school": "HAUI",
+            "major": "Kế toán",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1712,
+            "title": "Cử nhân Tài chính Ngân hàng",
+            "school": "BAV",
+            "major": "Tài chính Ngân hàng",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1713,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "BAV",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1714,
+            "title": "Cử nhân Luật kinh tế",
+            "school": "BAV",
+            "major": "Luật kinh tế",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1715,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "BAV",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1716,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "DNU",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1717,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "DNU",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1718,
+            "title": "Cử nhân Công nghệ thông tin",
+            "school": "DNU",
+            "major": "Công nghệ thông tin",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1719,
+            "title": "Cử nhân Kế toán",
+            "school": "Trường Đại học Kinh tế Quốc dân",
+            "major": "Kế toán",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1720,
+            "title": "Cử nhân Tài chính Ngân hàng",
+            "school": "Trường Đại học Kinh tế Quốc dân",
+            "major": "Tài chính Ngân hàng",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1721,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "Trường Đại học Kinh tế Quốc dân",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1722,
+            "title": "Cử nhân Luật kinh tế",
+            "school": "Trường Đại học Kinh tế Quốc dân",
+            "major": "Luật kinh tế",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1723,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "Học viện Công nghệ Bưu chính Viễn thông",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1724,
+            "title": "Cử nhân Công nghệ thông tin",
+            "school": "Học viện Công nghệ Bưu chính Viễn thông",
+            "major": "Công nghệ thông tin",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1726,
+            "title": "Cử nhân Kỹ thuật điện tử viễn thông",
+            "school": "Học viện Công nghệ Bưu chính Viễn thông",
+            "major": "Kỹ thuật điện tử viễn thông",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1727,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "Đại học Thái Nguyên",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1728,
+            "title": "Cử nhân Ngôn ngữ Trung",
+            "school": "Đại học Thái Nguyên",
+            "major": "Ngôn ngữ Trung",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1729,
+            "title": "Cử nhân Luật kinh tế",
+            "school": "Đại học Thái Nguyên",
+            "major": "Luật kinh tế",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1730,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "Đại học Thái Nguyên",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1731,
+            "title": "Cử nhân Kế toán",
+            "school": "Đại học Thái Nguyên",
+            "major": "Kế toán",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1732,
+            "title": "Cử nhân Công nghệ thông tin",
+            "school": "Đại học Thái Nguyên",
+            "major": "Công nghệ thông tin",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1733,
+            "title": "Cử nhân Tài chính Ngân hàng",
+            "school": "Đại học Thái Nguyên",
+            "major": "Tài chính Ngân hàng",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1734,
+            "title": "Cử nhân Kỹ thuật điện tử viễn thông",
+            "school": "Đại học Thái Nguyên",
+            "major": "Kỹ thuật điện tử viễn thông",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1736,
+            "title": "Cử nhân Thương mại điện tử và marketing số",
+            "school": "Đại học Thái Nguyên",
+            "major": "Thương mại điện tử và marketing số",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1737,
+            "title": "Cử nhân Luật",
+            "school": "Đại học Thái Nguyên",
+            "major": "Luật",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1738,
+            "title": "Cử nhân Kế toán",
+            "school": "Học viện Tài chính",
+            "major": "Kế toán",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1739,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "Học viện Tài chính",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1741,
+            "title": "Cử nhân Kỹ thuật xây dựng",
+            "school": "Trường Đại học Kỹ thuật Công nghiệp Thái Nguyên",
+            "major": "Kỹ thuật xây dựng",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1742,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "Trường Đại học Kỹ thuật Công nghiệp Thái Nguyên",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1744,
+            "title": "Cử nhân Kỹ thuật máy tính",
+            "school": "Trường Đại học Kỹ thuật Công nghiệp Thái Nguyên",
+            "major": "Kỹ thuật máy tính",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1746,
+            "title": "Cử nhân Kinh tế công nghiệp",
+            "school": "Trường Đại học Kỹ thuật Công nghiệp Thái Nguyên",
+            "major": "Kinh tế công nghiệp",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1748,
+            "title": "Cử nhân Quản lý công nghiệp",
+            "school": "Trường Đại học Kỹ thuật Công nghiệp Thái Nguyên",
+            "major": "Quản lý công nghiệp",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1749,
+            "title": "Cử nhân Kế toán",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Kế toán",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1750,
+            "title": "Cử nhân Quản trị kinh doanh",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Quản trị kinh doanh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1752,
+            "title": "Cử nhân Quản trị dịch vụ du lịch và Lữ hành",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Quản trị dịch vụ du lịch và Lữ hành",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1754,
+            "title": "Cử nhân Quản trị khách sạn",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Quản trị khách sạn",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1755,
+            "title": "Cử nhân Thương mại điện tử",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Thương mại điện tử",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1756,
+            "title": "Cử nhân Tài chính Ngân hàng",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Tài chính Ngân hàng",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1757,
+            "title": "Cử nhân Công nghệ thông tin",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Công nghệ thông tin",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1758,
+            "title": "Cử nhân Luật kinh tế",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Luật kinh tế",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1759,
+            "title": "Cử nhân Luật",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Luật",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1760,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1761,
+            "title": "Cử nhân Ngôn ngữ Trung",
+            "school": "Viện Đại học Mở Hà Nội",
+            "major": "Ngôn ngữ Trung",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1763,
+            "title": "Cử nhân Công nghệ thực phẩm- đào tạo bằng tiếng anh",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Công nghệ thực phẩm- đào tạo bằng tiếng anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1765,
+            "title": "Cử nhân Công nghệ sinh học",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Công nghệ sinh học",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1767,
+            "title": "Cử nhân Nông nghiệp công nghệ cao",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Nông nghiệp công nghệ cao",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1769,
+            "title": "Cử nhân Công nghệ thực phẩm",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Công nghệ thực phẩm",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1771,
+            "title": "Cử nhân Khoa học môi trường",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Khoa học môi trường",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1773,
+            "title": "Cử nhân Kinh tế nông nghiệp",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Kinh tế nông nghiệp",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1775,
+            "title": "Cử nhân Quản lý đất đai",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Quản lý đất đai",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1777,
+            "title": "Cử nhân Bất động sản",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Bất động sản",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1779,
+            "title": "Cử nhân Thú Y",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Thú Y",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1781,
+            "title": "Cử nhân Quản lý tài nguyên và môi trường",
+            "school": "Trường Đại học Nông Lâm Thái Nguyên",
+            "major": "Quản lý tài nguyên và môi trường",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1782,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "Trường Đại học Lao động - Xã hội",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1783,
+            "title": "Cử nhân Luật kinh tế",
+            "school": "Trường Đại học Lao động - Xã hội",
+            "major": "Luật kinh tế",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1785,
+            "title": "Cử nhân Công tác xã hội",
+            "school": "Trường Đại học Lao động - Xã hội",
+            "major": "Công tác xã hội",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1790,
+            "title": "Cử nhân Luật",
+            "school": "Trường Đại học Thủ đô Hà Nội",
+            "major": "Luật",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1791,
+            "title": "Cử nhân Logistics",
+            "school": "Trường Đại học Thủ đô Hà Nội",
+            "major": "Logistics",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1792,
+            "title": "Cử nhân Ngôn ngữ Trung",
+            "school": "Trường Đại học Thủ đô Hà Nội",
+            "major": "Ngôn ngữ Trung",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1793,
+            "title": "Cử nhân Luật",
+            "school": "Trường Đại học Công đoàn",
+            "major": "Luật",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1795,
+            "title": "Cử nhân Bảo hộ lao động",
+            "school": "Trường Đại học Công đoàn",
+            "major": "Bảo hộ lao động",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1797,
+            "title": "Cử nhân Quản trị nhân lực",
+            "school": "Trường Đại học Công đoàn",
+            "major": "Quản trị nhân lực",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1799,
+            "title": "Cử nhân Việt Nam học",
+            "school": "Trường Đại học Công đoàn",
+            "major": "Việt Nam học",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1800,
+            "title": "Cử nhân Công tác xã hội",
+            "school": "Trường Đại học Công đoàn",
+            "major": "Công tác xã hội",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1801,
+            "title": "Cử nhân Ngôn ngữ Anh",
+            "school": "Trường Đại học Công đoàn",
+            "major": "Ngôn ngữ Anh",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        },
+        {
+            "id": 1854,
+            "title": "Cử nhân Công nghệ thông tin (Vừa học vừa làm)",
+            "school": "Trường Đại học Giao thông Vận tải",
+            "major": "Công nghệ thông tin",
+            "category": "in_scope_vua_hoc_vua_lam",
+            "training_types": [
+                "Vừa học vừa làm"
+            ]
+        },
+        {
+            "id": 2014,
+            "title": "Cử nhân Công nghệ thông tin (Đào tạo từ xa)",
+            "school": "Trường Đại học Giao thông Vận tải",
+            "major": "Công nghệ thông tin",
+            "category": "in_scope_tu_xa",
+            "training_types": [
+                "Từ xa"
+            ]
+        }
+    ]
+}

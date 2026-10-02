@@ -404,7 +404,7 @@ function ltdh_breadcrumb(): void {
 		echo '<div class="ltdh-breadcrumb max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-sm text-slate-400">';
 		echo '<a href="' . esc_url( home_url( '/' ) ) . '" class="hover:text-brand-primary">Trang chủ</a>';
 		echo ' <span class="mx-2 text-slate-300">/</span> ';
-		echo '<a href="' . esc_url( home_url( '/he-dao-tao/tu-xa/' ) ) . '" class="hover:text-brand-primary">Chương trình</a>';
+		echo '<a href="' . esc_url( home_url( '/hinh-thuc-dao-tao/' ) ) . '" class="hover:text-brand-primary">Hình thức đào tạo</a>';
 		echo ' <span class="mx-2 text-slate-300">/</span> ';
 		echo '<span class="text-slate-600 font-medium">So sánh chương trình</span>';
 		echo '</div>';
@@ -412,7 +412,7 @@ function ltdh_breadcrumb(): void {
 	}
 
 	$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
-	$is_he_dao_tao = (bool) preg_match( '#^/he-dao-tao(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path );
+	$is_he_dao_tao = (bool) preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path );
 
 	$html = '';
 	if ( ! $is_he_dao_tao && function_exists( 'rank_math_the_breadcrumbs' ) ) {
@@ -429,7 +429,7 @@ function ltdh_breadcrumb(): void {
 		if ( is_singular() ) {
 			$post_type = get_post_type();
 			if ( $post_type === 'program' ) {
-				$crumbs[] = [ 'label' => 'Hệ đào tạo', 'url' => home_url( '/he-dao-tao/' ) ];
+				$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
 				$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
 			} elseif ( $post_type === 'school' ) {
 				$crumbs[] = [ 'label' => 'Trường đối tác', 'url' => get_post_type_archive_link( 'school' ) ?: home_url( '/truong-doi-tac/' ) ];
@@ -446,7 +446,7 @@ function ltdh_breadcrumb(): void {
 		} elseif ( is_tax() || is_category() || is_tag() ) {
 			$term = get_queried_object();
 			if ( is_tax( 'training_type' ) ) {
-				$crumbs[] = [ 'label' => 'Hệ đào tạo', 'url' => home_url( '/he-dao-tao/' ) ];
+				$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
 			}
 			$crumbs[] = [ 'label' => $term->name, 'url' => '' ];
 		} elseif ( is_post_type_archive() ) {
@@ -456,20 +456,21 @@ function ltdh_breadcrumb(): void {
 			} elseif ( $post_type === 'major' ) {
 				$crumbs[] = [ 'label' => 'Chuyên ngành', 'url' => '' ];
 			} else {
-				$crumbs[] = [ 'label' => 'Hệ đào tạo', 'url' => '' ];
+				$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => '' ];
 			}
 		} elseif ( is_home() ) {
 			$crumbs[] = [ 'label' => 'Tin tức', 'url' => '' ];
 		} else {
-			// Check if we are on training_type virtual archive /he-dao-tao/
+			// Check if we are on training_type virtual archive /hinh-thuc-dao-tao/ or /he-dao-tao/
 			$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
-			if ( preg_match( '#^/he-dao-tao(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path, $m ) ) {
+			if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path, $m ) ) {
 				if ( ! empty( $m[1] ) && 'page' !== $m[1] ) {
-					$term     = get_term_by( 'slug', $m[1], 'training_type' );
-					$crumbs[] = [ 'label' => 'Hệ đào tạo', 'url' => home_url( '/he-dao-tao/' ) ];
-					$crumbs[] = [ 'label' => $term ? $term->name : esc_html( $m[1] ), 'url' => '' ];
+					$slug_lookup = ( 'tu-xa' === $m[1] ) ? 'dao-tao-tu-xa' : $m[1];
+					$term        = get_term_by( 'slug', $slug_lookup, 'training_type' ) ?: get_term_by( 'slug', $m[1], 'training_type' );
+					$crumbs[]    = [ 'label' => 'Hình thức đào tạo', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
+					$crumbs[]    = [ 'label' => $term ? $term->name : esc_html( $m[1] ), 'url' => '' ];
 				} else {
-					$crumbs[] = [ 'label' => 'Hệ đào tạo', 'url' => '' ];
+					$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => '' ];
 				}
 			} else {
 				$crumbs[] = [ 'label' => wp_title( '', false ) ?: 'Lưu trữ', 'url' => '' ];
@@ -510,9 +511,9 @@ function ltdh_get_cached_query(string $transient_key, array $query_args, int $ex
 }
 
 function ltdh_get_cached_featured_schools() {
-	$cache_key = 'ltdh_featured_schools_data';
-	$data = get_transient( $cache_key );
-	if ( false !== $data ) {
+	$cache_key = 'ltdh_featured_schools_data_v10';
+	$data      = get_transient( $cache_key );
+	if ( false !== $data && is_array( $data ) ) {
 		return $data;
 	}
 
@@ -529,11 +530,11 @@ function ltdh_get_cached_featured_schools() {
 		while ( $schools_query->have_posts() ) {
 			$schools_query->the_post();
 			$school_id = get_the_ID();
-			$address = get_field('address', $school_id);
-			$hotline = get_field('hotline', $school_id) ?: ( function_exists('get_field') ? get_field('global_hotline', 'options') : '' );
-			$thumb_url = get_the_post_thumbnail_url($school_id, 'medium') ?: ($fallback_images[$index % 5] ?? ltdh_get_fallback_image('school'));
-			$logo_id = ltdh_get_school_image_id($school_id);
-			$en_name = get_post_meta($school_id, 'english_name', true) ?: 'University';
+			$address   = get_field( 'address', $school_id );
+			$hotline   = get_field( 'hotline', $school_id ) ?: ( function_exists( 'get_field' ) ? get_field( 'global_hotline', 'options' ) : '' );
+			$thumb_url = ltdh_get_school_cover_url( $school_id, 'medium' );
+			$logo_id   = ltdh_get_school_image_id( $school_id );
+			$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
 
 			$school_progs = get_posts([
 				'post_type' => 'program',
@@ -694,13 +695,183 @@ function ltdh_get_school_image_id(int $school_id): int {
 	if (function_exists('get_field')) {
 		$logo_id = get_field('logo', $school_id);
 		if ($logo_id) {
-			return (int) $logo_id;
+			if (is_numeric($logo_id)) {
+				return (int) $logo_id;
+			}
+			if (is_array($logo_id) && !empty($logo_id['ID'])) {
+				return (int) $logo_id['ID'];
+			}
 		}
 	}
-	if (has_post_thumbnail($school_id)) {
-		return (int) get_post_thumbnail_id($school_id);
-	}
 	return 0;
+}
+
+function ltdh_generate_school_svg_logo( string $code, string $title = '' ): string {
+	$code = strtoupper( trim( $code ) );
+	$color_map = [
+		'UTC'  => [ 'bg' => '#00308b', 'text' => '#ffffff', 'accent' => '#f97316' ],
+		'NEU'  => [ 'bg' => '#b91c1c', 'text' => '#ffffff', 'accent' => '#fbbf24' ],
+		'TNU'  => [ 'bg' => '#047857', 'text' => '#ffffff', 'accent' => '#34d399' ],
+		'PTIT' => [ 'bg' => '#c2410c', 'text' => '#ffffff', 'accent' => '#fca5a5' ],
+		'TMU'  => [ 'bg' => '#1d4ed8', 'text' => '#ffffff', 'accent' => '#93c5fd' ],
+		'TVU'  => [ 'bg' => '#0f766e', 'text' => '#ffffff', 'accent' => '#5eead4' ],
+		'DNU'  => [ 'bg' => '#ea580c', 'text' => '#ffffff', 'accent' => '#fed7aa' ],
+		'BAV'  => [ 'bg' => '#1e3a8a', 'text' => '#ffffff', 'accent' => '#93c5fd' ],
+		'AOF'  => [ 'bg' => '#4338ca', 'text' => '#ffffff', 'accent' => '#c7d2fe' ],
+		'HAUI' => [ 'bg' => '#0369a1', 'text' => '#ffffff', 'accent' => '#7dd3fc' ],
+	];
+
+	$c = $color_map[ $code ] ?? [ 'bg' => '#0f172a', 'text' => '#ffffff', 'accent' => '#3b82f6' ];
+	$font_size = strlen( $code ) <= 3 ? '40' : ( strlen( $code ) <= 5 ? '30' : '22' );
+
+	$svg = sprintf(
+		'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">' .
+		'<rect width="120" height="120" rx="24" fill="%s"/>' .
+		'<circle cx="60" cy="60" r="50" fill="none" stroke="%s" stroke-width="3" stroke-opacity="0.3"/>' .
+		'<text x="60" y="67" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif" font-weight="900" font-size="%s" fill="%s" text-anchor="middle" dominant-baseline="middle">%s</text>' .
+		'</svg>',
+		$c['bg'],
+		$c['accent'],
+		$font_size,
+		$c['text'],
+		esc_html( $code )
+	);
+
+	return 'data:image/svg+xml;utf8,' . rawurlencode( $svg );
+}
+
+function ltdh_get_school_logo_url( $school_id, string $size = 'thumbnail' ): string {
+	if ( is_array( $school_id ) ) {
+		$school_id = ! empty( $school_id ) ? ( is_object( $school_id[0] ) ? $school_id[0]->ID : $school_id[0] ) : 0;
+	} elseif ( is_object( $school_id ) ) {
+		$school_id = $school_id->ID;
+	}
+	$school_id = intval( $school_id );
+
+	if ( $school_id > 0 && function_exists( 'get_field' ) ) {
+		$logo = get_field( 'logo', $school_id );
+		if ( ! empty( $logo ) ) {
+			$url = '';
+			if ( is_numeric( $logo ) ) {
+				$url = wp_get_attachment_image_url( (int) $logo, $size );
+			} elseif ( is_array( $logo ) ) {
+				$url = $logo['sizes'][ $size ] ?? ( $logo['url'] ?? '' );
+			} elseif ( is_string( $logo ) && 0 === strpos( $logo, 'http' ) ) {
+				$url = $logo;
+			}
+			if ( ! empty( $url ) && false === strpos( $url, 'cropped-logo' ) ) {
+				return $url;
+			}
+		}
+
+		$image_id = ltdh_get_school_image_id( $school_id );
+		if ( $image_id ) {
+			$url = wp_get_attachment_image_url( $image_id, $size );
+			if ( ! empty( $url ) && false === strpos( $url, 'cropped-logo' ) ) {
+				return $url;
+			}
+		}
+	}
+
+	$school_code = '';
+	$title       = '';
+	if ( $school_id > 0 ) {
+		$school_code = get_post_meta( $school_id, 'school_code', true );
+		$title       = get_the_title( $school_id );
+	}
+
+	if ( empty( $school_code ) && ! empty( $title ) ) {
+		if ( false !== mb_stripos( $title, 'Giao thông' ) ) {
+			$school_code = 'UTC';
+		} elseif ( false !== mb_stripos( $title, 'Thái Nguyên' ) ) {
+			$school_code = 'TNU';
+		} elseif ( false !== mb_stripos( $title, 'Kinh tế Quốc dân' ) ) {
+			$school_code = 'NEU';
+		} elseif ( false !== mb_stripos( $title, 'Bưu chính' ) ) {
+			$school_code = 'PTIT';
+		} elseif ( false !== mb_stripos( $title, 'Thương mại' ) ) {
+			$school_code = 'TMU';
+		} elseif ( false !== mb_stripos( $title, 'Trà Vinh' ) ) {
+			$school_code = 'TVU';
+		} elseif ( false !== mb_stripos( $title, 'Đại Nam' ) ) {
+			$school_code = 'DNU';
+		} elseif ( false !== mb_stripos( $title, 'Ngân hàng' ) ) {
+			$school_code = 'BAV';
+		} elseif ( false !== mb_stripos( $title, 'Tài chính' ) ) {
+			$school_code = 'AOF';
+		} elseif ( false !== mb_stripos( $title, 'Công nghiệp' ) ) {
+			$school_code = 'HAUI';
+		} else {
+			$words       = explode( ' ', preg_replace( '/^(Trường|Đại học|Học viện)\s+/iu', '', $title ) );
+			$school_code = '';
+			foreach ( array_slice( $words, 0, 4 ) as $w ) {
+				if ( ! empty( $w ) ) {
+					$school_code .= mb_substr( $w, 0, 1 );
+				}
+			}
+			$school_code = mb_strtoupper( $school_code );
+		}
+	}
+
+	if ( ! empty( $school_code ) ) {
+		return ltdh_generate_school_svg_logo( $school_code, $title );
+	}
+
+	return ltdh_generate_school_svg_logo( 'UNI', 'Đại học' );
+}
+
+/**
+ * Get school cover / banner photo URL (e.g. for card top backgrounds or school page banners).
+ * Never uses the school logo attachment as a banner background.
+ *
+ * @param int|array|object $school_id School post ID, array, or post object.
+ * @param string           $size      Image size name (default 'medium_large').
+ * @return string
+ */
+function ltdh_get_school_cover_url( $school_id, string $size = 'medium_large' ): string {
+	if ( is_array( $school_id ) ) {
+		$school_id = ! empty( $school_id ) ? ( is_object( $school_id[0] ) ? $school_id[0]->ID : $school_id[0] ) : 0;
+	} elseif ( is_object( $school_id ) ) {
+		$school_id = $school_id->ID;
+	}
+	$school_id = intval( $school_id );
+
+	$theme_uri = get_template_directory_uri();
+
+	if ( $school_id > 0 ) {
+		$logo_id  = function_exists( 'ltdh_get_school_image_id' ) ? ltdh_get_school_image_id( $school_id ) : 0;
+		$logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'full' ) : '';
+
+		if ( function_exists( 'get_field' ) ) {
+			// 1. Try ACF school_banner, cover_image, page_banner, or banner
+			$banner = get_field( 'school_banner', $school_id ) ?: get_field( 'cover_image', $school_id ) ?: get_field( 'page_banner', $school_id ) ?: get_field( 'banner', $school_id );
+			if ( ! empty( $banner ) ) {
+				$url = '';
+				if ( is_numeric( $banner ) ) {
+					$url = wp_get_attachment_image_url( (int) $banner, $size );
+				} elseif ( is_array( $banner ) ) {
+					$url = $banner['sizes'][ $size ] ?? ( $banner['url'] ?? '' );
+				} elseif ( is_string( $banner ) && 0 === strpos( $banner, 'http' ) ) {
+					$url = $banner;
+				}
+				if ( ! empty( $url ) && $url !== $logo_url && false === strpos( $url, 'cropped-logo' ) && false === strpos( strtolower( $url ), 'logo' ) ) {
+					return $url;
+				}
+			}
+
+			// 2. Check featured image ONLY IF it's NOT the logo attachment
+			$thumb_id = get_post_thumbnail_id( $school_id );
+			if ( $thumb_id && (int) $thumb_id !== (int) $logo_id ) {
+				$url = wp_get_attachment_image_url( $thumb_id, $size );
+				if ( ! empty( $url ) && $url !== $logo_url && false === strpos( $url, 'cropped-logo' ) && false === strpos( strtolower( $url ), 'logo' ) ) {
+					return $url;
+				}
+			}
+		}
+	}
+
+	// 3. Fallback campus cover photos (never returning logo image)
+	return $theme_uri . '/assets/images/banner-school.jpg';
 }
 
 function ltdh_render_school_thumbnail(int $school_id, string $size = 'thumbnail', string $classes = 'h-14 w-14 object-cover border border-slate-100 bg-white rounded-lg'): void {
@@ -727,19 +898,56 @@ function ltdh_render_school_thumbnail(int $school_id, string $size = 'thumbnail'
 // ----------------------------------------------------
 
 function ltdh_get_program_learning_details(int $program_id): array {
-	$campuses    = wp_get_post_terms($program_id, LTDH_TAX_CAMPUS);
-	$campus_name = ! empty($campuses) && ! is_wp_error($campuses) ? implode(', ', wp_list_pluck($campuses, 'name')) : 'Hà Nội';
+	$campuses          = wp_get_post_terms($program_id, LTDH_TAX_CAMPUS);
+	$physical_campuses = [];
 
-	$types      = wp_get_post_terms($program_id, LTDH_TAX_TRAINING_TYPE);
-	$type_slug  = ! empty($types) && ! is_wp_error($types) ? $types[0]->slug : '';
+	if ( ! empty($campuses) && ! is_wp_error($campuses) ) {
+		foreach ($campuses as $campus) {
+			$slug = is_object($campus) ? $campus->slug : '';
+			$name = is_object($campus) ? trim($campus->name) : '';
+			if ('online' === strtolower($slug) || 'online' === strtolower($name)) {
+				continue;
+			}
+			if ($name && ! in_array($name, $physical_campuses, true)) {
+				$physical_campuses[] = $name;
+			}
+		}
+	}
 
-	$mode_map = [
-		'tu-xa'          => 'Học online 100%',
-		'vua-hoc-vua-lam' => 'Học tập trung cuối tuần',
-		'van-bang-2'     => 'Học tập trung / Online linh hoạt',
-	];
+	$types     = wp_get_post_terms($program_id, LTDH_TAX_TRAINING_TYPE);
+	$type_slug = ! empty($types) && ! is_wp_error($types) ? $types[0]->slug : '';
 
-	$learning_mode = $mode_map[$type_slug] ?? 'Học tập trung';
+	// Resolve physical campus location: never displays "Online" under physical location
+	if ( ! empty($physical_campuses) ) {
+		$campus_name = implode(', ', $physical_campuses);
+	} elseif ( 'tu-xa' === $type_slug ) {
+		$campus_name = 'Toàn quốc';
+	} else {
+		// Non-tu-xa without explicit physical campus: check school region
+		$school_id = get_post_meta($program_id, 'school_relationship', true);
+		if ( is_array($school_id) ) {
+			$school_id = ! empty($school_id) ? ( is_object($school_id[0]) ? $school_id[0]->ID : $school_id[0] ) : 0;
+		} elseif ( is_object($school_id) ) {
+			$school_id = $school_id->ID;
+		}
+		$school_region = '';
+		if ($school_id) {
+			$region_terms = wp_get_post_terms((int) $school_id, LTDH_TAX_REGION);
+			if ( ! empty($region_terms) && ! is_wp_error($region_terms) ) {
+				$school_region = $region_terms[0]->name;
+			}
+		}
+		$campus_name = $school_region ?: 'Toàn quốc';
+	}
+
+	// Resolve learning mode
+	if ( 'tu-xa' === $type_slug ) {
+		$learning_mode = 'Học online 100%';
+	} elseif ( 'vua-hoc-vua-lam' === $type_slug ) {
+		$learning_mode = 'Học tập trung / Cuối tuần';
+	} else {
+		$learning_mode = 'Học tập trung / Cuối tuần';
+	}
 
 	return [
 		'campus' => $campus_name,
@@ -802,9 +1010,10 @@ function ltdh_get_school_unique_majors_count( int $school_id ): int {
 		return (int) $cached;
 	}
 
-	$programs = get_posts( [
+	$allowed_slugs = [ 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];
+	$programs      = get_posts( [
 		'post_type'      => 'program',
-		'posts_per_page' => 100,
+		'posts_per_page' => -1,
 		'post_status'    => 'publish',
 		'fields'         => 'ids',
 		'no_found_rows'  => true,
@@ -815,7 +1024,37 @@ function ltdh_get_school_unique_majors_count( int $school_id ): int {
 				'compare' => '=',
 			],
 		],
+		'tax_query'      => [
+			[
+				'taxonomy' => LTDH_TAX_TRAINING_TYPE,
+				'field'    => 'slug',
+				'terms'    => $allowed_slugs,
+				'operator' => 'IN',
+			],
+		],
 	] );
+
+	if ( empty( $programs ) ) {
+		$offered_ids = get_post_meta( $school_id, '_offered_programs', true );
+		if ( ! empty( $offered_ids ) && is_array( $offered_ids ) ) {
+			$programs = get_posts( [
+				'post_type'      => 'program',
+				'posts_per_page' => -1,
+				'post_status'    => 'publish',
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+				'post__in'       => $offered_ids,
+				'tax_query'      => [
+					[
+						'taxonomy' => LTDH_TAX_TRAINING_TYPE,
+						'field'    => 'slug',
+						'terms'    => $allowed_slugs,
+						'operator' => 'IN',
+					],
+				],
+			] );
+		}
+	}
 
 	if ( empty( $programs ) ) {
 		wp_cache_set( $cache_key, 0, 'ltdh', HOUR_IN_SECONDS );
@@ -930,8 +1169,12 @@ function ltdh_get_program_admission_deadline_display(int $program_id): string {
 /**
  * Get active training types for a school (with caching and automatic rollup from programs).
  *
+ * Rolls up exclusively from published, in-scope programs where
+ * school_relationship = $school_id and training type term slug is in ['tu-xa', 'vua-hoc-vua-lam'].
+ * Step 1 (checking terms directly on school post) is eliminated.
+ *
  * @param int    $school_id      School post ID.
- * @param string $output_format  'names' or 'slugs'.
+ * @param string $output_format  'names', 'slugs', or 'terms'/'objects'.
  * @return array
  */
 function ltdh_get_school_training_types( int $school_id, string $output_format = 'names' ): array {
@@ -945,17 +1188,12 @@ function ltdh_get_school_training_types( int $school_id, string $output_format =
 		return (array) $cached;
 	}
 
-	// 1. Check if school has directly assigned taxonomy terms
-	$terms = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => $output_format ] );
-	if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-		wp_cache_set( $cache_key, $terms, 'ltdh', HOUR_IN_SECONDS );
-		return $terms;
-	}
+	$allowed_slugs = [ 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];
 
-	// 2. Otherwise rollup from its published programs
-	$programs = get_posts( [
+	// Rollup exclusively from published in-scope programs linked to this school
+	$query_args = [
 		'post_type'      => 'program',
-		'posts_per_page' => 100,
+		'posts_per_page' => -1,
 		'post_status'    => 'publish',
 		'fields'         => 'ids',
 		'no_found_rows'  => true,
@@ -966,7 +1204,40 @@ function ltdh_get_school_training_types( int $school_id, string $output_format =
 				'compare' => '=',
 			],
 		],
-	] );
+		'tax_query'      => [
+			[
+				'taxonomy' => LTDH_TAX_TRAINING_TYPE,
+				'field'    => 'slug',
+				'terms'    => $allowed_slugs,
+				'operator' => 'IN',
+			],
+		],
+	];
+
+	$programs = get_posts( $query_args );
+
+	// Fallback to _offered_programs if meta_query returned no programs
+	if ( empty( $programs ) ) {
+		$offered_ids = get_post_meta( $school_id, '_offered_programs', true );
+		if ( ! empty( $offered_ids ) && is_array( $offered_ids ) ) {
+			$programs = get_posts( [
+				'post_type'      => 'program',
+				'posts_per_page' => -1,
+				'post_status'    => 'publish',
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+				'post__in'       => $offered_ids,
+				'tax_query'      => [
+					[
+						'taxonomy' => LTDH_TAX_TRAINING_TYPE,
+						'field'    => 'slug',
+						'terms'    => $allowed_slugs,
+						'operator' => 'IN',
+					],
+				],
+			] );
+		}
+	}
 
 	if ( empty( $programs ) ) {
 		wp_cache_set( $cache_key, [], 'ltdh', HOUR_IN_SECONDS );
@@ -975,17 +1246,33 @@ function ltdh_get_school_training_types( int $school_id, string $output_format =
 
 	$school_types = [];
 	foreach ( $programs as $prog_id ) {
-		$prog_terms = wp_get_post_terms( $prog_id, LTDH_TAX_TRAINING_TYPE, [ 'fields' => $output_format ] );
+		$prog_terms = wp_get_post_terms( $prog_id, LTDH_TAX_TRAINING_TYPE );
 		if ( ! is_wp_error( $prog_terms ) && ! empty( $prog_terms ) ) {
 			foreach ( $prog_terms as $t ) {
-				$val = is_object( $t ) ? ( 'names' === $output_format ? $t->name : $t->slug ) : $t;
-				if ( ! in_array( $val, $school_types, true ) ) {
+				if ( ! is_object( $t ) || ! in_array( $t->slug, $allowed_slugs, true ) ) {
+					continue;
+				}
+				if ( 'slugs' === $output_format ) {
+					$val = $t->slug;
+				} elseif ( 'terms' === $output_format || 'objects' === $output_format || 'all' === $output_format ) {
+					$val = $t;
+				} else {
+					$val = $t->name;
+				}
+
+				if ( is_object( $val ) ) {
+					$school_types[ $t->slug ] = $val;
+				} elseif ( ! in_array( $val, $school_types, true ) ) {
 					$school_types[] = $val;
 				}
 			}
 		}
 	}
 
-	wp_cache_set( $cache_key, $school_types, 'ltdh', HOUR_IN_SECONDS );
-	return $school_types;
+	$result = ( 'terms' === $output_format || 'objects' === $output_format || 'all' === $output_format )
+		? array_values( $school_types )
+		: $school_types;
+
+	wp_cache_set( $cache_key, $result, 'ltdh', HOUR_IN_SECONDS );
+	return $result;
 }

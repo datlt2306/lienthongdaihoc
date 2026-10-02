@@ -31,21 +31,34 @@ function ltdh_get_defaults( string $group ): array {
 		],
 		'navigation' => [
 			'primary' => [
-				[ 'url' => '/',                   'label' => 'Trang chủ' ],
-				[ 'url' => '/truong-doi-tac/',   'label' => 'Trường đối tác' ],
-				[ 'url' => '/nganh-hoc/',         'label' => 'Chuyên ngành' ],
-				[ 'url' => '/he-dao-tao/',        'label' => 'Hệ đào tạo' ],
-				[ 'url' => '/tin-tuyen-sinh/',    'label' => 'Tin tức' ],
-				[ 'url' => '/lien-he/',           'label' => 'Liên hệ' ],
+				[ 'url' => '/',                    'label' => 'Trang chủ' ],
+				[
+					'url'   => '/hinh-thuc-dao-tao/',
+					'label' => 'Liên thông đại học',
+					'sub'   => [
+						[ 'url' => '/hinh-thuc-dao-tao/dao-tao-tu-xa/',   'label' => 'Từ xa' ],
+						[ 'url' => '/hinh-thuc-dao-tao/vua-hoc-vua-lam/', 'label' => 'Vừa học vừa làm' ],
+					],
+				],
+				[ 'url' => '/nganh-hoc/',          'label' => 'Ngành học' ],
+				[ 'url' => '/truong-doi-tac/',     'label' => 'Trường đối tác' ],
+				[ 'url' => '/tin-tuc/',            'label' => 'Kiến thức liên thông' ],
+				[ 'url' => '/kiem-tra-dieu-kien/',  'label' => 'Kiểm tra điều kiện' ],
 			],
 			'mobile' => [
-				[ 'url' => '/',                   'label' => 'Trang chủ' ],
-				[ 'url' => '/truong-doi-tac/',   'label' => 'Trường đối tác' ],
-				[ 'url' => '/nganh-hoc/',         'label' => 'Chuyên ngành' ],
-				[ 'url' => '/he-dao-tao/tu-xa/',  'label' => 'Chương trình' ],
-				[ 'url' => '/tin-tuyen-sinh/',    'label' => 'Tin tức' ],
-				[ 'url' => '/kiem-tra-dieu-kien/', 'label' => 'Kiểm tra điều kiện' ],
-				[ 'url' => '/lien-he/',           'label' => 'Liên hệ' ],
+				[ 'url' => '/',                    'label' => 'Trang chủ' ],
+				[
+					'url'   => '/hinh-thuc-dao-tao/',
+					'label' => 'Liên thông đại học',
+					'sub'   => [
+						[ 'url' => '/hinh-thuc-dao-tao/dao-tao-tu-xa/',   'label' => 'Từ xa' ],
+						[ 'url' => '/hinh-thuc-dao-tao/vua-hoc-vua-lam/', 'label' => 'Vừa học vừa làm' ],
+					],
+				],
+				[ 'url' => '/nganh-hoc/',          'label' => 'Ngành học' ],
+				[ 'url' => '/truong-doi-tac/',     'label' => 'Trường đối tác' ],
+				[ 'url' => '/tin-tuc/',            'label' => 'Kiến thức liên thông' ],
+				[ 'url' => '/kiem-tra-dieu-kien/',  'label' => 'Kiểm tra điều kiện' ],
 			],
 			'footer' => [
 				[ 'url' => '/gioi-thieu/',            'label' => 'Giới thiệu' ],
@@ -61,8 +74,9 @@ function ltdh_get_defaults( string $group ): array {
 		],
 		'homepage' => [
 			'hero_year_label' => 'TUYỂN SINH ' . date( 'Y' ),
+			'hero_badge_2'    => '50+ chương trình Liên thông Đại học: Từ xa & Vừa học vừa làm',
 			'hero_badges'     => [
-				[ 'text' => '50+ chương trình',          'subtext' => 'Liên thông, VB2, Từ xa' ],
+				[ 'text' => '50+ chương trình',          'subtext' => 'Liên thông Đại học: Từ xa & Vừa học vừa làm' ],
 				[ 'text' => '30+ trường ĐH',              'subtext' => 'Đối tác uy tín toàn quốc' ],
 				[ 'text' => 'Miễn giảm tín chỉ',          'subtext' => 'Rút ngắn thời gian học' ],
 			],
@@ -77,9 +91,9 @@ function ltdh_get_defaults( string $group ): array {
 			'year_pattern' => '%s | Tuyển sinh %d',
 		],
 		'images' => [
-			'fallback_school'      => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600',
-			'fallback_school_logo' => 'https://images.unsplash.com/photo-1594788094620-4579ad50c7fe?auto=format&fit=crop&q=80&w=150',
-			'fallback_program'     => 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=300',
+			'fallback_school'      => get_template_directory_uri() . '/assets/images/banner-school.jpg',
+			'fallback_school_logo' => get_template_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp',
+			'fallback_program'     => get_template_directory_uri() . '/assets/images/banner-program.jpg',
 			'fallback_post'        => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400',
 			'fallback_news'        => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=250',
 			'fallback_hero'        => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=600',
