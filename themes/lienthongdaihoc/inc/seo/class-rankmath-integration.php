@@ -135,12 +135,24 @@ function ltdh_seo_enforce_canonical_url( $canonical ) {
 	$request_uri  = $_SERVER['REQUEST_URI'] ?? '';
 	$request_path = parse_url( $request_uri, PHP_URL_PATH );
 
-	if ( is_post_type_archive( 'program' ) || is_tax( 'training_type' ) || preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao|chuong-trinh)/?#i', $request_path ) ) {
+	// Bảo vệ URL Canonical chuẩn cho các Taxonomy Landing Pages
+	if ( is_tax( 'training_type' ) ) {
+		$current_term = get_queried_object();
+		if ( $current_term instanceof WP_Term ) {
+			$term_link = get_term_link( $current_term );
+			if ( ! is_wp_error( $term_link ) && ! empty( $term_link ) ) {
+				return $term_link;
+			}
+		}
+		return $canonical;
+	}
+
+	if ( is_post_type_archive( 'program' ) || preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao|chuong-trinh)/?#i', $request_path ) ) {
 		// Clean parameter mapping
-		$truong = isset( $_GET['truong'] ) ? sanitize_text_field( $_GET['truong'] ) : '';
-		$nganh  = isset( $_GET['nganh'] ) ? sanitize_text_field( $_GET['nganh'] ) : '';
-		$sort   = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
-		$search = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
+		$truong = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : '';
+		$nganh  = isset( $_GET['nganh'] ) ? sanitize_text_field( wp_unslash( $_GET['nganh'] ) ) : '';
+		$sort   = isset( $_GET['sort'] ) ? sanitize_text_field( wp_unslash( $_GET['sort'] ) ) : '';
+		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 
 		// If single school filter only, point canonical to clean school page
 		if ( ! empty( $truong ) && empty( $nganh ) && empty( $search ) && empty( $sort ) ) {

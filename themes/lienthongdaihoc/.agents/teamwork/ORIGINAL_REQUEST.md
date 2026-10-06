@@ -327,3 +327,55 @@ Integrity mode: development
 - [ ] Trang chủ 100% đồng nhất thông điệp tuyển sinh Liên thông.
 - [ ] Không có lỗi 301 bất hợp lý từ `/chuong-trinh/` sang `/he-dao-tao/tu-xa/`.
 - [ ] Toàn bộ trang web (Single, Archive, Homepage, Search) không phát sinh lỗi PHP (Notice/Warning/Fatal) hay JS Console error.
+
+
+## 2026-10-06T11:50:54Z
+
+Thực hiện đánh giá toàn diện 360 độ về chất lượng nội dung, độ hoàn thiện chức năng, luồng chuyển đổi người dùng và cấu trúc kỹ thuật (SEO, Schema, UX) của website Cổng thông tin Tuyển sinh Liên thông Đại học, đồng thời lập báo cáo kiểm định chi tiết kèm ma trận giải pháp khắc phục.
+
+Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc
+Integrity mode: development
+
+## Requirements
+
+### R1. Kiểm định nội dung và tính toàn vẹn dữ liệu (Content & Data Integrity)
+- Khảo sát và đánh giá tính chính xác, tính đồng bộ của toàn bộ dữ liệu thực thể trên hệ thống: Trường đối tác (`school`), Ngành đào tạo (`major`), Chương trình tuyển sinh (`program`), Bài viết hướng dẫn/tin tức (`guide`, `post`).
+- Kiểm tra tính đầy đủ của các trường thông tin quan trọng: Học phí, thời gian đào tạo, văn bằng tốt nghiệp, điều kiện xét tuyển, hotline liên hệ, link Zalo OA/Group, thông tin tài khoản chuyển khoản và địa điểm thi/khai giảng.
+- Rà soát các dữ liệu placeholder, nội dung chưa hoàn thiện hoặc dữ liệu mẫu chưa được chuẩn hóa.
+
+### R2. Kiểm thử và đánh giá chức năng cốt lõi (Core Features & Funnels)
+- **Công cụ kiểm tra điều kiện (Eligibility Quiz)**: Kiểm thử logic các bước khảo sát, bộ quy tắc lọc điều kiện văn bằng (THPT, Trung cấp, Cao đẳng...), luồng hiển thị kết quả và form nộp hồ sơ nhận tư vấn.
+- **Công cụ so sánh chương trình (Program Comparison)**: Kiểm tra khả năng chọn và so sánh đa tiêu chí, tính chính xác của bảng thông số đối sánh trên cả giao diện Desktop và Mobile (Stacked cards).
+- **Bộ lọc và tìm kiếm (Filters & Search)**: Đánh giá bộ lọc trường, ngành học, khu vực, hình thức đào tạo (Từ xa, Vừa học vừa làm) và trạng thái hiển thị kết quả AJAX/Pagination.
+- **Hệ thống thu thập Lead & Form liên hệ**: Kiểm thử khả năng gửi dữ liệu, xác thực số điện thoại/email phía client/server, cơ chế chống spam/rate-limit và xử lý webhook/email thông báo.
+- **Điều hướng & Hotline/CTA**: Kiểm tra toàn bộ floating buttons (Hotline, Zalo), mobile fixed action bar và các nút kêu gọi hành động xuyên suốt các trang.
+
+### R3. Đánh giá UX/UI, Responsive và Luồng chuyển đổi (UX/UI & Conversion Flow)
+- Đánh giá giao diện thực tế trên các kích thước màn hình (Mobile 375px–430px, Tablet, Desktop).
+- Phát hiện các điểm gãy UX (layout shift, tràn màn hình, nút bấm khó thao tác trên mobile, nhầm lẫn thị giác).
+- Đánh giá mức độ rõ ràng của thông điệp chuyển đổi (value proposition, trust signals, cam kết hỗ trợ).
+
+### R4. Đánh giá Technical SEO, Schema Markup & Hiệu năng (Technical Quality)
+- Kiểm tra tính hợp lệ của Structured Data (Schema JSON-LD: `EducationalOrganization`, `Course`, `FAQPage`, `BreadcrumbList`).
+- Rà soát các thẻ meta SEO (title, description, canonical, OpenGraph, robots).
+- Đánh giá mã nguồn HTML/PHP về semantic, tính bảo mật cơ bản (sanitization, escaping, CSRF nonce) và tốc độ tải trang.
+
+### R5. Lập Báo cáo Kiểm định Tổng thể & Ma trận Khắc phục (Audit Report & Action Plan)
+- Tổng hợp tài liệu báo cáo `WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md` tại thư mục làm việc.
+- Phân loại lỗi và vấn đề theo mức độ nghiêm trọng: **P0 (Critical/Blocker)**, **P1 (High)**, **P2 (Medium)**, **P3 (Low/Enhancement)**.
+- Đưa ra khuyến nghị kỹ thuật và giải pháp xử lý cụ thể cho từng hạng mục để lập trình viên có thể triển khai ngay lập tức.
+
+## Acceptance Criteria
+
+### Tính toàn diện của khảo sát (Coverage)
+- [ ] Báo cáo bao phủ đầy đủ tất cả các loại trang: Trang chủ (`front-page.php`), Chi tiết trường (`single-school.php`), Chi tiết chương trình (`single-program.php`), Chi tiết ngành (`single-major.php`), Trang kiểm tra điều kiện (`page-eligibility.php`), Trang so sánh (`page-compare-program.php`), Danh mục/Lưu trữ (`archive-school.php`, `taxonomy.php`), Bài viết (`single.php`, `single-guide.php`).
+- [ ] Mọi chức năng chính (Quiz, So sánh, Bộ lọc, Form Lead, Sticky CTA) đều có mục đánh giá riêng kèm kết quả kiểm thử.
+
+### Tính khách quan và bằng chứng kiểm định (Evidence & Verifiability)
+- [ ] Mỗi phát hiện lỗi hoặc điểm hạn chế phải đi kèm dẫn chứng cụ thể: file mã nguồn / hàm phụ trách, hoặc dữ liệu mẫu gây lỗi, hoặc kịch bản tái hiện bước (reproduction steps).
+- [ ] Có số liệu đo lường cụ thể về độ đầy đủ của dữ liệu (ví dụ: số trường/chương trình thiếu thông tin, số form hoạt động đúng).
+
+### Giá trị thực thi của đề xuất (Actionability)
+- [ ] Báo cáo phân bổ rõ ràng ma trận ưu tiên (P0 -> P3).
+- [ ] Mỗi vấn đề đều có hướng giải quyết cụ thể (code fix, data update, hoặc cấu hình admin).
+- [ ] File báo cáo hoàn chỉnh `WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md` được lưu lại trong thư mục theme.

@@ -118,13 +118,11 @@ function ltdh_is_spam_submission( array $data ): bool {
 		return true;
 	}
 
-	// 5. Validate Phone Number length and format (must start with 0, 84, or +84)
-	$clean_phone = preg_replace( '/[^\d+]/', '', $phone );
-	if ( ! empty( $phone ) ) {
-		if ( strlen( $clean_phone ) < 8 || strlen( $clean_phone ) > 15 ) {
-			return true;
-		}
-		if ( ! preg_match( '/^(0|\+84|84)/', $clean_phone ) ) {
+	// 5. Validate Phone Number format (Chuẩn số điện thoại di động & cố định Việt Nam)
+	$clean_phone = preg_replace( '/[^\d+]/', '', (string) $phone );
+	if ( ! empty( $clean_phone ) ) {
+		$normalized_phone = preg_replace( '/^(\+84|84)/', '0', $clean_phone );
+		if ( ! preg_match( '/^(0(3[2-9]|5[25689]|7[06-9]|8[1-9]|9[0-9])[0-9]{7}|02[0-9]{8,9})$/', $normalized_phone ) ) {
 			return true;
 		}
 	}
@@ -513,27 +511,44 @@ function ltdh_handle_native_form_submit() {
 		return;
 	}
 
+	// 1. Kiểm tra xác thực WordPress CSRF Nonce Token bắt buộc
+	$nonce = isset( $_POST['ltdh_native_lead_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ltdh_native_lead_nonce'] ) ) : '';
+	if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'ltdh_native_lead_submit_action' ) ) {
+		wp_die(
+			esc_html__( 'Phiên làm việc bảo mật đã hết hạn hoặc yêu cầu không hợp lệ. Vui lòng tải lại trang và thử lại.', 'lienthongdaihoc' ),
+			esc_html__( 'Lỗi Bảo Mật CSRF', 'lienthongdaihoc' ),
+			[ 'response' => 403 ]
+		);
+	}
+
 	$name    = sanitize_text_field( wp_unslash( $_POST['your-name'] ) );
 	$phone   = sanitize_text_field( wp_unslash( $_POST['your-phone'] ) );
 	$email   = isset( $_POST['your-email'] ) ? sanitize_email( wp_unslash( $_POST['your-email'] ) ) : '';
 	$message = isset( $_POST['your-message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['your-message'] ) ) : '';
 
-	// Perform spam check
-	if ( ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $message ] ) ) {
-		wp_die( 'Yêu cầu của bạn bị chặn do nghi ngờ spam. Vui lòng liên hệ hotline.', 'Spam Blocked', [ 'response' => 403 ] );
+	// 2. Kiểm tra spam & honeypot
+	if ( function_exists( 'ltdh_is_spam_submission' ) && ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $message ] ) ) {
+		wp_die(
+			esc_html__( 'Yêu cầu của bạn bị chặn do nghi ngờ spam. Vui lòng liên hệ hotline.', 'lienthongdaihoc' ),
+			esc_html__( 'Spam Blocked', 'lienthongdaihoc' ),
+			[ 'response' => 403 ]
+		);
 	}
 
 	if ( empty( $name ) || empty( $phone ) ) {
 		return;
 	}
 
-	$program_id    = isset( $_POST['current_program_id'] ) ? intval( $_POST['current_program_id'] ) : 0;
-	$school_id     = isset( $_POST['current_school_id'] ) ? intval( $_POST['current_school_id'] ) : 0;
-	$major_id      = isset( $_POST['current_major_id'] ) ? intval( $_POST['current_major_id'] ) : 0;
+	// 3. Trích xuất tham số ID an toàn hỗ trợ tương thích ngược
+	$program_id    = isset( $_POST['program_id'] ) ? absint( $_POST['program_id'] ) : ( isset( $_POST['current_program_id'] ) ? absint( $_POST['current_program_id'] ) : 0 );
+	$school_id     = isset( $_POST['school_id'] ) ? absint( $_POST['school_id'] ) : ( isset( $_POST['current_school_id'] ) ? absint( $_POST['current_school_id'] ) : 0 );
+	$major_id      = isset( $_POST['major_id'] ) ? absint( $_POST['major_id'] ) : ( isset( $_POST['current_major_id'] ) ? absint( $_POST['current_major_id'] ) : 0 );
+	$training_type = isset( $_POST['training_type'] ) ? sanitize_text_field( wp_unslash( $_POST['training_type'] ) ) : '';
+	$campus        = isset( $_POST['campus'] ) ? sanitize_text_field( wp_unslash( $_POST['campus'] ) ) : '';
 
 	$referral_source = isset( $_POST['referral_source'] ) ? esc_url_raw( wp_unslash( $_POST['referral_source'] ) ) : '';
 	if ( empty( $referral_source ) ) {
-		$referral_source = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( $_SERVER['HTTP_REFERER'] ) : '';
+		$referral_source = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 	}
 
 	$inserted_id = ltdh_insert_lead( [
@@ -543,6 +558,8 @@ function ltdh_handle_native_form_submit() {
 		'program_id'      => $program_id,
 		'school_id'       => $school_id,
 		'major_id'        => $major_id,
+		'training_type'   => $training_type,
+		'campus'          => $campus,
 		'referral_source' => $referral_source,
 		'message'         => $message,
 	] );

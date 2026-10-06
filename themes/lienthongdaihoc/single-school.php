@@ -45,15 +45,6 @@ $school_tabs[] = [
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3" /></svg>',
 ];
 
-if ( ! empty( $adm_info ) ) {
-	$school_tabs[] = [
-		'id'       => 'phuong-thuc-tuyen-sinh',
-		'title'    => 'Xét tuyển',
-		'subtitle' => 'Phương thức tuyển sinh',
-		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
-	];
-}
-
 $school_tabs[] = [
 	'id'       => 'quy-trinh-tuyen-sinh',
 	'title'    => 'Quy trình',
@@ -62,7 +53,6 @@ $school_tabs[] = [
 ];
 
 $school_tabs[] = [
-	'id'       => 'chuong-trinh-tuyen-sinh',
 	'id'       => 'chuong-trinh-tuyen-sinh',
 	'title'    => 'Lớp tuyển sinh',
 	'subtitle' => 'Chương trình đang mở',
@@ -349,15 +339,6 @@ if ( ! empty( $contact ) ) {
 					?>
 				</section>
 
-				<!-- ADMISSION INFORMATION -->
-				<?php if ( $adm_info ) : ?>
-					<section id="phuong-thuc-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Phương thức tuyển sinh</h2>
-						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
-							<?php echo wp_kses_post( $adm_info ); ?>
-						</div>
-					</section>
-				<?php endif; ?>
 
 				<!-- ADMISSION PROCESS -->
 				<?php
@@ -365,7 +346,7 @@ if ( ! empty( $contact ) ) {
 					'template-parts/admission-process',
 					null,
 					[
-						'title'      => 'Quy trình tuyển sinh & Nhập học tại ' . esc_html( $school_title ),
+						'title'      => 'Quy trình tuyển sinh & Nhập học',
 						'subtitle'   => 'Lộ trình 4 bước nộp hồ sơ xét tuyển và làm thủ tục nhập học chính thức',
 						'section_id' => 'quy-trinh-tuyen-sinh',
 						'cta_text'   => 'Đăng ký tư vấn chọn ngành ngay',
@@ -376,7 +357,7 @@ if ( ! empty( $contact ) ) {
 
 				<!-- PROGRAMS OFFERED -->
 				<section id="chuong-trinh-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Chương trình tuyển sinh đang mở</h2>
+					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Chương trình tuyển sinh</h2>
 					
 					<?php
 					$meta_status_filter = [
@@ -649,8 +630,10 @@ if ( ! empty( $contact ) ) {
 				<!-- CONTACT INFO -->
 				<?php if ( $contact ) : ?>
 					<section id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<!-- Hidden anchor targets for backward compatibility -->
+						<span id="phuong-thuc-tuyen-sinh" class="relative -top-36 block invisible pointer-events-none"></span>
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Thông tin liên hệ tuyển sinh</h2>
-						<div class="prose prose-slate max-w-none text-slate-600 text-sm prose-card-list">
+						<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list">
 							<?php echo wp_kses_post( $contact ); ?>
 						</div>
 					</section>

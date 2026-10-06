@@ -30,3 +30,21 @@ Write a comprehensive review report to:
 `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/reviewer_2/handoff.md`
 State clearly in your report your verdict: **APPROVE** or **REQUEST_CHANGES** with supporting rationale.
 Once done, send a message to the orchestrator with your verdict.
+
+
+## 2026-10-06T12:28:44Z
+Bạn là teamwork_preview_reviewer (Reviewer 2) phụ trách rà soát độc lập báo cáo kiểm định 360 độ:
+`/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md`
+
+Working directory:
+`/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/reviewer_2/`
+
+ORIGINAL_REQUEST.md:
+`/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md` (chú trọng header `## 2026-10-06T11:50:54Z`, đặc biệt là R4, R5, Ma trận P0-P3, Kế hoạch khắc phục và Code snippets).
+
+Nhiệm vụ:
+1. Đọc và thẩm định tài liệu `WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md` đối chiếu với R4 (Technical SEO, Schema, Bảo mật & Hiệu năng), R5 (Báo cáo kiểm định tổng thể & Ma trận khắc phục).
+2. Kiểm tra tính đầy đủ, chuẩn xác của ma trận 30 lỗi P0-P3 và tính khả thi của các đoạn mã mẫu chuẩn WordPress trong Kế hoạch hành động 3 giai đoạn.
+3. Kiểm tra tính toàn diện theo Acceptance Criteria (bao phủ 100% template types, evidence verifiability, actionability).
+4. Xuất báo cáo rà soát và ghi rõ phán quyết (Verdict: APPROVE hoặc REQUEST_CHANGES) trong `handoff.md`.
+5. Dùng send_message gửi kết luận và phán quyết về cho orchestrator_6.

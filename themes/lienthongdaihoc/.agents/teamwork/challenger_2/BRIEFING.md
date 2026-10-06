@@ -1,68 +1,56 @@
-# BRIEFING — 2026-09-25T05:30:00Z
+# BRIEFING — 2026-10-06T12:45:30Z
 
 ## Mission
-Stress-test completeness and coverage of FULL_PROJECT_AUDIT_REPORT.md and PROJECT.md, verifying 100% PHP file inventory (49 files), all requirements R1-R5, absence of placeholder tokens, mathematical & logical consistency of Health Score, 4-phase remediation roadmap, and uncovering any missed files or security vectors. Provide APPROVE or REJECT verdict.
+Stress-test and verify source code and proposed solution snippets in Section 7 of WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md, verify baseline test suites pass, check syntax & standards, and issue an empirical verdict.
 
 ## 🔒 My Identity
-- Archetype: critic, specialist
+- Archetype: EMPIRICAL CHALLENGER
 - Roles: critic, specialist
 - Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/challenger_2
-- Original parent: 51dbca0c-0bdf-4e7a-a663-8f16b15aa54f
-- Milestone: Preview / Completeness & Stress Challenger
+- Original parent: 61a39739-d3ca-49a4-bab5-08679ea1dc41
+- Milestone: Preview / Verification
 - Instance: 2 of 2
 
 ## 🔒 Key Constraints
-- Review-only — do NOT modify implementation code in the theme
-- Write only within working directory (.agents/teamwork/challenger_2)
-- Maintain progress.md with timestamps
+- Review-only — do NOT modify implementation code directly unless running tests
+- Follow Empirical Challenger methodology: write and run tests, don't trust unverified claims
+- .agents/teamwork/ holds ONLY metadata (plans, progress, handoffs) — no source code or test files here
+- Report verdict: APPROVE or REJECT in handoff.md
 
 ## Current Parent
-- Conversation ID: 51dbca0c-0bdf-4e7a-a663-8f16b15aa54f
-- Updated: not yet
+- Conversation ID: 61a39739-d3ca-49a4-bab5-08679ea1dc41
+- Updated: 2026-10-06T12:45:30Z
 
 ## Review Scope
-- **Files to review**:
-  - `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/FULL_PROJECT_AUDIT_REPORT.md`
-  - `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/PROJECT.md`
-- **Target project codebase**:
-  - All 49 PHP files, JS/CSS assets, theme structure
-- **Interface contracts**:
-  - `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md`
-- **Review criteria**:
-  - 100% PHP file inventory (all 49 files)
-  - Full coverage of R1, R2, R3, R4, R5
-  - Zero placeholder tokens (`TODO`, `TBD`, `...`) in code snippets
-  - Mathematical & logical consistency of Health Score
-  - Complete 4-phase remediation roadmap covering all Critical & High issues
-  - Checking for any missed critical theme files or security vectors
-
-## Key Decisions Made
-- Executed empirical Python harness to verify 100% PHP file table: 49/49 PHP files verified matching.
-- Verified line numbers and byte sizes: 48/50 files match 100%, 2 files differ by only 1 line.
-- Verified absence of TODO/TBD tokens: 0 found across both documents.
-- Evaluated Health Score formula: exact weighted sum is 63.4 vs reported 63.5 (minor 0.1 rounding difference).
-- Evaluated 4-phase roadmap: 100% of Critical and High issues accounted for.
-- Decided final verdict: **APPROVE** with noted observations.
-
-## Artifact Index
-- `.agents/teamwork/challenger_2/DISPATCH.md` — Record of dispatch
-- `.agents/teamwork/challenger_2/BRIEFING.md` — Working memory and identity
-- `.agents/teamwork/challenger_2/progress.md` — Liveness heartbeat and step tracking
-- `.agents/teamwork/challenger_2/handoff.md` — Final completeness evaluation report and verdict
+- **Files reviewed**:
+  - `WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md` (Section 7 code solutions)
+  - `tests/test-m4-adversarial.php`, `tests/test-m6-e2e-master-acceptance.php`, `tests/test-m5-templates-presentation.php`, `tests/test-m3-empirical.php`
+  - Core theme files: `inc/lead-capture.php`, `inc/core/class-helpers.php`, `footer.php`, `template-parts/compare/tray.php`, `template-parts/eligibility/results.php`, `schools_import.json`, etc.
+- **Interface contracts**: WordPress coding standards, PHP 8.1+ compatibility, existing theme APIs
+- **Review criteria**: Syntax validity, WP coding standards, PHP 8.1+ compatibility, zero side-effects, regression safety
 
 ## Attack Surface
 - **Hypotheses tested**:
-  - Hypothesis 1: Inventory omitted some PHP files. Result: REJECTED. Exactly 49/49 files are indexed.
-  - Hypothesis 2: Placeholders exist in code snippets. Result: REJECTED. Zero TODO/TBD tokens.
-  - Hypothesis 3: Health score formula is inconsistent. Result: VERIFIED minor 0.1 discrepancy (63.4 vs 63.5).
-  - Hypothesis 4: Roadmap omitted Critical/High issues. Result: REJECTED. 100% accounted for.
-  - Hypothesis 5: Unhandled SQLi / SSRF vectors missed. Result: REJECTED. Queries use prepare, remote posts use wp_safe_remote_post.
+  - Theme passes baseline test suites test-m4 and test-m6: DISPROVEN (Both crash due to missing WP mocks and IA mismatch).
+  - Section 7 code patches can be applied as-is: DISPROVEN (Contains 5 critical defects/regressions).
 - **Vulnerabilities found**:
-  - Minor: FRONT-HIGH-02 fix snippet referenced non-existent DOM ID `elig-lead-form` (actual ID `elig-consultation-form`) and used brief placeholder comment.
-  - Minor: Missing `search.php` fallback in theme hierarchy.
-- **Untested angles**: None. All 49 files, requirements R1-R5, and attack vectors empirically inspected.
+  - Patch 1.1 omits existing spam filter and causes ID parameter disconnect with single page forms.
+  - Patch 1.2 ignores sensitive text in `contact_info`.
+  - Patch 2.1 fails on compare page rewrite route and hides mobile CTA on single major pages.
+  - Patch 2.4/2.5 schema and canonical edge cases.
+  - Patch 3.1 phone regex false positives.
+- **Untested angles**: Live browser rendering with active Local WP database.
 
 ## Loaded Skills
-- Source: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/skills/php-wordpress/SKILL.md
-- Local copy: N/A
-- Core methodology: WordPress theme & plugin development, security standards, coding standards, hooks & queries
+- **Source**: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/skills/php-wordpress/SKILL.md
+- **Local copy**: None needed (direct reference)
+- **Core methodology**: WordPress development mastery - security sanitization/escaping, hooks, actions/filters, WP_Query, REST API
+
+## Key Decisions Made
+- Issued verdict: **REJECT raw Section 7 code (MANDATORY REVISIONS REQUIRED BEFORE DEPLOYMENT)**.
+- Documented all 5 required fixes and test mock remedies in `handoff.md`.
+
+## Artifact Index
+- handoff.md — Final verdict and empirical verification report
+- progress.md — Heartbeat and step tracking
+- DISPATCH.md — Task history

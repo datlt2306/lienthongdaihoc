@@ -186,6 +186,7 @@ function ltdh_render_contact_form(): void {
 function ltdh_render_native_form(string $type = 'consultation', array $hidden_fields = []): void {
 ?>
 	<form action="" method="POST" class="space-y-4">
+		<?php wp_nonce_field( 'ltdh_native_lead_submit_action', 'ltdh_native_lead_nonce' ); ?>
 		<?php if ( isset( $_GET['submit_success'] ) && '1' === $_GET['submit_success'] ) : ?>
 			<div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 border border-green-200" role="alert">
 				<span class="font-bold">Gửi thông tin thành công!</span> Đội ngũ tư vấn tuyển sinh sẽ liên hệ với bạn trong thời gian sớm nhất.
@@ -531,7 +532,7 @@ function ltdh_get_cached_featured_schools() {
 			$schools_query->the_post();
 			$school_id = get_the_ID();
 			$address   = get_field( 'address', $school_id );
-			$hotline   = get_field( 'hotline', $school_id ) ?: ( function_exists( 'get_field' ) ? get_field( 'global_hotline', 'options' ) : '' );
+			$hotline   = ltdh_get_school_hotline( $school_id );
 			$thumb_url = ltdh_get_school_cover_url( $school_id, 'medium' );
 			$logo_id   = ltdh_get_school_image_id( $school_id );
 			$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: 'University';

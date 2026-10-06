@@ -25,7 +25,12 @@ build/
 # ==========================================
 scratch/
 audit_report.json
+.agent
+.agent/*
+.agents/*
 .agents/teamwork/
+*.md
+!README.md
 *.tmp
 *.temp
 *.bak

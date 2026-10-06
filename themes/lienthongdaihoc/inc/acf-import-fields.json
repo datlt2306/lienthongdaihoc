@@ -472,7 +472,7 @@
             },
             {
                 "key": "field_tab_prog_requirements",
-                "label": "Điều kiện xét tuyển",
+                "label": "Điều kiện & Hồ sơ xét tuyển",
                 "name": "",
                 "type": "tab",
                 "placement": "top",
@@ -483,6 +483,21 @@
                 "label": "Điều kiện xét tuyển",
                 "name": "admission_requirements",
                 "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_documents",
+                "label": "Hồ sơ xét tuyển cần thiết",
+                "name": "required_documents",
+                "type": "wysiwyg"
+            },
+            {
+                "key": "field_program_admission_form",
+                "label": "Tải phiếu tuyển sinh (File/Mẫu đăng ký)",
+                "name": "admission_form_file",
+                "type": "file",
+                "instructions": "Tải lên file Mẫu phiếu đăng ký tuyển sinh (PDF/DOCX) để sinh viên tải về.",
+                "return_format": "array",
+                "library": "all"
             },
             {
                 "key": "field_tab_prog_tuition",
@@ -642,29 +657,6 @@
                 "name": "curriculum_file",
                 "type": "file",
                 "instructions": "Tải lên file Ảnh scan (PNG/JPG) hoặc tệp PDF Khung chương trình & Lộ trình học của nhà trường.",
-                "return_format": "array",
-                "library": "all"
-            },
-            {
-                "key": "field_tab_prog_documents",
-                "label": "Hồ sơ xét tuyển cần thiết",
-                "name": "",
-                "type": "tab",
-                "placement": "top",
-                "endpoint": 0
-            },
-            {
-                "key": "field_program_documents",
-                "label": "Hồ sơ xét tuyển cần thiết",
-                "name": "required_documents",
-                "type": "wysiwyg"
-            },
-            {
-                "key": "field_program_admission_form",
-                "label": "Tải phiếu tuyển sinh (File/Mẫu đăng ký)",
-                "name": "admission_form_file",
-                "type": "file",
-                "instructions": "Tải lên file Mẫu phiếu đăng ký tuyển sinh (PDF/DOCX) để sinh viên tải về.",
                 "return_format": "array",
                 "library": "all"
             },

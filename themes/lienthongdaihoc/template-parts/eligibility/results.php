@@ -38,7 +38,7 @@ $years = range( $current_year, $current_year - 25 );
 </div>
 
 <!-- Alternatives -->
-<div id="elig-alternatives" class="elig-alternatives hidden mt-8">
+<div id="elig-alternatives-section" class="elig-alternatives hidden mt-8">
 	<h3 class="font-bold text-slate-800 text-lg mb-4">💡 Gợi ý chương trình liên quan</h3>
 	<div id="elig-alternatives-list" class="elig-program-list"></div>
 </div>
@@ -152,13 +152,14 @@ $years = range( $current_year, $current_year - 25 );
 <!-- CTA Bar -->
 <div class="elig-cta-bar">
 	<div class="elig-cta-channels">
-		<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', get_field( 'global_hotline', 'options' ) ?: '' ) ); ?>" class="elig-cta-card elig-cta-phone">
+		<?php $elig_hotline = function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : ( ( function_exists( 'get_field' ) ? get_field( 'global_hotline', 'options' ) : '' ) ?: '0988 991 496' ); ?>
+		<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $elig_hotline ) ); ?>" class="elig-cta-card elig-cta-phone">
 			<span class="elig-cta-icon">📞</span>
 			<span class="elig-cta-label">Gọi hotline</span>
-			<span class="elig-cta-value"><?php echo esc_html( get_field( 'global_hotline', 'options' ) ?: '1900 xxxx' ); ?></span>
+			<span class="elig-cta-value"><?php echo esc_html( $elig_hotline ); ?></span>
 		</a>
-		<?php $zalo = get_field( 'global_zalo_url', 'options' ); if ( $zalo ) : ?>
-		<a href="<?php echo esc_url( $zalo ); ?>" target="_blank" class="elig-cta-card elig-cta-zalo" rel="noopener">
+		<?php $elig_zalo = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : ( function_exists( 'get_field' ) ? get_field( 'global_zalo_url', 'options' ) : '' ); if ( $elig_zalo ) : ?>
+		<a href="<?php echo esc_url( $elig_zalo ); ?>" target="_blank" class="elig-cta-card elig-cta-zalo" rel="noopener">
 			<span class="elig-cta-icon">💬</span>
 			<span class="elig-cta-label">Nhắn Zalo</span>
 			<span class="elig-cta-value">Chat ngay</span>

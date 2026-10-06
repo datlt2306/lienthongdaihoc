@@ -1,188 +1,170 @@
-# BÁO CÁO KIỂM ĐỊNH TÍNH ĐẦY ĐỦ & ĐỐI SOÁT ĐỘ PHỦ (COMPLETENESS & STRESS CHALLENGE REPORT)
-
-**Tác tử thực hiện:** `teamwork_preview_challenger_2` (Vai trò: Completeness & Stress Challenger)  
-**Mục tiêu đối soát:**
-- `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/FULL_PROJECT_AUDIT_REPORT.md`
-- `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/PROJECT.md`
-**Văn bản hợp đồng & yêu cầu gốc:** `.agents/teamwork/ORIGINAL_REQUEST.md`  
-**Ngày thực hiện kiểm định:** 2026-09-25  
-**Phán quyết chung cuộc (Final Verdict):** **APPROVE (CHẤP THUẬN CÓ ĐIỀU KIỆN / KHUYẾN NGHỊ)**
+# BÁO CÁO THẨM ĐỊNH VÀ PHẢN BIỆN THỰC NGHIỆM (HANDOFF REPORT)
+**Người thực hiện**: `teamwork_preview_challenger` (Challenger 2)  
+**Mục tiêu**: Thẩm định thực nghiệm mã nguồn và các giải pháp kỹ thuật mẫu tại Mục 7 của `WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md`, kiểm tra cú pháp, chuẩn WPCS, PHP 8.1+, kiểm thử bộ test dự án (`test-m4-adversarial.php`, `test-m6-e2e-master-acceptance.php`), và đưa ra phán quyết độc lập.  
+**Thời gian hoàn thành**: 2026-10-06T12:45:00Z  
 
 ---
 
-## 1. OBSERVATION (CÁC QUAN SÁT THỰC NGHIỆM ĐỘC LẬP)
+## 1. OBSERVATION (QUAN SÁT THỰC NGHIỆM TRỰC TIẾP)
 
-Toàn bộ các quan sát dưới đây được thu thập bằng cách tự động quét hệ thống tệp và thực thi các đoạn mã kiểm thử Python/Bash trực tiếp trên mã nguồn dự án:
+### 1.1. Thực nghiệm chạy bộ kiểm thử hiện có của dự án
+1. **Lệnh thực thi**: `php tests/test-m4-adversarial.php` (môi trường CLI, PHP 8.4.19):
+   - **Kết quả**: **CRASH NGAY LẬP TỨC (Exit code: 255)**.
+   - **Verbatim Error**:
+     ```
+     Fatal error: Uncaught Error: Call to undefined function get_term_link() in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/core/class-menus.php:174
+     Stack trace:
+     #0 /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/tests/test-m4-adversarial.php(177): ltdh_dynamic_menu_submenu_injection(Array, Object(stdClass))
+     #1 {main}
+       thrown in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/core/class-menus.php on line 174
+     ```
+   - **Thực nghiệm bổ sung**: Khi mock bổ sung hàm `get_term_link()` và `get_template_directory_uri()`, harness chạy tiếp nhưng **FAIL tại Challenge C5.1**:
+     ```
+     [FAIL] C5.1: Fallback menu renders correctly across all 8 standard routes with expected labels
+     ```
+     Do file `inc/config/class-defaults.php:44` trả về nhãn `'Trường đối tác'`, trong khi test mong đợi `'Trường đại học'`.
 
-### 1.1. Khảo Sát Tệp Mã Nguồn Thực Tế Đối Soát Bảng Kiểm Kê (PHP Inventory Check)
-- **Lệnh thực thi:**
-  ```bash
-  python3 -c "
-  import os
-  files = [os.path.relpath(os.path.join(r, f), '.') for r, d, fs in os.walk('.') for f in fs if f.endswith('.php') and not any(x in r for x in ['.git', '.agents', 'node_modules'])]
-  print(len(files))
-  "
-  ```
-  **Kết quả thực tế:** Hệ thống có **chính xác 49 tệp `.php`**.
-- **Đối soát với Bảng 2 trong `FULL_PROJECT_AUDIT_REPORT.md` và Bảng 3 trong `PROJECT.md`:**
-  - Tổng số hàng kiểm kê: 50 hàng (gồm 1 tệp stylesheet chính `style.css` và 49 tệp `.php`).
-  - Số tệp PHP thực tế có trong bảng: **49 / 49 tệp (Đạt 100.0%)**.
-  - Số tệp PHP bị bỏ sót (Missing): **0 tệp**.
-  - Số tệp ảo hoặc không tồn tại (Extra): **0 tệp**.
-- **Đối soát trạng thái Guard `defined('ABSPATH') || exit;`:**
-  - Thực tế quét toàn bộ 49 tệp PHP cho thấy chính xác **3 tệp thiếu ABSPATH**:
-    1. `./header.php`
-    2. `./inc/search-engine.php`
-    3. `./tests/run-tests.php`
-  - Cả hai tài liệu kiểm định đều ghi nhận chính xác 100% trạng thái của 3 tệp này là **"THIẾU"** và đánh dấu 46 tệp còn lại là **"Đạt / Có"**.
-- **Đối soát số dòng và dung lượng:**
-  - 48 / 50 tệp khớp chính xác 100% từng dòng mã và từng byte.
-  - 2 tệp có chênh lệch 1 dòng: `style.css` (báo cáo ghi 260 dòng, thực tế 259 dòng, dung lượng khớp 6.952 bytes), `taxonomy.php` (báo cáo ghi 238 dòng, thực tế 237 dòng, dung lượng khớp 13.500 bytes). Đây là sai số không đáng kể do quy ước đếm dòng có hoặc không tính dòng trống cuối tệp.
+2. **Lệnh thực thi**: `php tests/test-m6-e2e-master-acceptance.php`:
+   - **Kết quả**: **FAIL 5 ASSERTION VÀ CRASH (Exit code: 255)**.
+   - **Verbatim Failures trước khi crash**:
+     - `[FAIL] taxonomy.php:220 has valid '<a href="<?php the_permalink(); ?>"' syntax`
+     - `[FAIL] Taxonomy title is 'Hình thức học' (Details: Actual: Hình thức đào tạo)`
+     - `[FAIL] Taxonomy label is 'Hình thức học' (Details: Actual: Hình thức đào tạo)`
+     - `[FAIL] Taxonomy rewrite_slug is preserved as 'he-dao-tao'`
+     - `[FAIL] Redirect target points strictly to /he-dao-tao/ (NOT /he-dao-tao/tu-xa/)`
+     - `[FAIL] Canonical filter enforces /he-dao-tao/ on program archive`
+   - **Verbatim Fatal Error**:
+     ```
+     Fatal error: Uncaught Error: Call to undefined function get_template_directory_uri() in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/config/class-defaults.php:94
+     Stack trace:
+     #0 /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/tests/test-m6-e2e-master-acceptance.php(287): ltdh_get_defaults('navigation')
+     #1 {main}
+       thrown in /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/inc/config/class-defaults.php on line 94
+     ```
 
-### 1.2. Độ Phủ Yêu Cầu Kỹ Thuật (Requirements R1, R2, R3, R4, R5 Coverage)
-Báo cáo kiểm định đã phân loại thành **36 mã định danh lỗi có cấu trúc chuẩn hóa** với độ phủ trọn vẹn:
-- **R1 (Chuẩn PHP 8+ & WordPress Core Standards):**
-  - Đã thực thi `php -l` độc lập trên toàn bộ 49 tệp: 100% đạt chuẩn cú pháp (0 lỗi fatal).
-  - Ghi nhận và định vị chính xác 18 lần gọi hàm deprecated `get_page_by_path()` trong WordPress 6.2+ (`[DEPR-MED-01]`).
-  - Ghi nhận nguy cơ deprecated null handling trên PHP 8.1+ tại `single.php:43` và `taxonomy.php:15` (`[COMPAT-LOW-01]`).
-  - Ghi nhận lỗi kiến trúc bỏ quên đăng ký CPT `guide` dẫn đến template mồ côi `single-guide.php` (`[ARCH-HIGH-01]`).
-  - Ghi nhận trùng lặp 98% mã nguồn giữa `archive-program.php` và `taxonomy-training_type.php` (`[ARCH-MED-01]`).
-- **R2 (Bảo Mật & Kiểm Soát Dữ Liệu):**
-  - Phát hiện lỗi nguy cấp kịch bản kiểm thử `tests/run-tests.php` tự nạp `wp-load.php` mở web công khai gây xóa/tạo dữ liệu DB (`[SEC-CRIT-01]`).
-  - Phát hiện lỗ hổng tải tệp công khai thiếu whitelist MIME types và giới hạn dung lượng trong `inc/eligibility.php` (`[SEC-HIGH-01]`).
-  - Phát hiện lỗ hổng IDOR cập nhật hồ sơ lead qua AJAX `$_POST['lead_id']` trong `inc/eligibility.php` (`[SEC-HIGH-02]`).
-  - Phát hiện thiếu nonce CSRF trên bộ lọc chương trình AJAX (`[SEC-MED-01]`) và form tư vấn gốc (`[SEC-MED-02]`).
-  - Phát hiện thiếu ABSPATH guard (`[SEC-LOW-01]`).
-- **R3 (Hiệu Năng & Tối Ưu Truy Vấn Cơ Sở Dữ Liệu):**
-  - Phát hiện lệnh tự hủy transient cache `delete_transient('ltdh_featured_schools_data')` chạy mỗi lượt xem trang chủ (`[PERF-HIGH-01]`).
-  - Phát hiện thiết lập mặc định nguy hiểm `posts_per_page => -1` trên các trang lưu trữ trường và ngành (`[PERF-HIGH-02]`).
-  - Phát hiện vấn nạn N+1 query nặng nề trên trang danh bạ trường học `archive-school.php` (`[PERF-MED-01]`).
-  - Phát hiện lưu trữ toàn bộ object `WP_Query` vào transient cache (`[PERF-LOW-01]`).
-  - Phát hiện các bất cập quản lý asset: Google Fonts nhúng trực tiếp bỏ qua enqueue (`[ASSET-MED-01]`), 250+ dòng CSS trùng lặp (`[ASSET-MED-02]`), 13 khối inline JS/CSS (`[ASSET-MED-03]`), thiếu `defer` (`[ASSET-MED-04]`), và 28.5 MB ảnh mockup thừa (`[FRONT-LOW-01]`).
-- **R4 (SEO On-Page, Schema Markup & Độ Hoàn Thiện Frontend):**
-  - Phát hiện lỗi cú pháp CSS `@media (max-w: 767px)` trong `footer.php:184` làm hỏng layout mobile footer (`[FRONT-CRIT-01]`).
-  - Phát hiện trang chủ hoàn toàn thiếu thẻ `<h1>` (`[SEO-CRIT-01]`).
-  - Phát hiện hệ thống Schema phụ thuộc 100% vào plugin Rank Math mà không có native fallback (`[SCHEMA-CRIT-01]`).
-  - Phát hiện nút so sánh tê liệt sau khi lọc AJAX do thiếu Event Delegation (`[FRONT-HIGH-01]`).
-  - Phát hiện lỗi Null Pointer và bind trùng submit form trong `eligibility.js` (`[FRONT-HIGH-02]`).
-  - Phát hiện trùng lặp 2 thẻ `<h1>` trên 3 template (`[SEO-HIGH-01]`).
-  - Phát hiện URL hardcode `localhost:10028` trên trang chủ (`[SEO-HIGH-02]`).
-  - Phát hiện link hỏng 404 `/truong-hoc/` trong breadcrumb (`[SEO-HIGH-03]`).
-  - Phát hiện các thiếu sót Schema: thiếu `EducationalOrganization` & `WebSite` Sitelinks (`[SCHEMA-HIGH-01]`), thiếu trường Course bắt buộc (`[SCHEMA-HIGH-02]`), thiếu `FAQPage` trên `page-faq.php` (`[SCHEMA-HIGH-03]`), và cố tình bỏ qua breadcrumb schema trên `/he-dao-tao/` (`[SCHEMA-HIGH-04]`).
-  - Phát hiện ảnh fallback lỗi 404 dung lượng 29 bytes (`[FRONT-MED-01]`).
-- **R5 (Báo Cáo Tổng Hợp & Lộ Trình Khắc Phục):**
-  - Toàn bộ kết quả được tổng hợp tại `FULL_PROJECT_AUDIT_REPORT.md` (1.263 dòng).
-  - Phân loại rõ ràng 4 mức độ: 4 Critical, 14 High, 12 Medium, 6 Low.
-  - 100% các vấn đề Critical và High đều có code snippet khắc phục chi tiết.
+3. **Kiểm tra cú pháp tĩnh toàn theme**:
+   - Quét 67 tệp tin `.php` trong theme bằng `php -l`: **100% đạt chuẩn cú pháp (0 Syntax Errors)**.
 
-### 1.3. Rà Soát Token Placeholder Trong Code Snippets
-- **Tìm kiếm toàn cục:** Quét toàn bộ `FULL_PROJECT_AUDIT_REPORT.md` và `PROJECT.md` cho thấy:
-  - Số lượng token `TODO`: **0**
-  - Số lượng token `TBD`: **0**
-  - Số lượng token `FIXME`: **0**
-  - Không có dấu `...` làm đứt đoạn mã trong các khối lệnh thực thi.
-- **Phát hiện ngoại lệ cần lưu ý (Minor Observations):**
-  1. Tại mục `[FRONT-HIGH-02]` (Dòng 594–606): Đoạn code minh họa cơ chế debounce/guard chống bind trùng listener sử dụng chú thích tóm tắt `// Xử lý gửi form an toàn` thay vì đưa toàn bộ logic fetch bên trong, và sử dụng selector `document.getElementById('elig-lead-form')` (trong khi ID form thực tế trong `template-parts/eligibility/results.php` là `elig-consultation-form`).
-  2. Tại mục `[SEC-HIGH-02]` (Dòng 385–390): Đoạn code đề xuất cơ chế chống IDOR sử dụng câu truy vấn `SELECT * FROM {$wpdb->prefix}ltdh_leads WHERE id = %d AND referral_source LIKE %s` dựa vào token lưu kèm trong trường `referral_source`. Giải pháp này hoạt động như một hotfix không làm thay đổi cấu trúc bảng CSDL, tuy nhiên chuẩn WordPress tối ưu hơn là dùng HMAC hash `hash_hmac('sha256', $lead_id, wp_salt())` hoặc `wp_create_nonce()`.
-  3. Tại mục `[SEC-MED-02]` (Dòng 961–972): Khối snippet minh họa CSRF trên native form có dòng chú thích `<!-- các input khác -->` và `// Tiến hành lưu lead`. Tuy nhiên đây là lỗi mức Medium và đoạn code chỉ mang tính minh họa vị trí đặt nonce.
+### 1.2. Thẩm định chi tiết từng đoạn code mẫu trong Mục 7 Báo cáo
 
-### 1.4. Đánh Giá Công Thức Điểm Sức Khỏe & Tính Logic
-- **Bảng điểm trong báo cáo:**
-  - Chuẩn PHP 8+ & WP Standards: Điểm 74, Trọng số 25% $\rightarrow 74 \times 0.25 = 18.5$
-  - Bảo mật & Kiểm soát dữ liệu: Điểm 62, Trọng số 30% $\rightarrow 62 \times 0.30 = 18.6$
-  - Hiệu năng & Truy vấn CSDL: Điểm 64, Trọng số 20% $\rightarrow 64 \times 0.20 = 12.8$
-  - SEO, Schema & Frontend: Điểm 54, Trọng số 25% $\rightarrow 54 \times 0.25 = 13.5$
-- **Tính toán thực nghiệm:**
-  $$\text{Tổng điểm thực tế} = 18.5 + 18.6 + 12.8 + 13.5 = \mathbf{63.4 / 100}$$
-  Báo cáo công bố điểm tổng hợp: **$63.5 / 100$**.
-  *Chênh lệch: $0.1$ điểm (sai số làm tròn số học).*
-- **Tính hợp lý của điểm số:**
-  - Điểm 54 của Domain SEO & Frontend là hoàn toàn thỏa đáng vì có tới 3 lỗi Critical và 7 lỗi High.
-  - Điểm 62 của Domain Security phản ánh chính xác mức độ nguy hại của lỗ hổng file upload và test runner mở web.
-  - Điểm 64 của Domain Performance phản ánh đúng mức độ tàn phá tài nguyên của bug xóa transient cache mỗi pageview và `posts_per_page = -1`.
-
-### 1.5. Đánh Giá Lộ Trình 4 Giai Đoạn (Remediation Roadmap)
-- Toàn bộ **4 lỗi Critical** và **14 lỗi High** đều được phân bổ chính xác vào 3 giai đoạn đầu:
-  - **Giai đoạn 1 (Hotfixes khẩn cấp):** 4 Critical (`SEC-CRIT-01`, `FRONT-CRIT-01`, `SEO-CRIT-01`, `SCHEMA-CRIT-01`) + 1 High hotfix hiệu năng cao (`PERF-HIGH-01`).
-  - **Giai đoạn 2 (Bảo mật & CSDL):** Các lỗi High an ninh (`SEC-HIGH-01`, `SEC-HIGH-02`), High hiệu năng DB (`PERF-HIGH-02`), High kiến trúc (`ARCH-HIGH-01`), kèm các lỗi CSRF Medium.
-  - **Giai đoạn 3 (SEO, Schema & UX):** Các lỗi High trải nghiệm (`FRONT-HIGH-01`, `FRONT-HIGH-02`), High SEO (`SEO-HIGH-01..03`), và cụm 4 lỗi High Schema (`SCHEMA-HIGH-01..04`).
-  - **Giai đoạn 4 (Vệ sinh mã nguồn):** Toàn bộ các cảnh báo Deprecated, trùng lặp mã nguồn, tinh chỉnh CSS/JS và dọn dẹp ảnh dư thừa.
-- Thứ tự ưu tiên hoàn toàn nhất quán: xử lý triệt để các rủi ro chặn phát hành (blockers) trước khi tối ưu kiến trúc và thẩm mỹ.
-
-### 1.6. Khảo Sát Các Góc Khuất / Vector Tiềm Ẩn Ngoài Báo Cáo
-- **Kiểm tra SQL Injection:** Đã quét toàn bộ các lệnh gọi `$wpdb->query`, `$wpdb->get_results`, `$wpdb->get_row`. Không phát hiện thêm câu query nào thiếu `prepare()` chưa được báo cáo ghi nhận. Lệnh `TRUNCATE TABLE` trong `inc/eligibility.php:1373` đã được bảo vệ bởi quyền `manage_options` và nonce.
-- **Kiểm tra SSRF trong CRM Adapters:** `crm-adapters.php` gọi API OnSchool và AUM bằng hàm chuẩn của WordPress là `wp_safe_remote_post()`. Hàm này mặc định chặn các dải IP nội bộ và loopback, do đó không tồn tại lỗ hổng SSRF nghiêm trọng. Báo cáo không phóng đại lỗi này là một điểm cộng lớn về tính chính xác.
-- **Kiểm tra Template Search:** Theme không có tệp `search.php`. Khi người dùng tìm kiếm qua `/?s=`, WordPress Core sẽ rơi về `index.php`. Tuy nhiên `index.php` được thiết kế thuần túy cho Blog Tin tức tuyển sinh và không xử lý truy vấn tìm kiếm. Đây là một điểm khuyết thiếu nhỏ về cấu trúc template WordPress chuẩn.
+| Bản vá | Vị trí đề xuất | Tình trạng cú pháp & chuẩn WPCS | Rủi ro / Lỗi thực nghiệm phát hiện |
+| :--- | :--- | :--- | :--- |
+| **Bản vá 1.1** (CSRF Lead Form) | `inc/core/class-helpers.php`<br>`single-guide.php`<br>`inc/lead-capture.php:403-452` | Cú pháp hợp lệ, đúng chuẩn Nonce WordPress | **CRITICAL REGRESSION**: <br>1. Đoạn code mẫu đã **bỏ quên hàm kiểm tra spam** `ltdh_is_spam_submission()` vốn có tại `inc/lead-capture.php:522`. Áp dụng code mẫu này sẽ làm tê liệt honeypot & bộ lọc Cyrillic/URL spam!<br>2. **Mất liên kết tham số**: Code mẫu đọc `$_POST['program_id']`, nhưng toàn bộ form đơn hiện tại (`single-program.php:1070`, `single-school.php:671`) đang gửi `current_program_id`. Nếu thay thế, toàn bộ lead từ các trang single sẽ bị lưu thành `program_id = 0`! |
+| **Bản vá 1.2** (Clean Data JSON) | Script chạy một lần `schools_import.json` | Cú pháp hợp lệ | **INCOMPLETE SANITIZATION**: <br>1. Script chỉ áp dụng regex xóa lên `$school['admission_info']`. Tuy nhiên, đoạn kịch bản nhạy cảm `(Văn phòng tuyển sinh: tên TVTS - SĐT` nằm trong trường `$school['contact_info']` (trường UNET, dòng 28). Do đó, script chạy xong vẫn để lọt nguyên văn chuỗi nhạy cảm trên web!<br>2. Mảng `$official_school_hotlines` khai báo mã `'UNETI'`, nhưng trong JSON mã thực tế là `'UNET'`. |
+| **Bản vá 1.3** (Form PDF Link) | `inc/cli-commands.php:443` | Cú pháp hợp lệ | Biến `$school_code` có tồn tại trong scope vòng lặp. Cần ép kiểu `(string) $school_code` trước khi gọi `preg_replace` để tránh deprecation notice trên PHP 8.1+ khi giá trị null. |
+| **Bản vá 2.1** (Z-index Mobile Bar) | `footer.php:151`<br>`compare/tray.php:11`<br>`assets/js/compare.js` | Cú pháp hợp lệ | **LOGIC DEFECT & UX REGRESSION**:<br>1. Điều kiện `$should_render_global_mobile_bar = ! is_singular( [ 'program', 'major' ] ) && ! is_page( 'so-sanh-chuong-trinh' );` bị sai. Trang so sánh của theme được route qua custom rewrite `^so-sanh/chuong-trinh/(.+?)/?$` (biến `ltdh_compare`), hàm `is_page('so-sanh-chuong-trinh')` **luôn trả về false**, thanh mobile bar vẫn sẽ xuất hiện trên trang so sánh.<br>2. Trang `single-major.php` hoàn toàn không có sticky bottom bar riêng. Việc loại trừ `'major'` sẽ khiến toàn bộ trang chi tiết ngành đào tạo **mất hoàn toàn các nút gọi điện/chat/đăng ký trên di động**! |
+| **Bản vá 2.2** (DOM ID Mismatch Quiz) | `template-parts/eligibility/results.php:41` | Cú pháp hợp lệ, đồng bộ chuẩn DOM | **CHÍNH XÁC 100%**: Sửa `id="elig-alternatives"` thành `id="elig-alternatives-section"` khớp với `assets/js/eligibility.js:400`. Đạt chuẩn. |
+| **Bản vá 2.3** (Preserve `program_id`) | `page-register.php:24-35` | Cú pháp hợp lệ | Cần gửi đồng thời cả hai key `program_id` và `current_program_id` vào `$hidden_context` để tương thích ngược 100% với logic tiếp nhận lead. |
+| **Bản vá 2.4** (Rank Math Canonical) | `inc/seo/class-rankmath-integration.php:138-163` | Cú pháp hợp lệ | **DEFECT**: `return get_term_link( $current_term );` thiếu guard kiểm tra `is_wp_error()`. Khi `$current_term` trả về rỗng/lỗi, Rank Math nhận đối tượng `WP_Error` làm canonical sẽ gây lỗi render HTML thẻ `<link rel="canonical">`. |
+| **Bản vá 2.5** (Course Schema) | `inc/seo/class-rankmath-integration.php:205-235` | Cú pháp hợp lệ | **DATA DEFECT**: Gán cứng `'courseMode' => 'Online'` bỏ qua hệ `vua-hoc-vua-lam`. Khi học phí rỗng, phát sinh `'price' => '0'` dẫn tới Google hiểu nhầm là khóa học miễn phí (vi phạm Google Search Central Guidelines về giá). |
+| **Bản vá 2.6** (ACF Admin & Diploma) | `inc/acf-fields.php:149`<br>`single-program.php` | Cú pháp hợp lệ, bảo mật escape đầy đủ | **CHÍNH XÁC 100%**: Mở khóa trường văn bằng và bổ sung khối Thông tư 27/2019/TT-BGDĐT đáp ứng đúng yêu cầu pháp lý đào tạo liên thông. |
+| **Bản vá 3.1** (Phone Regex VN) | `inc/lead-capture.php:121-130` | Cú pháp regex hợp lệ | **FALSE POSITIVE SPAM RISK**: Regex `$vn_phone_pattern` chỉ chấp nhận đầu số di động 10 số, chặn toàn bộ số điện thoại cố định bàn cơ quan/nhà trường (`024...`, `028...`) và đầu số mới FPT (`055`). Cần nới lỏng để không loại bỏ lead hợp lệ. |
+| **Bản vá 3.2** (Email Notification) | `inc/lead-capture.php:217` | Cú pháp hợp lệ, an toàn header injection | **CHÍNH XÁC 100%**: Gửi email qua `wp_mail()` có kiểm tra `is_email()`, nội dung plain text an toàn. |
+| **Bản vá 3.3** (ABSPATH Guard) | `header.php`, `inc/search-engine.php` | Cú pháp hợp lệ | **CHÍNH XÁC 100%**: Chuẩn bảo mật file WordPress. |
+| **Bản vá 3.4** (Dequeue redundant CSS) | `inc/core/class-theme-setup.php` | Cú pháp hợp lệ | **CHÍNH XÁC 100%**: Bỏ enqueue file `style.css` 15KB trùng lặp, tối ưu tốc độ. |
+| **Bản vá 3.5** (H1 Deduplication) | `page-compare-program.php:53` | Cú pháp hợp lệ | **CHÍNH XÁC 100%**: Chuyển H1 thứ 2 thành H2, triệt tiêu lỗi duplicate H1 theo chuẩn SEO. |
 
 ---
 
-## 2. LOGIC CHAIN (CHUỖI LÝ LUẬN & SUY DIỄN ĐÁNH GIÁ)
+## 2. LOGIC CHAIN (CHUỖI SUY LUẬN TỪ THỰC NGHIỆM ĐẾN KẾT LUẬN)
 
-1. **Từ việc 49/49 tệp PHP (100%) và `style.css` xuất hiện đầy đủ trong Bảng kiểm kê** (Mục 1.1)  
-   $\rightarrow$ Suy ra: Tiêu chí kiểm kê toàn diện đạt 100% độ phủ, không bỏ sót bất kỳ tệp PHP nào trong theme.
-2. **Từ việc kiểm tra 28 trích dẫn dòng code và kiểm tra cú pháp độc lập** (Mục 1.1 & 1.2)  
-   $\rightarrow$ Suy ra: Các quan sát trong báo cáo đều có căn cứ thực nghiệm chính xác trên mã nguồn hiện tại, không có phát hiện hư cấu hoặc sai lệch số dòng.
-3. **Từ việc 18/18 lỗi Critical và High đều có giải pháp kèm đoạn mã mẫu hoàn chỉnh** (Mục 1.2 & 1.3)  
-   $\rightarrow$ Suy ra: Báo cáo đáp ứng trọn vẹn Tiêu chuẩn Chấp thuận (Acceptance Criteria) của `ORIGINAL_REQUEST.md`.
-4. **Từ việc không tìm thấy token `TODO`, `TBD`, `FIXME` hay mã bị cắt cụt** (Mục 1.3)  
-   $\rightarrow$ Suy ra: Báo cáo đạt chuẩn chất lượng giao phẩm chuyên nghiệp, không có hiện tượng lười biếng hoặc bỏ dở nội dung.
-5. **Từ việc công thức điểm tổng hợp có độ lệch $0.1$ điểm ($63.4$ vs $63.5$)** (Mục 1.4)  
-   $\rightarrow$ Suy ra: Đây chỉ là sai số làm tròn số học thuần túy của tác giả báo cáo, hoàn toàn không làm sai lệch bản chất đánh giá hoặc thứ hạng sức khỏe của dự án.
-6. **Từ việc phân bổ 36 phát hiện vào 4 giai đoạn logic và khả thi** (Mục 1.5)  
-   $\rightarrow$ Suy ra: Kế hoạch khắc phục (Remediation Roadmap) có tính thực tiễn cao, sẵn sàng bàn giao cho đội ngũ lập trình viên thi công ngay lập tức.
+1. **Từ Quan sát 1.1**:
+   - Khi chạy `php tests/test-m4-adversarial.php`, hàm `ltdh_dynamic_menu_submenu_injection()` gọi `get_term_link()` tại `class-menus.php:174`. Tuy nhiên bộ test không mock hàm này, dẫn đến Fatal Error dừng ngay ở đầu test.
+   - Khi chạy `php tests/test-m6-e2e-master-acceptance.php`, hàm `ltdh_get_defaults()` khởi tạo mảng defaults có gọi `get_template_directory_uri()` tại `class-defaults.php:94`. Bộ test không mock hàm này, gây Fatal Error.
+   - Đồng thời, Suite 4 của Test M6 phát hiện xung đột định danh cốt lõi: Theme đang dùng `/hinh-thuc-dao-tao/` và `'Hình thức đào tạo'`, trong khi test suite mong đợi `/he-dao-tao/` và `'Hình thức học'`.
+   - $\rightarrow$ **Suy luận**: Tuyên bố rằng mã nguồn theme gốc hiện tại đang pass 100% hai bộ test này là **không chính xác về mặt thực nghiệm**. Bộ test bị thiếu mock hàm WordPress và có sự lệch pha về taxonomy slug.
+
+2. **Từ Quan sát 1.2 (Bản vá 1.1 - CSRF)**:
+   - Trong `inc/lead-capture.php`, hàm `ltdh_handle_native_form_submit()` gốc có gọi `ltdh_is_spam_submission()`.
+   - Bản vá 1.1 trong Mục 7 viết lại toàn bộ hàm nhưng lược bỏ dòng kiểm tra spam này.
+   - Các template hiện tại (`single-program.php`, `single-school.php`, `single-major.php`) truyền ID với tiền tố `current_program_id`, trong khi code mẫu của bản vá 1.1 chỉ trích xuất `program_id`.
+   - $\rightarrow$ **Suy luận**: Nếu developer copy nguyên văn Bản vá 1.1 vào theme, hệ thống sẽ: (a) Mở toang cửa cho bot spam gửi rác (do mất spam check); (b) Mất toàn bộ thông tin trường/ngành/chương trình của lead gửi từ các trang chi tiết.
+
+3. **Từ Quan sát 1.2 (Bản vá 1.2 - Clean Data)**:
+   - Regex trong Bản vá 1.2 chỉ chạy trên `$school['admission_info']`.
+   - Trong `schools_import.json`, chuỗi nhạy cảm `(Văn phòng tuyển sinh: tên TVTS - SĐT` nằm tại dòng 28 trong trường `contact_info`.
+   - $\rightarrow$ **Suy luận**: Bản vá 1.2 không thể làm sạch triệt để dữ liệu như báo cáo đã tuyên bố nếu không bổ sung trường `contact_info` vào phạm vi xử lý.
+
+4. **Từ Quan sát 1.2 (Bản vá 2.1 - Mobile Bar)**:
+   - Bản vá 2.1 dùng `is_page( 'so-sanh-chuong-trinh' )` để ẩn thanh bar.
+   - Cấu trúc theme xử lý trang so sánh qua rewrite rule `so-sanh/chuong-trinh/(.+?)/?$` gán biến `ltdh_compare = 'program'`, không phải là một WordPress standard page.
+   - Do đó, `is_page( 'so-sanh-chuong-trinh' )` luôn trả về false $\rightarrow$ Thanh bar không được ẩn trên trang so sánh.
+   - Đồng thời loại trừ `is_singular( 'major' )` làm mất CTA trên trang ngành đào tạo (nơi không có thanh sticky riêng).
+   - $\rightarrow$ **Suy luận**: Bản vá 2.1 sai điều kiện logic WordPress và gây tác dụng phụ làm hỏng trải nghiệm người dùng trên trang ngành.
 
 ---
 
-## 3. CAVEATS (CÁC ĐIỂM GIỚI HẠN & LƯU Ý)
+## 3. CAVEATS (GIỚI HẠN & GIẢ ĐỊNH)
 
-1. **Sai số làm tròn điểm số:** Điểm tổng hợp chính xác theo trọng số là $63.4 / 100$, báo cáo ghi $63.5 / 100$. Khuyến nghị hiệu chỉnh thành $63.4$ để đảm bảo độ chính xác toán học tuyệt đối.
-2. **Selector Form trong `FRONT-HIGH-02`:** Khi áp dụng bản vá cho `assets/js/eligibility.js`, lập trình viên cần lưu ý ID của form đăng ký tư vấn thực tế trong template là `elig-consultation-form` thay vì `elig-lead-form`.
-3. **Cơ chế xác thực token trong `SEC-HIGH-02`:** Thay vì lưu chuỗi token vào cột `referral_source`, khuyến nghị lập trình viên nên sinh token bảo mật bằng hàm chuẩn `wp_create_nonce( 'ltdh_lead_' . $lead_id )` hoặc hash HMAC.
-4. **Thiếu template `search.php`:** Mặc dù theme có bộ lọc tìm kiếm chuyên dụng trên trang chương trình, theme vẫn nên bổ sung `search.php` tiêu chuẩn để hoàn thiện 100% cấu trúc giao diện WordPress.
+1. Môi trường kiểm thử dòng lệnh CLI không nạp được `wp-load.php` toàn phần do máy chủ MySQL của Local WP không khởi chạy socket qua CLI, các bài test phải thực thi qua mock harness.
+2. Việc thay đổi slug từ `/hinh-thuc-dao-tao/` sang `/he-dao-tao/` liên quan đến URL rewrite rules và dữ liệu đã index trên Rank Math; cần có kế hoạch 301 redirect tương ứng nếu thực hiện chuẩn hóa.
 
 ---
 
 ## 4. CONCLUSION & FINAL VERDICT (KẾT LUẬN & PHÁN QUYẾT)
 
-### PHÁN QUYẾT: **APPROVE (CHẤP THUẬN)**
+### PHÁN QUYẾT CHÍNH THỨC: **REJECT CODE GỐC SECTION 7 (YÊU CẦU ĐIỀU CHỈNH 5 LỖI TRƯỚC KHI ÁP DỤNG)**
+*(Hoặc CONDITIONAL APPROVAL - Chỉ được áp dụng khi đã tích hợp các điều chỉnh kỹ thuật dưới đây)*
 
-**Lý do phê duyệt:**
-1. **Độ phủ tuyệt đối (100% Completeness):** Toàn bộ 49 tệp PHP mã nguồn đã được rà soát, kiểm tra cú pháp và lập chỉ mục đầy đủ không có ngoại lệ.
-2. **Đáp ứng toàn diện các yêu cầu R1 - R5:** Tất cả 5 nhóm yêu cầu cốt lõi về PHP Standards, Bảo mật, Hiệu năng, SEO/Schema và Tài liệu bàn giao đều được phân tích sâu sắc với 36 phát hiện rõ ràng.
-3. **Chất lượng giải pháp xuất sắc:** 100% các lỗi nguy cấp (Critical) và mức độ cao (High) đều có đoạn mã sửa lỗi mẫu (fix snippet) đạt chuẩn WordPress Coding Standards, sẵn sàng áp dụng.
-4. **Không có mã giữ chỗ (Zero Placeholders):** Báo cáo không chứa các token thoái thác trách nhiệm như `TODO`, `TBD`.
-5. **Lộ trình phân kỳ khoa học:** Kế hoạch 4 giai đoạn phân tách rõ ràng giữa việc vá khẩn cấp lỗi vận hành và tái cấu trúc mã nguồn dài hạn.
+Báo cáo `WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md` có chất lượng phân tích kiến trúc rất sâu sắc và phát hiện đúng các vấn đề gốc rễ. Tuy nhiên, **các đoạn code giải pháp mẫu tại Mục 7 KHÔNG THỂ sao chép trực tiếp vào production** vì chứa 5 lỗi logic/hồi quy nghiêm trọng:
+
+### 5 ĐIỀU CHỈNH BẮT BUỘC PHẢI THỰC HIỆN:
+
+1. **Khắc phục Bản vá 1.1**:
+   - Khôi phục kiểm tra `ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $notes ] )`.
+   - Hỗ trợ fallback tương thích ngược cho các tham số ID:
+     ```php
+     $program_id = isset( $_POST['program_id'] ) ? absint( $_POST['program_id'] ) : ( isset( $_POST['current_program_id'] ) ? absint( $_POST['current_program_id'] ) : 0 );
+     $school_id  = isset( $_POST['school_id'] ) ? absint( $_POST['school_id'] ) : ( isset( $_POST['current_school_id'] ) ? absint( $_POST['current_school_id'] ) : 0 );
+     $major_id   = isset( $_POST['major_id'] ) ? absint( $_POST['major_id'] ) : ( isset( $_POST['current_major_id'] ) ? absint( $_POST['current_major_id'] ) : 0 );
+     ```
+
+2. **Khắc phục Bản vá 1.2**:
+   - Áp dụng mảng regex cho **cả 2 trường** `admission_info` VÀ `contact_info`.
+   - Sửa key hotline từ `'UNETI'` thành `'UNET'`.
+
+3. **Khắc phục Bản vá 2.1**:
+   - Thay đổi điều kiện ẩn Mobile Bar thành:
+     ```php
+     $is_compare = ( get_query_var( 'ltdh_compare' ) === 'program' ) || ( strpos( $_SERVER['REQUEST_URI'] ?? '', '/so-sanh/' ) !== false );
+     $should_render_global_mobile_bar = ! is_singular( 'program' ) && ! $is_compare;
+     ```
+   - Không loại trừ `is_singular( 'major' )` để giữ CTA liên hệ cho trang ngành.
+
+4. **Khắc phục Bản vá 2.4 & 2.5**:
+   - Thêm guard `if ( ! is_wp_error( $term_link ) && ! empty( $term_link ) )` trước khi trả về URL canonical.
+   - Gán `courseMode` động theo taxonomy thay vì hardcode `'Online'`; chỉ render `offers` khi `price > 0`.
+
+5. **Khắc phục Bản vá 3.1**:
+   - Mở rộng regex số điện thoại hỗ trợ đầu số máy bàn và đầu số mới:
+     ```php
+     $vn_phone_pattern = '/^(?:0|\+84|84)(?:(?:3[2-9]|5[25689]|7[06-9]|8[1-9]|9[0-9])[0-9]{7}|2[0-9]{8,9})$/';
+     ```
+
+6. **Khắc phục 2 file test dự án**:
+   - Trong `tests/test-m4-adversarial.php`: Mock thêm `get_term_link()` và `get_template_directory_uri()`.
+   - Trong `tests/test-m6-e2e-master-acceptance.php`: Mock thêm `get_template_directory_uri()`.
 
 ---
 
-## 5. VERIFICATION METHOD (PHƯƠNG PHÁP XÁC MINH ĐỘC LẬP)
+## 5. VERIFICATION METHOD (PHƯƠNG PHÁP KIỂM TRA ĐỘC LẬP)
 
-Bất kỳ thành viên nào trong nhóm hoặc Orchestrator đều có thể kiểm chứng lại toàn bộ các phát hiện trên bằng các lệnh sau:
+Bất kỳ reviewer nào cũng có thể kiểm chứng độc lập các kết luận trên bằng các bước sau:
 
-### 1. Kiểm tra 100% tệp PHP trong bảng kiểm kê:
-```bash
-python3 << 'EOF'
-import os, re
-real_php = {os.path.relpath(os.path.join(r, f), '.') for r, d, fs in os.walk('.') for f in fs if f.endswith('.php') and not any(x in r for x in ['.git', '.agents', 'node_modules'])}
-with open('FULL_PROJECT_AUDIT_REPORT.md') as f:
-    table_files = {m for m in re.findall(r'\|\s*\d+\s*\|\s*`([^`]+)`', f.read()) if m.endswith('.php')}
-print("Discrepancy (Missing):", real_php - table_files)
-print("Discrepancy (Extra):", table_files - real_php)
-print("Match 100%:", real_php == table_files and len(table_files) == 49)
-EOF
-```
+1. **Kiểm tra crash test suite gốc**:
+   ```bash
+   php "tests/test-m4-adversarial.php"
+   # Quan sát: Fatal error get_term_link() tại inc/core/class-menus.php:174
+   
+   php "tests/test-m6-e2e-master-acceptance.php"
+   # Quan sát: Fatal error get_template_directory_uri() tại inc/config/class-defaults.php:94
+   ```
 
-### 2. Kiểm tra token TODO/TBD trong mã nguồn báo cáo:
-```bash
-grep -rnE "\b(TODO|TBD|FIXME)\b" FULL_PROJECT_AUDIT_REPORT.md PROJECT.md
-# Kết quả mong đợi: Không in ra kết quả nào (Exit code 1)
-```
+2. **Kiểm chứng rò rỉ dữ liệu trong `contact_info`**:
+   ```bash
+   php -r '$data = json_decode(file_get_contents("schools_import.json"), true); foreach($data as $s){ if(strpos($s["contact_info"]??"", "tên TVTS") !== false) echo "Found leak in contact_info of " . $s["code"] . "\n"; }'
+   # Quan sát: Output xác nhận "Found leak in contact_info of UNET"
+   ```
 
-### 3. Kiểm tra tính toán điểm số Health Score:
-```bash
-python3 -c "
-s = 74 * 0.25 + 62 * 0.30 + 64 * 0.20 + 54 * 0.25
-print(f'Calculated Score: {s:.1f}')
-"
-# Kết quả: Calculated Score: 63.4
-```
+3. **Kiểm chứng biến so sánh**:
+   - Mở `inc/comparison.php` xem dòng 23-45 để thấy rewrite rule gán vào `ltdh_compare`, chứng minh `is_page('so-sanh-chuong-trinh')` luôn là false.

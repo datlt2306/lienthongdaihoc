@@ -71,6 +71,33 @@ function ltdh_acf_json_load_point( $paths ) {
 	return $paths;
 }
 
+function ltdh_normalize_acf_fields_prefix( $fields, $prefix = 'acf' ) {
+	if ( ! is_array( $fields ) ) {
+		return $fields;
+	}
+	foreach ( $fields as &$field ) {
+		if ( ! is_array( $field ) ) {
+			continue;
+		}
+		if ( empty( $field['prefix'] ) ) {
+			$field['prefix'] = $prefix;
+		}
+		if ( ! empty( $field['sub_fields'] ) && is_array( $field['sub_fields'] ) ) {
+			$field['sub_fields'] = ltdh_normalize_acf_fields_prefix( $field['sub_fields'], $prefix );
+		}
+	}
+	return $fields;
+}
+
+// Global guarantee: Every ACF field rendered in WP Admin has prefix 'acf' so inputs are named acf[...]
+add_filter( 'acf/prepare_field', 'ltdh_force_field_prefix_acf', 1 );
+function ltdh_force_field_prefix_acf( $field ) {
+	if ( is_array( $field ) && empty( $field['prefix'] ) ) {
+		$field['prefix'] = 'acf';
+	}
+	return $field;
+}
+
 // Ensure Program & Major field groups always use the structured layout from JSON in WP Admin
 add_filter( 'acf/load_field_group', 'ltdh_filter_json_field_groups' );
 function ltdh_filter_json_field_groups( $field_group ) {
@@ -82,7 +109,7 @@ function ltdh_filter_json_field_groups( $field_group ) {
 			if ( is_array( $data ) ) {
 				foreach ( $data as $item ) {
 					if ( isset( $item['key'] ) && $item['key'] === $field_group['key'] && ! empty( $item['fields'] ) ) {
-						$field_group['fields'] = $item['fields'];
+						$field_group['fields'] = ltdh_normalize_acf_fields_prefix( $item['fields'] );
 						break;
 					}
 				}
@@ -102,7 +129,7 @@ function ltdh_filter_json_fields( $fields, $parent ) {
 			if ( is_array( $data ) ) {
 				foreach ( $data as $item ) {
 					if ( isset( $item['key'] ) && $item['key'] === $parent['key'] && ! empty( $item['fields'] ) ) {
-						return $item['fields'];
+						return ltdh_normalize_acf_fields_prefix( $item['fields'] );
 					}
 				}
 			}
@@ -142,12 +169,19 @@ function ltdh_override_field_program_faq_label( $field ) {
 	return $field;
 }
 
+// Ensure Program admin tab 'Điều kiện & Hồ sơ xét tuyển' is properly labeled
+add_filter( 'acf/load_field/key=field_tab_prog_requirements', 'ltdh_override_field_program_requirements_tab_label' );
+function ltdh_override_field_program_requirements_tab_label( $field ) {
+	$field['label'] = 'Điều kiện & Hồ sơ xét tuyển';
+	return $field;
+}
+
 // Remove/hide unwanted program fields in admin area dynamically
 add_filter( 'acf/prepare_field/key=field_program_why_choose', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_schedule', '__return_false' );
-add_filter( 'acf/prepare_field/key=field_program_target_students', '__return_false' );
-add_filter( 'acf/prepare_field/key=field_program_degree_type', '__return_false' );
-add_filter( 'acf/prepare_field/key=field_program_diploma_value', '__return_false' );
+// Keep degree_type and diploma_value visible for TT 27/2019/TT-BGDĐT compliance
+// add_filter( 'acf/prepare_field/key=field_program_degree_type', '__return_false' );
+// add_filter( 'acf/prepare_field/key=field_program_diploma_value', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_disadvantages', '__return_false' );
 
 // Remove duplicate and unused eligibility meta fields (use standard Taxonomies & pure admission requirements instead)
@@ -357,6 +391,70 @@ function ltdh_cleanup_major_legacy_content() {
 		] );
 	}
 }
+
+// Automatically correct legacy exam text in VHVL/Tu-xa programs to pure admission by records (one-time migration)
+add_action( 'init', 'ltdh_cleanup_vhvl_admission_requirements' );
+function ltdh_cleanup_vhvl_admission_requirements() {
+	if ( get_transient( 'ltdh_vhvl_admission_cleanup_done_v1' ) ) {
+		return;
+	}
+	if ( ! function_exists( 'get_posts' ) ) {
+		return;
+	}
+	$programs = get_posts( [
+		'post_type'      => 'program',
+		'posts_per_page' => -1,
+		'post_status'    => 'any',
+		'fields'         => 'ids',
+	] );
+
+	if ( empty( $programs ) ) {
+		set_transient( 'ltdh_vhvl_admission_cleanup_done_v1', 1, DAY_IN_SECONDS * 30 );
+		return;
+	}
+
+	foreach ( $programs as $pid ) {
+		$slug = get_post_field( 'post_name', $pid );
+		if ( str_contains( $slug, 'vua-hoc-vua-lam' ) || str_contains( $slug, 'tu-xa' ) ) {
+			$req = get_post_meta( $pid, 'admission_requirements', true );
+			if ( ! empty( $req ) && ( str_contains( $req, 'Thi tuyển 3 môn' ) || str_contains( $req, 'Phương thức 2: Thi tuyển' ) ) ) {
+				$clean_req = '<p>Chương trình tuyển sinh Liên thông Đại học hệ Vừa học vừa làm (VHVL) áp dụng phương thức <strong>Xét tuyển hồ sơ văn bằng</strong> (không phải thi tuyển):</p><ul><li><strong>Đối tượng tuyển sinh:</strong> Người đã tốt nghiệp Cao đẳng hoặc Trung cấp đúng ngành/ngành gần Công nghệ thông tin; hoặc người đã có bằng Đại học khác có nguyện vọng học văn bằng 2.</li><li><strong>Tiêu chí xét tuyển:</strong> Xét duyệt dựa trên kết quả học tập ghi trên văn bằng và bảng điểm bậc tốt nghiệp trước đó. Điểm trung bình tích lũy toàn khóa đạt yêu cầu theo Quy chế tuyển sinh của nhà trường.</li><li><strong>Ngưỡng đảm bảo chất lượng:</strong> Thí sinh hoàn thiện đầy đủ hồ sơ hợp lệ và nộp đúng thời hạn quy định của các đợt tuyển sinh.</li></ul>';
+				update_post_meta( $pid, 'admission_requirements', $clean_req );
+			}
+		}
+	}
+	set_transient( 'ltdh_vhvl_admission_cleanup_done_v1', 1, DAY_IN_SECONDS * 30 );
+}
+
+// Clean up deprecated "Tự chủ thời gian và không gian học tập, phôi bằng tốt nghiệp không ghi hình thức đào tạo." placeholder in program benefits (one-time migration)
+add_action( 'init', 'ltdh_cleanup_program_benefits_placeholder' );
+function ltdh_cleanup_program_benefits_placeholder() {
+	if ( get_transient( 'ltdh_benefits_cleanup_done_v1' ) ) {
+		return;
+	}
+	$programs = get_posts( [
+		'post_type'      => 'program',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+		'post_status'    => 'any',
+	] );
+
+	if ( empty( $programs ) ) {
+		set_transient( 'ltdh_benefits_cleanup_done_v1', 1, DAY_IN_SECONDS * 30 );
+		return;
+	}
+
+	foreach ( $programs as $pid ) {
+		$benefits = get_post_meta( $pid, 'program_benefits', true );
+		if ( ! empty( $benefits ) && ( str_contains( $benefits, 'phôi bằng tốt nghiệp không ghi hình thức đào tạo' ) || str_contains( $benefits, 'Tự chủ thời gian' ) ) ) {
+			$new_benefits = str_replace( 'Tự chủ thời gian và không gian học tập, phôi bằng tốt nghiệp không ghi hình thức đào tạo.', '', $benefits );
+			$new_benefits = str_replace( 'phôi bằng tốt nghiệp không ghi hình thức đào tạo.', '', $new_benefits );
+			$new_benefits = trim( strip_tags( $new_benefits ) ) ? trim( $new_benefits ) : '';
+			update_post_meta( $pid, 'program_benefits', $new_benefits );
+		}
+	}
+	set_transient( 'ltdh_benefits_cleanup_done_v1', 1, DAY_IN_SECONDS * 30 );
+}
 // Register ACF Theme Options Page
 add_action( 'acf/init', 'ltdh_register_acf_options_page' );
 function ltdh_register_acf_options_page() {
@@ -373,7 +471,6 @@ function ltdh_register_acf_options_page() {
 	}
 }
 
-// Pre-populate default 5 FAQ items into WP Admin ACF options if empty
 add_action( 'admin_init', 'ltdh_prepopulate_faq_items_if_empty' );
 function ltdh_prepopulate_faq_items_if_empty() {
 	if ( ! function_exists( 'get_field' ) || ! function_exists( 'update_field' ) ) {
@@ -410,4 +507,151 @@ function ltdh_prepopulate_faq_items_if_empty() {
 		update_field( 'faq_items', $default_faqs, 'option' );
 	}
 }
+
+// Use classic editor for Programs, Schools, and Majors to ensure reliable native ACF metabox editing and saving
+add_filter( 'use_block_editor_for_post_type', 'ltdh_disable_block_editor_for_structured_cpts', 99, 2 );
+function ltdh_disable_block_editor_for_structured_cpts( $use_block_editor, $post_type ) {
+	if ( in_array( $post_type, [ 'program', 'school', 'major' ], true ) ) {
+		return false;
+	}
+	return $use_block_editor;
+}
+
+add_filter( 'use_block_editor_for_post', 'ltdh_disable_block_editor_for_structured_posts', 99, 2 );
+function ltdh_disable_block_editor_for_structured_posts( $use_block_editor, $post ) {
+	if ( $post && in_array( get_post_type( $post ), [ 'program', 'school', 'major' ], true ) ) {
+		return false;
+	}
+	return $use_block_editor;
+}
+
+// Ensure TinyMCE editors in hidden tabs always sync content to textareas prior to form submission
+add_action( 'admin_footer-post.php', 'ltdh_admin_tinymce_sync_on_submit' );
+add_action( 'admin_footer-post-new.php', 'ltdh_admin_tinymce_sync_on_submit' );
+function ltdh_admin_tinymce_sync_on_submit() {
+	global $post;
+	if ( ! $post || ! in_array( $post->post_type, [ 'program', 'school', 'major' ], true ) ) {
+		return;
+	}
+	?>
+	<script>
+	jQuery(document).ready(function($) {
+		function syncMceEditors() {
+			if (typeof tinyMCE !== 'undefined') {
+				tinyMCE.triggerSave();
+			}
+		}
+		$('form#post').on('submit', syncMceEditors);
+		$('#publish, #save-post').on('click', syncMceEditors);
+	});
+	</script>
+	<?php
+}
+
+// Ensure standard ACF reference meta keys (_field_name) exist for all programs
+add_action( 'init', 'ltdh_ensure_program_acf_meta_keys' );
+function ltdh_ensure_program_acf_meta_keys() {
+	if ( get_transient( 'ltdh_program_meta_keys_synced_v1' ) ) {
+		return;
+	}
+	if ( ! function_exists( 'get_posts' ) ) {
+		return;
+	}
+	$programs = get_posts( [
+		'post_type'      => 'program',
+		'posts_per_page' => -1,
+		'post_status'    => 'any',
+		'fields'         => 'ids',
+	] );
+	if ( ! empty( $programs ) ) {
+		foreach ( $programs as $pid ) {
+			if ( ! get_post_meta( $pid, '_admission_requirements', true ) ) {
+				update_post_meta( $pid, '_admission_requirements', 'field_program_requirements' );
+			}
+			if ( ! get_post_meta( $pid, '_required_documents', true ) ) {
+				update_post_meta( $pid, '_required_documents', 'field_program_documents' );
+			}
+		}
+	}
+	set_transient( 'ltdh_program_meta_keys_synced_v1', 1, DAY_IN_SECONDS * 30 );
+}
+
+/**
+ * Returns a mapping of ACF field keys to meta keys from the theme JSON configuration.
+ */
+function ltdh_get_theme_acf_key_to_name_map() {
+	static $map = null;
+	if ( null !== $map ) {
+		return $map;
+	}
+	$map = [];
+	$json_path = get_template_directory() . '/inc/acf-import-fields.json';
+	if ( file_exists( $json_path ) ) {
+		$data = json_decode( file_get_contents( $json_path ), true );
+		if ( is_array( $data ) ) {
+			foreach ( $data as $group ) {
+				if ( ! empty( $group['fields'] ) && is_array( $group['fields'] ) ) {
+					foreach ( $group['fields'] as $f ) {
+						if ( ! empty( $f['key'] ) && ! empty( $f['name'] ) ) {
+							$map[ $f['key'] ] = $f['name'];
+						}
+					}
+				}
+			}
+		}
+	}
+	return $map;
+}
+
+/**
+ * Comprehensive fail-safe save handler for Program, School, and Major custom fields.
+ * Handles $_POST['acf'], top-level $_POST['field_*'], and top-level $_POST['meta_key'].
+ */
+add_action( 'save_post', 'ltdh_save_custom_fields_fail_safe', 25, 2 );
+function ltdh_save_custom_fields_fail_safe( $post_id, $post ) {
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+	if ( ! $post || ! in_array( $post->post_type, [ 'program', 'school', 'major' ], true ) ) {
+		return;
+	}
+
+	$field_map = ltdh_get_theme_acf_key_to_name_map();
+
+	// 1. Process standard $_POST['acf'] if populated
+	if ( ! empty( $_POST['acf'] ) && is_array( $_POST['acf'] ) ) {
+		foreach ( $_POST['acf'] as $key => $value ) {
+			if ( str_starts_with( $key, 'field_' ) ) {
+				$field = function_exists( 'acf_get_field' ) ? acf_get_field( $key ) : null;
+				$meta_name = ( $field && ! empty( $field['name'] ) ) ? $field['name'] : ( $field_map[ $key ] ?? '' );
+				if ( $meta_name ) {
+					update_post_meta( $post_id, $meta_name, $value );
+					update_post_meta( $post_id, '_' . $meta_name, $key );
+				}
+			} else {
+				update_post_meta( $post_id, $key, $value );
+			}
+		}
+	}
+
+	// 2. Process flat POST variables if submitted without acf[...] container
+	foreach ( $field_map as $field_key => $meta_name ) {
+		if ( isset( $_POST[ $field_key ] ) ) {
+			$val = $_POST[ $field_key ];
+			update_post_meta( $post_id, $meta_name, $val );
+			update_post_meta( $post_id, '_' . $meta_name, $field_key );
+		} elseif ( isset( $_POST[ $meta_name ] ) ) {
+			$val = $_POST[ $meta_name ];
+			update_post_meta( $post_id, $meta_name, $val );
+			update_post_meta( $post_id, '_' . $meta_name, $field_key );
+		}
+	}
+}
+
+
+
+
 

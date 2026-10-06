@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$hotline_val = isset( $hotline ) ? $hotline : ( function_exists( 'ltdh_compare_get_global_hotline' ) ? ltdh_compare_get_global_hotline() : '0338615497' );
+$hotline_val = isset( $hotline ) ? $hotline : ( function_exists( 'ltdh_compare_get_global_hotline' ) ? ltdh_compare_get_global_hotline() : '0988 991 496' );
 $zalo_val    = isset( $zalo ) ? $zalo : ( function_exists( 'ltdh_compare_get_zalo_url' ) ? ltdh_compare_get_zalo_url() : 'https://zalo.me' );
 
 $sections = [

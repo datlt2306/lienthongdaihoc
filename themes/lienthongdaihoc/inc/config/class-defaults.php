@@ -22,11 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 function ltdh_get_defaults( string $group ): array {
 	$defaults = [
 		'contact' => [
-			'hotline'    => '0338 615 497',
+			'hotline'    => '0988 991 496',
 			'zalo_url'   => 'https://zalo.me',
 			'messenger_url' => 'https://m.me',
-			'email'      => 'tuyensinh@lienthongdaihoc.com',
-			'address'    => '123 Đường Cầu Giấy, Quận Cầu Giấy, Hà Nội',
+			'email'      => '[EMAIL_ADDRESS]',
+			'address'    => 'Hà Nội',
 			'company_name' => 'Cổng thông tin Tuyển sinh đối tác Đại học',
 		],
 		'navigation' => [

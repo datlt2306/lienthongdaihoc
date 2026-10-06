@@ -57,7 +57,7 @@ $messenger = ltdh_get_messenger_url();
 						</span>
 						<div>
 							<strong class="text-white block font-extrabold text-xs uppercase tracking-wider">Hotline / Zalo</strong>
-							<span class="font-extrabold text-base block mt-0.5" style="color: #00a2f4;">0338 615 497</span>
+							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="font-extrabold text-base block mt-0.5 hover:underline" style="color: #00a2f4;"><?php echo esc_html( $hotline ?: '0988 991 496' ); ?></a>
 						</div>
 					</li>
 					<li class="flex items-start gap-3">
@@ -147,7 +147,12 @@ $messenger = ltdh_get_messenger_url();
 	</a>
 </div>
 
-<!-- FIXED MOBILE CTA BAR (ALL PAGES) -->
+<!-- FIXED MOBILE CTA BAR (ALL PAGES EXCEPT SINGLE PROGRAM & COMPARE) -->
+<?php
+$is_compare = ( get_query_var( 'ltdh_compare' ) === 'program' ) || ( str_contains( $_SERVER['REQUEST_URI'] ?? '', '/so-sanh/' ) );
+$should_render_global_mobile_bar = ! is_singular( 'program' ) && ! $is_compare;
+
+if ( $should_render_global_mobile_bar ) : ?>
 <div class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 p-2.5 flex items-center justify-between gap-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] md:hidden">
 	<!-- Messenger Button -->
 	<a href="<?php echo esc_url( $messenger ); ?>" target="_blank" rel="noopener" class="flex items-center justify-center h-12 w-12 bg-orange-500 hover:bg-orange-600 rounded-xl shrink-0 transition-colors" aria-label="Messenger">
@@ -175,6 +180,7 @@ $messenger = ltdh_get_messenger_url();
 		</svg>
 	</a>
 </div>
+<?php endif; ?>
 
 <style>
 @media (max-width: 767px) {

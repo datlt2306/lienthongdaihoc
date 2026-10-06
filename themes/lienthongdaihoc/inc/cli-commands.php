@@ -235,7 +235,7 @@ class LTDH_CLI_Commands {
 					update_post_meta( $post_id, 'school_code', $meta['code'] );
 					update_post_meta( $post_id, 'website', $meta['web'] );
 					update_post_meta( $post_id, 'address', $meta['addr'] );
-					update_post_meta( $post_id, 'hotline', '0338 615 497' );
+					update_post_meta( $post_id, 'hotline', '0988 991 496' );
 					update_post_meta( $post_id, 'english_name', $meta['en'] );
 					update_post_meta( $post_id, 'rating', $meta['rating'] );
 					update_post_meta( $post_id, 'reviews_count', $meta['reviews'] );
@@ -249,7 +249,7 @@ class LTDH_CLI_Commands {
 				}
 			} else {
 				update_post_meta( $school->ID, 'school_code', $meta['code'] );
-				update_post_meta( $school->ID, 'hotline', '0338 615 497' );
+				update_post_meta( $school->ID, 'hotline', '0988 991 496' );
 				update_post_meta( $school->ID, 'english_name', $meta['en'] );
 				update_post_meta( $school->ID, 'rating', $meta['rating'] );
 				update_post_meta( $school->ID, 'reviews_count', $meta['reviews'] );
@@ -439,9 +439,17 @@ class LTDH_CLI_Commands {
 				update_post_meta( $program_id, LTDH_META_DURATION, $variant['duration'] );
 				update_post_meta( $program_id, 'campus_info', $c_slug === 'ha-noi' ? 'Hà Nội' : ( $c_slug === 'ho-chi-minh' ? 'TP. Hồ Chí Minh' : 'Online' ) );
 				update_post_meta( $program_id, 'admission_requirements', 'Xét tuyển hồ sơ văn bằng đã có (THPT, Trung cấp, Cao đẳng).' );
-				update_post_meta( $program_id, 'required_documents', 'CCCD, Ảnh 3x4, Phiếu tuyển sinh, Bản sao công chứng Bằng tốt nghiệp.' );
-				update_post_meta( $program_id, 'admission_form_file', 'https://lienthongdaihoc.vn/phieu-dang-ky-tuyen-sinh-utc-2026.pdf' );
-				update_post_meta( $program_id, 'enrollment_period', $enrollment );
+				$s_code_val = get_post_meta( $school_id, 'school_code', true );
+				$school_code_clean = strtolower( preg_replace( '/[^a-zA-Z0-9]/', '', (string) $s_code_val ) );
+				$custom_form_path  = WP_CONTENT_DIR . "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf";
+
+				if ( file_exists( $custom_form_path ) ) {
+					$form_file_url = content_url( "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf" );
+				} else {
+					$form_file_url = home_url( "/dang-ky-tu-van/?school={$school_code_clean}&program_id={$program_id}" );
+				}
+
+				update_post_meta( $program_id, 'admission_form_file', esc_url_raw( $form_file_url ) );
 				update_post_meta( $program_id, 'program_benefits', $variant['advantages'] );
 				update_post_meta( $program_id, LTDH_META_SCHEDULE, $variant['schedule'] );
 				update_post_meta( $program_id, 'target_students', $variant['target'] );
@@ -695,7 +703,7 @@ class LTDH_CLI_Commands {
 		update_post_meta( $school_id, 'school_code', 'UTC' );
 		update_post_meta( $school_id, 'website', 'https://www.utc.edu.vn' );
 		update_post_meta( $school_id, 'address', 'Số 3 Cầu Giấy, Láng Thượng, Đống Đa, Hà Nội' );
-		update_post_meta( $school_id, 'hotline', '0338 615 497' );
+		update_post_meta( $school_id, 'hotline', '0988 991 496' );
 		update_post_meta( $school_id, 'english_name', 'University of Transport and Communications' );
 		update_post_meta( $school_id, 'rating', '4.7' );
 		update_post_meta( $school_id, 'reviews_count', '98' );
@@ -771,8 +779,8 @@ class LTDH_CLI_Commands {
 				'schedule' => 'Tối thứ 2 - thứ 6 hoặc Thứ 7 & Chủ nhật',
 				'target' => 'Người đi làm, người muốn học liên thông lên Cử nhân/Kỹ sư tại UTC',
 				'advantages' => '<ul><li><strong>Linh hoạt thời gian:</strong> Học ngoài giờ hành chính (buổi tối hoặc cuối tuần), phù hợp cho người vừa học vừa làm.</li><li><strong>Linh hoạt lựa chọn hệ đào tạo:</strong> Học 2 năm nhận bằng Cử nhân hoặc 3 năm nhận bằng Kỹ sư (tương đương trình độ Thạc sĩ).</li><li><strong>Bằng cấp uy tín:</strong> Bằng tốt nghiệp đại học do Trường Đại học Giao thông Vận tải cấp.</li></ul>',
-				'disadvantages' => 'Yêu cầu tự sắp xếp thời gian ôn tập và tham gia đầy đủ lịch thi tuyển sinh.',
-				'requirements' => '<p>Nhà trường tuyển sinh theo 2 phương thức chính:</p><ul><li><strong>Phương thức 1: Xét tuyển</strong> (Áp dụng cho thí sinh liên thông đúng ngành đã tốt nghiệp bậc Cao đẳng):<ul><li>Tốt nghiệp Cao đẳng ngành Công nghệ thông tin (hoặc có quyết định công nhận tốt nghiệp).</li><li>Điểm trung bình chung tích lũy toàn khóa đạt từ <strong>5.0/10</strong> (thang điểm 10) hoặc từ <strong>2.0/4</strong> (thang điểm 4) trở lên.</li><li>Điểm các học phần Toán cao cấp không có học phần nào dưới <strong>5.0/10</strong>.</li><li><em>Tiêu chí phụ:</em> Ưu tiên thí sinh có điểm các học phần tốt nghiệp cao hơn nếu số lượng vượt chỉ tiêu.</li></ul></li><li><strong>Phương thức 2: Thi tuyển</strong> (Áp dụng cho thí sinh không đủ điều kiện xét tuyển hoặc không có nguyện vọng xét tuyển):<ul><li>Thi tuyển 3 môn: <strong>Toán (Cơ bản)</strong>, <strong>Toán rời rạc (Cơ sở ngành)</strong>, và <strong>Cấu trúc dữ liệu và giải thuật (Chuyên môn ngành)</strong>.</li><li>Ngưỡng đảm bảo chất lượng đầu vào: Tổng điểm thi của 3 môn phải thỏa mãn ngưỡng đảm bảo chất lượng theo Quy chế tuyển sinh hiện hành.</li></ul></li></ul>',
+				'disadvantages' => 'Cần sắp xếp thời gian hợp lý giữa công việc và các buổi học tối hoặc cuối tuần.',
+				'requirements' => '<p>Chương trình tuyển sinh Liên thông Đại học hệ Vừa học vừa làm (VHVL) áp dụng phương thức <strong>Xét tuyển hồ sơ văn bằng</strong> (không phải thi tuyển):</p><ul><li><strong>Đối tượng tuyển sinh:</strong> Người đã tốt nghiệp Cao đẳng hoặc Trung cấp đúng ngành/ngành gần Công nghệ thông tin; hoặc người đã có bằng Đại học khác có nguyện vọng học văn bằng 2.</li><li><strong>Tiêu chí xét tuyển:</strong> Xét duyệt dựa trên kết quả học tập ghi trên văn bằng và bảng điểm bậc tốt nghiệp trước đó. Điểm trung bình tích lũy toàn khóa đạt yêu cầu theo Quy chế tuyển sinh của nhà trường.</li><li><strong>Ngưỡng đảm bảo chất lượng:</strong> Thí sinh hoàn thiện đầy đủ hồ sơ hợp lệ và nộp đúng thời hạn quy định của các đợt tuyển sinh.</li></ul>',
 				'documents' => '<ul><li>Phiếu tuyển sinh (theo mẫu của nhà trường).</li><li>Bản sao hợp lệ bằng tốt nghiệp Cao đẳng và bảng điểm học tập (mang theo bản chính để đối chiếu khi nộp).</li><li>Bản sao hợp lệ Giấy khai sinh.</li><li>Bản sao Căn cước công dân (CCCD).</li><li>Giấy chứng nhận đủ sức khỏe học tập từ bệnh viện đa khoa hoặc tương đương trở lên.</li><li>04 ảnh chân dung 4x6 cm (chụp trong vòng 6 tháng gần nhất).</li></ul><p><em>* Lưu ý: Hồ sơ do Nhà trường phát hành trực tiếp tại văn phòng tuyển sinh.</em></p>',
 				'degree_type' => 'Cử nhân / Kỹ sư Công nghệ thông tin',
 				'diploma_value' => 'Bằng tốt nghiệp Đại học (Cử nhân bậc 6 hoặc Kỹ sư bậc 7 tương đương trình độ Thạc sĩ) do Trường Đại học GTVT cấp, phôi bằng chuẩn Bộ GD&ĐT.',
@@ -869,7 +877,7 @@ class LTDH_CLI_Commands {
 				'quota' => 800,
 				'schedule' => 'Học trực tuyến (E-learning) 100% linh hoạt',
 				'target' => 'Người đi làm bận rộn, người muốn học văn bằng 2 hoặc liên thông từ xa',
-				'advantages' => 'Tự chủ thời gian và không gian học tập, phôi bằng tốt nghiệp không ghi hình thức đào tạo.',
+				'advantages' => '',
 				'disadvantages' => 'Đòi hỏi tính tự kỷ luật và chủ động cao trong tự học.',
 				'batches' => [
 					[ 'batch_name' => 'Tuyển sinh Đợt 1', 'release_period' => '-', 'application_period' => 'Liên tục trong năm', 'review_time' => '-', 'evaluation_time' => 'Xét tuyển tháng 3/2026', 'enrollment_time' => 'Khai giảng tháng 4/2026', 'batch_status' => 'da-dong' ],

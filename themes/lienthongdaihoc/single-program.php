@@ -21,13 +21,20 @@ $major_title  = $major_id ? get_the_title( $major_id ) : '';
 
 $tuition         = ltdh_get_program_tuition_display( $program_id );
 $duration        = get_field( LTDH_META_DURATION, $program_id );
-$requirements    = get_field( 'admission_requirements', $program_id );
-$documents       = get_field( 'required_documents', $program_id );
+$requirements    = get_field( 'admission_requirements', $program_id ) ?: get_post_meta( $program_id, 'admission_requirements', true );
+$documents       = get_field( 'required_documents', $program_id ) ?: get_post_meta( $program_id, 'required_documents', true );
 $enrollment      = ltdh_get_program_admission_deadline_display( $program_id );
 $quota           = get_field( 'quota', $program_id );
 
 $program_hotline = ltdh_get_program_hotline( $program_id );
 $benefits        = get_field( 'program_benefits', $program_id );
+if ( ! empty( $benefits ) ) {
+	$benefits = str_replace( 'Tự chủ thời gian và không gian học tập, phôi bằng tốt nghiệp không ghi hình thức đào tạo.', '', $benefits );
+	$benefits = str_replace( 'phôi bằng tốt nghiệp không ghi hình thức đào tạo.', '', $benefits );
+	if ( empty( trim( strip_tags( $benefits ) ) ) ) {
+		$benefits = '';
+	}
+}
 $opportunities   = get_field( 'career_opportunities', $program_id );
 $why_choose      = get_field( 'why_choose_us', $program_id );
 $faqs            = get_field( 'faq', $program_id );
@@ -95,12 +102,12 @@ if ( ! empty( $admission_batches_list ) && is_array( $admission_batches_list ) )
 	];
 }
 
-if ( ! empty( $requirements ) ) {
+if ( ! empty( $requirements ) || ! empty( $documents ) || ! empty( $admission_form_file ) ) {
 	$program_tabs[] = [
-		'id'       => 'dieu-kien-xet-tuyen',
-		'title'    => 'Điều kiện',
-		'subtitle' => 'Đối tượng & tiêu chuẩn',
-		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+		'id'       => 'dieu-kien-ho-so',
+		'title'    => 'Điều kiện & Hồ sơ',
+		'subtitle' => 'Tiêu chuẩn & Hồ sơ nộp',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>',
 	];
 }
 
@@ -120,15 +127,6 @@ if ( ! empty( $curriculum_url ) ) {
 	];
 }
 
-if ( ! empty( $documents ) || ! empty( $admission_form_file ) ) {
-	$program_tabs[] = [
-		'id'       => 'ho-so-can-nop',
-		'title'    => 'Hồ sơ',
-		'subtitle' => 'Thủ tục đăng ký',
-		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>',
-	];
-}
-
 $program_tabs[] = [
 	'id'       => 'quy-trinh-tuyen-sinh',
 	'title'    => 'Quy trình',
@@ -144,6 +142,13 @@ if ( ! empty( $faqs ) ) {
 		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>',
 	];
 }
+
+$program_tabs[] = [
+	'id'       => 'thong-tin-lien-he',
+	'title'    => 'Liên hệ',
+	'subtitle' => 'Đầu mối tuyển sinh',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>',
+];
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
@@ -245,9 +250,14 @@ if ( ! empty( $faqs ) ) {
 
 					<?php
 					$learning_details = ltdh_get_program_learning_details( $program_id );
-					$tuition_year = get_field( 'tuition_academic_year', $program_id );
+					$tuition_year     = get_field( 'tuition_academic_year', $program_id );
+					$degree_val       = get_field( 'degree_type', $program_id ) ?: get_post_meta( $program_id, 'degree_type', true );
+					if ( empty( $degree_val ) ) {
+						$clean_major = preg_replace( '/^ngành\s+/iu', '', trim( (string) $major_title ) );
+						$degree_val  = ! empty( $clean_major ) ? 'Cử nhân ' . $clean_major : 'Cử nhân / Kỹ sư';
+					}
 					?>
-					<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
+					<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
 						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí</span>
 							<span class="font-bold text-[#00308b] text-xs sm:text-sm leading-snug">
@@ -263,12 +273,18 @@ if ( ! empty( $faqs ) ) {
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
 							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
 						</div>
-						<?php if ( $quota ) : ?>
-							<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
-								<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
-								<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
-							</div>
-						<?php endif; ?>
+						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Danh hiệu văn bằng</span>
+							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $degree_val ); ?></span>
+						</div>
+						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Căn cứ pháp lý</span>
+							<span class="font-bold text-emerald-700 text-xs sm:text-sm leading-snug">Thông tư 27/2019/TT-BGDĐT</span>
+						</div>
+						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức đào tạo</span>
+							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
+						</div>
 						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
 							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php 
@@ -279,14 +295,28 @@ if ( ! empty( $faqs ) ) {
 								echo esc_html( $display_campus ); 
 							?></span>
 						</div>
-						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức đào tạo</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
-						</div>
+						<?php if ( $quota ) : ?>
+							<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+								<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
+								<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
+							</div>
+						<?php endif; ?>
 						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
 							<span class="font-bold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
+					</div>
+
+					<!-- Thông tin pháp lý văn bằng & Giá trị toàn quốc (Thông tư 27/2019/TT-BGDĐT) -->
+					<div class="mt-4 bg-emerald-50/60 border border-emerald-200/70 rounded-xl p-4 text-xs md:text-sm text-slate-700 space-y-2 leading-relaxed">
+						<p class="flex items-start gap-2">
+							<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
+							<span><strong>Không ghi hình thức đào tạo:</strong> Theo quy định tại Thông tư 27/2019/TT-BGDĐT của Bộ GD&ĐT, văn bằng đại học hiện hành không ghi hình thức đào tạo (không phân biệt Từ xa hay Vừa làm vừa học).</span>
+						</p>
+						<p class="flex items-start gap-2">
+							<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
+							<span><strong>Giá trị sử dụng toàn quốc:</strong> Bằng có đầy đủ giá trị pháp lý để thi tuyển công chức, viên chức, xét nâng lương ngạch bậc và học tiếp lên Thạc sĩ, Tiến sĩ tại tất cả các cơ sở đào tạo trong và ngoài nước.</span>
+						</p>
 					</div>
 				</section>
 
@@ -556,82 +586,95 @@ if ( ! empty( $faqs ) ) {
 				<?php endif; ?>
 
 
-				<!-- SECTION 5: ADMISSION REQUIREMENTS -->
-				<?php if ( $requirements ) : ?>
-					<section id="dieu-kien-xet-tuyen" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-						<div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Điều kiện xét tuyển</h2>
-							<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#00308b] border border-blue-100 text-xs font-bold rounded-full">
+				<!-- SECTION 3: ADMISSION REQUIREMENTS & DOCUMENTS -->
+				<?php 
+				$admission_form = get_field( 'admission_form_file', $program_id );
+				$form_url = '';
+				if ( is_array( $admission_form ) && ! empty( $admission_form['url'] ) ) {
+					$form_url = $admission_form['url'];
+				} elseif ( is_string( $admission_form ) && ! empty( $admission_form ) ) {
+					$form_url = $admission_form;
+				}
+
+				// Nếu file URL trỏ nhầm về UTC nhưng trường không phải UTC, ánh xạ lại chính xác
+				if ( ! empty( $form_url ) && str_contains( $form_url, 'utc-2026.pdf' ) ) {
+					$s_code_val = get_post_meta( $school_id, 'school_code', true );
+					$school_code_clean = strtolower( preg_replace( '/[^a-zA-Z0-9]/', '', (string) $s_code_val ) );
+					if ( $school_code_clean !== 'utc' ) {
+						$custom_form_path = WP_CONTENT_DIR . "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf";
+						if ( file_exists( $custom_form_path ) ) {
+							$form_url = content_url( "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf" );
+						} else {
+							$form_url = home_url( "/dang-ky-tu-van/?school={$school_code_clean}&program_id={$program_id}" );
+						}
+					}
+				}
+				?>
+				<?php if ( $requirements || $documents || $form_url ) : ?>
+					<section id="dieu-kien-ho-so" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<!-- Hidden anchor targets for backward compatibility with existing links -->
+						<span id="dieu-kien-xet-tuyen" class="relative -top-36 block invisible pointer-events-none"></span>
+						<span id="ho-so-can-nop" class="relative -top-36 block invisible pointer-events-none"></span>
+
+						<div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-5">
+							<div>
+								<h2 class="text-lg md:text-2xl font-bold text-slate-900">Điều kiện & Hồ sơ xét tuyển</h2>
+								<p class="text-xs md:text-sm text-slate-500 mt-0.5">Tiêu chuẩn tuyển sinh và danh mục hồ sơ thủ tục cần thiết để hoàn tất đăng ký nhập học</p>
+							</div>
+							<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs font-bold rounded-full shrink-0 self-start sm:self-auto">
 								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-								Phương thức: <?php echo ( strpos( mb_strtolower( $requirements ), 'thi tuyển' ) !== false ) ? 'Thi tuyển' : 'Xét tuyển'; ?>
+								Phương thức: Xét tuyển hồ sơ
 							</span>
 						</div>
 
-						<?php if ( strpos( strtolower($requirements), 'thi tuyển 3 môn' ) !== false || strpos( strtolower($requirements), 'thi tuyển' ) !== false ) : ?>
-							<!-- Structured High-End Admission Cards View -->
-							<div class="space-y-4">
-								<!-- Intro Box -->
-								<div class="bg-slate-50/80 border border-slate-200/80 rounded-xl p-4 flex items-center gap-3">
-									<div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-									</div>
-									<div>
-										<h4 class="font-extrabold text-slate-900 text-sm md:text-base">Phương thức tuyển sinh duy nhất: Thi tuyển 3 môn</h4>
-										<p class="text-xs md:text-sm text-slate-600 mt-0.5">Áp dụng chính thức cho thí sinh đăng ký chương trình Liên thông ngành Công nghệ thông tin.</p>
-									</div>
-								</div>
-
-								<!-- 3 Exam Subject Cards Grid -->
+						<div class="space-y-6">
+							<?php if ( $requirements ) : ?>
+								<!-- BLOCK 1: ADMISSION REQUIREMENTS (Dynamic from WP Admin) -->
 								<div>
-									<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">Danh mục 3 môn thi tuyển:</span>
-									<div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-										<!-- Môn 1 -->
-										<div class="bg-white border border-slate-200/80 rounded-xl p-4 shadow-2xs hover:border-blue-300 transition-all">
-											<div class="flex items-center justify-between mb-2">
-												<span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-black rounded-md">Môn 1</span>
-												<span class="text-[11px] font-semibold text-slate-400">Cơ bản</span>
-											</div>
-											<h5 class="font-black text-slate-900 text-base md:text-lg mb-1">Toán</h5>
-											<p class="text-xs text-slate-500 leading-relaxed">Phần thi kiến thức Toán học cơ bản.</p>
-										</div>
-
-										<!-- Môn 2 -->
-										<div class="bg-white border border-slate-200/80 rounded-xl p-4 shadow-2xs hover:border-blue-300 transition-all">
-											<div class="flex items-center justify-between mb-2">
-												<span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-black rounded-md">Môn 2</span>
-												<span class="text-[11px] font-semibold text-slate-400">Cơ sở ngành</span>
-											</div>
-											<h5 class="font-black text-slate-900 text-base md:text-lg mb-1">Toán rời rạc</h5>
-											<p class="text-xs text-slate-500 leading-relaxed">Phần thi kiến thức Cơ sở ngành CNTT.</p>
-										</div>
-
-										<!-- Môn 3 -->
-										<div class="bg-white border border-slate-200/80 rounded-xl p-4 shadow-2xs hover:border-blue-300 transition-all">
-											<div class="flex items-center justify-between mb-2">
-												<span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-md">Môn 3</span>
-												<span class="text-[11px] font-semibold text-slate-400">Chuyên môn</span>
-											</div>
-											<h5 class="font-black text-slate-900 text-base md:text-lg mb-1">Cấu trúc dữ liệu & Giải thuật</h5>
-											<p class="text-xs text-slate-500 leading-relaxed">Phần thi kiến thức Lập trình chuyên ngành.</p>
-										</div>
+									<h3 class="text-sm md:text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+										<span class="w-6 h-6 rounded-md bg-blue-100 text-[#00308b] flex items-center justify-center text-xs font-bold shrink-0">1</span>
+										<span>Điều kiện xét tuyển & Đối tượng áp dụng</span>
+									</h3>
+									<div class="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed bg-slate-50/50 p-4 md:p-5 rounded-xl border border-slate-200/60">
+										<?php echo wp_kses_post( $requirements ); ?>
 									</div>
 								</div>
+							<?php endif; ?>
 
-								<!-- Quality Threshold Alert Box -->
-								<div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-4 flex items-start gap-3 text-xs md:text-sm text-amber-950 leading-relaxed">
-									<svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-									<div>
-										<strong class="font-extrabold text-amber-950 block mb-0.5">Ngưỡng đảm bảo chất lượng đầu vào:</strong>
-										<p class="text-amber-900">Tổng điểm thi của 3 môn phải thỏa mãn ngưỡng đảm bảo chất lượng theo Quy chế tuyển sinh hiện hành của Trường Đại học Giao thông Vận tải và Bộ Giáo dục & Đào tạo.</p>
-									</div>
+							<?php if ( $documents || $form_url ) : ?>
+								<!-- BLOCK 2: REQUIRED DOCUMENTS & ADMISSION FORM DOWNLOAD -->
+								<div class="<?php echo $requirements ? 'pt-6 border-t border-slate-100' : ''; ?>">
+									<h3 class="text-sm md:text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+										<span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold shrink-0"><?php echo $requirements ? '2' : '1'; ?></span>
+										<span>Hồ sơ xét tuyển cần chuẩn bị</span>
+									</h3>
+
+									<?php if ( $documents ) : ?>
+										<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-slate-50/50 p-4 rounded-xl border border-slate-200/60">
+											<?php echo wp_kses_post( $documents ); ?>
+										</div>
+									<?php endif; ?>
+
+									<?php if ( $form_url ) : ?>
+										<div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-50/60 p-4 rounded-xl border border-blue-100/80">
+											<div class="flex items-center gap-3">
+												<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+													📄
+												</div>
+												<div>
+													<h4 class="font-bold text-slate-900 text-sm mb-0.5">Tải mẫu phiếu đăng ký tuyển sinh</h4>
+													<p class="text-xs text-slate-500">Mẫu phiếu đăng ký tuyển sinh chính thức để in và làm hồ sơ</p>
+												</div>
+											</div>
+											<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="Phiếu tuyển sinh: <?php echo esc_attr( get_the_title() ); ?>">
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+												<span>Tải Phiếu Tuyển Sinh</span>
+											</a>
+										</div>
+									<?php endif; ?>
 								</div>
-							</div>
-						<?php else : ?>
-							<!-- Fallback formatted view -->
-							<div class="bg-slate-50/60 border border-slate-200/80 rounded-xl p-4 sm:p-5 text-slate-800 text-sm md:text-base leading-relaxed">
-								<?php echo wp_kses_post( $requirements ); ?>
-							</div>
-						<?php endif; ?>
+							<?php endif; ?>
+						</div>
 					</section>
 				<?php endif; ?>
 
@@ -872,44 +915,6 @@ if ( ! empty( $faqs ) ) {
 					</section>
 				<?php endif; ?>
 
-				<!-- SECTION 8: DOCUMENTS REQUIRED -->
-				<?php 
-				$admission_form = get_field( 'admission_form_file', $program_id );
-				$form_url = '';
-				if ( is_array( $admission_form ) && ! empty( $admission_form['url'] ) ) {
-					$form_url = $admission_form['url'];
-				} elseif ( is_string( $admission_form ) && ! empty( $admission_form ) ) {
-					$form_url = $admission_form;
-				}
-				?>
-				<?php if ( $documents || $form_url ) : ?>
-					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="ho-so-can-nop">
-						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Hồ sơ xét tuyển cần thiết</h2>
-						<?php if ( $documents ) : ?>
-							<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
-								<?php echo wp_kses_post( $documents ); ?>
-							</div>
-						<?php endif; ?>
-
-						<?php if ( $form_url ) : ?>
-							<div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-50/60 p-4 rounded-xl border border-blue-100/80">
-								<div class="flex items-center gap-3">
-									<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
-										📄
-									</div>
-									<div>
-										<h4 class="font-bold text-slate-900 text-sm mb-0.5">Tải mẫu phiếu đăng ký tuyển sinh</h4>
-										<p class="text-xs text-slate-500">Mẫu phiếu đăng ký tuyển sinh chính thức để in và làm hồ sơ</p>
-									</div>
-								</div>
-								<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="Phiếu tuyển sinh: <?php echo esc_attr( get_the_title() ); ?>">
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-									<span>Tải Phiếu Tuyển Sinh</span>
-								</a>
-							</div>
-						<?php endif; ?>
-					</section>
-				<?php endif; ?>
 
 				<!-- SECTION 8.5: ADMISSION PROCESS -->
 				<?php
@@ -943,6 +948,82 @@ if ( ! empty( $faqs ) ) {
 						</div>
 					</section>
 				<?php endif; ?>
+
+				<!-- SECTION 9.5: CONTACT & ADMISSION OFFICE -->
+				<?php
+				$prog_contact_custom = get_field( 'contact_info', $program_id );
+				$school_contact_raw  = $school_id ? get_field( 'contact_info', $school_id ) : '';
+				$contact_html        = ! empty( $prog_contact_custom ) ? $prog_contact_custom : $school_contact_raw;
+				$school_address      = $school_id ? ( get_post_meta( $school_id, 'address', true ) ?: get_field( 'address', $school_id ) ) : '';
+				$school_website      = $school_id ? get_field( 'website', $school_id ) : '';
+				?>
+				<section id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<div class="border-b border-slate-100 pb-3 md:pb-4 mb-5">
+						<h2 class="text-lg md:text-2xl font-bold text-slate-900">Thông tin liên hệ & Tiếp nhận hồ sơ</h2>
+						<p class="text-xs md:text-sm text-slate-500 mt-1">Đầu mối tuyển sinh trực tiếp, địa điểm nộp hồ sơ và hướng dẫn thủ tục nhập học cho chương trình</p>
+					</div>
+
+					<!-- Contact Highlights Grid -->
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-5">
+						<!-- Hotline -->
+						<div class="bg-blue-50/60 border border-blue-100/80 rounded-xl p-4 flex items-start gap-3">
+							<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center shrink-0 shadow-2xs">
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+							</div>
+							<div class="min-w-0">
+								<span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Hotline tuyển sinh</span>
+								<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9]/', '', (string) $program_hotline ) ); ?>" class="text-[#00308b] font-black text-sm md:text-base hover:underline block truncate">
+									<?php echo esc_html( $program_hotline ); ?>
+								</a>
+								<span class="text-[11px] text-slate-500">Tư vấn miễn phí 24/7</span>
+							</div>
+						</div>
+
+						<!-- Zalo -->
+						<?php if ( ! empty( $global_zalo ) ) : ?>
+							<div class="bg-cyan-50/60 border border-cyan-100/80 rounded-xl p-4 flex items-start gap-3">
+								<div class="w-10 h-10 rounded-xl bg-[#0068FF] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-2xs">
+									Zalo
+								</div>
+								<div class="min-w-0">
+									<span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Tư vấn qua Zalo</span>
+									<a href="<?php echo esc_url( $global_zalo ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#0068FF] font-black text-sm md:text-base hover:underline block truncate">
+										Nhắn tin Zalo ngay
+									</a>
+									<span class="text-[11px] text-slate-500">Hỗ trợ nhận hồ sơ online</span>
+								</div>
+							</div>
+						<?php endif; ?>
+
+						<!-- Address -->
+						<?php if ( ! empty( $school_address ) ) : ?>
+							<div class="bg-slate-50/80 border border-slate-200/80 rounded-xl p-4 flex items-start gap-3 sm:col-span-2 lg:col-span-1">
+								<div class="w-10 h-10 rounded-xl bg-slate-700 text-white flex items-center justify-center shrink-0 shadow-2xs">
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+								</div>
+								<div class="min-w-0">
+									<span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Địa chỉ trường</span>
+									<span class="text-slate-800 font-bold text-xs md:text-sm block leading-snug line-clamp-2">
+										<?php echo esc_html( $school_address ); ?>
+									</span>
+								</div>
+							</div>
+						<?php endif; ?>
+					</div>
+
+					<!-- Detailed Venue, Office & Bank Info -->
+					<?php if ( ! empty( $contact_html ) ) : ?>
+						<div class="border-t border-slate-100 pt-5">
+							<h3 class="text-sm md:text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+								<span class="w-6 h-6 rounded-md bg-blue-100 text-[#00308b] flex items-center justify-center text-xs font-bold shrink-0">📍</span>
+								<span>Địa điểm thi, tiếp nhận hồ sơ & thông tin chuyển khoản</span>
+							</h3>
+							<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list">
+								<?php echo wp_kses_post( $contact_html ); ?>
+							</div>
+						</div>
+					<?php endif; ?>
+				</section>
 
 				<!-- SECTION 10: RELATED PROGRAMS -->
 				<?php

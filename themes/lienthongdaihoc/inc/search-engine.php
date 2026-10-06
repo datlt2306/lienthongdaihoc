@@ -4,6 +4,10 @@
  * lienthongdaihoc Theme
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 add_filter( 'pre_get_posts_args_ltdh', 'ltdh_filter_program_search_query' );
 
 function ltdh_filter_program_search_query( $args ) {

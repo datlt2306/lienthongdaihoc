@@ -1,13 +1,13 @@
-# BRIEFING — 2026-09-25T05:33:45Z
+# BRIEFING — 2026-10-06T12:35:00Z
 
 ## Mission
-Empirically stress-test line numbers, snippet accuracy, syntax viability, and repository immutability of FULL_PROJECT_AUDIT_REPORT.md.
+Empirically verify 6 critical audit findings in WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md against actual theme code and data.
 
 ## 🔒 My Identity
 - Archetype: challenger
 - Roles: critic, specialist
 - Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/challenger_1
-- Original parent: 51dbca0c-0bdf-4e7a-a663-8f16b15aa54f
+- Original parent: 61a39739-d3ca-49a4-bab5-08679ea1dc41
 - Milestone: empirical_audit_challenge
 - Instance: 1 of 1
 
@@ -15,41 +15,36 @@ Empirically stress-test line numbers, snippet accuracy, syntax viability, and re
 - Review-only — do NOT modify original implementation code
 - Write only within working directory (.agents/teamwork/challenger_1)
 - Maintain progress.md with timestamps
-- Must empirically verify: Line citations, Before snippets, Fix syntax, Git immutability
+- Must empirically verify: 6 critical findings in WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md
 
 ## Current Parent
-- Conversation ID: 51dbca0c-0bdf-4e7a-a663-8f16b15aa54f
-- Updated: 2026-09-25T05:33:45Z
-
-## Review Scope
-- **Files to review**: `FULL_PROJECT_AUDIT_REPORT.md`, cited theme files, git status
-- **Interface contracts**: `ORIGINAL_REQUEST.md`
-- **Review criteria**: Empirical line verification, syntax correctness of recommendations, immutability check
+- Conversation ID: 61a39739-d3ca-49a4-bab5-08679ea1dc41
+- Updated: 2026-10-06T12:35:00Z
 
 ## Attack Surface
 - **Hypotheses tested**: 
-  1. Hypothesis: Citations in FULL_PROJECT_AUDIT_REPORT.md might have line drifts or fabricated code snippets. (Result: Tested 31 citations across all severity levels; 100% exact match).
-  2. Hypothesis: Proposed PHP / JS / CSS fix snippets might contain syntax errors or invalid constructs. (Result: Tested 18 PHP snippets with `php -l` and 2 JS snippets with `node -c`; 100% valid syntax).
-  3. Hypothesis: Previous agents might have modified theme source files. (Result: Scanned 408 files across repo; 0 source files modified; timestamps pristine).
-  4. Hypothesis: Independent verification test suite in Section 5 might have incorrect expected outputs. (Result: All 8 commands executed and reproduced verbatim).
-- **Vulnerabilities found**: None in the report. All findings in the audit report are authentic, reproducible, and accurate.
-- **Untested angles**: Full production deployment environment (Local WP instance running on port 10028 vs live host).
+  1. Hypothesis: 15/20 schools have bank account numbers in `phone` (`schools_import.json`). (Result: Confirmed 15/20 full bank accounts + 1 truncated AOF bank account = 80%; 0 real hotlines).
+  2. Hypothesis: Hardcoded UTC PDF link for 100% programs in `inc/cli-commands.php:443`. (Result: Confirmed verbatim `https://lienthongdaihoc.vn/phieu-dang-ky-tuyen-sinh-utc-2026.pdf` on line 443).
+  3. Hypothesis: Missing CSRF Nonce in `inc/core/class-helpers.php:188` & `inc/lead-capture.php:507`. (Result: Confirmed native form has no `wp_nonce_field` and handler has no `wp_verify_nonce`).
+  4. Hypothesis: DOM ID mismatch (`results.php:41` `elig-alternatives` vs `eligibility.js:400` `elig-alternatives-section`). (Result: Confirmed mismatch; alternatives hidden forever).
+  5. Hypothesis: Mobile fixed bottom z-index conflict (`footer.php:151` z-50 vs `single-program.php:1244` z-40 and `tray.php:11` z-50). (Result: Confirmed z-50 footer covers z-40 single-program CTA bar).
+  6. Hypothesis: Forced canonical URL bug in `inc/seo/class-rankmath-integration.php:138-163`. (Result: Confirmed taxonomy term URLs fall back to parent `/hinh-thuc-dao-tao/`).
+- **Vulnerabilities found**: All 6 findings in `WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md` are genuine, verified bugs in the codebase.
+- **Untested angles**: Runtime performance under 10,000 concurrent bot requests.
 
 ## Loaded Skills
-- None required directly for line verification
+- None required directly for empirical code verification
 
 ## Key Decisions Made
-- [2026-09-25] Executed automated Python verification harnesses for 31 line citations.
-- [2026-09-25] Executed PHP 8.4 syntax validation (`php -l`) on 18 proposed PHP fix snippets.
-- [2026-09-25] Executed Node.js syntax validation (`node -c`) on 2 proposed JS fix snippets.
-- [2026-09-25] Verified filesystem immutability: zero source files altered.
-- [2026-09-25] Formulated final verdict: **APPROVE**.
+- [2026-10-06] Developed and executed automated test harness verifying all 6 audit findings against theme files.
+- [2026-10-06] Simulated Rank Math canonical URL logic via PHP CLI.
+- [2026-10-06] Formulated final verdict: **APPROVE**.
+- [2026-10-06] Authored `handoff.md` and prepared dispatch to `orchestrator_6`.
 
 ## Artifact Index
 - DISPATCH.md — Dispatch log
 - BRIEFING.md — Situational awareness
 - progress.md — Liveness heartbeat
-- test_fix_snippets.py — Syntax test harness
-- verify_lines_automated.py — Line citation verification harness
-- verify_immutability.py — Filesystem immutability test harness
 - handoff.md — Verification report
+
+

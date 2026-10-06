@@ -47,10 +47,10 @@ function get_field( $selector, $post_id = false ) {
 	return false; // Test default fallbacks
 }
 function ltdh_get_hotline() {
-	return '0912345678';
+	return '0988 991 496';
 }
 function ltdh_get_zalo_url() {
-	return 'https://zalo.me/0912345678';
+	return 'https://zalo.me/0988991496';
 }
 function ltdh_get_fallback_image( $type = '' ) {
 	return 'https://lienthongdaihoc.com/assets/images/default-' . $type . '.jpg';
