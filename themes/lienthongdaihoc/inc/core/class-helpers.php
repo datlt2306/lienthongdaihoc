@@ -917,27 +917,28 @@ function ltdh_get_program_learning_details(int $program_id): array {
 	$types     = wp_get_post_terms($program_id, LTDH_TAX_TRAINING_TYPE);
 	$type_slug = ! empty($types) && ! is_wp_error($types) ? $types[0]->slug : '';
 
-	// Resolve physical campus location: never displays "Online" under physical location
-	if ( ! empty($physical_campuses) ) {
-		$campus_name = implode(', ', $physical_campuses);
-	} elseif ( 'tu-xa' === $type_slug ) {
-		$campus_name = 'Toàn quốc';
+	// Resolve physical campus location:
+	if ( in_array( $type_slug, [ 'tu-xa', 'dao-tao-tu-xa' ], true ) ) {
+		// Online learning is accessible nationwide
+		$campus_name = ! empty( $physical_campuses ) ? 'Toàn quốc (' . implode( ', ', $physical_campuses ) . ')' : 'Toàn quốc (Học Online)';
+	} elseif ( ! empty( $physical_campuses ) ) {
+		$campus_name = implode( ', ', $physical_campuses );
 	} else {
 		// Non-tu-xa without explicit physical campus: check school region
-		$school_id = get_post_meta($program_id, 'school_relationship', true);
-		if ( is_array($school_id) ) {
-			$school_id = ! empty($school_id) ? ( is_object($school_id[0]) ? $school_id[0]->ID : $school_id[0] ) : 0;
-		} elseif ( is_object($school_id) ) {
+		$school_id = get_post_meta( $program_id, 'school_relationship', true );
+		if ( is_array( $school_id ) ) {
+			$school_id = ! empty( $school_id ) ? ( is_object( $school_id[0] ) ? $school_id[0]->ID : $school_id[0] ) : 0;
+		} elseif ( is_object( $school_id ) ) {
 			$school_id = $school_id->ID;
 		}
 		$school_region = '';
-		if ($school_id) {
-			$region_terms = wp_get_post_terms((int) $school_id, LTDH_TAX_REGION);
-			if ( ! empty($region_terms) && ! is_wp_error($region_terms) ) {
+		if ( $school_id ) {
+			$region_terms = wp_get_post_terms( (int) $school_id, LTDH_TAX_REGION );
+			if ( ! empty( $region_terms ) && ! is_wp_error( $region_terms ) ) {
 				$school_region = $region_terms[0]->name;
 			}
 		}
-		$campus_name = $school_region ?: 'Toàn quốc';
+		$campus_name = $school_region ?: 'Hà Nội, TP. Hồ Chí Minh';
 	}
 
 	// Resolve learning mode

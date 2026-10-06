@@ -13,6 +13,12 @@
     --font-family-display: Montserrat, "Be Vietnam Pro", sans-serif;
 }
 
+/* Custom text-md utility alias (equivalent to text-base 16px) */
+@utility text-md {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
+
 /* Global Smooth Scrolling */
 html {
     scroll-behavior: smooth;

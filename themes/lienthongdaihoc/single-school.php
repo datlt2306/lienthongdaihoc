@@ -55,6 +55,14 @@ if ( ! empty( $adm_info ) ) {
 }
 
 $school_tabs[] = [
+	'id'       => 'quy-trinh-tuyen-sinh',
+	'title'    => 'Quy trình',
+	'subtitle' => '4 bước xét tuyển',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+];
+
+$school_tabs[] = [
+	'id'       => 'chuong-trinh-tuyen-sinh',
 	'id'       => 'chuong-trinh-tuyen-sinh',
 	'title'    => 'Lớp tuyển sinh',
 	'subtitle' => 'Chương trình đang mở',
@@ -350,6 +358,21 @@ if ( ! empty( $contact ) ) {
 						</div>
 					</section>
 				<?php endif; ?>
+
+				<!-- ADMISSION PROCESS -->
+				<?php
+				get_template_part(
+					'template-parts/admission-process',
+					null,
+					[
+						'title'      => 'Quy trình tuyển sinh & Nhập học tại ' . esc_html( $school_title ),
+						'subtitle'   => 'Lộ trình 4 bước nộp hồ sơ xét tuyển và làm thủ tục nhập học chính thức',
+						'section_id' => 'quy-trinh-tuyen-sinh',
+						'cta_text'   => 'Đăng ký tư vấn chọn ngành ngay',
+						'cta_link'   => '#register',
+					]
+				);
+				?>
 
 				<!-- PROGRAMS OFFERED -->
 				<section id="chuong-trinh-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">

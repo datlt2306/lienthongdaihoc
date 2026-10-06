@@ -135,8 +135,8 @@ foreach ( $cover_tokens as $token ) {
 
 // 2.3 Institution header & typography
 $header_tokens = [
-	'w-12 h-12 bg-white border border-slate-200/90 rounded-xl flex items-center justify-center p-1.5 shrink-0 shadow-sm group-hover:border-brand-primary/40 transition-colors',
-	'text-xs font-bold text-slate-500 uppercase tracking-wider block truncate',
+	'w-12 h-12 bg-white border border-slate-200/90 rounded-xl flex items-center justify-center p-1.5 shrink-0 shadow-sm group-hover:border-brand-primary/40 group-hover:shadow-md transition-all -mt-7',
+	'text-xs sm:text-sm font-extrabold text-slate-800 hover:text-brand-primary transition-colors uppercase tracking-wide block truncate',
 	'font-black text-slate-900 text-base md:text-lg hover:text-brand-primary leading-snug line-clamp-2 min-h-[48px] transition-colors',
 ];
 

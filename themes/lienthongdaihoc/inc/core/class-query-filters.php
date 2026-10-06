@@ -10,6 +10,100 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Helper to get program IDs matching a location or region slug.
+ *
+ * @param string $location_slug Slug of campus or region (e.g. mien-bac, mien-trung, mien-nam, ha-noi, ho-chi-minh, da-nang, thai-nguyen, online)
+ * @return array Array of program IDs or [0] if no programs match.
+ */
+function ltdh_get_program_ids_by_location( $location_slug ) {
+	if ( empty( $location_slug ) ) {
+		return [];
+	}
+
+	$region_map = [
+		'mien-bac'   => [ 'campuses' => [ 'ha-noi', 'thai-nguyen' ], 'regions' => [ 'mien-bac' ] ],
+		'mien-trung' => [ 'campuses' => [ 'da-nang' ], 'regions' => [ 'mien-trung' ] ],
+		'mien-nam'   => [ 'campuses' => [ 'ho-chi-minh' ], 'regions' => [ 'mien-nam' ] ],
+		'ha-noi'     => [ 'campuses' => [ 'ha-noi' ], 'regions' => [] ],
+		'ho-chi-minh'=> [ 'campuses' => [ 'ho-chi-minh' ], 'regions' => [] ],
+		'da-nang'    => [ 'campuses' => [ 'da-nang' ], 'regions' => [] ],
+		'thai-nguyen'=> [ 'campuses' => [ 'thai-nguyen' ], 'regions' => [] ],
+		'online'     => [ 'campuses' => [ 'online' ], 'regions' => [] ],
+	];
+
+	$target_campuses = isset( $region_map[ $location_slug ] ) ? $region_map[ $location_slug ]['campuses'] : [ $location_slug ];
+	$target_regions  = isset( $region_map[ $location_slug ] ) ? $region_map[ $location_slug ]['regions'] : [ $location_slug ];
+
+	// 1. Find school IDs matching region taxonomy
+	$school_ids = [];
+	if ( ! empty( $target_regions ) ) {
+		$school_ids = get_posts( [
+			'post_type'   => 'school',
+			'numberposts' => -1,
+			'fields'      => 'ids',
+			'tax_query'   => [
+				[
+					'taxonomy' => 'region',
+					'field'    => 'slug',
+					'terms'    => $target_regions,
+				],
+			],
+		] );
+	}
+
+	// 2. Build tax query for programs
+	$tax_or_query = [ 'relation' => 'OR' ];
+	if ( ! empty( $target_campuses ) ) {
+		$tax_or_query[] = [
+			'taxonomy' => 'campus',
+			'field'    => 'slug',
+			'terms'    => $target_campuses,
+		];
+	}
+	if ( ! empty( $target_regions ) ) {
+		$tax_or_query[] = [
+			'taxonomy' => 'region',
+			'field'    => 'slug',
+			'terms'    => $target_regions,
+		];
+	}
+
+	// 3. Build meta query for school relationship or elig_campuses
+	$meta_or_query = [ 'relation' => 'OR' ];
+	if ( ! empty( $school_ids ) ) {
+		$meta_or_query[] = [
+			'key'     => 'school_relationship',
+			'value'   => $school_ids,
+			'compare' => 'IN',
+		];
+	}
+
+	foreach ( $target_campuses as $c_slug ) {
+		$meta_or_query[] = [
+			'key'     => 'elig_campuses',
+			'value'   => '"' . $c_slug . '"',
+			'compare' => 'LIKE',
+		];
+	}
+
+	$prog_args = [
+		'post_type'   => 'program',
+		'numberposts' => -1,
+		'fields'      => 'ids',
+		'post_status' => 'publish',
+		'tax_query'   => $tax_or_query,
+	];
+
+	if ( count( $meta_or_query ) > 1 ) {
+		$prog_args['meta_query'] = $meta_or_query;
+	}
+
+	$matched_ids = get_posts( $prog_args );
+
+	return ! empty( $matched_ids ) ? array_values( array_unique( array_map( 'intval', $matched_ids ) ) ) : [ 0 ];
+}
+
+/**
  * Customize archive queries for school, major, and program post types.
  */
 function ltdh_customize_archive_queries( $query ) {
@@ -95,6 +189,13 @@ function ltdh_ajax_filter_programs() {
 				'compare' => '=',
 			];
 		}
+	}
+
+	// Filter by region / campus (Khu vực)
+	$region_slug = ! empty( $_POST['khu_vuc'] ) ? sanitize_text_field( wp_unslash( $_POST['khu_vuc'] ) ) : ( ! empty( $_POST['khu-vuc'] ) ? sanitize_text_field( wp_unslash( $_POST['khu-vuc'] ) ) : '' );
+	if ( ! empty( $region_slug ) ) {
+		$loc_program_ids = ltdh_get_program_ids_by_location( $region_slug );
+		$args['post__in'] = $loc_program_ids;
 	}
 
 	// Filter by major / major category
@@ -274,20 +375,26 @@ function ltdh_ajax_filter_programs() {
 					<!-- Card Body -->
 					<div class="p-5 pb-0">
 						<!-- School Header with Logo -->
-						<div class="flex items-center gap-3 mb-3.5 -mt-8 relative z-10">
-							<div class="w-12 h-12 bg-white border border-slate-200/90 rounded-xl flex items-center justify-center p-1.5 shrink-0 shadow-sm group-hover:border-brand-primary/40 transition-colors">
+						<div class="flex items-end gap-3 mb-3.5 relative z-10">
+							<div class="w-12 h-12 bg-white border border-slate-200/90 rounded-xl flex items-center justify-center p-1.5 shrink-0 shadow-sm group-hover:border-brand-primary/40 group-hover:shadow-md transition-all -mt-7">
 								<?php if ( ! empty( $school_logo_url ) ) : ?>
 									<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_name ); ?>" class="h-full w-full object-contain p-0.5">
 								<?php elseif ( $school_logo_id ) : ?>
 									<?php echo wp_get_attachment_image( $school_logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
 								<?php else : ?>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-brand-primary"><path d="M11.7 2.805a.75.75 0 0 1 .6 0l9.3 4.25a.75.75 0 0 1 0 1.39l-9.3 4.25a.75.75 0 0 1-.6 0L2.4 8.445a.75.75 0 0 1 0-1.39l9.3-4.25ZM2.84 10.74l6.735 3.08a2.25 2.25 0 0 0 1.85 0l6.735-3.08v3.42c0 .532-.244 1.026-.642 1.378L12.5 19.544a1.25 1.25 0 0 1-1.6 0l-5.023-3.97a1.75 1.75 0 0 1-.642-1.378v-3.456Z" /><path d="M20.25 10.32v5.43a3.25 3.25 0 0 1-3.25 3.25h-.5a.75.75 0 0 0 0 1.5h.5a4.75 4.75 0 0 0 4.75-4.75v-5.43a.75.75 0 0 0-1.5 0Z" /></svg>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-brand-primary"><path d="M11.7 2.805a.75.75 0 0 1 .6 0l9.3 4.25a.75.75 0 0 1 0 1.39l-9.3 4.25a.75.75 0 0 1-.6 0L2.4 8.445a.75.75 0 0 1 0-1.39l9.3-4.25ZM2.84 10.74l6.735 3.08a2.25 2.25 0 0 0 1.85 0l6.735-3.08v3.42c0 .532-.244 1.026-.642 1.378L12.5 19.544a1.25 1.25 0 0 1-1.6 0l-5.023-3.97a1.75 1.75 0 0 1-.642-1.378v-3.456Z" /><path d="M20.25 10.32v5.43a3.25 3.25 0 0 1 3.25 3.25h-.5a.75.75 0 0 0 0 1.5h.5a4.75 4.75 0 0 0 4.75-4.75v-5.43a.75.75 0 0 0-1.5 0Z" /></svg>
 								<?php endif; ?>
 							</div>
-							<div class="min-w-0">
-								<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block truncate">
-									<?php echo esc_html( $school_name ); ?>
-								</span>
+							<div class="min-w-0 flex-1 pb-0.5">
+								<?php if ( ! empty( $school_rel_id ) ) : ?>
+									<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>" class="text-xs sm:text-sm font-extrabold text-slate-800 hover:text-brand-primary transition-colors uppercase tracking-wide block truncate" title="<?php echo esc_attr( $school_name ); ?>">
+										<?php echo esc_html( $school_name ); ?>
+									</a>
+								<?php else : ?>
+									<span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-brand-primary transition-colors uppercase tracking-wide block truncate">
+										<?php echo esc_html( $school_name ); ?>
+									</span>
+								<?php endif; ?>
 							</div>
 						</div>
 

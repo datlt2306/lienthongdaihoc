@@ -1,39 +1,106 @@
-themes/lienthongdaihoc/node_modules
-themes/lienthongdaihoc/dist
+# ==========================================
+# Dependencies & Package Managers
+# ==========================================
+node_modules/
+vendor/
+themes/*/node_modules/
+themes/*/vendor/
 
-# Uploads
-uploads/
+# Package manager logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# Build Artifacts & Generated Files
+# ==========================================
+dist/
+build/
+themes/*/dist/
+themes/*/build/
+*.map
+.cache/
+.parcel-cache/
+.sass-cache/
+
+# ==========================================
+# WordPress Plugins, Uploads & Backups
+# ==========================================
+plugins/
+uploads/*
 !uploads/.gitkeep
-
-# Backups
 ai1wm-backups/
-
-# Logs
-debug.log
-*.log
-
-# Binaries
+upgrade/
 wp-cli.phar
 
-# Plugin build artifacts
-plugins/advanced-custom-fields-pro/assets/build/**/*.map
-plugins/all-in-one-wp-migration/storage/error.log
-plugins
-# OS files
-.DS_Store
-Thumbs.db
+# ==========================================
+# Database & SQL Dumps
+# ==========================================
+*.sql
+*.sqlite
+*.db
 
-# MCP credentials
+# ==========================================
+# Logs & Debug Output
+# ==========================================
+debug.log
+*.log
+plugins/all-in-one-wp-migration/storage/error.log
+
+# ==========================================
+# Secrets, Environment & Credentials
+# ==========================================
+.env
+.env.*
+.envrc
 .wp-mcp-url
 .wp-mcp-user
 .wp-mcp-pass
+*.pem
+*.key
+*.crt
+secrets.json
+config.local.php
 
-# Environment variables
-.env
+# ==========================================
+# AI Agent & Scratch Tooling
+# ==========================================
+scratch/
+themes/*/scratch/
+.agents/teamwork/
+themes/*/.agents/teamwork/
+.antigravitycli/
+.mimocode/
+audit_report.json
+themes/*/audit_report.json
 
-# Docker volumes
+# ==========================================
+# OS & System Files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ==========================================
+# IDEs & Code Editors
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# Docker & Local Dev Overrides
+# ==========================================
 db_data/
 wp_data/
-
-# Local Docker overrides (not for VPS)
 docker-compose.override.yml

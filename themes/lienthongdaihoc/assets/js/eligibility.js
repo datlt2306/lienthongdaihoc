@@ -528,11 +528,11 @@
 						'<span class="elig-score-label" style="display: inline-block; padding: 4px 10px; border-radius: 6px;">' + statusLabel + ' (' + matchPriorityLabel + ')</span>' +
 					'</div>' +
 				'</div>' +
-				'<div class="elig-card-meta-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 0.85rem; color: #475569;">' +
-					'<div class="elig-meta-item"><strong>💰 Học phí:</strong> <span style="color: #0e2038; font-weight: 700;">' + escHtml(prog.tuition_fee || 'Liên hệ') + '</span></div>' +
-					'<div class="elig-meta-item"><strong>⏱ Thời gian:</strong> <span style="color: #0e2038; font-weight: 700;">' + escHtml(prog.duration || '—') + '</span></div>' +
-					'<div class="elig-meta-item"><strong>📅 Lịch học:</strong> <span style="color: #0e2038; font-weight: 700;">' + escHtml(prog.schedule || 'Linh hoạt') + '</span></div>' +
-					'<div class="elig-meta-item"><strong>📍 Trạm thi:</strong> <span style="color: #0e2038; font-weight: 700;">' + escHtml(prog.campus_info || '—') + '</span></div>' +
+				'<div class="elig-card-meta-grid">' +
+					'<div class="elig-meta-item"><strong>💰 Học phí:</strong> <span class="elig-meta-val">' + escHtml(prog.tuition_fee || 'Liên hệ') + '</span></div>' +
+					'<div class="elig-meta-item"><strong>⏱ Thời gian:</strong> <span class="elig-meta-val">' + escHtml(prog.duration || '—') + '</span></div>' +
+					'<div class="elig-meta-item elig-meta-item-wide"><strong>📅 Lịch học:</strong> <span class="elig-meta-val">' + escHtml(prog.schedule || 'Linh hoạt') + '</span></div>' +
+					'<div class="elig-meta-item"><strong>📍 Cơ sở học:</strong> <span class="elig-meta-val">' + escHtml(prog.campus_info || '—') + '</span></div>' +
 				'</div>' +
 				reasonsHtml +
 				'<div class="elig-card-actions" style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px;">' +

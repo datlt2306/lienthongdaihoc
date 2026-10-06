@@ -40,6 +40,7 @@ if ( ! in_array( $selected_limit, $valid_limits, true ) ) {
 
 $selected_search = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
 $selected_sort   = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
+$selected_region = isset( $_GET['khu_vuc'] ) ? sanitize_text_field( $_GET['khu_vuc'] ) : ( isset( $_GET['khu-vuc'] ) ? sanitize_text_field( $_GET['khu-vuc'] ) : '' );
 $paged           = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
 
 $args = [
@@ -65,6 +66,12 @@ if ( $selected_sort === 'title_asc' ) {
 
 if ( ! empty( $selected_search ) ) {
 	$args['s'] = $selected_search;
+}
+
+// Filter by region / campus
+if ( ! empty( $selected_region ) ) {
+	$loc_program_ids  = ltdh_get_program_ids_by_location( $selected_region );
+	$args['post__in'] = $loc_program_ids;
 }
 
 if ( ! empty( $selected_school ) ) {
@@ -180,7 +187,7 @@ $majors_list = get_posts( [
 	'order'          => 'ASC',
 ] );
 
-$has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school ) || ! empty( $selected_nhom ) || ! empty( $selected_search ) || ! empty( $selected_sort ) );
+$has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school ) || ! empty( $selected_nhom ) || ! empty( $selected_region ) || ! empty( $selected_search ) || ! empty( $selected_sort ) );
 ?>
 
 <main id="primary" class="site-main bg-slate-50 min-h-screen">
@@ -224,19 +231,54 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 			?>
 			<form id="catalog-filter-form" action="<?php echo esc_url( $form_action ); ?>" method="GET" class="space-y-4">
 				
-				<!-- Row 1: Search keyword + School dropdown + Major dropdown + Sorting -->
-				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+				<!-- Row 1: Search keyword + Region dropdown + School dropdown + Major dropdown + Sorting -->
+				<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
 					
 					<!-- 1. Search Box -->
-					<div class="relative">
+					<div class="relative sm:col-span-2 md:col-span-1">
 						<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 						</span>
 						<input type="text" 
 							   name="s" 
 							   value="<?php echo esc_attr( $selected_search ); ?>" 
-							   placeholder="Tìm tên ngành, trường học..." 
+							   placeholder="Tìm tên ngành, trường..." 
 							   class="w-full pl-10 pr-4 py-2.5 border border-slate-200/60 rounded-xl text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none placeholder-slate-400 min-h-[44px] transition-all bg-slate-50/30 focus:bg-white">
+					</div>
+
+					<!-- 2. Region / Location Select -->
+					<div>
+						<select name="khu_vuc" onchange="this.form.submit()" class="w-full py-2.5 px-3.5 border border-slate-200/60 rounded-xl text-sm font-medium bg-slate-50/30 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+							<option value="">Tất cả khu vực</option>
+							<?php
+							$default_regions = [
+								'ha-noi'      => 'Hà Nội',
+								'ho-chi-minh' => 'TP. Hồ Chí Minh',
+								'da-nang'     => 'Đà Nẵng',
+								'thai-nguyen' => 'Thái Nguyên',
+								'online'      => 'Học Online',
+								'mien-bac'    => 'Miền Bắc',
+								'mien-trung'  => 'Miền Trung',
+								'mien-nam'    => 'Miền Nam',
+							];
+							$all_region_terms = get_terms( [
+								'taxonomy'   => [ 'campus', 'region' ],
+								'hide_empty' => false,
+							] );
+							if ( ! is_wp_error( $all_region_terms ) && ! empty( $all_region_terms ) ) {
+								foreach ( $all_region_terms as $r_term ) {
+									if ( ! isset( $default_regions[ $r_term->slug ] ) ) {
+										$default_regions[ $r_term->slug ] = $r_term->name;
+									}
+								}
+							}
+							foreach ( $default_regions as $r_slug => $r_name ) :
+							?>
+								<option value="<?php echo esc_attr( $r_slug ); ?>" <?php selected( $selected_region, $r_slug ); ?>>
+									<?php echo esc_html( $r_name ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
 					</div>
 
 					<!-- 2. School Select -->
@@ -441,8 +483,8 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 							<!-- Card Body -->
 							<div class="p-5 pb-0">
 								<!-- School Header with Logo -->
-								<div class="flex items-center gap-3 mb-3.5 -mt-8 relative z-10">
-									<div class="w-12 h-12 bg-white border border-slate-200/90 rounded-xl flex items-center justify-center p-1.5 shrink-0 shadow-sm group-hover:border-brand-primary/40 transition-colors">
+								<div class="flex items-end gap-3 mb-3.5 relative z-10">
+									<div class="w-12 h-12 bg-white border border-slate-200/90 rounded-xl flex items-center justify-center p-1.5 shrink-0 shadow-sm group-hover:border-brand-primary/40 group-hover:shadow-md transition-all -mt-7">
 										<?php if ( ! empty( $school_logo_url ) ) : ?>
 											<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_name ); ?>" class="h-full w-full object-contain p-0.5">
 										<?php elseif ( $school_logo_id ) : ?>
@@ -451,10 +493,16 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-brand-primary"><path d="M11.7 2.805a.75.75 0 0 1 .6 0l9.3 4.25a.75.75 0 0 1 0 1.39l-9.3 4.25a.75.75 0 0 1-.6 0L2.4 8.445a.75.75 0 0 1 0-1.39l9.3-4.25ZM2.84 10.74l6.735 3.08a2.25 2.25 0 0 0 1.85 0l6.735-3.08v3.42c0 .532-.244 1.026-.642 1.378L12.5 19.544a1.25 1.25 0 0 1-1.6 0l-5.023-3.97a1.75 1.75 0 0 1-.642-1.378v-3.456Z" /><path d="M20.25 10.32v5.43a3.25 3.25 0 0 1 3.25 3.25h-.5a.75.75 0 0 0 0 1.5h.5a4.75 4.75 0 0 0 4.75-4.75v-5.43a.75.75 0 0 0-1.5 0Z" /></svg>
 										<?php endif; ?>
 									</div>
-									<div class="min-w-0">
-										<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block truncate">
-											<?php echo esc_html( $school_name ); ?>
-										</span>
+									<div class="min-w-0 flex-1 pb-0.5">
+										<?php if ( ! empty( $school_rel_id ) ) : ?>
+											<a href="<?php echo esc_url( get_permalink( $school_rel_id ) ); ?>" class="text-xs sm:text-sm font-extrabold text-slate-800 hover:text-brand-primary transition-colors uppercase tracking-wide block truncate" title="<?php echo esc_attr( $school_name ); ?>">
+												<?php echo esc_html( $school_name ); ?>
+											</a>
+										<?php else : ?>
+											<span class="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-brand-primary transition-colors uppercase tracking-wide block truncate">
+												<?php echo esc_html( $school_name ); ?>
+											</span>
+										<?php endif; ?>
 									</div>
 								</div>
 

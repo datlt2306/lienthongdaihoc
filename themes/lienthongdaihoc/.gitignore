@@ -1,0 +1,55 @@
+# ==========================================
+# Dependencies & Package Managers
+# ==========================================
+node_modules/
+vendor/
+
+# Package manager logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# Build Artifacts & Compiled Assets
+# ==========================================
+dist/
+build/
+*.map
+.cache/
+.parcel-cache/
+.sass-cache/
+
+# ==========================================
+# Scratch, Audits & Temporary Files
+# ==========================================
+scratch/
+audit_report.json
+.agents/teamwork/
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# ==========================================
+# Environment & Secret Credentials
+# ==========================================
+.env
+.env.*
+*.key
+*.pem
+secrets.json
+
+# ==========================================
+# OS & Editor Files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.vscode/
+.idea/
