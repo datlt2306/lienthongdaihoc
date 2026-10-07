@@ -315,8 +315,9 @@ if ( ! empty( $contact ) ) {
 					if ( $majors_query && $majors_query->have_posts() ) :
 						echo '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">';
 						while ( $majors_query->have_posts() ) : $majors_query->the_post();
+							$major_link = add_query_arg( 'from_school', get_post_field( 'post_name', $school_id ), get_permalink() );
 						?>
-							<a href="<?php the_permalink(); ?>" class="flex items-center gap-3 p-3 border border-slate-100 rounded-lg hover:border-brand-primary hover:shadow-sm transition-all bg-white">
+							<a href="<?php echo esc_url( $major_link ); ?>" class="flex items-center gap-3 p-3 border border-slate-100 rounded-lg hover:border-brand-primary hover:shadow-sm transition-all bg-white">
 								<?php 
 								$major_thumb = get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' );
 								if ( ! $major_thumb ) {

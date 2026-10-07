@@ -435,7 +435,7 @@
 	// ----------------------------------------------------
 	// 5. Init
 	// ----------------------------------------------------
-	document.addEventListener('DOMContentLoaded', function () {
+	function init() {
 		initCompareDelegation();
 		syncCompareButtonStates();
 
@@ -446,7 +446,13 @@
 		} else {
 			updateTray();
 		}
-	});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init);
+	} else {
+		init();
+	}
 
 	// Expose for external use
 	window.ltdhCompare = {

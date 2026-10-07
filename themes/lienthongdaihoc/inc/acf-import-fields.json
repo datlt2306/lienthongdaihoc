@@ -229,68 +229,7 @@
                     }
                 ]
             },
-            {
-                "key": "field_tab_major_specializations",
-                "label": "Các mảng đào tạo chuyên sâu",
-                "name": "",
-                "type": "tab",
-                "placement": "top",
-                "endpoint": 0
-            },
-            {
-                "key": "field_major_specializations",
-                "label": "Danh mục mảng chuyên sâu / Chuyên ngành hẹp",
-                "name": "major_specializations",
-                "type": "repeater",
-                "instructions": "Các khối chuyên môn trong ngành (Tự động render thành các Cards chuyên sâu có icon)",
-                "layout": "block",
-                "button_label": "+ Thêm mảng chuyên sâu",
-                "sub_fields": [
-                    {
-                        "key": "field_spec_icon",
-                        "label": "Biểu tượng / Emoji",
-                        "name": "spec_icon",
-                        "type": "text",
-                        "placeholder": "Ví dụ: 💻, 📊, 🔒, ☁️",
-                        "wrapper": {
-                            "width": "20"
-                        }
-                    },
-                    {
-                        "key": "field_spec_name",
-                        "label": "Tên mảng chuyên sâu",
-                        "name": "spec_name",
-                        "type": "text",
-                        "placeholder": "Ví dụ: Phát triển Phần mềm",
-                        "wrapper": {
-                            "width": "80"
-                        }
-                    },
-                    {
-                        "key": "field_spec_desc",
-                        "label": "Mô tả nội dung đào tạo",
-                        "name": "spec_desc",
-                        "type": "textarea",
-                        "rows": 3,
-                        "placeholder": "Ví dụ: Đào tạo lập trình Web, App di động, hệ thống quản trị..."
-                    }
-                ]
-            },
-            {
-                "key": "field_tab_major_career",
-                "label": "Cơ hội nghề nghiệp & Định hướng",
-                "name": "",
-                "type": "tab",
-                "placement": "top",
-                "endpoint": 0
-            },
-            {
-                "key": "field_major_opportunities",
-                "label": "Cơ hội nghề nghiệp & Định hướng",
-                "name": "career_opportunities",
-                "type": "wysiwyg",
-                "instructions": "Chi tiết về cơ hội việc làm, vị trí công tác và định hướng nghề nghiệp sau tốt nghiệp (Hiển thị tại Section Cơ hội nghề nghiệp ngoài website)"
-            },
+
             {
                 "key": "field_tab_major_related",
                 "label": "Ngành đào tạo liên quan",

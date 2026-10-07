@@ -78,7 +78,8 @@ function ltdh_enqueue_assets() {
 	] );
 
 	if ( ltdh_compare_should_load() ) {
-		wp_enqueue_script( 'ltdh-compare-js', get_template_directory_uri() . '/assets/js/compare.js', [], LTDH_VERSION, true );
+		$compare_ver = file_exists( get_template_directory() . '/assets/js/compare.js' ) ? filemtime( get_template_directory() . '/assets/js/compare.js' ) : LTDH_VERSION;
+		wp_enqueue_script( 'ltdh-compare-js', get_template_directory_uri() . '/assets/js/compare.js', [ $script_handle ], $compare_ver, true );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'ltdh_enqueue_assets' );
@@ -91,10 +92,17 @@ function ltdh_compare_should_load() {
 		return false;
 	}
 	$request_uri = $_SERVER['REQUEST_URI'] ?? '';
-	if ( strpos( $request_uri, '/hinh-thuc-dao-tao' ) !== false || strpos( $request_uri, '/he-dao-tao' ) !== false || strpos( $request_uri, '/so-sanh' ) !== false ) {
+	if ( strpos( $request_uri, '/hinh-thuc-dao-tao' ) !== false || strpos( $request_uri, '/he-dao-tao' ) !== false || strpos( $request_uri, '/so-sanh' ) !== false || strpos( $request_uri, '/nganh-' ) !== false ) {
 		return true;
 	}
-	return is_post_type_archive( 'program' ) || is_singular( 'program' ) || is_tax( 'training_type' ) || is_tax( 'major' ) || is_search() || is_page_template( 'template-search.php' ) || is_page( 'hinh-thuc-dao-tao' ) || is_page( 'he-dao-tao' );
+	return is_post_type_archive( [ 'program', 'major', 'school' ] )
+		|| is_singular( [ 'program', 'major', 'school' ] )
+		|| is_tax( 'training_type' )
+		|| is_tax( 'major' )
+		|| is_search()
+		|| is_page_template( 'template-search.php' )
+		|| is_page( 'hinh-thuc-dao-tao' )
+		|| is_page( 'he-dao-tao' );
 }
 
 /**

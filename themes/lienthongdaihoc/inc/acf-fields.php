@@ -176,13 +176,21 @@ function ltdh_override_field_program_requirements_tab_label( $field ) {
 	return $field;
 }
 
-// Remove/hide unwanted program fields in admin area dynamically
+// Remove/hide unwanted program & major fields in admin area dynamically
 add_filter( 'acf/prepare_field/key=field_program_why_choose', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_schedule', '__return_false' );
 // Keep degree_type and diploma_value visible for TT 27/2019/TT-BGDĐT compliance
 // add_filter( 'acf/prepare_field/key=field_program_degree_type', '__return_false' );
 // add_filter( 'acf/prepare_field/key=field_program_diploma_value', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_disadvantages', '__return_false' );
+
+// Remove/hide 'Các mảng đào tạo chuyên sâu' and 'Cơ hội nghề nghiệp & Định hướng' from Major CPT in admin
+add_filter( 'acf/prepare_field/key=field_tab_major_specializations', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_major_specializations', '__return_false' );
+add_filter( 'acf/prepare_field/name=major_specializations', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_tab_major_career', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_major_opportunities', '__return_false' );
+add_filter( 'acf/prepare_field/name=career_opportunities', '__return_false' );
 
 // Remove duplicate and unused eligibility meta fields (use standard Taxonomies & pure admission requirements instead)
 add_filter( 'acf/prepare_field/key=field_elig_campuses', '__return_false' );

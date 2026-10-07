@@ -177,4 +177,125 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+
+    // Single Major Page Filter (Training Type Pills & School Select Dropdown)
+    function initMajorPageFilter() {
+        const wrapper = document.getElementById('ltdh-major-programs-wrapper');
+        if (!wrapper) return;
+
+        const majorId = wrapper.dataset.majorId;
+        const listContainer = document.getElementById('ltdh-major-programs-list');
+        const pills = document.querySelectorAll('.ltdh-major-he-pill');
+        const schoolSelect = document.getElementById('ltdh-major-school-select');
+        const countBadge = document.getElementById('ltdh-major-programs-count');
+
+        if (!listContainer || !majorId) return;
+
+        function doFilter(pushUrl = true) {
+            listContainer.style.opacity = '0.4';
+            listContainer.style.pointerEvents = 'none';
+
+            const activePill = document.querySelector('.ltdh-major-he-pill.is-active');
+            const selectedHe = activePill ? (activePill.dataset.he || '') : '';
+            const selectedSchool = schoolSelect ? schoolSelect.value : '';
+
+            if (pushUrl) {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (selectedHe) {
+                    urlParams.set('he', selectedHe);
+                } else {
+                    urlParams.delete('he');
+                }
+
+                if (selectedSchool) {
+                    urlParams.set('truong', selectedSchool);
+                    urlParams.set('from_school', selectedSchool);
+                } else {
+                    urlParams.delete('truong');
+                    urlParams.delete('from_school');
+                }
+
+                const searchStr = urlParams.toString();
+                const newUrl = window.location.pathname + (searchStr ? '?' + searchStr : '');
+                window.history.pushState({ path: newUrl }, '', newUrl);
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'ltdh_filter_major_programs');
+            formData.append('major_id', majorId);
+            formData.append('he', selectedHe);
+            formData.append('school', selectedSchool);
+
+            const ajaxUrl = (typeof ltdh_ajax !== 'undefined' && ltdh_ajax.ajax_url)
+                ? ltdh_ajax.ajax_url
+                : '/wp-admin/admin-ajax.php';
+
+            fetch(ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    listContainer.innerHTML = data.data.html;
+                    if (countBadge && typeof data.data.count !== 'undefined') {
+                        countBadge.textContent = selectedSchool ? (data.data.count + ' chương trình') : (data.data.count + ' trường tuyển sinh');
+                    }
+                    if (window.ltdhCompare && typeof window.ltdhCompare.syncButtonStates === 'function') {
+                        window.ltdhCompare.syncButtonStates();
+                    }
+                }
+            })
+            .catch(err => console.error('Error filtering major programs:', err))
+            .finally(() => {
+                listContainer.style.opacity = '1';
+                listContainer.style.pointerEvents = 'auto';
+            });
+        }
+
+        pills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                pills.forEach(p => {
+                    p.classList.remove('bg-[#00308b]', 'text-white', 'border-[#00308b]', 'shadow-xs', 'is-active');
+                    p.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+                });
+                this.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+                this.classList.add('bg-[#00308b]', 'text-white', 'border-[#00308b]', 'shadow-xs', 'is-active');
+
+                doFilter(true);
+            });
+        });
+
+        if (schoolSelect) {
+            schoolSelect.addEventListener('change', function() {
+                doFilter(true);
+            });
+        }
+
+        window.addEventListener('popstate', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentHe = urlParams.get('he') || '';
+            const currentSchool = urlParams.get('truong') || urlParams.get('from_school') || urlParams.get('school') || '';
+
+            pills.forEach(p => {
+                const pHe = p.dataset.he || '';
+                if (pHe === currentHe) {
+                    p.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+                    p.classList.add('bg-[#00308b]', 'text-white', 'border-[#00308b]', 'shadow-xs', 'is-active');
+                } else {
+                    p.classList.remove('bg-[#00308b]', 'text-white', 'border-[#00308b]', 'shadow-xs', 'is-active');
+                    p.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+                }
+            });
+
+            if (schoolSelect) {
+                schoolSelect.value = currentSchool;
+            }
+
+            doFilter(false);
+        });
+    }
+
+    initMajorPageFilter();
 });
+
