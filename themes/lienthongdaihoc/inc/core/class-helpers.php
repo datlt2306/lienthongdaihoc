@@ -101,6 +101,64 @@ function ltdh_get_program_hotline(int $program_id): string {
 }
 
 /**
+ * Resolves the valid, published school ID for a given program.
+ * Falls back to matching slug/code if relation was broken or orphaned.
+ *
+ * @param int $program_id
+ * @return int
+ */
+function ltdh_get_program_school_id( int $program_id ): int {
+	if ( ! $program_id ) {
+		return 0;
+	}
+
+	$school_id = function_exists( 'get_field' ) ? get_field( defined( 'LTDH_META_SCHOOL_REL' ) ? LTDH_META_SCHOOL_REL : 'school_relationship', $program_id ) : 0;
+	if ( empty( $school_id ) ) {
+		$school_id = get_post_meta( $program_id, defined( 'LTDH_META_SCHOOL_REL' ) ? LTDH_META_SCHOOL_REL : 'school_relationship', true );
+	}
+	if ( is_array( $school_id ) ) {
+		$first     = reset( $school_id );
+		$school_id = is_object( $first ) ? $first->ID : intval( $first );
+	} elseif ( is_object( $school_id ) ) {
+		$school_id = $school_id->ID;
+	}
+	$school_id = intval( $school_id );
+
+	if ( $school_id > 0 && 'publish' === get_post_status( $school_id ) ) {
+		return $school_id;
+	}
+
+	// Healing fallback: Attempt to match existing published schools by slug/code
+	$slug = get_post_field( 'post_name', $program_id );
+	if ( empty( $slug ) ) {
+		return 0;
+	}
+
+	$school_cpt = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
+	$all_schools = get_posts( [
+		'post_type'      => $school_cpt,
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'no_found_rows'  => true,
+	] );
+
+	foreach ( $all_schools as $school ) {
+		$clean_school_slug = str_replace( 'truong-dai-hoc-', '', $school->post_name );
+		$clean_school_slug = str_replace( 'hoc-vien-', '', $clean_school_slug );
+		$school_code       = strtolower( (string) get_post_meta( $school->ID, 'school_code', true ) );
+
+		if ( ( ! empty( $clean_school_slug ) && false !== strpos( $slug, $clean_school_slug ) ) ||
+		     ( ! empty( $school_code ) && false !== strpos( $slug, $school_code ) ) ) {
+			$meta_key = defined( 'LTDH_META_SCHOOL_REL' ) ? LTDH_META_SCHOOL_REL : 'school_relationship';
+			update_post_meta( $program_id, $meta_key, $school->ID );
+			return $school->ID;
+		}
+	}
+
+	return 0;
+}
+
+/**
  * Get a school's effective hotline: school → global.
  */
 function ltdh_get_school_hotline(int $school_id): string {

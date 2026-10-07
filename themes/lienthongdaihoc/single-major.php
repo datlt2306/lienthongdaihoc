@@ -57,13 +57,7 @@ $all_major_programs = get_posts( [
 $distinct_school_objs = [];
 if ( ! empty( $all_major_programs ) ) {
 	foreach ( $all_major_programs as $p_id ) {
-		$s_rel = get_field( LTDH_META_SCHOOL_REL, $p_id );
-		if ( is_array( $s_rel ) ) {
-			$s_rel = ! empty( $s_rel ) ? ( is_object( $s_rel[0] ) ? $s_rel[0]->ID : $s_rel[0] ) : 0;
-		} elseif ( is_object( $s_rel ) ) {
-			$s_rel = $s_rel->ID;
-		}
-		$s_id = intval( $s_rel );
+		$s_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $p_id ) : intval( get_post_meta( $p_id, LTDH_META_SCHOOL_REL, true ) );
 		if ( $s_id && ! isset( $distinct_school_objs[ $s_id ] ) ) {
 			$s_post = get_post( $s_id );
 			if ( $s_post && 'publish' === $s_post->post_status ) {
@@ -85,18 +79,19 @@ $hotline     = ltdh_get_hotline();
 
 // Dynamically construct sticky navigation tabs matching reference mockup
 $major_tabs = [];
-$major_tabs[] = [
-	'id'       => 'truong-tuyen-sinh',
-	'title'    => 'Trường tuyển sinh',
-	'subtitle' => 'Bộ lọc & Các trường',
-	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>',
-];
 
 $major_tabs[] = [
 	'id'       => 'tong-quan',
 	'title'    => 'Tổng quan',
 	'subtitle' => 'Giới thiệu ngành',
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
+];
+
+$major_tabs[] = [
+	'id'       => 'truong-tuyen-sinh',
+	'title'    => 'Trường tuyển sinh',
+	'subtitle' => 'Bộ lọc & Các trường',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>',
 ];
 
 if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
@@ -185,85 +180,6 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 					</div>
 				<?php endif; ?>
 
-				<!-- PROGRAMS FOR THIS MAJOR (PRIMARY FOCUS & FILTER) -->
-				<section id="truong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4 md:p-6 mb-6">
-					<!-- Header & Count -->
-					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
-						<div>
-							<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
-								<?php echo ! empty( $context_school ) ? 'Chương trình đào tạo tại trường' : 'Chương trình & Trường tuyển sinh'; ?>
-							</h2>
-							<p class="text-xs md:text-sm text-slate-500 mt-0.5">
-								<?php echo ! empty( $context_school ) ? 'Danh sách các hình thức tuyển sinh đang mở cho ngành này' : 'Lựa chọn hình thức đào tạo và trường phù hợp với nguyện vọng của bạn'; ?>
-							</p>
-						</div>
-						<span id="ltdh-major-programs-count" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-[#00308b] border border-blue-100/80 shrink-0 self-start sm:self-center">
-							Đang tải...
-						</span>
-					</div>
-
-					<?php if ( empty( $context_school ) ) : ?>
-						<!-- Filter Bar (Only shown on direct major page visit with multiple schools) -->
-						<div class="bg-slate-50/80 border border-slate-200/80 rounded-xl p-3.5 md:p-4 mb-6 space-y-4">
-							<!-- Row 1: Training Type Filter Pills -->
-							<div>
-								<label class="block text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Hình thức đào tạo:</label>
-								<div class="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-									<button type="button" data-he="" class="ltdh-major-he-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo empty( $selected_he ) ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'; ?>">
-										Tất cả hình thức
-									</button>
-									<button type="button" data-he="tu-xa" class="ltdh-major-he-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo ( 'tu-xa' === $selected_he || 'dao-tao-tu-xa' === $selected_he ) ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'; ?>">
-										💻 Đào tạo từ xa
-									</button>
-									<button type="button" data-he="vua-hoc-vua-lam" class="ltdh-major-he-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo 'vua-hoc-vua-lam' === $selected_he ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'; ?>">
-										🌙 Vừa học vừa làm
-									</button>
-									<button type="button" data-he="chinh-quy" class="ltdh-major-he-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo 'chinh-quy' === $selected_he ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'; ?>">
-										🏫 Chính quy
-									</button>
-								</div>
-							</div>
-
-							<!-- Row 2: School Select Dropdown -->
-							<div class="pt-3 border-t border-slate-200/60">
-								<label for="ltdh-major-school-select" class="block text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Trường đào tạo:</label>
-								<select id="ltdh-major-school-select" class="w-full sm:max-w-md bg-white border border-slate-200 text-slate-800 text-xs sm:text-sm font-semibold rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-primary focus:outline-none transition-all cursor-pointer shadow-xs">
-									<option value="">-- Tất cả các trường --</option>
-									<?php foreach ( $distinct_school_objs as $s ) : ?>
-										<option value="<?php echo esc_attr( $s['slug'] ); ?>" <?php selected( $s['slug'], $selected_school_slug ); ?>>
-											<?php echo esc_html( $s['title'] ); ?>
-										</option>
-									<?php endforeach; ?>
-								</select>
-							</div>
-						</div>
-					<?php else : ?>
-						<!-- Hidden input preserving selected school context for JS AJAX queries -->
-						<input type="hidden" id="ltdh-major-school-select" value="<?php echo esc_attr( $selected_school_slug ); ?>">
-					<?php endif; ?>
-
-					<!-- Dynamic Programs List Container -->
-					<div id="ltdh-major-programs-wrapper" data-major-id="<?php echo esc_attr( $major_id ); ?>" class="transition-opacity duration-300">
-						<div id="ltdh-major-programs-list">
-							<?php 
-							$initial_count = ltdh_render_major_programs_list( $major_id, $selected_he, $selected_school_slug ); 
-							?>
-						</div>
-					</div>
-
-					<script>
-					document.addEventListener('DOMContentLoaded', function() {
-						var countBadge = document.getElementById('ltdh-major-programs-count');
-						if (countBadge) {
-							<?php if ( ! empty( $context_school ) ) : ?>
-								countBadge.textContent = '<?php echo $initial_count; ?> chương trình';
-							<?php else : ?>
-								countBadge.textContent = '<?php echo $initial_count; ?> trường tuyển sinh';
-							<?php endif; ?>
-						}
-					});
-					</script>
-				</section>
 
 				<!-- OVERVIEW -->
 				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
@@ -387,6 +303,84 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 					</script>
 				</section>
 
+				<!-- PROGRAMS FOR THIS MAJOR (PRIMARY FOCUS & FILTER) -->
+				<section id="truong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4 md:p-6 mb-6">
+					<!-- Header & Count -->
+					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
+						<div>
+							<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
+								<?php echo ! empty( $context_school ) ? 'Chương trình đào tạo tại trường' : 'Chương trình & Trường tuyển sinh'; ?>
+							</h2>
+							<p class="text-xs md:text-sm text-slate-500 mt-0.5">
+								<?php echo ! empty( $context_school ) ? 'Danh sách các hình thức tuyển sinh đang mở cho ngành này' : 'Lựa chọn hình thức đào tạo và trường phù hợp với nguyện vọng của bạn'; ?>
+							</p>
+						</div>
+						<span id="ltdh-major-programs-count" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-[#00308b] border border-blue-100/80 shrink-0 self-start sm:self-center">
+							Đang tải...
+						</span>
+					</div>
+
+					<!-- Filter Bar -->
+					<div class="flex bg-slate-50/70 border border-slate-200/80 rounded-2xl p-3 sm:p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+						<!-- Training Type Filter Pills -->
+						<div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+							<button type="button" data-he="" class="ltdh-major-he-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo empty( $selected_he ) ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'; ?>">
+								Tất cả hình thức
+							</button>
+							<button type="button" data-he="tu-xa" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo ( 'tu-xa' === $selected_he || 'dao-tao-tu-xa' === $selected_he ) ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'; ?>">
+								<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+								<span>Đào tạo từ xa</span>
+							</button>
+							<button type="button" data-he="vua-hoc-vua-lam" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo 'vua-hoc-vua-lam' === $selected_he ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'; ?>">
+								<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+								<span>Vừa học vừa làm</span>
+							</button>
+							<button type="button" data-he="chinh-quy" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo 'chinh-quy' === $selected_he ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'; ?>">
+								<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+								<span>Chính quy</span>
+							</button>
+						</div>
+
+						<!-- School Select Dropdown -->
+						<div class="flex items-center gap-2 shrink-0 md:w-64">
+							<div class="relative w-full">
+								<select id="ltdh-major-school-select" class="w-full bg-white border border-slate-200 text-slate-800 text-xs sm:text-sm font-semibold rounded-xl pl-3 pr-8 py-2 focus:ring-2 focus:ring-[#00308b] focus:border-transparent focus:outline-none transition-all cursor-pointer shadow-2xs appearance-none">
+									<option value="">Tất cả các trường</option>
+									<?php foreach ( $distinct_school_objs as $s ) : ?>
+										<option value="<?php echo esc_attr( $s['slug'] ); ?>" <?php selected( $s['slug'], $selected_school_slug ); ?>>
+											<?php echo esc_html( $s['title'] ); ?>
+										</option>
+									<?php endforeach; ?>
+								</select>
+								<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Dynamic Programs List Container -->
+					<div id="ltdh-major-programs-wrapper" data-major-id="<?php echo esc_attr( $major_id ); ?>" class="transition-opacity duration-300">
+						<div id="ltdh-major-programs-list">
+							<?php 
+							$initial_count = ltdh_render_major_programs_list( $major_id, $selected_he, $selected_school_slug ); 
+							?>
+						</div>
+					</div>
+
+					<script>
+					document.addEventListener('DOMContentLoaded', function() {
+						var countBadge = document.getElementById('ltdh-major-programs-count');
+						if (countBadge) {
+							<?php if ( ! empty( $context_school ) ) : ?>
+								countBadge.textContent = '<?php echo $initial_count; ?> chương trình';
+							<?php else : ?>
+								countBadge.textContent = '<?php echo $initial_count; ?> trường tuyển sinh';
+							<?php endif; ?>
+						}
+					});
+					</script>
+				</section>
 
 
 
