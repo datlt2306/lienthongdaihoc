@@ -527,7 +527,7 @@ if ( ! empty( $contact ) ) {
 						<span id="phuong-thuc-tuyen-sinh" class="relative -top-36 block invisible pointer-events-none"></span>
 						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Thông tin liên hệ tuyển sinh</h2>
 						<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list">
-							<?php echo wp_kses_post( $contact ); ?>
+							<?php echo wp_kses_post( ltdh_format_contact_info( (string) $contact, (int) $school_id ) ); ?>
 						</div>
 					</section>
 				<?php endif; ?>

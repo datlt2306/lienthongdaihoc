@@ -72,6 +72,48 @@ function ltdh_get_company_name(): string {
 }
 
 /**
+ * Format and sanitize contact information HTML for display.
+ * Replaces legacy "Địa điểm khai giảng & thi" headings and addresses with the modern admission office reception address.
+ *
+ * @param string $contact_html Raw contact HTML.
+ * @param int    $school_id    Optional school ID context.
+ * @return string Formatted HTML.
+ */
+function ltdh_format_contact_info( string $contact_html, int $school_id = 0 ): string {
+	$new_address_html = '<p class="text-slate-800 leading-relaxed font-normal"><strong>✅ Địa chỉ nộp hồ sơ (trực tiếp hoặc chuyển phát nhanh):</strong> 📍 Tầng 2 – Khu Hiệu bộ, 306B Kim Mã, phường Giảng Võ, Hà Nội (Trong khuôn viên Trường Lê Duẩn, đối diện Trường ĐH GTVT).</p>';
+
+	if ( empty( trim( strip_tags( $contact_html ) ) ) ) {
+		return $new_address_html;
+	}
+
+	// Pattern matches any legacy "Địa điểm khai giảng & thi" / "Địa điểm khai giảng" heading and its immediately following address paragraph or list
+	$pattern = '/<h[1-6][^>]*>[\s\S]*?(?:địa\s*điểm\s*khai\s*giảng|khai\s*giảng\s*&(?:amp;)?\s*thi)[\s\S]*?<\/h[1-6]>\s*(?:<p[^>]*>[\s\S]*?<\/p>|<ul[^>]*>[\s\S]*?<\/ul>)?/ui';
+
+	if ( preg_match( $pattern, $contact_html ) ) {
+		$contact_html = preg_replace( $pattern, $new_address_html, $contact_html, 1 );
+	}
+
+	// Also check if any standalone legacy heading remains
+	$heading_only_pattern = '/<h[1-6][^>]*>[\s\S]*?(?:địa\s*điểm\s*khai\s*giảng|khai\s*giảng\s*&(?:amp;)?\s*thi)[\s\S]*?<\/h[1-6]>/ui';
+	$contact_html = preg_replace( $heading_only_pattern, '', $contact_html );
+
+	// Remove legacy Cầu Giấy address text if still present
+	$legacy_address_pattern = '/<p[^>]*>[\s\S]*?Phòng\s+Khảo\s+thí[\s\S]*?Cầu\s+Giấy[\s\S]*?<\/p>/ui';
+	if ( preg_match( $legacy_address_pattern, $contact_html ) ) {
+		$contact_html = preg_replace( $legacy_address_pattern, $new_address_html, $contact_html, 1 );
+	}
+
+	return trim( (string) $contact_html );
+}
+
+add_filter( 'acf/format_value/name=contact_info', function( $value, $post_id, $field ) {
+	if ( ! empty( $value ) && is_string( $value ) ) {
+		return ltdh_format_contact_info( $value, (int) $post_id );
+	}
+	return $value;
+}, 20, 3 );
+
+/**
  * Get a program's effective hotline: program override → school → global.
  */
 function ltdh_get_program_hotline(int $program_id): string {

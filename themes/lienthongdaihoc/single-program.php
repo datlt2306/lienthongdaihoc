@@ -954,6 +954,7 @@ $program_tabs[] = [
 				$prog_contact_custom = get_field( 'contact_info', $program_id );
 				$school_contact_raw  = $school_id ? get_field( 'contact_info', $school_id ) : '';
 				$contact_html        = ! empty( $prog_contact_custom ) ? $prog_contact_custom : $school_contact_raw;
+				$contact_formatted   = ltdh_format_contact_info( (string) $contact_html, (int) $school_id );
 				$school_address      = $school_id ? ( get_post_meta( $school_id, 'address', true ) ?: get_field( 'address', $school_id ) ) : '';
 				$school_website      = $school_id ? get_field( 'website', $school_id ) : '';
 				?>
@@ -962,17 +963,9 @@ $program_tabs[] = [
 						<h2 class="text-lg md:text-2xl font-bold text-slate-900">Thông tin liên hệ & Tiếp nhận hồ sơ</h2>
 					</div>
 					<!-- Detailed Venue, Office & Bank Info -->
-					<?php if ( ! empty( $contact_html ) ) : ?>
-						<div class="">
-							<h3 class="text-sm md:text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
-								<span class="w-6 h-6 rounded-md bg-blue-100 text-[#00308b] flex items-center justify-center text-xs font-bold shrink-0">📍</span>
-								<span>✅ Địa chỉ nộp hồ sơ (trực tiếp hoặc chuyển phát nhanh):
-📍 Tầng 2 – Khu Hiệu bộ, 306B Kim Mã, phường Giảng Võ, Hà Nội
-(Trong khuôn viên Trường Lê Duẩn, đối diện Trường ĐH GTVT).</span>
-							</h3>
-							<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list">
-								<?php echo wp_kses_post( $contact_html ); ?>
-							</div>
+					<?php if ( ! empty( $contact_formatted ) ) : ?>
+						<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list">
+							<?php echo wp_kses_post( $contact_formatted ); ?>
 						</div>
 					<?php endif; ?>
 				</section>
