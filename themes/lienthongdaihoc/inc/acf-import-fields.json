@@ -21,7 +21,7 @@
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
-                    "width": "",
+                    "width": "50",
                     "class": "",
                     "id": ""
                 },
@@ -30,6 +30,25 @@
                 "ui": 1,
                 "ui_on_text": "Bật",
                 "ui_off_text": "Tắt"
+            },
+            {
+                "key": "field_school_order",
+                "label": "Thứ tự sắp xếp (Order)",
+                "name": "order",
+                "type": "number",
+                "instructions": "Số thứ tự sắp xếp hiển thị (ví dụ: 1, 2, 3... Số nhỏ hơn sẽ hiển thị trước)",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "50",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "min": 0,
+                "max": "",
+                "step": 1,
+                "placeholder": "Ví dụ: 1"
             },
             {
                 "key": "field_school_banner",
@@ -335,6 +354,22 @@
                 "name": "hotline_override",
                 "type": "text",
                 "placeholder": "Bỏ trống để dùng Hotline chung của trường"
+            },
+            {
+                "key": "field_program_learning_mode",
+                "label": "Hình thức học (Learning Mode)",
+                "name": "learning_mode",
+                "type": "text",
+                "instructions": "Ví dụ: Học online 100%, Học tập trung / Cuối tuần, Học tối & cuối tuần... (Để trống sẽ tự động hiển thị theo Hệ đào tạo).",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "Mặc định theo hệ đào tạo (Ví dụ: Học online 100%)"
             },
             {
                 "key": "field_tab_prog_batches",

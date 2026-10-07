@@ -45,10 +45,31 @@ add_action( 'init', 'ltdh_register_training_type_rewrite' );
  * Register rewrite rule: /slug/ → index.php?program=slug (top priority).
  */
 function ltdh_register_program_rewrite() {
-	add_rewrite_rule( '^nganh-([^/]+)/?$', 'index.php?post_type=' . LTDH_CPT_MAJOR . '&name=$matches[1]', 'top' );
+	// Paginated CPT Archives (must be top priority before single slugs)
+	add_rewrite_rule( '^nganh-hoc/page/([0-9]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major' ) . '&paged=$matches[1]', 'top' );
+	add_rewrite_rule( '^(?:truong-doi-tac|truong-da-hoc)/page/([0-9]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) . '&paged=$matches[1]', 'top' );
+
+	add_rewrite_rule( '^nganh-([^/]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major' ) . '&name=$matches[1]', 'top' );
 	add_rewrite_rule( '([^/]+)/?$', 'index.php?program=$matches[1]', 'top' );
 }
 add_action( 'init', 'ltdh_register_program_rewrite' );
+
+/**
+ * Filter request to fix CPT archive pagination when parsed as single post with slug 'page'.
+ */
+add_filter( 'request', 'ltdh_fix_cpt_archive_pagination_request', 1 );
+function ltdh_fix_cpt_archive_pagination_request( $query_vars ) {
+	if ( isset( $query_vars['post_type'] ) && in_array( $query_vars['post_type'], [ 'major', 'school' ], true ) ) {
+		if ( isset( $query_vars['name'] ) && 'page' === $query_vars['name'] ) {
+			$page_num = ! empty( $query_vars['page'] ) ? intval( $query_vars['page'] ) : ( ! empty( $query_vars['paged'] ) ? intval( $query_vars['paged'] ) : 1 );
+			unset( $query_vars['name'] );
+			unset( $query_vars['major'] );
+			unset( $query_vars['school'] );
+			$query_vars['paged'] = $page_num;
+		}
+	}
+	return $query_vars;
+}
 
 /**
  * Guard filter: when the generic rule sets ?program=slug, verify the slug

@@ -26,7 +26,8 @@
             "editor",
             "thumbnail",
             "excerpt",
-            "revisions"
+            "revisions",
+            "page-attributes"
         ],
         "taxonomies": [
             "region"

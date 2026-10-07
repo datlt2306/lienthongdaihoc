@@ -465,19 +465,13 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 									if ( $news_counter >= 5 ) {
 										continue;
 									}
-									$news_thumb = get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' );
+									$news_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( get_the_ID(), 'thumbnail' ) : ( get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' ) ?: ltdh_get_fallback_image( 'post' ) );
 									$news_counter++;
 								?>
 									<div class="flex gap-3 items-start pb-3 border-b border-slate-100 last:border-b-0 last:pb-0">
-										<?php if ( $news_thumb ) : ?>
-											<a href="<?php the_permalink(); ?>" class="shrink-0">
-												<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded border border-slate-100" loading="lazy">
-											</a>
-										<?php else : ?>
-											<div class="w-12 h-12 bg-slate-50 border border-slate-100 rounded flex items-center justify-center shrink-0">
-												<span class="text-lg">📰</span>
-											</div>
-										<?php endif; ?>
+										<a href="<?php the_permalink(); ?>" class="shrink-0">
+											<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded border border-slate-100" loading="lazy">
+										</a>
 										
 										<div class="flex-1 min-w-0">
 											<h4 class="font-bold text-slate-800 text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">

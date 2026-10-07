@@ -125,6 +125,11 @@ function ltdh_customize_archive_queries( $query ) {
 		}
 	}
 
+	if ( $query->is_post_type_archive( LTDH_CPT_SCHOOL ) ) {
+		$query->set( 'orderby', 'menu_order' );
+		$query->set( 'order', 'ASC' );
+	}
+
 	if ( $query->is_post_type_archive( LTDH_CPT_MAJOR ) ) {
 		if ( ! empty( $_GET['nhom_nganh'] ) ) {
 			$query->set( 'tax_query', [
@@ -150,6 +155,63 @@ function ltdh_customize_archive_queries( $query ) {
 	}
 }
 add_action( 'pre_get_posts', 'ltdh_customize_archive_queries' );
+
+/**
+ * Custom orderby for School queries:
+ * 1. Posts with menu_order > 0 come first (ASC: 1, 2, 3...)
+ * 2. Posts without order (0) come after, ordered by post_date DESC
+ */
+add_filter( 'posts_orderby', 'ltdh_filter_school_posts_orderby', 10, 2 );
+function ltdh_filter_school_posts_orderby( $orderby, $query ) {
+	if ( is_admin() ) {
+		return $orderby;
+	}
+
+	$post_type = $query->get( 'post_type' );
+	$is_school = ( defined( 'LTDH_CPT_SCHOOL' ) && LTDH_CPT_SCHOOL === $post_type )
+		|| ( 'school' === $post_type )
+		|| ( is_array( $post_type ) && in_array( 'school', $post_type, true ) )
+		|| ( function_exists( 'is_post_type_archive' ) && $query->is_post_type_archive( 'school' ) );
+
+	if ( $is_school ) {
+		$requested_orderby = $query->get( 'orderby' );
+		if ( empty( $requested_orderby ) || 'menu_order' === $requested_orderby || 'date' === $requested_orderby || ( is_array( $requested_orderby ) && isset( $requested_orderby['menu_order'] ) ) ) {
+			global $wpdb;
+			return "CASE WHEN {$wpdb->posts}.menu_order > 0 THEN 0 ELSE 1 END ASC, CASE WHEN {$wpdb->posts}.menu_order > 0 THEN {$wpdb->posts}.menu_order ELSE 999999 END ASC, {$wpdb->posts}.post_date DESC";
+		}
+	}
+
+	return $orderby;
+}
+
+/**
+ * Add Order column to School post list in WordPress Admin.
+ */
+add_filter( 'manage_school_posts_columns', 'ltdh_add_school_admin_columns' );
+function ltdh_add_school_admin_columns( $columns ) {
+	$new_columns = [];
+	foreach ( $columns as $key => $title ) {
+		$new_columns[ $key ] = $title;
+		if ( 'title' === $key ) {
+			$new_columns['school_order'] = __( 'Thứ tự', 'lienthongdaihoc' );
+		}
+	}
+	return $new_columns;
+}
+
+add_action( 'manage_school_posts_custom_column', 'ltdh_render_school_admin_columns', 10, 2 );
+function ltdh_render_school_admin_columns( $column, $post_id ) {
+	if ( 'school_order' === $column ) {
+		$order = function_exists( 'ltdh_get_school_order' ) ? ltdh_get_school_order( $post_id ) : intval( get_post_field( 'menu_order', $post_id ) );
+		echo $order > 0 ? '<strong style="color:#00308b; font-size:14px;">' . esc_html( $order ) . '</strong>' : '<span style="color:#94a3b8;">—</span>';
+	}
+}
+
+add_filter( 'manage_edit-school_sortable_columns', 'ltdh_school_admin_sortable_columns' );
+function ltdh_school_admin_sortable_columns( $columns ) {
+	$columns['school_order'] = 'menu_order';
+	return $columns;
+}
 
 /**
  * AJAX Handler for filtering programs without page reload.

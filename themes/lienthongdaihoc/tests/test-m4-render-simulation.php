@@ -55,6 +55,9 @@ function ltdh_get_zalo_url() {
 function ltdh_get_fallback_image( $type = '' ) {
 	return 'https://lienthongdaihoc.com/assets/images/default-' . $type . '.jpg';
 }
+function ltdh_get_post_thumbnail_url( $post = null, $size = 'medium' ) {
+	return 'https://lienthongdaihoc.com/assets/images/default-post.webp';
+}
 function ltdh_get_optimized_image_url( $url, $is_mobile = false ) {
 	return $url;
 }

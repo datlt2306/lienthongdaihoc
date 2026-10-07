@@ -971,7 +971,7 @@ $zalo    = ltdh_get_zalo_url();
 					$index = 0;
 					while ($news_query->have_posts()) : $news_query->the_post();
 						$post_id = get_the_ID();
-						$raw_thumb = get_the_post_thumbnail_url($post_id, 'medium') ?: ltdh_get_fallback_image('news');
+						$raw_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $post_id, 'medium' ) : ( get_the_post_thumbnail_url( $post_id, 'medium' ) ?: ltdh_get_fallback_image( 'news' ) );
 						$thumb_url = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $raw_thumb ) : $raw_thumb;
 						$categories = get_the_category($post_id);
 						$category_name = ! empty($categories) ? $categories[0]->name : 'Tin tuyển sinh';

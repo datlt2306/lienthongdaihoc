@@ -155,7 +155,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 
 				<!-- Featured Post (Split card design) -->
 				<?php if ( $featured_post && empty( $active_cat_slug ) && $paged === 1 ) :
-					$feat_thumb = get_the_post_thumbnail_url( $featured_post->ID, 'large' );
+					$feat_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $featured_post->ID, 'large' ) : ( get_the_post_thumbnail_url( $featured_post->ID, 'large' ) ?: ltdh_get_fallback_image( 'post' ) );
 					$feat_cats  = get_the_category( $featured_post->ID );
 					$feat_cat   = null;
 					foreach ( $feat_cats as $fc ) {
@@ -167,11 +167,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all group grid grid-cols-1 md:grid-cols-12">
 					<!-- Thumbnail Left -->
 					<div class="md:col-span-7 relative min-h-[220px] md:min-h-[340px] bg-slate-100 overflow-hidden">
-						<?php if ( $feat_thumb ) : ?>
-							<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('<?php echo esc_url( $feat_thumb ); ?>');"></div>
-						<?php else : ?>
-							<div class="absolute inset-0 bg-gradient-to-tr from-[#0E2038] to-brand-primary flex items-center justify-center text-4xl">📰</div>
-						<?php endif; ?>
+						<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('<?php echo esc_url( $feat_thumb ); ?>');"></div>
 						<?php if ( $feat_school_name ) : ?>
 							<span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#00308b] text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">
 								<?php echo esc_html( $feat_school_name ); ?>
@@ -222,7 +218,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 						if ( $blog_query->have_posts() ) :
 							while ( $blog_query->have_posts() ) : $blog_query->the_post();
 								$post_id    = get_the_ID();
-								$post_thumb = get_the_post_thumbnail_url( $post_id, 'medium' );
+								$post_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $post_id, 'medium' ) : ( get_the_post_thumbnail_url( $post_id, 'medium' ) ?: ltdh_get_fallback_image( 'post' ) );
 								$post_cats  = get_the_category( $post_id );
 								$post_cat   = null;
 								foreach ( $post_cats as $pc ) {
@@ -234,11 +230,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 						?>
 							<article class="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
 								<a href="<?php the_permalink(); ?>" class="relative block h-28 md:h-40 bg-slate-100 overflow-hidden shrink-0">
-									<?php if ( $post_thumb ) : ?>
-										<div class="w-full h-full bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('<?php echo esc_url( $post_thumb ); ?>');"></div>
-									<?php else : ?>
-										<div class="w-full h-full flex items-center justify-center text-3xl">📰</div>
-									<?php endif; ?>
+									<div class="w-full h-full bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('<?php echo esc_url( $post_thumb ); ?>');"></div>
 									<?php if ( $school_name ) : ?>
 										<span class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[#00308b] text-xs font-extrabold px-2 py-0.5 rounded-full shadow-sm line-clamp-1">
 											<?php echo esc_html( $school_name ); ?>
@@ -326,15 +318,11 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 					<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">🔥 Tin xem nhiều nhất</h3>
 					<ul class="space-y-4">
 						<?php foreach ( $recent_posts as $rp ) :
-							$rp_thumb = get_the_post_thumbnail_url( $rp->ID, 'thumbnail' );
+							$rp_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $rp->ID, 'thumbnail' ) : ( get_the_post_thumbnail_url( $rp->ID, 'thumbnail' ) ?: ltdh_get_fallback_image( 'post' ) );
 						?>
 							<li class="flex items-start gap-3">
 								<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-100 block">
-									<?php if ( $rp_thumb ) : ?>
-										<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-full h-full object-cover" loading="lazy">
-									<?php else : ?>
-										<div class="w-full h-full flex items-center justify-center text-base">📰</div>
-									<?php endif; ?>
+									<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-full h-full object-cover" loading="lazy">
 								</a>
 								<div class="min-w-0">
 									<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-sm font-bold text-slate-800 hover:text-brand-primary leading-snug block line-clamp-2 transition-all">

@@ -23,33 +23,18 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 		$cache_key = 'ltdh_archive_school_featured';
 		$featured_posts = get_transient( $cache_key );
 		if ( false === $featured_posts || ! is_array( $featured_posts ) ) {
-			$featured_args = [
-				'post_type'      => 'school',
-				'posts_per_page' => 4,
-				'post_status'    => 'publish',
-				'meta_query'     => [
-					[
-						'key'     => 'is_featured',
-						'value'   => '1',
-						'compare' => '='
-					]
-				]
-			];
-			$featured_query = new WP_Query( $featured_args );
-			$featured_posts = $featured_query->posts;
+			$all_school_candidates = get_posts( [
+				'post_type'        => 'school',
+				'numberposts'      => 100,
+				'post_status'      => 'publish',
+				'suppress_filters' => false,
+			] );
 
-			// If less than 4, query latest schools to fill the remaining slots
-			if ( count( $featured_posts ) < 4 ) {
-				$exclude_ids = wp_list_pluck( $featured_posts, 'ID' );
-				$fallback_args = [
-					'post_type'      => 'school',
-					'posts_per_page' => 4 - count( $featured_posts ),
-					'post_status'    => 'publish',
-					'post__not_in'   => ! empty( $exclude_ids ) ? $exclude_ids : [],
-				];
-				$fallback_query = new WP_Query( $fallback_args );
-				$featured_posts = array_merge( $featured_posts, $fallback_query->posts );
-			}
+			$all_school_candidates = function_exists( 'ltdh_sort_schools_by_order' )
+				? ltdh_sort_schools_by_order( $all_school_candidates )
+				: $all_school_candidates;
+
+			$featured_posts = array_slice( $all_school_candidates, 0, 4 );
 			set_transient( $cache_key, $featured_posts, 2 * HOUR_IN_SECONDS );
 		}
 

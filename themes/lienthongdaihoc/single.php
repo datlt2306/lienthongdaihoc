@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 $post_id    = get_the_ID();
-$post_thumb = get_the_post_thumbnail_url( $post_id, 'full' );
+$post_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $post_id, 'full' ) : ( get_the_post_thumbnail_url( $post_id, 'full' ) ?: ltdh_get_fallback_image( 'post' ) );
 $post_cats  = get_the_category( $post_id );
 $post_cat   = null;
 foreach ( $post_cats as $pc ) {
@@ -168,7 +168,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 					<h2 class="text-xl font-extrabold text-slate-900 mb-6">📚 Bài viết liên quan</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 						<?php foreach ( $related as $rp ) :
-							$rp_thumb = get_the_post_thumbnail_url( $rp->ID, 'medium' );
+							$rp_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $rp->ID, 'medium' ) : ( get_the_post_thumbnail_url( $rp->ID, 'medium' ) ?: ltdh_get_fallback_image( 'post' ) );
 							$rp_cats  = get_the_category( $rp->ID );
 							$rp_cat   = null;
 							foreach ( $rp_cats as $rc ) {
@@ -179,11 +179,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 							   class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all flex gap-0">
 								<!-- Thumbnail -->
 								<div class="w-28 shrink-0">
-									<?php if ( $rp_thumb ) : ?>
-										<div class="h-full bg-cover bg-center" style="background-image: url('<?php echo esc_url( $rp_thumb ); ?>');"></div>
-									<?php else : ?>
-										<div class="h-full bg-blue-50 flex items-center justify-center text-2xl">📰</div>
-									<?php endif; ?>
+									<div class="h-full bg-cover bg-center" style="background-image: url('<?php echo esc_url( $rp_thumb ); ?>');"></div>
 								</div>
 								<div class="p-4 flex flex-col justify-between min-w-0">
 									<?php if ( $rp_cat ) : ?>
@@ -231,14 +227,10 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 					<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">🔥 Bài viết mới nhất</h3>
 					<ul class="space-y-4">
 						<?php foreach ( $recent_posts as $rp ) :
-							$rp_thumb = get_the_post_thumbnail_url( $rp->ID, 'thumbnail' );
+							$rp_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $rp->ID, 'thumbnail' ) : ( get_the_post_thumbnail_url( $rp->ID, 'thumbnail' ) ?: ltdh_get_fallback_image( 'post' ) );
 						?>
 							<li class="flex items-start gap-3">
-								<?php if ( $rp_thumb ) : ?>
-									<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-14 h-14 rounded-lg object-cover shrink-0 border border-slate-100" loading="lazy">
-								<?php else : ?>
-									<div class="w-14 h-14 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 text-xl">📰</div>
-								<?php endif; ?>
+								<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-14 h-14 rounded-lg object-cover shrink-0 border border-slate-100" loading="lazy">
 								<div class="min-w-0">
 									<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-sm font-bold text-slate-800 hover:text-[#00308b] leading-snug block line-clamp-2 transition-colors">
 										<?php echo esc_html( $rp->post_title ); ?>

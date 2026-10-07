@@ -607,26 +607,174 @@ function ltdh_get_cached_query(string $transient_key, array $query_args, int $ex
 	return $query;
 }
 
+/**
+ * Retrieve the display order for a school.
+ * Checks ACF 'order', then postmeta 'order', then native 'menu_order'.
+ *
+ * @param int $school_id
+ * @return int
+ */
+function ltdh_get_school_order( int $school_id ): int {
+	if ( ! $school_id ) {
+		return 0;
+	}
+	$order = get_field( 'order', $school_id );
+	if ( null !== $order && false !== $order && '' !== $order ) {
+		return intval( $order );
+	}
+	$meta_order = get_post_meta( $school_id, 'order', true );
+	if ( '' !== $meta_order && false !== $meta_order && null !== $meta_order ) {
+		return intval( $meta_order );
+	}
+	$post = get_post( $school_id );
+	return $post ? intval( $post->menu_order ) : 0;
+}
+
+/**
+ * Sort an array of school posts by display order.
+ * Priority 1: Custom order > 0 (ASC: 1, 2, 3...)
+ * Priority 2: is_featured = 1
+ * Priority 3: Post date DESC
+ *
+ * @param array $posts Array of WP_Post objects
+ * @return array
+ */
+function ltdh_sort_schools_by_order( array $posts ): array {
+	if ( empty( $posts ) ) {
+		return [];
+	}
+
+	usort( $posts, function( $a, $b ) {
+		$id_a = is_object( $a ) ? $a->ID : intval( $a );
+		$id_b = is_object( $b ) ? $b->ID : intval( $b );
+
+		$order_a = ltdh_get_school_order( $id_a );
+		$order_b = ltdh_get_school_order( $id_b );
+
+		// Priority 1: custom order > 0
+		if ( $order_a > 0 && $order_b > 0 ) {
+			if ( $order_a !== $order_b ) {
+				return $order_a <=> $order_b;
+			}
+		} elseif ( $order_a > 0 ) {
+			return -1;
+		} elseif ( $order_b > 0 ) {
+			return 1;
+		}
+
+		// Priority 2: is_featured
+		$feat_a = get_field( 'is_featured', $id_a ) ? 1 : 0;
+		$feat_b = get_field( 'is_featured', $id_b ) ? 1 : 0;
+		if ( $feat_a !== $feat_b ) {
+			return $feat_b <=> $feat_a;
+		}
+
+		// Priority 3: date DESC
+		$post_a = is_object( $a ) ? $a : get_post( $id_a );
+		$post_b = is_object( $b ) ? $b : get_post( $id_b );
+		$time_a = $post_a ? strtotime( $post_a->post_date ) : 0;
+		$time_b = $post_b ? strtotime( $post_b->post_date ) : 0;
+
+		return $time_b <=> $time_a;
+	} );
+
+	return $posts;
+}
+
+/**
+ * Synchronize ACF field 'order' with native post menu_order for School CPT.
+ */
+add_action( 'save_post_school', 'ltdh_sync_school_order', 25, 3 );
+function ltdh_sync_school_order( $post_id, $post = null, $update = null ) {
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	$order_val = null;
+	if ( isset( $_POST['acf']['field_school_order'] ) ) {
+		$order_val = intval( $_POST['acf']['field_school_order'] );
+	} elseif ( isset( $_POST['order'] ) ) {
+		$order_val = intval( $_POST['order'] );
+	} elseif ( isset( $_POST['menu_order'] ) ) {
+		$order_val = intval( $_POST['menu_order'] );
+	}
+
+	if ( null !== $order_val ) {
+		update_post_meta( $post_id, 'order', $order_val );
+
+		global $wpdb;
+		$wpdb->update(
+			$wpdb->posts,
+			[ 'menu_order' => $order_val ],
+			[ 'ID' => $post_id ],
+			[ '%d' ],
+			[ '%d' ]
+		);
+		clean_post_cache( $post_id );
+	}
+
+	delete_transient( 'ltdh_archive_school_featured' );
+	delete_transient( 'ltdh_featured_schools_data_v11' );
+	delete_transient( 'ltdh_featured_schools_data_v10' );
+	delete_transient( 'ltdh_featured_schools_data' );
+}
+
+add_action( 'acf/save_post', function( $post_id ) {
+	if ( 'school' === get_post_type( $post_id ) ) {
+		$order_val = get_field( 'order', $post_id );
+		if ( null !== $order_val && false !== $order_val && '' !== $order_val ) {
+			$order_num = intval( $order_val );
+			global $wpdb;
+			$wpdb->update(
+				$wpdb->posts,
+				[ 'menu_order' => $order_num ],
+				[ 'ID' => $post_id ],
+				[ '%d' ],
+				[ '%d' ]
+			);
+			clean_post_cache( $post_id );
+			delete_transient( 'ltdh_archive_school_featured' );
+			delete_transient( 'ltdh_featured_schools_data_v11' );
+			delete_transient( 'ltdh_featured_schools_data_v10' );
+		}
+	}
+}, 20 );
+
+add_filter( 'acf/load_value/name=order', function( $value, $post_id, $field ) {
+	if ( ( empty( $value ) || 0 === intval( $value ) ) && $post_id ) {
+		$post = get_post( $post_id );
+		if ( $post && $post->menu_order > 0 ) {
+			return $post->menu_order;
+		}
+	}
+	return $value;
+}, 10, 3 );
+
 function ltdh_get_cached_featured_schools() {
-	$cache_key = 'ltdh_featured_schools_data_v10';
+	$cache_key = 'ltdh_featured_schools_data_v11';
 	$data      = get_transient( $cache_key );
 	if ( false !== $data && is_array( $data ) ) {
 		return $data;
 	}
 
-	$schools_query = new WP_Query([
+	$schools_candidates = get_posts([
 		'post_type'      => 'school',
-		'posts_per_page' => 5,
+		'numberposts'    => 100,
 		'post_status'    => 'publish',
 	]);
 
+	$schools_candidates = ltdh_sort_schools_by_order( $schools_candidates );
+	$top_schools        = array_slice( $schools_candidates, 0, 5 );
+
 	$data = [];
-	if ( $schools_query->have_posts() ) {
+	if ( ! empty( $top_schools ) ) {
 		$index = 0;
 		$fallback_images = ltdh_default('images', 'fallback_school_covers', []);
-		while ( $schools_query->have_posts() ) {
-			$schools_query->the_post();
-			$school_id = get_the_ID();
+		foreach ( $top_schools as $school_post ) {
+			$school_id = $school_post->ID;
 			$address   = get_field( 'address', $school_id );
 			$hotline   = ltdh_get_school_hotline( $school_id );
 			$thumb_url = ltdh_get_school_cover_url( $school_id, 'medium' );
@@ -660,7 +808,7 @@ function ltdh_get_cached_featured_schools() {
 
 			$systems_label = '';
 			if (! empty($systems)) {
-				if (count($systems) === 1 && isset($systems['tu-xa'])) {
+				if (count($systems) === 1 && (isset($systems['tu-xa']) || isset($systems['dao-tao-tu-xa']))) {
 					$systems_label = '';
 				} else {
 					$systems_label = implode(' · ', $systems);
@@ -1039,10 +1187,15 @@ function ltdh_get_program_learning_details(int $program_id): array {
 	}
 
 	// Resolve learning mode
-	if ( 'tu-xa' === $type_slug ) {
+	$custom_mode = get_post_meta( $program_id, 'learning_mode', true );
+	if ( ! empty( $custom_mode ) && is_string( $custom_mode ) && trim( $custom_mode ) !== '' ) {
+		$learning_mode = trim( $custom_mode );
+	} elseif ( in_array( $type_slug, [ 'tu-xa', 'dao-tao-tu-xa' ], true ) ) {
 		$learning_mode = 'Học online 100%';
-	} elseif ( 'vua-hoc-vua-lam' === $type_slug ) {
+	} elseif ( in_array( $type_slug, [ 'vua-hoc-vua-lam', 'vhvl', 'vua-lam-vua-hoc' ], true ) ) {
 		$learning_mode = 'Học tập trung / Cuối tuần';
+	} elseif ( in_array( $type_slug, [ 'chinh-quy', 'chinh-quy-tap-trung' ], true ) ) {
+		$learning_mode = 'Học tập trung';
 	} else {
 		$learning_mode = 'Học tập trung / Cuối tuần';
 	}
@@ -1084,14 +1237,27 @@ add_filter('wpcf7_form_tag', 'ltdh_cf7_dynamic_programs', 10, 2);
 
 function ltdh_get_fallback_image(string $context = 'program'): string {
 	$theme_uri = get_template_directory_uri();
+	$theme_dir = get_template_directory();
+
 	if ( $context === 'school' ) {
 		return $theme_uri . '/assets/images/banner-school.jpg';
 	}
-	if ( $context === 'news' ) {
-		if ( file_exists( get_template_directory() . '/assets/images/banner-fallback.webp' ) ) {
+
+	if ( $context === 'news' || $context === 'post' ) {
+		if ( function_exists( 'get_field' ) ) {
+			$custom_share_image = get_field( 'global_share_image', 'options' );
+			if ( ! empty( $custom_share_image ) ) {
+				return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $custom_share_image ) : $custom_share_image;
+			}
+		}
+		if ( file_exists( $theme_dir . '/assets/images/banner-fallback.webp' ) ) {
 			return $theme_uri . '/assets/images/banner-fallback.webp';
 		}
+		if ( file_exists( $theme_dir . '/assets/images/banner-default.jpg' ) ) {
+			return $theme_uri . '/assets/images/banner-default.jpg';
+		}
 	}
+
 	if ( function_exists( 'get_field' ) ) {
 		$custom_share_image = get_field( 'global_share_image', 'options' );
 		if ( ! empty( $custom_share_image ) ) {
@@ -1100,6 +1266,44 @@ function ltdh_get_fallback_image(string $context = 'program'): string {
 	}
 	return $theme_uri . '/assets/images/banner-program.jpg';
 }
+
+/**
+ * Lấy URL ảnh đại diện của bài viết, tự động fallback về ảnh mặc định nếu bài viết không có ảnh đại diện.
+ *
+ * @param int|WP_Post|null $post Post ID or post object. Default current post.
+ * @param string           $size Kích thước ảnh (thumbnail, medium, large, full).
+ * @return string URL ảnh đại diện hoặc ảnh mặc định.
+ */
+function ltdh_get_post_thumbnail_url( $post = null, string $size = 'medium' ): string {
+	$post_id = $post ? ( is_object( $post ) ? $post->ID : (int) $post ) : get_the_ID();
+	if ( $post_id && has_post_thumbnail( $post_id ) ) {
+		$thumb = get_the_post_thumbnail_url( $post_id, $size );
+		if ( ! empty( $thumb ) ) {
+			return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $thumb ) : $thumb;
+		}
+	}
+	$fallback = ltdh_get_fallback_image( 'post' );
+	return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $fallback ) : $fallback;
+}
+
+/**
+ * Filter default fallback HTML for post thumbnails when no featured image is set.
+ */
+function ltdh_filter_default_post_thumbnail_html( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
+	if ( empty( $html ) && ! is_admin() ) {
+		$fallback_url = ltdh_get_fallback_image( 'post' );
+		$alt = esc_attr( get_the_title( $post_id ) );
+		$class = 'wp-post-image';
+		if ( is_array( $attr ) && ! empty( $attr['class'] ) ) {
+			$class .= ' ' . esc_attr( $attr['class'] );
+		} elseif ( is_string( $attr ) && ! empty( $attr ) ) {
+			$class .= ' ' . esc_attr( $attr );
+		}
+		return sprintf( '<img src="%s" alt="%s" class="%s" loading="lazy" />', esc_url( $fallback_url ), $alt, $class );
+	}
+	return $html;
+}
+add_filter( 'post_thumbnail_html', 'ltdh_filter_default_post_thumbnail_html', 20, 5 );
 
 function ltdh_get_school_unique_majors_count( int $school_id ): int {
 	$cache_key = 'ltdh_school_majors_count_' . $school_id;

@@ -82,9 +82,6 @@ function ltdh_normalize_acf_fields_prefix( $fields, $prefix = 'acf' ) {
 		if ( empty( $field['prefix'] ) ) {
 			$field['prefix'] = $prefix;
 		}
-		if ( ! empty( $field['sub_fields'] ) && is_array( $field['sub_fields'] ) ) {
-			$field['sub_fields'] = ltdh_normalize_acf_fields_prefix( $field['sub_fields'], $prefix );
-		}
 	}
 	return $fields;
 }
@@ -612,8 +609,109 @@ function ltdh_get_theme_acf_key_to_name_map() {
 }
 
 /**
+ * Check if a given field key or name is a repeater or complex ACF field.
+ */
+function ltdh_is_repeater_or_complex_field( $key_or_name ) {
+	static $repeaters = [
+		'field_program_admission_batches',
+		'admission_batches',
+		'field_program_exemption_items',
+		'exemption_items',
+		'field_program_faq',
+		'faq',
+		'field_major_entry_roadmaps',
+		'major_entry_roadmaps',
+		'field_major_specializations',
+		'major_specializations',
+		'field_exemption_cert_scores',
+		'cert_scores',
+		'training_variants',
+		'field_program_training_variants',
+		'field_variant_admission_batches',
+	];
+	if ( in_array( $key_or_name, $repeaters, true ) ) {
+		return true;
+	}
+	if ( function_exists( 'acf_get_field' ) ) {
+		$f = acf_get_field( $key_or_name );
+		if ( $f && in_array( $f['type'] ?? '', [ 'repeater', 'flexible_content', 'clone', 'group' ], true ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Automatically handle and repair repeater values if stored as raw array instead of integer count in DB.
+ * Runs at priority 5 (before ACF's repeater load_value at priority 10).
+ */
+add_filter( 'acf/load_value/type=repeater', 'ltdh_fix_repeater_load_value', 5, 3 );
+function ltdh_fix_repeater_load_value( $value, $post_id, $field ) {
+	if ( ! is_array( $value ) || empty( $value ) ) {
+		return $value;
+	}
+
+	$field_name = $field['name'] ?? '';
+	$first_subfield = ! empty( $field['sub_fields'][0]['name'] ) ? $field['sub_fields'][0]['name'] : '';
+	$has_flat_meta = false;
+	if ( $field_name && $first_subfield ) {
+		$flat_check = get_post_meta( $post_id, "{$field_name}_0_{$first_subfield}", true );
+		if ( '' !== $flat_check && false !== $flat_check ) {
+			$has_flat_meta = true;
+		}
+	}
+
+	if ( $has_flat_meta ) {
+		return count( $value );
+	}
+
+	// Data is stored directly inside array rows: unpack to flat postmeta
+	$count = 0;
+	$sub_name_to_key = [];
+	if ( ! empty( $field['sub_fields'] ) && is_array( $field['sub_fields'] ) ) {
+		foreach ( $field['sub_fields'] as $sf ) {
+			if ( ! empty( $sf['name'] ) && ! empty( $sf['key'] ) ) {
+				$sub_name_to_key[ $sf['name'] ] = $sf['key'];
+			}
+		}
+	}
+
+	foreach ( array_values( $value ) as $i => $row ) {
+		if ( ! is_array( $row ) ) {
+			continue;
+		}
+		$count++;
+		foreach ( $row as $k => $v ) {
+			$sub_name = $k;
+			$sub_key = $sub_name_to_key[ $k ] ?? '';
+			if ( str_starts_with( $k, 'field_' ) ) {
+				$sub_key = $k;
+				$sub_name = array_search( $k, $sub_name_to_key, true ) ?: $k;
+			}
+			if ( $sub_name && $field_name ) {
+				update_post_meta( $post_id, "{$field_name}_{$i}_{$sub_name}", $v );
+				if ( $sub_key ) {
+					update_post_meta( $post_id, "_{$field_name}_{$i}_{$sub_name}", $sub_key );
+				}
+			}
+		}
+	}
+
+	if ( $count > 0 && $field_name ) {
+		update_post_meta( $post_id, $field_name, $count );
+		if ( ! empty( $field['key'] ) ) {
+			update_post_meta( $post_id, '_' . $field_name, $field['key'] );
+		}
+		return $count;
+	}
+
+	return count( $value );
+}
+
+/**
  * Comprehensive fail-safe save handler for Program, School, and Major custom fields.
  * Handles $_POST['acf'], top-level $_POST['field_*'], and top-level $_POST['meta_key'].
+ * Explicitly skips repeaters/complex fields so ACF PRO's native handling is never corrupted.
  */
 add_action( 'save_post', 'ltdh_save_custom_fields_fail_safe', 25, 2 );
 function ltdh_save_custom_fields_fail_safe( $post_id, $post ) {
@@ -629,31 +727,48 @@ function ltdh_save_custom_fields_fail_safe( $post_id, $post ) {
 
 	$field_map = ltdh_get_theme_acf_key_to_name_map();
 
-	// 1. Process standard $_POST['acf'] if populated
+	// 1. Process standard $_POST['acf'] if populated (skip repeaters/complex fields so ACF's native save is preserved)
 	if ( ! empty( $_POST['acf'] ) && is_array( $_POST['acf'] ) ) {
 		foreach ( $_POST['acf'] as $key => $value ) {
+			if ( ltdh_is_repeater_or_complex_field( $key ) ) {
+				continue;
+			}
 			if ( str_starts_with( $key, 'field_' ) ) {
 				$field = function_exists( 'acf_get_field' ) ? acf_get_field( $key ) : null;
 				$meta_name = ( $field && ! empty( $field['name'] ) ) ? $field['name'] : ( $field_map[ $key ] ?? '' );
 				if ( $meta_name ) {
-					update_post_meta( $post_id, $meta_name, $value );
+					if ( ltdh_is_repeater_or_complex_field( $meta_name ) ) {
+						continue;
+					}
+					if ( ! is_array( $value ) ) {
+						update_post_meta( $post_id, $meta_name, $value );
+					}
 					update_post_meta( $post_id, '_' . $meta_name, $key );
 				}
 			} else {
-				update_post_meta( $post_id, $key, $value );
+				if ( ! ltdh_is_repeater_or_complex_field( $key ) && ! is_array( $value ) ) {
+					update_post_meta( $post_id, $key, $value );
+				}
 			}
 		}
 	}
 
 	// 2. Process flat POST variables if submitted without acf[...] container
 	foreach ( $field_map as $field_key => $meta_name ) {
+		if ( ltdh_is_repeater_or_complex_field( $field_key ) || ltdh_is_repeater_or_complex_field( $meta_name ) ) {
+			continue;
+		}
 		if ( isset( $_POST[ $field_key ] ) ) {
 			$val = $_POST[ $field_key ];
-			update_post_meta( $post_id, $meta_name, $val );
+			if ( ! is_array( $val ) ) {
+				update_post_meta( $post_id, $meta_name, $val );
+			}
 			update_post_meta( $post_id, '_' . $meta_name, $field_key );
 		} elseif ( isset( $_POST[ $meta_name ] ) ) {
 			$val = $_POST[ $meta_name ];
-			update_post_meta( $post_id, $meta_name, $val );
+			if ( ! is_array( $val ) ) {
+				update_post_meta( $post_id, $meta_name, $val );
+			}
 			update_post_meta( $post_id, '_' . $meta_name, $field_key );
 		}
 	}
