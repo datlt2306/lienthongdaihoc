@@ -359,7 +359,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								<?php endif; ?>
 							</div>
 							<div class="flex items-center gap-2 shrink-0 w-full sm:w-auto mt-3 sm:mt-0">
-								<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-6 py-2.5 rounded-lg text-sm uppercase ltdh-btn-details min-h-[40px] flex items-center">Tìm hiểu chi tiết</a>
+								<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-6 py-2.5 rounded-lg text-sm ltdh-btn-details min-h-[40px] flex items-center">Tìm hiểu chi tiết</a>
 							</div>
 						</div>
 					</div>
