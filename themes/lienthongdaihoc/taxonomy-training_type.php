@@ -541,7 +541,7 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 						<!-- Card Footer Action Buttons -->
 						<div class="p-5 pt-0">
 							<div class="pt-3 border-t border-slate-100 flex items-center gap-2">
-								<a href="<?php the_permalink(); ?>" class="text-xs md:text-sm py-2.5 px-4 rounded-xl uppercase font-bold ltdh-btn-details min-h-[44px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all">
+								<a href="<?php the_permalink(); ?>" class="text-xs md:text-sm py-2.5 px-4 rounded-xl  font-bold ltdh-btn-details min-h-[44px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all">
 									Tìm hiểu
 								</a>
 								<button type="button"

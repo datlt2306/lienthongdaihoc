@@ -200,7 +200,7 @@ $program_tabs[] = [
 				$admission_status = get_post_meta( $program_id, 'admission_status', true ) ?: 'tuyen-sinh';
 				if ( $admission_status === 'tam-ngung' ) :
 				?>
-					<div class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 flex items-start gap-3 shadow-2xs">
+					<div class="bg-red-50 text-red-800 rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
 						<svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
 						<div>
 							<h4 class="font-bold text-red-900 text-sm">Đã hết chỉ tiêu tuyển sinh năm nay</h4>
@@ -211,10 +211,10 @@ $program_tabs[] = [
 				
 				<!-- MOBILE ONLY SCHOOL MINI BAR (< 1024px) -->
 				<?php if ( $school_id ) : ?>
-					<div class="block lg:hidden bg-white border border-slate-200/80 rounded-xl p-3 shadow-2xs">
+					<div class="block lg:hidden bg-white border border-slate-100 rounded-2xl p-3 shadow-xs">
 						<div class="flex items-center justify-between gap-3">
 							<div class="flex items-center gap-2.5 min-w-0">
-								<div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 p-0.5 shrink-0 flex items-center justify-center overflow-hidden">
+								<div class="w-9 h-9 rounded-xl bg-slate-50 p-0.5 shrink-0 flex items-center justify-center overflow-hidden">
 									<?php if ( $school_logo_url ) : ?>
 										<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain">
 									<?php else : ?>
@@ -234,13 +234,13 @@ $program_tabs[] = [
 				<?php endif; ?>
 
 				<!-- SECTION 2: PROGRAM OVERVIEW -->
-				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Tổng quan chương trình</h2>
 					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 						<?php the_content(); ?>
 					</div>
 					<?php if ( $benefits ) : ?>
-						<div class="mt-6 bg-teal-50/50 p-4 rounded-lg border border-teal-100/50 mb-6">
+						<div class="mt-6 bg-teal-50/40 p-4 rounded-xl mb-6">
 							<h3 class="text-teal-800 font-bold text-base mb-2">Quyền lợi nổi bật</h3>
 							<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 								<?php echo wp_kses_post( $benefits ); ?>
@@ -258,7 +258,7 @@ $program_tabs[] = [
 					}
 					?>
 					<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
-						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí</span>
 							<span class="font-bold text-[#00308b] text-xs sm:text-sm leading-snug">
 								<?php 
@@ -269,23 +269,23 @@ $program_tabs[] = [
 								?>
 							</span>
 						</div>
-						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
 							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
 						</div>
-						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Danh hiệu văn bằng</span>
 							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $degree_val ); ?></span>
 						</div>
-						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Căn cứ pháp lý</span>
 							<span class="font-bold text-emerald-700 text-xs sm:text-sm leading-snug">Thông tư 27/2019/TT-BGDĐT</span>
 						</div>
-						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức đào tạo</span>
 							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 						</div>
-						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
 							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php 
 								$display_campus = $learning_details['campus'] ?? '';
@@ -296,19 +296,19 @@ $program_tabs[] = [
 							?></span>
 						</div>
 						<?php if ( $quota ) : ?>
-							<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+							<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 								<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
 								<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
 							</div>
 						<?php endif; ?>
-						<div class="bg-slate-50/80 border border-slate-100 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center shadow-2xs">
+						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
 							<span class="font-bold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
 					</div>
 
 					<!-- Thông tin pháp lý văn bằng & Giá trị toàn quốc (Thông tư 27/2019/TT-BGDĐT) -->
-					<div class="mt-4 bg-emerald-50/60 border border-emerald-200/70 rounded-xl p-4 text-xs md:text-sm text-slate-700 space-y-2 leading-relaxed">
+					<div class="mt-4 bg-emerald-50/50 rounded-xl p-4 text-xs md:text-sm text-slate-700 space-y-2 leading-relaxed">
 						<p class="flex items-start gap-2">
 							<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
 							<span><strong>Không ghi hình thức đào tạo:</strong> Theo quy định tại Thông tư 27/2019/TT-BGDĐT của Bộ GD&ĐT, văn bằng đại học hiện hành không ghi hình thức đào tạo (không phân biệt Từ xa hay Vừa làm vừa học).</span>
@@ -350,7 +350,7 @@ $program_tabs[] = [
 						}
 					}
 				?>
-				<section id="lich-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6 mb-8">
+				<section id="lich-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-8">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Lịch trình các đợt tuyển sinh</h2>
 
 							<!-- MOBILE TABBED CARD VIEW (< 768px) -->
@@ -411,7 +411,7 @@ $program_tabs[] = [
 									$eval_display = ! empty( $eval_dates ) ? implode(' | ', $eval_dates) : '';
 									$is_hidden = ( $b_idx !== 0 );
 								?>
-									<div class="ltdh-batch-tab-card bg-white border border-slate-200/80 hover:border-slate-400 rounded-xl p-3.5 shadow-2xs hover:shadow-xs transition-all space-y-3 <?php echo $is_hidden ? 'hidden' : ''; ?>" data-batch-card="<?php echo (int) $b_idx; ?>">
+									<div class="ltdh-batch-tab-card bg-white border border-slate-100 rounded-xl p-3.5 shadow-xs transition-all space-y-3 <?php echo $is_hidden ? 'hidden' : ''; ?>" data-batch-card="<?php echo (int) $b_idx; ?>">
 										<div class="flex items-center justify-between border-b border-slate-100 pb-2.5 gap-2">
 											<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $clean_title ); ?></span>
 											<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border-0 shrink-0 <?php echo esc_attr( $status_class ); ?>">
@@ -478,12 +478,12 @@ $program_tabs[] = [
 									
 									$status_label = 'Đang nhận hồ sơ';
 									$status_class = 'bg-emerald-50 text-emerald-700 border-0';
-									$card_style   = 'bg-white border border-slate-200/80 hover:border-slate-400 shadow-2xs hover:shadow-xs';
+									$card_style   = 'bg-slate-50/70 hover:bg-white border border-slate-100/80 rounded-xl shadow-xs hover:shadow-sm';
 									
 									if ( $status === 'dang-nhan' ) {
 										$status_label = 'Đang nhận hồ sơ';
 										$status_class = 'bg-emerald-600 text-white border-0 shadow-2xs';
-										$card_style   = 'bg-emerald-50/15 border border-emerald-400/80 hover:border-emerald-500 shadow-xs';
+										$card_style   = 'bg-emerald-50/25 border border-emerald-300/70 rounded-xl shadow-xs';
 									} elseif ( $status === 'sap-mo' ) {
 										$status_label = 'Sắp mở';
 										$status_class = 'bg-amber-50 text-amber-700 border-0';
@@ -611,7 +611,7 @@ $program_tabs[] = [
 				}
 				?>
 				<?php if ( $requirements || $documents || $form_url ) : ?>
-					<section id="dieu-kien-ho-so" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section id="dieu-kien-ho-so" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 						<!-- Hidden anchor targets for backward compatibility with existing links -->
 						<span id="dieu-kien-xet-tuyen" class="relative -top-36 block invisible pointer-events-none"></span>
 						<span id="ho-so-can-nop" class="relative -top-36 block invisible pointer-events-none"></span>
@@ -621,7 +621,7 @@ $program_tabs[] = [
 								<h2 class="text-lg md:text-2xl font-bold text-slate-900">Điều kiện & Hồ sơ xét tuyển</h2>
 								<p class="text-xs md:text-sm text-slate-500 mt-0.5">Tiêu chuẩn tuyển sinh và danh mục hồ sơ thủ tục cần thiết để hoàn tất đăng ký nhập học</p>
 							</div>
-							<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs font-bold rounded-full shrink-0 self-start sm:self-auto">
+							<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-full shrink-0 self-start sm:self-auto">
 								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
 								Phương thức: Xét tuyển hồ sơ
 							</span>
@@ -635,7 +635,7 @@ $program_tabs[] = [
 										<span class="w-6 h-6 rounded-md bg-blue-100 text-[#00308b] flex items-center justify-center text-xs font-bold shrink-0">1</span>
 										<span>Điều kiện xét tuyển & Đối tượng áp dụng</span>
 									</h3>
-									<div class="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed bg-slate-50/50 p-4 md:p-5 rounded-xl border border-slate-200/60">
+									<div class="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed bg-slate-50/70 p-4 md:p-5 rounded-xl">
 										<?php echo wp_kses_post( $requirements ); ?>
 									</div>
 								</div>
@@ -650,13 +650,13 @@ $program_tabs[] = [
 									</h3>
 
 									<?php if ( $documents ) : ?>
-										<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-slate-50/50 p-4 rounded-xl border border-slate-200/60">
+										<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-slate-50/70 p-4 rounded-xl">
 											<?php echo wp_kses_post( $documents ); ?>
 										</div>
 									<?php endif; ?>
 
 									<?php if ( $form_url ) : ?>
-										<div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-50/60 p-4 rounded-xl border border-blue-100/80">
+										<div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-50/60 p-4 rounded-xl">
 											<div class="flex items-center gap-3">
 												<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
 													📄
@@ -679,11 +679,11 @@ $program_tabs[] = [
 				<?php endif; ?>
 
 				<!-- SECTION 6: TUITION & SECTION 7: DURATION -->
-				<section id="hoc-phi-thoi-gian" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="hoc-phi-thoi-gian" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Học phí & Thời gian học</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
 						<!-- Column 1: Tuition Details -->
-						<div class="bg-white border border-slate-200/80 p-5 rounded-2xl flex flex-col justify-between shadow-2xs hover:shadow-xs transition-all duration-300">
+						<div class="bg-white border border-slate-100 p-5 rounded-2xl flex flex-col justify-between shadow-xs transition-all duration-300">
 							<div class="space-y-3.5">
 								<div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-1">
 									<svg class="w-5.5 h-5.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -691,7 +691,7 @@ $program_tabs[] = [
 								</div>
 								
 								<!-- Học phí per credit -->
-								<div class="bg-slate-50 border border-slate-100/80 rounded-xl p-3.5">
+								<div class="bg-slate-50 rounded-xl p-3.5">
 									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Đơn giá học phí</span>
 									<div class="flex items-baseline flex-wrap gap-1">
 										<span class="text-base md:text-lg font-black text-slate-900">
@@ -708,7 +708,7 @@ $program_tabs[] = [
 								$total_credits = get_field( 'tuition_total_credits', $program_id );
 								if ( $total_credits ) : 
 								?>
-									<div class="bg-slate-50 border border-slate-100/80 rounded-xl p-3.5">
+									<div class="bg-slate-50 rounded-xl p-3.5">
 										<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tổng số tín chỉ toàn khóa</span>
 										<div class="flex items-baseline flex-wrap gap-1">
 											<span class="text-base font-black text-slate-900">
@@ -734,7 +734,7 @@ $program_tabs[] = [
 						</div>
 
 						<!-- Column 2: Study Duration -->
-						<div class="bg-white border border-slate-200/80 p-5 rounded-2xl flex flex-col justify-between shadow-2xs hover:shadow-xs transition-all duration-300">
+						<div class="bg-white border border-slate-100 p-5 rounded-2xl flex flex-col justify-between shadow-xs transition-all duration-300">
 							<div class="space-y-3.5">
 								<div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-1">
 									<svg class="w-5.5 h-5.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -742,7 +742,7 @@ $program_tabs[] = [
 								</div>
 								
 								<!-- Card 1: Standard Duration -->
-								<div class="bg-slate-50 border border-slate-100/80 rounded-xl p-3.5">
+								<div class="bg-slate-50 rounded-xl p-3.5">
 									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Lộ trình chuẩn</span>
 									<div class="flex items-baseline flex-wrap gap-1">
 										<span class="text-base font-black text-slate-900"><?php echo esc_html( $duration ?: '2.0 - 3.0 năm' ); ?></span>
@@ -785,7 +785,7 @@ $program_tabs[] = [
 
 								$scope_text = ! empty( $exemption_items ) ? 'Theo quy định nhà trường' : ( $is_utc ? 'Tối đa 2 môn (GDQP & Tiếng Anh)' : 'Xét theo bảng điểm cũ' );
 								?>
-								<div class="bg-slate-50 border border-slate-100/80 rounded-xl p-3.5">
+								<div class="bg-slate-50 rounded-xl p-3.5">
 									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Phạm vi miễn giảm môn</span>
 									<div class="flex items-baseline flex-wrap gap-1">
 										<span class="text-base font-black text-slate-900"><?php echo esc_html( $scope_text ); ?></span>
@@ -809,8 +809,8 @@ $program_tabs[] = [
 					if ( ! empty( $exemption_items ) && is_array( $exemption_items ) ) :
 					?>
 						<div class="mt-5 border-t border-slate-100 pt-5">
-							<div class="bg-blue-50/40 border border-blue-100 rounded-2xl p-5 shadow-3xs">
-								<div class="flex items-center gap-2 border-b border-blue-100 pb-3 mb-3">
+							<div class="bg-blue-50/40 rounded-2xl p-5">
+								<div class="flex items-center gap-2 border-b border-blue-100/60 pb-3 mb-3">
 									<svg class="w-6 h-6 text-blue-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222M12 14v8"></path></svg>
 									<h4 class="font-extrabold text-blue-950 text-base md:text-lg">
 										<?php echo esc_html( $exemption_title ?: 'Quy định miễn môn & Chuyển đổi tín chỉ' ); ?>
@@ -824,7 +824,7 @@ $program_tabs[] = [
 
 								<div class="space-y-4">
 									<?php foreach ( $exemption_items as $index => $item ) : ?>
-										<div class="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-4.5 shadow-3xs hover:border-blue-300 transition-all duration-300">
+										<div class="bg-white rounded-xl p-4 sm:p-4.5 shadow-xs transition-all duration-300">
 											<div class="flex items-center gap-2.5 mb-2">
 												<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-black shrink-0"><?php echo esc_html( $index + 1 ); ?></span>
 												<h5 class="font-extrabold text-slate-900 text-sm md:text-base"><?php echo esc_html( $item['subject_name'] ?? '' ); ?></h5>
@@ -839,7 +839,7 @@ $program_tabs[] = [
 												<div class="pl-8 mt-3">
 													<div class="grid grid-cols-3 gap-2.5 sm:gap-3 mb-3">
 														<?php foreach ( $item['cert_scores'] as $cert ) : ?>
-															<div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 sm:p-3 text-center hover:border-blue-400 hover:shadow-xs transition-all duration-200 cursor-pointer">
+															<div class="bg-slate-50 rounded-xl p-2.5 sm:p-3 text-center transition-all duration-200 cursor-pointer">
 																<span class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1"><?php echo esc_html( $cert['cert_name'] ?? '' ); ?></span>
 																<span class="text-sm md:text-base font-black text-blue-900"><?php echo esc_html( $cert['min_score'] ?? '' ); ?></span>
 															</div>
@@ -856,7 +856,7 @@ $program_tabs[] = [
 											<?php endif; ?>
 
 											<?php if ( ! empty( $item['assessment_process'] ) ) : ?>
-												<div class="mt-3 bg-amber-50 border border-amber-200/70 rounded-xl p-3.5 text-xs md:text-sm text-amber-900 leading-relaxed flex items-start gap-2.5">
+												<div class="mt-3 bg-amber-50/80 rounded-xl p-3.5 text-xs md:text-sm text-amber-900 leading-relaxed flex items-start gap-2.5">
 													<svg class="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
 													<p><?php echo esc_html( $item['assessment_process'] ); ?></p>
 												</div>
@@ -871,7 +871,7 @@ $program_tabs[] = [
 
 				<!-- SECTION 7.5: CURRICULUM ROADMAP FILE/IMAGE -->
 				<?php if ( $curriculum_url ) : ?>
-					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="lo-trinh-hoc">
+					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6" id="lo-trinh-hoc">
 						<div class="border-b border-slate-100 pb-3 mb-4">
 							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Lộ trình học & Khung chương trình</h2>
 							<p class="text-xs md:text-sm text-slate-500 mt-0.5">Khung chương trình đào tạo chính thức áp dụng cho khóa học này</p>
@@ -879,7 +879,7 @@ $program_tabs[] = [
 
 						<?php if ( $curriculum_type === 'image' ) : ?>
 							<!-- Clickable Label Card for Image -->
-							<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" class="flex items-center justify-between p-4 bg-slate-50 hover:bg-blue-50/60 border border-slate-200/80 hover:border-blue-300 rounded-xl transition-all duration-200 group shadow-2xs">
+							<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" class="flex items-center justify-between p-4 bg-slate-50/80 hover:bg-blue-50/50 rounded-xl transition-all duration-200 group shadow-xs">
 								<div class="flex items-center gap-3.5">
 									<div class="w-10 h-10 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center shrink-0">
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -889,14 +889,14 @@ $program_tabs[] = [
 										<p class="text-xs text-slate-500 mt-0.5">Click để mở xem ảnh lộ trình các học kỳ & môn học kích thước chuẩn</p>
 									</div>
 								</div>
-								<span class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-white border border-slate-200 group-hover:border-blue-300 px-3.5 py-2 rounded-lg shadow-2xs group-hover:bg-blue-600 group-hover:text-white transition-all shrink-0">
+								<span class="inline-flex items-center gap-1.5 text-xs font-bold text-[#00308b] bg-white group-hover:bg-[#00308b] group-hover:text-white px-3.5 py-2 rounded-lg shadow-2xs transition-all shrink-0">
 									<span>Xem chi tiết</span>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
 								</span>
 							</a>
 						<?php else : ?>
 							<!-- PDF or File Download Box -->
-							<div class="bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+							<div class="bg-slate-50/80 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 								<div class="flex items-center gap-3.5 min-w-0">
 									<div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-black text-xl shrink-0 shadow-2xs">
 										PDF
@@ -933,7 +933,7 @@ $program_tabs[] = [
 
 				<!-- SECTION 9: FAQ -->
 				<?php if ( ! empty( $faqs ) ) : ?>
-					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="hoi-dap">
+					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6" id="hoi-dap">
 						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Câu hỏi thường gặp</h2>
 						<div class="space-y-4">
 							<?php foreach ( $faqs as $index => $item ) : ?>
@@ -957,66 +957,18 @@ $program_tabs[] = [
 				$school_address      = $school_id ? ( get_post_meta( $school_id, 'address', true ) ?: get_field( 'address', $school_id ) ) : '';
 				$school_website      = $school_id ? get_field( 'website', $school_id ) : '';
 				?>
-				<section id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+				<section id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 					<div class="border-b border-slate-100 pb-3 md:pb-4 mb-5">
 						<h2 class="text-lg md:text-2xl font-bold text-slate-900">Thông tin liên hệ & Tiếp nhận hồ sơ</h2>
-						<p class="text-xs md:text-sm text-slate-500 mt-1">Đầu mối tuyển sinh trực tiếp, địa điểm nộp hồ sơ và hướng dẫn thủ tục nhập học cho chương trình</p>
 					</div>
-
-					<!-- Contact Highlights Grid -->
-					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-5">
-						<!-- Hotline -->
-						<div class="bg-blue-50/60 border border-blue-100/80 rounded-xl p-4 flex items-start gap-3">
-							<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center shrink-0 shadow-2xs">
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-							</div>
-							<div class="min-w-0">
-								<span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Hotline tuyển sinh</span>
-								<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9]/', '', (string) $program_hotline ) ); ?>" class="text-[#00308b] font-black text-sm md:text-base hover:underline block truncate">
-									<?php echo esc_html( $program_hotline ); ?>
-								</a>
-								<span class="text-[11px] text-slate-500">Tư vấn miễn phí 24/7</span>
-							</div>
-						</div>
-
-						<!-- Zalo -->
-						<?php if ( ! empty( $global_zalo ) ) : ?>
-							<div class="bg-cyan-50/60 border border-cyan-100/80 rounded-xl p-4 flex items-start gap-3">
-								<div class="w-10 h-10 rounded-xl bg-[#0068FF] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-2xs">
-									Zalo
-								</div>
-								<div class="min-w-0">
-									<span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Tư vấn qua Zalo</span>
-									<a href="<?php echo esc_url( $global_zalo ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#0068FF] font-black text-sm md:text-base hover:underline block truncate">
-										Nhắn tin Zalo ngay
-									</a>
-									<span class="text-[11px] text-slate-500">Hỗ trợ nhận hồ sơ online</span>
-								</div>
-							</div>
-						<?php endif; ?>
-
-						<!-- Address -->
-						<?php if ( ! empty( $school_address ) ) : ?>
-							<div class="bg-slate-50/80 border border-slate-200/80 rounded-xl p-4 flex items-start gap-3 sm:col-span-2 lg:col-span-1">
-								<div class="w-10 h-10 rounded-xl bg-slate-700 text-white flex items-center justify-center shrink-0 shadow-2xs">
-									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-								</div>
-								<div class="min-w-0">
-									<span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Địa chỉ trường</span>
-									<span class="text-slate-800 font-bold text-xs md:text-sm block leading-snug line-clamp-2">
-										<?php echo esc_html( $school_address ); ?>
-									</span>
-								</div>
-							</div>
-						<?php endif; ?>
-					</div>
-
 					<!-- Detailed Venue, Office & Bank Info -->
 					<?php if ( ! empty( $contact_html ) ) : ?>
-						<div class="border-t border-slate-100 pt-5">
+						<div class="">
 							<h3 class="text-sm md:text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
 								<span class="w-6 h-6 rounded-md bg-blue-100 text-[#00308b] flex items-center justify-center text-xs font-bold shrink-0">📍</span>
-								<span>Địa điểm thi, tiếp nhận hồ sơ & thông tin chuyển khoản</span>
+								<span>✅ Địa chỉ nộp hồ sơ (trực tiếp hoặc chuyển phát nhanh):
+📍 Tầng 2 – Khu Hiệu bộ, 306B Kim Mã, phường Giảng Võ, Hà Nội
+(Trong khuôn viên Trường Lê Duẩn, đối diện Trường ĐH GTVT).</span>
 							</h3>
 							<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list">
 								<?php echo wp_kses_post( $contact_html ); ?>
@@ -1048,7 +1000,7 @@ $program_tabs[] = [
 
 				if ( $related_query->have_posts() ) :
 				?>
-					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6" id="chuong-trinh-lien-quan">
+					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6" id="chuong-trinh-lien-quan">
 						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Chương trình liên quan</h2>
 						<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 							<?php 
@@ -1057,10 +1009,10 @@ $program_tabs[] = [
 								$rel_school_id = get_field( LTDH_META_SCHOOL_REL );
 								$rel_school = $rel_school_id ? get_the_title( $rel_school_id ) : '';
 							?>
-								<a href="<?php the_permalink(); ?>" class="group block border border-slate-100 rounded-lg p-4 hover:border-brand-primary hover:shadow-md transition-all bg-white">
+								<a href="<?php the_permalink(); ?>" class="group block bg-slate-50/80 hover:bg-blue-50/50 rounded-xl p-4 hover:shadow-xs transition-all">
 									<span class="text-sm text-slate-400 block mb-1 font-medium"><?php echo esc_html( $rel_school ); ?></span>
 									<h4 class="font-bold text-slate-800 text-sm group-hover:text-brand-primary transition-colors line-clamp-2"><?php the_title(); ?></h4>
-									<div class="mt-3 flex justify-between items-center text-sm text-slate-500 border-t border-slate-50 pt-2">
+									<div class="mt-3 flex justify-between items-center text-sm text-slate-500 border-t border-slate-200/50 pt-2">
 										<span>Học phí: <?php echo esc_html( ltdh_get_program_tuition_display( get_the_ID() ) ); ?></span>
 									</div>
 								</a>
@@ -1094,7 +1046,7 @@ $program_tabs[] = [
 						}
 						$initials = mb_strtoupper( $initials );
 					?>
-						<div class="hidden lg:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-sm transition-all">
+						<div class="hidden lg:block bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-xs hover:shadow-sm transition-all">
 							<!-- Banner Cover -->
 							<div class="h-24 bg-gradient-to-r from-[#00308b] to-[#001a4d] bg-cover bg-center relative" <?php echo $school_cover_url ? 'style="background-image: url(\'' . esc_url( $school_cover_url ) . '\');"' : ''; ?>>
 								<div class="absolute inset-0 bg-blue-950/20"></div>
@@ -1102,7 +1054,7 @@ $program_tabs[] = [
 							
 							<!-- Overlapping Logo Wrapper -->
 							<div class="relative flex justify-center -mt-9 mb-3">
-								<div class="w-18 h-18 bg-white p-1 rounded-xl shadow-md border border-slate-100 flex items-center justify-center overflow-hidden shrink-0">
+								<div class="w-18 h-18 bg-white p-1 rounded-xl shadow-md flex items-center justify-center overflow-hidden shrink-0">
 									<?php if ( $school_logo_url ) : ?>
 										<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain" loading="lazy">
 									<?php else : ?>
@@ -1142,7 +1094,7 @@ $program_tabs[] = [
 					<?php endif; ?>
 
 					<!-- SECTION 11: CONSULTATION FORM (Sidebar Form - Available on Mobile & Desktop) -->
-					<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+					<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 						<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
 						<p class="text-sm text-slate-500 mb-4">Hãy để lại thông tin, ban tư vấn tuyển sinh sẽ liên hệ và giải đáp lộ trình cụ thể cho bạn trong vòng 15 phút.</p>
 						
@@ -1164,7 +1116,7 @@ $program_tabs[] = [
 					$program_school_zalo = ( $school_id ? ( get_field( 'zalo_group_url', $school_id ) ?: get_field( 'school_zalo_group', $school_id ) ) : '' ) ?: $global_zalo;
 					$program_school_name = $school_title ?: 'chương trình';
 					?>
-					<div class="hidden lg:block bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-xl p-5 shadow-md relative overflow-hidden border border-blue-500/30">
+					<div class="hidden lg:block bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-2xl p-5 shadow-md relative overflow-hidden">
 						<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
 
 						<div class="flex items-center gap-3 mb-3 relative z-10">
@@ -1227,7 +1179,7 @@ $program_tabs[] = [
 					if ( $related_news_query->have_posts() ) :
 						$has_more = ( $related_news_query->post_count > 5 );
 					?>
-						<section class="hidden lg:block bg-white rounded-lg shadow-sm border border-slate-200 p-4 md:p-5">
+						<section class="hidden lg:block bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-5">
 							<h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-3">Tin tức & Thông báo liên quan</h3>
 							<div class="space-y-3.5">
 								<?php
@@ -1243,10 +1195,10 @@ $program_tabs[] = [
 									<div class="flex gap-3 items-start pb-3 border-b border-slate-100 last:border-b-0 last:pb-0">
 										<?php if ( $news_thumb ) : ?>
 											<a href="<?php the_permalink(); ?>" class="shrink-0">
-												<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded border border-slate-100" loading="lazy">
+												<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded-lg" loading="lazy">
 											</a>
 										<?php else : ?>
-											<div class="w-12 h-12 bg-slate-50 border border-slate-100 rounded flex items-center justify-center shrink-0">
+											<div class="w-12 h-12 bg-slate-50 rounded-lg flex items-center justify-center shrink-0">
 												<span class="text-lg">📰</span>
 											</div>
 										<?php endif; ?>
@@ -1266,7 +1218,7 @@ $program_tabs[] = [
 
 							<?php if ( $has_more ) : ?>
 								<div class="mt-4 pt-3 border-t border-slate-100">
-									<a href="<?php echo esc_url( home_url( '/tin-tuc/?chuong-trinh=' . $program_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
+									<a href="<?php echo esc_url( home_url( '/tin-tuc/?chuong-trinh=' . $program_id ) ); ?>" class="w-full text-center bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200/80 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
 										<span>Xem thêm tin tức</span>
 										<span>→</span>
 									</a>
@@ -1278,12 +1230,12 @@ $program_tabs[] = [
 					?>
 
 					<!-- SECTION 13: PHONE CTA & SECTION 14: ZALO CTA sidebar cards (Desktop Only) -->
-					<div class="hidden lg:block bg-brand-accent/5 border border-brand-primary/10 rounded-lg p-6 text-center">
+					<div class="hidden lg:block bg-amber-50/60 rounded-2xl p-6 text-center">
 						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Cần hỗ trợ trực tiếp?</span>
 						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $program_hotline ); ?></h4>
 						<div class="flex gap-2">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $program_hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center">Gọi Điện</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-3.5 rounded-lg font-semibold text-sm hover:bg-brand-accent/5 transition-all min-h-[44px] flex items-center justify-center">Chat Zalo</a>
+							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $program_hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center shadow-xs">Gọi Điện</a>
+							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white text-[#00308b] py-3.5 rounded-lg font-bold text-sm hover:bg-blue-50 transition-all min-h-[44px] flex items-center justify-center shadow-2xs">Chat Zalo</a>
 						</div>
 					</div>
 
@@ -1303,7 +1255,7 @@ $program_tabs[] = [
 					$major_slug = $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '';
 					?>
 					<button type="button"
-							class="hidden lg:flex w-full text-center bg-white border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold shadow-xs hover:bg-slate-50 transition-all ltdh-compare-single-btn text-sm flex items-center justify-center gap-2 mt-4 min-h-[44px]"
+							class="hidden lg:flex w-full text-center bg-slate-100 hover:bg-slate-200/80 text-slate-700 py-3.5 rounded-xl font-bold transition-all ltdh-compare-single-btn text-sm flex items-center justify-center gap-2 mt-4 min-h-[44px] cursor-pointer"
 							data-compare-type="program" data-compare-id="<?php echo esc_attr( $program_id ); ?>"
 							data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
 							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>"
@@ -1329,7 +1281,7 @@ $program_tabs[] = [
 	</div>
 	<div class="flex items-center gap-2 shrink-0">
 		<?php if ( ! empty( $form_url ) ) : ?>
-			<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn bg-slate-100 hover:bg-slate-200 text-slate-700 p-2.5 rounded-lg text-xs font-bold transition-all shrink-0 flex items-center justify-center border border-slate-200/80 min-h-[40px] cursor-pointer" title="Tải phiếu tuyển sinh" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="Phiếu tuyển sinh: <?php echo esc_attr( get_the_title() ); ?>">
+			<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn bg-slate-100 hover:bg-slate-200 text-slate-700 p-2.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center justify-center min-h-[40px] cursor-pointer" title="Tải phiếu tuyển sinh" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="Phiếu tuyển sinh: <?php echo esc_attr( get_the_title() ); ?>">
 				📄 <span class="hidden sm:inline ml-1">Tải phiếu</span>
 			</a>
 		<?php endif; ?>
@@ -1555,8 +1507,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				var indicatorEl = link.querySelector('.ltdh-tab-indicator');
 
 				if (item.id === targetId) {
-					link.classList.add('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
-					link.classList.remove('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
+					link.classList.add('bg-blue-50/90', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
+					link.classList.remove('text-slate-600', 'hover:bg-slate-100/70');
 					if (iconEl) {
 						iconEl.classList.add('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
 						iconEl.classList.remove('bg-slate-100', 'text-slate-500');
@@ -1584,8 +1536,8 @@ document.addEventListener('DOMContentLoaded', function() {
 						});
 					}
 				} else {
-					link.classList.remove('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
-					link.classList.add('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
+					link.classList.remove('bg-blue-50/90', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
+					link.classList.add('text-slate-600', 'hover:bg-slate-100/70');
 					if (iconEl) {
 						iconEl.classList.remove('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
 						iconEl.classList.add('bg-slate-100', 'text-slate-500');

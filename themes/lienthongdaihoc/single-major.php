@@ -304,7 +304,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 				</section>
 
 				<!-- PROGRAMS FOR THIS MAJOR (PRIMARY FOCUS & FILTER) -->
-				<section id="truong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4 md:p-6 mb-6">
+				<section id="truong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
 					<!-- Header & Count -->
 					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
 						<div>
@@ -315,36 +315,36 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 								<?php echo ! empty( $context_school ) ? 'Danh sách các hình thức tuyển sinh đang mở cho ngành này' : 'Lựa chọn hình thức đào tạo và trường phù hợp với nguyện vọng của bạn'; ?>
 							</p>
 						</div>
-						<span id="ltdh-major-programs-count" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-[#00308b] border border-blue-100/80 shrink-0 self-start sm:self-center">
+						<span id="ltdh-major-programs-count" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#00308b] shrink-0 self-start sm:self-center">
 							Đang tải...
 						</span>
 					</div>
 
-					<!-- Filter Bar -->
-					<div class="flex bg-slate-50/70 border border-slate-200/80 rounded-2xl p-3 sm:p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+					<!-- Filter Bar (Minimalist Segmented Track) -->
+					<div class="bg-slate-50/90 rounded-2xl p-1.5 sm:p-2 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-3">
 						<!-- Training Type Filter Pills -->
-						<div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-							<button type="button" data-he="" class="ltdh-major-he-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo empty( $selected_he ) ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'; ?>">
+						<div class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto pb-1 md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+							<button type="button" data-he="" class="ltdh-major-he-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 <?php echo empty( $selected_he ) ? 'bg-[#00308b] text-white shadow-xs is-active' : 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
 								Tất cả hình thức
 							</button>
-							<button type="button" data-he="tu-xa" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo ( 'tu-xa' === $selected_he || 'dao-tao-tu-xa' === $selected_he ) ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'; ?>">
+							<button type="button" data-he="tu-xa" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 <?php echo ( 'tu-xa' === $selected_he || 'dao-tao-tu-xa' === $selected_he ) ? 'bg-[#00308b] text-white shadow-xs is-active' : 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
 								<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
 								<span>Đào tạo từ xa</span>
 							</button>
-							<button type="button" data-he="vua-hoc-vua-lam" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo 'vua-hoc-vua-lam' === $selected_he ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'; ?>">
+							<button type="button" data-he="vua-hoc-vua-lam" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 <?php echo 'vua-hoc-vua-lam' === $selected_he ? 'bg-[#00308b] text-white shadow-xs is-active' : 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
 								<span class="w-2 h-2 rounded-full bg-amber-500"></span>
 								<span>Vừa học vừa làm</span>
 							</button>
-							<button type="button" data-he="chinh-quy" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 <?php echo 'chinh-quy' === $selected_he ? 'bg-[#00308b] text-white border-[#00308b] shadow-xs is-active' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'; ?>">
+							<button type="button" data-he="chinh-quy" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 <?php echo 'chinh-quy' === $selected_he ? 'bg-[#00308b] text-white shadow-xs is-active' : 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
 								<span class="w-2 h-2 rounded-full bg-blue-500"></span>
 								<span>Chính quy</span>
 							</button>
 						</div>
 
 						<!-- School Select Dropdown -->
-						<div class="flex items-center gap-2 shrink-0 md:w-64">
+						<div class="flex items-center gap-2 shrink-0 md:w-[164px]">
 							<div class="relative w-full">
-								<select id="ltdh-major-school-select" class="w-full bg-white border border-slate-200 text-slate-800 text-xs sm:text-sm font-semibold rounded-xl pl-3 pr-8 py-2 focus:ring-2 focus:ring-[#00308b] focus:border-transparent focus:outline-none transition-all cursor-pointer shadow-2xs appearance-none">
+								<select id="ltdh-major-school-select" class="w-full bg-white text-slate-800 text-xs sm:text-sm font-semibold rounded-xl pl-3 pr-8 py-2 shadow-2xs focus:ring-2 focus:ring-[#00308b] focus:outline-none transition-all cursor-pointer appearance-none">
 									<option value="">Tất cả các trường</option>
 									<?php foreach ( $distinct_school_objs as $s ) : ?>
 										<option value="<?php echo esc_attr( $s['slug'] ); ?>" <?php selected( $s['slug'], $selected_school_slug ); ?>>

@@ -142,7 +142,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								</div>
 								
 								<div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="w-full text-center py-2.5 rounded-lg text-sm uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu chi tiết</a>
+									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="w-full text-center py-2.5 rounded-lg text-sm  ltdh-btn-details flex items-center justify-center">Tìm hiểu chi tiết</a>
 								</div>
 							</div>
 						</div>
@@ -249,7 +249,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								</div>
 							</div>
 							<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-								<a href="<?php the_permalink(); ?>" class="w-full text-center py-2.5 rounded-lg text-sm uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
+								<a href="<?php the_permalink(); ?>" class="w-full text-center py-2.5 rounded-lg text-sm  ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
 							</div>
 						</div>
 					</div>

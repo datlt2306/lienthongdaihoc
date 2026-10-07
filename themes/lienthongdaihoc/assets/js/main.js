@@ -256,11 +256,11 @@ document.addEventListener('DOMContentLoaded', () => {
         pills.forEach(pill => {
             pill.addEventListener('click', function() {
                 pills.forEach(p => {
-                    p.classList.remove('bg-[#00308b]', 'text-white', 'border-[#00308b]', 'shadow-xs', 'is-active');
-                    p.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+                    p.classList.remove('bg-[#00308b]', 'text-white', 'shadow-xs', 'is-active');
+                    p.classList.add('bg-transparent', 'text-slate-600', 'hover:bg-white/60');
                 });
-                this.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
-                this.classList.add('bg-[#00308b]', 'text-white', 'border-[#00308b]', 'shadow-xs', 'is-active');
+                this.classList.remove('bg-transparent', 'text-slate-600', 'hover:bg-white/60');
+                this.classList.add('bg-[#00308b]', 'text-white', 'shadow-xs', 'is-active');
 
                 doFilter(true);
             });
@@ -280,11 +280,11 @@ document.addEventListener('DOMContentLoaded', () => {
             pills.forEach(p => {
                 const pHe = p.dataset.he || '';
                 if (pHe === currentHe) {
-                    p.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
-                    p.classList.add('bg-[#00308b]', 'text-white', 'border-[#00308b]', 'shadow-xs', 'is-active');
+                    p.classList.remove('bg-transparent', 'text-slate-600', 'hover:bg-white/60');
+                    p.classList.add('bg-[#00308b]', 'text-white', 'shadow-xs', 'is-active');
                 } else {
-                    p.classList.remove('bg-[#00308b]', 'text-white', 'border-[#00308b]', 'shadow-xs', 'is-active');
-                    p.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+                    p.classList.remove('bg-[#00308b]', 'text-white', 'shadow-xs', 'is-active');
+                    p.classList.add('bg-transparent', 'text-slate-600', 'hover:bg-white/60');
                 }
             });
 

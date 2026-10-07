@@ -339,15 +339,15 @@ if ( ! empty( $contact ) ) {
 							$major_slug = $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '';
 
 							// Determine badge classes based on training type name
-							$badge_class = 'bg-orange-50 text-orange-600 border border-orange-100';
+							$badge_class = 'bg-orange-50 text-orange-700';
 							if ( $clean_type_name ) {
 								$type_name_lower = mb_strtolower( trim( $clean_type_name ), 'UTF-8' );
 								if ( false !== strpos( $type_name_lower, 'chính quy' ) ) {
-									$badge_class = 'bg-blue-50 text-blue-600 border border-blue-100';
+									$badge_class = 'bg-blue-50 text-[#00308b]';
 								} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
-									$badge_class = 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+									$badge_class = 'bg-emerald-50 text-emerald-700';
 								} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {
-									$badge_class = 'bg-amber-50 text-amber-600 border border-amber-100';
+									$badge_class = 'bg-amber-50 text-amber-800';
 								}
 							}
 
@@ -403,14 +403,7 @@ if ( ! empty( $contact ) ) {
 								<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">Ngành và chương trình trường đào tạo</h2>
 								<p class="text-xs md:text-sm text-slate-500 mt-1">Danh sách các ngành và hệ đào tạo tuyển sinh chính thức tại trường</p>
 							</div>
-							<?php if ( ! empty( $majors_data ) ) : ?>
-								<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold self-start sm:self-auto border border-slate-200/60">
-									<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-									<span><?php echo esc_html( count( $majors_data ) ); ?> ngành</span>
-									<span>•</span>
-									<span><?php echo esc_html( $total_programs_count ); ?> hệ đào tạo</span>
-								</div>
-							<?php endif; ?>
+							
 						</div>
 					</div>
 
@@ -424,14 +417,14 @@ if ( ! empty( $contact ) ) {
 								$major_he_slugs = array_unique( array_column( $major['programs'], 'he' ) );
 								$programs_count = count( $major['programs'] );
 								?>
-								<div class="ltdh-major-group bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-2xs hover:border-slate-300 transition-all"
+								<div class="ltdh-major-group bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-sm transition-all"
 									 data-major-name="<?php echo esc_attr( mb_strtolower( $major['name'], 'UTF-8' ) ); ?>"
 									 data-major-he="<?php echo esc_attr( implode( ' ', $major_he_slugs ) ); ?>">
 									
 									<!-- Major Header -->
 									<div class="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-100">
-										<div class="flex items-center gap-2.5 min-w-0">
-											<div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 text-[#00308b] flex items-center justify-center shrink-0">
+										<div class="flex items-center gap-3 min-w-0">
+											<div class="w-8 h-8 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center shrink-0">
 												<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 													<path d="M12 14l9-5-9-5-9 5 9 5z" />
 													<path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
@@ -443,24 +436,27 @@ if ( ! empty( $contact ) ) {
 													Ngành <?php echo esc_html( $major['name'] ); ?>
 												</h3>
 											</div>
-											<span class="hidden sm:inline-block text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/60 shrink-0">
-												<?php echo esc_html( $programs_count ); ?> hệ đào tạo
-											</span>
 										</div>
 										<?php if ( $major_link ) : ?>
-											<a href="<?php echo esc_url( $major_link ); ?>" class="text-xs sm:text-sm font-extrabold text-[#00308b] hover:text-blue-700 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
-												<span>Xem chi tiết ngành</span>
-												<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-													<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-												</svg>
-											</a>
+											<div class="flex items-center gap-2 sm:self-center shrink-0">
+												<span class="hidden md:inline-flex items-center text-[11px] font-semibold text-slate-500 bg-slate-100/80 px-2.5 py-1 rounded-full shrink-0">
+													<?php echo esc_html( $programs_count ); ?> hình thức đào tạo
+												</span>
+												<a href="<?php echo esc_url( $major_link ); ?>" class="hidden md:flex text-xs font-bold text-[#00308b] hover:text-blue-700 hover:underline flex items-center gap-1 pl-1 shrink-0 whitespace-nowrap">
+													<span>Xem chi tiết ngành</span>
+													<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+													</svg>
+												</a>
+											</div>
+											
 										<?php endif; ?>
 									</div>
 
-									<!-- Program Rows (Compact Comparison Rows) -->
-									<div class="space-y-2">
+									<!-- Program Rows (Clean Hairline Divided List) -->
+									<div class="divide-y divide-slate-100">
 										<?php foreach ( $major['programs'] as $prog ) : ?>
-											<div class="ltdh-program-row bg-slate-50/70 hover:bg-blue-50/40 border border-slate-200/70 rounded-xl p-3 sm:p-3.5 transition-all flex items-center justify-between gap-3 group"
+											<div class="ltdh-program-row py-2.5 sm:py-3 first:pt-1 last:pb-1 flex items-center justify-between gap-3 group hover:bg-slate-50/60 -mx-2 sm:-mx-3 px-2 sm:px-3 rounded-xl transition-all"
 												 data-he="<?php echo esc_attr( $prog['he'] ); ?>"
 												 data-title="<?php echo esc_attr( mb_strtolower( $prog['title'], 'UTF-8' ) ); ?>"
 												 data-compare-btn
@@ -477,7 +473,7 @@ if ( ! empty( $contact ) ) {
 												<!-- Program Info: Training Type (Tên hệ) -->
 												<div class="flex items-center gap-3 min-w-0">
 													<?php if ( $prog['type_name'] ) : ?>
-														<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs sm:text-sm font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wide shrink-0 shadow-2xs hover:shadow-xs hover:opacity-90 transition-all" title="Xem chi tiết <?php echo esc_attr( $prog['type_name'] ); ?>">
+														<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs font-bold px-2.5 py-1 rounded-md tracking-wide shrink-0 hover:opacity-85 transition-opacity" title="Xem chi tiết <?php echo esc_attr( $prog['type_name'] ); ?>">
 															<?php echo esc_html( $prog['type_name'] ); ?>
 														</a>
 													<?php endif; ?>
@@ -488,11 +484,11 @@ if ( ! empty( $contact ) ) {
 													<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
 														<span class="text-xs text-slate-400 bg-slate-100 py-1.5 px-3 rounded-lg font-bold">Tạm ngưng</span>
 													<?php else : ?>
-														<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="text-xs py-1.5 px-3.5 rounded-lg font-bold ltdh-btn-details text-center shadow-2xs hover:shadow-xs transition-all whitespace-nowrap">
+														<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="text-xs py-1.5 px-3 rounded-lg font-bold text-[#00308b] bg-blue-50 hover:bg-[#00308b] hover:text-white transition-all whitespace-nowrap">
 															Chi tiết
 														</a>
 														<button type="button"
-																class="ltdh-compare-toggle text-xs text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg py-1.5 px-2.5 transition-all bg-white hover:bg-slate-50 flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer"
+																class="ltdh-compare-toggle text-xs text-slate-600 hover:text-slate-900 font-bold bg-slate-100 hover:bg-slate-200/80 rounded-lg py-1.5 px-2.5 transition-all flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer"
 																data-compare-type="program"
 																data-compare-id="<?php echo esc_attr( $prog['id'] ); ?>"
 																data-compare-title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>"

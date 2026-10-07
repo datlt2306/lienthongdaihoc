@@ -282,7 +282,7 @@ $zalo    = ltdh_get_zalo_url();
 									</div>
 								</div>
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<a href="<?php echo esc_url($school['permalink']); ?>" class="w-full text-center py-2.5 rounded-lg text-sm uppercase ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
+									<a href="<?php echo esc_url($school['permalink']); ?>" class="w-full text-center py-2.5 rounded-lg text-sm  ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
 								</div>
 							</div>
 						</div>
@@ -905,7 +905,7 @@ $zalo    = ltdh_get_zalo_url();
 					'subtitle'   => 'Chỉ với 4 bước đơn giản, người đi làm dễ dàng sở hữu bằng Đại học chính quy / chuẩn Bộ GD&ĐT',
 					'section_id' => 'quy-trinh-xet-tuyen-home',
 					'cta_text'   => 'Kiểm tra điều kiện & Nhận tư vấn ngay',
-					'cta_link'   => '#register-section',
+					'cta_link'   => '/kiem-tra-dieu-kien',
 					'card_bg'    => 'bg-white',
 				]
 			);
