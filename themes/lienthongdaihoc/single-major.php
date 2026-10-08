@@ -21,7 +21,7 @@ $related_majors   = get_field( 'major_related', $major_id );
 
 // Query parameters for filter & context tracking
 $selected_he  = isset( $_GET['he'] ) ? sanitize_text_field( wp_unslash( $_GET['he'] ) ) : '';
-$school_param = isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
+$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
 
 $context_school       = null;
 $selected_school_slug = '';
@@ -94,6 +94,13 @@ $major_tabs[] = [
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>',
 ];
 
+$major_tabs[] = [
+	'id'       => 'quy-trinh-tuyen-sinh',
+	'title'    => 'Quy trình',
+	'subtitle' => '4 bước xét tuyển',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+];
+
 if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 	$major_tabs[] = [
 		'id'       => 'nganh-lien-quan',
@@ -155,7 +162,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 					$c_school_permalink = get_permalink( $c_school_id );
 				?>
 					<!-- CONTEXT AWARENESS BANNER -->
-					<div class="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white rounded-2xl p-5 md:p-6 shadow-md border border-blue-800/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+					<div id="ltdh-major-context-banner" data-school-slug="<?php echo esc_attr( $selected_school_slug ); ?>" class="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white rounded-2xl p-5 md:p-6 shadow-md border border-blue-800/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
 						<div class="flex items-center gap-4">
 							<div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 border border-white/20 shadow-xs">
 								<img src="<?php echo esc_url( $c_school_thumb ); ?>" alt="<?php echo esc_attr( $c_school_title ); ?>" class="w-full h-full object-contain">
@@ -308,10 +315,10 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 					<!-- Header & Count -->
 					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
 						<div>
-							<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
+							<h2 id="ltdh-major-programs-title" class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
 								<?php echo ! empty( $context_school ) ? 'Chương trình đào tạo tại trường' : 'Chương trình & Trường tuyển sinh'; ?>
 							</h2>
-							<p class="text-xs md:text-sm text-slate-500 mt-0.5">
+							<p id="ltdh-major-programs-subtitle" class="text-xs md:text-sm text-slate-500 mt-0.5">
 								<?php echo ! empty( $context_school ) ? 'Danh sách các hình thức tuyển sinh đang mở cho ngành này' : 'Lựa chọn hình thức đào tạo và trường phù hợp với nguyện vọng của bạn'; ?>
 							</p>
 						</div>
@@ -382,12 +389,21 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 					</script>
 				</section>
 
-
-
-
-
-
-
+				<!-- SECTION: ADMISSION PROCESS -->
+				<?php 
+				get_template_part(
+					'template-parts/admission-process',
+					null,
+					[
+						'title'      => 'Quy trình tuyển sinh & Nhập học',
+						'subtitle'   => 'Lộ trình 4 bước nộp hồ sơ xét tuyển và làm thủ tục nhập học chính thức ngành ' . get_the_title( $major_id ),
+						'section_id' => 'quy-trinh-tuyen-sinh',
+						'cta_text'   => 'Đăng ký tư vấn chọn trường ngay',
+						'cta_link'   => '/kiem-tra-dieu-kien',
+						'card_bg'    => 'bg-white',
+					]
+				);
+				?>
 
 				<!-- RELATED MAJORS -->
 				<?php 
@@ -538,14 +554,13 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 					</div>
 
 					<!-- CONTACT INFO CARD -->
-					<div class="bg-brand-accent/5 border border-brand-primary/10 rounded-lg p-6 text-center">
-						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Ban hướng nghiệp</span>
-						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $hotline ); ?></h4>
-						<div class="flex gap-2">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center">Gọi Ngay</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white border border-brand-primary text-brand-primary py-3.5 rounded-lg font-semibold text-sm hover:bg-brand-accent/5 transition-all min-h-[44px] flex items-center justify-center">Zalo OA</a>
-						</div>
-					</div>
+					<?php
+					get_template_part( 'template-parts/sidebar-hotline', null, [
+						'hotline'  => $hotline,
+						'zalo_url' => $global_zalo,
+						'title'    => 'Văn phòng tuyển sinh',
+					] );
+					?>
 
 				</div>
 			</div>

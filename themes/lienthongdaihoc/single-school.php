@@ -413,7 +413,7 @@ if ( ! empty( $contact ) ) {
 							<?php
 							foreach ( $majors_data as $major ) :
 								$m_id = $major['id'];
-								$major_link = $m_id ? add_query_arg( 'from_school', get_post_field( 'post_name', $school_id ), get_permalink( $m_id ) ) : '';
+								$major_link = $m_id ? add_query_arg( 'truong', get_post_field( 'post_name', $school_id ), get_permalink( $m_id ) ) : '';
 								$major_he_slugs = array_unique( array_column( $major['programs'], 'he' ) );
 								$programs_count = count( $major['programs'] );
 								?>
@@ -541,7 +541,7 @@ if ( ! empty( $contact ) ) {
 						'subtitle'   => 'Lộ trình 4 bước nộp hồ sơ xét tuyển và làm thủ tục nhập học chính thức',
 						'section_id' => 'quy-trinh-tuyen-sinh',
 						'cta_text'   => 'Đăng ký tư vấn chọn ngành ngay',
-						'cta_link'   => '#register',
+						'cta_link'   => '/kiem-tra-dieu-kien',
 					]
 				);
 				?>
@@ -731,15 +731,13 @@ if ( ! empty( $contact ) ) {
 					</div>
 
 					<!-- CONTACT INFO CARD -->
-					<div class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white rounded-lg p-6 text-center shadow-lg overflow-hidden border border-slate-800">
-						<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 16px 16px;"></div>
-						<span class="text-sm text-brand-accent font-extrabold uppercase tracking-wider block mb-1">Văn phòng tuyển sinh</span>
-						<h4 class="font-display font-black text-xl md:text-2xl mb-4"><?php echo esc_html( $hotline ); ?></h4>
-						<div class="flex gap-2 relative z-10">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-bold text-sm hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center shadow-sm shadow-brand-accent/20">Gọi Ngay</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white/10 text-white border border-white/20 py-3.5 rounded-lg font-bold text-sm hover:bg-white/20 transition-all min-h-[44px] flex items-center justify-center">Chat Zalo</a>
-						</div>
-					</div>
+					<?php
+					get_template_part( 'template-parts/sidebar-hotline', null, [
+						'hotline'  => $hotline,
+						'zalo_url' => $global_zalo,
+						'title'    => 'Văn phòng tuyển sinh',
+					] );
+					?>
 
 				</div>
 			</div>

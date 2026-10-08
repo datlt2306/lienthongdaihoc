@@ -236,65 +236,192 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<!-- 3. NATIONAL SCHOOLS SECTION -->
-	<section id="program-section" class="py-12 md:py-16 bg-white">
+	<!-- 3. NATIONAL SCHOOLS SECTION (CAROUSEL SLIDER) -->
+	<section id="program-section" class="py-12 md:py-16 bg-white overflow-hidden">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8">
 				<div class="space-y-2">
 					<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">ĐỐI TÁC ĐẠI HỌC</span>
 					<h2 class="text-xl md:text-3xl font-black text-slate-900">Trường đối tác đào tạo</h2>
 				</div>
-				<a href="<?php echo esc_url(home_url('/truong-doi-tac/')); ?>" class="text-sm text-brand-primary font-bold hover:underline mt-4 sm:mt-0 flex items-center gap-1">
-					Xem tất cả
-					<span>→</span>
-				</a>
+				<div class="flex items-center gap-3 mt-4 sm:mt-0">
+					<a href="<?php echo esc_url(home_url('/truong-doi-tac/')); ?>" class="text-sm text-brand-primary font-bold hover:underline flex items-center gap-1">
+						Xem tất cả
+						<span>→</span>
+					</a>
+					<div class="hidden sm:flex items-center gap-2 pl-2 border-l border-slate-200">
+						<button type="button" class="school-slider-prev w-9 h-9 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-xs" aria-label="Trường trước đó">
+							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+							</svg>
+						</button>
+						<button type="button" class="school-slider-next w-9 h-9 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-xs" aria-label="Trường tiếp theo">
+							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+							</svg>
+						</button>
+					</div>
+				</div>
 			</div>
 
-			<div class="flex lg:grid overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory lg:snap-none gap-4 pb-4 lg:pb-0 no-scrollbar lg:grid-cols-5">
-				<?php
-				if ( ! empty( $featured_schools ) ) {
-					foreach ( $featured_schools as $school ) :
-						$school_id     = $school['id'];
-						$address       = $school['address'];
-						$hotline       = $school['hotline'];
-						$thumb_url     = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : $school['thumb_url'];
-						$logo_id       = $school['logo_id'];
-						$en_name       = $school['en_name'];
-						$systems_label = $school['systems_label'];
-						$prog_count    = $school['prog_count'];
-				?>
-						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between shrink-0 w-[45vw] sm:w-[250px] lg:w-auto snap-center">
-							<div class="h-20 md:h-28 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url($thumb_url); ?>');"></div>
-							<div class="h-12 w-12 md:h-16 md:w-16 bg-white rounded-lg border-2 md:border-4 border-white shadow-md bg-white -mt-6 md:-mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden">
-								<?php if ($logo_id) : ?>
-									<?php echo wp_get_attachment_image($logo_id, 'thumbnail', false, ['class' => 'h-full w-full object-contain']); ?>
-								<?php else : ?>
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-brand-primary/80"><path d="M11.7 2.805a.75.75 0 0 1 .6 0l9.3 4.25a.75.75 0 0 1 0 1.39l-9.3 4.25a.75.75 0 0 1-.6 0L2.4 8.445a.75.75 0 0 1 0-1.39l9.3-4.25ZM2.84 10.74l6.735 3.08a2.25 2.25 0 0 0 1.85 0l6.735-3.08v3.42c0 .532-.244 1.026-.642 1.378L12.5 19.544a1.25 1.25 0 0 1-1.6 0l-5.023-3.97a1.75 1.75 0 0 1-.642-1.378v-3.456Z" /><path d="M20.25 10.32v5.43a3.25 3.25 0 0 1-3.25 3.25h-.5a.75.75 0 0 0 0 1.5h.5a4.75 4.75 0 0 0 4.75-4.75v-5.43a.75.75 0 0 0-1.5 0Z" /></svg>
-								<?php endif; ?>
-							</div>
+			<!-- Swiper Carousel Container -->
+			<div class="relative -mx-4 px-4 sm:mx-0 sm:px-0">
+				<div class="swiper school-partner-swiper !overflow-visible sm:!overflow-hidden">
+					<div class="swiper-wrapper py-3">
+						<?php
+						if ( ! empty( $featured_schools ) ) {
+							foreach ( $featured_schools as $school ) :
+								$school_id     = $school['id'];
+								$address       = $school['address'];
+								$hotline       = $school['hotline'];
+								$thumb_url     = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : $school['thumb_url'];
+								$logo_id       = $school['logo_id'];
+								$en_name       = $school['en_name'];
+								$systems_label = $school['systems_label'];
+								$prog_count    = $school['prog_count'];
+								$school_code   = get_post_meta( $school_id, 'school_code', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' );
+								$school_types  = ltdh_get_school_training_types( $school_id );
+								$region_terms  = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
+								$region        = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
+						?>
+								<div class="swiper-slide h-auto flex">
+									<div class="w-full bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+										<!-- Card Cover & Location -->
+										<div class="relative h-32 sm:h-36 bg-slate-200 bg-cover bg-center overflow-hidden" style="background-image: url('<?php echo esc_url($thumb_url); ?>');">
+											<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent"></div>
+											<?php if ( $region ) : ?>
+												<span class="absolute top-2.5 right-2.5 bg-slate-900/60 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
+													<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+														<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+													</svg>
+													<span><?php echo esc_html( $region ); ?></span>
+												</span>
+											<?php endif; ?>
+										</div>
 
-							<div class="p-4 pt-2 flex-1 flex flex-col justify-between">
-								<div class="text-center">
-									<h4 class="font-extrabold text-slate-800 text-sm tracking-tight leading-snug  min-h-[36px] line-clamp-2 mt-1"><?php echo esc_html($school['title']); ?></h4>
-									<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic"><?php echo esc_html($en_name); ?></p>
-									<div class="mt-3 space-y-1 text-center text-xs md:text-sm">
-										<p class="text-slate-500 font-semibold text-xs">📊 <?php echo esc_html($prog_count); ?> ngành tuyển sinh</p>
+										<!-- Floating Logo -->
+										<div class="h-16 w-16 bg-white rounded-2xl border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
+											<?php if ($logo_id) : ?>
+												<?php echo wp_get_attachment_image($logo_id, 'thumbnail', false, ['class' => 'h-full w-full object-contain']); ?>
+											<?php else : ?>
+												<span class="font-display font-extrabold text-[#00308b] text-sm">UNI</span>
+											<?php endif; ?>
+										</div>
+
+										<!-- Card Body -->
+										<div class="p-5 pt-2 flex-1 flex flex-col justify-between">
+											<div class="text-center">
+												<!-- School Name -->
+												<h3 class="font-extrabold text-slate-900 text-sm md:text-[15px] tracking-tight leading-snug min-h-[44px] line-clamp-2 mt-1 group-hover:text-[#00308b] transition-colors">
+													<a href="<?php echo esc_url($school['permalink']); ?>">
+														<?php echo esc_html($school['title']); ?>
+													</a>
+												</h3>
+												
+												<!-- School Code & English Name -->
+												<p class="text-xs text-slate-400 mt-1 font-medium line-clamp-1 italic min-h-[18px]">
+													<?php if ( ! empty( $school_code ) ) : ?>
+														<span class="not-italic font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded text-[10px] mr-1 border border-slate-200/60"><?php echo esc_html( $school_code ); ?></span>
+													<?php endif; ?>
+													<span><?php echo esc_html($en_name); ?></span>
+												</p>
+												
+												<!-- Training Types / Status Badges Container -->
+												<div class="mt-3.5 min-h-[42px] flex items-center justify-center">
+													<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
+														<div class="flex flex-wrap justify-center gap-1.5">
+															<?php
+															foreach ( $school_types as $st_term ) {
+																echo ltdh_get_training_type_badge_html( $st_term );
+															}
+															?>
+														</div>
+													<?php else : ?>
+														<div class="flex flex-wrap justify-center gap-1.5">
+															<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200/60">
+																<span>Đang cập nhật hệ đào tạo</span>
+															</span>
+														</div>
+													<?php endif; ?>
+												</div>
+
+												<!-- Meta Row (Khu vực / Cơ sở & Ngành đào tạo) -->
+												<div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 px-0.5 gap-2">
+													<div class="flex items-center gap-1.5 text-slate-500 truncate" title="<?php echo esc_attr( $address ); ?>">
+														<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+															<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+															<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+														</svg>
+														<span class="truncate"><?php echo esc_html( ! empty( $school['location'] ) ? $school['location'] : ltdh_get_school_location_label( $school_id ) ); ?></span>
+													</div>
+
+													<div class="flex items-center gap-1.5 text-slate-700 font-semibold shrink-0 pl-1">
+														<svg class="w-3.5 h-3.5 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+															<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+														</svg>
+														<?php if ( $prog_count > 0 ) : ?>
+															<span><strong class="text-[#00308b] font-black"><?php echo esc_html( $prog_count ); ?></strong> ngành tuyển</span>
+														<?php else : ?>
+															<span class="text-slate-400 font-medium">Đang cập nhật ngành</span>
+														<?php endif; ?>
+													</div>
+												</div>
+											</div>
+
+											<!-- Action CTA Button -->
+											<div class="mt-3.5 pt-3 border-t border-slate-100">
+												<a href="<?php echo esc_url($school['permalink']); ?>" 
+												   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/80 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
+													<span>Tìm hiểu chi tiết</span>
+													<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+													</svg>
+												</a>
+											</div>
+										</div>
 									</div>
 								</div>
-								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<a href="<?php echo esc_url($school['permalink']); ?>" class="w-full text-center py-2.5 rounded-lg text-sm  ltdh-btn-details flex items-center justify-center">Tìm hiểu thêm</a>
-								</div>
-							</div>
-						</div>
-				<?php
-					endforeach;
-				} else {
-					echo '<div class="col-span-5 text-center text-slate-500 py-6">Chưa có trường đối tác nào được gieo dữ liệu.</div>';
-				}
-				?>
+						<?php
+							endforeach;
+						} else {
+							echo '<div class="w-full text-center text-slate-500 py-6">Chưa có trường đối tác nào được gieo dữ liệu.</div>';
+						}
+						?>
+					</div>
+				</div>
 			</div>
 		</div>
 	</section>
+
+	<style>
+	.school-partner-swiper:not(.swiper-initialized) .swiper-wrapper {
+		display: flex;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		gap: 1.25rem;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+	.school-partner-swiper:not(.swiper-initialized) .swiper-wrapper::-webkit-scrollbar {
+		display: none;
+	}
+	.school-partner-swiper:not(.swiper-initialized) .swiper-slide {
+		flex: 0 0 280px;
+		scroll-snap-align: start;
+	}
+	@media (min-width: 1280px) {
+		.school-partner-swiper:not(.swiper-initialized) .swiper-slide {
+			flex: 0 0 calc((100% - 3 * 1.5rem) / 4);
+		}
+	}
+	.school-slider-prev.swiper-button-disabled,
+	.school-slider-next.swiper-button-disabled {
+		opacity: 0.35;
+		pointer-events: none;
+		cursor: not-allowed;
+	}
+	</style>
 
 	<!-- 4. ELIGIBILITY QUICK CHECK SECTION -->
 	<section class="py-16 bg-slate-50 border-t border-slate-100">

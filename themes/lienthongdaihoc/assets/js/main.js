@@ -51,11 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ----------------------------------------------------
-    // 2. Hero Swiper Slider Initialization (Idle Hydration)
+    // 2. Swiper Sliders Initialization (Hero & School Partners)
     // ----------------------------------------------------
-    const initHeroSwiper = () => {
+    const initSwipers = () => {
+        if (typeof Swiper === 'undefined') return;
+
         const heroSwiperEl = document.querySelector('.hero-swiper');
-        if (heroSwiperEl && typeof Swiper !== 'undefined') {
+        if (heroSwiperEl) {
             new Swiper('.hero-swiper', {
                 loop: true,
                 autoplay: {
@@ -74,12 +76,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 watchSlidesProgress: true,
             });
         }
+
+        const schoolSwiperEl = document.querySelector('.school-partner-swiper');
+        if (schoolSwiperEl) {
+            new Swiper('.school-partner-swiper', {
+                slidesPerView: 1.25,
+                spaceBetween: 16,
+                rewind: true,
+                speed: 600,
+                watchSlidesProgress: true,
+                navigation: {
+                    nextEl: '.school-slider-next',
+                    prevEl: '.school-slider-prev',
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 2.2,
+                        spaceBetween: 20,
+                    },
+                    1024: {
+                        slidesPerView: 3.2,
+                        spaceBetween: 24,
+                    },
+                    1280: {
+                        slidesPerView: 4,
+                        spaceBetween: 24,
+                    },
+                },
+            });
+        }
     };
 
     if ('requestIdleCallback' in window) {
-        requestIdleCallback(initHeroSwiper, { timeout: 2000 });
+        requestIdleCallback(initSwipers, { timeout: 2000 });
     } else {
-        setTimeout(initHeroSwiper, 300);
+        setTimeout(initSwipers, 300);
     }
 
     // ----------------------------------------------------
@@ -209,11 +240,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (selectedSchool) {
                     urlParams.set('truong', selectedSchool);
-                    urlParams.set('from_school', selectedSchool);
                 } else {
                     urlParams.delete('truong');
-                    urlParams.delete('from_school');
                 }
+                // Clean up any legacy redundant query parameters
+                urlParams.delete('from_school');
+                urlParams.delete('school');
 
                 const searchStr = urlParams.toString();
                 const newUrl = window.location.pathname + (searchStr ? '?' + searchStr : '');
@@ -240,6 +272,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     listContainer.innerHTML = data.data.html;
                     if (countBadge && typeof data.data.count !== 'undefined') {
                         countBadge.textContent = selectedSchool ? (data.data.count + ' chương trình') : (data.data.count + ' trường tuyển sinh');
+                    }
+                    const titleEl = document.getElementById('ltdh-major-programs-title');
+                    const subtitleEl = document.getElementById('ltdh-major-programs-subtitle');
+                    if (titleEl) {
+                        titleEl.textContent = selectedSchool ? 'Chương trình đào tạo tại trường' : 'Chương trình & Trường tuyển sinh';
+                    }
+                    if (subtitleEl) {
+                        subtitleEl.textContent = selectedSchool ? 'Danh sách các hình thức tuyển sinh đang mở cho ngành này' : 'Lựa chọn hình thức đào tạo và trường phù hợp với nguyện vọng của bạn';
+                    }
+                    const contextBanner = document.getElementById('ltdh-major-context-banner');
+                    if (contextBanner) {
+                        const initialBannerSchool = contextBanner.dataset.schoolSlug || '';
+                        if (!selectedSchool || (initialBannerSchool && initialBannerSchool !== selectedSchool)) {
+                            contextBanner.style.display = 'none';
+                        } else {
+                            contextBanner.style.display = '';
+                        }
                     }
                     if (window.ltdhCompare && typeof window.ltdhCompare.syncButtonStates === 'function') {
                         window.ltdhCompare.syncButtonStates();

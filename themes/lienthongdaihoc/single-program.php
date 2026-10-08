@@ -970,52 +970,6 @@ $program_tabs[] = [
 					<?php endif; ?>
 				</section>
 
-				<!-- SECTION 10: RELATED PROGRAMS -->
-				<?php
-				$related_query = new WP_Query( [
-					'post_type'      => 'program',
-					'posts_per_page' => 3,
-					'post__not_in'   => [ $program_id ],
-					'meta_query'     => [
-						'relation' => 'OR',
-						[
-							'key'     => LTDH_META_MAJOR_REL,
-							'value'   => $major_id,
-							'compare' => '=',
-						],
-						[
-							'key'     => LTDH_META_SCHOOL_REL,
-							'value'   => $school_id,
-							'compare' => '=',
-						]
-					]
-				] );
-
-				if ( $related_query->have_posts() ) :
-				?>
-					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6" id="chuong-trinh-lien-quan">
-						<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Chương trình liên quan</h2>
-						<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-							<?php 
-							while ( $related_query->have_posts() ) : 
-								$related_query->the_post();
-								$rel_school_id = get_field( LTDH_META_SCHOOL_REL );
-								$rel_school = $rel_school_id ? get_the_title( $rel_school_id ) : '';
-							?>
-								<a href="<?php the_permalink(); ?>" class="group block bg-slate-50/80 hover:bg-blue-50/50 rounded-xl p-4 hover:shadow-xs transition-all">
-									<span class="text-sm text-slate-400 block mb-1 font-medium"><?php echo esc_html( $rel_school ); ?></span>
-									<h4 class="font-bold text-slate-800 text-sm group-hover:text-brand-primary transition-colors line-clamp-2"><?php the_title(); ?></h4>
-									<div class="mt-3 flex justify-between items-center text-sm text-slate-500 border-t border-slate-200/50 pt-2">
-										<span>Học phí: <?php echo esc_html( ltdh_get_program_tuition_display( get_the_ID() ) ); ?></span>
-									</div>
-								</a>
-							<?php 
-							endwhile; 
-							wp_reset_postdata();
-							?>
-						</div>
-					</section>
-				<?php endif; ?>
 
 			</div>
 
@@ -1217,14 +1171,14 @@ $program_tabs[] = [
 					?>
 
 					<!-- SECTION 13: PHONE CTA & SECTION 14: ZALO CTA sidebar cards (Desktop Only) -->
-					<div class="hidden lg:block bg-amber-50/60 rounded-2xl p-6 text-center">
-						<span class="text-sm text-brand-primary font-bold uppercase tracking-wider block mb-1">Cần hỗ trợ trực tiếp?</span>
-						<h4 class="font-display font-black text-2xl text-slate-800 mb-4"><?php echo esc_html( $program_hotline ); ?></h4>
-						<div class="flex gap-2">
-							<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $program_hotline ) ); ?>" class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-semibold text-sm hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center shadow-xs">Gọi Điện</a>
-							<a href="<?php echo esc_url( $global_zalo ); ?>" class="flex-1 bg-white text-[#00308b] py-3.5 rounded-lg font-bold text-sm hover:bg-blue-50 transition-all min-h-[44px] flex items-center justify-center shadow-2xs">Chat Zalo</a>
-						</div>
-					</div>
+					<?php
+					get_template_part( 'template-parts/sidebar-hotline', null, [
+						'hotline'     => $program_hotline,
+						'zalo_url'    => $global_zalo,
+						'title'       => 'Văn phòng tuyển sinh',
+						'extra_class' => 'hidden lg:block',
+					] );
+					?>
 
 					<!-- COMPARE BUTTON ONLY (Desktop Only) -->
 					<?php

@@ -753,8 +753,52 @@ add_filter( 'acf/load_value/name=order', function( $value, $post_id, $field ) {
 	return $value;
 }, 10, 3 );
 
+/**
+ * Get unified location display label for a school (Campus or Region).
+ *
+ * Prioritizes physical campus (e.g. 'Hà Nội', 'TP. Hồ Chí Minh'),
+ * then region ('Miền Bắc'), then city from address.
+ *
+ * @param int $school_id
+ * @return string
+ */
+function ltdh_get_school_location_label( int $school_id ): string {
+	if ( ! $school_id ) {
+		return 'Chưa cập nhật';
+	}
+
+	// 1. Campus taxonomy term (Cơ sở đào tạo)
+	$campus_terms = wp_get_post_terms( $school_id, LTDH_TAX_CAMPUS );
+	if ( ! is_wp_error( $campus_terms ) && ! empty( $campus_terms ) ) {
+		foreach ( $campus_terms as $ct ) {
+			if ( 'online' !== $ct->slug && ! empty( $ct->name ) ) {
+				return $ct->name;
+			}
+		}
+		if ( ! empty( $campus_terms[0]->name ) ) {
+			return $campus_terms[0]->name;
+		}
+	}
+
+	// 2. Region taxonomy term (Khu vực)
+	$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
+	if ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) {
+		return $region_terms[0]->name;
+	}
+
+	// 3. Extract city / province from address ACF meta
+	$address = get_field( 'address', $school_id );
+	if ( $address ) {
+		if ( preg_match( '/(Hà Nội|Hồ Chí Minh|Đà Nẵng|Thái Nguyên|Hưng Yên|Hải Phòng|Cần Thơ)/iu', $address, $matches ) ) {
+			return $matches[1];
+		}
+	}
+
+	return 'Miền Bắc';
+}
+
 function ltdh_get_cached_featured_schools() {
-	$cache_key = 'ltdh_featured_schools_data_v11';
+	$cache_key = 'ltdh_featured_schools_data_v15';
 	$data      = get_transient( $cache_key );
 	if ( false !== $data && is_array( $data ) ) {
 		return $data;
@@ -767,7 +811,7 @@ function ltdh_get_cached_featured_schools() {
 	]);
 
 	$schools_candidates = ltdh_sort_schools_by_order( $schools_candidates );
-	$top_schools        = array_slice( $schools_candidates, 0, 5 );
+	$top_schools        = array_slice( $schools_candidates, 0, 10 );
 
 	$data = [];
 	if ( ! empty( $top_schools ) ) {
@@ -780,6 +824,9 @@ function ltdh_get_cached_featured_schools() {
 			$thumb_url = ltdh_get_school_cover_url( $school_id, 'medium' );
 			$logo_id   = ltdh_get_school_image_id( $school_id );
 			$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
+
+			$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
+			$region       = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
 
 			$school_progs = get_posts([
 				'post_type' => 'program',
@@ -820,6 +867,8 @@ function ltdh_get_cached_featured_schools() {
 				'title'         => get_the_title($school_id),
 				'permalink'     => get_permalink($school_id),
 				'address'       => $address,
+				'location'      => ltdh_get_school_location_label($school_id),
+				'region'        => $region,
 				'hotline'       => $hotline,
 				'thumb_url'     => $thumb_url,
 				'logo_id'       => $logo_id,
@@ -1542,6 +1591,34 @@ function ltdh_get_school_training_types( int $school_id, string $output_format =
 	}
 
 	if ( empty( $programs ) ) {
+		// Fallback: check training_type terms directly assigned to school post
+		$direct_terms = wp_get_post_terms( $school_id, LTDH_TAX_TRAINING_TYPE );
+		if ( ! is_wp_error( $direct_terms ) && ! empty( $direct_terms ) ) {
+			$direct_types = [];
+			foreach ( $direct_terms as $dt ) {
+				if ( ! is_object( $dt ) || ! in_array( $dt->slug, $allowed_slugs, true ) ) {
+					continue;
+				}
+				if ( 'slugs' === $output_format ) {
+					$val = $dt->slug;
+				} elseif ( 'terms' === $output_format || 'objects' === $output_format || 'all' === $output_format ) {
+					$val = $dt;
+				} else {
+					$val = $dt->name;
+				}
+				if ( is_object( $val ) ) {
+					$direct_types[ $val->term_id ] = $val;
+				} else {
+					$direct_types[ $val ] = $val;
+				}
+			}
+			if ( ! empty( $direct_types ) ) {
+				$res = array_values( $direct_types );
+				wp_cache_set( $cache_key, $res, 'ltdh', HOUR_IN_SECONDS );
+				return $res;
+			}
+		}
+
 		wp_cache_set( $cache_key, [], 'ltdh', HOUR_IN_SECONDS );
 		return [];
 	}
