@@ -446,7 +446,7 @@ class LTDH_CLI_Commands {
 				if ( file_exists( $custom_form_path ) ) {
 					$form_file_url = content_url( "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf" );
 				} else {
-					$form_file_url = home_url( "/dang-ky-tu-van/?school={$school_code_clean}&program_id={$program_id}" );
+					$form_file_url = home_url( "/lien-he/?school={$school_code_clean}&program_id={$program_id}" );
 				}
 
 				update_post_meta( $program_id, 'admission_form_file', esc_url_raw( $form_file_url ) );

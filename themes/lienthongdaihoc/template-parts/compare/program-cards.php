@@ -152,7 +152,7 @@ $sections = [
 				   class="flex-1 inline-flex items-center justify-center gap-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold py-3 px-1 rounded-lg transition-all min-h-[44px]">
 					<span>💬 Chat Zalo</span>
 				</a>
-				<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/?program_id=' . $item['id'] ) ); ?>"
+				<a href="<?php echo esc_url( home_url( '/lien-he/?program_id=' . $item['id'] ) ); ?>"
 				   class="flex-1 inline-flex items-center justify-center gap-1 bg-brand-primary hover:bg-brand-darkBlue text-white text-xs font-bold py-3 px-1 rounded-lg transition-all min-h-[44px]">
 					<span>📝 Đăng ký</span>
 				</a>

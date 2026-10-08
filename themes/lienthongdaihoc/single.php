@@ -247,7 +247,7 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 					<div class="text-3xl mb-3">🎓</div>
 					<h3 class="font-extrabold text-base mb-2">Cần tư vấn tuyển sinh?</h3>
 					<p class="text-blue-100 text-sm mb-4 leading-relaxed">Đội ngũ tư vấn sẵn sàng hỗ trợ bạn 24/7</p>
-					<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>"
+					<a href="<?php echo esc_url( home_url( '/lien-he/' ) ); ?>"
 					   class="block w-full bg-white text-[#00308b] font-extrabold text-sm py-2.5 rounded-xl hover:bg-blue-50 transition-all mb-2">
 						Đăng ký ngay
 					</a>

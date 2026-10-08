@@ -605,7 +605,7 @@ $program_tabs[] = [
 						if ( file_exists( $custom_form_path ) ) {
 							$form_url = content_url( "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf" );
 						} else {
-							$form_url = home_url( "/dang-ky-tu-van/?school={$school_code_clean}&program_id={$program_id}" );
+							$form_url = home_url( "/lien-he/?school={$school_code_clean}&program_id={$program_id}" );
 						}
 					}
 				}

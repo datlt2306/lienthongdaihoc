@@ -30,7 +30,7 @@ $zalo    = ltdh_compare_get_zalo_url();
 			<span class="text-xs font-bold text-blue-700 uppercase">Chat Zalo</span>
 			<span class="text-sm font-bold text-slate-800">Trao đổi ngay</span>
 		</a>
-		<a href="<?php echo esc_url( home_url( '/dang-ky-tu-van/' ) ); ?>"
+		<a href="<?php echo esc_url( home_url( '/lien-he/' ) ); ?>"
 		   class="flex flex-col items-center gap-1.5 bg-brand-primary/5 hover:bg-brand-primary/10 border border-brand-primary/20 rounded-lg p-4 transition-all group">
 			<span class="text-2xl">📝</span>
 			<span class="text-xs font-bold text-brand-primary uppercase">Đăng ký tư vấn</span>
