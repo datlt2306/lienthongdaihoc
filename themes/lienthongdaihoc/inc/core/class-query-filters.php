@@ -799,6 +799,9 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 								   class="group/btn inline-flex items-center gap-1.5 px-1.5 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-2xs hover:shadow-xs no-underline <?php echo esc_attr( $btn_style ); ?>" 
 								   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
 									<span><?php echo esc_html( $display_label ); ?></span>
+									<svg class="w-3.5 h-3.5 opacity-60 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+									</svg>
 								</a>
 							<?php endif; ?>
 						<?php endforeach; ?>
