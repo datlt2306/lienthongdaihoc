@@ -520,17 +520,7 @@ if ( ! empty( $contact ) ) {
 					?>
 				</section>
 
-				<!-- CONTACT INFO -->
-				<?php if ( $contact ) : ?>
-					<section id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-						<!-- Hidden anchor targets for backward compatibility -->
-						<span id="phuong-thuc-tuyen-sinh" class="relative -top-36 block invisible pointer-events-none"></span>
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Thông tin liên hệ tuyển sinh</h2>
-						<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list">
-							<?php echo wp_kses_post( ltdh_format_contact_info( (string) $contact, (int) $school_id ) ); ?>
-						</div>
-					</section>
-				<?php endif; ?>
+				
 				<!-- ADMISSION PROCESS -->
 				<?php
 				get_template_part(
@@ -545,6 +535,17 @@ if ( ! empty( $contact ) ) {
 					]
 				);
 				?>
+				<!-- CONTACT INFO -->
+				<?php if ( $contact ) : ?>
+					<section id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
+						<!-- Hidden anchor targets for backward compatibility -->
+						<span id="phuong-thuc-tuyen-sinh" class="relative -top-36 block invisible pointer-events-none"></span>
+						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Thông tin liên hệ tuyển sinh</h2>
+						<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list">
+							<?php echo wp_kses_post( ltdh_format_contact_info( (string) $contact, (int) $school_id ) ); ?>
+						</div>
+					</section>
+				<?php endif; ?>
 			</div>
 
 			<!-- Sidebar Column -->
