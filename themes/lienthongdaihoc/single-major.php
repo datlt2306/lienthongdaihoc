@@ -39,40 +39,44 @@ if ( ! empty( $school_param ) ) {
 	}
 }
 
+// Retrieve pre-calculated list of programs matching this major (Formula: 'Liên thông ngành ' . $clean_major_name, $prog['opportunity_title'], preg_replace( '/^hệ\s+/iu', '', trim( $type_name ) ))
+$offered_program_ids = get_post_meta( $major_id, LTDH_META_OFFERED_PROGRAMS, true );
+
 // Retrieve all distinct schools offering programs for this major
-$all_major_programs = get_posts( [
+$direct_major_programs = get_posts( [
 	'post_type'   => LTDH_CPT_PROGRAM,
 	'post_status' => 'publish',
 	'numberposts' => -1,
 	'meta_query'  => [
+		'relation' => 'OR',
 		[
 			'key'     => LTDH_META_MAJOR_REL,
 			'value'   => $major_id,
 			'compare' => '=',
 		],
+		[
+			'key'     => LTDH_META_MAJOR_REL,
+			'value'   => '"' . $major_id . '"',
+			'compare' => 'LIKE',
+		],
+		[
+			'key'     => LTDH_META_MAJOR_REL,
+			'value'   => 's:' . strlen( (string) $major_id ) . ':"' . $major_id . '"',
+			'compare' => 'LIKE',
+		],
+		[
+			'key'     => LTDH_META_MAJOR_REL,
+			'value'   => 'i:' . $major_id . ';',
+			'compare' => 'LIKE',
+		],
 	],
 	'fields'      => 'ids',
 ] );
 
-$distinct_school_objs = [];
-if ( ! empty( $all_major_programs ) ) {
-	foreach ( $all_major_programs as $p_id ) {
-		$s_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $p_id ) : intval( get_post_meta( $p_id, LTDH_META_SCHOOL_REL, true ) );
-		if ( $s_id && ! isset( $distinct_school_objs[ $s_id ] ) ) {
-			$s_post = get_post( $s_id );
-			if ( $s_post && 'publish' === $s_post->post_status ) {
-				$distinct_school_objs[ $s_id ] = [
-					'id'    => $s_id,
-					'title' => get_the_title( $s_id ),
-					'slug'  => $s_post->post_name,
-				];
-			}
-		}
-	}
-}
-
-// Retrieve pre-calculated list of programs matching this major
-$offered_program_ids = get_post_meta( $major_id, LTDH_META_OFFERED_PROGRAMS, true );
+$all_major_programs = array_unique( array_filter( array_merge(
+	is_array( $offered_program_ids ) ? $offered_program_ids : [],
+	is_array( $direct_major_programs ) ? $direct_major_programs : []
+) ) );
 
 $global_zalo = ltdh_get_zalo_url();
 $hotline     = ltdh_get_hotline();
@@ -312,25 +316,17 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 
 				<!-- PROGRAMS FOR THIS MAJOR (PRIMARY FOCUS & FILTER) -->
 				<section id="truong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
-					<!-- Header & Count -->
-					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
-						<div>
-							<h2 id="ltdh-major-programs-title" class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
-								<?php echo ! empty( $context_school ) ? 'Chương trình đào tạo tại trường' : 'Chương trình & Trường tuyển sinh'; ?>
-							</h2>
-							<p id="ltdh-major-programs-subtitle" class="text-xs md:text-sm text-slate-500 mt-0.5">
-								<?php echo ! empty( $context_school ) ? 'Danh sách các hình thức tuyển sinh đang mở cho ngành này' : 'Lựa chọn hình thức đào tạo và trường phù hợp với nguyện vọng của bạn'; ?>
-							</p>
-						</div>
-						<span id="ltdh-major-programs-count" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#00308b] shrink-0 self-start sm:self-center">
-							Đang tải...
-						</span>
+					<!-- Header -->
+					<div class="mb-5 sm:mb-6">
+						<h2 id="ltdh-major-programs-title" class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
+							Trường đang tuyển sinh liên thông
+						</h2>
 					</div>
 
 					<!-- Filter Bar (Minimalist Segmented Track) -->
-					<div class="bg-slate-50/90 rounded-2xl p-1.5 sm:p-2 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-3">
+					<div class="bg-slate-50/90 rounded-2xl p-1.5 sm:p-2 mb-6 flex items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 						<!-- Training Type Filter Pills -->
-						<div class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto pb-1 md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+						<div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
 							<button type="button" data-he="" class="ltdh-major-he-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 <?php echo empty( $selected_he ) ? 'bg-[#00308b] text-white shadow-xs is-active' : 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
 								Tất cả hình thức
 							</button>
@@ -347,46 +343,16 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 								<span>Chính quy</span>
 							</button>
 						</div>
-
-						<!-- School Select Dropdown -->
-						<div class="flex items-center gap-2 shrink-0 md:w-[164px]">
-							<div class="relative w-full">
-								<select id="ltdh-major-school-select" class="w-full bg-white text-slate-800 text-xs sm:text-sm font-semibold rounded-xl pl-3 pr-8 py-2 shadow-2xs focus:ring-2 focus:ring-[#00308b] focus:outline-none transition-all cursor-pointer appearance-none">
-									<option value="">Tất cả các trường</option>
-									<?php foreach ( $distinct_school_objs as $s ) : ?>
-										<option value="<?php echo esc_attr( $s['slug'] ); ?>" <?php selected( $s['slug'], $selected_school_slug ); ?>>
-											<?php echo esc_html( $s['title'] ); ?>
-										</option>
-									<?php endforeach; ?>
-								</select>
-								<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
-									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-								</div>
-							</div>
-						</div>
 					</div>
 
 					<!-- Dynamic Programs List Container -->
 					<div id="ltdh-major-programs-wrapper" data-major-id="<?php echo esc_attr( $major_id ); ?>" class="transition-opacity duration-300">
 						<div id="ltdh-major-programs-list">
 							<?php 
-							$initial_count = ltdh_render_major_programs_list( $major_id, $selected_he, $selected_school_slug ); 
+							$initial_count = ltdh_render_major_programs_list( $major_id, $selected_he ); 
 							?>
 						</div>
 					</div>
-
-					<script>
-					document.addEventListener('DOMContentLoaded', function() {
-						var countBadge = document.getElementById('ltdh-major-programs-count');
-						if (countBadge) {
-							<?php if ( ! empty( $context_school ) ) : ?>
-								countBadge.textContent = '<?php echo $initial_count; ?> chương trình';
-							<?php else : ?>
-								countBadge.textContent = '<?php echo $initial_count; ?> trường tuyển sinh';
-							<?php endif; ?>
-						}
-					});
-					</script>
 				</section>
 
 				<!-- SECTION: ADMISSION PROCESS -->

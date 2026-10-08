@@ -20,7 +20,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 		<?php
 		// Query featured schools (Cached for performance)
-		$cache_key = 'ltdh_archive_school_featured';
+		$cache_key = 'ltdh_archive_school_featured_v2';
 		$featured_posts = get_transient( $cache_key );
 		if ( false === $featured_posts || ! is_array( $featured_posts ) ) {
 			$all_school_candidates = get_posts( [
@@ -62,19 +62,31 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 					$featured_count = count( $featured_posts );
 					$featured_index = 0;
 					foreach ( $featured_posts as $featured_post ) :
-						$school_id   = $featured_post->ID;
-						$logo_id     = get_field( 'logo', $school_id );
-						$en_name     = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
-						$school_code = get_post_meta( $school_id, 'school_code', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' );
+						$school_id       = $featured_post->ID;
+						$logo_id         = get_field( 'logo', $school_id );
+						$en_name         = get_post_meta( $school_id, 'english_name', true );
+						if ( empty( $en_name ) && function_exists( 'get_field' ) ) {
+							$en_name = get_field( 'english_name', $school_id );
+						}
+						$school_code     = get_post_meta( $school_id, 'school_code', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' );
+						if ( ( empty( $en_name ) || 'University' === $en_name ) && ! empty( $school_code ) ) {
+							$en_name = $school_code . ' University';
+						}
 
-						$prog_count = ltdh_get_school_unique_majors_count( $school_id );
-
-						$school_types = ltdh_get_school_training_types( $school_id );
-						$systems_label = ( ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
+						$school_types    = ltdh_get_school_training_types( $school_id );
+						$systems_label   = ( ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
 						
-						$address = get_field( 'address', $school_id ) ?: 'Việt Nam';
-						$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
-						$region = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
+						$address         = get_field( 'address', $school_id ) ?: 'Việt Nam';
+						$school_location = ltdh_get_school_location_label( $school_id );
+						$short_address   = $school_location;
+						if ( ! empty( $address ) && 'Việt Nam' !== $address ) {
+							$addr_parts = array_map( 'trim', explode( ',', $address ) );
+							if ( count( $addr_parts ) >= 2 ) {
+								$short_address = implode( ', ', array_slice( $addr_parts, -2 ) );
+							} else {
+								$short_address = $address;
+							}
+						}
 
 						$grid_span_class = '';
 						if ( $featured_count % 2 !== 0 && $featured_index === $featured_count - 1 ) {
@@ -94,14 +106,14 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 									<span>Nổi bật</span>
 								</span>
 
-								<!-- Location Pill on Cover (if available) -->
-								<?php if ( $region ) : ?>
+								<!-- Location Pill on Cover (Specific City/Province) -->
+								<?php if ( ! empty( $school_location ) ) : ?>
 									<span class="absolute top-3 right-3 bg-slate-900/60 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
 										<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 											<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 										</svg>
-										<span><?php echo esc_html( $region ); ?></span>
+										<span><?php echo esc_html( $school_location ); ?></span>
 									</span>
 								<?php endif; ?>
 							</div>
@@ -128,66 +140,43 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 										<?php if ( ! empty( $school_code ) ) : ?>
 											<span class="font-bold text-[#00308b] bg-blue-50 px-1.5 py-0.5 rounded text-[10px] border border-blue-100/80">Mã: <?php echo esc_html( $school_code ); ?></span>
 										<?php endif; ?>
-										<?php if ( ! empty( $region ) ) : ?>
-											<span class="text-xs text-slate-500 font-medium truncate"><?php echo esc_html( $region ); ?></span>
+										<?php if ( ! empty( $school_location ) ) : ?>
+											<span class="text-xs text-slate-500 font-medium truncate"><?php echo esc_html( $school_location ); ?></span>
 										<?php endif; ?>
 									</div>
 
 									<!-- School Name -->
-									<h3 class="font-extrabold text-slate-900 text-sm md:text-[15px] tracking-tight leading-snug min-h-[44px] line-clamp-2 mt-0.5 group-hover:text-[#00308b] transition-colors">
+									<h3 class="font-extrabold text-slate-900 text-sm md:text-[15px] tracking-tight leading-snug min-h-[40px] line-clamp-2 mt-0.5 group-hover:text-[#00308b] transition-colors">
 										<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>">
 											<?php echo esc_html( get_the_title( $school_id ) ); ?>
 										</a>
 									</h3>
-									
-									<!-- Training Types Badges Container -->
-									<div class="mt-3 min-h-[38px] flex items-center">
-										<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
-											<div class="flex flex-wrap gap-1.5">
-												<?php
-												foreach ( $school_types as $st_term ) {
-													echo ltdh_get_training_type_badge_html( $st_term );
-												}
-												?>
-											</div>
-										<?php else : ?>
-											<div class="flex flex-wrap gap-1.5">
-												<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500">
-													<span>Đang cập nhật hệ đào tạo</span>
-												</span>
-											</div>
-										<?php endif; ?>
-									</div>
 
-									<!-- Meta Row (Khu vực / Cơ sở & Ngành đào tạo) -->
-									<div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 gap-2">
-										<div class="flex items-center gap-1.5 text-slate-500 truncate" title="<?php echo esc_attr( $address ); ?>">
-											<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<!-- English Name -->
+									<?php if ( ! empty( $en_name ) ) : ?>
+										<p class="text-xs text-slate-400 font-medium line-clamp-1 italic mt-0.5" title="<?php echo esc_attr( $en_name ); ?>">
+											<?php echo esc_html( $en_name ); ?>
+										</p>
+									<?php endif; ?>
+									
+									<!-- Địa chỉ trường -->
+									<?php
+									$display_address = ! empty( $address ) && 'Việt Nam' !== $address ? $address : ( ! empty( $school_location ) ? 'Cơ sở: ' . $school_location : '' );
+									if ( ! empty( $display_address ) ) :
+									?>
+										<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-start gap-1.5 text-xs text-slate-500 min-h-[36px]">
+											<svg class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 												<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 											</svg>
-											<span class="truncate"><?php echo esc_html( ltdh_get_school_location_label( $school_id ) ); ?></span>
+											<span class="line-clamp-2 leading-relaxed" title="<?php echo esc_attr( $display_address ); ?>">
+												<?php echo esc_html( $display_address ); ?>
+											</span>
 										</div>
-
-										<div class="flex items-center gap-1 shrink-0">
-											<?php if ( $prog_count > 0 ) : ?>
-												<span class="inline-flex items-center gap-1 text-slate-700 font-semibold">
-													<svg class="w-3.5 h-3.5 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-														<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-													</svg>
-													<span><strong class="text-[#00308b] font-black"><?php echo esc_html( $prog_count ); ?></strong> ngành</span>
-												</span>
-											<?php else : ?>
-												<span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
-													<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-													Đang cập nhật chỉ tiêu
-												</span>
-											<?php endif; ?>
-										</div>
-									</div>
+									<?php endif; ?>
 								</div>
-								
-								<!-- Action CTA Button -->
+
+								<!-- Nút Tìm hiểu chi tiết -->
 								<div class="mt-3.5 pt-3 border-t border-slate-100">
 									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" 
 									   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
@@ -255,18 +244,30 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						if ( ! empty( $featured_school_ids ) && in_array( $school_id, $featured_school_ids, true ) ) {
 							continue;
 						}
-						$logo_id     = get_field( 'logo', $school_id );
-						$en_name     = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
-						$school_code = get_post_meta( $school_id, 'school_code', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' );
+						$logo_id         = get_field( 'logo', $school_id );
+						$en_name         = get_post_meta( $school_id, 'english_name', true );
+						if ( empty( $en_name ) && function_exists( 'get_field' ) ) {
+							$en_name = get_field( 'english_name', $school_id );
+						}
+						$school_code     = get_post_meta( $school_id, 'school_code', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' );
+						if ( ( empty( $en_name ) || 'University' === $en_name ) && ! empty( $school_code ) ) {
+							$en_name = $school_code . ' University';
+						}
 
-						$prog_count = ltdh_get_school_unique_majors_count( $school_id );
-
-						$school_types = ltdh_get_school_training_types( $school_id );
-						$systems_label = ( ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
+						$school_types    = ltdh_get_school_training_types( $school_id );
+						$systems_label   = ( ! empty( $school_types ) ) ? implode( ' · ', $school_types ) : '';
 						
-						$address = get_field( 'address', $school_id ) ?: 'Việt Nam';
-						$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
-						$region = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
+						$address         = get_field( 'address', $school_id ) ?: 'Việt Nam';
+						$school_location = ltdh_get_school_location_label( $school_id );
+						$short_address   = $school_location;
+						if ( ! empty( $address ) && 'Việt Nam' !== $address ) {
+							$addr_parts = array_map( 'trim', explode( ',', $address ) );
+							if ( count( $addr_parts ) >= 2 ) {
+								$short_address = implode( ', ', array_slice( $addr_parts, -2 ) );
+							} else {
+								$short_address = $address;
+							}
+						}
 
 						$grid_span_class = '';
 						if ( $non_featured_count % 2 !== 0 && $regular_index === $non_featured_count - 1 ) {
@@ -277,13 +278,13 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						<!-- Card Cover & Location -->
 						<div class="relative h-32 sm:h-36 bg-slate-200 bg-cover bg-center overflow-hidden" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ) ); ?>');">
 							<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent"></div>
-							<?php if ( $region ) : ?>
+							<?php if ( ! empty( $school_location ) ) : ?>
 								<span class="absolute top-2.5 right-2.5 bg-slate-900/60 backdrop-blur-md text-white text-[10px] font-semibold px-2 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
 									<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 										<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 									</svg>
-									<span><?php echo esc_html( $region ); ?></span>
+									<span><?php echo esc_html( $school_location ); ?></span>
 								</span>
 							<?php endif; ?>
 						</div>
@@ -310,8 +311,8 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 									<?php if ( ! empty( $school_code ) ) : ?>
 										<span class="font-bold text-[#00308b] bg-blue-50 px-1.5 py-0.5 rounded text-[10px] border border-blue-100/80">Mã: <?php echo esc_html( $school_code ); ?></span>
 									<?php endif; ?>
-									<?php if ( ! empty( $region ) ) : ?>
-										<span class="text-xs text-slate-500 font-medium truncate"><?php echo esc_html( $region ); ?></span>
+									<?php if ( ! empty( $school_location ) ) : ?>
+										<span class="text-xs text-slate-500 font-medium truncate"><?php echo esc_html( $school_location ); ?></span>
 									<?php endif; ?>
 								</div>
 
@@ -321,65 +322,43 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 										<?php the_title(); ?>
 									</a>
 								</h3>
+
+								<!-- English Name -->
+								<?php if ( ! empty( $en_name ) ) : ?>
+									<p class="text-xs text-slate-400 font-medium line-clamp-1 italic mt-0.5" title="<?php echo esc_attr( $en_name ); ?>">
+										<?php echo esc_html( $en_name ); ?>
+									</p>
+								<?php endif; ?>
 								
-								<!-- Training Types / Status Badges Container -->
-								<div class="mt-3 min-h-[38px] flex items-center">
-									<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
-										<div class="flex flex-wrap gap-1.5">
-											<?php
-											foreach ( $school_types as $st_term ) {
-												echo ltdh_get_training_type_badge_html( $st_term );
-											}
-											?>
-										</div>
-									<?php else : ?>
-										<div class="flex flex-wrap gap-1.5">
-											<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500">
-												<span>Đang cập nhật hệ đào tạo</span>
+									<!-- Địa chỉ trường -->
+									<?php
+									$display_address = ! empty( $address ) && 'Việt Nam' !== $address ? $address : ( ! empty( $school_location ) ? 'Cơ sở: ' . $school_location : '' );
+									if ( ! empty( $display_address ) ) :
+									?>
+										<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-start gap-1.5 text-xs text-slate-500 min-h-[36px]">
+											<svg class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+												<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+												<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+											</svg>
+											<span class="line-clamp-2 leading-relaxed" title="<?php echo esc_attr( $display_address ); ?>">
+												<?php echo esc_html( $display_address ); ?>
 											</span>
 										</div>
 									<?php endif; ?>
 								</div>
 
-								<!-- Meta Row (Khu vực / Cơ sở & Ngành đào tạo) -->
-								<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 gap-2">
-									<div class="flex items-center gap-1 text-slate-500 truncate" title="<?php echo esc_attr( $address ); ?>">
-										<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-											<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+								<!-- Nút Tìm hiểu chi tiết -->
+								<div class="mt-3.5 pt-3 border-t border-slate-100">
+									<a href="<?php the_permalink(); ?>" 
+									   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
+										<span>Tìm hiểu chi tiết</span>
+										<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
 										</svg>
-										<span class="truncate"><?php echo esc_html( ltdh_get_school_location_label( $school_id ) ); ?></span>
-									</div>
-
-									<div class="flex items-center gap-1 shrink-0">
-										<?php if ( $prog_count > 0 ) : ?>
-											<span class="inline-flex items-center gap-1 text-slate-700 font-semibold">
-												<svg class="w-3.5 h-3.5 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-													<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-												</svg>
-												<span><strong class="text-[#00308b] font-black"><?php echo esc_html( $prog_count ); ?></strong> ngành</span>
-											</span>
-										<?php else : ?>
-											<span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
-												<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-												Đang cập nhật chỉ tiêu
-											</span>
-										<?php endif; ?>
-									</div>
+									</a>
 								</div>
 							</div>
-							
-							<!-- Action CTA Button -->
-							<div class="mt-3 pt-2.5 border-t border-slate-100">
-								<a href="<?php the_permalink(); ?>" 
-								   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
-									<span>Tìm hiểu chi tiết</span>
-									<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-									</svg>
-								</a>
-							</div>
-					</div>
+						</div>
 				<?php
 						$regular_index++;
 					endwhile;
@@ -395,98 +374,63 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 				<?php
 				if ( have_posts() ) :
 					while ( have_posts() ) : the_post();
-						$school_id = get_the_ID();
+						$school_id       = get_the_ID();
 						if ( ! empty( $featured_school_ids ) && in_array( $school_id, $featured_school_ids, true ) ) {
 							continue;
 						}
-						$address   = get_field( 'address', $school_id ) ?: 'Việt Nam';
-						$hotline   = ltdh_get_school_hotline( $school_id );
-						$logo_id   = get_field( 'logo', $school_id );
-						$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: '';
-
-						$prog_count = ltdh_get_school_unique_majors_count( $school_id );
-						$offered_program_ids = get_posts( [
-							'post_type'      => 'program',
-							'posts_per_page' => 5,
-							'post_status'    => 'publish',
-							'fields'         => 'ids',
-							'no_found_rows'  => true,
-							'meta_query'     => [
-								[
-									'key'     => 'school_relationship',
-									'value'   => $school_id,
-									'compare' => '=',
-								],
-							],
-						] );
-
-						$prog_tags = [];
-						if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
-							foreach ( $offered_program_ids as $tid ) {
-								$title = get_the_title( $tid );
-								if ( $title ) {
-									$prog_tags[] = [
-										'title' => $title,
-										'link'  => get_permalink( $tid ),
-									];
-								}
-							}
+						$address         = get_field( 'address', $school_id ) ?: 'Việt Nam';
+						$logo_id         = get_field( 'logo', $school_id );
+						$school_code     = get_post_meta( $school_id, 'school_code', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' );
+						$en_name         = get_post_meta( $school_id, 'english_name', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'english_name', $school_id ) : '' );
+						if ( ( empty( $en_name ) || 'University' === $en_name ) && ! empty( $school_code ) ) {
+							$en_name = $school_code . ' University';
 						}
-
-						$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
-						$region = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
-
-						$training_modes = ltdh_get_school_training_types( $school_id );
+						$school_location = ltdh_get_school_location_label( $school_id );
+						$display_address = ! empty( $address ) && 'Việt Nam' !== $address ? $address : ( ! empty( $school_location ) ? 'Cơ sở: ' . $school_location : '' );
 				?>
-				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+				<div class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all">
 					<div class="flex flex-col sm:flex-row items-stretch">
-						<div class="sm:w-36 h-32 sm:h-auto bg-cover bg-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-100" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ltdh_get_fallback_image( 'school' ) ); ?>');"></div>
-						<div class="flex-1 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+						<div class="sm:w-44 h-32 sm:h-auto bg-cover bg-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-100" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ) ); ?>');"></div>
+						<div class="flex-1 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 							<div class="flex-1 min-w-0">
-								<div class="flex items-center gap-2">
+								<div class="flex items-center gap-2 mb-1.5">
+									<?php if ( ! empty( $school_code ) ) : ?>
+										<span class="font-bold text-[#00308b] bg-blue-50 px-2 py-0.5 rounded text-[11px] border border-blue-100">Mã: <?php echo esc_html( $school_code ); ?></span>
+									<?php endif; ?>
+									<?php if ( ! empty( $school_location ) ) : ?>
+										<span class="text-xs text-slate-500 font-medium"><?php echo esc_html( $school_location ); ?></span>
+									<?php endif; ?>
+								</div>
+								<div class="flex items-center gap-2.5">
 									<?php if ( $logo_id ) : ?>
-										<div class="h-8 w-8 bg-white border border-slate-100 rounded shrink-0 flex items-center justify-center overflow-hidden p-0.5">
+										<div class="h-9 w-9 bg-white border border-slate-200/80 rounded-lg shrink-0 flex items-center justify-center overflow-hidden p-0.5 shadow-2xs">
 											<?php echo wp_get_attachment_image( $logo_id, 'thumbnail', false, [ 'class' => 'h-full w-full object-contain' ] ); ?>
 										</div>
 									<?php endif; ?>
-									<h3 class="font-extrabold text-slate-900 text-base sm:text-lg leading-tight">
-										<a href="<?php the_permalink(); ?>" class="hover:text-brand-accent transition-colors"><?php the_title(); ?></a>
+									<h3 class="font-extrabold text-slate-900 text-base sm:text-lg leading-tight hover:text-[#00308b] transition-colors">
+										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 									</h3>
 								</div>
-								<?php if ( $en_name ) : ?>
-									<p class="text-sm text-slate-400 italic mt-0.5"><?php echo esc_html( $en_name ); ?></p>
+								<?php if ( ! empty( $en_name ) ) : ?>
+									<p class="text-xs text-slate-400 font-medium italic mt-1 line-clamp-1"><?php echo esc_html( $en_name ); ?></p>
 								<?php endif; ?>
-								<div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-500">
-									<span class="flex items-center gap-1"><span class="text-brand-primary">📍</span> <?php echo esc_html( $address ); ?></span>
-									<?php if ( $prog_count > 0 ) : ?>
-										<span class="flex items-center gap-1"><span class="text-brand-primary">📊</span> <?php echo esc_html( $prog_count ); ?> chương trình</span>
-									<?php endif; ?>
-									<?php if ( ! empty( $training_modes ) ) : ?>
-										<span class="flex items-center gap-1.5">
-											<span class="text-brand-primary">🎓</span>
-											<span class="flex flex-wrap gap-1">
-												<?php
-												foreach ( $training_modes as $mode ) {
-													echo ltdh_get_training_type_badge_html( $mode );
-												}
-												?>
-											</span>
-										</span>
-									<?php endif; ?>
-								</div>
-								<?php if ( ! empty( $prog_tags ) ) : ?>
-									<div class="flex flex-wrap gap-1.5 mt-2">
-										<?php foreach ( $prog_tags as $tag ) : ?>
-											<a href="<?php echo esc_url( $tag['link'] ); ?>" class="inline-block bg-blue-50 text-brand-primary text-xs font-bold px-2 py-0.5 rounded-full hover:bg-blue-100 transition-colors"><?php echo esc_html( $tag['title'] ); ?></a>
-										<?php endforeach; ?>
-										<?php if ( $prog_count > 5 ) : ?>
-											<a href="<?php the_permalink(); ?>" class="inline-block bg-slate-100 text-slate-500 text-xs font-bold px-2 py-0.5 rounded-full hover:bg-slate-200 transition-colors">+<?php echo esc_html( $prog_count - 5 ); ?> nữa</a>
-										<?php endif; ?>
+								<?php if ( ! empty( $display_address ) ) : ?>
+									<div class="flex items-center gap-1.5 mt-2.5 text-xs text-slate-500">
+										<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+											<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+										</svg>
+										<span class="line-clamp-1" title="<?php echo esc_attr( $display_address ); ?>"><?php echo esc_html( $display_address ); ?></span>
 									</div>
 								<?php endif; ?>
 							</div>
-							<div class="flex items-center gap-2 shrink-0 w-full sm:w-auto mt-3 sm:mt-0">
-								<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-6 py-2.5 rounded-lg text-sm ltdh-btn-details min-h-[40px] flex items-center">Tìm hiểu chi tiết</a>
+							<div class="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+								<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center shadow-2xs">
+									<span>Tìm hiểu chi tiết</span>
+									<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+									</svg>
+								</a>
 							</div>
 						</div>
 					</div>

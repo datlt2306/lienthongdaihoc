@@ -78,11 +78,6 @@ $steps = [
 			</p>
 		</div>
 
-		<!-- Step Count Badge (Brand Color) -->
-		<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 rounded-full text-xs font-semibold text-slate-600 shrink-0">
-			<span class="w-2 h-2 rounded-full bg-[#00308b]"></span>
-			<span>4 Bước xét tuyển</span>
-		</div>
 	</div>
 
 	<!-- STEPS GRID CONTAINER -->

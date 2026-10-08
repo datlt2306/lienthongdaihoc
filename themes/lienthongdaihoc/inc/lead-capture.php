@@ -60,24 +60,33 @@ function ltdh_check_leads_table_schema() {
 }
 
 /**
- * Check if current IP address has exceeded the rate limit (3 submissions per 10 minutes).
+ * Check if current IP address has exceeded the rate limit (10 submissions per 10 minutes).
  */
 function ltdh_is_ip_rate_limited(): bool {
+	// Whitelist administrators and authenticated testers
+	if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
+		return false;
+	}
+
 	$ip = $_SERVER['REMOTE_ADDR'] ?? '';
-	if ( empty( $ip ) || $ip === '127.0.0.1' || $ip === '::1' ) {
+	if ( empty( $ip ) || $ip === '127.0.0.1' || $ip === '::1' || strpos( $ip, '127.0.0.' ) === 0 || strpos( $ip, '192.168.' ) === 0 || strpos( $ip, '10.' ) === 0 || strpos( $ip, '172.' ) === 0 ) {
 		return false;
 	}
 	$transient_key = 'ltdh_rl_' . md5( $ip );
 	$count         = (int) get_transient( $transient_key );
-	return ( $count >= 3 );
+	return ( $count >= 10 );
 }
 
 /**
  * Increment the submission counter for current IP.
  */
 function ltdh_increment_ip_rate_limit(): void {
+	if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
+		return;
+	}
+
 	$ip = $_SERVER['REMOTE_ADDR'] ?? '';
-	if ( empty( $ip ) || $ip === '127.0.0.1' || $ip === '::1' ) {
+	if ( empty( $ip ) || $ip === '127.0.0.1' || $ip === '::1' || strpos( $ip, '127.0.0.' ) === 0 || strpos( $ip, '192.168.' ) === 0 || strpos( $ip, '10.' ) === 0 || strpos( $ip, '172.' ) === 0 ) {
 		return;
 	}
 	$transient_key = 'ltdh_rl_' . md5( $ip );

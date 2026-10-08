@@ -1719,6 +1719,9 @@
   .animate-pulse {
     animation: var(--animate-pulse);
   }
+  .cursor-not-allowed {
+    cursor: not-allowed;
+  }
   .cursor-pointer {
     cursor: pointer;
   }
@@ -2113,6 +2116,12 @@
   }
   .border-emerald-200 {
     border-color: var(--color-emerald-200);
+  }
+  .border-emerald-200\/60 {
+    border-color: color-mix(in srgb, oklch(90.5% 0.093 164.15) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-emerald-200) 60%, transparent);
+    }
   }
   .border-emerald-200\/70 {
     border-color: color-mix(in srgb, oklch(90.5% 0.093 164.15) 70%, transparent);
@@ -2618,6 +2627,9 @@
   .bg-slate-200 {
     background-color: var(--color-slate-200);
   }
+  .bg-slate-300 {
+    background-color: var(--color-slate-300);
+  }
   .bg-slate-400 {
     background-color: var(--color-slate-400);
   }
@@ -2835,6 +2847,14 @@
   }
   .via-slate-900 {
     --tw-gradient-via: var(--color-slate-900);
+    --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-via-stops);
+  }
+  .via-slate-900\/10 {
+    --tw-gradient-via: color-mix(in srgb, oklch(20.8% 0.042 265.755) 10%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-gradient-via: color-mix(in oklab, var(--color-slate-900) 10%, transparent);
+    }
     --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
     --tw-gradient-stops: var(--tw-gradient-via-stops);
   }
@@ -3226,6 +3246,9 @@
   .text-\[11px\] {
     font-size: 11px;
   }
+  .text-\[12px\] {
+    font-size: 12px;
+  }
   .text-\[15px\] {
     font-size: 15px;
   }
@@ -3404,6 +3427,9 @@
   .text-green-800 {
     color: var(--color-green-800);
   }
+  .text-inherit {
+    color: inherit;
+  }
   .text-orange-300 {
     color: var(--color-orange-300);
   }
@@ -3526,6 +3552,9 @@
   }
   .opacity-50 {
     opacity: 50%;
+  }
+  .opacity-60 {
+    opacity: 60%;
   }
   .opacity-75 {
     opacity: 75%;
@@ -3844,9 +3873,19 @@
       --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
       box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
     }
+    .group-hover\/btn\:translate-x-0\.5:is(:where(.group\/btn):hover *) {
+      --tw-translate-x: calc(var(--spacing) * 0.5);
+      translate: var(--tw-translate-x) var(--tw-translate-y);
+    }
     .group-hover\/btn\:translate-x-1:is(:where(.group\/btn):hover *) {
       --tw-translate-x: var(--spacing);
       translate: var(--tw-translate-x) var(--tw-translate-y);
+    }
+    .group-hover\/btn\:bg-white:is(:where(.group\/btn):hover *) {
+      background-color: var(--color-white);
+    }
+    .group-hover\/btn\:opacity-100:is(:where(.group\/btn):hover *) {
+      opacity: 100%;
     }
     .group-hover\/btn\:shadow-sm:is(:where(.group\/btn):hover *) {
       --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
@@ -3915,6 +3954,9 @@
     .hover\:border-amber-300:hover {
       border-color: var(--color-amber-300);
     }
+    .hover\:border-amber-600:hover {
+      border-color: var(--color-amber-600);
+    }
     .hover\:border-blue-300:hover {
       border-color: var(--color-blue-300);
     }
@@ -3944,6 +3986,9 @@
     .hover\:border-emerald-500:hover {
       border-color: var(--color-emerald-500);
     }
+    .hover\:border-emerald-600:hover {
+      border-color: var(--color-emerald-600);
+    }
     .hover\:border-red-600:hover {
       border-color: var(--color-red-600);
     }
@@ -3956,6 +4001,14 @@
     @supports (color: color-mix(in lab, red, red)) {
       .hover\:border-slate-200\/60:hover {
         border-color: color-mix(in oklab, var(--color-slate-200) 60%, transparent);
+      }
+    }
+    .hover\:border-slate-200\/90:hover {
+      border-color: color-mix(in srgb, oklch(92.9% 0.013 255.508) 90%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:border-slate-200\/90:hover {
+        border-color: color-mix(in oklab, var(--color-slate-200) 90%, transparent);
       }
     }
     .hover\:border-slate-300:hover {
@@ -3981,6 +4034,9 @@
     }
     .hover\:bg-\[\#e06e00\]:hover {
       background-color: #e06e00;
+    }
+    .hover\:bg-amber-600:hover {
+      background-color: var(--color-amber-600);
     }
     .hover\:bg-black\/50:hover {
       background-color: color-mix(in srgb, #000 50%, transparent);
@@ -4056,6 +4112,9 @@
     }
     .hover\:bg-emerald-100:hover {
       background-color: var(--color-emerald-100);
+    }
+    .hover\:bg-emerald-600:hover {
+      background-color: var(--color-emerald-600);
     }
     .hover\:bg-orange-50:hover {
       background-color: var(--color-orange-50);
@@ -4296,6 +4355,9 @@
     .sm\:mt-0 {
       margin-top: 0px;
     }
+    .sm\:mb-6 {
+      margin-bottom: calc(var(--spacing) * 6);
+    }
     .sm\:ml-5 {
       margin-left: calc(var(--spacing) * 5);
     }
@@ -4319,6 +4381,9 @@
     }
     .sm\:h-11 {
       height: calc(var(--spacing) * 11);
+    }
+    .sm\:h-12 {
+      height: calc(var(--spacing) * 12);
     }
     .sm\:h-16 {
       height: calc(var(--spacing) * 16);
@@ -4356,11 +4421,17 @@
     .sm\:w-11 {
       width: calc(var(--spacing) * 11);
     }
+    .sm\:w-12 {
+      width: calc(var(--spacing) * 12);
+    }
     .sm\:w-16 {
       width: calc(var(--spacing) * 16);
     }
     .sm\:w-36 {
       width: calc(var(--spacing) * 36);
+    }
+    .sm\:w-44 {
+      width: calc(var(--spacing) * 44);
     }
     .sm\:w-\[250px\] {
       width: 250px;
@@ -4370,6 +4441,9 @@
     }
     .sm\:w-auto {
       width: auto;
+    }
+    .sm\:max-w-\[310px\] {
+      max-width: 310px;
     }
     .sm\:grid-cols-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4391,6 +4465,9 @@
     }
     .sm\:justify-between {
       justify-content: space-between;
+    }
+    .sm\:justify-end {
+      justify-content: flex-end;
     }
     .sm\:gap-1\.5 {
       gap: calc(var(--spacing) * 1.5);

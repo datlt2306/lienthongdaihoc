@@ -248,7 +248,6 @@
                     }
                 ]
             },
-
             {
                 "key": "field_tab_major_related",
                 "label": "Ngành đào tạo liên quan",
@@ -335,6 +334,23 @@
                 "type": "wysiwyg"
             },
             {
+                "key": "field_program_admission_status",
+                "label": "Trạng thái tuyển sinh",
+                "name": "admission_status",
+                "type": "select",
+                "instructions": "Chọn trạng thái tuyển sinh. Nếu chọn 'Tạm ngưng tuyển sinh (Đã hết chỉ tiêu)', hệ thống sẽ hiển thị cảnh báo đã hết chỉ tiêu.",
+                "choices": {
+                    "tuyen-sinh": "Đang tuyển sinh (Còn chỉ tiêu)",
+                    "tam-ngung": "Tạm ngưng tuyển sinh (Đã hết chỉ tiêu)",
+                    "sap-mo": "Sắp mở tuyển sinh"
+                },
+                "default_value": "tuyen-sinh",
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 1,
+                "return_format": "value"
+            },
+            {
                 "key": "field_program_quota",
                 "label": "Chỉ tiêu tuyển sinh",
                 "name": "quota",
@@ -373,7 +389,7 @@
             },
             {
                 "key": "field_tab_prog_batches",
-                "label": "Lịch trình các đợt tuyển sinh",
+                "label": "Các đợt tuyển sinh",
                 "name": "",
                 "type": "tab",
                 "placement": "top",
@@ -384,7 +400,7 @@
                 "label": "Các đợt tuyển sinh",
                 "name": "admission_batches",
                 "type": "repeater",
-                "instructions": "Nhập lịch trình các đợt tuyển sinh của chương trình này",
+                "instructions": "Nhập các đợt tuyển sinh của chương trình này",
                 "layout": "table",
                 "button_label": "Thêm đợt tuyển sinh",
                 "sub_fields": [
@@ -619,7 +635,7 @@
             },
             {
                 "key": "field_tab_prog_curriculum",
-                "label": "Lộ trình học & Khung chương trình",
+                "label": "Khung chương trình",
                 "name": "",
                 "type": "tab",
                 "placement": "top",
@@ -1407,13 +1423,6 @@
                 "type": "tab",
                 "placement": "top",
                 "endpoint": 0
-            },
-            {
-                "key": "field_hp_benefits_heading",
-                "label": "Heading",
-                "name": "hp_benefits_heading",
-                "type": "text",
-                "default_value": "Lợi ích dành cho bạn"
             },
             {
                 "key": "field_hp_benefits_desc",

@@ -757,7 +757,7 @@ add_filter( 'acf/load_value/name=order', function( $value, $post_id, $field ) {
  * Get unified location display label for a school (Campus or Region).
  *
  * Prioritizes physical campus (e.g. 'Hà Nội', 'TP. Hồ Chí Minh'),
- * then region ('Miền Bắc'), then city from address.
+ * then city from address, then region ('Miền Bắc').
  *
  * @param int $school_id
  * @return string
@@ -780,25 +780,29 @@ function ltdh_get_school_location_label( int $school_id ): string {
 		}
 	}
 
-	// 2. Region taxonomy term (Khu vực)
+	// 2. Extract city / province from address ACF meta
+	$address = get_field( 'address', $school_id );
+	if ( $address ) {
+		if ( preg_match( '/(Hà Nội|Hồ Chí Minh|TP\.?\s*HCM|Đà Nẵng|Hải Phòng|Cần Thơ|Thái Nguyên|Hưng Yên|Nghệ An|Nam Định|Bắc Ninh|Thanh Hóa|Huế|Thừa Thiên Huế|Bình Dương|Đồng Nai|Quảng Ninh|Vĩnh Phúc|Hải Dương|Bắc Giang|Phú Thọ|Thái Bình|Hà Nam|Ninh Bình|Quảng Nam|Khánh Hòa|Bà Rịa|Vũng Tàu|An Giang|Kiên Giang|Tiền Giang|Vĩnh Long|Trà Vinh|Đắk Lắk|Lâm Đồng|Gia Lai)/iu', $address, $matches ) ) {
+			$matched_city = $matches[1];
+			if ( preg_match( '/TP\.?\s*HCM/i', $matched_city ) ) {
+				return 'Hồ Chí Minh';
+			}
+			return $matched_city;
+		}
+	}
+
+	// 3. Region taxonomy term (Khu vực)
 	$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
 	if ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) {
 		return $region_terms[0]->name;
 	}
 
-	// 3. Extract city / province from address ACF meta
-	$address = get_field( 'address', $school_id );
-	if ( $address ) {
-		if ( preg_match( '/(Hà Nội|Hồ Chí Minh|Đà Nẵng|Thái Nguyên|Hưng Yên|Hải Phòng|Cần Thơ)/iu', $address, $matches ) ) {
-			return $matches[1];
-		}
-	}
-
-	return 'Miền Bắc';
+	return 'Hà Nội';
 }
 
 function ltdh_get_cached_featured_schools() {
-	$cache_key = 'ltdh_featured_schools_data_v15';
+	$cache_key = 'ltdh_featured_schools_data_v16';
 	$data      = get_transient( $cache_key );
 	if ( false !== $data && is_array( $data ) ) {
 		return $data;
@@ -818,12 +822,19 @@ function ltdh_get_cached_featured_schools() {
 		$index = 0;
 		$fallback_images = ltdh_default('images', 'fallback_school_covers', []);
 		foreach ( $top_schools as $school_post ) {
-			$school_id = $school_post->ID;
-			$address   = get_field( 'address', $school_id );
-			$hotline   = ltdh_get_school_hotline( $school_id );
-			$thumb_url = ltdh_get_school_cover_url( $school_id, 'medium' );
-			$logo_id   = ltdh_get_school_image_id( $school_id );
-			$en_name   = get_post_meta( $school_id, 'english_name', true ) ?: 'University';
+			$school_id   = $school_post->ID;
+			$address     = get_field( 'address', $school_id );
+			$hotline     = ltdh_get_school_hotline( $school_id );
+			$thumb_url   = ltdh_get_school_cover_url( $school_id, 'medium' );
+			$logo_id     = ltdh_get_school_image_id( $school_id );
+			$school_code = get_post_meta( $school_id, 'school_code', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' );
+			$en_name     = get_post_meta( $school_id, 'english_name', true );
+			if ( empty( $en_name ) && function_exists( 'get_field' ) ) {
+				$en_name = get_field( 'english_name', $school_id );
+			}
+			if ( ( empty( $en_name ) || 'University' === $en_name ) && ! empty( $school_code ) ) {
+				$en_name = $school_code . ' University';
+			}
 
 			$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
 			$region       = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
@@ -866,6 +877,7 @@ function ltdh_get_cached_featured_schools() {
 				'id'            => $school_id,
 				'title'         => get_the_title($school_id),
 				'permalink'     => get_permalink($school_id),
+				'code'          => $school_code,
 				'address'       => $address,
 				'location'      => ltdh_get_school_location_label($school_id),
 				'region'        => $region,
@@ -874,6 +886,7 @@ function ltdh_get_cached_featured_schools() {
 				'logo_id'       => $logo_id,
 				'en_name'       => $en_name,
 				'systems_label' => $systems_label,
+				'school_types'  => ltdh_get_school_training_types( $school_id ),
 				'prog_count'    => ltdh_get_school_unique_majors_count($school_id),
 			];
 			$index++;

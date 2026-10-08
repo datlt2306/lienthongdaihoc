@@ -217,8 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const majorId = wrapper.dataset.majorId;
         const listContainer = document.getElementById('ltdh-major-programs-list');
         const pills = document.querySelectorAll('.ltdh-major-he-pill');
-        const schoolSelect = document.getElementById('ltdh-major-school-select');
-        const countBadge = document.getElementById('ltdh-major-programs-count');
 
         if (!listContainer || !majorId) return;
 
@@ -228,7 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const activePill = document.querySelector('.ltdh-major-he-pill.is-active');
             const selectedHe = activePill ? (activePill.dataset.he || '') : '';
-            const selectedSchool = schoolSelect ? schoolSelect.value : '';
 
             if (pushUrl) {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -237,13 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     urlParams.delete('he');
                 }
-
-                if (selectedSchool) {
-                    urlParams.set('truong', selectedSchool);
-                } else {
-                    urlParams.delete('truong');
-                }
-                // Clean up any legacy redundant query parameters
+                // Clean up any legacy school filter query parameters
+                urlParams.delete('truong');
                 urlParams.delete('from_school');
                 urlParams.delete('school');
 
@@ -256,7 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('action', 'ltdh_filter_major_programs');
             formData.append('major_id', majorId);
             formData.append('he', selectedHe);
-            formData.append('school', selectedSchool);
 
             const ajaxUrl = (typeof ltdh_ajax !== 'undefined' && ltdh_ajax.ajax_url)
                 ? ltdh_ajax.ajax_url
@@ -270,25 +261,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 if (data.success) {
                     listContainer.innerHTML = data.data.html;
-                    if (countBadge && typeof data.data.count !== 'undefined') {
-                        countBadge.textContent = selectedSchool ? (data.data.count + ' chương trình') : (data.data.count + ' trường tuyển sinh');
-                    }
                     const titleEl = document.getElementById('ltdh-major-programs-title');
-                    const subtitleEl = document.getElementById('ltdh-major-programs-subtitle');
                     if (titleEl) {
-                        titleEl.textContent = selectedSchool ? 'Chương trình đào tạo tại trường' : 'Chương trình & Trường tuyển sinh';
-                    }
-                    if (subtitleEl) {
-                        subtitleEl.textContent = selectedSchool ? 'Danh sách các hình thức tuyển sinh đang mở cho ngành này' : 'Lựa chọn hình thức đào tạo và trường phù hợp với nguyện vọng của bạn';
-                    }
-                    const contextBanner = document.getElementById('ltdh-major-context-banner');
-                    if (contextBanner) {
-                        const initialBannerSchool = contextBanner.dataset.schoolSlug || '';
-                        if (!selectedSchool || (initialBannerSchool && initialBannerSchool !== selectedSchool)) {
-                            contextBanner.style.display = 'none';
-                        } else {
-                            contextBanner.style.display = '';
-                        }
+                        titleEl.textContent = 'Trường đang tuyển sinh liên thông';
                     }
                     if (window.ltdhCompare && typeof window.ltdhCompare.syncButtonStates === 'function') {
                         window.ltdhCompare.syncButtonStates();
@@ -315,16 +290,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        if (schoolSelect) {
-            schoolSelect.addEventListener('change', function() {
-                doFilter(true);
-            });
-        }
-
         window.addEventListener('popstate', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const currentHe = urlParams.get('he') || '';
-            const currentSchool = urlParams.get('truong') || urlParams.get('from_school') || urlParams.get('school') || '';
 
             pills.forEach(p => {
                 const pHe = p.dataset.he || '';
@@ -336,10 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     p.classList.add('bg-transparent', 'text-slate-600', 'hover:bg-white/60');
                 }
             });
-
-            if (schoolSelect) {
-                schoolSelect.value = currentSchool;
-            }
 
             doFilter(false);
         });

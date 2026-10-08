@@ -587,13 +587,43 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 		];
 	}
 
+	$offered_program_ids = get_post_meta( $major_id, LTDH_META_OFFERED_PROGRAMS, true );
+	$direct_prog_ids = get_posts( [
+		'post_type'   => LTDH_CPT_PROGRAM,
+		'post_status' => 'publish',
+		'numberposts' => -1,
+		'fields'      => 'ids',
+		'meta_query'  => [
+			'relation' => 'OR',
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => $major_id,
+				'compare' => '=',
+			],
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => '"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => 's:' . strlen( (string) $major_id ) . ':"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => 'i:' . $major_id . ';',
+				'compare' => 'LIKE',
+			],
+		],
+	] );
+	$all_candidate_prog_ids = array_unique( array_filter( array_merge(
+		is_array( $offered_program_ids ) ? $offered_program_ids : [],
+		is_array( $direct_prog_ids ) ? $direct_prog_ids : []
+	) ) );
+
 	$meta_query = [
 		'relation' => 'AND',
-		[
-			'key'     => LTDH_META_MAJOR_REL,
-			'value'   => $major_id,
-			'compare' => '=',
-		],
 		$meta_status_filter,
 	];
 
@@ -612,6 +642,25 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 		'no_found_rows'  => true,
 		'meta_query'     => $meta_query,
 	];
+
+	if ( ! empty( $all_candidate_prog_ids ) ) {
+		$query_args['post__in'] = $all_candidate_prog_ids;
+	} else {
+		$meta_query[] = [
+			'relation' => 'OR',
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => $major_id,
+				'compare' => '=',
+			],
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => '"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+		];
+		$query_args['meta_query'] = $meta_query;
+	}
 
 	if ( ! empty( $tax_query ) ) {
 		$query_args['tax_query'] = $tax_query;
@@ -693,31 +742,26 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 		foreach ( $schools_data as $school ) :
 			$programs_count = count( $school['programs'] );
 			?>
-			<div class="ltdh-school-group bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-sm transition-all">
-				<!-- School Header -->
-				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 mb-3.5 border-b border-slate-100">
-					<div class="flex items-center gap-3 min-w-0">
+			<div class="ltdh-school-group bg-white border border-slate-100 hover:border-slate-200/90 rounded-2xl p-4 sm:p-5 transition-all shadow-2xs hover:shadow-xs">
+				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+					<div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
 						<!-- School Logo -->
-						<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-50 p-1 flex items-center justify-center shrink-0">
+						<a href="<?php echo esc_url( get_permalink( $school['id'] ) ); ?>" class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-50 p-1 flex items-center justify-center shrink-0 border border-slate-100 hover:opacity-90 transition-opacity" title="<?php echo esc_attr( $school['name'] ); ?>">
 							<?php if ( ! empty( $school['logo'] ) ) : ?>
 								<img src="<?php echo esc_url( $school['logo'] ); ?>" alt="<?php echo esc_attr( $school['name'] ); ?>" class="w-full h-full object-contain" loading="lazy">
 							<?php else : ?>
 								<span class="text-xs font-black text-[#00308b]">ĐH</span>
 							<?php endif; ?>
-						</div>
+						</a>
 						<!-- School Title & Code & Location -->
-						<div class="min-w-0">
-							<h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug truncate hover:text-[#00308b] transition-colors">
-								<?php if ( $school['id'] ) : ?>
-									<a href="<?php echo esc_url( get_permalink( $school['id'] ) ); ?>" class="hover:underline">
-										<?php echo esc_html( $school['name'] ); ?><?php if ( ! empty( $school['code'] ) ) : ?><span class="text-slate-400 font-semibold"> - <?php echo esc_html( $school['code'] ); ?></span><?php endif; ?>
-									</a>
-								<?php else : ?>
-									<span><?php echo esc_html( $school['name'] ); ?></span>
-								<?php endif; ?>
+						<div class="min-w-0 flex-1">
+							<h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug">
+								<a href="<?php echo esc_url( get_permalink( $school['id'] ) ); ?>" class="hover:text-[#00308b] transition-colors no-underline text-inherit">
+									<?php echo esc_html( $school['name'] ); ?><?php if ( ! empty( $school['code'] ) ) : ?><span class="text-slate-400 font-semibold"> - <?php echo esc_html( $school['code'] ); ?></span><?php endif; ?>
+								</a>
 							</h3>
 							<?php if ( ! empty( $school['address'] ) ) : ?>
-								<p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+								<p class="text-xs text-slate-500 flex items-center gap-1.5 mt-1">
 									<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -728,75 +772,37 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 						</div>
 					</div>
 
-					<!-- School Meta & Page Link -->
-					<div class="flex items-center gap-2 sm:self-center shrink-0">
-						<span class="hidden md:inline-flex items-center text-[11px] font-semibold text-slate-500 bg-slate-100/80 px-2.5 py-1 rounded-full shrink-0">
-							<?php echo esc_html( $programs_count ); ?> hình thức đào tạo
-						</span>
-						<?php if ( $school['id'] ) : ?>
-							<a href="<?php echo esc_url( get_permalink( $school['id'] ) ); ?>" class="hidden md:flex text-xs font-bold text-[#00308b] hover:text-blue-700 hover:underline flex items-center gap-1 pl-1 shrink-0 whitespace-nowrap">
-								<span>Xem trường</span>
-								<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-								</svg>
-							</a>
-						<?php endif; ?>
+					<!-- Training Forms (Clickable buttons) -->
+					<div class="flex items-center flex-wrap sm:justify-end gap-1.5 sm:gap-2 shrink-0 sm:max-w-[310px]">
+						<?php foreach ( $school['programs'] as $prog ) : 
+							$type_name_lower = mb_strtolower( trim( $prog['type_name'] ), 'UTF-8' );
+							$dot_class = 'bg-blue-500';
+							$btn_style = 'bg-blue-50 text-[#00308b] border-blue-200/80 hover:bg-[#00308b] hover:text-white hover:border-[#00308b]';
+
+							if ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
+								$dot_class = 'bg-emerald-500';
+								$btn_style = 'bg-emerald-50 text-emerald-800 border-emerald-200/80 hover:bg-emerald-600 hover:text-white hover:border-emerald-600';
+							} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {
+								$dot_class = 'bg-amber-500';
+								$btn_style = 'bg-amber-50 text-amber-900 border-amber-200/80 hover:bg-amber-600 hover:text-white hover:border-amber-600';
+							}
+
+							$display_label = $prog['type_name'] ? $prog['type_name'] : 'Xem chương trình';
+						?>
+							<?php if ( 'tam-ngung' === $prog['status'] ) : ?>
+								<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed">
+									<span class="w-2 h-2 rounded-full bg-slate-300"></span>
+									<span><?php echo esc_html( $display_label ); ?> (Tạm ngưng)</span>
+								</span>
+							<?php else : ?>
+								<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
+								   class="group/btn inline-flex items-center gap-1.5 px-1.5 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-2xs hover:shadow-xs no-underline <?php echo esc_attr( $btn_style ); ?>" 
+								   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
+									<span><?php echo esc_html( $display_label ); ?></span>
+								</a>
+							<?php endif; ?>
+						<?php endforeach; ?>
 					</div>
-				</div>
-
-				<!-- Program Rows (Clean Hairline Divided List) -->
-				<div class="divide-y divide-slate-100">
-					<?php foreach ( $school['programs'] as $prog ) : ?>
-						<div class="ltdh-program-row py-2.5 sm:py-3 first:pt-1 last:pb-1 flex items-center justify-between gap-3 group hover:bg-slate-50/60 -mx-2 sm:-mx-3 px-2 sm:px-3 rounded-xl transition-all"
-							 data-he="<?php echo esc_attr( $prog['he'] ); ?>"
-							 data-compare-btn
-							 data-compare-type="program"
-							 data-compare-id="<?php echo esc_attr( $prog['id'] ); ?>"
-							 data-compare-title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>"
-							 data-compare-slug="<?php echo esc_attr( $prog['slug'] ); ?>"
-							 data-compare-thumb="<?php echo esc_url( $prog['thumb'] ); ?>"
-							 data-compare-he="<?php echo esc_attr( $prog['he'] ); ?>"
-							 data-compare-nganh="<?php echo esc_attr( $prog['nganh'] ); ?>"
-							 data-compare-major-name="<?php echo esc_attr( $prog['major_name'] ); ?>"
-							 data-compare-school-name="<?php echo esc_attr( $prog['school_name'] ); ?>">
-							
-							<!-- Left: Training Type (Tên hệ) -->
-							<div class="flex items-center gap-3 min-w-0">
-								<?php if ( $prog['type_name'] ) : ?>
-									<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs font-bold px-2.5 py-1 rounded-md tracking-wide shrink-0 hover:opacity-85 transition-opacity" title="Xem chi tiết <?php echo esc_attr( $prog['type_name'] ); ?>">
-										<?php echo esc_html( $prog['type_name'] ); ?>
-									</a>
-								<?php endif; ?>
-							</div>
-
-							<!-- Right: Actions (Chi tiết + So sánh) -->
-							<div class="flex items-center gap-2 shrink-0 justify-end">
-								<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
-									<span class="text-xs text-slate-400 bg-slate-100 py-1.5 px-3 rounded-lg font-bold">Tạm ngưng</span>
-								<?php else : ?>
-									<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="text-xs py-1.5 px-3 rounded-lg font-bold text-[#00308b] bg-blue-50 hover:bg-[#00308b] hover:text-white transition-all whitespace-nowrap">
-										Chi tiết
-									</a>
-									<button type="button"
-											class="ltdh-compare-toggle text-xs text-slate-600 hover:text-slate-900 font-bold bg-slate-100 hover:bg-slate-200/80 rounded-lg py-1.5 px-2.5 transition-all flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer"
-											data-compare-type="program"
-											data-compare-id="<?php echo esc_attr( $prog['id'] ); ?>"
-											data-compare-title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>"
-											data-compare-slug="<?php echo esc_attr( $prog['slug'] ); ?>"
-											data-compare-he="<?php echo esc_attr( $prog['he'] ); ?>"
-											data-compare-nganh="<?php echo esc_attr( $prog['nganh'] ); ?>"
-											data-compare-major-name="<?php echo esc_attr( $prog['major_name'] ); ?>"
-											data-compare-school-name="<?php echo esc_attr( $prog['school_name'] ); ?>"
-											data-compare-thumb="<?php echo esc_url( $prog['thumb'] ); ?>">
-										<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-										</svg>
-										<span>So sánh</span>
-									</button>
-								<?php endif; ?>
-							</div>
-						</div>
-					<?php endforeach; ?>
 				</div>
 			</div>
 			<?php
@@ -810,8 +816,8 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 					<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
 				</svg>
 			</div>
-			<h3 class="font-bold text-slate-800 text-base mb-1">Không tìm thấy chương trình phù hợp</h3>
-			<p class="text-slate-500 text-xs sm:text-sm max-w-md mx-auto">Vui lòng thử chọn hình thức đào tạo khác hoặc thay đổi trường tuyển sinh.</p>
+			<h3 class="font-bold text-slate-800 text-base mb-1">Không tìm thấy trường phù hợp</h3>
+			<p class="text-slate-500 text-xs sm:text-sm max-w-md mx-auto">Vui lòng thử chọn hình thức đào tạo khác.</p>
 		</div>
 		<?php
 	endif;

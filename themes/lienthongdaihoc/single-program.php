@@ -351,7 +351,7 @@ $program_tabs[] = [
 					}
 				?>
 				<section id="lich-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-8">
-					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Lịch trình các đợt tuyển sinh</h2>
+					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Các đợt tuyển sinh</h2>
 
 							<!-- MOBILE TABBED CARD VIEW (< 768px) -->
 							<div class="block md:hidden admission-batches-mobile">
@@ -643,7 +643,7 @@ $program_tabs[] = [
 
 							<?php if ( $documents || $form_url ) : ?>
 								<!-- BLOCK 2: REQUIRED DOCUMENTS & ADMISSION FORM DOWNLOAD -->
-								<div class="<?php echo $requirements ? 'pt-6 border-t border-slate-100' : ''; ?>">
+								<div class="<?php echo $requirements ?>">
 									<h3 class="text-sm md:text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
 										<span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold shrink-0"><?php echo $requirements ? '2' : '1'; ?></span>
 										<span>Hồ sơ xét tuyển cần chuẩn bị</span>
@@ -694,7 +694,7 @@ $program_tabs[] = [
 								<div class="bg-slate-50 rounded-xl p-3.5">
 									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Đơn giá học phí</span>
 									<div class="flex items-baseline flex-wrap gap-1">
-										<span class="text-base md:text-lg font-black text-slate-900">
+										<span class="text-base md:text-lg font-bold text-slate-900">
 											<?php echo esc_html( $tuition ?: 'Liên hệ ban tuyển sinh' ); ?>
 										</span>
 										<?php if ( isset($tuition_year) && $tuition_year ) : ?>
@@ -711,7 +711,7 @@ $program_tabs[] = [
 									<div class="bg-slate-50 rounded-xl p-3.5">
 										<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tổng số tín chỉ toàn khóa</span>
 										<div class="flex items-baseline flex-wrap gap-1">
-											<span class="text-base font-black text-slate-900">
+											<span class="text-base font-bold text-slate-900">
 												<?php echo esc_html( $total_credits ); ?> tín chỉ
 											</span>
 											<?php if ( isset($tuition_year) && $tuition_year ) : ?>
@@ -745,7 +745,7 @@ $program_tabs[] = [
 								<div class="bg-slate-50 rounded-xl p-3.5">
 									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Lộ trình chuẩn</span>
 									<div class="flex items-baseline flex-wrap gap-1">
-										<span class="text-base font-black text-slate-900"><?php echo esc_html( $duration ?: '2.0 - 3.0 năm' ); ?></span>
+										<span class="text-base font-bold text-slate-900"><?php echo esc_html( $duration ?: '2.0 - 3.0 năm' ); ?></span>
 									</div>
 								</div>
 
@@ -788,7 +788,7 @@ $program_tabs[] = [
 								<div class="bg-slate-50 rounded-xl p-3.5">
 									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Phạm vi miễn giảm môn</span>
 									<div class="flex items-baseline flex-wrap gap-1">
-										<span class="text-base font-black text-slate-900"><?php echo esc_html( $scope_text ); ?></span>
+										<span class="text-base font-bold text-slate-900"><?php echo esc_html( $scope_text ); ?></span>
 									</div>
 								</div>
 							</div>
@@ -873,7 +873,7 @@ $program_tabs[] = [
 				<?php if ( $curriculum_url ) : ?>
 					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6" id="lo-trinh-hoc">
 						<div class="border-b border-slate-100 pb-3 mb-4">
-							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Lộ trình học & Khung chương trình</h2>
+							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Khung chương trình</h2>
 							<p class="text-xs md:text-sm text-slate-500 mt-0.5">Khung chương trình đào tạo chính thức áp dụng cho khóa học này</p>
 						</div>
 
