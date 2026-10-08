@@ -84,7 +84,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						<div class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group<?php echo $grid_span_class ? ' ' . esc_attr( $grid_span_class ) : ''; ?>">
 							<!-- Card Cover & Badges -->
 							<div class="relative h-36 sm:h-40 bg-slate-200 bg-cover bg-center overflow-hidden" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'large' ) : ( get_the_post_thumbnail_url( $school_id, 'large' ) ?: ltdh_get_fallback_image( 'school' ) ) ); ?>');">
-								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent"></div>
+								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent"></div>
 								
 								<!-- Featured Pill -->
 								<span class="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider shadow-sm z-10 flex items-center gap-1.5">
@@ -106,8 +106,8 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								<?php endif; ?>
 							</div>
 
-							<!-- Floating Logo -->
-							<div class="h-16 w-16 bg-white rounded-2xl border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] -mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
+							<!-- Floating Logo (Left-anchored for clean architectural balance) -->
+							<div class="h-14 w-14 sm:h-16 sm:w-16 bg-white rounded-2xl border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.12)] -mt-7 sm:-mt-8 ml-4 sm:ml-5 z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105">
 								<?php
 								$school_logo_url = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'thumbnail' ) : '';
 								if ( ! empty( $school_logo_url ) ) :
@@ -120,28 +120,30 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								<?php endif; ?>
 							</div>
 
-							<!-- Card Body -->
-							<div class="p-5 pt-2 flex-1 flex flex-col justify-between">
-								<div class="text-center">
+							<!-- Card Body (Left-aligned & Structured Hierarchy) -->
+							<div class="p-4 sm:p-5 pt-2.5 flex-1 flex flex-col justify-between text-left">
+								<div>
+									<!-- Code & Location Mini Row -->
+									<div class="flex items-center gap-2 mb-1 min-h-[20px]">
+										<?php if ( ! empty( $school_code ) ) : ?>
+											<span class="font-bold text-[#00308b] bg-blue-50 px-1.5 py-0.5 rounded text-[10px] border border-blue-100/80">Mã: <?php echo esc_html( $school_code ); ?></span>
+										<?php endif; ?>
+										<?php if ( ! empty( $region ) ) : ?>
+											<span class="text-xs text-slate-500 font-medium truncate"><?php echo esc_html( $region ); ?></span>
+										<?php endif; ?>
+									</div>
+
 									<!-- School Name -->
-									<h3 class="font-extrabold text-slate-900 text-sm md:text-[15px] tracking-tight leading-snug min-h-[44px] line-clamp-2 mt-1 group-hover:text-[#00308b] transition-colors">
+									<h3 class="font-extrabold text-slate-900 text-sm md:text-[15px] tracking-tight leading-snug min-h-[44px] line-clamp-2 mt-0.5 group-hover:text-[#00308b] transition-colors">
 										<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>">
 											<?php echo esc_html( get_the_title( $school_id ) ); ?>
 										</a>
 									</h3>
 									
-									<!-- School Code & English Name -->
-									<p class="text-xs text-slate-400 mt-1 font-medium line-clamp-1 italic min-h-[18px]">
-										<?php if ( ! empty( $school_code ) ) : ?>
-											<span class="not-italic font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded text-[10px] mr-1 border border-slate-200/60"><?php echo esc_html( $school_code ); ?></span>
-										<?php endif; ?>
-										<span><?php echo esc_html( $en_name ); ?></span>
-									</p>
-									
-									<!-- Training Types / Status Badges Container (Guaranteed Balanced Height) -->
-									<div class="mt-3.5 min-h-[44px] flex items-center justify-center">
+									<!-- Training Types Badges Container -->
+									<div class="mt-3 min-h-[38px] flex items-center">
 										<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
-											<div class="flex flex-wrap justify-center gap-1.5">
+											<div class="flex flex-wrap gap-1.5">
 												<?php
 												foreach ( $school_types as $st_term ) {
 													echo ltdh_get_training_type_badge_html( $st_term );
@@ -149,8 +151,8 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 												?>
 											</div>
 										<?php else : ?>
-											<div class="flex flex-wrap justify-center gap-1.5">
-												<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200/60">
+											<div class="flex flex-wrap gap-1.5">
+												<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500">
 													<span>Đang cập nhật hệ đào tạo</span>
 												</span>
 											</div>
@@ -158,7 +160,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 									</div>
 
 									<!-- Meta Row (Khu vực / Cơ sở & Ngành đào tạo) -->
-									<div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 px-1 gap-2">
+									<div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 gap-2">
 										<div class="flex items-center gap-1.5 text-slate-500 truncate" title="<?php echo esc_attr( $address ); ?>">
 											<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -167,14 +169,19 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 											<span class="truncate"><?php echo esc_html( ltdh_get_school_location_label( $school_id ) ); ?></span>
 										</div>
 
-										<div class="flex items-center gap-1 text-slate-700 font-semibold shrink-0">
-											<svg class="w-3.5 h-3.5 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-												<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-											</svg>
+										<div class="flex items-center gap-1 shrink-0">
 											<?php if ( $prog_count > 0 ) : ?>
-												<span><strong class="text-[#00308b] font-black"><?php echo esc_html( $prog_count ); ?></strong> ngành tuyển</span>
+												<span class="inline-flex items-center gap-1 text-slate-700 font-semibold">
+													<svg class="w-3.5 h-3.5 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+													</svg>
+													<span><strong class="text-[#00308b] font-black"><?php echo esc_html( $prog_count ); ?></strong> ngành</span>
+												</span>
 											<?php else : ?>
-												<span class="text-slate-400 font-medium">Đang cập nhật ngành</span>
+												<span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
+													<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+													Đang cập nhật chỉ tiêu
+												</span>
 											<?php endif; ?>
 										</div>
 									</div>
@@ -183,7 +190,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								<!-- Action CTA Button -->
 								<div class="mt-3.5 pt-3 border-t border-slate-100">
 									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" 
-									   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/80 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
+									   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
 										<span>Tìm hiểu chi tiết</span>
 										<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
@@ -281,8 +288,8 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 							<?php endif; ?>
 						</div>
 
-						<!-- Floating Logo -->
-						<div class="h-14 w-14 sm:h-16 sm:w-16 bg-white rounded-2xl border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] -mt-7 sm:-mt-8 mx-auto z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
+						<!-- Floating Logo (Left-anchored for clean architectural balance) -->
+						<div class="h-14 w-14 sm:h-16 sm:w-16 bg-white rounded-2xl border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.12)] -mt-7 sm:-mt-8 ml-4 sm:ml-5 z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105">
 							<?php
 							$school_logo_url = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'thumbnail' ) : '';
 							if ( ! empty( $school_logo_url ) ) :
@@ -295,28 +302,30 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 							<?php endif; ?>
 						</div>
 
-						<!-- Card Body -->
-						<div class="p-4 sm:p-5 pt-2 flex-1 flex flex-col justify-between">
-							<div class="text-center">
+						<!-- Card Body (Left-aligned & Structured Hierarchy) -->
+						<div class="p-4 sm:p-5 pt-2.5 flex-1 flex flex-col justify-between text-left">
+							<div>
+								<!-- Code & Location Mini Row -->
+								<div class="flex items-center gap-2 mb-1 min-h-[20px]">
+									<?php if ( ! empty( $school_code ) ) : ?>
+										<span class="font-bold text-[#00308b] bg-blue-50 px-1.5 py-0.5 rounded text-[10px] border border-blue-100/80">Mã: <?php echo esc_html( $school_code ); ?></span>
+									<?php endif; ?>
+									<?php if ( ! empty( $region ) ) : ?>
+										<span class="text-xs text-slate-500 font-medium truncate"><?php echo esc_html( $region ); ?></span>
+									<?php endif; ?>
+								</div>
+
 								<!-- School Name -->
-								<h3 class="font-extrabold text-slate-900 text-sm tracking-tight leading-snug min-h-[40px] line-clamp-2 mt-1 group-hover:text-[#00308b] transition-colors">
+								<h3 class="font-extrabold text-slate-900 text-sm tracking-tight leading-snug min-h-[40px] line-clamp-2 mt-0.5 group-hover:text-[#00308b] transition-colors">
 									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>">
 										<?php the_title(); ?>
 									</a>
 								</h3>
 								
-								<!-- School Code & English Name -->
-								<p class="text-xs text-slate-400 mt-0.5 font-medium line-clamp-1 italic min-h-[18px]">
-									<?php if ( ! empty( $school_code ) ) : ?>
-										<span class="not-italic font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded text-[10px] mr-1 border border-slate-200/60"><?php echo esc_html( $school_code ); ?></span>
-									<?php endif; ?>
-									<span><?php echo esc_html( $en_name ); ?></span>
-								</p>
-								
 								<!-- Training Types / Status Badges Container -->
-								<div class="mt-3 min-h-[42px] flex items-center justify-center">
+								<div class="mt-3 min-h-[38px] flex items-center">
 									<?php if ( ! empty( $school_types ) && ! is_wp_error( $school_types ) ) : ?>
-										<div class="flex flex-wrap justify-center gap-1.5">
+										<div class="flex flex-wrap gap-1.5">
 											<?php
 											foreach ( $school_types as $st_term ) {
 												echo ltdh_get_training_type_badge_html( $st_term );
@@ -324,8 +333,8 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 											?>
 										</div>
 									<?php else : ?>
-										<div class="flex flex-wrap justify-center gap-1.5">
-											<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200/60">
+										<div class="flex flex-wrap gap-1.5">
+											<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500">
 												<span>Đang cập nhật hệ đào tạo</span>
 											</span>
 										</div>
@@ -333,7 +342,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								</div>
 
 								<!-- Meta Row (Khu vực / Cơ sở & Ngành đào tạo) -->
-								<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 px-0.5 gap-2">
+								<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 gap-2">
 									<div class="flex items-center gap-1 text-slate-500 truncate" title="<?php echo esc_attr( $address ); ?>">
 										<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -342,14 +351,19 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 										<span class="truncate"><?php echo esc_html( ltdh_get_school_location_label( $school_id ) ); ?></span>
 									</div>
 
-									<div class="flex items-center gap-1 text-slate-700 font-semibold shrink-0">
-										<svg class="w-3.5 h-3.5 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-										</svg>
+									<div class="flex items-center gap-1 shrink-0">
 										<?php if ( $prog_count > 0 ) : ?>
-											<span><strong class="text-[#00308b] font-black"><?php echo esc_html( $prog_count ); ?></strong> ngành</span>
+											<span class="inline-flex items-center gap-1 text-slate-700 font-semibold">
+												<svg class="w-3.5 h-3.5 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+													<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+												</svg>
+												<span><strong class="text-[#00308b] font-black"><?php echo esc_html( $prog_count ); ?></strong> ngành</span>
+											</span>
 										<?php else : ?>
-											<span class="text-slate-400 font-medium">Đang cập nhật ngành</span>
+											<span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
+												<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+												Đang cập nhật chỉ tiêu
+											</span>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -358,14 +372,13 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 							<!-- Action CTA Button -->
 							<div class="mt-3 pt-2.5 border-t border-slate-100">
 								<a href="<?php the_permalink(); ?>" 
-								   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/80 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
+								   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
 									<span>Tìm hiểu chi tiết</span>
 									<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
 									</svg>
 								</a>
 							</div>
-						</div>
 					</div>
 				<?php
 						$regular_index++;

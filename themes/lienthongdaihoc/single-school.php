@@ -307,14 +307,28 @@ if ( ! empty( $contact ) ) {
 
 							if ( ! isset( $majors_data[ $major_key ] ) ) {
 								$major_name = $major_rel_id ? get_the_title( $major_rel_id ) : 'Mời tư vấn';
-								$major_thumb = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium' ) : '';
+								$major_thumb = $major_rel_id ? get_the_post_thumbnail_url( $major_rel_id, 'medium_large' ) : '';
 								if ( ! $major_thumb ) {
-									$major_thumb = ltdh_get_fallback_image( 'program' );
+									$major_thumb = get_the_post_thumbnail_url( $prog_id, 'medium_large' );
 								}
+								if ( ! $major_thumb ) {
+									$major_fallbacks = [
+										get_stylesheet_directory_uri() . '/assets/images/banner-program.jpg',
+										get_stylesheet_directory_uri() . '/assets/images/banner-hero-02.webp',
+										get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg',
+									];
+									$idx = absint( $prog_id ) % count( $major_fallbacks );
+									$major_thumb = $major_fallbacks[ $idx ];
+								}
+								$major_code = $major_rel_id ? ( get_field( 'major_code', $major_rel_id ) ?: get_post_meta( $major_rel_id, 'major_code', true ) ) : '';
+								$major_terms = $major_rel_id ? get_the_terms( $major_rel_id, 'major_cat' ) : [];
+								$major_cat_name = ( ! empty( $major_terms ) && ! is_wp_error( $major_terms ) ) ? $major_terms[0]->name : '';
 
 								$majors_data[ $major_key ] = [
 									'id'       => $major_rel_id,
 									'name'     => $major_name,
+									'code'     => $major_code,
+									'cat_name' => $major_cat_name,
 									'thumb'    => $major_thumb,
 									'programs' => [],
 								];
@@ -396,123 +410,314 @@ if ( ! empty( $contact ) ) {
 					}
 					?>
 
-					<!-- Header with Live Stats Badge -->
-					<div class="border-b border-slate-100 pb-3 md:pb-4 mb-5">
-						<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+					<!-- Header with Live Stats & Quick Search/Filter -->
+					<div class="border-b border-slate-200/80 pb-5 mb-6">
+						<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
 							<div>
 								<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">Ngành và chương trình trường đào tạo</h2>
 								<p class="text-xs md:text-sm text-slate-500 mt-1">Danh sách các ngành và hệ đào tạo tuyển sinh chính thức tại trường</p>
 							</div>
-							
+							<div class="flex items-center gap-2 self-start sm:self-center shrink-0">
+								<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-[#00308b] border border-blue-100/80">
+									<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+									</svg>
+									<span id="ltdh-majors-total-badge"><?php echo count( $majors_data ); ?> ngành tuyển sinh</span>
+								</span>
+							</div>
+						</div>
+
+						<!-- Quick Filter Controls: Instant Search & Training System Tabs -->
+						<div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 pt-3 border-t border-slate-100">
+							<!-- Search Input -->
+							<div class="relative flex-1">
+								<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+									</svg>
+								</span>
+								<input type="text"
+									   id="ltdh-major-search-input"
+									   placeholder="Tìm kiếm tên ngành, mã ngành..."
+									   class="w-full pl-9 pr-8 py-2 rounded-xl text-xs sm:text-sm border border-slate-200 bg-slate-50/70 focus:bg-white focus:border-[#00308b] focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-slate-400">
+								<button type="button"
+										id="ltdh-major-search-clear"
+										class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+										title="Xóa tìm kiếm">
+									<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+									</svg>
+								</button>
+							</div>
+
+							<!-- Training Types Tabs -->
+							<?php if ( ! empty( $available_he ) && count( $available_he ) > 1 ) : ?>
+								<div class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0" id="ltdh-he-filter-tabs">
+									<button type="button"
+											data-he-filter="all"
+											class="ltdh-he-tab-btn active px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-[#00308b] text-white shadow-2xs cursor-pointer whitespace-nowrap">
+										Tất cả (<?php echo count( $majors_data ); ?>)
+									</button>
+									<?php foreach ( $available_he as $he_key => $he_info ) : ?>
+										<button type="button"
+												data-he-filter="<?php echo esc_attr( $he_key ); ?>"
+												class="ltdh-he-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-100 hover:bg-slate-200/80 text-slate-700 cursor-pointer whitespace-nowrap">
+											<?php echo esc_html( $he_info['name'] ); ?> (<?php echo esc_html( $he_info['count'] ); ?>)
+										</button>
+									<?php endforeach; ?>
+								</div>
+							<?php endif; ?>
 						</div>
 					</div>
 
 					<?php if ( ! empty( $majors_data ) ) : ?>
-						<!-- Majors Container -->
-						<div class="space-y-4" id="ltdh-majors-container">
+						<!-- Majors Grid (Visual Cards with Thumbnails) -->
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5" id="ltdh-majors-container">
 							<?php
 							foreach ( $majors_data as $major ) :
-								$m_id = $major['id'];
-								$major_link = $m_id ? add_query_arg( 'truong', get_post_field( 'post_name', $school_id ), get_permalink( $m_id ) ) : '';
+								$m_id           = $major['id'];
+								$major_link     = $m_id ? add_query_arg( 'truong', get_post_field( 'post_name', $school_id ), get_permalink( $m_id ) ) : '';
 								$major_he_slugs = array_unique( array_column( $major['programs'], 'he' ) );
 								$programs_count = count( $major['programs'] );
+								$first_prog     = ! empty( $major['programs'] ) ? $major['programs'][0] : null;
+								$primary_link   = $major_link ?: ( $first_prog ? $first_prog['permalink'] : '#' );
 								?>
-								<div class="ltdh-major-group bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-sm transition-all"
+								<div class="ltdh-major-card group bg-white border border-slate-200/90 hover:border-blue-300 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
 									 data-major-name="<?php echo esc_attr( mb_strtolower( $major['name'], 'UTF-8' ) ); ?>"
+									 data-major-code="<?php echo esc_attr( mb_strtolower( $major['code'] ?? '', 'UTF-8' ) ); ?>"
 									 data-major-he="<?php echo esc_attr( implode( ' ', $major_he_slugs ) ); ?>">
 									
-									<!-- Major Header -->
-									<div class="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-100">
-										<div class="flex items-center gap-3 min-w-0">
-											<div class="w-8 h-8 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center shrink-0">
-												<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-													<path d="M12 14l9-5-9-5-9 5 9 5z" />
-													<path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-													<path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
-												</svg>
-											</div>
-											<div class="min-w-0">
-												<h3 class="text-base sm:text-lg font-black text-slate-900 leading-snug truncate">
-													Ngành <?php echo esc_html( $major['name'] ); ?>
-												</h3>
-											</div>
-										</div>
-										<?php if ( $major_link ) : ?>
-											<div class="flex items-center gap-2 sm:self-center shrink-0">
-												<span class="hidden md:inline-flex items-center text-[11px] font-semibold text-slate-500 bg-slate-100/80 px-2.5 py-1 rounded-full shrink-0">
-													<?php echo esc_html( $programs_count ); ?> hình thức đào tạo
+									<!-- Thumbnail Area (16:9 ratio, smooth zoom on hover) -->
+									<div class="relative h-40 sm:h-44 bg-slate-100 overflow-hidden">
+										<a href="<?php echo esc_url( $primary_link ); ?>" class="block w-full h-full">
+											<img src="<?php echo esc_url( $major['thumb'] ); ?>" 
+												 alt="Ngành <?php echo esc_attr( $major['name'] ); ?>" 
+												 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+												 loading="lazy">
+										</a>
+										<div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/25 to-transparent pointer-events-none"></div>
+
+										<!-- Top Badges on Thumbnail -->
+										<div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1.5 z-10 pointer-events-none">
+											<?php if ( ! empty( $major['code'] ) ) : ?>
+												<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-900/80 text-white backdrop-blur-md shadow-xs border border-white/10">
+													Mã: <?php echo esc_html( $major['code'] ); ?>
 												</span>
-												<a href="<?php echo esc_url( $major_link ); ?>" class="hidden md:flex text-xs font-bold text-[#00308b] hover:text-blue-700 hover:underline flex items-center gap-1 pl-1 shrink-0 whitespace-nowrap">
-													<span>Xem chi tiết ngành</span>
-													<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-														<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-													</svg>
-												</a>
-											</div>
-											
-										<?php endif; ?>
+											<?php else : ?>
+												<span></span>
+											<?php endif; ?>
+
+											<?php if ( $programs_count > 1 ) : ?>
+												<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-white/95 text-slate-800 backdrop-blur-md shadow-xs">
+													<?php echo esc_html( $programs_count ); ?> hệ đào tạo
+												</span>
+											<?php endif; ?>
+										</div>
+
+										<!-- Bottom Badges on Thumbnail (Training Systems) -->
+										<div class="absolute bottom-2.5 left-2.5 right-2.5 flex flex-wrap gap-1.5 z-10">
+											<?php foreach ( $major['programs'] as $prog ) : ?>
+												<?php if ( $prog['type_name'] ) : ?>
+													<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
+													   class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[11px] font-bold px-2 py-0.5 rounded-md shadow-xs hover:opacity-90 transition-opacity" 
+													   title="Xem chi tiết <?php echo esc_attr( $prog['type_name'] ); ?>">
+														<?php echo esc_html( $prog['type_name'] ); ?>
+													</a>
+												<?php endif; ?>
+											<?php endforeach; ?>
+										</div>
 									</div>
 
-									<!-- Program Rows (Clean Hairline Divided List) -->
-									<div class="divide-y divide-slate-100">
-										<?php foreach ( $major['programs'] as $prog ) : ?>
-											<div class="ltdh-program-row py-2.5 sm:py-3 first:pt-1 last:pb-1 flex items-center justify-between gap-3 group hover:bg-slate-50/60 -mx-2 sm:-mx-3 px-2 sm:px-3 rounded-xl transition-all"
-												 data-he="<?php echo esc_attr( $prog['he'] ); ?>"
-												 data-title="<?php echo esc_attr( mb_strtolower( $prog['title'], 'UTF-8' ) ); ?>"
-												 data-compare-btn
-												 data-compare-type="program"
-												 data-compare-id="<?php echo esc_attr( $prog['id'] ); ?>"
-												 data-compare-title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>"
-												 data-compare-slug="<?php echo esc_attr( $prog['slug'] ); ?>"
-												 data-compare-thumb="<?php echo esc_url( $prog['thumb'] ); ?>"
-												 data-compare-he="<?php echo esc_attr( $prog['he'] ); ?>"
-												 data-compare-nganh="<?php echo esc_attr( $prog['nganh'] ); ?>"
-												 data-compare-major-name="<?php echo esc_attr( $prog['major_name'] ); ?>"
-												 data-compare-school-name="<?php echo esc_attr( $prog['school_name'] ); ?>">
-												
-												<!-- Program Info: Training Type (Tên hệ) -->
-												<div class="flex items-center gap-3 min-w-0">
-													<?php if ( $prog['type_name'] ) : ?>
-														<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-xs font-bold px-2.5 py-1 rounded-md tracking-wide shrink-0 hover:opacity-85 transition-opacity" title="Xem chi tiết <?php echo esc_attr( $prog['type_name'] ); ?>">
-															<?php echo esc_html( $prog['type_name'] ); ?>
-														</a>
-													<?php endif; ?>
-												</div>
+									<!-- Card Body -->
+									<div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+										<div>
+											<?php if ( ! empty( $major['cat_name'] ) ) : ?>
+												<span class="text-[11px] font-bold uppercase tracking-wider text-[#00308b] mb-1 block">
+													<?php echo esc_html( $major['cat_name'] ); ?>
+												</span>
+											<?php endif; ?>
 
-												<!-- Program Actions: Chi tiết & So sánh -->
-												<div class="flex items-center gap-2 shrink-0 justify-end">
-													<?php if ( $prog['status'] === 'tam-ngung' ) : ?>
-														<span class="text-xs text-slate-400 bg-slate-100 py-1.5 px-3 rounded-lg font-bold">Tạm ngưng</span>
-													<?php else : ?>
-														<a href="<?php echo esc_url( $prog['permalink'] ); ?>" class="text-xs py-1.5 px-3 rounded-lg font-bold text-[#00308b] bg-blue-50 hover:bg-[#00308b] hover:text-white transition-all whitespace-nowrap">
-															Chi tiết
-														</a>
-														<button type="button"
-																class="ltdh-compare-toggle text-xs text-slate-600 hover:text-slate-900 font-bold bg-slate-100 hover:bg-slate-200/80 rounded-lg py-1.5 px-2.5 transition-all flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer"
-																data-compare-type="program"
-																data-compare-id="<?php echo esc_attr( $prog['id'] ); ?>"
-																data-compare-title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>"
-																data-compare-slug="<?php echo esc_attr( $prog['slug'] ); ?>"
-																data-compare-he="<?php echo esc_attr( $prog['he'] ); ?>"
-																data-compare-nganh="<?php echo esc_attr( $prog['nganh'] ); ?>"
-																data-compare-major-name="<?php echo esc_attr( $prog['major_name'] ); ?>"
-																data-compare-school-name="<?php echo esc_attr( $prog['school_name'] ); ?>"
-																data-compare-thumb="<?php echo esc_url( $prog['thumb'] ); ?>">
-															<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-																<path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-															</svg>
-															<span>So sánh</span>
-														</button>
-													<?php endif; ?>
+											<!-- Major Name (Display full title, clamp 2 lines nicely, no truncation) -->
+											<h3 class="font-extrabold text-slate-900 text-sm sm:text-base group-hover:text-[#00308b] transition-colors leading-snug line-clamp-2 min-h-[42px] mb-2.5">
+												<a href="<?php echo esc_url( $primary_link ); ?>">
+													Ngành <?php echo esc_html( $major['name'] ); ?>
+												</a>
+											</h3>
+
+											<!-- Highlights Info Row -->
+											<?php if ( $programs_count === 1 && $first_prog ) : ?>
+												<div class="flex items-center gap-2.5 text-xs text-slate-500 mb-3">
+													<span class="inline-flex items-center gap-1 font-medium">
+														<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+														</svg>
+														<span><?php echo esc_html( $first_prog['duration'] ?: '1.5 - 2 năm' ); ?></span>
+													</span>
+													<span class="text-slate-300">•</span>
+													<span class="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+														<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+														<span>Tuyển sinh 2025</span>
+													</span>
 												</div>
-											</div>
-										<?php endforeach; ?>
+											<?php elseif ( $programs_count > 1 ) : ?>
+												<div class="space-y-1.5 mb-3">
+													<?php foreach ( $major['programs'] as $sub_prog ) : ?>
+														<div class="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 border border-slate-100">
+															<span class="font-medium text-slate-700"><?php echo esc_html( $sub_prog['type_name'] ); ?></span>
+															<a href="<?php echo esc_url( $sub_prog['permalink'] ); ?>" class="font-bold text-[#00308b] hover:underline text-[11px]">Chi tiết &rarr;</a>
+														</div>
+													<?php endforeach; ?>
+												</div>
+											<?php endif; ?>
+										</div>
+
+										<!-- Action CTA Buttons Footer -->
+										<div class="pt-3 border-t border-slate-100 flex items-center gap-2 mt-auto">
+											<a href="<?php echo esc_url( $primary_link ); ?>" 
+											   class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold text-center text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all flex items-center justify-center gap-1 shadow-2xs group-hover/btn:shadow-sm whitespace-nowrap">
+												<span>Xem chi tiết ngành</span>
+												<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+													<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+												</svg>
+											</a>
+
+											<?php if ( ! empty( $first_prog ) ) : ?>
+												<button type="button"
+														class="ltdh-compare-toggle py-2 px-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 border border-slate-200/60 transition-all flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer"
+														title="So sánh chương trình này"
+														data-compare-type="program"
+														data-compare-id="<?php echo esc_attr( $first_prog['id'] ); ?>"
+														data-compare-title="<?php echo esc_attr( $first_prog['opportunity_title'] ); ?>"
+														data-compare-slug="<?php echo esc_attr( $first_prog['slug'] ); ?>"
+														data-compare-he="<?php echo esc_attr( $first_prog['he'] ); ?>"
+														data-compare-nganh="<?php echo esc_attr( $first_prog['nganh'] ); ?>"
+														data-compare-major-name="<?php echo esc_attr( $first_prog['major_name'] ); ?>"
+														data-compare-school-name="<?php echo esc_attr( $first_prog['school_name'] ); ?>"
+														data-compare-thumb="<?php echo esc_url( $first_prog['thumb'] ); ?>">
+													<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+													</svg>
+													<span class="hidden sm:inline">So sánh</span>
+												</button>
+											<?php endif; ?>
+										</div>
 									</div>
 								</div>
 								<?php
 							endforeach;
 							?>
+
+							<!-- Empty Search Results State -->
+							<div id="ltdh-majors-empty-state" class="hidden col-span-full text-center py-12 bg-white border border-slate-200/80 rounded-2xl p-6">
+								<div class="w-12 h-12 bg-blue-50 text-[#00308b] rounded-full flex items-center justify-center mx-auto mb-3 text-xl">🔍</div>
+								<h3 class="text-base font-bold text-slate-800 mb-1">Không tìm thấy ngành đào tạo phù hợp</h3>
+								<p class="text-xs text-slate-500 mb-4">Vui lòng thử tìm với từ khóa khác hoặc xóa bộ lọc.</p>
+								<button type="button" id="ltdh-major-reset-search" class="px-4 py-2 bg-[#00308b] text-white rounded-xl text-xs font-bold hover:bg-blue-800 transition-colors cursor-pointer">
+									Xem tất cả ngành
+								</button>
+							</div>
 						</div>
+
+						<!-- Instant Search & Filter Script -->
+						<script>
+						(function() {
+							var searchInput = document.getElementById('ltdh-major-search-input');
+							var searchClear = document.getElementById('ltdh-major-search-clear');
+							var tabButtons = document.querySelectorAll('.ltdh-he-tab-btn');
+							var cards = document.querySelectorAll('.ltdh-major-card');
+							var emptyState = document.getElementById('ltdh-majors-empty-state');
+							var resetBtn = document.getElementById('ltdh-major-reset-search');
+							var badge = document.getElementById('ltdh-majors-total-badge');
+
+							if (!cards.length) return;
+
+							var activeHe = 'all';
+							var searchQuery = '';
+
+							function filterCards() {
+								var visibleCount = 0;
+								var q = searchQuery.trim().toLowerCase();
+
+								cards.forEach(function(card) {
+									var name = card.getAttribute('data-major-name') || '';
+									var code = card.getAttribute('data-major-code') || '';
+									var heList = (card.getAttribute('data-major-he') || '').split(' ');
+
+									var matchesSearch = !q || name.indexOf(q) !== -1 || code.indexOf(q) !== -1;
+									var matchesHe = (activeHe === 'all') || heList.indexOf(activeHe) !== -1;
+
+									if (matchesSearch && matchesHe) {
+										card.style.display = '';
+										visibleCount++;
+									} else {
+										card.style.display = 'none';
+									}
+								});
+
+								if (emptyState) {
+									emptyState.classList.toggle('hidden', visibleCount > 0);
+								}
+
+								if (badge) {
+									badge.textContent = visibleCount + ' ngành tuyển sinh';
+								}
+
+								if (searchClear) {
+									searchClear.classList.toggle('hidden', !searchQuery);
+								}
+							}
+
+							if (searchInput) {
+								searchInput.addEventListener('input', function() {
+									searchQuery = this.value;
+									filterCards();
+								});
+							}
+
+							if (searchClear) {
+								searchClear.addEventListener('click', function() {
+									if (searchInput) {
+										searchInput.value = '';
+										searchQuery = '';
+										searchInput.focus();
+										filterCards();
+									}
+								});
+							}
+
+							tabButtons.forEach(function(btn) {
+								btn.addEventListener('click', function() {
+									tabButtons.forEach(function(b) {
+										b.classList.remove('active', 'bg-[#00308b]', 'text-white', 'shadow-2xs');
+										b.classList.add('bg-slate-100', 'text-slate-700');
+									});
+									this.classList.remove('bg-slate-100', 'text-slate-700');
+									this.classList.add('active', 'bg-[#00308b]', 'text-white', 'shadow-2xs');
+
+									activeHe = this.getAttribute('data-he-filter') || 'all';
+									filterCards();
+								});
+							});
+
+							if (resetBtn) {
+								resetBtn.addEventListener('click', function() {
+									if (searchInput) searchInput.value = '';
+									searchQuery = '';
+									activeHe = 'all';
+									tabButtons.forEach(function(b) {
+										var isAll = (b.getAttribute('data-he-filter') === 'all');
+										b.classList.toggle('active', isAll);
+										b.classList.toggle('bg-[#00308b]', isAll);
+										b.classList.toggle('text-white', isAll);
+										b.classList.toggle('shadow-2xs', isAll);
+										b.classList.toggle('bg-slate-100', !isAll);
+										b.classList.toggle('text-slate-700', !isAll);
+									});
+									filterCards();
+								});
+							}
+						})();
+						</script>
 					<?php
 					else :
 						echo '<p class="text-sm text-slate-500 py-4">Hiện tại chưa có chương trình nào được cập nhật cho trường này.</p>';
