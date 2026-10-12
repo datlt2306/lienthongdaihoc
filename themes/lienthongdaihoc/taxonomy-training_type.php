@@ -457,7 +457,7 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 
 						<div>
 							<!-- School Cover Image with Top Badges -->
-							<div class="h-28 sm:h-32 w-full bg-slate-100 bg-cover bg-center relative overflow-hidden" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');">
+							<div class="h-32 sm:h-64 w-full bg-slate-100 bg-cover bg-center relative overflow-hidden" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');">
 								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent"></div>
 								
 								<!-- Status Badge (Left) -->

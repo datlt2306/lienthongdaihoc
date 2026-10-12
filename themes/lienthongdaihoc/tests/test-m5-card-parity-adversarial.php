@@ -114,7 +114,7 @@ foreach ( $outer_classes as $cls ) {
 
 // 2.2 Cover image and badge overlay tokens
 $cover_tokens = [
-	'h-28 sm:h-32 w-full bg-slate-100 bg-cover bg-center relative overflow-hidden',
+	'h-32 sm:h-64 w-full bg-slate-100 bg-cover bg-center relative overflow-hidden',
 	'bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent',
 	'tam-ngung',
 	'Đã hết chỉ tiêu',

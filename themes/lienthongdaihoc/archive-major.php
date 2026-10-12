@@ -207,7 +207,7 @@ $all_tab_url = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $arc
 					<div class="bg-white border border-slate-100/60 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-brand-primary/20 transition-all duration-300 flex flex-col justify-between group">
 						
 						<!-- Header Thumbnail Area -->
-						<div class="relative h-44 bg-slate-100 overflow-hidden">
+						<div class="relative h-64 bg-slate-100 overflow-hidden">
 							<img src="<?php echo esc_url( $thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
 							<div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-900/20 to-transparent"></div>
 
