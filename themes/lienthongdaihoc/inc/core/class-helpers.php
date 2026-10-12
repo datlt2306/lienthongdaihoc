@@ -801,8 +801,42 @@ function ltdh_get_school_location_label( int $school_id ): string {
 	return 'Hà Nội';
 }
 
+/**
+ * Get school region label ('Miền Bắc', 'Miền Trung', 'Miền Nam').
+ *
+ * @param int $school_id
+ * @return string
+ */
+function ltdh_get_school_region_label( int $school_id ): string {
+	if ( ! $school_id ) {
+		return '';
+	}
+
+	// 1. Region taxonomy term (Khu vực)
+	$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
+	if ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) {
+		return $region_terms[0]->name;
+	}
+
+	// 2. Fallback: Infer region from address
+	$address = (string) get_field( 'address', $school_id );
+	if ( $address ) {
+		if ( preg_match( '/(Hà Nội|Thái Nguyên|Hải Phòng|Hưng Yên|Nam Định|Bắc Ninh|Vĩnh Phúc|Hải Dương|Bắc Giang|Phú Thọ|Thái Bình|Hà Nam|Ninh Bình|Quảng Ninh)/iu', $address ) ) {
+			return 'Miền Bắc';
+		}
+		if ( preg_match( '/(Hồ Chí Minh|TP\.?\s*HCM|Cần Thơ|Bình Dương|Đồng Nai|Bà Rịa|Vũng Tàu|An Giang|Kiên Giang|Tiền Giang|Vĩnh Long|Trà Vinh)/iu', $address ) ) {
+			return 'Miền Nam';
+		}
+		if ( preg_match( '/(Đà Nẵng|Nghệ An|Thanh Hóa|Huế|Thừa Thiên Huế|Quảng Nam|Khánh Hòa|Đắk Lắk|Lâm Đồng|Gia Lai)/iu', $address ) ) {
+			return 'Miền Trung';
+		}
+	}
+
+	return 'Miền Bắc';
+}
+
 function ltdh_get_cached_featured_schools() {
-	$cache_key = 'ltdh_featured_schools_data_v16';
+	$cache_key = 'ltdh_featured_schools_data_v17';
 	$data      = get_transient( $cache_key );
 	if ( false !== $data && is_array( $data ) ) {
 		return $data;
@@ -836,8 +870,7 @@ function ltdh_get_cached_featured_schools() {
 				$en_name = $school_code . ' University';
 			}
 
-			$region_terms = wp_get_post_terms( $school_id, LTDH_TAX_REGION );
-			$region       = ( ! is_wp_error( $region_terms ) && ! empty( $region_terms ) ) ? $region_terms[0]->name : '';
+			$region = ltdh_get_school_region_label( $school_id );
 
 			$school_progs = get_posts([
 				'post_type' => 'program',

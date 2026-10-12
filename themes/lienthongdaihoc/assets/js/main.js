@@ -227,6 +227,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const activePill = document.querySelector('.ltdh-major-he-pill.is-active');
             const selectedHe = activePill ? (activePill.dataset.he || '') : '';
 
+            const currentSchoolSlug = new URLSearchParams(window.location.search).get('truong')
+                || new URLSearchParams(window.location.search).get('from_school')
+                || new URLSearchParams(window.location.search).get('school')
+                || (wrapper ? (wrapper.dataset.schoolSlug || '') : '');
+
             if (pushUrl) {
                 const urlParams = new URLSearchParams(window.location.search);
                 if (selectedHe) {
@@ -234,10 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     urlParams.delete('he');
                 }
-                // Clean up any legacy school filter query parameters
-                urlParams.delete('truong');
-                urlParams.delete('from_school');
-                urlParams.delete('school');
+                if (currentSchoolSlug) {
+                    urlParams.set('truong', currentSchoolSlug);
+                }
 
                 const searchStr = urlParams.toString();
                 const newUrl = window.location.pathname + (searchStr ? '?' + searchStr : '');
@@ -248,6 +252,9 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('action', 'ltdh_filter_major_programs');
             formData.append('major_id', majorId);
             formData.append('he', selectedHe);
+            if (currentSchoolSlug) {
+                formData.append('school', currentSchoolSlug);
+            }
 
             const ajaxUrl = (typeof ltdh_ajax !== 'undefined' && ltdh_ajax.ajax_url)
                 ? ltdh_ajax.ajax_url

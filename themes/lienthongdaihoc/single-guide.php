@@ -45,58 +45,9 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 
 			<!-- Sidebar Column -->
 			<div class="lg:col-span-1">
-				<div class="sticky top-24 space-y-6">
-					
-					<!-- Sidebar register widget -->
-					<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-						<h3 class="text-lg font-bold text-slate-900 mb-2">Nhận thêm thông tin chi tiết</h3>
-						<p class="text-sm text-slate-500 mb-4">Để lại câu hỏi của bạn. Ban tuyển sinh đại học đối tác sẽ giải đáp nhanh chóng sau 15 phút.</p>
-						
-						<?php if ( isset( $_GET['submit_success'] ) && '1' === $_GET['submit_success'] ) : ?>
-							<div class="p-3 mb-4 text-sm text-green-800 rounded-lg bg-green-50 border border-green-200" role="alert">
-								<span class="font-bold">Gửi thông tin thành công!</span> Chúng tôi sẽ liên hệ lại sớm nhất.
-							</div>
-						<?php endif; ?>
-						<?php 
-						if ( function_exists( 'wpcf7_contact_form_html' ) ) :
-							echo do_shortcode( '[contact-form-7 id="consultation-form" title="Form Tư vấn"]' );
-						else :
-						?>
-							<form action="" method="POST" class="space-y-4">
-								<?php wp_nonce_field( 'ltdh_native_lead_submit_action', 'ltdh_native_lead_nonce' ); ?>
-								<input type="hidden" name="referral_source" value="<?php echo esc_attr( get_permalink() ); ?>">
-								<div class="hidden" style="display:none !important;" aria-hidden="true">
-									<label for="hp_website_guide">Website</label>
-									<input type="text" name="hp_website" id="hp_website_guide" tabindex="-1" autocomplete="off" value="">
-								</div>
-
-								<div>
-									<label class="block text-sm font-semibold text-slate-600 mb-1">Họ và tên *</label>
-									<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
-								</div>
-								<div>
-									<label class="block text-sm font-semibold text-slate-600 mb-1">Số điện thoại *</label>
-									<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
-								</div>
-								
-								<button type="submit" class="w-full bg-brand-accent text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-[#e06e00] transition-all">
-									Gửi Thông Tin Yêu Cầu
-								</button>
-							</form>
-						<?php endif; ?>
-					</section>
-
-					<!-- Zalo / Call Card -->
-					<?php
-					get_template_part( 'template-parts/sidebar-hotline', null, [
-						'hotline'  => $hotline,
-						'zalo_url' => $global_zalo,
-						'title'    => 'Văn phòng tuyển sinh',
-					] );
-					?>
-
-				</div>
+				<?php get_sidebar( 'guide' ); ?>
 			</div>
+
 		</div>
 
 	</div>

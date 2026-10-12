@@ -149,13 +149,20 @@ $program_tabs[] = [
 	'subtitle' => 'Đầu mối tuyển sinh',
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>',
 ];
+
+$program_tabs[] = [
+	'id'       => 'register',
+	'title'    => 'Đăng ký tư vấn',
+	'subtitle' => 'Miễn phí 100%',
+	'icon'     => '<svg class="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>',
+];
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 
 	<!-- STICKY SECTION TAB NAVIGATION (Redesigned with UI/UX Pro Max) -->
-	<div id="ltdh-program-sticky-nav" class="ltdh-sticky-nav sticky top-20 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-all duration-200">
+	<div id="ltdh-program-sticky-nav" class="ltdh-sticky-nav sticky top-16 sm:top-20 z-40 bg-white/98 backdrop-blur-md border-b border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-all duration-200">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<nav class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-2" aria-label="Điều hướng các mục chương trình đào tạo">
 				<?php foreach ( $program_tabs as $tab_idx => $tab ) : 
@@ -975,239 +982,7 @@ $program_tabs[] = [
 
 			<!-- Sidebar Column -->
 			<div class="lg:col-span-1">
-				<div class="sticky top-36 md:top-40 space-y-6">
-					
-					<!-- SCHOOL INFO CARD (Desktop Only >= 1024px) -->
-					<?php if ( $school_id ) : 
-						$school_logo_id  = function_exists( 'ltdh_get_school_image_id' ) ? ltdh_get_school_image_id( $school_id ) : 0;
-						$school_logo_url = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'thumbnail' ) : get_stylesheet_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp';
-						$school_cover_url = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ltdh_get_fallback_image( 'school' );
-						$school_address = get_post_meta( $school_id, 'address', true ) ?: get_field( 'address', $school_id ) ?: 'Việt Nam';
-						$school_web = get_field( 'website', $school_id );
-						
-						// Get initials for typographic logo fallback (e.g. UTC, ĐHGTVT)
-						$words = explode( ' ', $school_title );
-						$initials = '';
-						foreach ( array_slice( $words, -3 ) as $w ) {
-							$initials .= mb_substr( $w, 0, 1 );
-						}
-						$initials = mb_strtoupper( $initials );
-					?>
-						<div class="hidden lg:block bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-xs hover:shadow-sm transition-all">
-							<!-- Banner Cover -->
-							<div class="h-24 bg-gradient-to-r from-[#00308b] to-[#001a4d] bg-cover bg-center relative" <?php echo $school_cover_url ? 'style="background-image: url(\'' . esc_url( $school_cover_url ) . '\');"' : ''; ?>>
-								<div class="absolute inset-0 bg-blue-950/20"></div>
-							</div>
-							
-							<!-- Overlapping Logo Wrapper -->
-							<div class="relative flex justify-center -mt-9 mb-3">
-								<div class="w-18 h-18 bg-white p-1 rounded-xl shadow-md flex items-center justify-center overflow-hidden shrink-0">
-									<?php if ( $school_logo_url ) : ?>
-										<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain" loading="lazy">
-									<?php else : ?>
-										<div class="w-full h-full bg-[#00308b] text-white flex items-center justify-center font-black text-base rounded-lg uppercase tracking-wider">
-											<?php echo esc_html( $initials ?: 'ĐH' ); ?>
-										</div>
-									<?php endif; ?>
-								</div>
-							</div>
-							
-							<!-- School Info details -->
-							<div class="px-5 pb-5 text-center">
-								<h4 class="font-extrabold text-slate-800 text-sm leading-snug uppercase tracking-tight mb-2">
-									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="hover:text-[#00308b] transition-colors"><?php echo esc_html( $school_title ); ?></a>
-								</h4>
-								
-								<?php if ( $school_web ) : ?>
-									<p class="text-xs text-slate-500 mb-2 font-medium">
-										Website: <a href="<?php echo esc_url( $school_web ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#00308b] hover:underline"><?php echo esc_html( $school_web ); ?></a>
-									</p>
-								<?php endif; ?>
-
-								<div class="flex items-start justify-center gap-1.5 text-xs text-slate-500 font-medium max-w-xs mx-auto mb-3.5">
-									<span class="text-[#00308b] shrink-0 mt-0.5">📍</span>
-									<span class="text-left leading-relaxed">
-										Địa chỉ: <?php echo esc_html( $school_address ); ?>
-										<a href="<?php echo esc_url( 'https://www.google.com/maps/search/?api=1&query=' . urlencode( $school_title . ' ' . $school_address ) ); ?>" target="_blank" rel="noopener noreferrer" class="text-[#00308b] font-bold hover:underline ml-0.5 inline-block">(Xem bản đồ)</a>
-									</span>
-								</div>
-								<div class="border-t border-slate-100 pt-3">
-									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="text-[#00308b] font-bold text-xs sm:text-sm hover:underline flex items-center justify-center gap-1">
-										<span>Xem chi tiết trường</span> <span>→</span>
-									</a>
-								</div>
-							</div>
-						</div>
-					<?php endif; ?>
-
-					<!-- SECTION 11: CONSULTATION FORM (Sidebar Form - Available on Mobile & Desktop) -->
-					<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
-						<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
-						<p class="text-sm text-slate-500 mb-4">Hãy để lại thông tin, ban tư vấn tuyển sinh sẽ liên hệ và giải đáp lộ trình cụ thể cho bạn trong vòng 15 phút.</p>
-						
-						<?php 
-						$form_context = [
-							'current_program_id' => $program_id,
-							'current_school_id'  => $school_id,
-							'current_major_id'   => $major_id,
-							'referral_source'    => get_permalink(),
-						];
-						ltdh_render_consultation_form( $form_context );
-						?>
-					</section>
-					
-
-
-					<!-- ZALO GROUP COMMUNITY WIDGET (Sidebar - Desktop Only) -->
-					<?php
-					$program_school_zalo = ( $school_id ? ( get_field( 'zalo_group_url', $school_id ) ?: get_field( 'school_zalo_group', $school_id ) ) : '' ) ?: $global_zalo;
-					$program_school_name = $school_title ?: 'chương trình';
-					?>
-					<div class="hidden lg:block bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-2xl p-5 shadow-md relative overflow-hidden">
-						<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-
-						<div class="flex items-center gap-3 mb-3 relative z-10">
-							<div class="w-10 h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center font-black text-xl shadow-xs shrink-0">
-								💬
-							</div>
-							<div>
-								<span class="text-[11px] uppercase font-bold tracking-wider text-blue-200 block">Cộng đồng sinh viên</span>
-								<h3 class="font-extrabold text-base text-white leading-tight">Nhóm Zalo Trao Đổi</h3>
-							</div>
-						</div>
-
-						<p class="text-xs text-blue-100 leading-relaxed mb-4 relative z-10">
-							Tham gia nhóm Zalo trao đổi thông tin tuyển sinh, lịch học và đề án cùng sinh viên <?php echo esc_html( $program_school_name ); ?>.
-						</p>
-
-						<ul class="space-y-1.5 text-xs text-blue-50 font-medium mb-4 relative z-10">
-							<li class="flex items-center gap-2">
-								<span class="text-emerald-300 font-bold">✓</span>
-								<span>Cập nhật lịch thi & đề án mới nhất</span>
-							</li>
-							<li class="flex items-center gap-2">
-								<span class="text-emerald-300 font-bold">✓</span>
-								<span>Giải đáp thắc mắc hồ sơ 24/7</span>
-							</li>
-						</ul>
-
-						<a href="<?php echo esc_url( $program_school_zalo ); ?>"
-						   target="_blank"
-						   rel="noopener noreferrer"
-						   class="w-full bg-white hover:bg-blue-50 text-blue-700 font-extrabold text-sm py-3 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] relative z-10 hover:scale-[1.02]">
-							<span>💬 Tham gia Nhóm Zalo</span>
-							<span class="text-xs">→</span>
-						</a>
-					</div>
-
-					<!-- RELATED NEWS & ANNOUNCEMENTS (Sidebar - Desktop Only) -->
-					<?php
-					$program_news_meta = [ 'relation' => 'OR' ];
-					$program_news_meta[] = [
-						'key'     => 'related_programs',
-						'value'   => '"' . $program_id . '"',
-						'compare' => 'LIKE',
-					];
-					if ( $school_id ) {
-						$program_news_meta[] = [
-							'key'     => 'related_schools',
-							'value'   => '"' . $school_id . '"',
-							'compare' => 'LIKE',
-						];
-					}
-
-					$related_news_query = new WP_Query( [
-						'post_type'      => [ 'post', 'guide' ],
-						'posts_per_page' => 6,
-						'post_status'    => 'publish',
-						'meta_query'     => $program_news_meta,
-					] );
-
-					if ( $related_news_query->have_posts() ) :
-						$has_more = ( $related_news_query->post_count > 5 );
-					?>
-						<section class="hidden lg:block bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-5">
-							<h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-3">Tin tức & Thông báo liên quan</h3>
-							<div class="space-y-3.5">
-								<?php
-								$news_counter = 0;
-								while ( $related_news_query->have_posts() ) :
-									$related_news_query->the_post();
-									if ( $news_counter >= 5 ) {
-										continue;
-									}
-									$news_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( get_the_ID(), 'thumbnail' ) : ( get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' ) ?: ltdh_get_fallback_image( 'post' ) );
-									$news_counter++;
-								?>
-									<div class="flex gap-3 items-start pb-3 border-b border-slate-100 last:border-b-0 last:pb-0">
-										<a href="<?php the_permalink(); ?>" class="shrink-0">
-											<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded-lg" loading="lazy">
-										</a>
-										
-										<div class="flex-1 min-w-0">
-											<h4 class="font-bold text-slate-800 text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
-												<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-											</h4>
-											<p class="text-xs text-slate-400 mt-0.5">📅 <?php echo get_the_date(); ?></p>
-										</div>
-									</div>
-								<?php
-								endwhile;
-								wp_reset_postdata();
-								?>
-							</div>
-
-							<?php if ( $has_more ) : ?>
-								<div class="mt-4 pt-3 border-t border-slate-100">
-									<a href="<?php echo esc_url( home_url( '/tin-tuc/?chuong-trinh=' . $program_id ) ); ?>" class="w-full text-center bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200/80 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
-										<span>Xem thêm tin tức</span>
-										<span>→</span>
-									</a>
-								</div>
-							<?php endif; ?>
-						</section>
-					<?php
-					endif;
-					?>
-
-					<!-- SECTION 13: PHONE CTA & SECTION 14: ZALO CTA sidebar cards (Desktop Only) -->
-					<?php
-					get_template_part( 'template-parts/sidebar-hotline', null, [
-						'hotline'     => $program_hotline,
-						'zalo_url'    => $global_zalo,
-						'title'       => 'Văn phòng tuyển sinh',
-						'extra_class' => 'hidden lg:block',
-					] );
-					?>
-
-					<!-- COMPARE BUTTON ONLY (Desktop Only) -->
-					<?php
-					$types = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
-					$type_slug = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->slug : '';
-					$major_rel_id_raw = get_field( LTDH_META_MAJOR_REL, $program_id );
-					$major_rel_id = 0;
-					if ( is_array( $major_rel_id_raw ) ) {
-						$major_rel_id = ! empty( $major_rel_id_raw ) ? ( is_object( $major_rel_id_raw[0] ) ? $major_rel_id_raw[0]->ID : $major_rel_id_raw[0] ) : 0;
-					} elseif ( is_object( $major_rel_id_raw ) ) {
-						$major_rel_id = $major_rel_id_raw->ID;
-					} elseif ( $major_rel_id_raw ) {
-						$major_rel_id = intval( $major_rel_id_raw );
-					}
-					$major_slug = $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '';
-					?>
-					<button type="button"
-							class="hidden lg:flex w-full text-center bg-slate-100 hover:bg-slate-200/80 text-slate-700 py-3.5 rounded-xl font-bold transition-all ltdh-compare-single-btn text-sm flex items-center justify-center gap-2 mt-4 min-h-[44px] cursor-pointer"
-							data-compare-type="program" data-compare-id="<?php echo esc_attr( $program_id ); ?>"
-							data-compare-title="<?php echo esc_attr( get_the_title() ); ?>"
-							data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $program_id ) ); ?>"
-							data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
-							data-compare-nganh="<?php echo esc_attr( $major_slug ); ?>"
-							data-compare-major-name="<?php echo esc_attr( preg_replace( '/^ngành\s+/iu', '', trim( $major_title ) ) ); ?>"
-							data-compare-school-name="<?php echo esc_attr( $school_title ); ?>">
-						<span>📊</span> <span>Thêm vào so sánh</span>
-					</button>
-
-				</div>
+				<?php get_sidebar( 'program' ); ?>
 			</div>
 		</div>
 
@@ -1439,7 +1214,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			return headerHeight + navHeight + adminBarHeight;
 		}
 
-		function setActiveTab(targetId, shouldScrollNav) {
+		var currentActiveId = null;
+
+		function setActiveTab(targetId, isFromUserClick) {
+			if (targetId === currentActiveId && !isFromUserClick) return;
+			currentActiveId = targetId;
+
 			sectionMap.forEach(function(item) {
 				var link = item.link;
 				var iconEl = link.querySelector('.ltdh-tab-icon');
@@ -1467,13 +1247,13 @@ document.addEventListener('DOMContentLoaded', function() {
 						indicatorEl.classList.remove('bg-transparent', 'opacity-0');
 					}
 
-					if (shouldScrollNav && navContainer && navContainer.scrollWidth > navContainer.clientWidth) {
+					if (navContainer && navContainer.scrollWidth > navContainer.clientWidth) {
 						var tabLeft = link.offsetLeft;
 						var tabWidth = link.offsetWidth;
 						var containerWidth = navContainer.clientWidth;
 						navContainer.scrollTo({
 							left: tabLeft - (containerWidth / 2) + (tabWidth / 2),
-							behavior: 'smooth'
+							behavior: isFromUserClick ? 'smooth' : 'auto'
 						});
 					}
 				} else {
@@ -1558,7 +1338,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			if (currentId) {
-				setActiveTab(currentId, true);
+				setActiveTab(currentId, false);
 			}
 		}
 

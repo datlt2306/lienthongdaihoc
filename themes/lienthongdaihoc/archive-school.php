@@ -78,6 +78,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						
 						$address         = get_field( 'address', $school_id ) ?: 'Việt Nam';
 						$school_location = ltdh_get_school_location_label( $school_id );
+						$school_region   = ltdh_get_school_region_label( $school_id );
 						$short_address   = $school_location;
 						if ( ! empty( $address ) && 'Việt Nam' !== $address ) {
 							$addr_parts = array_map( 'trim', explode( ',', $address ) );
@@ -106,14 +107,14 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 									<span>Nổi bật</span>
 								</span>
 
-								<!-- Location Pill on Cover (Specific City/Province) -->
-								<?php if ( ! empty( $school_location ) ) : ?>
+								<!-- Region Pill on Cover (Miền Bắc, Miền Trung, Miền Nam) -->
+								<?php if ( ! empty( $school_region ) ) : ?>
 									<span class="absolute top-3 right-3 bg-slate-900/60 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
 										<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 											<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 										</svg>
-										<span><?php echo esc_html( $school_location ); ?></span>
+										<span><?php echo esc_html( $school_region ); ?></span>
 									</span>
 								<?php endif; ?>
 							</div>
@@ -259,6 +260,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						
 						$address         = get_field( 'address', $school_id ) ?: 'Việt Nam';
 						$school_location = ltdh_get_school_location_label( $school_id );
+						$school_region   = ltdh_get_school_region_label( $school_id );
 						$short_address   = $school_location;
 						if ( ! empty( $address ) && 'Việt Nam' !== $address ) {
 							$addr_parts = array_map( 'trim', explode( ',', $address ) );
@@ -278,13 +280,13 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 						<!-- Card Cover & Location -->
 						<div class="relative h-32 sm:h-36 bg-slate-200 bg-cover bg-center overflow-hidden" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ) ); ?>');">
 							<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent"></div>
-							<?php if ( ! empty( $school_location ) ) : ?>
+							<?php if ( ! empty( $school_region ) ) : ?>
 								<span class="absolute top-2.5 right-2.5 bg-slate-900/60 backdrop-blur-md text-white text-[10px] font-semibold px-2 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
 									<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 										<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 									</svg>
-									<span><?php echo esc_html( $school_location ); ?></span>
+									<span><?php echo esc_html( $school_region ); ?></span>
 								</span>
 							<?php endif; ?>
 						</div>

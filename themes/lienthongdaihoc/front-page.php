@@ -283,6 +283,7 @@ $zalo    = ltdh_get_zalo_url();
 								}
 								$school_types    = ! empty( $school['school_types'] ) ? $school['school_types'] : ltdh_get_school_training_types( $school_id );
 								$school_location = ! empty( $school['location'] ) ? $school['location'] : ltdh_get_school_location_label( $school_id );
+								$school_region   = ! empty( $school['region'] ) ? $school['region'] : ltdh_get_school_region_label( $school_id );
 
 								// Clean short address for footer info row
 								$short_address = $school_location;
@@ -300,13 +301,13 @@ $zalo    = ltdh_get_zalo_url();
 										<!-- Ảnh trường & Vị trí -->
 										<div class="relative h-36 sm:h-40 bg-slate-200 bg-cover bg-center overflow-hidden" style="background-image: url('<?php echo esc_url($thumb_url); ?>');">
 											<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent"></div>
-											<?php if ( ! empty( $school_location ) ) : ?>
+											<?php if ( ! empty( $school_region ) ) : ?>
 												<span class="absolute top-3 right-3 bg-slate-900/60 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
 													<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 														<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 														<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 													</svg>
-													<span><?php echo esc_html( $school_location ); ?></span>
+													<span><?php echo esc_html( $school_region ); ?></span>
 												</span>
 											<?php endif; ?>
 										</div>

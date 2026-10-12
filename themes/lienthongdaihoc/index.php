@@ -286,68 +286,10 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 			</div>
 
 			<!-- ====== RIGHT: SIDEBAR ====== -->
-			<aside class="lg:col-span-4 space-y-6">
+			<div class="lg:col-span-4">
+				<?php get_sidebar(); ?>
+			</div>
 
-				<!-- Sidebar Category Card -->
-				<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-					<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">📂 Chuyên mục cẩm nang</h3>
-					<ul class="space-y-1">
-						<li>
-							<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>" 
-							   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-all <?php echo empty( $active_cat_slug ) ? 'bg-slate-50 text-brand-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
-								<span>Tất cả tin tức</span>
-								<span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500"><?php echo esc_html( wp_count_posts( 'post' )->publish ); ?></span>
-							</a>
-						</li>
-						<?php foreach ( $blog_cats as $bcat ) :
-							$is_active_cat = ( $active_cat_slug === $bcat->slug );
-						?>
-							<li>
-								<a href="<?php echo esc_url( home_url( '/tin-tuc/?danh-muc=' . $bcat->slug ) ); ?>" 
-								   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-all <?php echo $is_active_cat ? 'bg-slate-50 text-brand-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
-									<span><?php echo esc_html( $bcat->name ); ?></span>
-									<span class="text-xs px-2 py-0.5 rounded-full <?php echo $is_active_cat ? 'bg-blue-50 text-brand-primary' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $bcat->count ); ?></span>
-								</a>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				</div>
-
-				<!-- Featured Posts / Recent Widget -->
-				<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-					<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">🔥 Tin xem nhiều nhất</h3>
-					<ul class="space-y-4">
-						<?php foreach ( $recent_posts as $rp ) :
-							$rp_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $rp->ID, 'thumbnail' ) : ( get_the_post_thumbnail_url( $rp->ID, 'thumbnail' ) ?: ltdh_get_fallback_image( 'post' ) );
-						?>
-							<li class="flex items-start gap-3">
-								<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-100 block">
-									<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-full h-full object-cover" loading="lazy">
-								</a>
-								<div class="min-w-0">
-									<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-sm font-bold text-slate-800 hover:text-brand-primary leading-snug block line-clamp-2 transition-all">
-										<?php echo esc_html( $rp->post_title ); ?>
-									</a>
-									<time class="text-xs text-slate-400 mt-0.5 block"><?php echo get_the_date( 'd/m/Y', $rp->ID ); ?></time>
-								</div>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				</div>
-
-				<!-- Premium CTA Consultation Sidebar Card -->
-				<div class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary rounded-xl p-6 text-center text-white shadow-lg overflow-hidden">
-					<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 16px 16px;"></div>
-					<div class="text-3xl mb-2">💡</div>
-					<h3 class="font-extrabold text-base mb-1.5 leading-tight">Bạn chưa chọn được lộ trình học?</h3>
-					<p class="text-blue-100 text-sm mb-4 leading-relaxed">Để lại thông tin, ban tư vấn sẽ giải đáp lộ trình liên thông hoàn toàn miễn phí cho bạn.</p>
-					<a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>" 
-					   class="block w-full bg-brand-accent text-white font-extrabold text-sm py-3 rounded-lg hover:bg-[#e06e00] transition-all shadow-md shadow-brand-accent/20 min-h-[44px] flex items-center justify-center">
-						KIỂM TRA ĐIỀU KIỆN NGAY
-					</a>
-				</div>
-
-			</aside>
 		</div>
 	</div>
 </main>

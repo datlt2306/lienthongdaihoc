@@ -26,6 +26,7 @@ require_once __DIR__ . '/inc/core/class-menus.php';
 require_once __DIR__ . '/inc/core/class-rewrite-rules.php';
 require_once __DIR__ . '/inc/core/class-query-filters.php';
 require_once __DIR__ . '/inc/core/class-performance.php';
+require_once __DIR__ . '/inc/core/class-widgets.php';
 
 
 // ----------------------------------------------------

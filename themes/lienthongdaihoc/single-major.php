@@ -113,13 +113,20 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>',
 	];
 }
+
+$major_tabs[] = [
+	'id'       => 'register',
+	'title'    => 'Đăng ký tư vấn',
+	'subtitle' => 'Miễn phí 100%',
+	'icon'     => '<svg class="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>',
+];
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 
 	<!-- STICKY SECTION TAB NAVIGATION (Redesigned with UI/UX Pro Max) -->
-	<div id="ltdh-major-sticky-nav" class="ltdh-sticky-nav sticky top-20 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-all duration-200">
+	<div id="ltdh-major-sticky-nav" class="ltdh-sticky-nav sticky top-16 sm:top-20 z-40 bg-white/98 backdrop-blur-md border-b border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-all duration-200">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<nav class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-2" aria-label="Điều hướng các mục ngành đào tạo">
 				<?php foreach ( $major_tabs as $tab_idx => $tab ) : 
@@ -346,10 +353,10 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 					</div>
 
 					<!-- Dynamic Programs List Container -->
-					<div id="ltdh-major-programs-wrapper" data-major-id="<?php echo esc_attr( $major_id ); ?>" class="transition-opacity duration-300">
+					<div id="ltdh-major-programs-wrapper" data-major-id="<?php echo esc_attr( $major_id ); ?>" data-school-slug="<?php echo esc_attr( $selected_school_slug ); ?>" class="transition-opacity duration-300">
 						<div id="ltdh-major-programs-list">
 							<?php 
-							$initial_count = ltdh_render_major_programs_list( $major_id, $selected_he ); 
+							$initial_count = ltdh_render_major_programs_list( $major_id, $selected_he, $selected_school_slug ); 
 							?>
 						</div>
 					</div>
@@ -404,131 +411,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 
 			<!-- Sidebar Column -->
 			<div class="lg:col-span-1">
-				<div class="sticky top-36 md:top-40 space-y-6">
-					
-					<!-- CONSULTATION FORM -->
-					<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-						<h3 class="text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn ngành <?php the_title(); ?></h3>
-						<p class="text-sm text-slate-500 mb-4">Để lại thông tin, ban tuyển sinh sẽ gửi danh sách trường đào tạo phù hợp nhất với học lực và thời gian của bạn.</p>
-						
-						<?php 
-						ltdh_render_consultation_form( [
-							'current_major_id' => $major_id,
-							'referral_source'  => get_permalink(),
-						] );
-					?>
-					</section>
-
-					<!-- RELATED NEWS & ANNOUNCEMENTS (Sidebar) -->
-					<?php
-					$related_news_query = new WP_Query( [
-						'post_type'      => [ 'post', 'guide' ],
-						'posts_per_page' => 6,
-						'post_status'    => 'publish',
-						'meta_query'     => [
-							[
-								'key'     => 'related_majors',
-								'value'   => '"' . $major_id . '"',
-								'compare' => 'LIKE',
-							],
-						],
-					] );
-
-					if ( $related_news_query->have_posts() ) :
-						$has_more = ( $related_news_query->post_count > 5 );
-					?>
-						<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-							<h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-3">Tin tức & Hướng dẫn</h3>
-							<div class="space-y-3.5">
-								<?php
-								$news_counter = 0;
-								while ( $related_news_query->have_posts() ) :
-									$related_news_query->the_post();
-									if ( $news_counter >= 5 ) {
-										continue;
-									}
-									$news_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( get_the_ID(), 'thumbnail' ) : ( get_the_post_thumbnail_url( get_the_ID(), 'thumbnail' ) ?: ltdh_get_fallback_image( 'post' ) );
-									$news_counter++;
-								?>
-									<div class="flex gap-3 items-start pb-3 border-b border-slate-100 last:border-b-0 last:pb-0">
-										<a href="<?php the_permalink(); ?>" class="shrink-0">
-											<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded border border-slate-100" loading="lazy">
-										</a>
-										
-										<div class="flex-1 min-w-0">
-											<h4 class="font-bold text-slate-800 text-sm hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
-												<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-											</h4>
-											<p class="text-xs text-slate-400 mt-0.5">📅 <?php echo get_the_date(); ?></p>
-										</div>
-									</div>
-								<?php
-								endwhile;
-								wp_reset_postdata();
-								?>
-							</div>
-
-							<?php if ( $has_more ) : ?>
-								<div class="mt-4 pt-3 border-t border-slate-100">
-									<a href="<?php echo esc_url( home_url( '/tin-tuc/?nganh=' . $major_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
-										<span>Xem thêm tin tức</span>
-										<span>→</span>
-									</a>
-								</div>
-							<?php endif; ?>
-						</section>
-					<?php
-					endif;
-					?>
- 
-					<!-- ZALO GROUP COMMUNITY WIDGET -->
-					<div class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-xl p-5 shadow-md relative overflow-hidden border border-blue-500/30">
-						<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-
-						<div class="flex items-center gap-3 mb-3 relative z-10">
-							<div class="w-10 h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center font-black text-xl shadow-xs shrink-0">
-								💬
-							</div>
-							<div>
-								<span class="text-[11px] uppercase font-bold tracking-wider text-blue-200 block">Cộng đồng sinh viên</span>
-								<h3 class="font-extrabold text-base text-white leading-tight">Nhóm Zalo Trao Đổi</h3>
-							</div>
-						</div>
-
-						<p class="text-xs text-blue-100 leading-relaxed mb-4 relative z-10">
-							Tham gia nhóm Zalo trao đổi thông tin tuyển sinh, định hướng nghề nghiệp ngành <?php echo esc_html( get_the_title( $major_id ) ); ?>.
-						</p>
-
-						<ul class="space-y-1.5 text-xs text-blue-50 font-medium mb-4 relative z-10">
-							<li class="flex items-center gap-2">
-								<span class="text-emerald-300 font-bold">✓</span>
-								<span>Cập nhật thông tin tuyển sinh mới nhất</span>
-							</li>
-							<li class="flex items-center gap-2">
-								<span class="text-emerald-300 font-bold">✓</span>
-								<span>Chia sẻ kinh nghiệm & đề án học tập</span>
-							</li>
-						</ul>
-
-						<a href="<?php echo esc_url( $global_zalo ); ?>"
-						   target="_blank"
-						   rel="noopener noreferrer"
-						   class="w-full bg-white hover:bg-blue-50 text-blue-700 font-extrabold text-sm py-3 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] relative z-10 hover:scale-[1.02]">
-							<span>💬 Tham gia Nhóm Zalo</span>
-							<span class="text-xs">→</span>
-						</a>
-					</div>
-
-					<!-- CONTACT INFO CARD -->
-					<?php
-					get_template_part( 'template-parts/sidebar-hotline', null, [
-						'hotline'  => $hotline,
-						'zalo_url' => $global_zalo,
-						'title'    => 'Văn phòng tuyển sinh',
-					] );
-					?>
-
-				</div>
+				<?php get_sidebar( 'major' ); ?>
 			</div>
 		</div>
 
@@ -624,7 +507,12 @@ body.admin-bar #ltdh-major-sticky-nav {
 			return headerHeight + navHeight + adminBarHeight;
 		}
 
-		function setActiveTab(targetId, shouldScrollNav) {
+		var currentActiveId = null;
+
+		function setActiveTab(targetId, isFromUserClick) {
+			if (targetId === currentActiveId && !isFromUserClick) return;
+			currentActiveId = targetId;
+
 			sectionMap.forEach(function(item) {
 				var link = item.link;
 				var iconEl = link.querySelector('.ltdh-tab-icon');
@@ -652,13 +540,13 @@ body.admin-bar #ltdh-major-sticky-nav {
 						indicatorEl.classList.remove('bg-transparent', 'opacity-0');
 					}
 
-					if (shouldScrollNav && navContainer && navContainer.scrollWidth > navContainer.clientWidth) {
+					if (navContainer && navContainer.scrollWidth > navContainer.clientWidth) {
 						var tabLeft = link.offsetLeft;
 						var tabWidth = link.offsetWidth;
 						var containerWidth = navContainer.clientWidth;
 						navContainer.scrollTo({
 							left: tabLeft - (containerWidth / 2) + (tabWidth / 2),
-							behavior: 'smooth'
+							behavior: isFromUserClick ? 'smooth' : 'auto'
 						});
 					}
 				} else {
@@ -743,7 +631,7 @@ body.admin-bar #ltdh-major-sticky-nav {
 			}
 
 			if (currentId) {
-				setActiveTab(currentId, true);
+				setActiveTab(currentId, false);
 			}
 		}
 

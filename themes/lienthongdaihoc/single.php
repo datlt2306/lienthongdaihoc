@@ -35,10 +35,6 @@ if ( empty( $related ) ) {
 	$related = get_posts( [ 'numberposts' => 4, 'post__not_in' => [ $post_id ] ] );
 }
 
-// Recent posts for sidebar
-$recent_posts = get_posts( [ 'numberposts' => 5, 'post__not_in' => [ $post_id ] ] );
-$blog_cats    = get_categories( [ 'hide_empty' => true, 'exclude' => [ 1 ] ] );
-
 // Estimate reading time
 $word_count   = str_word_count( strip_tags( get_the_content() ) );
 $reading_time = max( 1, ceil( $word_count / 200 ) );
@@ -196,67 +192,10 @@ $reading_time = max( 1, ceil( $word_count / 200 ) );
 			</article>
 
 			<!-- Sidebar -->
-			<aside class="lg:col-span-1 space-y-6">
+			<div class="lg:col-span-1">
+				<?php get_sidebar(); ?>
+			</div>
 
-				<!-- Danh mục -->
-				<div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm sticky top-24">
-					<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">📂 Danh mục</h3>
-					<ul class="space-y-1">
-						<li>
-							<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>"
-							   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#00308b] transition-all">
-								<span>Tất cả tin tức</span>
-							</a>
-						</li>
-						<?php foreach ( $blog_cats as $bcat ) : ?>
-							<li>
-								<a href="<?php echo esc_url( home_url( '/tin-tuc/?danh-muc=' . $bcat->slug ) ); ?>"
-								   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold <?php echo ( $post_cat && $post_cat->slug === $bcat->slug ) ? 'bg-[#00308b] text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-[#00308b]'; ?> transition-all">
-									<span><?php echo esc_html( $bcat->name ); ?></span>
-									<span class="text-xs px-2 py-0.5 rounded-full font-bold <?php echo ( $post_cat && $post_cat->slug === $bcat->slug ) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'; ?>">
-										<?php echo esc_html( $bcat->count ); ?>
-									</span>
-								</a>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				</div>
-
-				<!-- Bài viết mới nhất -->
-				<div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-					<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">🔥 Bài viết mới nhất</h3>
-					<ul class="space-y-4">
-						<?php foreach ( $recent_posts as $rp ) :
-							$rp_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $rp->ID, 'thumbnail' ) : ( get_the_post_thumbnail_url( $rp->ID, 'thumbnail' ) ?: ltdh_get_fallback_image( 'post' ) );
-						?>
-							<li class="flex items-start gap-3">
-								<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-14 h-14 rounded-lg object-cover shrink-0 border border-slate-100" loading="lazy">
-								<div class="min-w-0">
-									<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-sm font-bold text-slate-800 hover:text-[#00308b] leading-snug block line-clamp-2 transition-colors">
-										<?php echo esc_html( $rp->post_title ); ?>
-									</a>
-									<time class="text-xs text-slate-400 mt-1 block"><?php echo get_the_date( 'd/m/Y', $rp->ID ); ?></time>
-								</div>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				</div>
-
-				<!-- CTA -->
-				<div class="bg-gradient-to-br from-[#00308b] to-[#00308b] rounded-xl p-6 text-center text-white shadow-lg">
-					<div class="text-3xl mb-3">🎓</div>
-					<h3 class="font-extrabold text-base mb-2">Cần tư vấn tuyển sinh?</h3>
-					<p class="text-blue-100 text-sm mb-4 leading-relaxed">Đội ngũ tư vấn sẵn sàng hỗ trợ bạn 24/7</p>
-					<a href="<?php echo esc_url( home_url( '/lien-he/' ) ); ?>"
-					   class="block w-full bg-white text-[#00308b] font-extrabold text-sm py-2.5 rounded-xl hover:bg-blue-50 transition-all mb-2">
-						Đăng ký ngay
-					</a>
-					<?php $hotline = ltdh_get_hotline(); ?>
-					<a href="tel:<?php echo esc_attr( str_replace( ' ', '', $hotline ) ); ?>" class="block text-blue-200 text-sm font-semibold hover:text-white transition-colors">
-						📞 <?php echo esc_html( $hotline ); ?>
-					</a>
-				</div>
-			</aside>
 		</div>
 	</div>
 </main>
