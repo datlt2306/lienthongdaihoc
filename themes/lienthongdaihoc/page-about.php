@@ -39,7 +39,7 @@ get_header();
 
 			// Fallback if ACF not populated.
 			if ( empty( $about_intro ) ) {
-				$about_intro = 'lienthongdaihoc.com là cổng thông tin tìm kiếm, đối chiếu và tư vấn tuyển sinh đại học trực tuyến liên thông, văn bằng 2 và đào tạo từ xa hàng đầu tại Việt Nam.';
+				$about_intro = 'lienthongdaihoc.com là cổng thông tin tìm kiếm, đối chiếu và tư vấn tuyển sinh Liên thông Đại học hàng đầu tại Việt Nam với 3 hình thức: Chính quy, Vừa học vừa làm và Đào tạo từ xa.';
 			}
 			if ( empty( $about_mission ) ) {
 				$about_mission = 'Sứ mệnh của chúng tôi là trở thành cầu nối tin cậy giữa người học và các trường Đại học danh tiếng, mang lại cơ hội tiếp cận tri thức đại học dễ dàng, linh hoạt và tối ưu hóa chi phí cho người đi làm.';

@@ -28,7 +28,7 @@ $zalo    = ltdh_get_zalo_url();
 
 <main id="primary" class="site-main bg-white">
 	<!-- H1 Semantic Heading for SEO & Screen Readers -->
-	<h1 class="sr-only">Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hình Thức Từ Xa & Vừa Học Vừa Làm</h1>
+	<h1 class="sr-only">Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hệ Chính Quy, Vừa Học Vừa Làm & Đào Tạo Từ Xa</h1>
 
 	<!-- 1. HERO SECTION (Swiper Banner Slider) -->
 	<?php
@@ -450,13 +450,13 @@ $zalo    = ltdh_get_zalo_url();
 					<?php echo $e_heading ?: 'Bạn có đủ điều kiện học<br>Liên thông Đại học?'; ?>
 				</h2>
 				<p class="text-slate-500 text-sm leading-relaxed max-w-2xl mx-auto">
-					<?php echo esc_html($e_desc ?: 'Chương trình tuyển sinh mở rộng cho người tốt nghiệp Trung cấp, Cao đẳng, Đại học. Chỉ mất 1 phút để kiểm tra tự động.'); ?>
+					<?php echo esc_html($e_desc ?: 'Chương trình tuyển sinh mở rộng cho người tốt nghiệp Trung cấp hoặc Cao đẳng. Chỉ mất 1 phút để kiểm tra tự động.'); ?>
 				</p>
 				<?php
 				$e_items_default = [
 					['title' => 'Tốt nghiệp Trung cấp', 'desc' => 'Liên thông lên Đại học'],
 					['title' => 'Tốt nghiệp Cao đẳng', 'desc' => 'Liên thông miễn giảm tín chỉ'],
-					['title' => 'Đã có bằng Đại học', 'desc' => 'Liên thông văn bằng thứ hai'],
+					['title' => 'Khác ngành / Ngành gần', 'desc' => 'Học bổ sung kiến thức liên thông'],
 				];
 				$e_items_render = !empty($e_items) ? $e_items : $e_items_default;
 				?>

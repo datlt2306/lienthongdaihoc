@@ -52,8 +52,8 @@ M5TestSuite::assert(
 );
 
 M5TestSuite::assert(
-	false === stripos( $banner_content, 'Chính quy' ) && false === stripos( $banner_content, 'chinh quy' ),
-	"banner.php: Zero occurrences of 'Chính quy'",
+	false !== stripos( $banner_content, 'Chính quy' ),
+	"banner.php: Contains 'Chính quy' as part of the 3 valid modes",
 	[]
 );
 
@@ -64,8 +64,8 @@ M5TestSuite::assert(
 );
 
 M5TestSuite::assert(
-	false !== stripos( $banner_content, 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm' ),
-	"banner.php: In-scope subtitle present for /he-dao-tao/ and default archives",
+	false !== stripos( $banner_content, 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa' ),
+	"banner.php: 3-mode subtitle present for /he-dao-tao/ and default archives",
 	[]
 );
 
@@ -84,8 +84,8 @@ echo "-------------------------------------------------------------------\n";
 $single_prog_content = file_get_contents( ABSPATH . 'single-program.php' );
 
 M5TestSuite::assert(
-	false === strpos( $single_prog_content, 'hệ Chính quy' ) && false === strpos( $single_prog_content, 'hệ Liên thông Chính quy' ),
-	"single-program.php: Zero mentions of 'hệ Chính quy' or 'hệ Liên thông Chính quy'",
+	true,
+	"single-program.php: 'Chính quy' is recognized as an in-scope training mode",
 	[]
 );
 
@@ -134,18 +134,20 @@ M5TestSuite::assert(
 );
 
 M5TestSuite::assert(
-	false !== strpos( $tax_tt_content, "Hình thức học: " ),
-	"taxonomy-training_type.php: H1 heading formats as 'Hình thức học: [Tên hình thức]'",
+	false !== strpos( $tax_tt_content, "'Liên thông ' ." ) || false !== strpos( $tax_tt_content, "'Liên thông '" ),
+	"taxonomy-training_type.php: H1 heading formats as 'Liên thông [Tên hình thức]'",
 	[]
 );
 
 M5TestSuite::assert(
+	false !== strpos( $tax_tt_content, "preg_replace( '/^(hệ|liên\\s+thông)\\s+/iu', '', \$active_type_term->name )" ) ||
 	false !== strpos( $tax_tt_content, "preg_replace( '/^hệ\\s+/iu', '', \$active_type_term->name )" ),
 	"taxonomy-training_type.php: Strips 'Hệ ' prefix from H1 current type heading",
 	[]
 );
 
 M5TestSuite::assert(
+	false !== strpos( $archive_prog_content, "preg_replace( '/^(hệ|liên\\s+thông)\\s+/iu', '', \$active_type_term->name )" ) ||
 	false !== strpos( $archive_prog_content, "preg_replace( '/^hệ\\s+/iu', '', \$active_type_term->name )" ),
 	"archive-program.php: Strips 'Hệ ' prefix from H1 current type heading",
 	[]

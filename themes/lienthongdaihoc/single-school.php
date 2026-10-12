@@ -56,7 +56,7 @@ $school_tabs[] = [
 $school_tabs[] = [
 	'id'       => 'chuong-trinh-tuyen-sinh',
 	'title'    => 'Ngành & Chương trình',
-	'subtitle' => 'Hệ đào tạo tuyển sinh',
+	'subtitle' => 'Hình thức học tuyển sinh',
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>',
 ];
 
@@ -355,7 +355,7 @@ if ( ! empty( $contact ) ) {
 					$tax_training_type_filter = [
 						'taxonomy' => LTDH_TAX_TRAINING_TYPE,
 						'field'    => 'slug',
-						'terms'    => [ 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ],
+						'terms'    => [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ],
 						'operator' => 'IN',
 					];
 
@@ -467,7 +467,7 @@ if ( ! empty( $contact ) ) {
 									$badge_class = 'bg-blue-50 text-[#00308b]';
 								} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
 									$badge_class = 'bg-emerald-50 text-emerald-700';
-								} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {
+								} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
 									$badge_class = 'bg-amber-50 text-amber-800';
 								}
 							}
@@ -522,7 +522,7 @@ if ( ! empty( $contact ) ) {
 						<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
 							<div>
 								<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">Ngành và chương trình trường đào tạo</h2>
-								<p class="text-xs md:text-sm text-slate-500 mt-1">Danh sách các ngành và hệ đào tạo tuyển sinh chính thức tại trường</p>
+								<p class="text-xs md:text-sm text-slate-500 mt-1">Danh sách các ngành và hình thức học tuyển sinh chính thức tại trường</p>
 							</div>
 							<div class="flex items-center gap-2 self-start sm:self-center shrink-0">
 								<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-[#00308b] border border-blue-100/80">
@@ -616,7 +616,7 @@ if ( ! empty( $contact ) ) {
 
 											<?php if ( $programs_count > 1 ) : ?>
 												<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-white/95 text-slate-800 backdrop-blur-md shadow-xs">
-													<?php echo esc_html( $programs_count ); ?> hệ đào tạo
+													<?php echo esc_html( $programs_count ); ?> hình thức học
 												</span>
 											<?php endif; ?>
 										</div>
@@ -627,7 +627,7 @@ if ( ! empty( $contact ) ) {
 												<?php if ( $prog['type_name'] ) : ?>
 													<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
 													   class="<?php echo esc_attr( $prog['badge_class'] ); ?> text-[11px] font-bold px-2 py-0.5 rounded-md shadow-xs hover:opacity-90 transition-opacity" 
-													   title="Xem chi tiết <?php echo esc_attr( $prog['type_name'] ); ?>">
+													   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
 														<?php echo esc_html( $prog['type_name'] ); ?>
 													</a>
 												<?php endif; ?>

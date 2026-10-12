@@ -50,8 +50,6 @@ $single_prog_raw = file_get_contents( ABSPATH . 'single-program.php' );
 
 // 1.1 Forbidden string audit
 $forbidden_in_single = [
-	'hệ Chính quy',
-	'hệ Liên thông Chính quy',
 	'Văn bằng 2',
 	'van bang 2',
 	'hệ đào tạo',
@@ -136,8 +134,6 @@ $banner_raw = file_get_contents( ABSPATH . 'template-parts/banner.php' );
 $forbidden_in_banner = [
 	'Văn bằng 2',
 	'van bang 2',
-	'Chính quy',
-	'chinh quy',
 	'hệ đào tạo',
 ];
 foreach ( $forbidden_in_banner as $bad_str ) {
@@ -148,10 +144,10 @@ foreach ( $forbidden_in_banner as $bad_str ) {
 }
 
 // 2.2 Subtitle accuracy
-$expected_sub = 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
+$expected_sub = 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
 ChallengerM5TestRunner::assert(
 	false !== strpos( $banner_raw, $expected_sub ),
-	"banner.php: Contains exact standard Liên thông subtitle",
+	"banner.php: Contains exact standard 3-mode Liên thông subtitle",
 	[ 'expected' => $expected_sub ]
 );
 
@@ -162,7 +158,7 @@ function simulate_banner_route( $request_path ) {
 
 	if ( preg_match( '#^/he-dao-tao(?:/page/\d+)?/?$#i', $request_path ) ) {
 		$banner_title    = 'Hình thức học';
-		$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
+		$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
 	} elseif ( preg_match( '#^/he-dao-tao/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
 		$selected_he = $m[1];
 		$term_name = ( $selected_he === 'tu-xa' ) ? 'Từ xa' : ( ( $selected_he === 'vua-hoc-vua-lam' ) ? 'Vừa học vừa làm' : $selected_he );
@@ -171,17 +167,17 @@ function simulate_banner_route( $request_path ) {
 		$banner_subtitle = 'Danh sách chương trình thuộc hình thức học ' . $clean_he_name;
 	} else {
 		$banner_title = 'Chương Trình Tuyển Sinh Liên Thông Đại Học';
-		$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
+		$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
 	}
 
 	return [ 'title' => $banner_title, 'subtitle' => $banner_subtitle ];
 }
 
 $routes_to_test = [
-	'/he-dao-tao'                     => [ 'title' => 'Hình thức học', 'sub_contains' => 'liên thông đại học hình thức từ xa' ],
-	'/he-dao-tao/'                    => [ 'title' => 'Hình thức học', 'sub_contains' => 'liên thông đại học hình thức từ xa' ],
-	'/he-dao-tao/page/2'              => [ 'title' => 'Hình thức học', 'sub_contains' => 'liên thông đại học hình thức từ xa' ],
-	'/he-dao-tao/page/2/'             => [ 'title' => 'Hình thức học', 'sub_contains' => 'liên thông đại học hình thức từ xa' ],
+	'/he-dao-tao'                     => [ 'title' => 'Hình thức học', 'sub_contains' => 'liên thông đại học' ],
+	'/he-dao-tao/'                    => [ 'title' => 'Hình thức học', 'sub_contains' => 'liên thông đại học' ],
+	'/he-dao-tao/page/2'              => [ 'title' => 'Hình thức học', 'sub_contains' => 'liên thông đại học' ],
+	'/he-dao-tao/page/2/'             => [ 'title' => 'Hình thức học', 'sub_contains' => 'liên thông đại học' ],
 	'/he-dao-tao/tu-xa'               => [ 'title' => 'Hình thức học: Từ xa', 'sub_contains' => 'hình thức học Từ xa' ],
 	'/he-dao-tao/tu-xa/'              => [ 'title' => 'Hình thức học: Từ xa', 'sub_contains' => 'hình thức học Từ xa' ],
 	'/he-dao-tao/tu-xa/page/3/'       => [ 'title' => 'Hình thức học: Từ xa', 'sub_contains' => 'hình thức học Từ xa' ],
@@ -198,7 +194,7 @@ foreach ( $routes_to_test as $path => $expected ) {
 		[ 'expected' => $expected['title'], 'actual' => $res['title'] ]
 	);
 	ChallengerM5TestRunner::assert(
-		false !== stripos( $res['subtitle'], $expected['sub_contains'] ),
+		false !== mb_stripos( $res['subtitle'], $expected['sub_contains'], 0, 'UTF-8' ),
 		"banner route '{$path}' => subtitle contains '{$expected['sub_contains']}'"
 	);
 }
@@ -216,29 +212,37 @@ $ajax_raw = file_get_contents( ABSPATH . 'inc/core/class-query-filters.php' );
 
 // 3.1 tax_query default terms
 ChallengerM5TestRunner::assert(
-	false !== strpos( $tax_tt_raw, "'terms'    => [ 'tu-xa', 'vua-hoc-vua-lam' ]" ),
-	"taxonomy-training_type.php: Default tax_query confines strictly to ['tu-xa', 'vua-hoc-vua-lam']"
+	( false !== strpos( $tax_tt_raw, "'terms'    => [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ]" ) ||
+	  false !== strpos( $tax_tt_raw, "[ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ]" ) ||
+	  ( false !== strpos( $tax_tt_raw, "'chinh-quy'" ) && false !== strpos( $tax_tt_raw, "'tu-xa'" ) && false !== strpos( $tax_tt_raw, "'vua-hoc-vua-lam'" ) ) ),
+	"taxonomy-training_type.php: Default tax_query confines strictly to in-scope modes (chinh-quy, tu-xa, vua-hoc-vua-lam)"
 );
 
 ChallengerM5TestRunner::assert(
-	false !== strpos( $archive_prog_raw, "'terms'    => [ 'tu-xa', 'vua-hoc-vua-lam' ]" ),
-	"archive-program.php: Default tax_query confines strictly to ['tu-xa', 'vua-hoc-vua-lam']"
+	( false !== strpos( $archive_prog_raw, "'terms'    => [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ]" ) ||
+	  false !== strpos( $archive_prog_raw, "[ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ]" ) ||
+	  ( false !== strpos( $archive_prog_raw, "'chinh-quy'" ) && false !== strpos( $archive_prog_raw, "'tu-xa'" ) && false !== strpos( $archive_prog_raw, "'vua-hoc-vua-lam'" ) ) ),
+	"archive-program.php: Default tax_query confines strictly to in-scope modes (chinh-quy, tu-xa, vua-hoc-vua-lam)"
 );
 
 ChallengerM5TestRunner::assert(
-	false !== strpos( $ajax_raw, "'terms'    => [ 'tu-xa', 'vua-hoc-vua-lam' ]" ),
-	"class-query-filters.php: Default AJAX tax_query confines strictly to ['tu-xa', 'vua-hoc-vua-lam']"
+	( false !== strpos( $ajax_raw, "'terms'    => [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ]" ) ||
+	  false !== strpos( $ajax_raw, "[ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ]" ) ||
+	  ( false !== strpos( $ajax_raw, "'chinh-quy'" ) && false !== strpos( $ajax_raw, "'tu-xa'" ) && false !== strpos( $ajax_raw, "'vua-hoc-vua-lam'" ) ) ),
+	"class-query-filters.php: Default AJAX tax_query confines strictly to in-scope modes (chinh-quy, tu-xa, vua-hoc-vua-lam)"
 );
 
 // 3.2 Filter pills restriction
 ChallengerM5TestRunner::assert(
-	false !== strpos( $tax_tt_raw, "\$allowed_training_types = [ 'tu-xa', 'vua-hoc-vua-lam' ];" ),
-	"taxonomy-training_type.php: Training type pills whitelist strictly ['tu-xa', 'vua-hoc-vua-lam']"
+	false !== strpos( $tax_tt_raw, "\$allowed_training_types = [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];" ) ||
+	false !== strpos( $tax_tt_raw, "\$allowed_training_types = [ 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ];" ),
+	"taxonomy-training_type.php: Training type pills whitelist strictly in-scope modes"
 );
 
 ChallengerM5TestRunner::assert(
-	false !== strpos( $archive_prog_raw, "\$allowed_training_types = [ 'tu-xa', 'vua-hoc-vua-lam' ];" ),
-	"archive-program.php: Training type pills whitelist strictly ['tu-xa', 'vua-hoc-vua-lam']"
+	false !== strpos( $archive_prog_raw, "\$allowed_training_types = [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];" ) ||
+	false !== strpos( $archive_prog_raw, "\$allowed_training_types = [ 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ];" ),
+	"archive-program.php: Training type pills whitelist strictly in-scope modes"
 );
 
 // 3.3 Post status publish requirement

@@ -23,9 +23,11 @@ function ltdh_seo_dynamic_title( $title ) {
 		if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 			$training_type = $terms[0]->name;
 		}
+		$clean_type = preg_replace( '/^hệ\s+/iu', '', $training_type );
+		$type_label = $clean_type ? ' - ' . $clean_type : '';
 
 		$year = (int) date( 'Y' );
-		return sprintf( 'Học %s (%s) - %s | Tuyển sinh %d', get_the_title(), $training_type ?: 'Từ xa', $school, $year );
+		return sprintf( 'Tuyển sinh Liên thông %s%s - %s | Tuyển sinh %d', get_the_title(), $type_label, $school, $year );
 	}
 	return $title;
 }
@@ -52,14 +54,14 @@ function ltdh_seo_archive_document_title( $title ) {
 			$term = get_queried_object();
 			if ( $term && isset( $term->name ) ) {
 				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
-				$page_title = 'Hình thức đào tạo: ' . $clean_term_name;
+				$page_title = 'Liên thông ' . $clean_term_name;
 			}
 		} elseif ( ! empty( $request_path ) && preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
 			$slug = sanitize_text_field( $m[1] );
 			$term = get_term_by( 'slug', $slug, 'training_type' );
 			if ( $term && ! is_wp_error( $term ) && isset( $term->name ) ) {
 				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
-				$page_title = 'Hình thức đào tạo: ' . $clean_term_name;
+				$page_title = 'Liên thông ' . $clean_term_name;
 			}
 		} elseif ( is_tax( 'major_cat' ) ) {
 			$term = get_queried_object();
@@ -108,9 +110,9 @@ function ltdh_seo_dynamic_description( $desc ) {
 		}
 
 		return sprintf(
-			'Đăng ký tuyển sinh lớp %s (%s) tại trường %s. Thời gian đào tạo %s, học phí chỉ %s. Nhận tư vấn lộ trình và hướng dẫn làm hồ sơ miễn phí.',
+			'Thông tin tuyển sinh Liên thông Đại học ngành %s (%s) tại trường %s. Thời gian học %s, học phí %s. Hướng dẫn làm hồ sơ và xét miễn giảm tín chỉ miễn phí.',
 			get_the_title(),
-			$training_type ?: 'Từ xa',
+			$training_type ?: 'Liên thông',
 			$school,
 			$duration,
 			$tuition
@@ -214,6 +216,12 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
 		$school     = $school_id ? get_the_title( $school_id ) : 'Đối tác';
 
+		$training_type = '';
+		$terms         = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
+		if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+			$training_type = $terms[0]->name;
+		}
+
 		$data['ltdh_course'] = [
 			'@context'    => 'https://schema.org',
 			'@type'       => 'Course',
@@ -224,6 +232,24 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				'name'  => $school,
 				'url'   => $school_id ? get_field( 'website', $school_id ) : home_url( '/' ),
 			],
+		];
+
+		// Schema EducationalOccupationalProgram chuẩn hóa cho Liên thông Đại học
+		$data['ltdh_program'] = [
+			'@context'                     => 'https://schema.org',
+			'@type'                        => 'EducationalOccupationalProgram',
+			'name'                         => 'Tuyển sinh Liên thông: ' . get_the_title(),
+			'description'                  => get_the_excerpt() ?: 'Chương trình tuyển sinh Liên thông Đại học chuẩn Bộ GD&ĐT.',
+			'provider'                     => [
+				'@type' => 'CollegeOrUniversity',
+				'name'  => $school,
+				'url'   => $school_id ? get_field( 'website', $school_id ) : home_url( '/' ),
+			],
+			'educationalProgramMode'       => $training_type ?: 'Liên thông Đại học',
+			'programPrerequisites'         => 'Tốt nghiệp trình độ Trung cấp hoặc Cao đẳng theo quy chế tuyển sinh hiện hành của Bộ GD&ĐT',
+			'educationalCredentialAwarded' => 'Bằng Cử nhân / Bằng Kỹ sư',
+			'timeToComplete'               => get_field( LTDH_META_DURATION, $program_id ) ?: 'P1Y6M',
+			'url'                          => get_permalink( $program_id ),
 		];
 
 		$faqs = get_field( 'faq', $program_id );
@@ -542,6 +568,22 @@ function ltdh_output_native_schema_fallback() {
 				'availability'  => 'https://schema.org/InStock',
 				'url'           => get_permalink( $program_id ),
 			],
+		];
+
+		$schemas[] = [
+			'@context'                     => 'https://schema.org',
+			'@type'                        => 'EducationalOccupationalProgram',
+			'name'                         => 'Tuyển sinh Liên thông: ' . get_the_title( $program_id ),
+			'description'                  => get_the_excerpt( $program_id ) ?: get_the_title( $program_id ),
+			'provider'                     => [
+				'@type' => 'CollegeOrUniversity',
+				'name'  => $school_id ? get_the_title( $school_id ) : get_bloginfo( 'name' ),
+				'url'   => $school_id ? get_permalink( $school_id ) : home_url( '/' ),
+			],
+			'educationalProgramMode'       => $mode_name,
+			'programPrerequisites'         => 'Tốt nghiệp trình độ Trung cấp hoặc Cao đẳng theo quy chế tuyển sinh của Bộ GD&ĐT',
+			'educationalCredentialAwarded' => 'Bằng Cử nhân / Bằng Kỹ sư',
+			'url'                          => get_permalink( $program_id ),
 		];
 	}
 

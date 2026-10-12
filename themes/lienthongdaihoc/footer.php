@@ -80,6 +80,10 @@ $messenger = ltdh_get_messenger_url();
 				<ul class="space-y-2.5 text-sm">
 					<li class="flex items-center">
 						<span style="display: inline-block; width: 6px; height: 6px; background-color: #00a2f4; border-radius: 50%; margin-right: 8px; flex-shrink: 0;"></span>
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/chinh-quy/' ) ); ?>" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Liên thông Chính quy</a>
+					</li>
+					<li class="flex items-center">
+						<span style="display: inline-block; width: 6px; height: 6px; background-color: #00a2f4; border-radius: 50%; margin-right: 8px; flex-shrink: 0;"></span>
 						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/dao-tao-tu-xa/' ) ); ?>" class="text-slate-400 hover:text-white transition-colors text-xs font-semibold">Liên thông Đại học Từ xa</a>
 					</li>
 					<li class="flex items-center">

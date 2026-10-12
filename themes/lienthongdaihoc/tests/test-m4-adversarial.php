@@ -20,6 +20,11 @@ if ( ! function_exists( 'home_url' ) ) {
 		return 'https://lienthongdaihoc.com' . ( $path ? ( '/' . ltrim( $path, '/' ) ) : '' );
 	}
 }
+if ( ! function_exists( 'get_template_directory_uri' ) ) {
+	function get_template_directory_uri() {
+		return 'https://lienthongdaihoc.com/wp-content/themes/lienthongdaihoc';
+	}
+}
 if ( ! function_exists( 'untrailingslashit' ) ) {
 	function untrailingslashit( $string ) {
 		return rtrim( (string) $string, '/\\' );
@@ -357,7 +362,7 @@ $test_uris = [
 	'/he-dao-tao/tu-xa/' => [ 'active_expected' => 'Từ xa' ],
 	'/he-dao-tao/vua-hoc-vua-lam/' => [ 'active_expected' => 'Vừa học vừa làm' ],
 	'/nganh-hoc/' => [ 'active_expected' => 'Ngành học' ],
-	'/truong-doi-tac/' => [ 'active_expected' => 'Trường đại học' ],
+	'/truong-doi-tac/' => [ 'active_expected' => 'Trường' ],
 	'/tin-tuc/' => [ 'active_expected' => 'Kiến thức liên thông' ],
 	'/kiem-tra-dieu-kien/' => [ 'active_expected' => 'Kiểm tra điều kiện' ],
 ];
@@ -415,8 +420,8 @@ preg_match_all( '/<a\s+[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/s', $c3_block, $all_c
 $c3_link_count = count( $all_c3_links );
 
 AdversarialHarness::assert(
-	$c3_link_count === 5,
-	"C6.2: Footer Column 3 contains exactly 5 navigation links",
+	$c3_link_count === 6,
+	"C6.2: Footer Column 3 contains exactly 6 navigation links",
 	[ 'count' => $c3_link_count ]
 );
 
@@ -438,8 +443,6 @@ $banned_terms = [
 	'VB2',
 	'Văn bằng 2',
 	'Cao đẳng online',
-	'Chính quy',
-	'Đại học chính quy',
 	'Tại chức',
 	'Đại học tại chức',
 	'Trung Cấp lên Đại học',
@@ -453,7 +456,7 @@ foreach ( $banned_terms as $term ) {
 }
 AdversarialHarness::assert(
 	empty( $found_banned ),
-	"C6.4: Zero out-of-scope educational terms (VB2, Cao đẳng online, Chính quy, v.v.) in Column 3",
+	"C6.4: Zero out-of-scope educational terms (VB2, Cao đẳng online, v.v.) in Column 3",
 	[ 'found_banned' => $found_banned ]
 );
 

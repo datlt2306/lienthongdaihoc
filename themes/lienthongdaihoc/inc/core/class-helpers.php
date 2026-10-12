@@ -595,7 +595,7 @@ function ltdh_breadcrumb(): void {
 		echo '<div class="ltdh-breadcrumb bg-slate-50/60 border-b border-slate-100 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-1.5">';
 		echo '<a href="' . esc_url( home_url( '/' ) ) . '" class="hover:text-brand-primary transition-colors font-medium">Trang chủ</a>';
 		echo ' <span class="mx-1 text-slate-300 font-light">/</span> ';
-		echo '<a href="' . esc_url( home_url( '/hinh-thuc-dao-tao/' ) ) . '" class="hover:text-brand-primary transition-colors font-medium">Hình thức đào tạo</a>';
+		echo '<a href="' . esc_url( home_url( '/hinh-thuc-dao-tao/' ) ) . '" class="hover:text-brand-primary transition-colors font-medium">Liên thông Đại học</a>';
 		echo ' <span class="mx-1 text-slate-300 font-light">/</span> ';
 		echo '<span class="text-slate-700 font-semibold">So sánh chương trình</span>';
 		echo '</div>';
@@ -620,7 +620,7 @@ function ltdh_breadcrumb(): void {
 		if ( is_singular() ) {
 			$post_type = get_post_type();
 			if ( $post_type === 'program' ) {
-				$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
+				$crumbs[] = [ 'label' => 'Liên thông Đại học', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
 				$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
 			} elseif ( $post_type === 'school' ) {
 				$crumbs[] = [ 'label' => 'Trường đối tác', 'url' => get_post_type_archive_link( 'school' ) ?: home_url( '/truong-doi-tac/' ) ];
@@ -637,7 +637,7 @@ function ltdh_breadcrumb(): void {
 		} elseif ( is_tax() || is_category() || is_tag() ) {
 			$term = get_queried_object();
 			if ( is_tax( 'training_type' ) ) {
-				$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
+				$crumbs[] = [ 'label' => 'Liên thông Đại học', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
 			}
 			$crumbs[] = [ 'label' => $term->name, 'url' => '' ];
 		} elseif ( is_post_type_archive() ) {
@@ -1352,11 +1352,10 @@ function ltdh_get_program_learning_details(int $program_id): array {
 	$type_slug = ! empty($types) && ! is_wp_error($types) ? $types[0]->slug : '';
 
 	// Resolve physical campus location:
-	if ( in_array( $type_slug, [ 'tu-xa', 'dao-tao-tu-xa' ], true ) ) {
-		// Online learning is accessible nationwide
-		$campus_name = ! empty( $physical_campuses ) ? 'Toàn quốc (' . implode( ', ', $physical_campuses ) . ')' : 'Toàn quốc (Học Online)';
-	} elseif ( ! empty( $physical_campuses ) ) {
+	if ( ! empty( $physical_campuses ) ) {
 		$campus_name = implode( ', ', $physical_campuses );
+	} elseif ( in_array( $type_slug, [ 'tu-xa', 'dao-tao-tu-xa' ], true ) ) {
+		$campus_name = 'Toàn quốc';
 	} else {
 		// Non-tu-xa without explicit physical campus: check school region
 		$school_id = get_post_meta( $program_id, 'school_relationship', true );
@@ -1372,7 +1371,7 @@ function ltdh_get_program_learning_details(int $program_id): array {
 				$school_region = $region_terms[0]->name;
 			}
 		}
-		$campus_name = $school_region ?: 'Hà Nội, TP. Hồ Chí Minh';
+		$campus_name = $school_region ?: 'Toàn quốc';
 	}
 
 	// Resolve learning mode
@@ -1501,7 +1500,7 @@ function ltdh_get_school_unique_majors_count( int $school_id ): int {
 		return (int) $cached;
 	}
 
-	$allowed_slugs = [ 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];
+	$allowed_slugs = [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];
 	$programs      = get_posts( [
 		'post_type'      => 'program',
 		'posts_per_page' => -1,
@@ -1581,7 +1580,7 @@ function ltdh_get_training_type_badge_html( string $type_name ): string {
 		$badge_class = 'bg-blue-50 text-blue-600 border border-blue-100';
 	} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
 		$badge_class = 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-	} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {
+	} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
 		$badge_class = 'bg-amber-50 text-amber-600 border border-amber-100';
 	}
 	return sprintf(
@@ -1679,7 +1678,7 @@ function ltdh_get_school_training_types( int $school_id, string $output_format =
 		return (array) $cached;
 	}
 
-	$allowed_slugs = [ 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];
+	$allowed_slugs = [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];
 
 	// Rollup exclusively from published in-scope programs linked to this school
 	$query_args = [

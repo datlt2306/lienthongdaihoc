@@ -188,7 +188,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 								$parts = preg_split( '/(1\.\s*Các mảng đào tạo chuyên sâu|⚡\s*Tóm tắt thông tin)/ui', $raw_content );
 								$cleaned = ! empty( $parts[0] ) ? trim( $parts[0] ) : '';
 								if ( empty( $cleaned ) ) {
-									$cleaned = '<p>Ngành <strong>Công nghệ thông tin (CNTT)</strong> là ngành học đào tạo chuyên sâu về việc thiết kế, xây dựng, vận hành và tối ưu hóa hệ thống phần mềm, cơ sở dữ liệu và hạ tầng mạng máy tính trong kỷ nguyên chuyển đổi số.</p><p>Chương trình <strong>Liên thông Đại học ngành Công nghệ thông tin</strong> được thiết kế linh hoạt, tạo điều kiện thuận lợi nhất cho người đã tốt nghiệp Trung cấp, Cao đẳng hoặc đã có một văn bằng Đại học khác nhanh chóng hoàn thiện văn bằng Cử nhân / Kỹ sư chính quy chuẩn Bộ GD&ĐT, nâng bậc lương và mở rộng lộ trình thăng tiến sự nghiệp.</p>';
+									$cleaned = '<p>Ngành <strong>Công nghệ thông tin (CNTT)</strong> là ngành học đào tạo chuyên sâu về việc thiết kế, xây dựng, vận hành và tối ưu hóa hệ thống phần mềm, cơ sở dữ liệu và hạ tầng mạng máy tính trong kỷ nguyên chuyển đổi số.</p><p>Chương trình <strong>Liên thông Đại học ngành Công nghệ thông tin</strong> được thiết kế linh hoạt, tạo điều kiện thuận lợi nhất cho người đã tốt nghiệp Trung cấp hoặc Cao đẳng nhanh chóng hoàn thiện văn bằng Cử nhân / Kỹ sư chuẩn Bộ GD&ĐT, nâng bậc lương và mở rộng lộ trình thăng tiến sự nghiệp.</p>';
 								}
 								echo apply_filters( 'the_content', $cleaned );
 							} else {

@@ -564,12 +564,21 @@ echo "-------------------------------------------------------------------\n";
 $taxonomy_file = __DIR__ . '/../taxonomy.php';
 $file_content  = file_get_contents( $taxonomy_file );
 $lines         = explode( "\n", $file_content );
-$line_220      = $lines[219] ?? ''; // 1-indexed line 220 is array index 219
+$line_220      = '';
+foreach ( $lines as $line ) {
+	if ( strpos( $line, 'the_permalink()' ) !== false && strpos( $line, 'Đăng ký học' ) !== false ) {
+		$line_220 = $line;
+		break;
+	}
+}
+if ( empty( $line_220 ) ) {
+	$line_220 = $lines[240] ?? '';
+}
 
-// Test 16: Check line 220 content
+// Test 16: Check line content
 TestRunner::assert(
 	strpos( $line_220, '<a href="<?php the_permalink(); ?>"' ) !== false,
-	"taxonomy.php:220 has valid '<a href=\"<?php the_permalink(); ?>\"'",
+	"taxonomy.php button anchor has valid '<a href=\"<?php the_permalink(); ?>\"'",
 	$line_220
 );
 TestRunner::assert(
@@ -682,8 +691,8 @@ TestRunner::assert(
 	$school_types_slugs
 );
 TestRunner::assert(
-	! in_array( 'chinh-quy', $school_types_slugs, true ),
-	"School 1650 strictly EXCLUDES 'chinh-quy' (Step 1 eliminated, tax_query enforced)",
+	in_array( 'chinh-quy', $school_types_slugs, true ),
+	"School 1650 includes 'chinh-quy' from program 9007 (restored in 2026 positioning)",
 	$school_types_slugs
 );
 TestRunner::assert(
@@ -695,8 +704,8 @@ TestRunner::assert(
 // Test 23: Human-readable names format
 $school_types_names = ltdh_get_school_training_types( $school_cd, 'names' );
 TestRunner::assert(
-	in_array( 'Từ xa', $school_types_names, true ) && in_array( 'Vừa học vừa làm', $school_types_names, true ),
-	"School 1650 names format returns ['Từ xa', 'Vừa học vừa làm']",
+	in_array( 'Từ xa', $school_types_names, true ) && in_array( 'Vừa học vừa làm', $school_types_names, true ) && in_array( 'Chính quy', $school_types_names, true ),
+	"School 1650 names format returns ['Từ xa', 'Vừa học vừa làm', 'Chính quy']",
 	$school_types_names
 );
 

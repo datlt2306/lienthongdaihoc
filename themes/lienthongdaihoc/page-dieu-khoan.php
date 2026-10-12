@@ -115,7 +115,7 @@ $company_name = function_exists( 'ltdh_get_company_name' ) ? ltdh_get_company_na
 							<strong>lienthongdaihoc.com</strong> là cổng thông tin điện tử chuyên sâu chuyên cung cấp:
 						</p>
 						<ul class="list-disc list-inside space-y-1.5 text-slate-600 text-sm pl-2">
-							<li>Thông tin tra cứu, tổng hợp và so sánh các chương trình tuyển sinh Liên thông Đại học, Đại học từ xa (Trực tuyến), Đại học vừa học vừa làm và Văn bằng 2;</li>
+							<li>Thông tin tra cứu, tổng hợp và so sánh các chương trình tuyển sinh Liên thông Đại học (bao gồm Hệ chính quy, Hệ vừa học vừa làm và Hệ đào tạo từ xa);</li>
 							<li>Công cụ hỗ trợ học viên kiểm tra điều kiện xét tuyển, ước tính thời gian đào tạo và dự toán học phí tương ứng với văn bằng hiện có;</li>
 							<li>Dịch vụ kết nối và tư vấn lộ trình học tập hoàn toàn <strong>miễn phí</strong> từ các chuyên viên giáo dục giàu kinh nghiệm;</li>
 							<li>Hỗ trợ hướng dẫn chuẩn bị hồ sơ xét tuyển và chuyển tiếp nguyện vọng học tập đến các trường Đại học đối tác.</li>
@@ -142,7 +142,7 @@ $company_name = function_exists( 'ltdh_get_company_name' ) ? ltdh_get_company_na
 							<h3 class="font-bold text-slate-900 text-base pt-2">3.2. Nghĩa vụ và Trách nhiệm của Người dùng</h3>
 							<ul class="list-disc list-inside space-y-1 text-slate-600 text-sm pl-2">
 								<li><strong>Tính chính xác của thông tin:</strong> Cam kết cung cấp thông tin trung thực, chính xác về họ tên, số điện thoại, văn bằng đã tốt nghiệp khi gửi yêu cầu tư vấn hoặc hồ sơ xét tuyển;</li>
-								<li><strong>Trách nhiệm về tính pháp lý văn bằng:</strong> Người học tự chịu trách nhiệm trước pháp luật về tính hợp pháp và hợp lệ của các văn bằng đầu vào (Bằng tốt nghiệp THPT, Trung cấp, Cao đẳng...) khi đăng ký xét tuyển liên thông;</li>
+								<li><strong>Trách nhiệm về tính pháp lý văn bằng:</strong> Người học tự chịu trách nhiệm trước pháp luật về tính hợp pháp và hợp lệ của các văn bằng đầu vào (Bằng tốt nghiệp Trung cấp, Cao đẳng...) khi đăng ký xét tuyển liên thông đại học;</li>
 								<li><strong>Sử dụng dịch vụ văn minh:</strong> Tôn trọng cán bộ tư vấn, không sử dụng ngôn từ xúc phạm, quấy rối hoặc khiêu khích trong quá trình trao đổi hỗ trợ.</li>
 							</ul>
 

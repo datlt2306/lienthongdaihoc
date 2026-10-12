@@ -378,16 +378,6 @@ function ltdh_default_cntt_entry_roadmaps( $value, $post_id, $field ) {
 					'study_mode'                  => 'Online từ xa / Tối & Cuối tuần',
 					'degree_output'               => 'Cử nhân / Kỹ sư CNTT',
 				],
-				[
-					'field_roadmap_entry_level'   => 'Văn bằng 2 (Đã có 1 bằng ĐH/CĐ khác)',
-					'field_roadmap_study_time'    => '1.5 - 2 năm',
-					'field_roadmap_study_mode'    => 'Văn bằng 2 CNTT',
-					'field_roadmap_degree_output' => 'Bằng Đại học thứ 2 CNTT',
-					'entry_level'                 => 'Văn bằng 2 (Đã có 1 bằng ĐH/CĐ khác)',
-					'study_time'                  => '1.5 - 2 năm',
-					'study_mode'                  => 'Văn bằng 2 CNTT',
-					'degree_output'               => 'Bằng Đại học thứ 2 CNTT',
-				],
 			];
 		}
 	}
@@ -446,7 +436,7 @@ function ltdh_cleanup_major_legacy_content() {
 	}
 	$major_post = get_post( 1677 );
 	if ( $major_post && ( false !== strpos( $major_post->post_content, 'Các mảng đào tạo chuyên sâu' ) || false !== strpos( $major_post->post_content, 'Tóm tắt thông tin' ) ) ) {
-		$clean_content = "<p>Ngành <strong>Công nghệ thông tin (CNTT)</strong> là ngành học đào tạo chuyên sâu về việc thiết kế, xây dựng, vận hành và tối ưu hóa hệ thống phần mềm, cơ sở dữ liệu và hạ tầng mạng máy tính trong kỷ nguyên chuyển đổi số.</p>\n\n<p>Chương trình <strong>Liên thông Đại học ngành Công nghệ thông tin</strong> được thiết kế linh hoạt, tạo điều kiện thuận lợi nhất cho người đã tốt nghiệp Trung cấp, Cao đẳng hoặc đã có một văn bằng Đại học khác nhanh chóng hoàn thiện văn bằng Cử nhân / Kỹ sư chính quy chuẩn Bộ GD&ĐT, nâng bậc lương và mở rộng lộ trình thăng tiến sự nghiệp.</p>";
+		$clean_content = "<p>Ngành <strong>Công nghệ thông tin (CNTT)</strong> là ngành học đào tạo chuyên sâu về việc thiết kế, xây dựng, vận hành và tối ưu hóa hệ thống phần mềm, cơ sở dữ liệu và hạ tầng mạng máy tính trong kỷ nguyên chuyển đổi số.</p>\n\n<p>Chương trình <strong>Liên thông Đại học ngành Công nghệ thông tin</strong> được thiết kế linh hoạt, tạo điều kiện thuận lợi nhất cho người đã tốt nghiệp Trung cấp hoặc Cao đẳng nhanh chóng hoàn thiện văn bằng Cử nhân / Kỹ sư chuẩn Bộ GD&ĐT, nâng bậc lương và mở rộng lộ trình thăng tiến sự nghiệp.</p>";
 		wp_update_post( [
 			'ID'           => 1677,
 			'post_content' => $clean_content,
@@ -457,7 +447,7 @@ function ltdh_cleanup_major_legacy_content() {
 // Automatically correct legacy exam text in VHVL/Tu-xa programs to pure admission by records (one-time migration)
 add_action( 'init', 'ltdh_cleanup_vhvl_admission_requirements' );
 function ltdh_cleanup_vhvl_admission_requirements() {
-	if ( get_transient( 'ltdh_vhvl_admission_cleanup_done_v1' ) ) {
+	if ( get_transient( 'ltdh_vhvl_admission_cleanup_done_v2' ) ) {
 		return;
 	}
 	if ( ! function_exists( 'get_posts' ) ) {
@@ -471,7 +461,7 @@ function ltdh_cleanup_vhvl_admission_requirements() {
 	] );
 
 	if ( empty( $programs ) ) {
-		set_transient( 'ltdh_vhvl_admission_cleanup_done_v1', 1, DAY_IN_SECONDS * 30 );
+		set_transient( 'ltdh_vhvl_admission_cleanup_done_v2', 1, DAY_IN_SECONDS * 30 );
 		return;
 	}
 
@@ -480,12 +470,12 @@ function ltdh_cleanup_vhvl_admission_requirements() {
 		if ( str_contains( $slug, 'vua-hoc-vua-lam' ) || str_contains( $slug, 'tu-xa' ) ) {
 			$req = get_post_meta( $pid, 'admission_requirements', true );
 			if ( ! empty( $req ) && ( str_contains( $req, 'Thi tuyển 3 môn' ) || str_contains( $req, 'Phương thức 2: Thi tuyển' ) ) ) {
-				$clean_req = '<p>Chương trình tuyển sinh Liên thông Đại học hệ Vừa học vừa làm (VHVL) áp dụng phương thức <strong>Xét tuyển hồ sơ văn bằng</strong> (không phải thi tuyển):</p><ul><li><strong>Đối tượng tuyển sinh:</strong> Người đã tốt nghiệp Cao đẳng hoặc Trung cấp đúng ngành/ngành gần Công nghệ thông tin; hoặc người đã có bằng Đại học khác có nguyện vọng học văn bằng 2.</li><li><strong>Tiêu chí xét tuyển:</strong> Xét duyệt dựa trên kết quả học tập ghi trên văn bằng và bảng điểm bậc tốt nghiệp trước đó. Điểm trung bình tích lũy toàn khóa đạt yêu cầu theo Quy chế tuyển sinh của nhà trường.</li><li><strong>Ngưỡng đảm bảo chất lượng:</strong> Thí sinh hoàn thiện đầy đủ hồ sơ hợp lệ và nộp đúng thời hạn quy định của các đợt tuyển sinh.</li></ul>';
+				$clean_req = '<p>Chương trình tuyển sinh Liên thông Đại học hệ Vừa học vừa làm (VHVL) áp dụng phương thức <strong>Xét tuyển hồ sơ văn bằng</strong> (không phải thi tuyển):</p><ul><li><strong>Đối tượng tuyển sinh:</strong> Người đã tốt nghiệp Cao đẳng hoặc Trung cấp đúng ngành/ngành gần theo quy định tuyển sinh liên thông.</li><li><strong>Tiêu chí xét tuyển:</strong> Xét duyệt dựa trên kết quả học tập ghi trên văn bằng và bảng điểm bậc tốt nghiệp trước đó. Điểm trung bình tích lũy toàn khóa đạt yêu cầu theo Quy chế tuyển sinh của nhà trường.</li><li><strong>Ngưỡng đảm bảo chất lượng:</strong> Thí sinh hoàn thiện đầy đủ hồ sơ hợp lệ và nộp đúng thời hạn quy định của các đợt tuyển sinh.</li></ul>';
 				update_post_meta( $pid, 'admission_requirements', $clean_req );
 			}
 		}
 	}
-	set_transient( 'ltdh_vhvl_admission_cleanup_done_v1', 1, DAY_IN_SECONDS * 30 );
+	set_transient( 'ltdh_vhvl_admission_cleanup_done_v2', 1, DAY_IN_SECONDS * 30 );
 }
 
 // Clean up deprecated "Tự chủ thời gian và không gian học tập, phôi bằng tốt nghiệp không ghi hình thức đào tạo." placeholder in program benefits (one-time migration)

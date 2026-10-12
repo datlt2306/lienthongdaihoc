@@ -15,20 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // ----------------------------------------------------
 function ltdh_elig_get_training_type_compatibility() {
 	return [
-		'thpt'         => [ 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
-		'thap-phan'    => [ 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
-		'trung-cap'    => [ 'lien-thong', 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
-		'cao-dang'     => [ 'lien-thong', 'tu-xa', 'van-bang-2', 'vua-hoc-vua-lam', 'chinh-quy' ],
-		'dai-hoc'      => [ 'van-bang-2', 'tu-xa', 'vua-hoc-vua-lam' ],
-		'thac-si'      => [ 'van-bang-2', 'tu-xa' ],
+		'trung-cap'    => [ 'tu-xa', 'dao-tao-tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
+		'cao-dang'     => [ 'tu-xa', 'dao-tao-tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ],
 	];
-
-	/*
-	 * Liên thông: requires same-level or lower degree (Trung cấp/Cao đẳng)
-	 * VB2: requires existing degree (Cao đẳng/Đại học)
-	 * Từ xa/Vừa học vừa làm: compatible with all levels
-	 * Chính quy: THPT/Trung cấp/Cao đẳng only
-	 */
 }
 
 // ----------------------------------------------------
@@ -73,12 +62,8 @@ function ltdh_elig_get_budget_ranges() {
 // ----------------------------------------------------
 function ltdh_elig_get_education_hierarchy() {
 	return [
-		'thpt'       => 1,
-		'thap-phan'  => 1,
-		'trung-cap'  => 2,
-		'cao-dang'   => 3,
-		'dai-hoc'    => 4,
-		'thac-si'    => 5,
+		'trung-cap'  => 1,
+		'cao-dang'   => 2,
 	];
 }
 

@@ -98,7 +98,7 @@ $company_name = function_exists( 'ltdh_get_company_name' ) ? ltdh_get_company_na
 							Mục đích và phạm vi áp dụng
 						</h2>
 						<p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-							Chính sách bảo mật này quy định cách thức mà Ban quản trị <strong>lienthongdaihoc.com</strong> (sau đây gọi là "Chúng tôi", "Hệ thống" hoặc "Website") thu thập, lưu trữ, xử lý, bảo vệ và sử dụng dữ liệu cá nhân của người dùng, học viên quan tâm đến các chương trình đào tạo liên thông Đại học, Đại học từ xa, Đại học vừa học vừa làm và Văn bằng 2.
+							Chính sách bảo mật này quy định cách thức mà Ban quản trị <strong>lienthongdaihoc.com</strong> (sau đây gọi là "Chúng tôi", "Hệ thống" hoặc "Website") thu thập, lưu trữ, xử lý, bảo vệ và sử dụng dữ liệu cá nhân của người dùng, học viên quan tâm đến các chương trình đào tạo Liên thông Đại học (bao gồm Hệ chính quy, Hệ vừa học vừa làm và Hệ đào tạo từ xa).
 						</p>
 						<p class="text-slate-600 text-sm sm:text-base leading-relaxed">
 							Chính sách này được xây dựng và thực thi trên cơ sở tuân thủ nghiêm ngặt các quy định pháp luật hiện hành của nước Cộng hòa Xã hội Chủ nghĩa Việt Nam, bao gồm:
@@ -139,11 +139,11 @@ $company_name = function_exists( 'ltdh_get_company_name' ) ? ltdh_get_company_na
 									Dữ liệu học vấn & nguyện vọng
 								</h3>
 								<ul class="text-xs text-slate-600 space-y-1 leading-relaxed">
-									<li>• Trình độ học vấn hiện tại (THPT, Trung cấp, CĐ, ĐH)</li>
+									<li>• Trình độ học vấn hiện tại (Trung cấp, Cao đẳng)</li>
 									<li>• Chuyên ngành đã tốt nghiệp trước đó</li>
-									<li>• Ngành học đăng ký liên thông / văn bằng 2</li>
+									<li>• Ngành học đăng ký liên thông đại học</li>
 									<li>• Trường đại học mong muốn nộp hồ sơ xét tuyển</li>
-									<li>• Hình thức học mong muốn (Từ xa 100%, Vừa học vừa làm)</li>
+									<li>• Hình thức học mong muốn (Chính quy, Vừa học vừa làm, Đào tạo từ xa)</li>
 								</ul>
 							</div>
 						</div>

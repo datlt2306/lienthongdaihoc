@@ -93,7 +93,7 @@ if ( count( $unique_majors ) === 1 ) {
 					],
 					[
 						'question' => 'Bằng cấp từ các chương trình này có giá trị không?',
-						'answer'   => 'Các chương trình liên thông và văn bằng 2 đều được Bộ Giáo dục & Đào tạo công nhận. Bằng cấp có giá trị toàn quốc.'
+						'answer'   => 'Tất cả các chương trình Liên thông Đại học (Chính quy, Vừa học vừa làm, Từ xa) đều được Bộ Giáo dục & Đào tạo công nhận theo Thông tư 27/2019/TT-BGDĐT. Bằng cấp có giá trị pháp lý toàn quốc.'
 					],
 					[
 						'question' => 'Tôi có thể vừa học vừa làm được không?',

@@ -102,7 +102,7 @@ $years = range( $current_year, $current_year - 25 );
 				<!-- Trường học trước đây -->
 				<div class="space-y-2">
 					<label class="block text-sm font-bold text-slate-700">Trường đã học / tốt nghiệp trước đây</label>
-					<input type="text" name="previous_school" class="elig-input" placeholder="Ví dụ: THPT Lê Quý Đôn, CĐ Kinh Tế, ĐH Bách Khoa...">
+					<input type="text" name="previous_school" class="elig-input" placeholder="Ví dụ: CĐ Kinh Tế Đối Ngoại, CĐ Công Thương, TC Y Dược...">
 				</div>
 
 				<!-- Năm tốt nghiệp -->

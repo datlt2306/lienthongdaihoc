@@ -933,11 +933,8 @@
                 "name": "elig_min_education",
                 "type": "select",
                 "choices": {
-                    "thap-phan": "THPT",
                     "trung-cap": "Trung cấp",
-                    "cao-dang": "Cao đẳng",
-                    "dai-hoc": "Đại học",
-                    "thac-si": "Thạc sĩ"
+                    "cao-dang": "Cao đẳng"
                 },
                 "allow_null": 1,
                 "placeholder": "Không yêu cầu",
@@ -949,8 +946,6 @@
                 "name": "elig_training_types",
                 "type": "checkbox",
                 "choices": {
-                    "lien-thong": "Liên thông",
-                    "van-bang-2": "Văn bằng 2",
                     "tu-xa": "Từ xa",
                     "vua-hoc-vua-lam": "Vừa học vừa làm",
                     "chinh-quy": "Chính quy"

@@ -434,8 +434,8 @@
 		tags.innerHTML = '';
 
 		var labels = {
-			education: { 'thpt': 'THPT', 'thap-phan': 'THPT', 'trung-cap': 'Trung cấp', 'cao-dang': 'Cao đẳng', 'dai-hoc': 'Đại học', 'thac-si': 'Thạc sĩ' },
-			training_type: { 'lien-thong': 'Liên thông', 'tu-xa': 'Từ xa', 'vua-hoc-vua-lam': 'Vừa học vừa làm', 'chinh-quy': 'Chính quy', 'van-bang-2': 'Văn bằng 2' },
+			education: { 'trung-cap': 'Trung cấp', 'cao-dang': 'Cao đẳng' },
+			training_type: { 'chinh-quy': 'Hệ chính quy', 'vua-hoc-vua-lam': 'Hệ vừa học vừa làm', 'tu-xa': 'Hệ đào tạo từ xa', 'dao-tao-tu-xa': 'Hệ đào tạo từ xa' },
 			campus: { 'ha-noi': 'Hà Nội', 'ho-chi-minh': 'TP.HCM', 'da-nang': 'Đà Nẵng', 'thai-nguyen': 'Thái Nguyên', 'online': 'Online' }
 		};
 

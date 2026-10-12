@@ -98,7 +98,6 @@ class LTDH_CLI_Commands {
 
 		// 1. Training Types
 		$types = [
-			'Văn bằng 2'       => 'van-bang-2',
 			'Từ xa'            => 'tu-xa',
 			'Vừa học vừa làm'  => 'vua-hoc-vua-lam',
 			'Chính quy'        => 'chinh-quy',
@@ -275,7 +274,7 @@ class LTDH_CLI_Commands {
 				],
 				'Kinh tế' => [
 					'tuition' => '580.000đ / tín chỉ', 'duration' => '2 năm',
-					'schedule' => 'Tối thứ 2, 4, 6', 'target' => 'Người đi làm, văn bằng 2',
+					'schedule' => 'Tối thứ 2, 4, 6', 'target' => 'Người đi làm có bằng Trung cấp hoặc Cao đẳng',
 					'degree' => 'Cử nhân Ngôn ngữ Anh', 'diploma' => 'Bằng chính quy, có giá trị toàn quốc',
 					'advantages' => 'Học phí hợp lý, lịch học linh hoạt cho người đi làm',
 					'disadvantages' => 'Không có chứng chỉ quốc tế đi kèm, số lượng lớp hạn chế',
@@ -301,7 +300,7 @@ class LTDH_CLI_Commands {
 		];
 
 		$campus_slugs   = ['ha-noi', 'ho-chi-minh', 'online'];
-		$training_slugs = ['van-bang-2', 'tu-xa', 'chinh-quy'];
+		$training_slugs = ['vua-hoc-vua-lam', 'tu-xa', 'chinh-quy'];
 		$program_index = 0;
 
 		foreach ( $school_ids as $school_id ) {
@@ -374,7 +373,7 @@ class LTDH_CLI_Commands {
 					'tuition' => number_format( $base_tuition ) . 'đ / tín chỉ',
 					'duration' => '1.5 - 3 năm',
 					'schedule' => 'Lịch học linh hoạt',
-					'target' => 'Người đi làm, văn bằng 2',
+					'target' => 'Người đi làm có bằng Trung cấp hoặc Cao đẳng',
 					'degree' => 'Cử nhân ' . $major_title,
 					'diploma' => 'Bằng chính quy, được Bộ GD&ĐT công nhận',
 					'advantages' => 'Học phí hợp lý, thời gian học linh hoạt',
@@ -397,7 +396,7 @@ class LTDH_CLI_Commands {
 					$t_slug = 'tu-xa';
 				}
 				$c_slug = $campus_slugs[ $program_index % count( $campus_slugs ) ];
-				$t_names = [ 'van-bang-2' => 'Văn bằng 2', 'tu-xa' => 'Từ xa', 'chinh-quy' => 'Chính quy' ];
+				$t_names = [ 'vua-hoc-vua-lam' => 'Vừa học vừa làm', 'tu-xa' => 'Từ xa', 'chinh-quy' => 'Chính quy' ];
 				$t_name = isset( $t_names[ $t_slug ] ) ? $t_names[ $t_slug ] : 'Từ xa';
 
 				$program_title = "Cử nhân $major_title";
@@ -438,7 +437,7 @@ class LTDH_CLI_Commands {
 				update_post_meta( $program_id, LTDH_META_TUITION, $variant['tuition'] );
 				update_post_meta( $program_id, LTDH_META_DURATION, $variant['duration'] );
 				update_post_meta( $program_id, 'campus_info', $c_slug === 'ha-noi' ? 'Hà Nội' : ( $c_slug === 'ho-chi-minh' ? 'TP. Hồ Chí Minh' : 'Online' ) );
-				update_post_meta( $program_id, 'admission_requirements', 'Xét tuyển hồ sơ văn bằng đã có (THPT, Trung cấp, Cao đẳng).' );
+				update_post_meta( $program_id, 'admission_requirements', 'Xét tuyển hồ sơ văn bằng (Trung cấp, Cao đẳng).' );
 				$s_code_val = get_post_meta( $school_id, 'school_code', true );
 				$school_code_clean = strtolower( preg_replace( '/[^a-zA-Z0-9]/', '', (string) $s_code_val ) );
 				$custom_form_path  = WP_CONTENT_DIR . "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf";
@@ -469,18 +468,11 @@ class LTDH_CLI_Commands {
 				update_post_meta( $program_id, 'faq', $faqs );
 
 				// Set eligibility criteria.
-				$elig_min_edu = '';
-				if ( $t_slug === 'lien-thong' ) {
-					$elig_min_edu = 'trung-cap';
-				} elseif ( $t_slug === 'van-bang-2' ) {
-					$elig_min_edu = 'dai-hoc';
-				} else {
-					$elig_min_edu = 'thap-phan';
-				}
+				$elig_min_edu = ( $t_slug === 'chinh-quy' ) ? 'cao-dang' : 'trung-cap';
 				update_post_meta( $program_id, 'elig_min_education', $elig_min_edu );
 				update_post_meta( $program_id, 'elig_training_types', [ $t_slug ] );
 				update_post_meta( $program_id, 'elig_campuses', [ $c_slug ] );
-				update_post_meta( $program_id, 'elig_max_grad_years', $t_slug === 'lien-thong' ? 10 : 99 );
+				update_post_meta( $program_id, 'elig_max_grad_years', 10 );
 				update_post_meta( $program_id, 'elig_notes', '' );
 
 				wp_set_object_terms( $program_id, $t_slug, LTDH_TAX_TRAINING_TYPE );
@@ -520,14 +512,14 @@ class LTDH_CLI_Commands {
 					],
 					[
 						'title' => 'Thông báo tuyển sinh Đại học từ xa đợt 1 năm 2026',
-						'desc'  => 'Thông tin chi tiết các ngành đào tạo tuyển sinh đại học trực tuyến và văn bằng 2 đợt đầu năm.',
+						'desc'  => 'Thông tin chi tiết các ngành đào tạo tuyển sinh Liên thông Đại học trực tuyến đợt đầu năm.',
 						'cat'   => $cat_ann,
 						'img'   => ltdh_get_fallback_image( 'post' ),
 						'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
 					],
 					[
-						'title' => 'Quy định miễn giảm tín chỉ khi học văn bằng 2',
-						'desc'  => 'Học viên có thể rút ngắn đến 50% thời gian học nếu đối chiếu bảng điểm môn học tương đồng.',
+						'title' => 'Quy định miễn giảm tín chỉ khi học Liên thông Đại học',
+						'desc'  => 'Học viên tốt nghiệp Trung cấp, Cao đẳng có thể rút ngắn thời gian học nếu đối chiếu bảng điểm môn học tương đồng.',
 						'cat'   => $cat_guide,
 						'img'   => ltdh_get_fallback_image( 'post' ),
 						'school' => ! empty( $school_ids ) ? $school_ids[ array_rand( $school_ids ) ] : 0,
@@ -780,7 +772,7 @@ class LTDH_CLI_Commands {
 				'target' => 'Người đi làm, người muốn học liên thông lên Cử nhân/Kỹ sư tại UTC',
 				'advantages' => '<ul><li><strong>Linh hoạt thời gian:</strong> Học ngoài giờ hành chính (buổi tối hoặc cuối tuần), phù hợp cho người vừa học vừa làm.</li><li><strong>Linh hoạt lựa chọn hệ đào tạo:</strong> Học 2 năm nhận bằng Cử nhân hoặc 3 năm nhận bằng Kỹ sư (tương đương trình độ Thạc sĩ).</li><li><strong>Bằng cấp uy tín:</strong> Bằng tốt nghiệp đại học do Trường Đại học Giao thông Vận tải cấp.</li></ul>',
 				'disadvantages' => 'Cần sắp xếp thời gian hợp lý giữa công việc và các buổi học tối hoặc cuối tuần.',
-				'requirements' => '<p>Chương trình tuyển sinh Liên thông Đại học hệ Vừa học vừa làm (VHVL) áp dụng phương thức <strong>Xét tuyển hồ sơ văn bằng</strong> (không phải thi tuyển):</p><ul><li><strong>Đối tượng tuyển sinh:</strong> Người đã tốt nghiệp Cao đẳng hoặc Trung cấp đúng ngành/ngành gần Công nghệ thông tin; hoặc người đã có bằng Đại học khác có nguyện vọng học văn bằng 2.</li><li><strong>Tiêu chí xét tuyển:</strong> Xét duyệt dựa trên kết quả học tập ghi trên văn bằng và bảng điểm bậc tốt nghiệp trước đó. Điểm trung bình tích lũy toàn khóa đạt yêu cầu theo Quy chế tuyển sinh của nhà trường.</li><li><strong>Ngưỡng đảm bảo chất lượng:</strong> Thí sinh hoàn thiện đầy đủ hồ sơ hợp lệ và nộp đúng thời hạn quy định của các đợt tuyển sinh.</li></ul>',
+				'requirements' => '<p>Chương trình tuyển sinh Liên thông Đại học hệ Vừa học vừa làm (VHVL) áp dụng phương thức <strong>Xét tuyển hồ sơ văn bằng</strong> (không phải thi tuyển):</p><ul><li><strong>Đối tượng tuyển sinh:</strong> Người đã tốt nghiệp Cao đẳng hoặc Trung cấp đúng ngành/ngành gần Công nghệ thông tin.</li><li><strong>Tiêu chí xét tuyển:</strong> Xét duyệt dựa trên kết quả học tập ghi trên văn bằng và bảng điểm bậc tốt nghiệp trước đó. Điểm trung bình tích lũy toàn khóa đạt yêu cầu theo Quy chế tuyển sinh của nhà trường.</li><li><strong>Ngưỡng đảm bảo chất lượng:</strong> Thí sinh hoàn thiện đầy đủ hồ sơ hợp lệ và nộp đúng thời hạn quy định của các đợt tuyển sinh.</li></ul>',
 				'documents' => '<ul><li>Phiếu tuyển sinh (theo mẫu của nhà trường).</li><li>Bản sao hợp lệ bằng tốt nghiệp Cao đẳng và bảng điểm học tập (mang theo bản chính để đối chiếu khi nộp).</li><li>Bản sao hợp lệ Giấy khai sinh.</li><li>Bản sao Căn cước công dân (CCCD).</li><li>Giấy chứng nhận đủ sức khỏe học tập từ bệnh viện đa khoa hoặc tương đương trở lên.</li><li>04 ảnh chân dung 4x6 cm (chụp trong vòng 6 tháng gần nhất).</li></ul><p><em>* Lưu ý: Hồ sơ do Nhà trường phát hành trực tiếp tại văn phòng tuyển sinh.</em></p>',
 				'degree_type' => 'Cử nhân / Kỹ sư Công nghệ thông tin',
 				'diploma_value' => 'Bằng tốt nghiệp Đại học (Cử nhân bậc 6 hoặc Kỹ sư bậc 7 tương đương trình độ Thạc sĩ) do Trường Đại học GTVT cấp, phôi bằng chuẩn Bộ GD&ĐT.',
@@ -876,7 +868,7 @@ class LTDH_CLI_Commands {
 				'duration' => 'Tối thiểu 1.5 năm',
 				'quota' => 800,
 				'schedule' => 'Học trực tuyến (E-learning) 100% linh hoạt',
-				'target' => 'Người đi làm bận rộn, người muốn học văn bằng 2 hoặc liên thông từ xa',
+				'target' => 'Người đi làm bận rộn, người có bằng Trung cấp/Cao đẳng muốn liên thông từ xa',
 				'advantages' => '',
 				'disadvantages' => 'Đòi hỏi tính tự kỷ luật và chủ động cao trong tự học.',
 				'batches' => [
@@ -936,8 +928,8 @@ class LTDH_CLI_Commands {
 			update_post_meta( $program_id, 'quota', $p_info['quota'] );
 			update_post_meta( $program_id, LTDH_META_DURATION, $p_info['duration'] );
 			update_post_meta( $program_id, 'campus_info', 'Hà Nội' );
-			update_post_meta( $program_id, 'admission_requirements', $p_info['requirements'] ?? 'Xét tuyển học bạ hoặc hồ sơ văn bằng (THPT, Trung cấp, Cao đẳng, Đại học).' );
-			update_post_meta( $program_id, 'required_documents', $p_info['documents'] ?? 'Bản sao công chứng CCCD, Ảnh chân dung, Bằng tốt nghiệp cao nhất, Học bạ/Bảng điểm tương ứng.' );
+			update_post_meta( $program_id, 'admission_requirements', $p_info['requirements'] ?? 'Xét tuyển hồ sơ văn bằng (Trung cấp, Cao đẳng).' );
+			update_post_meta( $program_id, 'required_documents', $p_info['documents'] ?? 'Bản sao công chứng CCCD, Ảnh chân dung, Bằng tốt nghiệp Trung cấp/Cao đẳng, Bảng điểm tương ứng.' );
 			update_post_meta( $program_id, 'enrollment_period', $p_info['enrollment_period'] ?? 'Tuyển sinh liên tục trong năm' );
 			update_post_meta( $program_id, 'program_benefits', $p_info['advantages'] );
 			update_post_meta( $program_id, LTDH_META_SCHEDULE, $p_info['schedule'] );
@@ -997,12 +989,12 @@ class LTDH_CLI_Commands {
 
 			$faqs = [
 				[ 'question' => $faq_question, 'answer' => 'Có. Theo Thông tư của Bộ GD&ĐT, từ ngày 01/03/2020 trên văn bằng tốt nghiệp Đại học không ghi hình thức đào tạo (Chính quy, Từ xa, hay Vừa học vừa làm), giá trị pháp lý là hoàn toàn như nhau.' ],
-				[ 'question' => 'Thời gian đào tạo tối đa là bao lâu?', 'answer' => 'Thời gian đào tạo tiêu chuẩn là từ 1.5 đến 4 năm tùy thuộc văn bằng đầu vào của học viên (Liên thông, văn bằng 2 hoặc tốt nghiệp THPT).' ]
+				[ 'question' => 'Thời gian đào tạo tối đa là bao lâu?', 'answer' => 'Thời gian đào tạo tiêu chuẩn là từ 1.5 đến 2.5 năm tùy thuộc văn bằng đầu vào của học viên (Liên thông từ Cao đẳng hoặc Trung cấp).' ]
 			];
 			update_post_meta( $program_id, 'faq', $faqs );
 
 			// Set eligibility criteria
-			$elig_min_edu = ( $t_slug === 'tu-xa' || $t_slug === 'vua-hoc-vua-lam' ) ? 'thap-phan' : 'cao-dang';
+			$elig_min_edu = ( $t_slug === 'tu-xa' || $t_slug === 'vua-hoc-vua-lam' ) ? 'trung-cap' : 'cao-dang';
 			update_post_meta( $program_id, 'elig_min_education', $elig_min_edu );
 			update_post_meta( $program_id, 'elig_training_types', [ $t_slug ] );
 			update_post_meta( $program_id, 'elig_campuses', [ 'ha-noi' ] );
@@ -1036,7 +1028,7 @@ class LTDH_CLI_Commands {
 
 		$titles_guides = [
 			'Lộ trình học liên thông đại học cho người đi làm bận rộn',
-			'Cách chuyển đổi tín chỉ khi học Văn bằng 2 đại học từ xa',
+			'Cách chuyển đổi tín chỉ khi học Liên thông Đại học từ xa',
 			'Những lưu ý quan trọng khi chuẩn bị hồ sơ tuyển sinh đại học trực tuyến',
 			'Bằng Đại học từ xa có được thi công chức, cao học không?',
 			'Kinh nghiệm tự học trực tuyến E-Learning đạt kết quả xuất sắc',
@@ -1049,16 +1041,16 @@ class LTDH_CLI_Commands {
 			'Các trường đại học công bố chỉ tiêu tuyển sinh liên thông đợt mới',
 			'Xu hướng chọn ngành Quản trị kinh doanh trong kỷ nguyên số',
 			'Đại học Giao thông Vận tải mở rộng đào tạo hệ từ xa chất lượng cao',
-			'Thị trường lao động ưu tiên nhân sự sở hữu từ hai văn bằng',
-			'Phương thức tuyển sinh bằng học bạ tiếp tục giữ ưu thế',
+			'Thị trường lao động ưu tiên nhân sự hoàn thiện văn bằng đại học',
+			'Quy chế tuyển sinh Liên thông Đại học mới nhất',
 			'Ngành Kế toán doanh nghiệp chuyển mình với công nghệ AI'
 		];
 
 		$titles_ann = [
 			'Thông báo tuyển sinh đợt 2 hệ Đại học từ xa năm 2026',
-			'Lịch khai giảng các lớp liên thông và văn bằng 2 tháng tới',
+			'Lịch khai giảng các lớp Liên thông Đại học tháng tới',
 			'Danh sách học viên trúng tuyển đợt tuyển sinh vừa qua',
-			'Thông báo nhận hồ sơ xét tuyển học bạ đợt 1',
+			'Thông báo nhận hồ sơ xét tuyển liên thông đợt 1',
 			'Lịch thi tốt nghiệp và hướng dẫn thủ tục làm khóa luận tốt nghiệp',
 			'Chương trình học bổng khuyến học cho tân sinh viên E-Learning'
 		];
@@ -1258,11 +1250,11 @@ class LTDH_CLI_Commands {
 				$out_of_scope_programs[]       = $program_info;
 			} elseif ( in_array( 'chinh-quy', $tt_slugs, true ) ) {
 				$count_fulltime++;
-				$program_info['scope']         = 'out_of_scope';
-				$program_info['category']      = 'out_of_scope_fulltime';
-				$program_info['reason']        = 'Hình thức đào tạo Chính quy nằm ngoài phạm vi Liên thông (Từ xa / Vừa học vừa làm).';
-				$program_info['target_status'] = 'draft';
-				$out_of_scope_programs[]       = $program_info;
+				$program_info['scope']         = 'in_scope';
+				$program_info['category']      = 'in_scope_chinh_quy';
+				$program_info['reason']        = 'Chương trình Liên thông Đại học hình thức Chính quy hợp lệ.';
+				$program_info['target_status'] = 'publish';
+				$in_scope_programs[]           = $program_info;
 			} elseif ( in_array( 'van-bang-2', $tt_slugs, true ) ) {
 				$count_vb2++;
 				$program_info['scope']         = 'out_of_scope';
@@ -1294,8 +1286,8 @@ class LTDH_CLI_Commands {
 		}
 
 		WP_CLI::line( sprintf( ' - Tổng số program đã quét: %d', $total_programs_scanned ) );
-		WP_CLI::line( sprintf( '   * In-scope (Hợp lệ): %d (Từ xa: %d, Vừa học vừa làm: %d)', count( $in_scope_programs ), $count_tu_xa, $count_vhvl ) );
-		WP_CLI::line( sprintf( '   * Out-of-scope (Ngoài phạm vi): %d (Cao đẳng: %d, Chính quy: %d, VB2: %d)', count( $out_of_scope_programs ), $count_college, $count_fulltime, $count_vb2 ) );
+		WP_CLI::line( sprintf( '   * In-scope (Hợp lệ): %d (Chính quy: %d, Từ xa: %d, Vừa học vừa làm: %d)', count( $in_scope_programs ), $count_fulltime, $count_tu_xa, $count_vhvl ) );
+		WP_CLI::line( sprintf( '   * Out-of-scope (Ngoài phạm vi): %d (Cao đẳng: %d, VB2: %d)', count( $out_of_scope_programs ), $count_college, $count_vb2 ) );
 		WP_CLI::line( sprintf( '   * Cần xem xét thủ công: %d', count( $manual_review_programs ) ) );
 
 		// ----------------------------------------------------
@@ -1555,9 +1547,9 @@ class LTDH_CLI_Commands {
 					'in_scope_total'           => count( $in_scope_programs ),
 					'in_scope_tu_xa'           => $count_tu_xa,
 					'in_scope_vua_hoc_vua_lam' => $count_vhvl,
+					'in_scope_chinh_quy'       => $count_fulltime,
 					'out_of_scope_total'       => count( $out_of_scope_programs ),
 					'out_of_scope_college'     => $count_college,
-					'out_of_scope_fulltime'    => $count_fulltime,
 					'out_of_scope_vb2'         => $count_vb2,
 					'manual_review'            => count( $manual_review_programs ),
 					'post_status_before'       => [

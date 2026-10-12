@@ -23,10 +23,8 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 				<div class="space-y-2">
 					<label class="block text-sm font-bold text-slate-700">Trình độ học vấn hiện tại *</label>
 					<select name="education" class="elig-select select-education">
-						<option value="thpt">Tốt nghiệp THPT (Học ĐH Từ xa)</option>
 						<option value="trung-cap">Trung cấp / Trung cấp nghề</option>
 						<option value="cao-dang" selected>Cao đẳng / Cao đẳng nghề</option>
-						<option value="dai-hoc">Đã tốt nghiệp Đại học (Học Văn bằng 2)</option>
 					</select>
 				</div>
 
@@ -76,14 +74,9 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 					<label class="block text-sm font-bold text-slate-700">Hình thức đào tạo mong muốn</label>
 					<select name="training_type" class="elig-select">
 						<option value="">Chưa xác định / Gợi ý cho tôi</option>
-						<?php 
-						$training_types = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false ] );
-						if ( ! is_wp_error( $training_types ) && ! empty( $training_types ) ) {
-							foreach ( $training_types as $tt ) {
-								echo '<option value="' . esc_attr( $tt->slug ) . '">' . esc_html( $tt->name ) . '</option>';
-							}
-						}
-						?>
+						<option value="tu-xa">Đào tạo từ xa (Trực tuyến 100%)</option>
+						<option value="vua-hoc-vua-lam">Vừa học vừa làm (Tối & Cuối tuần)</option>
+						<option value="chinh-quy">Chính quy (Tập trung)</option>
 					</select>
 				</div>
 

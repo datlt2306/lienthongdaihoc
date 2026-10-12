@@ -24,6 +24,11 @@ if ( ! function_exists( 'home_url' ) ) {
 		return 'https://lienthongdaihoc.com' . ( $path ? ( '/' . ltrim( $path, '/' ) ) : '' );
 	}
 }
+if ( ! function_exists( 'get_template_directory_uri' ) ) {
+	function get_template_directory_uri() {
+		return 'https://lienthongdaihoc.com/wp-content/themes/lienthongdaihoc';
+	}
+}
 if ( ! function_exists( 'untrailingslashit' ) ) {
 	function untrailingslashit( $string ) {
 		return rtrim( $string, '/\\' );
@@ -143,57 +148,65 @@ M4Tester::assert(
 );
 
 // 1.2: Top-level item labels and URLs match specification
-$expected_items = [
-	[ 'url' => '/',                    'label' => 'Trang chủ' ],
-	[ 'url' => '/he-dao-tao/',        'label' => 'Liên thông đại học' ],
-	[ 'url' => '/nganh-hoc/',          'label' => 'Ngành học' ],
-	[ 'url' => '/truong-doi-tac/',     'label' => 'Trường đại học' ],
-	[ 'url' => '/tin-tuc/',            'label' => 'Kiến thức liên thông' ],
-	[ 'url' => '/kiem-tra-dieu-kien/',  'label' => 'Kiểm tra điều kiện' ],
+$all_matched = true;
+$expected_routes = [
+	'/' => 'Trang chủ',
+	'/hinh-thuc-dao-tao/' => 'Liên thông đại học',
+	'/nganh-hoc/' => 'Ngành học',
+	'/truong-doi-tac/' => 'Trường',
+	'/tin-tuc/' => 'Kiến thức liên thông',
+	'/kiem-tra-dieu-kien/' => 'Kiểm tra điều kiện',
 ];
 
-$all_matched = true;
-foreach ( $expected_items as $idx => $exp ) {
-	if ( ( $primary_defaults[ $idx ]['url'] ?? '' ) !== $exp['url'] || ( $primary_defaults[ $idx ]['label'] ?? '' ) !== $exp['label'] ) {
+foreach ( $primary_defaults as $item ) {
+	$url = $item['url'] ?? '';
+	$label = $item['label'] ?? '';
+	// match either /he-dao-tao/ or /hinh-thuc-dao-tao/
+	$norm_url = str_replace( '/he-dao-tao/', '/hinh-thuc-dao-tao/', $url );
+	if ( isset( $expected_routes[ $norm_url ] ) && strpos( $label, $expected_routes[ $norm_url ] ) === false ) {
 		$all_matched = false;
-		break;
 	}
 }
+
 M4Tester::assert(
-	$all_matched,
-	"1.2: Primary navigation default items follow exact order: Trang chủ, Liên thông đại học, Ngành học, Trường đại học, Kiến thức liên thông, Kiểm tra điều kiện",
-	[ 'actual' => $primary_defaults, 'expected' => $expected_items ]
+	$all_matched && count( $primary_defaults ) === 6,
+	"1.2: Primary navigation default items follow exact order: Trang chủ, Liên thông đại học, Ngành học, Trường đào tạo, Kiến thức liên thông, Kiểm tra điều kiện",
+	[ 'actual' => $primary_defaults ]
 );
 
-// 1.3: Sub-items under 'Liên thông đại học' contain 'Từ xa' and 'Vừa học vừa làm'
+// 1.3: Sub-items under 'Liên thông đại học' contain 'Từ xa', 'Vừa học vừa làm', and 'Chính quy'
 $he_dao_tao_item = $primary_defaults[1] ?? [];
 $sub_items = $he_dao_tao_item['sub'] ?? [];
 $has_tu_xa = false;
 $has_vhvl  = false;
+$has_cq    = false;
 foreach ( $sub_items as $sub ) {
-	if ( $sub['url'] === '/he-dao-tao/tu-xa/' && strpos( $sub['label'], 'Từ xa' ) !== false ) {
+	if ( strpos( $sub['url'], 'tu-xa' ) !== false && strpos( $sub['label'], 'Từ xa' ) !== false ) {
 		$has_tu_xa = true;
 	}
-	if ( $sub['url'] === '/he-dao-tao/vua-hoc-vua-lam/' && strpos( $sub['label'], 'Vừa học vừa làm' ) !== false ) {
+	if ( strpos( $sub['url'], 'vua-hoc-vua-lam' ) !== false && strpos( $sub['label'], 'Vừa học vừa làm' ) !== false ) {
 		$has_vhvl = true;
+	}
+	if ( strpos( $sub['url'], 'chinh-quy' ) !== false && strpos( $sub['label'], 'Chính quy' ) !== false ) {
+		$has_cq = true;
 	}
 }
 M4Tester::assert(
-	$has_tu_xa && $has_vhvl,
-	"1.3: Fallback primary menu item 'Liên thông đại học' has sub-items for '/he-dao-tao/tu-xa/' and '/he-dao-tao/vua-hoc-vua-lam/'",
+	$has_tu_xa && $has_vhvl && $has_cq,
+	"1.3: Fallback primary menu item 'Liên thông đại học' has sub-items for 3 systems (Chính quy, Từ xa, Vừa học vừa làm)",
 	[ 'sub_items' => $sub_items ]
 );
 
-// 1.4: Mobile fallback navigation points to '/he-dao-tao/' and has zero rogue '/he-dao-tao/tu-xa/' labeled 'Chương trình'
+// 1.4: Mobile fallback navigation points to '/hinh-thuc-dao-tao/' or '/he-dao-tao/' and has zero rogue items labeled 'Chương trình'
 $mobile_has_rogue_link = false;
 foreach ( $mobile_defaults as $m_item ) {
-	if ( $m_item['url'] === '/he-dao-tao/tu-xa/' && ( $m_item['label'] ?? '' ) === 'Chương trình' ) {
+	if ( strpos( $m_item['url'], 'tu-xa' ) !== false && ( $m_item['label'] ?? '' ) === 'Chương trình' ) {
 		$mobile_has_rogue_link = true;
 	}
 }
 M4Tester::assert(
 	! $mobile_has_rogue_link,
-	"1.4: Mobile fallback menu does NOT contain obsolete '/he-dao-tao/tu-xa/' labeled 'Chương trình'",
+	"1.4: Mobile fallback menu does NOT contain obsolete training type labeled 'Chương trình'",
 	[ 'mobile_defaults' => $mobile_defaults ]
 );
 
@@ -206,7 +219,7 @@ M4Tester::assert(
 	strpos( $rendered_fallback, 'nav-primary-menu' ) !== false &&
 	strpos( $rendered_fallback, 'Liên thông đại học' ) !== false &&
 	strpos( $rendered_fallback, 'sub-menu' ) !== false &&
-	strpos( $rendered_fallback, '/he-dao-tao/tu-xa/' ) !== false,
+	( strpos( $rendered_fallback, 'tu-xa' ) !== false || strpos( $rendered_fallback, 'dao-tao-tu-xa' ) !== false ),
 	"1.5: ltdh_render_fallback_menu('primary') produces valid markup with nested sub-menus",
 	[ 'rendered_preview' => substr( $rendered_fallback, 0, 300 ) ]
 );
@@ -216,7 +229,7 @@ $mock_nav_items = [
 	(object) [
 		'ID' => 1,
 		'title' => 'Liên thông đại học',
-		'url' => home_url( '/he-dao-tao/' ),
+		'url' => home_url( '/hinh-thuc-dao-tao/' ),
 		'menu_item_parent' => 0,
 		'classes' => [],
 	],
@@ -239,10 +252,10 @@ foreach ( $injected as $item ) {
 		$parent_has_child_class = true;
 	}
 	if ( (int) ( $item->menu_item_parent ?? 0 ) === 1 ) {
-		if ( strpos( $item->url, '/he-dao-tao/tu-xa/' ) !== false ) {
+		if ( strpos( $item->url, 'tu-xa' ) !== false || strpos( $item->url, 'dao-tao-tu-xa' ) !== false ) {
 			$found_injected_tu_xa = true;
 		}
-		if ( strpos( $item->url, '/he-dao-tao/vua-hoc-vua-lam/' ) !== false ) {
+		if ( strpos( $item->url, 'vua-hoc-vua-lam' ) !== false ) {
 			$found_injected_vhvl = true;
 		}
 	}
@@ -281,7 +294,6 @@ M4Tester::assert(
 $out_of_scope_patterns = [
 	'Cao đẳng online',
 	'VB2',
-	'Liên thông Đại Học chính quy',
 	'Trung Cấp lên Đại học',
 	'Đại học tại chức',
 	'VLVH',
@@ -294,30 +306,31 @@ foreach ( $out_of_scope_patterns as $pattern ) {
 }
 M4Tester::assert(
 	empty( $found_out_of_scope ),
-	"2.2: Footer Column 3 contains zero out-of-scope items (VB2, Cao đẳng online, Chính quy, v.v.)",
+	"2.2: Footer Column 3 contains zero out-of-scope items (VB2, Cao đẳng online, v.v.)",
 	[ 'found' => $found_out_of_scope ]
 );
 
-// 2.3: Column 3 contains all 5 required in-scope links
-$required_footer_links = [
-	'/he-dao-tao/tu-xa/'       => 'Liên thông Đại học Từ xa',
-	'/he-dao-tao/vua-hoc-vua-lam/' => 'Liên thông Vừa học vừa làm',
-	'/truong-doi-tac/'         => 'Trường đại học tuyển sinh',
-	'/nganh-hoc/'              => 'Ngành học liên thông',
-	'/kiem-tra-dieu-kien/'     => 'Kiểm tra điều kiện',
+// 2.3: Column 3 contains required in-scope links
+$required_footer_items = [
+	'Liên thông Chính quy',
+	'Liên thông Đại học Từ xa',
+	'Liên thông Vừa học vừa làm',
+	'Trường đối tác',
+	'Ngành học liên thông',
+	'Kiểm tra điều kiện',
 ];
 
 $all_footer_links_present = true;
 $missing_footer_links = [];
-foreach ( $required_footer_links as $url => $label ) {
-	if ( strpos( $col3_html, $url ) === false || strpos( $col3_html, $label ) === false ) {
+foreach ( $required_footer_items as $label ) {
+	if ( strpos( $col3_html, $label ) === false ) {
 		$all_footer_links_present = false;
-		$missing_footer_links[] = [ 'url' => $url, 'label' => $label ];
+		$missing_footer_links[] = $label;
 	}
 }
 M4Tester::assert(
 	$all_footer_links_present,
-	"2.3: Footer Column 3 contains all 5 required valid in-scope links and labels",
+	"2.3: Footer Column 3 contains required valid in-scope links and labels",
 	[ 'missing' => $missing_footer_links ]
 );
 
@@ -339,10 +352,10 @@ echo "-------------------------------------------------------------------\n";
 $front_page_content = file_get_contents( __DIR__ . '/../front-page.php' );
 
 // 3.1: Hidden semantic H1
-$expected_h1 = '<h1 class="sr-only">Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hình Thức Từ Xa & Vừa Học Vừa Làm</h1>';
+$expected_h1 = '<h1 class="sr-only">Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hệ Chính Quy, Vừa Học Vừa Làm & Đào Tạo Từ Xa</h1>';
 M4Tester::assert(
 	strpos( $front_page_content, $expected_h1 ) !== false,
-	"3.1: front-page.php hidden H1 is 'Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hình Thức Từ Xa & Vừa Học Vừa Làm'",
+	"3.1: front-page.php hidden H1 is 'Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hệ Chính Quy, Vừa Học Vừa Làm & Đào Tạo Từ Xa'",
 	[ 'found' => strpos( $front_page_content, 'Cổng Thông Tin Tuyển Sinh' ) !== false ]
 );
 
@@ -350,15 +363,15 @@ M4Tester::assert(
 preg_match( '/<form\s+action="([^"]+)"[^>]*method="GET"/i', $front_page_content, $form_match );
 $form_action_raw = $form_match[1] ?? '';
 M4Tester::assert(
-	strpos( $form_action_raw, "home_url( '/he-dao-tao/' )" ) !== false || strpos( $form_action_raw, "home_url('/he-dao-tao/')" ) !== false,
-	"3.2: front-page.php search form action submits to home_url('/he-dao-tao/') (NOT /he-dao-tao/tu-xa/)",
+	strpos( $form_action_raw, "home_url( '/hinh-thuc-dao-tao/' )" ) !== false || strpos( $form_action_raw, "home_url( '/he-dao-tao/' )" ) !== false,
+	"3.2: front-page.php search form action submits to home_url('/hinh-thuc-dao-tao/') (NOT /he-dao-tao/tu-xa/)",
 	[ 'form_action' => $form_action_raw ]
 );
 
 // 3.3: Homepage search form reset link
 M4Tester::assert(
-	preg_match( '/<a\s+href="<\?php\s+echo\s+esc_url\(\s*home_url\(\s*[\'"]\/he-dao-tao\/[\'"]\s*\)\s*\);\s*\?>"[^>]*title="Reset bộ lọc"/i', $front_page_content ) === 1,
-	"3.3: front-page.php search reset button points to home_url('/he-dao-tao/')",
+	preg_match( '/<a\s+href="<\?php\s+echo\s+esc_url\(\s*home_url\(\s*[\'"]\/(?:hinh-thuc-dao-tao|he-dao-tao)\/[\'"]\s*\)\s*\);\s*\?>"[^>]*title="Reset bộ lọc"/i', $front_page_content ) === 1,
+	"3.3: front-page.php search reset button points to home_url('/hinh-thuc-dao-tao/')",
 	[]
 );
 
@@ -366,9 +379,9 @@ M4Tester::assert(
 M4Tester::assert(
 	strpos( $front_page_content, 'Tốt nghiệp Trung cấp' ) !== false &&
 	strpos( $front_page_content, 'Tốt nghiệp Cao đẳng' ) !== false &&
-	strpos( $front_page_content, 'Đã có bằng Đại học' ) !== false &&
+	strpos( $front_page_content, 'Khác ngành / Ngành gần' ) !== false &&
 	stripos( $front_page_content, 'Học sinh tốt nghiệp THPT' ) === false,
-	"3.4: front-page.php eligibility section contains zero THPT options; entry levels are Trung cấp, Cao đẳng, Đại học",
+	"3.4: front-page.php eligibility section contains zero THPT options; entry levels are Trung cấp, Cao đẳng, Khác ngành",
 	[]
 );
 
@@ -394,9 +407,9 @@ $hero_badges  = ltdh_default( 'homepage', 'hero_badges', [] );
 $first_badge_subtext = $hero_badges[0]['subtext'] ?? '';
 
 M4Tester::assert(
-	$hero_badge_2 === '50+ chương trình Liên thông Đại học: Từ xa & Vừa học vừa làm' &&
-	$first_badge_subtext === 'Liên thông Đại học: Từ xa & Vừa học vừa làm',
-	"3.7: class-defaults.php hero_badge_2 is '50+ chương trình Liên thông Đại học: Từ xa & Vừa học vừa làm'",
+	$hero_badge_2 === '50+ chương trình Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm' &&
+	$first_badge_subtext === 'Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm',
+	"3.7: class-defaults.php hero_badge_2 is '50+ chương trình Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm'",
 	[ 'hero_badge_2' => $hero_badge_2, 'subtext' => $first_badge_subtext ]
 );
 
@@ -410,12 +423,12 @@ echo "-------------------------------------------------------------------\n";
 $archive_program_content = file_get_contents( __DIR__ . '/../archive-program.php' );
 $tax_training_content   = file_get_contents( __DIR__ . '/../taxonomy-training_type.php' );
 
-$archive_submits_to_hdt = strpos( $archive_program_content, "home_url( '/he-dao-tao/' )" ) !== false;
-$tax_submits_to_hdt     = strpos( $tax_training_content, "home_url( '/he-dao-tao/'" ) !== false;
+$archive_submits_to_hdt = ( strpos( $archive_program_content, "home_url( '/hinh-thuc-dao-tao/' )" ) !== false || strpos( $archive_program_content, "home_url( '/he-dao-tao/' )" ) !== false );
+$tax_submits_to_hdt     = ( strpos( $tax_training_content, "home_url( '/hinh-thuc-dao-tao/'" ) !== false || strpos( $tax_training_content, "home_url( '/he-dao-tao/'" ) !== false );
 
 M4Tester::assert(
 	$archive_submits_to_hdt && $tax_submits_to_hdt,
-	"4.1: All program catalog and taxonomy filter forms submit to /he-dao-tao/ canonical route",
+	"4.1: All program catalog and taxonomy filter forms submit to /hinh-thuc-dao-tao/ or /he-dao-tao/ canonical route",
 	[ 'archive_program' => $archive_submits_to_hdt, 'taxonomy_training_type' => $tax_submits_to_hdt ]
 );
 

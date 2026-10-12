@@ -36,6 +36,7 @@ function ltdh_get_defaults( string $group ): array {
 					'url'   => '/hinh-thuc-dao-tao/',
 					'label' => 'Liên thông đại học',
 					'sub'   => [
+						[ 'url' => '/hinh-thuc-dao-tao/chinh-quy/',        'label' => 'Liên thông Chính quy' ],
 						[ 'url' => '/hinh-thuc-dao-tao/dao-tao-tu-xa/',   'label' => 'Từ xa' ],
 						[ 'url' => '/hinh-thuc-dao-tao/vua-hoc-vua-lam/', 'label' => 'Vừa học vừa làm' ],
 					],
@@ -51,6 +52,7 @@ function ltdh_get_defaults( string $group ): array {
 					'url'   => '/hinh-thuc-dao-tao/',
 					'label' => 'Liên thông đại học',
 					'sub'   => [
+						[ 'url' => '/hinh-thuc-dao-tao/chinh-quy/',        'label' => 'Liên thông Chính quy' ],
 						[ 'url' => '/hinh-thuc-dao-tao/dao-tao-tu-xa/',   'label' => 'Từ xa' ],
 						[ 'url' => '/hinh-thuc-dao-tao/vua-hoc-vua-lam/', 'label' => 'Vừa học vừa làm' ],
 					],
@@ -74,9 +76,9 @@ function ltdh_get_defaults( string $group ): array {
 		],
 		'homepage' => [
 			'hero_year_label' => 'TUYỂN SINH ' . date( 'Y' ),
-			'hero_badge_2'    => '50+ chương trình Liên thông Đại học: Từ xa & Vừa học vừa làm',
+			'hero_badge_2'    => '50+ chương trình Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm',
 			'hero_badges'     => [
-				[ 'text' => '50+ chương trình',          'subtext' => 'Liên thông Đại học: Từ xa & Vừa học vừa làm' ],
+				[ 'text' => '50+ chương trình',          'subtext' => 'Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm' ],
 				[ 'text' => '30+ trường ĐH',              'subtext' => 'Đối tác uy tín toàn quốc' ],
 				[ 'text' => 'Miễn giảm tín chỉ',          'subtext' => 'Rút ngắn thời gian học' ],
 			],
@@ -91,11 +93,11 @@ function ltdh_get_defaults( string $group ): array {
 			'year_pattern' => '%s | Tuyển sinh %d',
 		],
 		'images' => [
-			'fallback_school'      => get_template_directory_uri() . '/assets/images/banner-school.jpg',
-			'fallback_school_logo' => get_template_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp',
-			'fallback_program'     => get_template_directory_uri() . '/assets/images/banner-program.jpg',
-			'fallback_post'        => get_template_directory_uri() . '/assets/images/banner-fallback.webp',
-			'fallback_news'        => get_template_directory_uri() . '/assets/images/banner-fallback.webp',
+			'fallback_school'      => ( function_exists( 'get_template_directory_uri' ) ? get_template_directory_uri() : '' ) . '/assets/images/banner-school.jpg',
+			'fallback_school_logo' => ( function_exists( 'get_template_directory_uri' ) ? get_template_directory_uri() : '' ) . '/assets/images/cropped-logo-scaled-2.webp',
+			'fallback_program'     => ( function_exists( 'get_template_directory_uri' ) ? get_template_directory_uri() : '' ) . '/assets/images/banner-program.jpg',
+			'fallback_post'        => ( function_exists( 'get_template_directory_uri' ) ? get_template_directory_uri() : '' ) . '/assets/images/banner-fallback.webp',
+			'fallback_news'        => ( function_exists( 'get_template_directory_uri' ) ? get_template_directory_uri() : '' ) . '/assets/images/banner-fallback.webp',
 			'fallback_hero'        => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=600',
 			'fallback_consult'     => 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=400',
 			'fallback_segment_1'   => 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=200',

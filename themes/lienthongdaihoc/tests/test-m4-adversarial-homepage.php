@@ -10,6 +10,17 @@ if ( php_sapi_name() !== 'cli' ) {
 
 define( 'ABSPATH', dirname( __DIR__ ) . '/' );
 
+if ( ! function_exists( 'home_url' ) ) {
+	function home_url( $path = '' ) {
+		return 'https://lienthongdaihoc.com' . ( $path ? ( '/' . ltrim( $path, '/' ) ) : '' );
+	}
+}
+if ( ! function_exists( 'get_template_directory_uri' ) ) {
+	function get_template_directory_uri() {
+		return 'https://lienthongdaihoc.com/wp-content/themes/lienthongdaihoc';
+	}
+}
+
 class M4AdversarialTester {
 	public static int $passed = 0;
 	public static int $failed = 0;
@@ -97,7 +108,7 @@ M4AdversarialTester::assert(
 	[ 'tag' => $h1_tag ]
 );
 
-$banned_terms_in_h1 = [ 'văn bằng 2', 'vb2', 'cao đẳng', 'chính quy', 'thpt', 'sau đại học', 'thạc sĩ' ];
+$banned_terms_in_h1 = [ 'văn bằng 2', 'vb2', 'cao đẳng', 'thpt', 'sau đại học', 'thạc sĩ' ];
 $found_banned_in_h1 = [];
 foreach ( $banned_terms_in_h1 as $term ) {
 	if ( mb_stripos( $h1_inner, $term ) !== false ) {
@@ -106,12 +117,12 @@ foreach ( $banned_terms_in_h1 as $term ) {
 }
 M4AdversarialTester::assert(
 	empty( $found_banned_in_h1 ),
-	"2.3: <h1> contains zero out-of-scope terms (VB2, Cao đẳng, Chính quy, THPT)",
+	"2.3: <h1> contains zero out-of-scope terms (VB2, Cao đẳng, THPT)",
 	[ 'banned_found' => $found_banned_in_h1, 'h1_inner' => $h1_inner ]
 );
 
 M4AdversarialTester::assert(
-	$h1_inner === 'Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hình Thức Từ Xa & Vừa Học Vừa Làm',
+	$h1_inner === 'Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hệ Chính Quy, Vừa Học Vừa Làm & Đào Tạo Từ Xa',
 	"2.4: <h1> matches exact canonical string",
 	[ 'actual' => $h1_inner ]
 );
@@ -128,8 +139,8 @@ preg_match( '/<form\s+action="([^"]+)"[^>]*method="GET"/i', $fp_content, $form_m
 $form_action = $form_match[1] ?? '';
 
 M4AdversarialTester::assert(
-	preg_match( '/home_url\(\s*[\'"]\/he-dao-tao\/[\'"]\s*\)/', $form_action ) === 1,
-	"3.1: Form action evaluates strictly to home_url('/he-dao-tao/')",
+	preg_match( '/home_url\(\s*[\'"]\/(?:hinh-thuc-dao-tao|he-dao-tao)\/[\'"]\s*\)/', $form_action ) === 1,
+	"3.1: Form action evaluates strictly to home_url('/hinh-thuc-dao-tao/') or '/he-dao-tao/'",
 	[ 'action' => $form_action ]
 );
 
@@ -144,8 +155,8 @@ preg_match( '/<a\s+href="([^"]+)"[^>]*title="Reset bộ lọc"/i', $fp_content, 
 $reset_href = $reset_match[1] ?? '';
 
 M4AdversarialTester::assert(
-	preg_match( '/home_url\(\s*[\'"]\/he-dao-tao\/[\'"]\s*\)/', $reset_href ) === 1,
-	"3.3: Reset button href evaluates strictly to home_url('/he-dao-tao/')",
+	preg_match( '/home_url\(\s*[\'"]\/(?:hinh-thuc-dao-tao|he-dao-tao)\/[\'"]\s*\)/', $reset_href ) === 1,
+	"3.3: Reset button href evaluates strictly to home_url('/hinh-thuc-dao-tao/') or '/he-dao-tao/'",
 	[ 'reset_href' => $reset_href ]
 );
 
@@ -153,8 +164,8 @@ M4AdversarialTester::assert(
 preg_match( '/<select\s+name="he"[^>]*>(.*?)<\/select>/is', $fp_content, $he_select_match );
 $he_select_inner = $he_select_match[1] ?? '';
 M4AdversarialTester::assert(
-	strpos( $he_select_inner, '-- Chọn hình thức học --' ) !== false,
-	"3.4: 'he' select dropdown default option is '-- Chọn hình thức học --'",
+	strpos( $he_select_inner, '-- Chọn hình thức' ) !== false,
+	"3.4: 'he' select dropdown default option has placeholder '-- Chọn hình thức... --'",
 	[ 'he_select_inner' => $he_select_inner ]
 );
 
@@ -185,12 +196,12 @@ M4AdversarialTester::assert(
 // 3 Default items check
 $has_tc = strpos( $fp_content, "['title' => 'Tốt nghiệp Trung cấp', 'desc' => 'Liên thông lên Đại học']" ) !== false;
 $has_cd = strpos( $fp_content, "['title' => 'Tốt nghiệp Cao đẳng', 'desc' => 'Liên thông miễn giảm tín chỉ']" ) !== false;
-$has_dh = strpos( $fp_content, "['title' => 'Đã có bằng Đại học', 'desc' => 'Liên thông văn bằng thứ hai']" ) !== false;
+$has_kn = strpos( $fp_content, "['title' => 'Khác ngành / Ngành gần', 'desc' => 'Học bổ sung kiến thức liên thông']" ) !== false;
 
 M4AdversarialTester::assert(
-	$has_tc && $has_cd && $has_dh,
-	"4.3: Eligibility section default levels are exclusively Trung cấp, Cao đẳng, Đại học",
-	[ 'has_tc' => $has_tc, 'has_cd' => $has_cd, 'has_dh' => $has_dh ]
+	$has_tc && $has_cd && $has_kn,
+	"4.3: Eligibility section default levels are exclusively Trung cấp, Cao đẳng, Khác ngành (zero VB2)",
+	[ 'has_tc' => $has_tc, 'has_cd' => $has_cd, 'has_kn' => $has_kn ]
 );
 
 
@@ -234,15 +245,15 @@ echo "-------------------------------------------------------------------\n";
 
 $hero_b2 = $homepage_defs['hero_badge_2'] ?? '';
 M4AdversarialTester::assert(
-	$hero_b2 === '50+ chương trình Liên thông Đại học: Từ xa & Vừa học vừa làm',
-	"6.1: hero_badge_2 in class-defaults.php is '50+ chương trình Liên thông Đại học: Từ xa & Vừa học vừa làm'",
+	$hero_b2 === '50+ chương trình Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm',
+	"6.1: hero_badge_2 in class-defaults.php is '50+ chương trình Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm'",
 	[ 'hero_badge_2' => $hero_b2 ]
 );
 
 $first_badge = $homepage_defs['hero_badges'][0] ?? [];
 M4AdversarialTester::assert(
-	( $first_badge['subtext'] ?? '' ) === 'Liên thông Đại học: Từ xa & Vừa học vừa làm',
-	"6.2: hero_badges[0].subtext is 'Liên thông Đại học: Từ xa & Vừa học vừa làm' (zero VB2)",
+	( $first_badge['subtext'] ?? '' ) === 'Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm',
+	"6.2: hero_badges[0].subtext is 'Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm' (zero VB2)",
 	[ 'badge_0' => $first_badge ]
 );
 

@@ -287,11 +287,8 @@ function ltdh_elig_ajax_check() {
 // ----------------------------------------------------
 
 function ltdh_elig_validate_input( $input ) {
-	$valid_education = [ 'thpt', 'thap-phan', 'trung-cap', 'cao-dang', 'dai-hoc', 'thac-si' ];
-
-	// Dynamic fetch training types - cho phép van-bang-2
-	$training_terms = get_terms( [ 'taxonomy' => 'training_type', 'hide_empty' => false, 'fields' => 'slugs' ] );
-	$valid_training = ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ? $training_terms : [ 'lien-thong', 'van-bang-2', 'tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ];
+	$valid_education = [ 'trung-cap', 'cao-dang' ];
+	$valid_training  = [ 'tu-xa', 'dao-tao-tu-xa', 'vua-hoc-vua-lam', 'chinh-quy' ];
 
 	// Dynamic fetch campuses
 	$campus_terms = get_terms( [ 'taxonomy' => 'campus', 'hide_empty' => false, 'fields' => 'slugs' ] );
@@ -299,7 +296,7 @@ function ltdh_elig_validate_input( $input ) {
 	$valid_budget    = [ 'duoi-20-trieu', '20-30-trieu', '30-50-trieu', 'tren-50-trieu' ];
 
 	if ( empty( $input['education'] ) || ! in_array( $input['education'], $valid_education, true ) ) {
-		return new WP_Error( 'invalid_education', 'Vui lòng chọn trình độ học vấn hợp lệ (THPT, Trung cấp, Cao đẳng, Đại học).' );
+		return new WP_Error( 'invalid_education', 'Chương trình Liên thông Đại học chỉ tiếp nhận thí sinh đã tốt nghiệp trình độ Trung cấp hoặc Cao đẳng.' );
 	}
 
 	if ( ! empty( $input['training_type'] ) && ! in_array( $input['training_type'], $valid_training, true ) ) {
@@ -639,23 +636,18 @@ function ltdh_elig_parse_duration( $str ) {
 
 function ltdh_elig_get_education_label( $slug ) {
 	$map = [
-		'thpt'       => 'THPT',
-		'thap-phan'  => 'THPT',
 		'trung-cap'  => 'Trung cấp',
 		'cao-dang'   => 'Cao đẳng',
-		'dai-hoc'    => 'Đại học (VB2)',
-		'thac-si'    => 'Thạc sĩ',
 	];
 	return $map[ $slug ] ?? $slug;
 }
 
 function ltdh_elig_get_training_label( $slug ) {
 	$map = [
-		'lien-thong'       => 'Liên thông',
-		'van-bang-2'       => 'Văn bằng 2',
-		'tu-xa'            => 'Từ xa',
-		'vua-hoc-vua-lam'  => 'Vừa học vừa làm',
-		'chinh-quy'        => 'Chính quy',
+		'tu-xa'            => 'Hệ đào tạo từ xa',
+		'dao-tao-tu-xa'    => 'Hệ đào tạo từ xa',
+		'vua-hoc-vua-lam'  => 'Hệ vừa học vừa làm',
+		'chinh-quy'        => 'Hệ chính quy',
 	];
 	return $map[ $slug ] ?? $slug;
 }
@@ -1566,11 +1558,8 @@ function ltdh_elig_admin_checks_page() {
 					<label for="check-education" style="font-weight: 600; display: block; margin-bottom: 5px;">Trình độ:</label>
 					<select id="check-education" name="input_education">
 						<option value="">Tất cả trình độ</option>
-						<option value="thap-phan" <?php selected( $input_education, 'thap-phan' ); ?>>THPT</option>
 						<option value="trung-cap" <?php selected( $input_education, 'trung-cap' ); ?>>Trung cấp</option>
 						<option value="cao-dang" <?php selected( $input_education, 'cao-dang' ); ?>>Cao đẳng</option>
-						<option value="dai-hoc" <?php selected( $input_education, 'dai-hoc' ); ?>>Đại học</option>
-						<option value="thac-si" <?php selected( $input_education, 'thac-si' ); ?>>Thạc sĩ</option>
 					</select>
 				</div>
 				
@@ -1593,11 +1582,9 @@ function ltdh_elig_admin_checks_page() {
 					<label for="check-training-type" style="font-weight: 600; display: block; margin-bottom: 5px;">Hệ học:</label>
 					<select id="check-training-type" name="input_training_type">
 						<option value="">Tất cả hệ học</option>
-						<option value="lien-thong" <?php selected( $input_training_type, 'lien-thong' ); ?>>Liên thông</option>
-						<option value="van-bang-2" <?php selected( $input_training_type, 'van-bang-2' ); ?>>Văn bằng 2</option>
-						<option value="tu-xa" <?php selected( $input_training_type, 'tu-xa' ); ?>>Từ xa</option>
-						<option value="vua-hoc-vua-lam" <?php selected( $input_training_type, 'vua-hoc-vua-lam' ); ?>>Vừa học vừa làm</option>
-						<option value="chinh-quy" <?php selected( $input_training_type, 'chinh-quy' ); ?>>Chính quy</option>
+						<option value="tu-xa" <?php selected( $input_training_type, 'tu-xa' ); ?>>Hệ đào tạo từ xa</option>
+						<option value="vua-hoc-vua-lam" <?php selected( $input_training_type, 'vua-hoc-vua-lam' ); ?>>Hệ vừa học vừa làm</option>
+						<option value="chinh-quy" <?php selected( $input_training_type, 'chinh-quy' ); ?>>Hệ chính quy</option>
 					</select>
 				</div>
 

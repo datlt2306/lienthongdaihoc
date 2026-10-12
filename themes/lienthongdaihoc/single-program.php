@@ -288,7 +288,7 @@ $program_tabs[] = [
 							<span class="font-bold text-emerald-700 text-xs sm:text-sm leading-snug">Thông tư 27/2019/TT-BGDĐT</span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức đào tạo</span>
+							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
 							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
@@ -317,7 +317,7 @@ $program_tabs[] = [
 					<div class="mt-4 bg-emerald-50/50 rounded-xl p-4 text-xs md:text-sm text-slate-700 space-y-2 leading-relaxed">
 						<p class="flex items-start gap-2">
 							<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
-							<span><strong>Không ghi hình thức đào tạo:</strong> Theo quy định tại Thông tư 27/2019/TT-BGDĐT của Bộ GD&ĐT, văn bằng đại học hiện hành không ghi hình thức đào tạo (không phân biệt Từ xa hay Vừa làm vừa học).</span>
+							<span><strong>Không ghi hình thức đào tạo:</strong> Theo quy định tại Thông tư 27/2019/TT-BGDĐT của Bộ GD&ĐT, văn bằng đại học hiện hành không ghi hình thức đào tạo (không phân biệt Chính quy, Vừa làm vừa học hay Đào tạo từ xa).</span>
 						</p>
 						<p class="flex items-start gap-2">
 							<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>

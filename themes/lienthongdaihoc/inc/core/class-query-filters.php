@@ -313,7 +313,7 @@ function ltdh_ajax_filter_programs() {
 			[
 				'taxonomy' => LTDH_TAX_TRAINING_TYPE,
 				'field'    => 'slug',
-				'terms'    => [ 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ],
+				'terms'    => [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ],
 			],
 		];
 	}
@@ -386,7 +386,7 @@ function ltdh_ajax_filter_programs() {
 					$badge_class = 'bg-blue-50 text-blue-700 border border-blue-200';
 				} elseif ( false !== strpos( $t_lower, 'từ xa' ) ) {
 					$badge_class = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-				} elseif ( false !== strpos( $t_lower, 'vừa học vừa làm' ) || false !== strpos( $t_lower, 'vừa làm vừa học' ) || false !== strpos( $t_lower, 'liên thông' ) || false !== strpos( $t_lower, 'văn bằng 2' ) ) {
+				} elseif ( false !== strpos( $t_lower, 'vừa học vừa làm' ) || false !== strpos( $t_lower, 'vừa làm vừa học' ) || false !== strpos( $t_lower, 'vhvl' ) ) {
 					$badge_class = 'bg-amber-50 text-amber-700 border border-amber-200';
 				}
 			}
@@ -709,7 +709,7 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 					$badge_class = 'bg-blue-50 text-[#00308b]';
 				} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
 					$badge_class = 'bg-emerald-50 text-emerald-700';
-				} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {
+				} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
 					$badge_class = 'bg-amber-50 text-amber-800';
 				}
 			}
@@ -782,7 +782,7 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 							if ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
 								$dot_class = 'bg-emerald-500';
 								$btn_style = 'bg-emerald-50 text-emerald-800 border-emerald-200/80 hover:bg-emerald-600 hover:text-white hover:border-emerald-600';
-							} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {
+							} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
 								$dot_class = 'bg-amber-500';
 								$btn_style = 'bg-amber-50 text-amber-900 border-amber-200/80 hover:bg-amber-600 hover:text-white hover:border-amber-600';
 							}

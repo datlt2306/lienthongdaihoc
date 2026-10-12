@@ -160,7 +160,7 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 
 			$item->classes[] = 'menu-item-has-children';
 
-			$allowed_training_types = ['dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam'];
+			$allowed_training_types = ['chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam'];
 			$types = get_terms([
 				'taxonomy'   => LTDH_TAX_TRAINING_TYPE,
 				'slug'       => $allowed_training_types,
@@ -171,7 +171,7 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 					return in_array($t->slug, $allowed_training_types, true);
 				}));
 				foreach ($types as $t) {
-					$term_link = get_term_link( $t );
+					$term_link = function_exists( 'get_term_link' ) ? get_term_link( $t ) : '';
 					$url = ( ! is_wp_error( $term_link ) && ! empty( $term_link ) ) ? $term_link : home_url( '/hinh-thuc-dao-tao/' . $t->slug . '/' );
 
 					$max_db_id++;

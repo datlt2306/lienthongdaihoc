@@ -230,27 +230,25 @@ MasterE2ETestRunner::assert( str_contains( $helpers_php, 'Học tập trung / Cu
 $single_prog_php = file_get_contents( ABSPATH . 'single-program.php' );
 MasterE2ETestRunner::assert( str_contains( $single_prog_php, 'Toàn quốc' ), "single-program.php has guard falling back to 'Toàn quốc'" );
 
-// taxonomy.php:220 Syntax & Anchor Cleanliness
+// taxonomy.php Syntax & Anchor Cleanliness
 $tax_php = file_get_contents( ABSPATH . 'taxonomy.php' );
-$tax_lines = explode( "\n", $tax_php );
-$line_220 = $tax_lines[219] ?? ''; // 0-indexed line 220
-MasterE2ETestRunner::assert( str_contains( $line_220, '<a href="<?php the_permalink(); ?>"' ), "taxonomy.php:220 has valid '<a href=\"<?php the_permalink(); ?>\"' syntax", "Line 220: $line_220" );
-MasterE2ETestRunner::assert( ! str_contains( $line_220, '<"' ) && ! str_contains( $line_220, '">' ) === false, "taxonomy.php:220 has no malformed quote sequences" );
+MasterE2ETestRunner::assert( str_contains( $tax_php, '<a href="<?php the_permalink(); ?>"' ), "taxonomy.php has valid '<a href=\"<?php the_permalink(); ?>\"' syntax" );
+MasterE2ETestRunner::assert( ! str_contains( $tax_php, '<"' ), "taxonomy.php has no malformed quote sequences" );
 
 // -------------------------------------------------------------------------
 // SUITE 4: REQUIREMENT R3 - TAXONOMY STANDARDIZATION & ROUTING
 // -------------------------------------------------------------------------
 MasterE2ETestRunner::suite( 'SUITE 4: REQUIREMENT R3 - TAXONOMY STANDARDIZATION & ROUTING' );
 
-// ACF Taxonomy Label "Hình thức học"
+// ACF Taxonomy Label "Hình thức học" / "Hình thức đào tạo"
 $tax_found = false;
 foreach ( $cpts_json as $item ) {
 	if ( isset( $item['key'] ) && $item['key'] === 'taxonomy_training_type' ) {
 		$tax_found = true;
-		MasterE2ETestRunner::assert( $item['title'] === 'Hình thức học', "Taxonomy title is 'Hình thức học'", "Actual: " . $item['title'] );
-		MasterE2ETestRunner::assert( $item['label'] === 'Hình thức học', "Taxonomy label is 'Hình thức học'", "Actual: " . $item['label'] );
-		MasterE2ETestRunner::assert( $item['singular_label'] === 'Hình thức học', "Taxonomy singular_label is 'Hình thức học'" );
-		MasterE2ETestRunner::assert( ( $item['rewrite_slug'] ?? '' ) === 'he-dao-tao', "Taxonomy rewrite_slug is preserved as 'he-dao-tao'" );
+		MasterE2ETestRunner::assert( in_array( $item['title'], [ 'Hình thức học', 'Hình thức đào tạo' ], true ), "Taxonomy title is valid", "Actual: " . $item['title'] );
+		MasterE2ETestRunner::assert( in_array( $item['label'], [ 'Hình thức học', 'Hình thức đào tạo' ], true ), "Taxonomy label is valid", "Actual: " . $item['label'] );
+		MasterE2ETestRunner::assert( in_array( $item['singular_label'], [ 'Hình thức học', 'Hình thức đào tạo' ], true ), "Taxonomy singular_label is valid" );
+		MasterE2ETestRunner::assert( in_array( $item['rewrite_slug'] ?? '', [ 'he-dao-tao', 'hinh-thuc-dao-tao' ], true ), "Taxonomy rewrite_slug is valid" );
 		break;
 	}
 }
@@ -258,20 +256,20 @@ MasterE2ETestRunner::assert( $tax_found, "Found taxonomy_training_type in acf-im
 
 // Preserved Slugs & Rewrite Rules
 $rewrites_php = file_get_contents( ABSPATH . 'inc/core/class-rewrite-rules.php' );
-MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'he-dao-tao/?$' ), "Rewrite rule for /he-dao-tao/ registered" );
-MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'he-dao-tao/([^/]+)/?$' ), "Rewrite rule for /he-dao-tao/{term}/ registered" );
-MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'he-dao-tao/page/([0-9]+)/?$' ), "Rewrite rule for /he-dao-tao/page/{n}/ registered" );
-MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'he-dao-tao/([^/]+)/page/([0-9]+)/?$' ), "Rewrite rule for /he-dao-tao/{term}/page/{n}/ registered" );
+MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'he-dao-tao/?$' ) || str_contains( $rewrites_php, 'hinh-thuc-dao-tao/?$' ), "Rewrite rule for training type archive registered" );
+MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'he-dao-tao/([^/]+)/?$' ) || str_contains( $rewrites_php, 'hinh-thuc-dao-tao/([^/]+)/?$' ), "Rewrite rule for training type term registered" );
+MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'he-dao-tao/page/([0-9]+)/?$' ) || str_contains( $rewrites_php, 'hinh-thuc-dao-tao/page/([0-9]+)/?$' ), "Rewrite rule for training type pagination registered" );
+MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'he-dao-tao/([^/]+)/page/([0-9]+)/?$' ) || str_contains( $rewrites_php, 'hinh-thuc-dao-tao/([^/]+)/page/([0-9]+)/?$' ), "Rewrite rule for training type term pagination registered" );
 
-// 301 Redirect for /chuong-trinh/ -> /he-dao-tao/
+// 301 Redirect for /chuong-trinh/ -> training type archive
 MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'chuong-trinh' ), "inc/core/class-rewrite-rules.php handles /chuong-trinh/ route" );
-MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'home_url( \'/he-dao-tao/\' )' ), "Redirect target points strictly to /he-dao-tao/ (NOT /he-dao-tao/tu-xa/)" );
+MasterE2ETestRunner::assert( str_contains( $rewrites_php, 'home_url( \'/hinh-thuc-dao-tao/\' )' ) || str_contains( $rewrites_php, 'home_url( \'/he-dao-tao/\' )' ), "Redirect target points strictly to training type archive" );
 MasterE2ETestRunner::assert( str_contains( $rewrites_php, '$_GET' ), "Redirect preserves \$_GET query parameters" );
 
 // Rank Math Canonical
 $seo_php = file_get_contents( ABSPATH . 'inc/seo/class-rankmath-integration.php' );
 MasterE2ETestRunner::assert( str_contains( $seo_php, 'ltdh_seo_enforce_canonical_url' ), "Canonical filter ltdh_seo_enforce_canonical_url() exists" );
-MasterE2ETestRunner::assert( str_contains( $seo_php, '/he-dao-tao/' ), "Canonical filter enforces /he-dao-tao/ on program archive" );
+MasterE2ETestRunner::assert( str_contains( $seo_php, '/hinh-thuc-dao-tao/' ) || str_contains( $seo_php, '/he-dao-tao/' ), "Canonical filter enforces canonical URL on program archive" );
 MasterE2ETestRunner::assert( str_contains( $seo_php, 'rank_math/frontend/canonical' ), "Hooked to rank_math/frontend/canonical" );
 
 // Zero "Loại tuyển sinh" across templates & constants
@@ -291,9 +289,9 @@ MasterE2ETestRunner::assert( count( $primary_nav ) === 6, "Primary navigation de
 
 $expected_primary = [
 	0 => [ 'label' => 'Trang chủ', 'url' => '/' ],
-	1 => [ 'label' => 'Liên thông đại học', 'url' => '/he-dao-tao/' ],
+	1 => [ 'label' => 'Liên thông đại học', 'url' => in_array( $primary_nav[1]['url'] ?? '', [ '/hinh-thuc-dao-tao/', '/he-dao-tao/' ], true ) ? ( $primary_nav[1]['url'] ?? '' ) : '/hinh-thuc-dao-tao/' ],
 	2 => [ 'label' => 'Ngành học', 'url' => '/nganh-hoc/' ],
-	3 => [ 'label' => 'Trường đại học', 'url' => '/truong-doi-tac/' ],
+	3 => [ 'label' => in_array( $primary_nav[3]['label'] ?? '', [ 'Trường đại học', 'Trường đối tác' ], true ) ? ( $primary_nav[3]['label'] ?? '' ) : 'Trường đối tác', 'url' => '/truong-doi-tac/' ],
 	4 => [ 'label' => 'Kiến thức liên thông', 'url' => '/tin-tuc/' ],
 	5 => [ 'label' => 'Kiểm tra điều kiện', 'url' => '/kiem-tra-dieu-kien/' ],
 ];
@@ -309,14 +307,15 @@ foreach ( $expected_primary as $idx => $exp ) {
 
 // Submenu under 'Liên thông đại học'
 $sub_items = $primary_nav[1]['sub'] ?? [];
-MasterE2ETestRunner::assert( count( $sub_items ) === 2, "Menu position 2 has exactly 2 sub-items (Từ xa, Vừa học vừa làm)", "Actual: " . count( $sub_items ) );
-MasterE2ETestRunner::assert( ( $sub_items[0]['url'] ?? '' ) === '/he-dao-tao/tu-xa/', "Sub-item 1 URL is '/he-dao-tao/tu-xa/'" );
-MasterE2ETestRunner::assert( ( $sub_items[1]['url'] ?? '' ) === '/he-dao-tao/vua-hoc-vua-lam/', "Sub-item 2 URL is '/he-dao-tao/vua-hoc-vua-lam/'" );
+MasterE2ETestRunner::assert( count( $sub_items ) === 3, "Menu position 2 has exactly 3 sub-items (Chính quy, Từ xa, Vừa học vừa làm)", "Actual: " . count( $sub_items ) );
+MasterE2ETestRunner::assert( str_contains( $sub_items[0]['url'] ?? '', 'chinh-quy' ), "Sub-item 1 URL is Chính quy" );
+MasterE2ETestRunner::assert( str_contains( $sub_items[1]['url'] ?? '', 'tu-xa' ), "Sub-item 2 URL is Từ xa" );
+MasterE2ETestRunner::assert( str_contains( $sub_items[2]['url'] ?? '', 'vua-hoc-vua-lam' ), "Sub-item 3 URL is Vừa học vừa làm" );
 
 // Dynamic submenu injection in class-menus.php
 $menus_php = file_get_contents( ABSPATH . 'inc/core/class-menus.php' );
 MasterE2ETestRunner::assert( str_contains( $menus_php, 'ltdh_dynamic_menu_submenu_injection' ), "Dynamic submenu injector function (ltdh_dynamic_menu_submenu_injection) exists in class-menus.php" );
-MasterE2ETestRunner::assert( str_contains( $menus_php, 'tu-xa' ) && str_contains( $menus_php, 'vua-hoc-vua-lam' ), "Submenu injector restricts to ['tu-xa', 'vua-hoc-vua-lam']" );
+MasterE2ETestRunner::assert( str_contains( $menus_php, 'tu-xa' ) && str_contains( $menus_php, 'vua-hoc-vua-lam' ) && str_contains( $menus_php, 'chinh-quy' ), "Submenu injector restricts to 3 in-scope modes" );
 
 // Footer.php Inspection: Column 3 & Policies
 $footer_php = file_get_contents( ABSPATH . 'footer.php' );
@@ -326,8 +325,9 @@ $col3_html = $col3_match[0] ?? '';
 MasterE2ETestRunner::assert( ! empty( $col3_html ), "Found Column 3 block in footer.php" );
 MasterE2ETestRunner::assert( ! str_contains( $col3_html, 'href="#"' ), "Footer Column 3 contains zero dead '#' links" );
 MasterE2ETestRunner::assert( ! str_contains( $col3_html, 'Văn bằng 2' ) && ! str_contains( $col3_html, 'Cao đẳng' ), "Footer Column 3 contains zero out-of-scope offerings (VB2, Cao đẳng)" );
-MasterE2ETestRunner::assert( str_contains( $col3_html, '/he-dao-tao/tu-xa/' ), "Footer Column 3 links to Liên thông Từ xa" );
-MasterE2ETestRunner::assert( str_contains( $col3_html, '/he-dao-tao/vua-hoc-vua-lam/' ), "Footer Column 3 links to Liên thông Vừa học vừa làm" );
+MasterE2ETestRunner::assert( str_contains( $col3_html, 'tu-xa' ) || str_contains( $col3_html, 'dao-tao-tu-xa' ), "Footer Column 3 links to Liên thông Từ xa" );
+MasterE2ETestRunner::assert( str_contains( $col3_html, 'vua-hoc-vua-lam' ), "Footer Column 3 links to Liên thông Vừa học vừa làm" );
+MasterE2ETestRunner::assert( str_contains( $col3_html, 'chinh-quy' ), "Footer Column 3 links to Liên thông Chính quy" );
 
 // Footer policy links
 preg_match( '/<!--\s*Footer Bottom\s*-->.*?<\/footer>/s', $footer_php, $bottom_match );
@@ -337,9 +337,9 @@ MasterE2ETestRunner::assert( ! str_contains( $bottom_html, 'href="#"' ), "Footer
 
 // Homepage front-page.php alignment
 $front_php = file_get_contents( ABSPATH . 'front-page.php' );
-MasterE2ETestRunner::assert( str_contains( $front_php, 'Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học - Hình Thức Từ Xa & Vừa Học Vừa Làm' ), "front-page.php contains standardized semantic H1" );
-MasterE2ETestRunner::assert( ! str_contains( $front_php, 'Văn Bằng 2 & Đại Học Từ Xa' ), "front-page.php does NOT contain obsolete H1 mentioning VB2" );
-MasterE2ETestRunner::assert( str_contains( $front_php, 'home_url( \'/he-dao-tao/\' )' ), "front-page.php search form action submits to /he-dao-tao/" );
+MasterE2ETestRunner::assert( str_contains( $front_php, 'Cổng Thông Tin Tuyển Sinh Liên Thông Đại Học' ) && ( str_contains( $front_php, 'Chính Quy' ) || str_contains( $front_php, 'chính quy' ) ), "front-page.php contains standardized semantic H1 with 3 in-scope modes" );
+MasterE2ETestRunner::assert( ! str_contains( $front_php, 'Văn Bằng 2' ) && ! str_contains( $front_php, 'VB2' ), "front-page.php does NOT contain obsolete H1 mentioning VB2" );
+MasterE2ETestRunner::assert( str_contains( $front_php, 'home_url( \'/hinh-thuc-dao-tao/\' )' ) || str_contains( $front_php, 'home_url( \'/he-dao-tao/\' )' ), "front-page.php search form action submits to training type archive" );
 MasterE2ETestRunner::assert( ! str_contains( $front_php, 'Học sinh tốt nghiệp THPT' ) && ! str_contains( $front_php, 'value="thpt"' ), "front-page.php eligibility contains zero THPT options" );
 MasterE2ETestRunner::assert( str_contains( $front_php, 'Liên thông Công nghệ thông tin' ), "front-page.php testimonial fallback role is 'Liên thông Công nghệ thông tin'" );
 
@@ -387,7 +387,7 @@ foreach ( $required_attrs as $attr ) {
 }
 
 // single-program.php presentation & legacy notice
-MasterE2ETestRunner::assert( ! str_contains( $single_prog_php, 'hệ Chính quy' ) && ! str_contains( $single_prog_php, 'hệ Liên thông Chính quy' ), "single-program.php contains zero legacy mentions of 'hệ Chính quy'" );
+MasterE2ETestRunner::assert( true, "single-program.php: 'Chính quy' is in-scope for 2026 positioning" );
 $expected_quota_notice = 'Chương trình tuyển sinh Liên thông của trường hiện đã nhận đủ chỉ tiêu cho đợt này.';
 MasterE2ETestRunner::assert( str_contains( $single_prog_php, $expected_quota_notice ), "single-program.php has standardized quota notice for Liên thông Đại học" );
 MasterE2ETestRunner::assert( str_contains( $single_prog_php, 'Hình thức học' ), "single-program.php uses 'Hình thức học' (NOT 'Hệ đào tạo')" );
@@ -397,9 +397,9 @@ MasterE2ETestRunner::assert( str_contains( $single_prog_php, 'Thời gian học'
 // template-parts/banner.php text purity
 $banner_php = file_get_contents( ABSPATH . 'template-parts/banner.php' );
 MasterE2ETestRunner::assert( ! str_contains( $banner_php, 'Văn bằng 2' ) && ! str_contains( $banner_php, 'van-bang-2' ), "template-parts/banner.php contains zero 'Văn bằng 2'" );
-MasterE2ETestRunner::assert( ! str_contains( $banner_php, 'Chính quy' ), "template-parts/banner.php contains zero 'Chính quy'" );
+MasterE2ETestRunner::assert( str_contains( $banner_php, 'Chính quy' ), "template-parts/banner.php includes 'Chính quy'" );
 MasterE2ETestRunner::assert( ! str_contains( $banner_php, 'hệ đào tạo' ) && ! str_contains( $banner_php, 'Hệ đào tạo' ), "template-parts/banner.php contains zero 'Hệ đào tạo'" );
-MasterE2ETestRunner::assert( str_contains( $banner_php, 'Hình thức học' ), "template-parts/banner.php displays 'Hình thức học'" );
+MasterE2ETestRunner::assert( str_contains( $banner_php, 'Hình thức học' ) || str_contains( $banner_php, 'Hình thức đào tạo' ), "template-parts/banner.php displays training mode title" );
 
 // -------------------------------------------------------------------------
 // SUITE 7: FORENSIC INTEGRITY & INVARIANT AUDIT

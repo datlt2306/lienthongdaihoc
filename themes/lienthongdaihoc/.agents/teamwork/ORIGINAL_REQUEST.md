@@ -379,3 +379,54 @@ Integrity mode: development
 - [ ] Báo cáo phân bổ rõ ràng ma trận ưu tiên (P0 -> P3).
 - [ ] Mỗi vấn đề đều có hướng giải quyết cụ thể (code fix, data update, hoặc cấu hình admin).
 - [ ] File báo cáo hoàn chỉnh `WEBSITE_COMPREHENSIVE_AUDIT_REPORT.md` được lưu lại trong thư mục theme.
+
+
+## 2026-10-12T12:10:12Z
+
+Thực hiện đánh giá toàn diện (Comprehensive Audit) website và codebase theme WordPress 'lienthongdaihoc' nhằm chuẩn hóa định vị kinh doanh: Website chỉ tập trung duy nhất vào **Liên thông Đại học** với 3 hình thức đào tạo: **Hệ chính quy**, **Hệ vừa học vừa làm**, và **Hệ đào tạo từ xa**. Tuyệt đối không có **Văn bằng 2** (VB2) và không có đối tượng **Tốt nghiệp THPT** (Xét tuyển từ cấp 3).
+
+Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc
+Integrity mode: development
+
+## Requirements
+
+### R1. Rà soát Nội dung & Chuẩn hóa Định vị (Content & Positioning Audit)
+Quét và phân tích toàn bộ các file template PHP, include modules (`inc/`), ACF fields, helper classes, seed/CLI commands (`inc/cli-commands.php`), và các chuỗi text tĩnh hiển thị trên giao diện.
+- Phát hiện mọi vị trí xuất hiện của thuật ngữ hoặc tính năng ngoài phạm vi: "Văn bằng 2", "VB2", "Văn bằng hai", "THPT", "Tốt nghiệp trung học phổ thông", "Xét học bạ THPT", v.v.
+- Đánh giá độ phủ và tính nhất quán của 3 hệ đào tạo mục tiêu: Hệ chính quy, Hệ vừa học vừa làm, Hệ đào tạo từ xa trên toàn bộ các trang (Trang chủ, Chi tiết trường, Chi tiết ngành, Chi tiết chương trình).
+
+### R2. Rà soát Logic Tuyển sinh, Form & Điều kiện Đăng ký (Eligibility & Forms Audit)
+Đánh giá chuyên sâu các form đăng ký tư vấn, popup tuyển sinh, công cụ tra cứu điều kiện xét tuyển (`page-eligible.php`, `inc/eligibility-rules.php`, `page-register.php`, `page-compare-program.php`):
+- Đảm bảo đối tượng đầu vào của liên thông chỉ bao gồm thí sinh đã có bằng Trung cấp hoặc Cao đẳng. Phát hiện và loại bỏ mọi lựa chọn hoặc logic tính toán liên quan đến tốt nghiệp THPT hoặc người học văn bằng 2.
+- Kiểm tra các trường chọn (select / radio / tags) về hình thức đào tạo: đảm bảo đúng 3 hệ (Chính quy, Vừa học vừa làm, Đào tạo từ xa).
+
+### R3. Rà soát Cấu trúc Điều hướng & Taxonomy (Navigation, Architecture & Taxonomy Audit)
+Kiểm tra cấu trúc Menu (Header, Footer, Mobile drawer, Breadcrumbs) và các taxonomy/archive liên quan (`taxonomy-training_type.php`, `archive-program.php`, `archive-major.php`, `archive-school.php`):
+- Xác định xem các thuật ngữ menu, bộ lọc (filter buttons), thẻ tags có bị lẫn lộn các hệ đào tạo khác hay không.
+- Đảm bảo taxonomy `training_type` phản ánh chuẩn xác 3 hệ đào tạo quy định.
+
+### R4. Rà soát SEO, Schema Markup & Metadata (SEO & Structured Data Audit)
+Kiểm tra các thẻ Meta title, Meta description, OpenGraph và Schema JSON-LD (`EducationalOccupationalProgram`, `Course`, `CollegeOrUniversity`, `BreadcrumbList`):
+- Rà soát các mẫu title/description tự động sinh ra có bị chứa từ khóa ngoài phạm vi (VB2, THPT) hay không.
+- Đảm bảo từ khóa chính và cấu trúc semantic nhắm chuẩn xác vào "Liên thông Đại học" và 3 hệ tương ứng.
+
+### R5. Lập Báo cáo Đánh giá Tổng thể & Kế hoạch Khắc phục Chi tiết (Comprehensive Audit Report & Action Plan)
+Tổng hợp toàn bộ phát hiện thành tài liệu `WEBSITE_POSITIONING_AUDIT_REPORT_2026.md` tại thư mục làm việc, bao gồm:
+1. **Executive Summary**: Điểm số tuân thủ định vị (Positioning Compliance Score) và tổng quan các vấn đề cốt lõi.
+2. **Inventory of Violations**: Danh sách chi tiết từng file, số dòng (line number), đoạn code vi phạm và lý do vi phạm.
+3. **Target Mode Consistency**: Đánh giá độ nhất quán hiển thị của 3 hệ đào tạo (Chính quy, Vừa học vừa làm, Đào tạo từ xa).
+4. **Actionable Remediation Plan**: Đề xuất cụ thể phương án sửa đổi / thay thế code (kèm diff dự kiến) cho từng file vi phạm để người dùng duyệt trước khi sửa codebase.
+
+## Acceptance Criteria
+
+### Scope & Violations Identification
+- [ ] Báo cáo liệt kê đầy đủ 100% các file và vị trí có chứa từ khóa hoặc logic liên quan đến "Văn bằng 2 / VB2" và "THPT / Trung học phổ thông".
+- [ ] Rà soát cụ thể các file nhạy cảm đã phát hiện sơ bộ (`inc/cli-commands.php`, `inc/acf-fields.php`, `inc/eligibility-rules.php`, `inc/core/class-query-filters.php`, `inc/core/class-helpers.php`, `front-page.php`, các single templates).
+
+### 3 Training Modes Coverage
+- [ ] Kiểm tra và xác nhận mọi danh mục hình thức đào tạo trên toàn site chỉ gồm 3 hệ: Chính quy, Vừa học vừa làm, Đào tạo từ xa.
+- [ ] Xác minh form đăng ký tư vấn và hệ thống tính điều kiện liên thông chỉ cho phép chọn đầu vào phù hợp (Trung cấp, Cao đẳng liên thông lên Đại học).
+
+### Safety & Deliverables
+- [ ] Không tự ý sửa đổi hoặc xóa code trong giai đoạn audit; chỉ xuất tài liệu báo cáo phân tích và phương án sửa chữa chi tiết.
+- [ ] File báo cáo `WEBSITE_POSITIONING_AUDIT_REPORT_2026.md` được tạo đầy đủ, rõ ràng và có thể kiểm chứng độc lập.

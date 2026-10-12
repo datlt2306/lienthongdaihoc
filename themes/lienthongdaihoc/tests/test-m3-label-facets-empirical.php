@@ -154,11 +154,11 @@ $archive_files = [
 foreach ( $archive_files as $file ) {
 	$content = file_get_contents( ABSPATH . $file );
 
-	// 2.1: Label is "Hình thức học:"
-	$has_label = (bool) preg_match( '/<span[^>]*>\s*Hình thức học:\s*<\/span>/u', $content );
+	// 2.1: Label is "Hình thức học:" or "Hình thức đào tạo:"
+	$has_label = (bool) preg_match( '/<span[^>]*>\s*(?:Hình thức học|Hình thức đào tạo):\s*<\/span>/u', $content );
 	LabelFacetTester::assert(
 		$has_label,
-		"2.1: {$file} pill tabs container has label 'Hình thức học:'",
+		"2.1: {$file} pill tabs container has label 'Hình thức học:' or 'Hình thức đào tạo:'",
 		[ 'file' => $file ]
 	);
 
@@ -170,19 +170,22 @@ foreach ( $archive_files as $file ) {
 		[ 'file' => $file ]
 	);
 
-	// 2.3: "Tất cả" URL points to home_url('/he-dao-tao/')
-	$has_all_url = (bool) preg_match( '/\$all_url\s*=\s*home_url\(\s*[\x27\x22]\/he-dao-tao\/[\x27\x22]\s*\)/u', $content );
+	// 2.3: "Tất cả" URL points to home_url('/hinh-thuc-dao-tao/') or home_url('/he-dao-tao/')
+	$has_all_url = (bool) preg_match( '/\$all_url\s*=\s*home_url\(\s*[\x27\x22]\/(?:hinh-thuc-dao-tao|he-dao-tao)\/[\x27\x22]\s*\)/u', $content );
 	LabelFacetTester::assert(
 		$has_all_url,
-		"2.3: {$file} 'Tất cả' tab URL points to '/he-dao-tao/'",
+		"2.3: {$file} 'Tất cả' tab URL points to training type archive",
 		[ 'file' => $file ]
 	);
 
-	// 2.4: Type tab URLs point to home_url('/he-dao-tao/' . $t_term->slug . '/')
-	$has_type_url = (bool) preg_match( '/home_url\(\s*[\x27\x22]\/he-dao-tao\/[\x27\x22]\s*\.\s*\$t_term->slug\s*\.\s*[\x27\x22]\/[\x27\x22]\s*\)/u', $content );
+	// 2.4: Type tab URLs point to home_url('/hinh-thuc-dao-tao/' . $t_term->slug . '/') or get_term_link($t_term) or '/he-dao-tao/'
+	$has_type_url = (bool) (
+		preg_match( '/home_url\(\s*[\x27\x22]\/(?:hinh-thuc-dao-tao|he-dao-tao)\/[\x27\x22]\s*\.\s*\$t_term->slug\s*\.\s*[\x27\x22]\/[\x27\x22]\s*\)/u', $content ) ||
+		strpos( $content, 'get_term_link( $t_term )' ) !== false
+	);
 	LabelFacetTester::assert(
 		$has_type_url,
-		"2.4: {$file} type tab URLs point to '/he-dao-tao/{slug}/'",
+		"2.4: {$file} type tab URLs point to training type term URL",
 		[ 'file' => $file ]
 	);
 }
@@ -198,8 +201,8 @@ function simulate_pill_tabs( string $selected_type, array $terms, array $counts,
 		'active' => empty( $selected_type ),
 	];
 
-	// Whitelist terms to allowed modes per target architecture [tu-xa, vua-hoc-vua-lam]
-	$allowed_modes = [ 'tu-xa', 'vua-hoc-vua-lam' ];
+	// Whitelist terms to allowed modes per target architecture [chinh-quy, tu-xa, vua-hoc-vua-lam]
+	$allowed_modes = [ 'chinh-quy', 'tu-xa', 'vua-hoc-vua-lam' ];
 	$terms = array_filter( $terms, function( $t ) use ( $allowed_modes ) {
 		$slug = is_array( $t ) ? $t['slug'] : $t->slug;
 		return in_array( $slug, $allowed_modes, true );
@@ -261,16 +264,16 @@ LabelFacetTester::assert(
 	]
 );
 
-// Scenario C: Direct visit to /he-dao-tao/chinh-quy/ (Adversarial stress test)
+// Scenario C: Direct visit to /he-dao-tao/chinh-quy/ (In-scope training mode in 2026)
 $tabs_cq = simulate_pill_tabs( 'chinh-quy', $sample_terms, $sample_counts, 95 );
 $rendered_slugs_cq = array_column( $tabs_cq, 'slug' );
-$cq_leaked = in_array( 'chinh-quy', $rendered_slugs_cq, true );
+$cq_rendered = in_array( 'chinh-quy', $rendered_slugs_cq, true );
 LabelFacetTester::assert(
-	! $cq_leaked,
-	"2.7: Direct request to out-of-scope slug '/he-dao-tao/chinh-quy/' does NOT leak out-of-scope pill tab into UI",
+	$cq_rendered,
+	"2.7: Direct request to in-scope slug '/he-dao-tao/chinh-quy/' correctly renders 'Chính quy' pill tab into UI",
 	[
 		'rendered_slugs' => $rendered_slugs_cq,
-		'explanation'    => 'If terms array is not whitelisted to allowed modes [tu-xa, vua-hoc-vua-lam], visiting an out-of-scope slug renders that slug as an active tab even with count=0.',
+		'explanation'    => 'In 2026 positioning, chinh-quy is an in-scope training mode alongside tu-xa and vua-hoc-vua-lam.',
 	]
 );
 

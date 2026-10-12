@@ -24,7 +24,7 @@ $address = ltdh_get_address();
 	
 	<div class="relative max-w-4xl mx-auto px-4 text-center z-10 space-y-2 animate-fade-in">
 		<h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight leading-tight uppercase">LIÊN HỆ VỚI CHÚNG TÔI</h1>
-		<p class="text-blue-100 text-sm md:text-base font-semibold max-w-xl mx-auto">Hỗ trợ giải đáp các thắc mắc về điều kiện tuyển sinh, chương trình đào tạo liên thông, văn bằng 2 và đại học từ xa.</p>
+		<p class="text-blue-100 text-sm md:text-base font-semibold max-w-xl mx-auto">Hỗ trợ giải đáp các thắc mắc về điều kiện tuyển sinh, chương trình đào tạo Liên thông Đại học (Hệ chính quy, Vừa học vừa làm, Đào tạo từ xa).</p>
 	</div>
 </section>
 

@@ -127,7 +127,7 @@ if ( ! empty( $selected_type ) ) {
 	$args['tax_query'][] = [
 		'taxonomy' => 'training_type',
 		'field'    => 'slug',
-		'terms'    => [ 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ],
+		'terms'    => [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ],
 	];
 }
 
@@ -155,7 +155,7 @@ if ( isset( $t_counts['dao-tao-tu-xa'] ) && ! isset( $t_counts['tu-xa'] ) ) {
 	$t_counts['tu-xa'] = $t_counts['dao-tao-tu-xa'];
 }
 
-$allowed_training_types = [ 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];
+$allowed_training_types = [ 'chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam' ];
 $all_types             = get_terms( [
 	'taxonomy'   => 'training_type',
 	'slug'       => $allowed_training_types,
@@ -202,7 +202,7 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 			<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-5 border-b border-slate-100 gap-3">
 				<div>
 					<h1 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-						<?php echo $active_type_term ? 'Hình thức đào tạo: ' . esc_html( preg_replace( '/^hệ\s+/iu', '', $active_type_term->name ) ) : 'Chương trình tuyển sinh Liên thông Đại học'; ?>
+						<?php echo $active_type_term ? 'Liên thông ' . esc_html( preg_replace( '/^(hệ|liên\s+thông)\s+/iu', '', $active_type_term->name ) ) : 'Chương trình tuyển sinh Liên thông Đại học'; ?>
 					</h1>
 					<p class="text-xs md:text-sm text-slate-500 mt-1">
 						Tìm thấy <strong class="text-brand-primary font-extrabold text-sm md:text-base"><?php echo esc_html( $query->found_posts ); ?></strong> chương trình phù hợp.
@@ -432,7 +432,7 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 							$badge_class = 'bg-blue-50 text-blue-700 border border-blue-200';
 						} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
 							$badge_class = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-						} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'liên thông' ) || false !== strpos( $type_name_lower, 'văn bằng 2' ) ) {
+						} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
 							$badge_class = 'bg-amber-50 text-amber-700 border border-amber-200';
 						}
 					}
