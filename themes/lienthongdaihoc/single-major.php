@@ -165,38 +165,6 @@ $major_tabs[] = [
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 			<!-- Main Column -->
 			<div class="lg:col-span-2 space-y-6 md:space-y-8">
-				
-				<?php if ( $context_school ) : 
-					$c_school_id = $context_school->ID;
-					$c_school_title = get_the_title( $c_school_id );
-					$c_school_thumb = get_the_post_thumbnail_url( $c_school_id, 'thumbnail' ) ?: ltdh_get_fallback_image( 'school' );
-					$c_school_permalink = get_permalink( $c_school_id );
-				?>
-					<!-- CONTEXT AWARENESS BANNER -->
-					<div id="ltdh-major-context-banner" data-school-slug="<?php echo esc_attr( $selected_school_slug ); ?>" class="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white rounded-2xl p-5 md:p-6 shadow-md border border-blue-800/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-						<div class="flex items-center gap-4">
-							<div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 border border-white/20 shadow-xs">
-								<img src="<?php echo esc_url( $c_school_thumb ); ?>" alt="<?php echo esc_attr( $c_school_title ); ?>" class="w-full h-full object-contain">
-							</div>
-							<div>
-								<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-200 text-xs font-bold border border-blue-400/30 mb-1">
-									<span>🎓</span> <span>Trường tuyển sinh chọn sẵn</span>
-								</div>
-								<h2 class="text-base md:text-xl font-black text-white leading-snug">
-									Ngành <?php the_title(); ?> — <?php echo esc_html( $c_school_title ); ?>
-								</h2>
-								<p class="text-xs md:text-sm text-blue-100/80 mt-0.5">
-									Đang ưu tiên hiển thị thông tin đào tạo và các lớp tuyển sinh thuộc <strong><?php echo esc_html( $c_school_title ); ?></strong>
-								</p>
-							</div>
-						</div>
-						<div class="flex items-center gap-2 w-full md:w-auto">
-							<a href="<?php echo esc_url( $c_school_permalink ); ?>" class="w-full md:w-auto text-xs md:text-sm font-extrabold bg-white text-blue-900 px-4 py-2.5 rounded-xl hover:bg-blue-50 transition-all text-center whitespace-nowrap shadow-sm">
-								Trang trường ➔
-							</a>
-						</div>
-					</div>
-				<?php endif; ?>
 
 
 				<!-- OVERVIEW -->
@@ -411,7 +379,7 @@ $major_tabs[] = [
 
 			<!-- Sidebar Column -->
 			<div class="lg:col-span-1">
-				<?php get_sidebar( 'major' ); ?>
+				<?php get_sidebar( 'major', [ 'school_id' => $context_school ? $context_school->ID : 0 ] ); ?>
 			</div>
 		</div>
 

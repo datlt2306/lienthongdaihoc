@@ -86,6 +86,7 @@ function ltdh_widgets_init() {
 	register_widget( 'LTDH_Widget_Hotline' );
 	register_widget( 'LTDH_Widget_Consultation_Form' );
 	register_widget( 'LTDH_Widget_Zalo_Community' );
+	register_widget( 'LTDH_Widget_School_Info' );
 }
 add_action( 'widgets_init', 'ltdh_widgets_init' );
 
@@ -551,6 +552,18 @@ class LTDH_Widget_Consultation_Form extends WP_Widget {
 					$hidden['current_school_id'] = get_the_ID();
 				} elseif ( is_singular( 'major' ) ) {
 					$hidden['current_major_id'] = get_the_ID();
+					$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
+					if ( ! empty( $school_param ) ) {
+						if ( is_numeric( $school_param ) ) {
+							$s_post = get_post( intval( $school_param ) );
+						} else {
+							$cpt_school = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
+							$s_post     = get_page_by_path( sanitize_title( $school_param ), OBJECT, $cpt_school );
+						}
+						if ( $s_post && 'publish' === $s_post->post_status && ( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) === $s_post->post_type ) {
+							$hidden['current_school_id'] = $s_post->ID;
+						}
+					}
 				}
 				ltdh_render_consultation_form( $hidden );
 			}
@@ -708,6 +721,144 @@ class LTDH_Widget_Zalo_Community extends WP_Widget {
 
 
 // =========================================================================
+// CUSTOM WIDGET 7: THÔNG TIN TRƯỜNG ĐÀO TẠO (TỰ ĐỘNG THEO NGỮ CẢNH)
+// =========================================================================
+class LTDH_Widget_School_Info extends WP_Widget {
+
+	public function __construct() {
+		parent::__construct(
+			'ltdh_school_info',
+			__( '[LTDH] Thông tin trường đào tạo', 'ltdh' ),
+			[
+				'description'                 => __( 'Tự động hiển thị thẻ thông tin trường đối tác (ảnh bìa, logo, tên trường, địa chỉ, website, nút xem chi tiết) theo ngữ cảnh trang hoặc URL (?truong=...).', 'ltdh' ),
+				'customize_selective_refresh' => true,
+			]
+		);
+	}
+
+	/**
+	 * Detect school ID from context (URL parameter, single program, single school, or manual override).
+	 *
+	 * @param array $instance
+	 * @return int
+	 */
+	public function get_school_id( $instance ) {
+		// 1. If a manual school is selected in settings (not 'auto' and numeric)
+		if ( ! empty( $instance['school_id'] ) && 'auto' !== $instance['school_id'] && is_numeric( $instance['school_id'] ) ) {
+			return (int) $instance['school_id'];
+		}
+
+		// 2. Check URL query parameters (?truong=..., ?school=..., ?from_school=...)
+		$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
+		if ( ! empty( $school_param ) ) {
+			if ( is_numeric( $school_param ) ) {
+				$s_post = get_post( intval( $school_param ) );
+			} else {
+				$cpt_school = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
+				$s_post     = get_page_by_path( sanitize_title( $school_param ), OBJECT, $cpt_school );
+			}
+			if ( $s_post && 'publish' === $s_post->post_status && ( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) === $s_post->post_type ) {
+				return $s_post->ID;
+			}
+		}
+
+		// 3. Check Single Program
+		if ( is_singular( 'program' ) ) {
+			$prog_id    = get_the_ID();
+			$school_rel = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $prog_id ) : ( get_field( 'school_relationship', $prog_id ) ?: get_post_meta( $prog_id, 'school_relationship', true ) );
+			if ( is_array( $school_rel ) ) {
+				$school_rel = ! empty( $school_rel ) ? ( is_object( $school_rel[0] ) ? $school_rel[0]->ID : $school_rel[0] ) : 0;
+			} elseif ( is_object( $school_rel ) ) {
+				$school_rel = $school_rel->ID;
+			}
+			$school_rel = (int) $school_rel;
+			if ( $school_rel && 'publish' === get_post_status( $school_rel ) ) {
+				return $school_rel;
+			}
+		}
+
+		// 4. Check Single School
+		if ( is_singular( 'school' ) ) {
+			return get_the_ID();
+		}
+
+		return 0;
+	}
+
+	public function widget( $args, $instance ) {
+		$school_id     = $this->get_school_id( $instance );
+		$hide_if_empty = isset( $instance['hide_if_empty'] ) ? (bool) $instance['hide_if_empty'] : true;
+
+		if ( ! $school_id ) {
+			if ( $hide_if_empty ) {
+				return;
+			}
+			return;
+		}
+
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : '';
+
+		// Strip default padding/borders from the widget wrapper to let the card render edge-to-edge
+		$custom_before = preg_replace( '/\b(p-[0-9]+|md:p-[0-9]+|bg-white|border|border-slate-200|shadow-xs)\b/', '', $args['before_widget'] );
+		echo $custom_before;
+
+		if ( ! empty( $title ) ) {
+			echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
+		}
+
+		if ( function_exists( 'ltdh_render_school_info_card' ) ) {
+			ltdh_render_school_info_card( $school_id, 'bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden' );
+		}
+
+		echo $args['after_widget'];
+	}
+
+	public function form( $instance ) {
+		$title         = ! empty( $instance['title'] ) ? $instance['title'] : '';
+		$selected_id   = ! empty( $instance['school_id'] ) ? $instance['school_id'] : 'auto';
+		$hide_if_empty = isset( $instance['hide_if_empty'] ) ? (bool) $instance['hide_if_empty'] : true;
+
+		$schools = get_posts( [
+			'post_type'      => defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		] );
+		?>
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Tiêu đề widget (tùy chọn, để trống sẽ hiển thị thẻ tràn viền đẹp mắt):', 'ltdh' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'school_id' ) ); ?>"><?php esc_html_e( 'Chế độ lấy thông tin trường:', 'ltdh' ); ?></label>
+			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'school_id' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'school_id' ) ); ?>">
+				<option value="auto" <?php selected( $selected_id, 'auto' ); ?>>⚡ Tự động nhận diện (URL ?truong=... hoặc Trang trường / Chương trình)</option>
+				<?php foreach ( $schools as $sch ) : ?>
+					<option value="<?php echo esc_attr( $sch->ID ); ?>" <?php selected( $selected_id, (string) $sch->ID ); ?>>
+						<?php echo esc_html( $sch->post_title ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+		</p>
+		<p>
+			<input class="checkbox" type="checkbox" <?php checked( $hide_if_empty ); ?> id="<?php echo esc_attr( $this->get_field_id( 'hide_if_empty' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'hide_if_empty' ) ); ?>" value="1">
+			<label for="<?php echo esc_attr( $this->get_field_id( 'hide_if_empty' ) ); ?>"><?php esc_html_e( 'Tự động ẩn widget nếu không có thông tin trường', 'ltdh' ); ?></label>
+		</p>
+		<?php
+	}
+
+	public function update( $new_instance, $old_instance ) {
+		$instance                  = [];
+		$instance['title']         = sanitize_text_field( $new_instance['title'] ?? '' );
+		$instance['school_id']     = sanitize_text_field( $new_instance['school_id'] ?? 'auto' );
+		$instance['hide_if_empty'] = ! empty( $new_instance['hide_if_empty'] );
+		return $instance;
+	}
+}
+
+
+// =========================================================================
 // DEFAULT SIDEBAR FALLBACK RENDERERS
 // =========================================================================
 
@@ -855,6 +1006,48 @@ function ltdh_render_default_guide_sidebar() {
 	] );
 }
 
+if ( ! function_exists( 'ltdh_render_school_info_card' ) ) {
+	/**
+	 * Render School Info Card (for sidebars).
+	 *
+	 * @param int    $school_id
+	 * @param string $wrapper_class
+	 */
+	function ltdh_render_school_info_card( $school_id, $wrapper_class = 'bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden' ) {
+		if ( ! $school_id ) {
+			return;
+		}
+		$school_title     = get_the_title( $school_id );
+		$school_logo_url  = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'thumbnail' ) : get_stylesheet_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp';
+		$school_cover_url = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ( function_exists( 'ltdh_get_fallback_image' ) ? ltdh_get_fallback_image( 'school' ) : '' );
+		$school_address   = get_post_meta( $school_id, 'address', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'address', $school_id ) : '' ) ?: 'Việt Nam';
+		?>
+		<div class="<?php echo esc_attr( $wrapper_class ); ?>">
+			<div class="h-28 bg-cover bg-center relative" style="background-image: url('<?php echo esc_url( $school_cover_url ); ?>');">
+				<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+			</div>
+			<div class="p-4 sm:p-5 text-center relative -mt-12">
+				<div class="w-20 h-20 rounded-2xl bg-white p-2 shadow-md mx-auto mb-3 border border-slate-100 flex items-center justify-center overflow-hidden">
+					<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain">
+				</div>
+				<h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug mb-1">
+					<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="hover:text-brand-primary transition-colors">
+						<?php echo esc_html( $school_title ); ?>
+					</a>
+				</h3>
+				<p class="text-xs text-slate-500 mb-3 line-clamp-2">📍 <?php echo esc_html( $school_address ); ?></p>
+
+				<div class="border-t border-slate-100 pt-3">
+					<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="text-brand-primary font-bold text-xs sm:text-sm hover:underline flex items-center justify-center gap-1">
+						<span>Xem chi tiết trường</span> <span>→</span>
+					</a>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
+}
+
 /**
  * Render default program sidebar when no widgets are active in 'sidebar-program'.
  *
@@ -872,49 +1065,11 @@ function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
 	$school_title = $school_id ? get_the_title( $school_id ) : '';
 	?>
 	<!-- SCHOOL INFO CARD (Desktop Only >= 1024px) -->
-	<?php if ( $school_id ) : 
-		$school_logo_url  = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'thumbnail' ) : get_stylesheet_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp';
-		$school_cover_url = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ( function_exists( 'ltdh_get_fallback_image' ) ? ltdh_get_fallback_image( 'school' ) : '' );
-		$school_address   = get_post_meta( $school_id, 'address', true ) ?: get_field( 'address', $school_id ) ?: 'Việt Nam';
-		$school_web       = get_field( 'website', $school_id );
-		
-		$words = explode( ' ', $school_title );
-		$initials = '';
-		foreach ( array_slice( $words, -3 ) as $w ) {
-			$initials .= mb_substr( $w, 0, 1 );
-		}
+	<?php 
+	if ( $school_id ) {
+		ltdh_render_school_info_card( $school_id, 'hidden lg:block bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden' );
+	}
 	?>
-		<div class="hidden lg:block bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-			<div class="h-28 bg-cover bg-center relative" style="background-image: url('<?php echo esc_url( $school_cover_url ); ?>');">
-				<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-			</div>
-			<div class="p-4 sm:p-5 text-center relative -mt-12">
-				<div class="w-20 h-20 rounded-2xl bg-white p-2 shadow-md mx-auto mb-3 border border-slate-100 flex items-center justify-center overflow-hidden">
-					<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain">
-				</div>
-				<h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug mb-1">
-					<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="hover:text-brand-primary transition-colors">
-						<?php echo esc_html( $school_title ); ?>
-					</a>
-				</h3>
-				<p class="text-xs text-slate-500 mb-3 line-clamp-2">📍 <?php echo esc_html( $school_address ); ?></p>
-				
-				<?php if ( $school_web ) : ?>
-					<div class="mb-3">
-						<a href="<?php echo esc_url( $school_web ); ?>" target="_blank" rel="noopener noreferrer" class="text-xs text-brand-primary font-bold hover:underline inline-flex items-center gap-1">
-							<span>🌐 Website trường</span> ↗
-						</a>
-					</div>
-				<?php endif; ?>
-
-				<div class="border-t border-slate-100 pt-3">
-					<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="text-brand-primary font-bold text-xs sm:text-sm hover:underline flex items-center justify-center gap-1">
-						<span>Xem chi tiết trường</span> <span>→</span>
-					</a>
-				</div>
-			</div>
-		</div>
-	<?php endif; ?>
 
 	<!-- CONSULTATION FORM -->
 	<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
@@ -1280,30 +1435,40 @@ function ltdh_render_default_school_sidebar( $school_id ) {
  * Render default major sidebar when no widgets are active in 'sidebar-major'.
  *
  * @param int $major_id
+ * @param int $school_id
  */
-function ltdh_render_default_major_sidebar( $major_id ) {
-	$global_zalo    = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me';
-	$hotline        = function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496';
-	$major_title    = get_the_title( $major_id );
-	$c_school_id    = isset( $_GET['truong'] ) ? absint( $_GET['truong'] ) : 0;
-	$context_school = $c_school_id && 'school' === get_post_type( $c_school_id );
-	$c_school_title = $context_school ? get_the_title( $c_school_id ) : '';
-	$c_school_thumb = $context_school ? ( function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $c_school_id, 'thumbnail' ) : ( get_the_post_thumbnail_url( $c_school_id, 'thumbnail' ) ?: get_stylesheet_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp' ) ) : '';
+function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
+	$global_zalo = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me';
+	$hotline     = function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496';
+	$major_title = get_the_title( $major_id );
+
+	if ( ! $school_id ) {
+		$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
+		if ( ! empty( $school_param ) ) {
+			if ( is_numeric( $school_param ) ) {
+				$s_post = get_post( intval( $school_param ) );
+			} else {
+				$cpt_school = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
+				$s_post     = get_page_by_path( sanitize_title( $school_param ), OBJECT, $cpt_school );
+			}
+			if ( $s_post && 'publish' === $s_post->post_status && ( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) === $s_post->post_type ) {
+				$school_id = $s_post->ID;
+			}
+		}
+	}
+
+	$context_school  = $school_id && ( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) === get_post_type( $school_id );
+	$c_school_title  = $context_school ? get_the_title( $school_id ) : '';
+	$program_hotline = ( $context_school ? ( get_post_meta( $school_id, 'hotline', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'hotline', $school_id ) : '' ) ) : '' ) ?: $hotline;
 	?>
+
+	<!-- SCHOOL INFO CARD (When navigating from school) -->
+	<?php if ( $context_school ) : ?>
+		<?php ltdh_render_school_info_card( $school_id ); ?>
+	<?php endif; ?>
+
 	<!-- Consultation Form -->
 	<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-		<?php if ( $context_school ) : ?>
-			<div class="flex items-center gap-3 p-3.5 mb-4 rounded-xl bg-blue-50/80 border border-blue-100/90 shadow-2xs">
-				<div class="w-11 h-11 rounded-lg bg-white p-1 flex items-center justify-center shrink-0 border border-blue-200/60 shadow-2xs">
-					<img src="<?php echo esc_url( $c_school_thumb ); ?>" alt="<?php echo esc_attr( $c_school_title ); ?>" class="w-full h-full object-contain">
-				</div>
-				<div class="min-w-0 flex-1">
-					<span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-blue-700">🎓 Trường tuyển sinh chọn sẵn</span>
-					<h4 class="text-xs sm:text-sm font-extrabold text-slate-900 truncate leading-snug"><?php echo esc_html( $c_school_title ); ?></h4>
-				</div>
-			</div>
-		<?php endif; ?>
-
 		<h3 id="ltdh-sidebar-form-title" class="text-lg font-bold text-slate-900 mb-2">
 			<?php if ( $context_school ) : ?>
 				Đăng ký tư vấn ngành <?php echo esc_html( $major_title ); ?> — <?php echo esc_html( $c_school_title ); ?>
@@ -1326,7 +1491,7 @@ function ltdh_render_default_major_sidebar( $major_id ) {
 				'referral_source'  => get_permalink(),
 			];
 			if ( $context_school ) {
-				$consultation_hidden['current_school_id'] = $c_school_id;
+				$consultation_hidden['current_school_id'] = $school_id;
 			}
 			ltdh_render_consultation_form( $consultation_hidden );
 		}
@@ -1425,7 +1590,7 @@ function ltdh_render_default_major_sidebar( $major_id ) {
 	<!-- Contact Info Card -->
 	<?php
 	get_template_part( 'template-parts/sidebar-hotline', null, [
-		'hotline'  => $hotline,
+		'hotline'  => $program_hotline,
 		'zalo_url' => $global_zalo,
 		'title'    => 'Văn phòng tuyển sinh',
 	] );
