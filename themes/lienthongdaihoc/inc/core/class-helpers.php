@@ -40,6 +40,111 @@ function ltdh_get_zalo_url(): string {
 }
 
 /**
+ * Detect the current school ID based on the viewed page/context.
+ *
+ * @return int School ID or 0 if not found.
+ */
+function ltdh_get_current_context_school_id(): int {
+	// 1. Direct school singular
+	if ( is_singular( 'school' ) ) {
+		return (int) get_the_ID();
+	}
+
+	// 2. Query parameters (?truong=..., ?school=..., ?from_school=...)
+	$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
+	if ( ! empty( $school_param ) ) {
+		if ( is_numeric( $school_param ) ) {
+			$sid = (int) $school_param;
+			if ( $sid && 'school' === get_post_type( $sid ) && 'publish' === get_post_status( $sid ) ) {
+				return $sid;
+			}
+		} else {
+			$cpt_school = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
+			$s_post     = get_page_by_path( sanitize_title( $school_param ), OBJECT, $cpt_school );
+			if ( $s_post && 'publish' === $s_post->post_status && $cpt_school === $s_post->post_type ) {
+				return (int) $s_post->ID;
+			}
+		}
+	}
+
+	// 3. Program singular
+	if ( is_singular( 'program' ) ) {
+		$prog_id = get_the_ID();
+		if ( function_exists( 'ltdh_get_program_school_id' ) ) {
+			$sid = ltdh_get_program_school_id( $prog_id );
+			if ( $sid ) {
+				return (int) $sid;
+			}
+		}
+		$school_rel = function_exists( 'get_field' ) ? get_field( 'school_relationship', $prog_id ) : get_post_meta( $prog_id, 'school_relationship', true );
+		if ( ! empty( $school_rel ) ) {
+			if ( is_array( $school_rel ) ) {
+				$first = reset( $school_rel );
+				return is_object( $first ) ? (int) $first->ID : (int) $first;
+			}
+			return is_object( $school_rel ) ? (int) $school_rel->ID : (int) $school_rel;
+		}
+	}
+
+	// 4. Post or guide singular
+	if ( is_singular( [ 'post', 'guide' ] ) ) {
+		$post_id    = get_the_ID();
+		$school_rel = function_exists( 'get_field' ) ? get_field( 'school_relationship', $post_id ) : get_post_meta( $post_id, 'school_relationship', true );
+		if ( ! empty( $school_rel ) ) {
+			if ( is_array( $school_rel ) ) {
+				$first = reset( $school_rel );
+				return is_object( $first ) ? (int) $first->ID : (int) $first;
+			}
+			return is_object( $school_rel ) ? (int) $school_rel->ID : (int) $school_rel;
+		}
+	}
+
+	return 0;
+}
+
+/**
+ * Get the Zalo group URL for a specific school or the current context school.
+ *
+ * @param int $school_id School ID (0 to auto-detect from context).
+ * @return string Zalo URL.
+ */
+function ltdh_get_school_zalo_group_url( int $school_id = 0 ): string {
+	if ( ! $school_id ) {
+		$school_id = ltdh_get_current_context_school_id();
+	}
+	if ( $school_id ) {
+		$url = function_exists( 'get_field' ) ? ( get_field( 'zalo_group_url', $school_id ) ?: get_field( 'school_zalo_group', $school_id ) ) : '';
+		if ( empty( $url ) ) {
+			$url = get_post_meta( $school_id, 'zalo_group_url', true ) ?: get_post_meta( $school_id, 'school_zalo_group', true );
+		}
+		if ( ! empty( $url ) && is_string( $url ) ) {
+			return trim( $url );
+		}
+	}
+	return ltdh_get_zalo_url();
+}
+
+/**
+ * Get the hotline for a specific school or the current context school.
+ *
+ * @param int $school_id School ID (0 to auto-detect from context).
+ * @return string Hotline string.
+ */
+function ltdh_get_school_hotline( int $school_id = 0 ): string {
+	if ( ! $school_id ) {
+		$school_id = ltdh_get_current_context_school_id();
+	}
+	if ( $school_id ) {
+		$phone = get_post_meta( $school_id, 'hotline', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'hotline', $school_id ) : '' );
+		if ( ! empty( $phone ) && is_string( $phone ) ) {
+			return trim( $phone );
+		}
+	}
+	return ltdh_get_hotline();
+}
+
+
+/**
  * Get the global Messenger URL.
  */
 function ltdh_get_messenger_url(): string {
@@ -198,17 +303,6 @@ function ltdh_get_program_school_id( int $program_id ): int {
 	}
 
 	return 0;
-}
-
-/**
- * Get a school's effective hotline: school → global.
- */
-function ltdh_get_school_hotline(int $school_id): string {
-	$school_hotline = '';
-	if (function_exists('get_field')) {
-		$school_hotline = get_field('hotline', $school_id);
-	}
-	return $school_hotline ?: ltdh_get_hotline();
 }
 
 // ----------------------------------------------------
@@ -1701,3 +1795,300 @@ function ltdh_get_school_training_types( int $school_id, string $output_format =
 	wp_cache_set( $cache_key, $result, 'ltdh', HOUR_IN_SECONDS );
 	return $result;
 }
+
+/**
+ * Format admission fee display with '/ hồ sơ' unit and currency formatting.
+ *
+ * @param mixed $fee Raw admission fee value from meta/ACF.
+ * @return array Array with keys 'display' and 'is_free'.
+ */
+function ltdh_format_admission_fee( $fee ): array {
+	if ( '' === $fee || null === $fee || false === $fee ) {
+		return [ 'display' => '', 'is_free' => false ];
+	}
+	$fee_str = trim( (string) $fee );
+	if ( '' === $fee_str ) {
+		return [ 'display' => '', 'is_free' => false ];
+	}
+
+	$fee_lower = mb_strtolower( $fee_str, 'UTF-8' );
+	$is_free   = in_array( $fee_lower, [ '0', '0đ', '0 đ', '0d', '0 d', 'miễn phí', 'mien phi', 'không thu', 'khong thu', 'miễn lệ phí' ], true );
+
+	if ( $is_free ) {
+		return [
+			'display' => 'Miễn phí / hồ sơ',
+			'is_free' => true,
+		];
+	}
+
+	// If already contains "hồ sơ" or "ho so"
+	if ( preg_match( '/\b(hồ sơ|ho so|hs)\b/iu', $fee_str ) ) {
+		return [
+			'display' => $fee_str,
+			'is_free' => false,
+		];
+	}
+
+	// Check if it's purely digits (e.g. "200000")
+	if ( ctype_digit( $fee_str ) ) {
+		return [
+			'display' => number_format( (float) $fee_str, 0, ',', '.' ) . ' đ / hồ sơ',
+			'is_free' => false,
+		];
+	}
+
+	// Check if string contains numbers with optional separators (e.g. "200.000" or "200.000đ" or "200,000")
+	$clean_num = preg_replace( '/[^\d]/', '', $fee_str );
+	if ( is_numeric( $clean_num ) && (float) $clean_num > 0 ) {
+		if ( preg_match( '/^[\d.,\s]+(?:đ|vnđ|vnd)?$/iu', $fee_str ) ) {
+			return [
+				'display' => number_format( (float) $clean_num, 0, ',', '.' ) . ' đ / hồ sơ',
+				'is_free' => false,
+			];
+		}
+	}
+
+	// Fallback: append " / hồ sơ"
+	return [
+		'display' => rtrim( $fee_str, ' /' ) . ' / hồ sơ',
+		'is_free' => false,
+	];
+}
+
+/**
+ * Lấy dữ liệu phân loại đối tượng tuyển sinh theo văn bằng (Ngành đúng / Ngành gần / Học bổ sung)
+ *
+ * @param int $program_id
+ * @return array|null
+ */
+function ltdh_get_program_target_majors( int $program_id ): ?array {
+	// Helper tách chuỗi thành mảng danh sách ngành
+	$parse_items = function( $val ) {
+		if ( is_array( $val ) ) {
+			return array_values( array_filter( array_map( 'trim', $val ) ) );
+		}
+		if ( empty( $val ) ) {
+			return [];
+		}
+		$lines = preg_split( '/[\r\n;]+/', (string) $val );
+		return array_values( array_filter( array_map( 'trim', $lines ) ) );
+	};
+
+	// 1. Kiểm tra ACF fields nếu được lưu trong admin
+	$custom_proper = function_exists( 'get_field' ) ? get_field( 'admission_target_proper_majors', $program_id ) : get_post_meta( $program_id, 'admission_target_proper_majors', true );
+	$custom_near   = function_exists( 'get_field' ) ? get_field( 'admission_target_near_majors', $program_id ) : get_post_meta( $program_id, 'admission_target_near_majors', true );
+	$custom_note   = function_exists( 'get_field' ) ? get_field( 'admission_bridge_courses_note', $program_id ) : get_post_meta( $program_id, 'admission_bridge_courses_note', true );
+	$custom_cnt    = function_exists( 'get_field' ) ? get_field( 'admission_bridge_courses_count', $program_id ) : get_post_meta( $program_id, 'admission_bridge_courses_count', true );
+
+	$major_id   = function_exists( 'get_field' ) ? get_field( LTDH_META_MAJOR_REL, $program_id ) : 0;
+	$major_name = $major_id ? get_the_title( $major_id ) : get_the_title( $program_id );
+
+	if ( ! empty( $custom_proper ) || ! empty( $custom_near ) ) {
+		return [
+			'title'                => 'Quy định đối tượng tuyển sinh liên thông (Từ Cao đẳng lên Đại học)',
+			'major_name'           => $major_name ?: 'Công nghệ thông tin',
+			'proper_majors'        => $parse_items( $custom_proper ),
+			'near_majors'          => $parse_items( $custom_near ),
+			'bridge_courses_count' => is_numeric( $custom_cnt ) ? (int) $custom_cnt : 3,
+			'bridge_courses_note'  => $custom_note ?: 'Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.',
+		];
+	}
+
+	// 2. Tự động nhận diện theo ngành của chương trình nếu admin chưa nhập riêng
+	$major_slug = $major_id ? get_post_field( 'post_name', $major_id ) : '';
+	$is_cntt    = false;
+	if ( $major_slug && ( str_contains( $major_slug, 'cong-nghe-thong-tin' ) || str_contains( $major_slug, 'cntt' ) || str_contains( $major_slug, 'tin-hoc' ) ) ) {
+		$is_cntt = true;
+	} else {
+		$prog_title_lower = mb_strtolower( (string) $major_name, 'UTF-8' );
+		if ( str_contains( $prog_title_lower, 'công nghệ thông tin' ) || str_contains( $prog_title_lower, 'cntt' ) ) {
+			$is_cntt = true;
+		}
+	}
+
+	if ( $is_cntt ) {
+		return [
+			'title'                => 'Quy định đối tượng tuyển sinh liên thông (Từ Cao đẳng lên Đại học)',
+			'major_name'           => 'Công nghệ thông tin',
+			'proper_majors'        => [
+				'Khoa học máy tính',
+				'Công nghệ thông tin',
+				'Ứng dụng phần mềm',
+				'Công nghệ kỹ thuật máy tính',
+				'Lập trình máy tính',
+			],
+			'near_majors'          => [
+				'Kỹ thuật sửa chữa lắp ráp máy tính',
+				'Thiết kế mạch điện tử trên máy tính',
+				'Truyền thông và mạng máy tính',
+				'Công nghệ kỹ thuật máy tính',
+				'Điện tử máy tính',
+				'Đồ họa đa phương tiện',
+				'Tin học văn phòng',
+				'Tin học viễn thông ứng dụng',
+				'Tin học ứng dụng',
+				'Xử lý dữ liệu',
+				'Quản trị cơ sở dữ liệu',
+				'Quản trị mạng máy tính',
+				'và các ngành tương đương',
+			],
+			'bridge_courses_count' => 3,
+			'bridge_courses_note'  => 'Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.',
+		];
+	}
+
+	return null;
+}
+
+/**
+ * Lấy danh sách các hình thức đào tạo thực tế có chương trình đang tuyển sinh của một ngành.
+ *
+ * @param int $major_id ID của ngành (CPT major).
+ * @return array Mảng các hình thức: [ 'tu-xa' => [ 'slug' => 'tu-xa', 'name' => 'Đào tạo từ xa', 'dot' => 'bg-emerald-500' ], ... ]
+ */
+function ltdh_get_major_training_types( int $major_id ): array {
+	if ( ! $major_id ) {
+		return [];
+	}
+
+	$cache_key = 'ltdh_major_training_types_' . $major_id;
+	$cached    = wp_cache_get( $cache_key, 'ltdh' );
+	if ( false !== $cached && is_array( $cached ) ) {
+		return $cached;
+	}
+
+	$offered_program_ids = get_post_meta( $major_id, LTDH_META_OFFERED_PROGRAMS, true );
+	$direct_prog_ids     = get_posts( [
+		'post_type'   => LTDH_CPT_PROGRAM,
+		'post_status' => 'publish',
+		'numberposts' => -1,
+		'fields'      => 'ids',
+		'meta_query'  => [
+			'relation' => 'OR',
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => $major_id,
+				'compare' => '=',
+			],
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => '"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => 's:' . strlen( (string) $major_id ) . ':"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => 'i:' . $major_id . ';',
+				'compare' => 'LIKE',
+			],
+		],
+	] );
+
+	$candidate_ids = array_unique( array_filter( array_merge(
+		is_array( $offered_program_ids ) ? $offered_program_ids : [],
+		is_array( $direct_prog_ids ) ? $direct_prog_ids : []
+	) ) );
+
+	$meta_query = [
+		'relation' => 'AND',
+		[
+			'relation' => 'OR',
+			[
+				'key'     => LTDH_META_ADMISSION_STATUS,
+				'value'   => 'tam-ngung',
+				'compare' => '!=',
+			],
+			[
+				'key'     => LTDH_META_ADMISSION_STATUS,
+				'compare' => 'NOT EXISTS',
+			],
+		],
+	];
+
+	$args = [
+		'post_type'      => LTDH_CPT_PROGRAM,
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+		'no_found_rows'  => true,
+		'meta_query'     => $meta_query,
+	];
+
+	if ( ! empty( $candidate_ids ) ) {
+		$args['post__in'] = $candidate_ids;
+	} else {
+		$meta_query[] = [
+			'relation' => 'OR',
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => $major_id,
+				'compare' => '=',
+			],
+			[
+				'key'     => LTDH_META_MAJOR_REL,
+				'value'   => '"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+		];
+		$args['meta_query'] = $meta_query;
+	}
+
+	$prog_ids = get_posts( $args );
+	if ( empty( $prog_ids ) ) {
+		wp_cache_set( $cache_key, [], 'ltdh', HOUR_IN_SECONDS );
+		return [];
+	}
+
+	$available_types = [];
+
+	foreach ( $prog_ids as $p_id ) {
+		$school_rel_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $p_id ) : intval( get_post_meta( $p_id, LTDH_META_SCHOOL_REL, true ) );
+		if ( ! $school_rel_id || 'publish' !== get_post_status( $school_rel_id ) ) {
+			continue;
+		}
+
+		$terms = wp_get_post_terms( $p_id, LTDH_TAX_TRAINING_TYPE );
+		if ( empty( $terms ) || is_wp_error( $terms ) ) {
+			continue;
+		}
+
+		foreach ( $terms as $term ) {
+			$raw_slug       = $term->slug;
+			$canonical_slug = $raw_slug;
+			$dot_class      = 'bg-slate-400';
+			$name           = $term->name;
+
+			if ( in_array( $raw_slug, [ 'tu-xa', 'dao-tao-tu-xa' ], true ) ) {
+				$canonical_slug = 'tu-xa';
+				$name           = 'Đào tạo từ xa';
+				$dot_class      = 'bg-emerald-500';
+			} elseif ( in_array( $raw_slug, [ 'vua-hoc-vua-lam', 'vhvl', 'vua-lam-vua-hoc' ], true ) ) {
+				$canonical_slug = 'vua-hoc-vua-lam';
+				$name           = 'Vừa học vừa làm';
+				$dot_class      = 'bg-amber-500';
+			} elseif ( in_array( $raw_slug, [ 'chinh-quy', 'chinh-quy-tap-trung' ], true ) ) {
+				$canonical_slug = 'chinh-quy';
+				$name           = 'Chính quy';
+				$dot_class      = 'bg-blue-500';
+			}
+
+			if ( ! isset( $available_types[ $canonical_slug ] ) ) {
+				$available_types[ $canonical_slug ] = [
+					'slug' => $canonical_slug,
+					'name' => $name,
+					'dot'  => $dot_class,
+				];
+			}
+		}
+	}
+
+	wp_cache_set( $cache_key, $available_types, 'ltdh', HOUR_IN_SECONDS );
+	return $available_types;
+}
+
+
+

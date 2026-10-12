@@ -142,6 +142,12 @@ function ltdh_override_field_program_tuition_label( $field ) {
 	return $field;
 }
 
+add_filter( 'acf/load_field/key=field_program_admission_fee', 'ltdh_override_field_program_admission_fee_label' );
+function ltdh_override_field_program_admission_fee_label( $field ) {
+	$field['label'] = 'Lệ phí xét tuyển (trên 1 hồ sơ)';
+	return $field;
+}
+
 add_filter( 'acf/load_field/key=field_program_duration', 'ltdh_override_field_program_duration_label' );
 function ltdh_override_field_program_duration_label( $field ) {
 	$field['label'] = 'Thời gian học';
@@ -171,6 +177,57 @@ add_filter( 'acf/load_field/key=field_tab_prog_requirements', 'ltdh_override_fie
 function ltdh_override_field_program_requirements_tab_label( $field ) {
 	$field['label'] = 'Điều kiện & Hồ sơ xét tuyển';
 	return $field;
+}
+
+// Provide intelligent defaults for Target Majors fields in Program Admin if empty
+add_filter( 'acf/load_value/name=admission_target_proper_majors', 'ltdh_default_target_proper_majors', 10, 3 );
+function ltdh_default_target_proper_majors( $value, $post_id, $field ) {
+	if ( ! empty( $value ) ) {
+		return $value;
+	}
+	$major_id   = function_exists( 'get_field' ) ? get_field( LTDH_META_MAJOR_REL, $post_id ) : 0;
+	$major_slug = $major_id ? get_post_field( 'post_name', $major_id ) : '';
+	$title      = get_the_title( $post_id );
+	if ( ( $major_slug && ( str_contains( $major_slug, 'thong-tin' ) || str_contains( $major_slug, 'cntt' ) ) ) || str_contains( mb_strtolower( (string) $title, 'UTF-8' ), 'thông tin' ) ) {
+		return "Khoa học máy tính\nCông nghệ thông tin\nỨng dụng phần mềm\nCông nghệ kỹ thuật máy tính\nLập trình máy tính";
+	}
+	return $value;
+}
+
+add_filter( 'acf/load_value/name=admission_target_near_majors', 'ltdh_default_target_near_majors', 10, 3 );
+function ltdh_default_target_near_majors( $value, $post_id, $field ) {
+	if ( ! empty( $value ) ) {
+		return $value;
+	}
+	$major_id   = function_exists( 'get_field' ) ? get_field( LTDH_META_MAJOR_REL, $post_id ) : 0;
+	$major_slug = $major_id ? get_post_field( 'post_name', $major_id ) : '';
+	$title      = get_the_title( $post_id );
+	if ( ( $major_slug && ( str_contains( $major_slug, 'thong-tin' ) || str_contains( $major_slug, 'cntt' ) ) ) || str_contains( mb_strtolower( (string) $title, 'UTF-8' ), 'thông tin' ) ) {
+		return "Kỹ thuật sửa chữa lắp ráp máy tính\nThiết kế mạch điện tử trên máy tính\nTruyền thông và mạng máy tính\nCông nghệ kỹ thuật máy tính\nĐiện tử máy tính\nĐồ họa đa phương tiện\nTin học văn phòng\nTin học viễn thông ứng dụng\nTin học ứng dụng\nXử lý dữ liệu\nQuản trị cơ sở dữ liệu\nQuản trị mạng máy tính\nvà các ngành tương đương";
+	}
+	return $value;
+}
+
+add_filter( 'acf/load_value/name=admission_bridge_courses_note', 'ltdh_default_target_bridge_note', 10, 3 );
+function ltdh_default_target_bridge_note( $value, $post_id, $field ) {
+	if ( ! empty( $value ) ) {
+		return $value;
+	}
+	$major_id   = function_exists( 'get_field' ) ? get_field( LTDH_META_MAJOR_REL, $post_id ) : 0;
+	$major_slug = $major_id ? get_post_field( 'post_name', $major_id ) : '';
+	$title      = get_the_title( $post_id );
+	if ( ( $major_slug && ( str_contains( $major_slug, 'thong-tin' ) || str_contains( $major_slug, 'cntt' ) ) ) || str_contains( mb_strtolower( (string) $title, 'UTF-8' ), 'thông tin' ) ) {
+		return "Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.";
+	}
+	return $value;
+}
+
+add_filter( 'acf/load_value/name=admission_bridge_courses_count', 'ltdh_default_target_bridge_count', 10, 3 );
+function ltdh_default_target_bridge_count( $value, $post_id, $field ) {
+	if ( ! empty( $value ) || ( is_numeric( $value ) && (int) $value === 0 ) ) {
+		return $value;
+	}
+	return 3;
 }
 
 // Remove/hide unwanted program & major fields in admin area dynamically
@@ -556,7 +613,7 @@ function ltdh_admin_tinymce_sync_on_submit() {
 // Ensure standard ACF reference meta keys (_field_name) exist for all programs
 add_action( 'init', 'ltdh_ensure_program_acf_meta_keys' );
 function ltdh_ensure_program_acf_meta_keys() {
-	if ( get_transient( 'ltdh_program_meta_keys_synced_v1' ) ) {
+	if ( get_transient( 'ltdh_program_meta_keys_synced_v2' ) ) {
 		return;
 	}
 	if ( ! function_exists( 'get_posts' ) ) {
@@ -576,9 +633,12 @@ function ltdh_ensure_program_acf_meta_keys() {
 			if ( ! get_post_meta( $pid, '_required_documents', true ) ) {
 				update_post_meta( $pid, '_required_documents', 'field_program_documents' );
 			}
+			if ( ! get_post_meta( $pid, '_admission_fee', true ) ) {
+				update_post_meta( $pid, '_admission_fee', 'field_program_admission_fee' );
+			}
 		}
 	}
-	set_transient( 'ltdh_program_meta_keys_synced_v1', 1, DAY_IN_SECONDS * 30 );
+	set_transient( 'ltdh_program_meta_keys_synced_v2', 1, DAY_IN_SECONDS * 30 );
 }
 
 /**

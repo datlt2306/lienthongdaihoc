@@ -380,7 +380,7 @@ class LTDH_Widget_CTA extends WP_Widget {
 				<?php echo esc_html( $btn_text ); ?>
 			</a>
 			<?php if ( $show_hotline ) :
-				$hotline = function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496';
+				$hotline       = function_exists( 'ltdh_get_school_hotline' ) ? ltdh_get_school_hotline() : ( function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496' );
 				$clean_hotline = preg_replace( '/\D/', '', $hotline );
 			?>
 				<a href="tel:<?php echo esc_attr( $clean_hotline ); ?>" class="block text-blue-200 text-xs font-semibold hover:text-white transition-colors mt-3">
@@ -459,14 +459,62 @@ class LTDH_Widget_Hotline extends WP_Widget {
 		parent::__construct(
 			'ltdh_hotline',
 			__( '[LTDH] Hotline & Zalo Tuyển sinh', 'ltdh' ),
-			[ 'description' => __( 'Hộp liên hệ trực tiếp với hotline và nút bấm Gọi ngay / Chat Zalo.', 'ltdh' ) ]
+			[ 'description' => __( 'Hộp liên hệ trực tiếp với hotline và nút bấm Gọi ngay / Chat Zalo. Tự động nhận diện Hotline & Zalo theo từng trường.', 'ltdh' ) ]
 		);
 	}
 
 	public function widget( $args, $instance ) {
-		$title    = ! empty( $instance['title'] ) ? $instance['title'] : 'VĂN PHÒNG TUYỂN SINH';
-		$hotline  = ! empty( $instance['hotline'] ) ? $instance['hotline'] : ( function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496' );
-		$zalo_url = ! empty( $instance['zalo_url'] ) ? $instance['zalo_url'] : ( function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me' );
+		// Resolve school ID
+		$school_setting   = ! empty( $instance['school_id'] ) ? $instance['school_id'] : 'auto';
+		$target_school_id = 0;
+		if ( 'global' !== $school_setting ) {
+			if ( 'auto' === $school_setting ) {
+				$target_school_id = function_exists( 'ltdh_get_current_context_school_id' ) ? ltdh_get_current_context_school_id() : 0;
+			} elseif ( is_numeric( $school_setting ) && (int) $school_setting > 0 ) {
+				$target_school_id = (int) $school_setting;
+			}
+		}
+
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : 'VĂN PHÒNG TUYỂN SINH';
+		if ( $target_school_id > 0 ) {
+			$s_title = get_the_title( $target_school_id );
+			$s_code  = get_post_meta( $target_school_id, 'school_code', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'school_code', $target_school_id ) : '' );
+			$s_code  = $s_code ? $s_code : $s_title;
+			$replace = [
+				'{school_name}' => $s_title,
+				'{ten_truong}'  => $s_title,
+				'{school_code}' => $s_code,
+				'{ma_truong}'   => $s_code,
+			];
+		} else {
+			$replace = [
+				'{school_name}' => '',
+				'{ten_truong}'  => '',
+				'{school_code}' => '',
+				'{ma_truong}'   => '',
+			];
+		}
+		$title = trim( preg_replace( '/\s+/', ' ', strtr( $title, $replace ) ) );
+
+		// Hotline: if set manually in widget, use it; else resolve from school context; else fallback to global
+		$manual_hotline = ! empty( $instance['hotline'] ) ? trim( $instance['hotline'] ) : '';
+		if ( ! empty( $manual_hotline ) ) {
+			$hotline = $manual_hotline;
+		} elseif ( $target_school_id > 0 && function_exists( 'ltdh_get_school_hotline' ) ) {
+			$hotline = ltdh_get_school_hotline( $target_school_id );
+		} else {
+			$hotline = function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496';
+		}
+
+		// Zalo URL: if set manually in widget, use it; else resolve from school context; else fallback to global
+		$manual_zalo = ! empty( $instance['zalo_url'] ) ? trim( $instance['zalo_url'] ) : '';
+		if ( ! empty( $manual_zalo ) ) {
+			$zalo_url = $manual_zalo;
+		} elseif ( $target_school_id > 0 && function_exists( 'ltdh_get_school_zalo_group_url' ) ) {
+			$zalo_url = ltdh_get_school_zalo_group_url( $target_school_id );
+		} else {
+			$zalo_url = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me';
+		}
 
 		echo $args['before_widget'];
 		get_template_part( 'template-parts/sidebar-hotline', null, [
@@ -478,30 +526,57 @@ class LTDH_Widget_Hotline extends WP_Widget {
 	}
 
 	public function form( $instance ) {
-		$title    = ! empty( $instance['title'] ) ? $instance['title'] : 'VĂN PHÒNG TUYỂN SINH';
-		$hotline  = ! empty( $instance['hotline'] ) ? $instance['hotline'] : '';
-		$zalo_url = ! empty( $instance['zalo_url'] ) ? $instance['zalo_url'] : '';
+		$title          = ! empty( $instance['title'] ) ? $instance['title'] : 'VĂN PHÒNG TUYỂN SINH';
+		$hotline        = ! empty( $instance['hotline'] ) ? $instance['hotline'] : '';
+		$zalo_url       = ! empty( $instance['zalo_url'] ) ? $instance['zalo_url'] : '';
+		$school_setting = ! empty( $instance['school_id'] ) ? $instance['school_id'] : 'auto';
+
+		$schools = get_posts( [
+			'post_type'      => defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		] );
 		?>
+		<div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 12px; margin-bottom: 14px; font-size: 12px; line-height: 1.5; color: #1e3a8a; border-radius: 4px;">
+			<strong>💡 Tự động theo từng trường:</strong><br>
+			Để trống ô <em>Hotline</em> và <em>Đường dẫn Zalo</em> để widget <strong>tự động lấy theo trường đang xem</strong> (hoặc lấy cài đặt chung nếu trang không thuộc trường nào). Hỗ trợ thẻ <code>{school_name}</code> hoặc <code>{school_code}</code> trong Tiêu đề.
+		</div>
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'school_id' ) ); ?>"><strong><?php esc_html_e( 'Chế độ nhận diện trường:', 'ltdh' ); ?></strong></label>
+			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'school_id' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'school_id' ) ); ?>">
+				<option value="auto" <?php selected( $school_setting, 'auto' ); ?>>⚡ Tự động nhận diện theo trang đang xem (Khuyên dùng)</option>
+				<option value="global" <?php selected( $school_setting, 'global' ); ?>>🌐 Dùng cài đặt chung toàn trang (không theo trường)</option>
+				<?php foreach ( $schools as $sch ) : ?>
+					<option value="<?php echo esc_attr( $sch->ID ); ?>" <?php selected( $school_setting, (string) $sch->ID ); ?>>
+						<?php echo esc_html( 'Cố định: ' . $sch->post_title ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Tiêu đề:', 'ltdh' ); ?></label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+			<small style="color:#64748b;"><?php esc_html_e( 'Có thể chèn {school_name} hoặc {school_code}', 'ltdh' ); ?></small>
 		</p>
 		<p>
-			<label for="<?php echo esc_attr( $this->get_field_id( 'hotline' ) ); ?>"><?php esc_html_e( 'Số điện thoại Hotline (để trống lấy theo cài đặt chung):', 'ltdh' ); ?></label>
-			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'hotline' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'hotline' ) ); ?>" type="text" value="<?php echo esc_attr( $hotline ); ?>">
+			<label for="<?php echo esc_attr( $this->get_field_id( 'hotline' ) ); ?>"><?php esc_html_e( 'Số điện thoại Hotline:', 'ltdh' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'hotline' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'hotline' ) ); ?>" type="text" value="<?php echo esc_attr( $hotline ); ?>" placeholder="<?php esc_attr_e( 'Để trống để tự động lấy theo trường / cài đặt chung', 'ltdh' ); ?>">
 		</p>
 		<p>
-			<label for="<?php echo esc_attr( $this->get_field_id( 'zalo_url' ) ); ?>"><?php esc_html_e( 'Đường dẫn Zalo (để trống lấy theo cài đặt chung):', 'ltdh' ); ?></label>
-			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'zalo_url' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'zalo_url' ) ); ?>" type="text" value="<?php echo esc_attr( $zalo_url ); ?>">
+			<label for="<?php echo esc_attr( $this->get_field_id( 'zalo_url' ) ); ?>"><?php esc_html_e( 'Đường dẫn Zalo:', 'ltdh' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'zalo_url' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'zalo_url' ) ); ?>" type="text" value="<?php echo esc_attr( $zalo_url ); ?>" placeholder="<?php esc_attr_e( 'Để trống để tự động lấy theo trường / cài đặt chung', 'ltdh' ); ?>">
 		</p>
 		<?php
 	}
 
 	public function update( $new_instance, $old_instance ) {
-		$instance             = [];
-		$instance['title']    = sanitize_text_field( $new_instance['title'] ?? '' );
-		$instance['hotline']  = sanitize_text_field( $new_instance['hotline'] ?? '' );
-		$instance['zalo_url'] = esc_url_raw( $new_instance['zalo_url'] ?? '' );
+		$instance              = [];
+		$instance['school_id'] = sanitize_text_field( $new_instance['school_id'] ?? 'auto' );
+		$instance['title']     = sanitize_text_field( $new_instance['title'] ?? '' );
+		$instance['hotline']   = sanitize_text_field( $new_instance['hotline'] ?? '' );
+		$instance['zalo_url']  = esc_url_raw( $new_instance['zalo_url'] ?? '' );
 		return $instance;
 	}
 }
@@ -612,17 +687,64 @@ class LTDH_Widget_Zalo_Community extends WP_Widget {
 		parent::__construct(
 			'ltdh_zalo_community',
 			__( '[LTDH] Nhóm Zalo Cộng đồng', 'ltdh' ),
-			[ 'description' => __( 'Hộp kêu gọi tham gia nhóm Zalo trao đổi thông tin tuyển sinh với giao diện nổi bật.', 'ltdh' ) ]
+			[ 'description' => __( 'Hộp kêu gọi tham gia nhóm Zalo trao đổi thông tin tuyển sinh với giao diện nổi bật. Tự động liên kết nhóm Zalo của từng trường.', 'ltdh' ) ]
 		);
 	}
 
 	public function widget( $args, $instance ) {
+		// Resolve school ID
+		$school_setting   = ! empty( $instance['school_id'] ) ? $instance['school_id'] : 'auto';
+		$target_school_id = 0;
+		if ( 'global' !== $school_setting ) {
+			if ( 'auto' === $school_setting ) {
+				$target_school_id = function_exists( 'ltdh_get_current_context_school_id' ) ? ltdh_get_current_context_school_id() : 0;
+			} elseif ( is_numeric( $school_setting ) && (int) $school_setting > 0 ) {
+				$target_school_id = (int) $school_setting;
+			}
+		}
+
 		$title       = ! empty( $instance['title'] ) ? $instance['title'] : 'Nhóm Zalo Trao Đổi';
 		$subtitle    = ! empty( $instance['subtitle'] ) ? $instance['subtitle'] : 'Cộng đồng sinh viên';
 		$desc        = ! empty( $instance['desc'] ) ? $instance['desc'] : 'Tham gia nhóm Zalo trao đổi thông tin tuyển sinh, lịch học và đề án cùng sinh viên.';
-		$zalo_url    = ! empty( $instance['zalo_url'] ) ? $instance['zalo_url'] : ( function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me' );
 		$btn_text    = ! empty( $instance['btn_text'] ) ? $instance['btn_text'] : '💬 Tham gia Nhóm Zalo';
 		$raw_bullets = ! empty( $instance['bullets'] ) ? $instance['bullets'] : "Cập nhật lịch thi & đề án mới nhất\nGiải đáp thắc mắc hồ sơ 24/7";
+
+		// Dynamic tag replacement ({school_name}, {ten_truong}, {school_code}, {ma_truong})
+		if ( $target_school_id > 0 ) {
+			$s_title = get_the_title( $target_school_id );
+			$s_code  = get_post_meta( $target_school_id, 'school_code', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'school_code', $target_school_id ) : '' );
+			$s_code  = $s_code ? $s_code : $s_title;
+
+			$replace = [
+				'{school_name}' => $s_title,
+				'{ten_truong}'  => $s_title,
+				'{school_code}' => $s_code,
+				'{ma_truong}'   => $s_code,
+			];
+		} else {
+			$replace = [
+				'{school_name}' => '',
+				'{ten_truong}'  => '',
+				'{school_code}' => '',
+				'{ma_truong}'   => '',
+			];
+		}
+
+		$title       = trim( preg_replace( '/\s+/', ' ', strtr( $title, $replace ) ) );
+		$subtitle    = trim( preg_replace( '/\s+/', ' ', strtr( $subtitle, $replace ) ) );
+		$desc        = trim( preg_replace( '/\s+/', ' ', strtr( $desc, $replace ) ) );
+		$btn_text    = trim( preg_replace( '/\s+/', ' ', strtr( $btn_text, $replace ) ) );
+		$raw_bullets = strtr( $raw_bullets, $replace );
+
+		// Resolve Zalo URL
+		$manual_url = ! empty( $instance['zalo_url'] ) ? trim( $instance['zalo_url'] ) : '';
+		if ( ! empty( $manual_url ) ) {
+			$zalo_url = $manual_url;
+		} elseif ( $target_school_id > 0 && function_exists( 'ltdh_get_school_zalo_group_url' ) ) {
+			$zalo_url = ltdh_get_school_zalo_group_url( $target_school_id );
+		} else {
+			$zalo_url = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me';
+		}
 
 		$bullets = array_filter( array_map( 'trim', explode( "\n", $raw_bullets ) ) );
 
@@ -673,20 +795,50 @@ class LTDH_Widget_Zalo_Community extends WP_Widget {
 	}
 
 	public function form( $instance ) {
-		$title       = ! empty( $instance['title'] ) ? $instance['title'] : 'Nhóm Zalo Trao Đổi';
-		$subtitle    = ! empty( $instance['subtitle'] ) ? $instance['subtitle'] : 'Cộng đồng sinh viên';
-		$desc        = ! empty( $instance['desc'] ) ? $instance['desc'] : 'Tham gia nhóm Zalo trao đổi thông tin tuyển sinh, lịch học và đề án cùng sinh viên.';
-		$zalo_url    = ! empty( $instance['zalo_url'] ) ? $instance['zalo_url'] : '';
-		$btn_text    = ! empty( $instance['btn_text'] ) ? $instance['btn_text'] : '💬 Tham gia Nhóm Zalo';
-		$raw_bullets = ! empty( $instance['bullets'] ) ? $instance['bullets'] : "Cập nhật lịch thi & đề án mới nhất\nGiải đáp thắc mắc hồ sơ 24/7";
+		$title          = ! empty( $instance['title'] ) ? $instance['title'] : 'Nhóm Zalo Trao Đổi';
+		$subtitle       = ! empty( $instance['subtitle'] ) ? $instance['subtitle'] : 'Cộng đồng sinh viên';
+		$desc           = ! empty( $instance['desc'] ) ? $instance['desc'] : 'Tham gia nhóm Zalo trao đổi thông tin tuyển sinh, lịch học và đề án cùng sinh viên.';
+		$zalo_url       = ! empty( $instance['zalo_url'] ) ? $instance['zalo_url'] : '';
+		$btn_text       = ! empty( $instance['btn_text'] ) ? $instance['btn_text'] : '💬 Tham gia Nhóm Zalo';
+		$raw_bullets    = ! empty( $instance['bullets'] ) ? $instance['bullets'] : "Cập nhật lịch thi & đề án mới nhất\nGiải đáp thắc mắc hồ sơ 24/7";
+		$school_setting = ! empty( $instance['school_id'] ) ? $instance['school_id'] : 'auto';
+
+		$schools = get_posts( [
+			'post_type'      => defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		] );
 		?>
+		<div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 12px; margin-bottom: 14px; font-size: 12px; line-height: 1.5; color: #1e3a8a; border-radius: 4px;">
+			<strong style="display:block; margin-bottom:4px; color:#1d4ed8; font-size:13px;">💡 Mỗi trường có 1 link Zalo riêng:</strong>
+			1. Cài đặt link Zalo riêng từng trường tại: <strong>Trường Đào tạo &gt; Sửa trường &gt; "Link Nhóm Zalo Trao Đổi (Cộng đồng)"</strong>.<br>
+			2. Ở widget này, bạn hãy <strong>ĐỂ TRỐNG ô "Link Nhóm Zalo"</strong> bên dưới. Hệ thống sẽ <strong>tự động nhận diện trường</strong> người dùng đang xem để mở đúng nhóm Zalo của trường đó!<br>
+			3. Hỗ trợ biến <code>{school_name}</code> (tên trường) hoặc <code>{school_code}</code> (mã viết tắt) trong Tiêu đề, Tiêu đề phụ, Mô tả.
+		</div>
+
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'school_id' ) ); ?>"><strong><?php esc_html_e( 'Chế độ nhận diện trường:', 'ltdh' ); ?></strong></label>
+			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'school_id' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'school_id' ) ); ?>">
+				<option value="auto" <?php selected( $school_setting, 'auto' ); ?>>⚡ Tự động nhận diện theo trang đang xem (Khuyên dùng)</option>
+				<option value="global" <?php selected( $school_setting, 'global' ); ?>>🌐 Dùng nhóm Zalo chung toàn trang (không theo trường)</option>
+				<?php foreach ( $schools as $sch ) : ?>
+					<option value="<?php echo esc_attr( $sch->ID ); ?>" <?php selected( $school_setting, (string) $sch->ID ); ?>>
+						<?php echo esc_html( 'Cố định: ' . $sch->post_title ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Tiêu đề:', 'ltdh' ); ?></label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+			<small style="color:#64748b;"><?php esc_html_e( 'Ví dụ: Nhóm Zalo {school_code} hoặc Nhóm Zalo Trao Đổi', 'ltdh' ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'subtitle' ) ); ?>"><?php esc_html_e( 'Tiêu đề phụ:', 'ltdh' ); ?></label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'subtitle' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'subtitle' ) ); ?>" type="text" value="<?php echo esc_attr( $subtitle ); ?>">
+			<small style="color:#64748b;"><?php esc_html_e( 'Ví dụ: Cộng đồng sinh viên {school_name}', 'ltdh' ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'desc' ) ); ?>"><?php esc_html_e( 'Mô tả:', 'ltdh' ); ?></label>
@@ -697,8 +849,9 @@ class LTDH_Widget_Zalo_Community extends WP_Widget {
 			<textarea class="widefat" rows="3" id="<?php echo esc_attr( $this->get_field_id( 'bullets' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'bullets' ) ); ?>"><?php echo esc_textarea( $raw_bullets ); ?></textarea>
 		</p>
 		<p>
-			<label for="<?php echo esc_attr( $this->get_field_id( 'zalo_url' ) ); ?>"><?php esc_html_e( 'Link Nhóm Zalo (để trống lấy theo hệ thống):', 'ltdh' ); ?></label>
-			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'zalo_url' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'zalo_url' ) ); ?>" type="text" value="<?php echo esc_attr( $zalo_url ); ?>">
+			<label for="<?php echo esc_attr( $this->get_field_id( 'zalo_url' ) ); ?>"><?php esc_html_e( 'Link Nhóm Zalo (Ghi đè thủ công nếu muốn):', 'ltdh' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'zalo_url' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'zalo_url' ) ); ?>" type="text" value="<?php echo esc_attr( $zalo_url ); ?>" placeholder="<?php esc_attr_e( 'Để trống để TỰ ĐỘNG lấy link Zalo riêng của từng trường', 'ltdh' ); ?>">
+			<small style="color:#64748b; display:block; margin-top:3px;"><?php esc_html_e( '👉 Để trống để hệ thống tự lấy link riêng của trường đang xem.', 'ltdh' ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'btn_text' ) ); ?>"><?php esc_html_e( 'Nhãn nút bấm:', 'ltdh' ); ?></label>
@@ -708,13 +861,14 @@ class LTDH_Widget_Zalo_Community extends WP_Widget {
 	}
 
 	public function update( $new_instance, $old_instance ) {
-		$instance             = [];
-		$instance['title']    = sanitize_text_field( $new_instance['title'] ?? '' );
-		$instance['subtitle'] = sanitize_text_field( $new_instance['subtitle'] ?? '' );
-		$instance['desc']     = sanitize_textarea_field( $new_instance['desc'] ?? '' );
-		$instance['bullets']  = sanitize_textarea_field( $new_instance['bullets'] ?? '' );
-		$instance['zalo_url'] = esc_url_raw( $new_instance['zalo_url'] ?? '' );
-		$instance['btn_text'] = sanitize_text_field( $new_instance['btn_text'] ?? '' );
+		$instance              = [];
+		$instance['school_id'] = sanitize_text_field( $new_instance['school_id'] ?? 'auto' );
+		$instance['title']     = sanitize_text_field( $new_instance['title'] ?? '' );
+		$instance['subtitle']  = sanitize_text_field( $new_instance['subtitle'] ?? '' );
+		$instance['desc']      = sanitize_textarea_field( $new_instance['desc'] ?? '' );
+		$instance['bullets']   = sanitize_textarea_field( $new_instance['bullets'] ?? '' );
+		$instance['zalo_url']  = esc_url_raw( $new_instance['zalo_url'] ?? '' );
+		$instance['btn_text']  = sanitize_text_field( $new_instance['btn_text'] ?? '' );
 		return $instance;
 	}
 }

@@ -475,6 +475,41 @@
                 "type": "wysiwyg"
             },
             {
+                "key": "field_program_target_proper_majors",
+                "label": "Đối tượng tuyển sinh: Nhóm Ngành đúng (Cao đẳng)",
+                "name": "admission_target_proper_majors",
+                "type": "textarea",
+                "instructions": "Danh sách các ngành/chuyên ngành đúng tốt nghiệp Cao đẳng (mỗi ngành 1 dòng hoặc cách nhau bằng dấu chấm phẩy ;). Thí sinh nhóm này vào học thẳng chuyên ngành.",
+                "rows": 4,
+                "placeholder": "Khoa học máy tính\nCông nghệ thông tin\nỨng dụng phần mềm\nCông nghệ kỹ thuật máy tính\nLập trình máy tính"
+            },
+            {
+                "key": "field_program_target_near_majors",
+                "label": "Đối tượng tuyển sinh: Nhóm Ngành gần (Cao đẳng)",
+                "name": "admission_target_near_majors",
+                "type": "textarea",
+                "instructions": "Danh sách các ngành gần tốt nghiệp Cao đẳng (mỗi ngành 1 dòng hoặc cách nhau bằng dấu chấm phẩy ;).",
+                "rows": 6,
+                "placeholder": "Kỹ thuật sửa chữa lắp ráp máy tính\nThiết kế mạch điện tử trên máy tính\nTruyền thông và mạng máy tính\nCông nghệ kỹ thuật máy tính\nĐiện tử máy tính\nĐồ họa đa phương tiện\nTin học văn phòng\nTin học viễn thông ứng dụng\nTin học ứng dụng\nXử lý dữ liệu\nQuản trị cơ sở dữ liệu\nQuản trị mạng máy tính"
+            },
+            {
+                "key": "field_program_target_bridge_note",
+                "label": "Quy định học phần bổ sung cho ngành gần",
+                "name": "admission_bridge_courses_note",
+                "type": "textarea",
+                "instructions": "Quy định học phần bổ sung/chuyển đổi kiến thức cho thí sinh ngành gần.",
+                "rows": 3,
+                "placeholder": "Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo."
+            },
+            {
+                "key": "field_program_target_bridge_count",
+                "label": "Số học phần bổ sung (ngành gần)",
+                "name": "admission_bridge_courses_count",
+                "type": "number",
+                "instructions": "Số lượng học phần cần học bổ sung (mặc định: 3).",
+                "placeholder": "3"
+            },
+            {
                 "key": "field_program_documents",
                 "label": "Hồ sơ xét tuyển cần thiết",
                 "name": "required_documents",
@@ -536,8 +571,16 @@
                 "label": "Tổng số tín chỉ toàn khóa (Nếu có)",
                 "name": "tuition_total_credits",
                 "type": "number",
-                "instructions": "Dùng để tạm tính tổng học phí toàn khóa",
+                "instructions": "Tùy chọn. Đối với hệ liên thông, số tín chỉ thực tế phụ thuộc thẩm định bảng điểm của từng học viên.",
                 "placeholder": "136"
+            },
+            {
+                "key": "field_program_admission_fee",
+                "label": "Lệ phí xét tuyển (trên 1 hồ sơ)",
+                "name": "admission_fee",
+                "type": "text",
+                "instructions": "Nhập mức lệ phí tính trên 1 bộ hồ sơ xét tuyển (Ví dụ: 200.000 đ hoặc Miễn phí). Để trống nếu trường không thu lệ phí.",
+                "placeholder": "Ví dụ: 200.000 đ / hồ sơ hoặc Miễn phí (Để trống nếu không thu)"
             },
             {
                 "key": "field_program_tuition_increase_roadmap",

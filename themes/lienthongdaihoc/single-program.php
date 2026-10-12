@@ -16,8 +16,12 @@ $school_id  = get_field( LTDH_META_SCHOOL_REL, $program_id );
 $major_id   = get_field( LTDH_META_MAJOR_REL, $program_id );
 
 // Retrieve school, major and global fields
-$school_title = $school_id ? get_the_title( $school_id ) : '';
-$major_title  = $major_id ? get_the_title( $major_id ) : '';
+$school_title        = $school_id ? get_the_title( $school_id ) : '';
+$program_school_name = $school_title;
+$major_title         = $major_id ? get_the_title( $major_id ) : '';
+$school_logo_id      = $school_id ? ( get_field( 'logo', $school_id ) ?: get_post_thumbnail_id( $school_id ) ) : 0;
+$school_logo_url     = $school_logo_id ? ( is_numeric( $school_logo_id ) ? wp_get_attachment_image_url( (int) $school_logo_id, 'thumbnail' ) : ( is_array( $school_logo_id ) ? ( $school_logo_id['url'] ?? '' ) : (string) $school_logo_id ) ) : '';
+$initials            = $school_title ? ( function_exists( 'ltdh_get_initials' ) ? ltdh_get_initials( $school_title ) : 'ĐH' ) : 'ĐH';
 
 $tuition         = ltdh_get_program_tuition_display( $program_id );
 $duration        = get_field( LTDH_META_DURATION, $program_id );
@@ -25,6 +29,7 @@ $requirements    = get_field( 'admission_requirements', $program_id ) ?: get_pos
 $documents       = get_field( 'required_documents', $program_id ) ?: get_post_meta( $program_id, 'required_documents', true );
 $enrollment      = ltdh_get_program_admission_deadline_display( $program_id );
 $quota           = get_field( 'quota', $program_id );
+$admission_fee   = get_field( 'admission_fee', $program_id ) ?: get_post_meta( $program_id, 'admission_fee', true );
 
 $program_hotline = ltdh_get_program_hotline( $program_id );
 $benefits        = get_field( 'program_benefits', $program_id );
@@ -150,12 +155,6 @@ $program_tabs[] = [
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>',
 ];
 
-$program_tabs[] = [
-	'id'       => 'register',
-	'title'    => 'Đăng ký tư vấn',
-	'subtitle' => 'Miễn phí 100%',
-	'icon'     => '<svg class="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>',
-];
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
@@ -164,7 +163,7 @@ $program_tabs[] = [
 	<!-- STICKY SECTION TAB NAVIGATION (Redesigned with UI/UX Pro Max) -->
 	<div id="ltdh-program-sticky-nav" class="ltdh-sticky-nav sticky top-16 sm:top-20 z-40 bg-white/98 backdrop-blur-md border-b border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-all duration-200">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<nav class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-2" aria-label="Điều hướng các mục chương trình đào tạo">
+			<nav class="flex items-center gap-1.5  overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-2" aria-label="Điều hướng các mục chương trình đào tạo">
 				<?php foreach ( $program_tabs as $tab_idx => $tab ) : 
 					$is_active = ( 0 === $tab_idx );
 				?>
@@ -331,265 +330,152 @@ $program_tabs[] = [
 				<?php 
 				$batches_data = get_field( 'admission_batches', $program_id );
 				if ( ! empty( $batches_data ) && is_array( $batches_data ) ) : 
-					$has_release = false;
-					$has_app     = false;
-					$has_review  = false;
-					$has_eval    = false;
+					// Determine training type: 'chinh-quy' -> 'Thi tuyển', others ('tu-xa', 'vua-hoc-vua-lam') -> 'Xét tuyển'
+					$training_terms = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
+					$t_slug         = ! empty( $training_terms ) && ! is_wp_error( $training_terms ) ? $training_terms[0]->slug : '';
+					$t_name         = ! empty( $training_terms ) && ! is_wp_error( $training_terms ) ? mb_strtolower( $training_terms[0]->name, 'UTF-8' ) : '';
+					$is_chinh_quy   = ( in_array( $t_slug, [ 'chinh-quy', 'chinh-quy-tap-trung' ], true ) || strpos( $t_name, 'chính quy' ) !== false );
+					$eval_label     = $is_chinh_quy ? 'Thi tuyển' : 'Xét tuyển';
 
-					foreach ( $batches_data as $b_item ) {
-						$rel = trim( $b_item['release_period'] ?? '' );
-						$app = trim( $b_item['application_period'] ?? '' );
-						$rev = trim( $b_item['review_time'] ?? '' );
-						$ev1 = trim( $b_item['evaluation_time'] ?? '' );
-						$ev2 = trim( $b_item['enrollment_time'] ?? '' );
+					$parsed_batches = [];
 
-						if ( $rel !== '' && $rel !== '-' ) {
-							$has_release = true;
+					foreach ( $batches_data as $b_idx => $b_item ) {
+						$raw_name    = trim( $b_item['batch_name'] ?? '' );
+						$clean_title = preg_replace( '/^Tuyển sinh\s*/ui', '', $raw_name );
+						if ( empty( $clean_title ) ) {
+							$clean_title = 'Đợt ' . ( $b_idx + 1 );
 						}
-						if ( $app !== '' && $app !== '-' ) {
-							$has_app = true;
+
+						$status         = $b_item['batch_status'] ?? 'dang-nhan';
+						$release_period = trim( $b_item['release_period'] ?? '' );
+						$app_period     = trim( $b_item['application_period'] ?? '' );
+						$review_time    = trim( $b_item['review_time'] ?? '' );
+						$eval_time      = trim( $b_item['evaluation_time'] ?? '' );
+						$enrol_time     = trim( $b_item['enrollment_time'] ?? '' );
+
+						// Parse evaluation and enrollment if grouped with pipe '|'
+						$eval_val  = ( $eval_time !== '-' ) ? $eval_time : '';
+						$enrol_val = ( $enrol_time !== '-' ) ? $enrol_time : '';
+						if ( empty( $enrol_val ) && strpos( $eval_val, '|' ) !== false ) {
+							$parts     = explode( '|', $eval_val );
+							$eval_val  = trim( $parts[0] );
+							$enrol_val = trim( $parts[1] ?? '' );
 						}
-						if ( $rev !== '' && $rev !== '-' ) {
-							$has_review = true;
+
+						// Standardize evaluation text based on training type
+						if ( ! empty( $eval_val ) ) {
+							if ( ! $is_chinh_quy ) {
+								$eval_val = preg_replace( '/^Thi tuyển\s*/ui', 'Xét tuyển ', $eval_val );
+							} else {
+								$eval_val = preg_replace( '/^Xét tuyển\s*/ui', 'Thi tuyển ', $eval_val );
+							}
 						}
-						if ( ( $ev1 !== '' && $ev1 !== '-' ) || ( $ev2 !== '' && $ev2 !== '-' ) ) {
-							$has_eval = true;
-						}
+
+						$parsed_batches[ $b_idx ] = [
+							'title'          => $clean_title,
+							'status'         => $status,
+							'release_period' => ( $release_period !== '-' ) ? $release_period : '',
+							'app_period'     => ( $app_period !== '-' ) ? $app_period : '',
+							'review_time'    => ( $review_time !== '-' ) ? $review_time : '',
+							'eval_val'       => $eval_val,
+							'enrol_val'      => $enrol_val,
+						];
 					}
 				?>
-				<section id="lich-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-8">
-					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Các đợt tuyển sinh</h2>
+				<section id="lich-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6 mb-8">
+					<!-- Header -->
+					<div class="border-b border-slate-100 pb-3 mb-4 sm:mb-5">
+						<h2 class="text-lg md:text-xl font-bold text-slate-900">Các đợt tuyển sinh</h2>
+						<p class="text-xs sm:text-sm text-slate-500 mt-0.5">Kế hoạch nhận hồ sơ, <?php echo esc_html( mb_strtolower( $eval_label, 'UTF-8' ) ); ?> và khai giảng trong năm</p>
+					</div>
 
-							<!-- MOBILE TABBED CARD VIEW (< 768px) -->
-							<div class="block md:hidden admission-batches-mobile">
-								<!-- iOS Segmented Control Tab Navigation -->
-								<div class="bg-slate-100 p-1 rounded-xl flex items-center justify-between gap-1 mb-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-									<?php foreach ( $batches_data as $b_idx => $b_item ) :
-										$raw_name = $b_item['batch_name'] ?? '';
-										// Shorten batch name for tabs: "Tuyển sinh Đợt 1" -> "Đợt 1", "Tuyển sinh Đợt 3 (Bổ sung)" -> "Đợt 3"
-										$short_name = $raw_name;
-										if ( preg_match( '/Đợt\s*\d+/i', $raw_name, $matches ) ) {
-											$short_name = $matches[0];
-										} elseif ( empty( $short_name ) ) {
-											$short_name = 'Đợt ' . ( $b_idx + 1 );
-										}
+					<!-- Batches List (Spacious Horizontal Rows) -->
+					<div class="space-y-3.5">
+						<?php foreach ( $parsed_batches as $b_idx => $b_data ) : 
+							$status      = $b_data['status'];
+							$is_open     = ( $status === 'dang-nhan' );
+							$is_upcoming = ( $status === 'sap-mo' );
+							$is_closed   = ( $status === 'da-dong' );
 
-										$b_status  = $b_item['batch_status'] ?? '';
-										$is_active = ( $b_idx === 0 );
-										$tab_badge = '';
-										if ( 'dang-nhan' === $b_status ) {
-											$tab_badge = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-0.5 inline-block"></span>';
-										}
-									?>
-										<button type="button" 
-											onclick="ltdhSwitchBatchTab(this, <?php echo (int) $b_idx; ?>)"
-											class="ltdh-batch-tab-btn flex-1 py-2 px-3 text-xs rounded-lg transition-all text-center flex items-center justify-center gap-1 shrink-0 whitespace-nowrap outline-none focus:outline-none focus:ring-0 focus-visible:outline-none border-0 <?php echo $is_active ? 'bg-[#00308b] text-white font-bold shadow-xs' : 'bg-transparent text-slate-600 font-medium hover:text-slate-900'; ?>">
-											<span><?php echo esc_html( $short_name ); ?></span>
-											<?php echo $tab_badge; ?>
-										</button>
-									<?php endforeach; ?>
+							if ( $is_open ) {
+								$row_class = 'bg-emerald-50/40 border-2 border-emerald-500 shadow-md shadow-emerald-500/10 rounded-2xl p-3';
+							} elseif ( $is_upcoming ) {
+								$row_class = 'bg-blue-50/25 border border-blue-200/70 rounded-2xl p-4 sm:p-5';
+							} else {
+								$row_class = 'bg-slate-50/60 border border-slate-200/60 rounded-2xl p-3 opacity-80 hover:opacity-100 transition-opacity';
+							}
+						?>
+							<div class="transition-all <?php echo esc_attr( $row_class ); ?>">
+								<div class="flex flex-col md:flex-row md:items-center justify-between sm:gap-3">
+									
+									<!-- 1. Tên đợt (Thu gọn vừa vặn, không chiếm khoảng trống thừa) -->
+									<div class="w-auto md:w-24 shrink-0 flex items-center justify-between md:flex-col md:items-start md:justify-center gap-1">
+										<h3 class="<?php echo $is_open ? 'text-base font-bold text-slate-900' : 'text-base font-bold text-slate-700'; ?>">
+											<?php echo esc_html( $b_data['title'] ); ?>
+										</h3>
+										
+									</div>
+
+									<!-- 2. Các mốc thời gian trải rộng ở giữa (Theo đúng quy trình: Hạn nộp -> Xét tuyển/Thi tuyển -> Khai giảng) -->
+									<div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-6 lg:gap-8">
+										
+										<!-- Cột 1: Hạn nộp hồ sơ -->
+										<?php if ( ! empty( $b_data['app_period'] ) ) : ?>
+											<div>
+												<span class="text-xs font-semibold text-slate-500 block mb-1">Hạn nộp hồ sơ</span>
+												<span class="<?php echo $is_open ? 'text-sm font-bold text-amber-950' : 'text-sm font-semibold text-slate-800'; ?> block leading-snug">
+													<?php echo esc_html( $b_data['app_period'] ); ?>
+												</span>
+											</div>
+										<?php endif; ?>
+
+										<!-- Cột 2: Xét tuyển / Thi tuyển (Đặt ở giữa theo tiến trình) -->
+										<div>
+											<span class="text-xs font-semibold text-slate-500 block mb-1"><?php echo esc_html( $eval_label ); ?></span>
+											<span class="<?php echo $is_open ? 'text-sm font-bold text-slate-900' : 'text-sm font-medium text-slate-700'; ?> block leading-snug">
+												<?php echo esc_html( $b_data['eval_val'] ?: ( $is_chinh_quy ? 'Thi tuyển theo đợt' : 'Xét tuyển hồ sơ' ) ); ?>
+											</span>
+										</div>
+
+										<!-- Cột 3: Khai giảng (Mốc cuối cùng) -->
+										<div>
+											<span class="text-xs font-semibold text-slate-500 block mb-1">Khai giảng dự kiến</span>
+											<span class="<?php echo $is_open ? 'text-sm font-bold text-[#00308b]' : 'text-sm font-medium text-slate-700'; ?> block leading-snug">
+												<?php echo esc_html( $b_data['enrol_val'] ?: 'Theo kế hoạch' ); ?>
+											</span>
+										</div>
+
+									</div>
+
+									<!-- 3. Trạng thái bên phải: Thay nút bằng chữ "Đang nhận hồ sơ" siêu nổi bật -->
+									<div class="w-auto md:w-44 lg:w-48 shrink-0 flex items-center justify-start md:justify-end pt-1 md:pt-0">
+										
+										<?php if ( $is_open ) : ?>
+											<div class="inline-flex items-center gap-2 px-4 py-2 sm:px-3 sm:py-2.5 rounded-full bg-emerald-600 text-white font-black text-xs sm:text-sm shadow-md ring-4 ring-emerald-500/20 whitespace-nowrap">
+												<span class="relative flex h-2.5 w-2.5">
+													<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+													<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+												</span>
+												<span>Đang nhận hồ sơ</span>
+											</div>
+										<?php elseif ( $is_upcoming ) : ?>
+											<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+												Sắp mở nhận
+											</span>
+										<?php else : ?>
+											<?php if ( $is_closed ) : ?>
+												<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-200 text-slate-600">
+													Đã kết thúc
+												</span>
+											<?php endif; ?>
+										<?php endif; ?>
+									</div>
+
 								</div>
-
-								<!-- Tab Content Cards -->
-								<?php foreach ( $batches_data as $b_idx => $b_item ) :
-									$batch_name     = $b_item['batch_name'] ?? '';
-									$clean_title    = preg_replace( '/^Tuyển sinh\s*/ui', '', $batch_name );
-									$release_period = $b_item['release_period'] ?? '';
-									$app_period     = $b_item['application_period'] ?? '';
-									$review_time    = $b_item['review_time'] ?? '';
-									$eval_time      = $b_item['evaluation_time'] ?? '';
-									$enrol_time     = $b_item['enrollment_time'] ?? '';
-									$status         = $b_item['batch_status'] ?? 'dang-nhan';
-									
-									$status_label = 'Đang nhận hồ sơ';
-									$status_class = 'bg-emerald-50 text-emerald-700 border-0';
-									if ( $status === 'sap-mo' ) {
-										$status_label = 'Sắp mở';
-										$status_class = 'bg-amber-50 text-amber-700 border-0';
-									} elseif ( $status === 'da-dong' ) {
-										$status_label = 'Đã đóng';
-										$status_class = 'bg-slate-100 text-slate-600 border-0';
-									}
-
-									$eval_dates = array_filter([ $eval_time, $enrol_time ], function( $v ) {
-										$v_clean = trim( $v );
-										return $v_clean !== '' && $v_clean !== '-';
-									});
-									$eval_display = ! empty( $eval_dates ) ? implode(' | ', $eval_dates) : '';
-									$is_hidden = ( $b_idx !== 0 );
-								?>
-									<div class="ltdh-batch-tab-card bg-white border border-slate-100 rounded-xl p-3.5 shadow-xs transition-all space-y-3 <?php echo $is_hidden ? 'hidden' : ''; ?>" data-batch-card="<?php echo (int) $b_idx; ?>">
-										<div class="flex items-center justify-between border-b border-slate-100 pb-2.5 gap-2">
-											<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $clean_title ); ?></span>
-											<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border-0 shrink-0 <?php echo esc_attr( $status_class ); ?>">
-												<?php echo esc_html( $status_label ); ?>
-											</span>
-										</div>
-
-										<div class="space-y-3 pt-0.5">
-											<?php if ( ! empty( $release_period ) && $release_period !== '-' ) : ?>
-												<div class="flex items-start gap-2.5">
-													<div class="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 shrink-0"></div>
-													<div class="flex-1 min-w-0">
-														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phát hành hồ sơ</div>
-														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $release_period ); ?></div>
-													</div>
-												</div>
-											<?php endif; ?>
-
-											<?php if ( ! empty( $app_period ) && $app_period !== '-' ) : ?>
-												<div class="flex items-start gap-2.5">
-													<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
-													<div class="flex-1 min-w-0">
-														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hạn nhận hồ sơ</div>
-														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $app_period ); ?></div>
-													</div>
-												</div>
-											<?php endif; ?>
-
-											<?php if ( ! empty( $review_time ) && $review_time !== '-' ) : ?>
-												<div class="flex items-start gap-2.5">
-													<div class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></div>
-													<div class="flex-1 min-w-0">
-														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Thời gian ôn tập</div>
-														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $review_time ); ?></div>
-													</div>
-												</div>
-											<?php endif; ?>
-
-											<?php if ( ! empty( $eval_display ) ) : ?>
-												<div class="flex items-start gap-2.5 pt-1.5 border-t border-slate-100">
-													<div class="w-1.5 h-1.5 rounded-full bg-indigo-600 mt-1.5 shrink-0"></div>
-													<div class="flex-1 min-w-0">
-														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Xét tuyển / Thi tuyển</div>
-														<div class="text-xs font-bold text-[#00308b] mt-0.5"><?php echo esc_html( $eval_display ); ?></div>
-													</div>
-												</div>
-											<?php endif; ?>
-										</div>
-									</div>
-								<?php endforeach; ?>
 							</div>
-
-							<!-- DESKTOP BENTO GRID CARDS VIEW (>= 768px) -->
-							<div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
-								<?php foreach ( $batches_data as $b_idx => $b_item ) :
-									$batch_name     = $b_item['batch_name'] ?? '';
-									$clean_title    = preg_replace( '/^Tuyển sinh\s*/ui', '', $batch_name );
-									$release_period = $b_item['release_period'] ?? '';
-									$app_period     = $b_item['application_period'] ?? '';
-									$review_time    = $b_item['review_time'] ?? '';
-									$eval_time      = $b_item['evaluation_time'] ?? '';
-									$enrol_time     = $b_item['enrollment_time'] ?? '';
-									$status         = $b_item['batch_status'] ?? 'dang-nhan';
-									
-									$status_label = 'Đang nhận hồ sơ';
-									$status_class = 'bg-emerald-50 text-emerald-700 border-0';
-									$card_style   = 'bg-slate-50/70 hover:bg-white border border-slate-100/80 rounded-xl shadow-xs hover:shadow-sm';
-									
-									if ( $status === 'dang-nhan' ) {
-										$status_label = 'Đang nhận hồ sơ';
-										$status_class = 'bg-emerald-600 text-white border-0 shadow-2xs';
-										$card_style   = 'bg-emerald-50/25 border border-emerald-300/70 rounded-xl shadow-xs';
-									} elseif ( $status === 'sap-mo' ) {
-										$status_label = 'Sắp mở';
-										$status_class = 'bg-amber-50 text-amber-700 border-0';
-									} elseif ( $status === 'da-dong' ) {
-										$status_label = 'Đã đóng';
-										$status_class = 'bg-slate-100 text-slate-500 border-0';
-									}
-
-									$eval_dates = array_filter([ $eval_time, $enrol_time ], function( $v ) {
-										$v_clean = trim( $v );
-										return $v_clean !== '' && $v_clean !== '-';
-									});
-									$eval_display = ! empty( $eval_dates ) ? implode(' | ', $eval_dates) : '';
-								?>
-									<div class="rounded-xl p-3.5 sm:p-4 transition-all duration-200 flex flex-col justify-between space-y-3 <?php echo esc_attr( $card_style ); ?>">
-										<!-- Card Header -->
-										<div class="flex items-center justify-between pb-2.5 gap-2 border-b border-slate-100/80">
-											<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $clean_title ); ?></span>
-											<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 <?php echo esc_attr( $status_class ); ?>">
-												<?php echo esc_html( $status_label ); ?>
-											</span>
-										</div>
-
-										<!-- Card Content Timeline -->
-										<div class="space-y-3 flex-1">
-											<?php if ( ! empty( $release_period ) && $release_period !== '-' ) : ?>
-												<div class="flex items-start gap-x-2.5">
-													<div class="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 shrink-0"></div>
-													<div class="flex-1 min-w-0">
-														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phát hành hồ sơ</div>
-														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $release_period ); ?></div>
-													</div>
-												</div>
-											<?php endif; ?>
-
-											<?php if ( ! empty( $app_period ) && $app_period !== '-' ) : ?>
-												<div class="flex items-start gap-x-2.5">
-													<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
-													<div class="flex-1 min-w-0">
-														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hạn nhận hồ sơ</div>
-														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $app_period ); ?></div>
-													</div>
-												</div>
-											<?php endif; ?>
-
-											<?php if ( ! empty( $review_time ) && $review_time !== '-' ) : ?>
-												<div class="flex items-start gap-x-2.5">
-													<div class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></div>
-													<div class="flex-1 min-w-0">
-														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Thời gian ôn tập</div>
-														<div class="text-xs font-semibold text-slate-800 mt-0.5"><?php echo esc_html( $review_time ); ?></div>
-													</div>
-												</div>
-											<?php endif; ?>
-
-											<?php if ( ! empty( $eval_display ) ) : ?>
-												<div class="flex items-start gap-x-2.5 pt-1.5">
-													<div class="w-1.5 h-1.5 rounded-full bg-indigo-600 mt-1.5 shrink-0"></div>
-													<div class="flex-1 min-w-0">
-														<div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Xét tuyển / Thi tuyển</div>
-														<div class="text-xs font-bold text-[#00308b] mt-0.5"><?php echo esc_html( $eval_display ); ?></div>
-													</div>
-												</div>
-											<?php endif; ?>
-										</div>
-									</div>
-								<?php endforeach; ?>
-							</div>
-
-						<script>
-						function ltdhSwitchBatchTab(btn, idx) {
-							const container = btn.closest('.admission-batches-mobile');
-							if (!container) return;
-							const btns = container.querySelectorAll('.ltdh-batch-tab-btn');
-							const cards = container.querySelectorAll('.ltdh-batch-tab-card');
-							
-							const activeCls   = ['bg-[#00308b]', 'text-white', 'font-bold', 'shadow-xs'];
-							const inactiveCls = ['bg-transparent', 'text-slate-600', 'font-medium'];
-
-							btns.forEach((b, i) => {
-								if (i === idx) {
-									inactiveCls.forEach(c => b.classList.remove(c));
-									activeCls.forEach(c => b.classList.add(c));
-								} else {
-									activeCls.forEach(c => b.classList.remove(c));
-									inactiveCls.forEach(c => b.classList.add(c));
-								}
-							});
-
-							cards.forEach((c, i) => {
-								if (i === idx) {
-									c.classList.remove('hidden');
-								} else {
-									c.classList.add('hidden');
-								}
-							});
-						}
-						</script>
-					</section>
+						<?php endforeach; ?>
+					</div>
+				</section>
 				<?php endif; ?>
 
 
@@ -648,9 +534,125 @@ $program_tabs[] = [
 								</div>
 							<?php endif; ?>
 
+							<?php 
+							$target_majors_data = function_exists( 'ltdh_get_program_target_majors' ) ? ltdh_get_program_target_majors( $program_id ) : null;
+							if ( ! empty( $target_majors_data ) ) : 
+								$major_display_name = $target_majors_data['major_name'] ?? $major_title;
+							?>
+								<!-- SUB-BLOCK: ĐỐI TƯỢNG TUYỂN SINH (BẢNG QUY CHẾ NGÀNH ĐÚNG & NGÀNH GẦN) -->
+								<div class="mt-4 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+									<!-- Tiêu đề mục bảng -->
+									<div class="bg-slate-100/90 px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+										<div class="flex items-center gap-2">
+											<span class="w-6 h-6 rounded bg-[#00308b] text-white flex items-center justify-center font-bold text-xs shrink-0">
+												1.2
+											</span>
+											<h4 class="font-bold text-slate-900 text-sm md:text-base">
+												Đối tượng tuyển sinh liên thông từ Cao đẳng lên Đại học
+											</h4>
+										</div>
+										<span class="text-xs font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+											Ngành: <strong class="text-slate-900"><?php echo esc_html( $major_display_name ); ?></strong>
+										</span>
+									</div>
+
+									<!-- Desktop & Tablet View: Bảng quy chế chuẩn -->
+									<div class="hidden sm:block overflow-x-auto">
+										<table class="w-full text-left border-collapse text-xs md:text-sm">
+											<thead>
+												<tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
+													<th class="py-3 px-3.5 w-12 text-center font-bold border-r border-slate-200">STT</th>
+													<th class="py-3 px-4 w-40 font-bold border-r border-slate-200">Ngành dự tuyển</th>
+													<th class="py-3 px-4 font-bold border-r border-slate-200 bg-emerald-50/60 w-[42%]">
+														<div class="flex items-center gap-1.5 text-emerald-800">
+															<span>✓ Ngành đúng</span>
+															<span class="text-[11px] font-normal bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">(Vào thẳng chuyên ngành)</span>
+														</div>
+													</th>
+													<th class="py-3 px-4 font-bold bg-amber-50/60 w-[45%]">
+														<div class="flex items-center gap-1.5 text-amber-900">
+															<span>⚡ Ngành gần</span>
+															<span class="text-[11px] font-normal bg-amber-100 text-amber-900 px-2 py-0.5 rounded">(Học bổ sung 03 học phần)</span>
+														</div>
+													</th>
+												</tr>
+											</thead>
+											<tbody class="text-slate-700">
+												<tr class="align-top divide-x divide-slate-200">
+													<td class="py-4 px-3.5 text-center font-bold text-slate-500">
+														1
+													</td>
+													<td class="py-4 px-4 font-bold text-slate-900 bg-slate-50/40">
+														<div class="text-sm font-bold text-slate-900"><?php echo esc_html( $major_display_name ); ?></div>
+														<span class="text-xs font-normal text-slate-500 block mt-1">Trình độ Đại học</span>
+													</td>
+													<!-- Cột Ngành Đúng -->
+													<td class="py-4 px-4 bg-emerald-50/20 leading-relaxed">
+														<p class="text-xs font-semibold text-slate-800 mb-2">Thí sinh tốt nghiệp Cao đẳng các ngành/chuyên ngành:</p>
+														<ul class="space-y-1.5 pl-4 list-disc text-slate-800 text-xs md:text-sm mb-4">
+															<?php foreach ( $target_majors_data['proper_majors'] as $p_major ) : ?>
+																<li><span class="font-medium"><?php echo esc_html( $p_major ); ?></span></li>
+															<?php endforeach; ?>
+														</ul>
+														<div class="mt-3 pt-2.5 border-t border-emerald-200/60 text-xs text-emerald-800 font-semibold">
+															✓ Không phải học bổ sung kiến thức. Thời gian học tiêu chuẩn 1.5 - 2 năm.
+														</div>
+													</td>
+													<!-- Cột Ngành Gần -->
+													<td class="py-4 px-4 bg-amber-50/20 leading-relaxed">
+														<p class="text-xs font-semibold text-slate-800 mb-2">Thí sinh tốt nghiệp Cao đẳng các ngành:</p>
+														<p class="text-xs md:text-sm text-slate-800 leading-relaxed mb-4">
+															<?php echo esc_html( implode( '; ', $target_majors_data['near_majors'] ) ); ?>.
+														</p>
+														<div class="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed">
+															⚠️ <strong>Quy định:</strong> <?php echo esc_html( $target_majors_data['bridge_courses_note'] ?? 'Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.' ); ?>
+														</div>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+
+									<!-- Mobile View: Danh sách 2 khối rõ ràng, không cuộn, không cắt chữ -->
+									<div class="sm:hidden p-4 space-y-4">
+										<!-- Khối Ngành Đúng -->
+										<div class="border border-emerald-200 bg-emerald-50/30 rounded-xl p-3.5">
+											<div class="flex items-center justify-between gap-1 mb-2">
+												<span class="font-bold text-sm text-emerald-900">✓ Nhóm Ngành Đúng</span>
+												<span class="text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Không học bổ sung</span>
+											</div>
+											<p class="text-xs text-slate-600 mb-2">Tốt nghiệp CĐ các ngành/chuyên ngành:</p>
+											<ul class="text-xs text-slate-800 space-y-1 pl-4 list-disc mb-3">
+												<?php foreach ( $target_majors_data['proper_majors'] as $p_major ) : ?>
+													<li><strong><?php echo esc_html( $p_major ); ?></strong></li>
+												<?php endforeach; ?>
+											</ul>
+											<div class="text-[11px] text-emerald-800 font-semibold border-t border-emerald-200/60 pt-2">
+												✓ Vào thẳng môn chuyên ngành, thời gian học 1.5 - 2 năm.
+											</div>
+										</div>
+
+										<!-- Khối Ngành Gần -->
+										<div class="border border-amber-200 bg-amber-50/30 rounded-xl p-3.5">
+											<div class="flex items-center justify-between gap-1 mb-2">
+												<span class="font-bold text-sm text-amber-950">⚡ Nhóm Ngành Gần</span>
+												<span class="text-[11px] bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-semibold">+ 03 Học phần</span>
+											</div>
+											<p class="text-xs text-slate-600 mb-2">Tốt nghiệp CĐ các ngành:</p>
+											<p class="text-xs text-slate-800 leading-relaxed mb-3">
+												<?php echo esc_html( implode( '; ', $target_majors_data['near_majors'] ) ); ?>.
+											</p>
+											<div class="p-2.5 bg-amber-100/70 border border-amber-200 rounded-lg text-xs text-amber-950">
+												⚠️ <strong>Lưu ý:</strong> <?php echo esc_html( $target_majors_data['bridge_courses_note'] ?? 'Thí sinh phải học bổ sung 03 học phần theo quy chế.' ); ?>
+											</div>
+										</div>
+									</div>
+								</div>
+							<?php endif; ?>
+
 							<?php if ( $documents || $form_url ) : ?>
 								<!-- BLOCK 2: REQUIRED DOCUMENTS & ADMISSION FORM DOWNLOAD -->
-								<div class="<?php echo $requirements ?>">
+								<div class="<?php echo $requirements ? 'pt-2' : ''; ?>">
 									<h3 class="text-sm md:text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
 										<span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold shrink-0"><?php echo $requirements ? '2' : '1'; ?></span>
 										<span>Hồ sơ xét tuyển cần chuẩn bị</span>
@@ -710,19 +712,22 @@ $program_tabs[] = [
 									</div>
 								</div>
 
-								<!-- Total credits -->
+								<!-- Admission fee (Lệ phí xét tuyển trên 1 hồ sơ) -->
 								<?php 
-								$total_credits = get_field( 'tuition_total_credits', $program_id );
-								if ( $total_credits ) : 
+								if ( ! empty( $admission_fee ) || ( is_numeric( $admission_fee ) && (int) $admission_fee === 0 ) ) : 
+									$fee_info = function_exists( 'ltdh_format_admission_fee' ) ? ltdh_format_admission_fee( $admission_fee ) : [ 'display' => esc_html( $admission_fee ) . ' / hồ sơ', 'is_free' => false ];
 								?>
 									<div class="bg-slate-50 rounded-xl p-3.5">
-										<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Tổng số tín chỉ toàn khóa</span>
+										<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Lệ phí xét tuyển</span>
 										<div class="flex items-baseline flex-wrap gap-1">
-											<span class="text-base font-bold text-slate-900">
-												<?php echo esc_html( $total_credits ); ?> tín chỉ
-											</span>
-											<?php if ( isset($tuition_year) && $tuition_year ) : ?>
-												<span class="text-xs font-semibold text-slate-600">(Năm học <?php echo esc_html( $tuition_year ); ?>)</span>
+											<?php if ( ! empty( $fee_info['is_free'] ) ) : ?>
+												<span class="text-base md:text-lg font-bold text-emerald-600">
+													<?php echo esc_html( $fee_info['display'] ); ?>
+												</span>
+											<?php else : ?>
+												<span class="text-base md:text-lg font-bold text-slate-900">
+													<?php echo esc_html( $fee_info['display'] ); ?>
+												</span>
 											<?php endif; ?>
 										</div>
 									</div>
@@ -756,59 +761,17 @@ $program_tabs[] = [
 									</div>
 								</div>
 
-								<!-- Card 2: Exemption Scope -->
-								<?php
-								$exemption_title = get_field( 'exemption_title', $program_id );
-								$exemption_intro = get_field( 'exemption_intro', $program_id );
-								$exemption_items = get_field( 'exemption_items', $program_id );
-
-								$school_slug = $school_id ? get_post_field( 'post_name', $school_id ) : '';
-								$is_utc      = ( false !== strpos( $school_slug, 'giao-thong-van-tai' ) );
-
-								if ( empty( $exemption_items ) && $is_utc ) {
-									$exemption_title = 'Quy định miễn môn đối với Đại học GTVT (UTC)';
-									$exemption_intro = 'Chương trình đào tạo hệ liên thông của UTC chỉ xem xét miễn trừ tối đa đối với 2 môn học dưới đây nếu học viên đáp ứng đủ điều kiện:';
-									$exemption_items = [
-										[
-											'subject_name'       => 'Giáo dục quốc phòng an ninh',
-											'condition_note'     => 'Chỉ được xét miễn giảm khi học viên nộp chứng chỉ do Bộ Giáo dục và Đào tạo cấp theo phôi mẫu chuẩn (màu đỏ). Các loại phôi khác (kể cả phôi của các trường tự cấp) đều không được chấp nhận.',
-											'cert_scores'        => [],
-											'cert_note'          => '',
-											'assessment_process' => '',
-										],
-										[
-											'subject_name'       => 'Tiếng Anh B1',
-											'condition_note'     => 'Được xem xét quy đổi điểm khi sở hữu một trong các chứng chỉ quốc tế/quốc gia còn hiệu lực:',
-											'cert_scores'        => [
-												[ 'cert_name' => 'IELTS', 'min_score' => '≥ 4.5' ],
-												[ 'cert_name' => 'TOEIC', 'min_score' => '≥ 450' ],
-												[ 'cert_name' => 'VSTEP', 'min_score' => '≥ 5.0' ],
-											],
-											'cert_note'          => '* Riêng VSTEP: Chỉ nhận chứng chỉ do 1 trong 3 cơ sở đào tạo cấp: ĐH Quốc gia HN, ĐH Sư phạm HN, và ĐH Hà Nội.',
-											'assessment_process' => 'Quy trình thẩm định & Quy đổi điểm: Sinh viên bắt buộc phải tham gia và vượt qua bài kiểm tra năng lực do bộ môn tổ chức. Nếu đạt yêu cầu, điểm số sẽ được quy đổi sang điểm 5 trên hệ thống.',
-										],
-									];
-								}
-
-								$scope_text = ! empty( $exemption_items ) ? 'Theo quy định nhà trường' : ( $is_utc ? 'Tối đa 2 môn (GDQP & Tiếng Anh)' : 'Xét theo bảng điểm cũ' );
-								?>
-								<div class="bg-slate-50 rounded-xl p-3.5">
-									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Phạm vi miễn giảm môn</span>
-									<div class="flex items-baseline flex-wrap gap-1">
-										<span class="text-base font-bold text-slate-900"><?php echo esc_html( $scope_text ); ?></span>
+								<?php if ( ! empty( $target_majors_data['bridge_courses_count'] ) ) : ?>
+									<div class="bg-amber-50/70 border border-amber-200/60 rounded-xl p-3 text-xs text-amber-900 flex items-start gap-2">
+										<span class="text-amber-600 font-bold shrink-0 mt-0.5">⚡</span>
+										<span class="leading-relaxed"><strong>Thí sinh ngành gần:</strong> Hoàn thành thêm <strong>03 học phần bổ sung</strong> kiến thức trong quá trình học (<a href="#dieu-kien-ho-so" class="font-bold underline text-amber-950 hover:text-blue-700">xem danh mục ngành</a>).</span>
 									</div>
-								</div>
+								<?php endif; ?>
 							</div>
 							
 							<div class="mt-4 pt-3.5 border-t border-slate-100 text-xs md:text-sm text-slate-600 leading-relaxed">
 								<span class="font-bold text-slate-700 block mb-1">Lưu ý quan trọng:</span>
-								<?php if ( ! empty( $exemption_items ) ) : ?>
-									<p class="text-slate-600">Quy định miễn trừ học phần và quy đổi tín chỉ được thực hiện theo đúng hướng dẫn của Nhà trường.</p>
-								<?php elseif ( $is_utc ) : ?>
-									<p class="text-slate-600">Nhà trường chỉ xem xét miễn trừ 2 môn (GDQP-AN và Tiếng Anh B1) nếu đủ điều kiện chứng chỉ. Tất cả các môn học khác học viên bắt buộc phải hoàn thành theo khung chương trình.</p>
-								<?php else : ?>
-									<p class="text-slate-600">Học viên được xem xét miễn giảm các môn đại cương và môn chuyên ngành dựa trên bảng điểm tốt nghiệp trung cấp, cao đẳng hoặc văn bằng 1 đã có.</p>
-								<?php endif; ?>
+								<p class="text-slate-600">Quy định miễn trừ học phần, chuyển đổi tín chỉ và số tín chỉ thực tế cần hoàn thành sẽ được Nhà trường thẩm định cụ thể dựa trên bảng điểm tốt nghiệp của từng học viên.</p>
 							</div>
 						</div>
 					</div>

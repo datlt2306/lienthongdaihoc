@@ -63,6 +63,7 @@ define( 'LTDH_META_OFFERED_PROGRAMS', '_offered_programs' );
 define( 'LTDH_META_LAST_SCHOOL', '_last_known_school_id' );
 define( 'LTDH_META_LAST_MAJOR', '_last_known_major_id' );
 define( 'LTDH_META_TUITION', 'tuition_fee' );
+define( 'LTDH_META_ADMISSION_FEE', 'admission_fee' );
 define( 'LTDH_META_DURATION', 'duration' );
 define( 'LTDH_META_SCHEDULE', 'schedule' );
 define( 'LTDH_META_AD_GROUPS', 'admission_groups' );

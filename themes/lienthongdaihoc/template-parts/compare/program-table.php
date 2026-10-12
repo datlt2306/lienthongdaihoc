@@ -105,6 +105,21 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 					'render' => function( $item ) { return esc_html( $item['tuition_fee'] ?: 'Chưa cập nhật' ); }
 				],
 				[
+					'label' => 'Lệ phí xét tuyển',
+					'key' => 'admission_fee',
+					'render' => function( $item ) {
+						$fee = ! empty( $item['admission_fee'] ) ? trim( (string) $item['admission_fee'] ) : '';
+						if ( empty( $fee ) ) {
+							return '<span class="text-slate-400 text-xs">Không thu / Miễn phí</span>';
+						}
+						$fee_info = function_exists( 'ltdh_format_admission_fee' ) ? ltdh_format_admission_fee( $fee ) : [ 'display' => esc_html( $fee ) . ' / hồ sơ', 'is_free' => false ];
+						if ( ! empty( $fee_info['is_free'] ) ) {
+							return '<span class="font-bold text-emerald-600 text-xs">' . esc_html( $fee_info['display'] ) . '</span>';
+						}
+						return esc_html( $fee_info['display'] );
+					}
+				],
+				[
 					'label' => 'Thời gian đào tạo',
 					'key' => 'duration',
 					'render' => function( $item ) { return esc_html( $item['duration'] ?: 'Chưa cập nhật' ); }
