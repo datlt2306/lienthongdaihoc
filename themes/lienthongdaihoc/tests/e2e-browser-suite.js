@@ -116,6 +116,64 @@ async function runE2ETests() {
         assert(false, `LocalStorage code test error: ${err.message}`);
     }
 
+    // ----------------------------------------------------
+    // TEST 7: Eligibility Checker Page Delivery & Asset Validation
+    // ----------------------------------------------------
+    console.log('\n--- TEST 7: Eligibility Checker Page Delivery & Assets ---');
+    try {
+        const res = await fetch(`${BASE_URL}/kiem-tra-dieu-kien/`);
+        assert(res.status === 200, `GET ${BASE_URL}/kiem-tra-dieu-kien/ returns HTTP 200 OK`);
+
+        const html = await res.text();
+        assert(html.includes('id="elig-unified-form"'), 'Page contains #elig-unified-form');
+        assert(html.includes('id="elig-unified-submit"'), 'Page contains unified submit button');
+        assert(html.includes('id="elig-input-summary"') && html.includes('id="elig-summary-tags"'), 'Page contains input summary & tags container');
+        assert(html.includes('assets/css/eligibility.css?ver='), 'Styles eligibility.css enqueued with version parameter');
+        assert(html.includes('assets/js/eligibility.js?ver='), 'Script eligibility.js enqueued with version parameter');
+
+        // Extract localized config
+        const match = html.match(/var ltdh_elig = (\{.*?\});/s);
+        assert(match && match[1], 'Page contains localized ltdh_elig object');
+
+        if (match && match[1]) {
+            const config = JSON.parse(match[1]);
+            assert(config.ajax_url && config.nonce, 'ltdh_elig contains ajax_url and nonce');
+
+            // ----------------------------------------------------
+            // TEST 8: Live AJAX Eligibility Check & UTC #1 Ranking
+            // ----------------------------------------------------
+            console.log('\n--- TEST 8: Live AJAX Eligibility Matching (UTC #1) ---');
+            const params = new URLSearchParams();
+            params.append('action', 'ltdh_elig_check');
+            params.append('nonce', config.nonce);
+            params.append('education', 'cao-dang');
+            params.append('desired_major', '1677'); // CNTT
+            params.append('training_type', 'tu-xa');
+            params.append('campus', 'ha-noi');
+
+            const ajaxRes = await fetch(config.ajax_url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+
+            assert(ajaxRes.status === 200, `POST ${config.ajax_url} returns HTTP 200 OK`);
+            const ajaxJson = await ajaxRes.json();
+
+            assert(ajaxJson.success === true, 'AJAX response success is true');
+            assert(ajaxJson.data && ajaxJson.data.eligible === true, 'Data eligible is true');
+            assert(ajaxJson.data.input && ajaxJson.data.input.desired_major_title === 'Công nghệ thông tin', 'Serialized input contains desired_major_title ("Công nghệ thông tin")');
+            assert(ajaxJson.data.programs && ajaxJson.data.programs.length > 0, 'Returned programs array is not empty');
+
+            const topProg = ajaxJson.data.programs[0];
+            assert(topProg.program_id === 2014, `Top match program_id is 2014 (Got: ${topProg.program_id})`);
+            assert(topProg.school && topProg.school.code === 'UTC', `Top match university code is 'UTC' (Got: ${topProg.school ? topProg.school.code : 'NONE'})`);
+            assert(topProg.school && topProg.school.title === 'Trường Đại học Giao thông Vận tải', `Top match school title is 'Trường Đại học Giao thông Vận tải'`);
+        }
+    } catch (err) {
+        assert(false, `Eligibility E2E test error: ${err.message}`);
+    }
+
     console.log('\n==================================================');
     console.log(`E2E TEST SUMMARY: ${passed} PASSED, ${failed} FAILED`);
     console.log('==================================================');

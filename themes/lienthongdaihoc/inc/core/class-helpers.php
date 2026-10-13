@@ -1598,6 +1598,109 @@ function ltdh_get_school_unique_majors_count( int $school_id ): int {
 	return $count;
 }
 
+/**
+ * Get count of valid, actively offered programs linked to a major.
+ * Only counts published programs linked to published schools and not marked as 'tam-ngung'.
+ *
+ * @param int $major_id
+ * @return int
+ */
+function ltdh_get_major_valid_programs_count( int $major_id ): int {
+	if ( ! $major_id ) {
+		return 0;
+	}
+
+	$cache_key = 'ltdh_major_programs_count_' . $major_id;
+	$cached    = wp_cache_get( $cache_key, 'ltdh' );
+	if ( false !== $cached ) {
+		return (int) $cached;
+	}
+
+	$offered_program_ids = get_post_meta( $major_id, defined( 'LTDH_META_OFFERED_PROGRAMS' ) ? LTDH_META_OFFERED_PROGRAMS : '_offered_programs', true );
+	$major_rel_key       = defined( 'LTDH_META_MAJOR_REL' ) ? LTDH_META_MAJOR_REL : 'major_relationship';
+	$program_cpt         = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
+	$school_rel_key      = defined( 'LTDH_META_SCHOOL_REL' ) ? LTDH_META_SCHOOL_REL : 'school_relationship';
+	$status_key          = defined( 'LTDH_META_ADMISSION_STATUS' ) ? LTDH_META_ADMISSION_STATUS : 'admission_status';
+
+	$direct_prog_ids = get_posts( [
+		'post_type'     => $program_cpt,
+		'post_status'   => 'publish',
+		'numberposts'   => -1,
+		'fields'        => 'ids',
+		'no_found_rows' => true,
+		'meta_query'    => [
+			'relation' => 'OR',
+			[
+				'key'     => $major_rel_key,
+				'value'   => $major_id,
+				'compare' => '=',
+			],
+			[
+				'key'     => $major_rel_key,
+				'value'   => '"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => $major_rel_key,
+				'value'   => 's:' . strlen( (string) $major_id ) . ':"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => $major_rel_key,
+				'value'   => 'i:' . $major_id . ';',
+				'compare' => 'LIKE',
+			],
+		],
+	] );
+
+	$all_candidate_ids = array_unique( array_filter( array_merge(
+		is_array( $offered_program_ids ) ? $offered_program_ids : [],
+		is_array( $direct_prog_ids ) ? $direct_prog_ids : []
+	) ) );
+
+	if ( empty( $all_candidate_ids ) ) {
+		wp_cache_set( $cache_key, 0, 'ltdh', HOUR_IN_SECONDS );
+		return 0;
+	}
+
+	$meta_query = [
+		'relation' => 'AND',
+		[
+			'relation' => 'OR',
+			[
+				'key'     => $status_key,
+				'value'   => 'tam-ngung',
+				'compare' => '!=',
+			],
+			[
+				'key'     => $status_key,
+				'compare' => 'NOT EXISTS',
+			],
+		],
+	];
+
+	$programs = get_posts( [
+		'post_type'      => $program_cpt,
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'post__in'       => $all_candidate_ids,
+		'fields'         => 'ids',
+		'no_found_rows'  => true,
+		'meta_query'     => $meta_query,
+	] );
+
+	$count = 0;
+	foreach ( $programs as $p_id ) {
+		$school_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $p_id ) : intval( get_post_meta( $p_id, $school_rel_key, true ) );
+		if ( $school_id > 0 && 'publish' === get_post_status( $school_id ) ) {
+			$count++;
+		}
+	}
+
+	wp_cache_set( $cache_key, $count, 'ltdh', HOUR_IN_SECONDS );
+	return $count;
+}
+
 function ltdh_get_training_type_badge_html( string $type_name ): string {
 	if ( ! $type_name ) {
 		return '';
@@ -2170,6 +2273,220 @@ function ltdh_get_major_training_types( int $major_id ): array {
 	wp_cache_set( $cache_key, $available_types, 'ltdh', HOUR_IN_SECONDS );
 	return $available_types;
 }
+
+// ----------------------------------------------------
+// 21. Program Verification Helpers
+// ----------------------------------------------------
+
+/**
+ * Format verification date into Vietnamese standard DD/MM/YYYY.
+ *
+ * @param mixed $date_raw Date string or timestamp.
+ * @return string Formatted date (DD/MM/YYYY) or empty string.
+ */
+function ltdh_format_verification_date( $date_raw ): string {
+	if ( empty( $date_raw ) || ! is_string( $date_raw ) ) {
+		return '';
+	}
+	$trimmed = trim( $date_raw );
+	if ( '' === $trimmed ) {
+		return '';
+	}
+
+	// 1. Format: DD/MM/YYYY
+	if ( preg_match( '#^(\d{1,2})/(\d{1,2})/(\d{4})$#', $trimmed, $m ) ) {
+		return sprintf( '%02d/%02d/%04d', (int) $m[1], (int) $m[2], (int) $m[3] );
+	}
+
+	// 2. Format: YYYYMMDD (ACF datepicker raw)
+	if ( preg_match( '#^(\d{4})(\d{2})(\d{2})$#', $trimmed, $m ) ) {
+		return sprintf( '%02d/%02d/%04d', (int) $m[3], (int) $m[2], (int) $m[1] );
+	}
+
+	// 3. Format: YYYY-MM-DD
+	if ( preg_match( '#^(\d{4})-(\d{1,2})-(\d{1,2})$#', $trimmed, $m ) ) {
+		return sprintf( '%02d/%02d/%04d', (int) $m[3], (int) $m[2], (int) $m[1] );
+	}
+
+	// 4. Try strtotime for standard ISO formats
+	$ts = strtotime( $trimmed );
+	if ( false !== $ts && $ts > 0 ) {
+		return date_i18n( 'd/m/Y', $ts );
+	}
+
+	return '';
+}
+
+/**
+ * Retrieve verified status, date, source and internal notes for a program.
+ *
+ * @param int $program_id Program post ID.
+ * @return array Verification data.
+ */
+function ltdh_get_program_verification( int $program_id ): array {
+	if ( ! $program_id || 'program' !== get_post_type( $program_id ) ) {
+		return [
+			'status'             => LTDH_VERIF_STATUS_UNVERIFIED,
+			'status_label'       => 'Chưa xác minh',
+			'is_verified'        => false,
+			'is_partial'         => false,
+			'is_unverified'      => true,
+			'last_verified_at'   => '',
+			'last_verified_raw'  => '',
+			'source_url'         => '',
+			'source_title'       => '',
+			'notes'              => '',
+		];
+	}
+
+	$status = get_post_meta( $program_id, LTDH_META_VERIFICATION_STATUS, true );
+	if ( empty( $status ) && function_exists( 'get_field' ) ) {
+		$status = get_field( LTDH_META_VERIFICATION_STATUS, $program_id );
+	}
+	$allowed_statuses = [
+		LTDH_VERIF_STATUS_VERIFIED,
+		LTDH_VERIF_STATUS_PARTIAL,
+		LTDH_VERIF_STATUS_UNVERIFIED,
+	];
+	if ( ! in_array( $status, $allowed_statuses, true ) ) {
+		$status = LTDH_VERIF_STATUS_UNVERIFIED;
+	}
+
+	$status_labels = [
+		LTDH_VERIF_STATUS_VERIFIED   => 'Đã xác minh',
+		LTDH_VERIF_STATUS_PARTIAL    => 'Đã xác minh một phần',
+		LTDH_VERIF_STATUS_UNVERIFIED => 'Chưa xác minh',
+	];
+
+	// Date: Only use recorded verification date, never fall back to publish or modified date
+	$raw_date = get_post_meta( $program_id, LTDH_META_LAST_VERIFIED_AT, true );
+	if ( empty( $raw_date ) && function_exists( 'get_field' ) ) {
+		$raw_date = get_field( LTDH_META_LAST_VERIFIED_AT, $program_id, false );
+	}
+	$formatted_date = ltdh_format_verification_date( $raw_date );
+
+	// Source URL: Must be validated HTTP/HTTPS URL
+	$raw_url = get_post_meta( $program_id, LTDH_META_VERIFICATION_SOURCE, true );
+	if ( empty( $raw_url ) && function_exists( 'get_field' ) ) {
+		$raw_url = get_field( LTDH_META_VERIFICATION_SOURCE, $program_id );
+	}
+	$clean_url = '';
+	if ( ! empty( $raw_url ) && is_string( $raw_url ) ) {
+		$candidate_url = esc_url_raw( trim( $raw_url ) );
+		if ( ! empty( $candidate_url ) && filter_var( $candidate_url, FILTER_VALIDATE_URL ) && preg_match( '#^https?://#i', $candidate_url ) ) {
+			$clean_url = $candidate_url;
+		}
+	}
+
+	// Source Title
+	$source_title = get_post_meta( $program_id, LTDH_META_VERIFICATION_SOURCE_TITLE, true );
+	if ( empty( $source_title ) && function_exists( 'get_field' ) ) {
+		$source_title = get_field( LTDH_META_VERIFICATION_SOURCE_TITLE, $program_id );
+	}
+	$clean_title = ! empty( $source_title ) && is_string( $source_title ) ? trim( sanitize_text_field( $source_title ) ) : '';
+
+	// Notes (internal only)
+	$notes = get_post_meta( $program_id, LTDH_META_VERIFICATION_NOTES, true );
+	if ( empty( $notes ) && function_exists( 'get_field' ) ) {
+		$notes = get_field( LTDH_META_VERIFICATION_NOTES, $program_id );
+	}
+	$clean_notes = ! empty( $notes ) && is_string( $notes ) ? trim( sanitize_textarea_field( $notes ) ) : '';
+
+	return [
+		'status'            => $status,
+		'status_label'      => $status_labels[ $status ] ?? 'Chưa xác minh',
+		'is_verified'       => ( LTDH_VERIF_STATUS_VERIFIED === $status ),
+		'is_partial'        => ( LTDH_VERIF_STATUS_PARTIAL === $status ),
+		'is_unverified'     => ( LTDH_VERIF_STATUS_UNVERIFIED === $status ),
+		'last_verified_at'  => $formatted_date,
+		'last_verified_raw' => is_string( $raw_date ) ? trim( $raw_date ) : '',
+		'source_url'        => $clean_url,
+		'source_title'      => $clean_title,
+		'notes'             => $clean_notes,
+	];
+}
+
+/**
+ * Get verification badge HTML for a program.
+ *
+ * @param int    $program_id Program post ID.
+ * @param string $context    'detail' for single page, 'card' for listing cards.
+ * @return string HTML output or empty string.
+ */
+function ltdh_get_program_verification_badge_html( int $program_id, string $context = 'detail' ): string {
+	$data = ltdh_get_program_verification( $program_id );
+
+	if ( 'card' === $context ) {
+		if ( ! empty( $data['is_verified'] ) ) {
+			return '<span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md shadow-2xs select-none" title="Thông tin chương trình đã được xác minh">'
+				. '<svg class="w-3 h-3 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>'
+				. '<span>Đã xác minh</span>'
+				. '</span>';
+		}
+		return '';
+	}
+
+	// Single Program Detail Page
+	if ( ! empty( $data['is_verified'] ) ) {
+		$source_label = ! empty( $data['source_title'] ) ? $data['source_title'] : 'Xem nguồn chính thức';
+
+		$meta_items = [];
+		if ( ! empty( $data['last_verified_at'] ) ) {
+			$meta_items[] = '<span class="inline-flex items-center gap-1.5">'
+				. '<span class="text-emerald-700/80">Cập nhật xác minh:</span>'
+				. '<strong class="font-bold text-emerald-950">' . esc_html( $data['last_verified_at'] ) . '</strong>'
+				. '</span>';
+		}
+		if ( ! empty( $data['source_url'] ) ) {
+			$meta_items[] = '<span class="inline-flex items-center gap-1.5">'
+				. '<span class="text-emerald-700/80">Nguồn thông tin:</span>'
+				. '<a href="' . esc_url( $data['source_url'] ) . '" target="_blank" rel="noopener noreferrer nofollow" class="font-bold text-emerald-800 hover:text-emerald-950 underline underline-offset-2 transition-colors inline-flex items-center gap-0.5">'
+				. '<span>' . esc_html( $source_label ) . '</span>'
+				. '<svg class="w-3 h-3 ml-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>'
+				. '</a>'
+				. '</span>';
+		}
+
+		$meta_html = '';
+		if ( ! empty( $meta_items ) ) {
+			$meta_html = '<div class="mt-2.5 pt-2.5 border-t border-emerald-200/70 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-emerald-800">'
+				. implode( '<span class="text-emerald-300 hidden sm:inline select-none" aria-hidden="true">•</span>', $meta_items )
+				. '</div>';
+		}
+
+		return '<div class="ltdh-verification-badge mb-5 rounded-2xl border border-emerald-200/90 bg-emerald-50/70 p-3.5 sm:p-4 text-emerald-950 shadow-2xs">'
+			. '<div class="flex items-center gap-2.5 min-w-0">'
+			. '<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-black shrink-0 shadow-xs" aria-hidden="true">✓</span>'
+			. '<span class="font-extrabold text-sm sm:text-base text-emerald-950 tracking-tight leading-snug">Thông tin chương trình đã được xác minh</span>'
+			. '</div>'
+			. $meta_html
+			. '</div>';
+	}
+
+	if ( ! empty( $data['is_partial'] ) ) {
+		return '<div class="ltdh-verification-partial mb-5 rounded-2xl border border-amber-200/90 bg-amber-50/70 p-3.5 sm:p-4 text-amber-950 shadow-2xs">'
+			. '<div class="flex items-center gap-2.5">'
+			. '<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-white text-xs font-bold shrink-0" aria-hidden="true">!</span>'
+			. '<span class="font-semibold text-xs sm:text-sm text-amber-900 leading-snug">Một số thông tin chương trình chưa được xác minh đầy đủ.</span>'
+			. '</div>'
+			. '</div>';
+	}
+
+	// Unverified programs output nothing public, per specification.
+	return '';
+}
+
+/**
+ * Render verification information badge on frontend.
+ *
+ * @param int    $program_id Program post ID.
+ * @param string $context    'detail' for single page, 'card' for listing cards.
+ */
+function ltdh_render_program_verification_badge( int $program_id, string $context = 'detail' ): void {
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo ltdh_get_program_verification_badge_html( $program_id, $context );
+}
+
 
 
 

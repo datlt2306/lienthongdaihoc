@@ -338,6 +338,11 @@
 	font-size: 0.85rem;
 	font-weight: 700;
 }
+.elig-tag.elig-tag-major {
+	background: #1E3A8A;
+	color: #FFFFFF;
+	border-color: #1E3A8A;
+}
 
 /* ----------------------------------------------------
    Program Matching Cards Design

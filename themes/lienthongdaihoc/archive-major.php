@@ -183,22 +183,10 @@ $all_tab_url = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $arc
 						$thumb = $major_fallbacks[ $idx ];
 					}
 					
-					// Get count of programs linked to this major
-					$prog_query = new WP_Query( [
-						'post_type'      => 'program',
-						'post_status'    => 'publish',
-						'posts_per_page' => -1,
-						'fields'         => 'ids',
-						'meta_query'     => [
-							[
-								'key'     => 'major_relationship',
-								'value'   => $major_id,
-								'compare' => '=',
-							],
-						],
-					] );
-					$prog_count = $prog_query->post_count;
-					wp_reset_postdata();
+					// Get count of valid, active programs linked to this major
+					$prog_count = function_exists( 'ltdh_get_major_valid_programs_count' )
+						? ltdh_get_major_valid_programs_count( $major_id )
+						: 0;
 
 					// Get category term
 					$terms    = get_the_terms( $major_id, 'major_cat' );

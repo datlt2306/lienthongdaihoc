@@ -511,13 +511,14 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 									<h2 class="font-black text-slate-900 text-base md:text-lg hover:text-brand-primary leading-snug line-clamp-2 min-h-[48px] transition-colors">
 										<a href="<?php the_permalink(); ?>"><?php echo esc_html( $card_headline ); ?></a>
 									</h2>
-									<?php if ( 'tam-ngung' === $admission_status ) : ?>
-										<div class="mt-2">
+									<div class="mt-2 flex flex-wrap items-center gap-2">
+										<?php if ( 'tam-ngung' === $admission_status ) : ?>
 											<span class="inline-flex items-center gap-1.5 text-xs font-bold text-red-700 bg-red-50 border border-red-200/80 px-2.5 py-1 rounded-md">
 												<span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span> Tạm dừng tuyển sinh năm nay
 											</span>
-										</div>
-									<?php endif; ?>
+										<?php endif; ?>
+										<?php ltdh_render_program_verification_badge( $prog_id, 'card' ); ?>
+									</div>
 								</div>
 
 								<!-- Key Information List -->

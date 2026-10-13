@@ -161,5 +161,17 @@ if ( empty( $banner_image ) ) {
 				<?php echo esc_html( $banner_subtitle ); ?>
 			</p>
 		<?php endif; ?>
+		<?php if ( is_singular( 'program' ) ) :
+			$banner_verif = function_exists( 'ltdh_get_program_verification' ) ? ltdh_get_program_verification( get_the_ID() ) : null;
+			if ( ! empty( $banner_verif['is_verified'] ) ) :
+		?>
+			<div class="mt-3.5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-semibold backdrop-blur-xs select-none">
+				<span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] font-black shrink-0">✓</span>
+				<span>Thông tin tuyển sinh đã được xác minh</span>
+				<?php if ( ! empty( $banner_verif['last_verified_at'] ) ) : ?>
+					<span class="text-emerald-300/80">• <?php echo esc_html( $banner_verif['last_verified_at'] ); ?></span>
+				<?php endif; ?>
+			</div>
+		<?php endif; endif; ?>
 	</div>
 </section>

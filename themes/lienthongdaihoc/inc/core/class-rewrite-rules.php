@@ -338,6 +338,14 @@ function ltdh_redirect_taxonomy_base() {
 		wp_redirect( $redirect_url, 301 );
 		exit;
 	}
+	if ( preg_match( '#^/(?:faq|hoi-dap)/?$#i', $request_path ) ) {
+		$redirect_url = home_url( '/cau-hoi-thuong-gap/' );
+		if ( ! empty( $_GET ) ) {
+			$redirect_url = add_query_arg( $_GET, $redirect_url );
+		}
+		wp_redirect( $redirect_url, 301 );
+		exit;
+	}
 }
 add_action( 'template_redirect', 'ltdh_redirect_taxonomy_base' );
 

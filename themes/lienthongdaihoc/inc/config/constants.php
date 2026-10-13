@@ -73,6 +73,17 @@ define( 'LTDH_STATUS_OPEN', 'tuyen-sinh' );
 define( 'LTDH_STATUS_PAUSED', 'tam-ngung' );
 define( 'LTDH_STATUS_COMING_SOON', 'sap-mo' );
 
+// Verification meta keys and status values.
+define( 'LTDH_META_VERIFICATION_STATUS', 'verification_status' );
+define( 'LTDH_META_LAST_VERIFIED_AT', 'last_verified_at' );
+define( 'LTDH_META_VERIFICATION_SOURCE', 'verification_source' );
+define( 'LTDH_META_VERIFICATION_SOURCE_TITLE', 'verification_source_title' );
+define( 'LTDH_META_VERIFICATION_NOTES', 'verification_notes' );
+
+define( 'LTDH_VERIF_STATUS_UNVERIFIED', 'unverified' );
+define( 'LTDH_VERIF_STATUS_PARTIAL', 'partially_verified' );
+define( 'LTDH_VERIF_STATUS_VERIFIED', 'verified' );
+
 // ====================================================
 // Telegram Bot Settings (For Lead Notifications)
 // Can be overridden in wp-config.php for production security

@@ -785,12 +785,18 @@ function ltdh_save_custom_fields_fail_safe( $post_id, $post ) {
 						continue;
 					}
 					if ( ! is_array( $value ) ) {
+						if ( in_array( $meta_name, [ 'verification_status', 'verification_source', 'verification_source_title', 'last_verified_at', 'verification_notes' ], true ) ) {
+							$value = ltdh_sanitize_verification_meta( $meta_name, $value );
+						}
 						update_post_meta( $post_id, $meta_name, $value );
 					}
 					update_post_meta( $post_id, '_' . $meta_name, $key );
 				}
 			} else {
 				if ( ! ltdh_is_repeater_or_complex_field( $key ) && ! is_array( $value ) ) {
+					if ( in_array( $key, [ 'verification_status', 'verification_source', 'verification_source_title', 'last_verified_at', 'verification_notes' ], true ) ) {
+						$value = ltdh_sanitize_verification_meta( $key, $value );
+					}
 					update_post_meta( $post_id, $key, $value );
 				}
 			}
@@ -805,18 +811,641 @@ function ltdh_save_custom_fields_fail_safe( $post_id, $post ) {
 		if ( isset( $_POST[ $field_key ] ) ) {
 			$val = $_POST[ $field_key ];
 			if ( ! is_array( $val ) ) {
+				if ( in_array( $meta_name, [ 'verification_status', 'verification_source', 'verification_source_title', 'last_verified_at', 'verification_notes' ], true ) ) {
+					$val = ltdh_sanitize_verification_meta( $meta_name, $val );
+				}
 				update_post_meta( $post_id, $meta_name, $val );
 			}
 			update_post_meta( $post_id, '_' . $meta_name, $field_key );
 		} elseif ( isset( $_POST[ $meta_name ] ) ) {
 			$val = $_POST[ $meta_name ];
 			if ( ! is_array( $val ) ) {
+				if ( in_array( $meta_name, [ 'verification_status', 'verification_source', 'verification_source_title', 'last_verified_at', 'verification_notes' ], true ) ) {
+					$val = ltdh_sanitize_verification_meta( $meta_name, $val );
+				}
 				update_post_meta( $post_id, $meta_name, $val );
 			}
 			update_post_meta( $post_id, '_' . $meta_name, $field_key );
 		}
 	}
+
+	// 3. Auto-promote verification_status to 'verified' if verification_source is present
+	// and status was left as default 'unverified' (unless explicitly set to 'partially_verified').
+	if ( 'program' === $post->post_type ) {
+		$source = get_post_meta( $post_id, 'verification_source', true );
+		$status = get_post_meta( $post_id, 'verification_status', true );
+		if ( ! empty( $source ) && ( empty( $status ) || 'unverified' === $status ) ) {
+			update_post_meta( $post_id, 'verification_status', 'verified' );
+		}
+	}
 }
+
+// Auto-promote verification status on ACF save if verification source URL is provided
+add_action( 'acf/save_post', 'ltdh_acf_auto_promote_verification_status', 20 );
+function ltdh_acf_auto_promote_verification_status( $post_id ) {
+	if ( ! is_numeric( $post_id ) || 'program' !== get_post_type( $post_id ) ) {
+		return;
+	}
+	$source = get_post_meta( $post_id, 'verification_source', true );
+	$status = get_post_meta( $post_id, 'verification_status', true );
+	if ( ! empty( $source ) && ( empty( $status ) || 'unverified' === $status ) ) {
+		update_post_meta( $post_id, 'verification_status', 'verified' );
+	}
+}
+
+/**
+ * Sanitize and validate verification metadata.
+ *
+ * @param string $meta_name Field or meta name.
+ * @param mixed  $value     Input value.
+ * @return mixed Sanitized value.
+ */
+function ltdh_sanitize_verification_meta( $meta_name, $value ) {
+	switch ( $meta_name ) {
+		case 'verification_status':
+			$val = is_string( $value ) ? trim( $value ) : '';
+			return in_array( $val, [ 'verified', 'partially_verified', 'unverified' ], true ) ? $val : 'unverified';
+
+		case 'verification_source':
+			if ( empty( $value ) || ! is_string( $value ) ) {
+				return '';
+			}
+			$url = esc_url_raw( trim( $value ) );
+			return ( filter_var( $url, FILTER_VALIDATE_URL ) && preg_match( '#^https?://#i', $url ) ) ? $url : '';
+
+		case 'verification_source_title':
+			return is_string( $value ) ? sanitize_text_field( trim( $value ) ) : '';
+
+		case 'last_verified_at':
+			if ( empty( $value ) || ! is_string( $value ) ) {
+				return '';
+			}
+			$val = trim( $value );
+			// Check standard date formats (Y-m-d, d/m/Y, Ymd)
+			if ( preg_match( '#^(\d{4})-(\d{1,2})-(\d{1,2})$#', $val ) ||
+			     preg_match( '#^(\d{1,2})/(\d{1,2})/(\d{4})$#', $val ) ||
+			     preg_match( '#^(\d{4})(\d{2})(\d{2})$#', $val ) ) {
+				return sanitize_text_field( $val );
+			}
+			$ts = strtotime( $val );
+			return ( false !== $ts && $ts > 0 ) ? date( 'Y-m-d', $ts ) : '';
+
+		case 'verification_notes':
+			return is_string( $value ) ? sanitize_textarea_field( trim( $value ) ) : '';
+
+		default:
+			return $value;
+	}
+}
+
+// Ensure ACF field updates pass through sanitization
+add_filter( 'acf/update_value/name=verification_status', function( $value ) {
+	return ltdh_sanitize_verification_meta( 'verification_status', $value );
+} );
+add_filter( 'acf/update_value/name=verification_source', function( $value ) {
+	return ltdh_sanitize_verification_meta( 'verification_source', $value );
+} );
+add_filter( 'acf/update_value/name=verification_source_title', function( $value ) {
+	return ltdh_sanitize_verification_meta( 'verification_source_title', $value );
+} );
+add_filter( 'acf/update_value/name=last_verified_at', function( $value ) {
+	return ltdh_sanitize_verification_meta( 'last_verified_at', $value );
+} );
+add_filter( 'acf/update_value/name=verification_notes', function( $value ) {
+	return ltdh_sanitize_verification_meta( 'verification_notes', $value );
+} );
+
+// ----------------------------------------------------
+// Admin UI: Verification Workflow & Quick Actions
+// ----------------------------------------------------
+
+add_action( 'admin_footer-post.php', 'ltdh_admin_verification_quick_actions' );
+add_action( 'admin_footer-post-new.php', 'ltdh_admin_verification_quick_actions' );
+function ltdh_admin_verification_quick_actions() {
+	global $post;
+	if ( ! $post || 'program' !== $post->post_type ) {
+		return;
+	}
+	$today_iso = current_time( 'Y-m-d' );
+	$today_vn  = current_time( 'd/m/Y' );
+	?>
+	<script>
+	jQuery(document).ready(function($) {
+		// Wait for ACF fields to be rendered
+		setTimeout(function() {
+			var $verifTab = $('.acf-tab-wrap a[data-key="field_tab_prog_verification"]');
+			var $statusField = $('[data-name="verification_status"], [data-key="field_program_verification_status"]');
+			if (!$statusField.length) return;
+
+			// Inject Quick Action toolbar above the verification status field
+			if (!$('#ltdh-verif-quick-bar').length) {
+				var barHtml = '<div id="ltdh-verif-quick-bar" style="margin-bottom:15px;padding:12px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #10b981;border-radius:6px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">' +
+					'<span style="font-weight:600;font-size:12px;color:#1e293b;">⚡ Thao tác nhanh:</span>' +
+					'<button type="button" id="ltdh-act-verify-today" class="button button-secondary" style="font-size:12px;display:inline-flex;align-items:center;gap:4px;border-color:#10b981;color:#047857;">' +
+						'<span>✓ Xác nhận đã kiểm tra hôm nay</span>' +
+					'</button>' +
+					'<button type="button" id="ltdh-act-clear-verif" class="button button-link-delete" style="font-size:12px;color:#b91c1c;margin-left:auto;">' +
+						'Xóa ngày xác minh' +
+					'</button>' +
+					'<div id="ltdh-verif-quick-msg" style="width:100%;font-size:11px;color:#047857;display:none;margin-top:4px;"></div>' +
+				'</div>';
+				$statusField.before(barHtml);
+			}
+
+			// Handle "Xác nhận đã kiểm tra hôm nay"
+			$('#ltdh-act-verify-today').on('click', function(e) {
+				e.preventDefault();
+				// 1. Set status to 'verified'
+				var $statusSelect = $('select[name="acf[field_program_verification_status]"], select[name*="verification_status"]');
+				if ($statusSelect.length) {
+					$statusSelect.val('verified').trigger('change');
+				}
+
+				// 2. Set date to today
+				var todayIso = <?php echo json_encode( $today_iso ); ?>;
+				var todayVn  = <?php echo json_encode( $today_vn ); ?>;
+
+				var $dateHidden = $('input[type="hidden"][name="acf[field_program_last_verified_at]"], input[type="hidden"][name*="last_verified_at"]');
+				var $dateField  = $('[data-name="last_verified_at"], [data-key="field_program_last_verified_at"]');
+				var $dateVisible = $dateField.find('.input-alt, input.hasDatepicker, input[type="text"]');
+
+				if ($dateHidden.length) {
+					$dateHidden.val(todayIso).trigger('change');
+				}
+				if ($dateVisible.length) {
+					$dateVisible.val(todayVn).trigger('change');
+				}
+
+				$('#ltdh-verif-quick-msg')
+					.html('✓ Đã chọn "Đã xác minh" và điền ngày hôm nay (' + todayVn + '). Hãy nhấn <strong>Cập nhật</strong> để lưu.')
+					.css('color', '#047857')
+					.show();
+			});
+
+			// Handle "Xóa ngày xác minh"
+			$('#ltdh-act-clear-verif').on('click', function(e) {
+				e.preventDefault();
+				var $dateHidden = $('input[type="hidden"][name="acf[field_program_last_verified_at]"], input[type="hidden"][name*="last_verified_at"]');
+				var $dateField  = $('[data-name="last_verified_at"], [data-key="field_program_last_verified_at"]');
+				var $dateVisible = $dateField.find('.input-alt, input.hasDatepicker, input[type="text"]');
+
+				if ($dateHidden.length) {
+					$dateHidden.val('').trigger('change');
+				}
+				if ($dateVisible.length) {
+					$dateVisible.val('').trigger('change');
+				}
+
+				$('#ltdh-verif-quick-msg')
+					.html('Đã xóa ngày xác minh. Nhấn <strong>Cập nhật</strong> để lưu.')
+					.css('color', '#64748b')
+					.show();
+			});
+
+			// Auto-sync status to "verified" when a source URL is typed or pasted
+			$(document).on('input paste change', '[data-name="verification_source"] input, [data-key="field_program_verification_source"] input, input[name*="verification_source"]', function() {
+				var val = $.trim($(this).val());
+				var $statusSelect = $('select[name="acf[field_program_verification_status]"], select[name*="verification_status"]');
+				if (val.length > 0 && (/^https?:\/\//i.test(val) || val.indexOf('.') !== -1)) {
+					if ($statusSelect.length && ($statusSelect.val() === 'unverified' || !$statusSelect.val())) {
+						$statusSelect.val('verified').trigger('change');
+						$('#ltdh-verif-quick-msg')
+							.html('✓ Đã tự động chọn "Đã xác minh" khi nhập nguồn xác minh. Nhấn <strong>Cập nhật</strong> để lưu ra ngoài website.')
+							.css('color', '#047857')
+							.show();
+					}
+				}
+			});
+
+			// On load check: if source exists but status is unverified, auto-select verified
+			var $sourceInput = $('[data-name="verification_source"] input, [data-key="field_program_verification_source"] input, input[name*="verification_source"]');
+			var $statusSelect = $('select[name="acf[field_program_verification_status]"], select[name*="verification_status"]');
+			if ($sourceInput.length && $statusSelect.length) {
+				var curUrl = $.trim($sourceInput.val());
+				if (curUrl.length > 0 && $statusSelect.val() === 'unverified') {
+					$statusSelect.val('verified').trigger('change');
+					$('#ltdh-verif-quick-msg')
+						.html('✓ Đã tự động chuyển sang "Đã xác minh" do có nguồn URL. Nhấn <strong>Cập nhật</strong> để lưu.')
+						.css('color', '#047857')
+						.show();
+				}
+			}
+		}, 300);
+	});
+	</script>
+	<?php
+}
+
+// ----------------------------------------------------
+// Admin Columns & Filter for Program CPT
+// ----------------------------------------------------
+
+// Admin Columns & Filter for Program CPT
+// ----------------------------------------------------
+
+add_filter( 'manage_edit-program_columns', 'ltdh_add_program_admin_columns', 20 );
+function ltdh_add_program_admin_columns( $columns ) {
+	$new_columns = [];
+	foreach ( $columns as $key => $title ) {
+		$new_columns[ $key ] = $title;
+		if ( 'title' === $key ) {
+			$new_columns['verification_status'] = 'Xác minh thông tin';
+			$new_columns['data_completeness']   = 'Chuẩn dữ liệu P0';
+		}
+	}
+	if ( ! isset( $new_columns['verification_status'] ) ) {
+		$new_columns['verification_status'] = 'Xác minh thông tin';
+	}
+	if ( ! isset( $new_columns['data_completeness'] ) ) {
+		$new_columns['data_completeness']   = 'Chuẩn dữ liệu P0';
+	}
+	return $new_columns;
+}
+
+add_action( 'manage_program_posts_custom_column', 'ltdh_render_program_admin_columns', 10, 2 );
+function ltdh_render_program_admin_columns( $column, $post_id ) {
+	if ( 'verification_status' === $column ) {
+		$verif = ltdh_get_program_verification( $post_id );
+
+		if ( $verif['is_verified'] ) {
+			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:600;font-size:11px;">✓ Đã xác minh</span>';
+			if ( ! empty( $verif['last_verified_at'] ) ) {
+				echo '<div style="font-size:11px;color:#64748b;margin-top:2px;">' . esc_html( $verif['last_verified_at'] ) . '</div>';
+			}
+			if ( ! empty( $verif['source_url'] ) ) {
+				$label = ! empty( $verif['source_title'] ) ? $verif['source_title'] : 'Nguồn chính thức';
+				echo '<div style="font-size:10px;margin-top:2px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="' . esc_url( $verif['source_url'] ) . '" target="_blank" rel="noopener noreferrer nofollow" style="color:#0284c7;text-decoration:none;" title="' . esc_attr( $label ) . '">' . esc_html( $label ) . ' ↗</a></div>';
+			}
+		} elseif ( $verif['is_partial'] ) {
+			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#fffbeb;color:#b45309;border:1px solid #fde68a;font-weight:600;font-size:11px;">⚠ Một phần</span>';
+		} else {
+			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#f1f5f9;color:#64748b;border:1px solid #cbd5e1;font-weight:500;font-size:11px;">Chưa xác minh</span>';
+		}
+	} elseif ( 'data_completeness' === $column ) {
+		$completeness = ltdh_get_program_data_completeness( $post_id );
+		if ( $completeness['is_p0_valid'] ) {
+			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:600;font-size:11px;" title="Đầy đủ 100% các trường bắt buộc P0">✓ Đạt chuẩn</span>';
+			if ( ! empty( $completeness['warnings'] ) ) {
+				echo '<div style="font-size:10px;color:#d97706;margin-top:2px;" title="' . esc_attr( implode( '; ', $completeness['warnings'] ) ) . '">⚠ Cảnh báo dữ liệu</div>';
+			}
+		} else {
+			$count = count( $completeness['p0_missing'] );
+			$title = implode( "\n• ", $completeness['p0_missing'] );
+			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:600;font-size:11px;cursor:help;" title="Thiếu các trường P0:&#10;• ' . esc_attr( $title ) . '">⚠ Thiếu ' . $count . ' trường P0</span>';
+		}
+	}
+}
+
+add_action( 'restrict_manage_posts', 'ltdh_filter_programs_dropdowns' );
+function ltdh_filter_programs_dropdowns( $post_type ) {
+	if ( 'program' !== $post_type ) {
+		return;
+	}
+	$selected_verif = isset( $_GET['filter_verification_status'] ) ? sanitize_text_field( $_GET['filter_verification_status'] ) : '';
+	?>
+	<select name="filter_verification_status">
+		<option value="">Tất cả trạng thái xác minh</option>
+		<option value="verified" <?php selected( $selected_verif, 'verified' ); ?>>Đã xác minh</option>
+		<option value="partially_verified" <?php selected( $selected_verif, 'partially_verified' ); ?>>Đã xác minh một phần</option>
+		<option value="unverified" <?php selected( $selected_verif, 'unverified' ); ?>>Chưa xác minh</option>
+	</select>
+	<?php
+	$selected_comp = isset( $_GET['filter_data_completeness'] ) ? sanitize_text_field( $_GET['filter_data_completeness'] ) : '';
+	?>
+	<select name="filter_data_completeness">
+		<option value="">Tất cả chất lượng dữ liệu</option>
+		<option value="complete" <?php selected( $selected_comp, 'complete' ); ?>>Đạt chuẩn P0</option>
+		<option value="incomplete" <?php selected( $selected_comp, 'incomplete' ); ?>>Thiếu trường P0</option>
+	</select>
+	<?php
+}
+
+add_action( 'pre_get_posts', 'ltdh_apply_program_admin_filters' );
+function ltdh_apply_program_admin_filters( $query ) {
+	if ( ! is_admin() || ! $query->is_main_query() || 'program' !== $query->get( 'post_type' ) ) {
+		return;
+	}
+
+	$meta_query = $query->get( 'meta_query' ) ?: [];
+
+	$verif_filter = isset( $_GET['filter_verification_status'] ) ? sanitize_text_field( $_GET['filter_verification_status'] ) : '';
+	if ( ! empty( $verif_filter ) && in_array( $verif_filter, [ 'verified', 'partially_verified', 'unverified' ], true ) ) {
+		if ( 'unverified' === $verif_filter ) {
+			$meta_query[] = [
+				'relation' => 'OR',
+				[
+					'key'     => 'verification_status',
+					'value'   => 'unverified',
+					'compare' => '=',
+				],
+				[
+					'key'     => 'verification_status',
+					'compare' => 'NOT EXISTS',
+				],
+				[
+					'key'     => 'verification_status',
+					'value'   => '',
+					'compare' => '=',
+				],
+			];
+		} else {
+			$meta_query[] = [
+				'key'     => 'verification_status',
+				'value'   => $verif_filter,
+				'compare' => '=',
+			];
+		}
+	}
+
+	$comp_filter = isset( $_GET['filter_data_completeness'] ) ? sanitize_text_field( $_GET['filter_data_completeness'] ) : '';
+	if ( 'complete' === $comp_filter ) {
+		$meta_query[] = [
+			'key'     => 'tuition_amount',
+			'value'   => 0,
+			'compare' => '>',
+			'type'    => 'NUMERIC',
+		];
+	} elseif ( 'incomplete' === $comp_filter ) {
+		$meta_query[] = [
+			'relation' => 'OR',
+			[
+				'key'     => 'tuition_amount',
+				'compare' => 'NOT EXISTS',
+			],
+			[
+				'key'     => 'tuition_amount',
+				'value'   => '',
+				'compare' => '=',
+			],
+			[
+				'key'     => 'tuition_amount',
+				'value'   => '0',
+				'compare' => '<=',
+				'type'    => 'NUMERIC',
+			],
+		];
+	}
+
+	if ( ! empty( $meta_query ) ) {
+		$query->set( 'meta_query', $meta_query );
+	}
+}
+
+/**
+ * Kiểm tra và trả về mức độ hoàn thiện các trường dữ liệu bắt buộc (P0/P1) của một chương trình.
+ *
+ * @param int $post_id Program post ID.
+ * @return array
+ */
+function ltdh_get_program_data_completeness( $post_id ) {
+	$p0_missing = [];
+	$p1_missing = [];
+	$warnings   = [];
+
+	if ( ! $post_id || 'program' !== get_post_type( $post_id ) ) {
+		return [
+			'is_p0_valid' => false,
+			'p0_missing'  => [ 'Bản ghi không tồn tại hoặc không phải là chương trình' ],
+			'p1_missing'  => [],
+			'warnings'    => [],
+			'score'       => 0,
+		];
+	}
+
+	// 1. Kiểm tra P0: Thực thể liên kết (Trường và Ngành bắt buộc phải tồn tại và đang ở trạng thái publish)
+	$school_id = get_post_meta( $post_id, 'school_relationship', true );
+	if ( empty( $school_id ) ) {
+		$p0_missing[] = 'Trường đào tạo (school_relationship rỗng)';
+	} else {
+		$school_post = get_post( $school_id );
+		if ( ! $school_post || 'publish' !== $school_post->post_status || 'school' !== $school_post->post_type ) {
+			$p0_missing[] = 'Trường đào tạo liên kết không hợp lệ hoặc không ở trạng thái công khai';
+		}
+	}
+
+	$major_id = get_post_meta( $post_id, 'major_relationship', true );
+	if ( empty( $major_id ) ) {
+		$p0_missing[] = 'Ngành đào tạo (major_relationship rỗng)';
+	} else {
+		$major_post = get_post( $major_id );
+		if ( ! $major_post || 'publish' !== $major_post->post_status || 'major' !== $major_post->post_type ) {
+			$p0_missing[] = 'Ngành đào tạo liên kết không hợp lệ hoặc đã bị xóa vào thùng rác (trash)';
+		}
+	}
+
+	// 2. Kiểm tra P0: Taxonomies
+	$tt = get_the_terms( $post_id, 'training_type' );
+	if ( empty( $tt ) || is_wp_error( $tt ) ) {
+		$p0_missing[] = 'Hình thức đào tạo (Taxonomy training_type)';
+	}
+
+	$cp = get_the_terms( $post_id, 'campus' );
+	if ( empty( $cp ) || is_wp_error( $cp ) ) {
+		$p0_missing[] = 'Cơ sở đào tạo (Taxonomy campus)';
+	}
+
+	// 3. Kiểm tra P0: Học phí
+	$tuition_fee = get_post_meta( $post_id, 'tuition_fee', true );
+	if ( empty( $tuition_fee ) ) {
+		$p0_missing[] = 'Học phí hiển thị (tuition_fee)';
+	}
+
+	$tuition_amount = get_post_meta( $post_id, 'tuition_amount', true );
+	if ( '' === $tuition_amount || null === $tuition_amount || ! is_numeric( $tuition_amount ) || intval( $tuition_amount ) < 1000 ) {
+		$p0_missing[] = 'Mức học phí định mức (tuition_amount)';
+	}
+
+	$tuition_unit = get_post_meta( $post_id, 'tuition_unit', true );
+	if ( empty( $tuition_unit ) ) {
+		$p0_missing[] = 'Đơn vị tính học phí (tuition_unit)';
+	}
+
+	// 4. Kiểm tra P0: Thời gian học & Trạng thái tuyển sinh
+	$duration = get_post_meta( $post_id, 'duration', true );
+	if ( empty( $duration ) ) {
+		$p0_missing[] = 'Thời gian học chuẩn (duration)';
+	}
+
+	$status = get_post_meta( $post_id, 'admission_status', true );
+	if ( empty( $status ) ) {
+		$p0_missing[] = 'Trạng thái tuyển sinh (admission_status)';
+	}
+
+	// 5. Kiểm tra P0: Yêu cầu & Hồ sơ
+	$req = get_post_meta( $post_id, 'admission_requirements', true );
+	$req_clean = trim( strip_tags( (string) $req ) );
+	if ( empty( $req_clean ) || strlen( $req_clean ) < 80 || str_contains( $req_clean, 'THPT' ) ) {
+		$p0_missing[] = 'Điều kiện xét tuyển (admission_requirements rỗng, sơ sài hoặc còn dính THPT)';
+	}
+
+	$docs = get_post_meta( $post_id, 'required_documents', true );
+	$docs_clean = trim( strip_tags( (string) $docs ) );
+	if ( empty( $docs_clean ) || strlen( $docs_clean ) < 80 ) {
+		$p0_missing[] = 'Hồ sơ xét tuyển (required_documents rỗng hoặc chưa hoàn thiện)';
+	}
+
+	// 6. Kiểm tra P0: Đợt tuyển sinh
+	$batches = get_field( 'admission_batches', $post_id );
+	if ( empty( $batches ) || ! is_array( $batches ) ) {
+		$p0_missing[] = 'Các đợt tuyển sinh (admission_batches chưa khai báo)';
+	}
+
+	$verif_status = get_post_meta( $post_id, 'verification_status', true );
+	if ( 'verified' === $verif_status ) {
+		$source = get_post_meta( $post_id, 'verification_source', true );
+		$date   = get_post_meta( $post_id, 'last_verified_at', true );
+		if ( empty( $source ) ) {
+			$p1_missing[] = 'Nguồn xác minh chính thức (verification_source)';
+		}
+		if ( empty( $date ) ) {
+			$p1_missing[] = 'Ngày xác minh gần nhất (last_verified_at)';
+		}
+	}
+
+	// 7. Cảnh báo dữ liệu bất thường (Sanity Warnings)
+	if ( $duration && ( preg_match( '/\d{4}-\d{2}-\d{2}/', (string) $duration ) || str_contains( (string) $duration, '00:00:00' ) ) ) {
+		$warnings[] = 'Thời gian học dính lỗi định dạng ngày tháng Excel rác: ' . esc_html( $duration );
+	}
+	if ( $tuition_fee && preg_match( '/\b\d+\.0\b/', (string) $tuition_fee ) ) {
+		$warnings[] = 'Học phí bị cắt cụt số thực (.0): ' . esc_html( $tuition_fee );
+	}
+
+	$form_file = get_post_meta( $post_id, 'admission_form_file', true );
+	if ( ! empty( $form_file ) && is_string( $form_file ) && str_contains( $form_file, 'utc' ) ) {
+		$school_slug = $school_id ? get_post_field( 'post_name', $school_id ) : '';
+		if ( ! str_contains( (string) $school_slug, 'giao-thong-van-tai' ) ) {
+			$warnings[] = 'Phiếu đăng ký tuyển sinh đang trỏ nhầm về biểu mẫu UTC';
+		}
+	}
+
+	$total_checks = 11;
+	$passed       = $total_checks - count( $p0_missing );
+	$score        = max( 0, min( 100, intval( round( ( $passed / $total_checks ) * 100 ) ) ) );
+
+	return [
+		'is_p0_valid' => empty( $p0_missing ),
+		'p0_missing'  => $p0_missing,
+		'p1_missing'  => $p1_missing,
+		'warnings'    => $warnings,
+		'score'       => $score,
+	];
+}
+
+/**
+ * Hiển thị thông báo hướng dẫn hoàn thiện trường dữ liệu bắt buộc P0 trên màn hình sửa bài viết.
+ */
+add_action( 'admin_notices', 'ltdh_program_admin_edit_completeness_notice' );
+function ltdh_program_admin_edit_completeness_notice() {
+	$screen = get_current_screen();
+	if ( ! $screen || 'program' !== $screen->post_type || 'post' !== $screen->base ) {
+		return;
+	}
+	$post_id = get_the_ID();
+	if ( ! $post_id ) {
+		return;
+	}
+	$completeness = ltdh_get_program_data_completeness( $post_id );
+	if ( ! $completeness['is_p0_valid'] ) {
+		?>
+		<div class="notice notice-warning is-dismissible" style="border-left-color: #f59e0b; padding: 12px 16px;">
+			<p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #92400e;">
+				⚠️ QUY CHUẨN DỮ LIỆU CHƯƠNG TRÌNH (REG-DATA-PROGRAM-2026):
+			</p>
+			<p style="margin: 0 0 6px 0; color: #1e293b;">
+				Chương trình này đang thiếu <strong><?php echo count( $completeness['p0_missing'] ); ?> trường bắt buộc cấp độ P0</strong>:
+			</p>
+			<ul style="margin: 0 0 8px 18px; list-style-type: disc; color: #dc2626; font-size: 13px;">
+				<?php foreach ( $completeness['p0_missing'] as $miss ) : ?>
+					<li><strong><?php echo esc_html( $miss ); ?></strong></li>
+				<?php endforeach; ?>
+			</ul>
+			<?php if ( ! empty( $completeness['warnings'] ) ) : ?>
+				<p style="margin: 4px 0; color: #b45309; font-size: 12px;">
+					<strong>Cảnh báo chất lượng dữ liệu:</strong> <?php echo esc_html( implode( ' | ', $completeness['warnings'] ) ); ?>
+				</p>
+			<?php endif; ?>
+			<p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
+				<em>* Bạn có thể lưu bản nháp (Draft), nhưng hệ thống sẽ yêu cầu hoàn thiện đầy đủ các trường P0 trên khi bấm Xuất bản (Publish).</em>
+			</p>
+		</div>
+		<?php
+	}
+}
+
+/**
+ * Kiểm thực chặn xuất bản bài viết nếu thiếu các trường bắt buộc P0 trên giao diện ACF Admin.
+ */
+add_action( 'acf/validate_save_post', 'ltdh_validate_program_acf_publish_fields', 10 );
+function ltdh_validate_program_acf_publish_fields() {
+	$post_type = isset( $_POST['post_type'] ) ? sanitize_text_field( $_POST['post_type'] ) : '';
+	if ( 'program' !== $post_type ) {
+		return;
+	}
+
+	// Chỉ bắt buộc kiểm tra chặt chẽ khi có hành động Xuất bản (Publish)
+	$is_publishing = false;
+	if ( isset( $_POST['post_status'] ) && 'publish' === $_POST['post_status'] ) {
+		$is_publishing = true;
+	} elseif ( isset( $_POST['publish'] ) ) {
+		$is_publishing = true;
+	}
+
+	if ( ! $is_publishing ) {
+		return;
+	}
+
+	$acf = isset( $_POST['acf'] ) && is_array( $_POST['acf'] ) ? $_POST['acf'] : [];
+
+	// 1. School relationship
+	if ( empty( $acf['field_program_school'] ) ) {
+		acf_add_validation_error( 'acf[field_program_school]', 'Vui lòng chọn Trường đào tạo liên kết (Trường bắt buộc P0).' );
+	}
+
+	// 2. Major relationship
+	if ( empty( $acf['field_program_major'] ) ) {
+		acf_add_validation_error( 'acf[field_program_major]', 'Vui lòng chọn Ngành đào tạo liên kết (Trường bắt buộc P0).' );
+	}
+
+	// 3. Tuition Fee
+	if ( empty( $acf['field_program_tuition'] ) ) {
+		acf_add_validation_error( 'acf[field_program_tuition]', 'Vui lòng nhập Học phí hiển thị (Trường bắt buộc P0).' );
+	}
+
+	// 4. Tuition Amount
+	if ( empty( $acf['field_program_tuition_amount'] ) || intval( $acf['field_program_tuition_amount'] ) < 1000 ) {
+		acf_add_validation_error( 'acf[field_program_tuition_amount]', 'Vui lòng nhập Mức học phí định mức bằng số tiền VNĐ đầy đủ (Trường bắt buộc P0).' );
+	}
+
+	// 5. Tuition Unit
+	if ( empty( $acf['field_program_tuition_unit'] ) ) {
+		acf_add_validation_error( 'acf[field_program_tuition_unit]', 'Vui lòng chọn Đơn vị tính học phí (Trường bắt buộc P0).' );
+	}
+
+	// 6. Duration
+	if ( empty( $acf['field_program_duration'] ) ) {
+		acf_add_validation_error( 'acf[field_program_duration]', 'Vui lòng nhập Thời gian học chuẩn (Trường bắt buộc P0).' );
+	} elseif ( preg_match( '/\d{4}-\d{2}-\d{2}/', (string) $acf['field_program_duration'] ) ) {
+		acf_add_validation_error( 'acf[field_program_duration]', 'Thời gian học bị dính lỗi định dạng ngày tháng Excel. Vui lòng nhập khoảng thời gian dạng "1.5 - 2 năm".' );
+	}
+
+	// 7. Admission status
+	if ( empty( $acf['field_program_admission_status'] ) ) {
+		acf_add_validation_error( 'acf[field_program_admission_status]', 'Vui lòng chọn Trạng thái tuyển sinh (Trường bắt buộc P0).' );
+	}
+
+	// 8. Requirements
+	$req_text = isset( $acf['field_program_requirements'] ) ? trim( strip_tags( (string) $acf['field_program_requirements'] ) ) : '';
+	if ( empty( $req_text ) ) {
+		acf_add_validation_error( 'acf[field_program_requirements]', 'Vui lòng nhập nội dung Điều kiện xét tuyển (Trường bắt buộc P0).' );
+	}
+
+	// 9. Required documents
+	$doc_text = isset( $acf['field_program_documents'] ) ? trim( strip_tags( (string) $acf['field_program_documents'] ) ) : '';
+	if ( empty( $doc_text ) ) {
+		acf_add_validation_error( 'acf[field_program_documents]', 'Vui lòng nhập danh mục Hồ sơ xét tuyển cần thiết (Trường bắt buộc P0).' );
+	}
+}
+
 
 
 

@@ -439,9 +439,30 @@
 			campus: { 'ha-noi': 'Hà Nội', 'ho-chi-minh': 'TP.HCM', 'da-nang': 'Đà Nẵng', 'thai-nguyen': 'Thái Nguyên', 'online': 'Online' }
 		};
 
+		var majorTitle = (input && input.desired_major_title) ? input.desired_major_title : '';
+		if (!majorTitle) {
+			var desiredMajorHidden = document.querySelector('input[name="desired_major"]');
+			if (desiredMajorHidden) {
+				var container = desiredMajorHidden.closest('[data-search-select]');
+				if (container) {
+					var searchInput = container.querySelector('.elig-search-input');
+					if (searchInput && searchInput.value) {
+						majorTitle = searchInput.value;
+					}
+				}
+			}
+		}
+
+		if (majorTitle) {
+			var majorTag = document.createElement('span');
+			majorTag.className = 'elig-tag elig-tag-major';
+			majorTag.textContent = 'Ngành: ' + majorTitle;
+			tags.appendChild(majorTag);
+		}
+
 		var keys = ['education', 'training_type', 'campus'];
 		keys.forEach(function (key) {
-			if (input[key]) {
+			if (input && input[key]) {
 				var label = labels[key] && labels[key][input[key]] ? labels[key][input[key]] : input[key];
 				var tag = document.createElement('span');
 				tag.className = 'elig-tag';

@@ -289,6 +289,38 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		];
 	}
 
+	if ( is_page( 'cau-hoi-thuong-gap' ) || is_page_template( 'page-faq.php' ) || is_page_template( 'page-cau-hoi-thuong-gap.php' ) ) {
+		$faq_items = [];
+		if ( function_exists( 'get_field' ) ) {
+			$faq_items = get_field( 'faq_items', 'options' ) ?: get_field( 'faq_items', 'option' ) ?: [];
+		}
+		if ( ! empty( $faq_items ) && is_array( $faq_items ) ) {
+			$faq_elements = [];
+			foreach ( $faq_items as $item ) {
+				$q = trim( $item['question'] ?? '' );
+				$a = trim( $item['answer'] ?? '' );
+				if ( empty( $q ) || empty( $a ) ) {
+					continue;
+				}
+				$faq_elements[] = [
+					'@type'          => 'Question',
+					'name'           => $q,
+					'acceptedAnswer' => [
+						'@type' => 'Answer',
+						'text'  => $a,
+					],
+				];
+			}
+			if ( ! empty( $faq_elements ) ) {
+				$data['ltdh_faq_page'] = [
+					'@context'   => 'https://schema.org',
+					'@type'      => 'FAQPage',
+					'mainEntity' => $faq_elements,
+				];
+			}
+		}
+	}
+
 	return $data;
 }
 add_filter( 'rank_math/json_ld', 'ltdh_seo_inject_custom_schema', 99, 2 );

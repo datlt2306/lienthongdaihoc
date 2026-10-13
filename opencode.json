@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "wordpress": {
+      "type": "stdio",
+      "command": "wp",
+      "args": ["mcp-adapter", "serve", "--user=admin", "--path=/Users/ken/Local Sites/lienthongdaihoc/app/public"],
+      "enabled": true
+    }
+  }
+}

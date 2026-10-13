@@ -79,14 +79,20 @@ function ltdh_get_defaults( string $group ): array {
 			'hero_badge_2'    => '50+ chương trình Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm',
 			'hero_badges'     => [
 				[ 'text' => '50+ chương trình',          'subtext' => 'Liên thông Đại học: Chính quy, Từ xa & Vừa học vừa làm' ],
-				[ 'text' => '30+ trường ĐH',              'subtext' => 'Đối tác uy tín toàn quốc' ],
+				[ 'text' => 'Đa dạng trường ĐH',          'subtext' => 'Thông tin tuyển sinh toàn quốc' ],
 				[ 'text' => 'Miễn giảm tín chỉ',          'subtext' => 'Rút ngắn thời gian học' ],
 			],
 			'kpi_metrics' => [
-				[ 'value' => '1.200+', 'label' => 'Học viên' ],
-				[ 'value' => '98%',    'label' => 'Hài lòng' ],
-				[ 'value' => '30+',    'label' => 'Đối tác ĐH' ],
-				[ 'value' => '10+',    'label' => 'Năm uy tín' ],
+				[
+					'value'   => '500+',
+					'label'   => 'Người học được hỗ trợ đăng ký liên thông',
+					'subtext' => 'Trong 4 năm qua',
+				],
+				[
+					'value'   => '4 năm',
+					'label'   => 'Kinh nghiệm tư vấn tuyển sinh liên thông',
+					'subtext' => 'Tư vấn lựa chọn chương trình và hỗ trợ hồ sơ',
+				],
 			],
 		],
 		'seo' => [

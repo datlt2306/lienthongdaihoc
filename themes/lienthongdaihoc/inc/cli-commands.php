@@ -32,7 +32,7 @@ class LTDH_CLI_Commands {
 			'gioi-thieu'            => [ 'title' => 'Giới thiệu', 'template' => 'page-about.php' ],
 			'lien-he'               => [ 'title' => 'Liên hệ', 'template' => 'page-contact.php' ],
 			'dang-ky-tu-van'        => [ 'title' => 'Đăng ký tư vấn', 'template' => 'page-register.php' ],
-			'faq'                   => [ 'title' => 'Câu hỏi thường gặp', 'template' => 'page-faq.php' ],
+			'cau-hoi-thuong-gap'    => [ 'title' => 'Câu hỏi thường gặp', 'template' => 'page-faq.php' ],
 			'kiem-tra-dieu-kien'    => [ 'title' => 'Kiểm tra điều kiện', 'template' => 'page-eligible.php' ],
 			'dieu-khoan'            => [ 'title' => 'Điều khoản dịch vụ', 'template' => '' ],
 			'chinh-sach-bao-mat'    => [ 'title' => 'Chính sách bảo mật', 'template' => '' ],
@@ -1644,8 +1644,196 @@ class LTDH_CLI_Commands {
 			WP_CLI::success( 'Hoàn tất mô phỏng kiểm toán! Hãy chạy với cờ --apply để thực thi thay đổi.' );
 		}
 	}
+
+	/**
+	 * Tự động phân tích và trích xuất số tiền học phí định mức (tuition_amount) và đơn vị (tuition_unit)
+	 * từ chuỗi học phí văn bản (tuition_fee) cho các chương trình đào tạo.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--status=<status>]
+	 * : Lọc trạng thái chương trình cần xử lý (publish, draft, any). Mặc định: any.
+	 *
+	 * [--dry-run]
+	 * : Chạy mô phỏng không ghi vào CSDL.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp ltdh backfill-tuition --dry-run
+	 *     wp ltdh backfill-tuition
+	 */
+	public function backfill_tuition( $args, $assoc_args ) {
+		$status     = isset( $assoc_args['status'] ) ? sanitize_text_field( $assoc_args['status'] ) : 'any';
+		$is_dry_run = isset( $assoc_args['dry-run'] );
+
+		WP_CLI::log( sprintf( '=== LTDH BACKFILL TUITION DATA (%s) ===', $is_dry_run ? 'DRY-RUN' : 'APPLY' ) );
+
+		$programs = get_posts( [
+			'post_type'      => 'program',
+			'post_status'    => $status,
+			'posts_per_page' => -1,
+			'orderby'        => 'ID',
+			'order'          => 'ASC',
+		] );
+
+		if ( empty( $programs ) ) {
+			WP_CLI::warning( 'Không tìm thấy chương trình nào phù hợp với bộ lọc.' );
+			return;
+		}
+
+		$total   = count( $programs );
+		$updated = 0;
+		$skipped = 0;
+
+		foreach ( $programs as $p ) {
+			$post_id        = $p->ID;
+			$fee_text       = get_post_meta( $post_id, 'tuition_fee', true );
+			$current_amount = get_post_meta( $post_id, 'tuition_amount', true );
+			$current_unit   = get_post_meta( $post_id, 'tuition_unit', true );
+			$current_year   = get_post_meta( $post_id, 'tuition_academic_year', true );
+
+			if ( empty( $fee_text ) ) {
+				$skipped++;
+				continue;
+			}
+
+			// Phân tích đơn vị tính học phí
+			$unit = 'tin-chi';
+			if ( mb_stripos( $fee_text, 'kỳ' ) !== false || mb_stripos( $fee_text, 'ky' ) !== false ) {
+				$unit = 'ky';
+			} elseif ( mb_stripos( $fee_text, 'tháng' ) !== false || mb_stripos( $fee_text, 'thang' ) !== false ) {
+				$unit = 'thang';
+			} elseif ( mb_stripos( $fee_text, 'năm' ) !== false || mb_stripos( $fee_text, 'nam' ) !== false ) {
+				$unit = 'nam';
+			} elseif ( mb_stripos( $fee_text, 'khóa' ) !== false || mb_stripos( $fee_text, 'khoa' ) !== false ) {
+				$unit = 'khoa';
+			}
+
+			// Phân tích số tiền học phí định mức
+			$amount = 0;
+			if ( preg_match( '/([0-9\.,]+)/', $fee_text, $m ) ) {
+				$num_str = $m[1];
+				if ( strpos( $num_str, ',' ) !== false && strpos( $num_str, '.' ) !== false ) {
+					$num_str = str_replace( ',', '', $num_str );
+				} else {
+					$num_str = str_replace( [ ',', '.' ], '', $num_str );
+				}
+				$amount = intval( $num_str );
+				if ( $amount > 0 && $amount < 1000 ) {
+					// Khắc phục lỗi cắt cụt float như 510 -> 510000
+					$amount = $amount * 1000;
+				}
+			}
+
+			if ( $amount <= 0 ) {
+				$skipped++;
+				continue;
+			}
+
+			$needs_update = false;
+			if ( empty( $current_amount ) || intval( $current_amount ) !== $amount ) {
+				$needs_update = true;
+			}
+			if ( empty( $current_unit ) || $current_unit !== $unit ) {
+				$needs_update = true;
+			}
+			if ( empty( $current_year ) ) {
+				$needs_update = true;
+			}
+
+			if ( $needs_update ) {
+				$updated++;
+				if ( ! $is_dry_run ) {
+					update_post_meta( $post_id, 'tuition_amount', $amount );
+					update_post_meta( $post_id, '_tuition_amount', 'field_program_tuition_amount' );
+
+					update_post_meta( $post_id, 'tuition_unit', $unit );
+					update_post_meta( $post_id, '_tuition_unit', 'field_program_tuition_unit' );
+
+					if ( empty( $current_year ) ) {
+						update_post_meta( $post_id, 'tuition_academic_year', '2025 - 2026' );
+						update_post_meta( $post_id, '_tuition_academic_year', 'field_program_tuition_academic_year' );
+					}
+				}
+				WP_CLI::line( sprintf( ' [%s] #%d %s: "%s" => Amount: %d | Unit: %s', $is_dry_run ? 'DRY-RUN' : 'UPDATED', $post_id, $p->post_title, $fee_text, $amount, $unit ) );
+			} else {
+				$skipped++;
+			}
+		}
+
+		WP_CLI::success( sprintf( 'Hoàn tất! Tổng: %d chương trình. Cập nhật: %d. Bỏ qua (Đã chuẩn): %d.', $total, $updated, $skipped ) );
+	}
+
+	/**
+	 * Rà soát và kiểm định mức độ tuân thủ quy định các trường dữ liệu bắt buộc (P0/P1) cho từng chương trình.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--status=<status>]
+	 * : Lọc trạng thái chương trình cần kiểm định (publish, draft, any). Mặc định: publish.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp ltdh validate-programs
+	 *     wp ltdh validate-programs --status=any
+	 */
+	public function validate_programs( $args, $assoc_args ) {
+		$status = isset( $assoc_args['status'] ) ? sanitize_text_field( $assoc_args['status'] ) : 'publish';
+
+		WP_CLI::log( sprintf( '=== LTDH VALIDATE PROGRAM MANDATORY FIELDS (Status: %s) ===', strtoupper( $status ) ) );
+
+		$programs = get_posts( [
+			'post_type'      => 'program',
+			'post_status'    => $status,
+			'posts_per_page' => -1,
+			'orderby'        => 'ID',
+			'order'          => 'ASC',
+		] );
+
+		if ( empty( $programs ) ) {
+			WP_CLI::warning( 'Không tìm thấy chương trình nào.' );
+			return;
+		}
+
+		$total        = count( $programs );
+		$passed_count = 0;
+		$failed_count = 0;
+		$table_data   = [];
+
+		foreach ( $programs as $p ) {
+			$post_id = $p->ID;
+			$result  = function_exists( 'ltdh_get_program_data_completeness' ) 
+				? ltdh_get_program_data_completeness( $post_id ) 
+				: [ 'is_p0_valid' => false, 'p0_missing' => [ 'Hàm ltdh_get_program_data_completeness chưa khởi tạo' ], 'warnings' => [] ];
+
+			if ( $result['is_p0_valid'] ) {
+				$passed_count++;
+				$status_str = '✓ Đạt P0';
+			} else {
+				$failed_count++;
+				$status_str = '✗ Thiếu P0 (' . count( $result['p0_missing'] ) . ')';
+			}
+
+			$table_data[] = [
+				'ID'         => $post_id,
+				'Tiêu đề'    => mb_substr( $p->post_title, 0, 35 ) . '...',
+				'Trạng thái' => $p->post_status,
+				'Chuẩn P0'   => $status_str,
+				'Trường thiếu P0' => ! empty( $result['p0_missing'] ) ? implode( ', ', array_slice( $result['p0_missing'], 0, 2 ) ) . ( count( $result['p0_missing'] ) > 2 ? '...' : '' ) : '—',
+				'Cảnh báo'   => ! empty( $result['warnings'] ) ? implode( '; ', $result['warnings'] ) : '—',
+			];
+		}
+
+		WP_CLI\Utils\format_items( 'table', $table_data, [ 'ID', 'Tiêu đề', 'Trạng thái', 'Chuẩn P0', 'Trường thiếu P0', 'Cảnh báo' ] );
+
+		WP_CLI::log( "\n------------------------------------------------------------" );
+		WP_CLI::log( sprintf( 'TỔNG QUAN: %d chương trình | Đạt chuẩn P0: %d (%s%%) | Chưa đạt: %d', $total, $passed_count, round( ( $passed_count / $total ) * 100, 1 ), $failed_count ) );
+		WP_CLI::log( "------------------------------------------------------------\n" );
+	}
 }
 
 WP_CLI::add_command( 'ltdh', 'LTDH_CLI_Commands' );
 WP_CLI::add_command( 'ltdh audit-data', [ new LTDH_CLI_Commands(), 'audit_data' ] );
+WP_CLI::add_command( 'ltdh backfill-tuition', [ new LTDH_CLI_Commands(), 'backfill_tuition' ] );
+WP_CLI::add_command( 'ltdh validate-programs', [ new LTDH_CLI_Commands(), 'validate_programs' ] );
 

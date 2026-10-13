@@ -263,6 +263,13 @@ function ltdh_elig_ajax_check() {
 	// Store check in database
 	$check_id = ltdh_elig_store_check( $input, $results );
 
+	// Attach desired major title for frontend summary
+	if ( ! empty( $input['desired_major'] ) ) {
+		$input['desired_major_title'] = get_the_title( intval( $input['desired_major'] ) );
+	} else {
+		$input['desired_major_title'] = '';
+	}
+
 	// Capture lead if phone/email provided
 	$lead_id = 0;
 	if ( ! empty( $input['phone'] ) || ! empty( $input['email'] ) ) {
@@ -342,24 +349,32 @@ function ltdh_elig_run_check( $input ) {
 
 	// Pre-filter by training type if specified (Safe Filter)
 	if ( ! empty( $input['training_type'] ) ) {
+		$type_terms = in_array( $input['training_type'], [ 'tu-xa', 'dao-tao-tu-xa' ], true )
+			? [ 'dao-tao-tu-xa', 'tu-xa' ]
+			: [ $input['training_type'] ];
+
 		$query_args['tax_query'] = [
 			[
 				'taxonomy' => 'training_type',
 				'field'    => 'slug',
-				'terms'    => $input['training_type'],
+				'terms'    => $type_terms,
 			],
 		];
 	}
 
-	// Pre-filter by campus (Safe Filter - matches selected campus exactly)
+	// Pre-filter by campus (Safe Filter - matches selected campus or online)
 	if ( ! empty( $input['campus'] ) ) {
 		if ( ! isset( $query_args['tax_query'] ) ) {
 			$query_args['tax_query'] = [ 'relation' => 'AND' ];
 		}
+		$campus_terms = [ $input['campus'] ];
+		if ( 'online' !== $input['campus'] ) {
+			$campus_terms[] = 'online';
+		}
 		$query_args['tax_query'][] = [
 			'taxonomy' => 'campus',
 			'field'    => 'slug',
-			'terms'    => $input['campus'],
+			'terms'    => $campus_terms,
 		];
 	}
 
@@ -425,7 +440,9 @@ function ltdh_elig_run_check( $input ) {
 		// 2.1. Lệnh cấm Đào tạo từ xa ngành Y Dược & Sư phạm (Khoản 3 Điều 5 Thông tư 28/2023/TT-BGDĐT)
 		if ( ! $hard_fail ) {
 			$prog_training_types = wp_get_post_terms( $program_id, 'training_type', [ 'fields' => 'slugs' ] );
-			$is_distance_program = in_array( 'tu-xa', $prog_training_types, true ) || ( ! empty( $input['training_type'] ) && $input['training_type'] === 'tu-xa' );
+			$is_distance_program = in_array( 'tu-xa', $prog_training_types, true )
+				|| in_array( 'dao-tao-tu-xa', $prog_training_types, true )
+				|| in_array( $input['training_type'], [ 'tu-xa', 'dao-tao-tu-xa' ], true );
 
 			if ( $is_distance_program ) {
 				$prohibited_slugs = function_exists( 'ltdh_elig_get_prohibited_distance_learning_categories' ) 
@@ -469,7 +486,9 @@ function ltdh_elig_run_check( $input ) {
 		if ( ! $hard_fail && ! empty( $input['training_type'] ) ) {
 			$user_edu = $input['education'];
 			$allowed_types = $compatibility[ $user_edu ] ?? [];
-			if ( ! in_array( $input['training_type'], $allowed_types, true ) ) {
+			$is_compat = in_array( $input['training_type'], $allowed_types, true )
+				|| ( in_array( $input['training_type'], [ 'tu-xa', 'dao-tao-tu-xa' ], true ) && ( in_array( 'tu-xa', $allowed_types, true ) || in_array( 'dao-tao-tu-xa', $allowed_types, true ) ) );
+			if ( ! $is_compat ) {
 				if ( $preliminary_status !== 'not_compatible' ) {
 					$preliminary_status = 'needs_verification';
 				}
@@ -542,15 +561,23 @@ function ltdh_elig_run_check( $input ) {
 		$match_score = min( $match_score, 100 );
 
 		// Get school information
-		$school_id = get_field( 'school_relationship', $program_id );
-		if ( is_array( $school_id ) ) {
-			$school_id = ! empty( $school_id ) ? $school_id[0] : 0;
+		$school_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
+		if ( ! $school_id ) {
+			$raw_school = get_field( 'school_relationship', $program_id );
+			if ( is_array( $raw_school ) ) {
+				$raw_school = ! empty( $raw_school ) ? $raw_school[0] : 0;
+			}
+			if ( is_object( $raw_school ) ) {
+				$raw_school = $raw_school->ID;
+			}
+			$school_id = intval( $raw_school );
 		}
-		if ( is_object( $school_id ) ) {
-			$school_id = $school_id->ID;
+
+		if ( ! $school_id || 'publish' !== get_post_status( $school_id ) ) {
+			continue;
 		}
-		$school_id = intval( $school_id );
-		$school_logo_id = $school_id ? ltdh_get_school_image_id( $school_id ) : 0;
+
+		$school_logo_id = ltdh_get_school_image_id( $school_id );
 
 		$program_data = [
 			'program_id'         => $program_id,
@@ -683,25 +710,27 @@ function ltdh_elig_store_check( $input, $results ) {
 
 	$token = wp_generate_password( 32, false );
 
-	$wpdb->insert( $table, [
+	$data = [
 		'session_token'         => $token,
-		'input_education'       => $input['education'],
-		'input_major_id'        => $input['major_id'],
-		'input_previous_school' => $input['previous_school'],
-		'input_graduation'      => $input['graduation'] ?: null,
-		'input_desired_major'   => $input['desired_major'],
-		'input_training_type'   => $input['training_type'],
-		'input_campus'          => $input['campus'],
-		'input_budget'          => $input['budget'],
-		'total_candidates'      => $results['total_candidates'],
-		'eligible_count'        => $results['eligible_count'],
-		'top_score'             => $results['top_score'],
-		'top_program_id'        => $results['programs'][0]['program_id'] ?? 0,
-		'phone'                 => $input['phone'],
-		'email'                 => $input['email'],
+		'input_education'       => sanitize_text_field( $input['education'] ?? '' ),
+		'input_major_id'        => intval( $input['major_id'] ?? 0 ),
+		'input_previous_school' => sanitize_text_field( $input['previous_school'] ?? '' ),
+		'input_graduation'      => ! empty( $input['graduation'] ) ? intval( $input['graduation'] ) : null,
+		'input_desired_major'   => intval( $input['desired_major'] ?? 0 ),
+		'input_training_type'   => sanitize_text_field( $input['training_type'] ?? '' ),
+		'input_campus'          => sanitize_text_field( $input['campus'] ?? '' ),
+		'input_budget'          => sanitize_text_field( $input['budget'] ?? '' ),
+		'total_candidates'      => intval( $results['total_candidates'] ?? 0 ),
+		'eligible_count'        => intval( $results['eligible_count'] ?? 0 ),
+		'top_score'             => intval( $results['top_score'] ?? 0 ),
+		'top_program_id'        => intval( $results['programs'][0]['program_id'] ?? 0 ),
+		'phone'                 => sanitize_text_field( $input['phone'] ?? '' ),
+		'email'                 => sanitize_email( $input['email'] ?? '' ),
 		'created_at'            => current_time( 'mysql' ),
 		'referrer_url'          => wp_get_referer() ?: '',
-	], [ '%s', '%s', '%d', '%s', '%d', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s' ] );
+	];
+
+	$wpdb->insert( $table, $data );
 
 	return $wpdb->insert_id;
 }
