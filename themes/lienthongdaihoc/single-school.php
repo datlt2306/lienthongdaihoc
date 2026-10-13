@@ -519,7 +519,7 @@ if ( ! empty( $contact ) ) {
 
 					<!-- Header with Live Stats & Quick Search/Filter -->
 					<div class="border-b border-slate-200/80 pb-5 mb-6">
-						<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+						<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 <?php echo ( count( $majors_data ) > 1 ) ? 'mb-4' : ''; ?>">
 							<div>
 								<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">Ngành và chương trình trường đào tạo</h2>
 								<p class="text-xs md:text-sm text-slate-500 mt-1">Danh sách các ngành và hình thức học tuyển sinh chính thức tại trường</p>
@@ -534,6 +534,7 @@ if ( ! empty( $contact ) ) {
 							</div>
 						</div>
 
+						<?php if ( count( $majors_data ) > 1 ) : ?>
 						<!-- Quick Filter Controls: Instant Search & Training System Tabs -->
 						<div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 pt-3 border-t border-slate-100">
 							<!-- Search Input -->
@@ -575,6 +576,7 @@ if ( ! empty( $contact ) ) {
 								</div>
 							<?php endif; ?>
 						</div>
+						<?php endif; ?>
 					</div>
 
 					<?php if ( ! empty( $majors_data ) ) : ?>

@@ -534,122 +534,6 @@ $program_tabs[] = [
 								</div>
 							<?php endif; ?>
 
-							<?php 
-							$target_majors_data = function_exists( 'ltdh_get_program_target_majors' ) ? ltdh_get_program_target_majors( $program_id ) : null;
-							if ( ! empty( $target_majors_data ) ) : 
-								$major_display_name = $target_majors_data['major_name'] ?? $major_title;
-							?>
-								<!-- SUB-BLOCK: ĐỐI TƯỢNG TUYỂN SINH (BẢNG QUY CHẾ NGÀNH ĐÚNG & NGÀNH GẦN) -->
-								<div class="mt-4 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-									<!-- Tiêu đề mục bảng -->
-									<div class="bg-slate-100/90 px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
-										<div class="flex items-center gap-2">
-											<span class="w-6 h-6 rounded bg-[#00308b] text-white flex items-center justify-center font-bold text-xs shrink-0">
-												1.2
-											</span>
-											<h4 class="font-bold text-slate-900 text-sm md:text-base">
-												Đối tượng tuyển sinh liên thông từ Cao đẳng lên Đại học
-											</h4>
-										</div>
-										<span class="text-xs font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-md border border-slate-200">
-											Ngành: <strong class="text-slate-900"><?php echo esc_html( $major_display_name ); ?></strong>
-										</span>
-									</div>
-
-									<!-- Desktop & Tablet View: Bảng quy chế chuẩn -->
-									<div class="hidden sm:block overflow-x-auto">
-										<table class="w-full text-left border-collapse text-xs md:text-sm">
-											<thead>
-												<tr class="bg-slate-50 border-b border-slate-200 text-slate-700">
-													<th class="py-3 px-3.5 w-12 text-center font-bold border-r border-slate-200">STT</th>
-													<th class="py-3 px-4 w-40 font-bold border-r border-slate-200">Ngành dự tuyển</th>
-													<th class="py-3 px-4 font-bold border-r border-slate-200 bg-emerald-50/60 w-[42%]">
-														<div class="flex items-center gap-1.5 text-emerald-800">
-															<span>✓ Ngành đúng</span>
-															<span class="text-[11px] font-normal bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">(Vào thẳng chuyên ngành)</span>
-														</div>
-													</th>
-													<th class="py-3 px-4 font-bold bg-amber-50/60 w-[45%]">
-														<div class="flex items-center gap-1.5 text-amber-900">
-															<span>⚡ Ngành gần</span>
-															<span class="text-[11px] font-normal bg-amber-100 text-amber-900 px-2 py-0.5 rounded">(Học bổ sung 03 học phần)</span>
-														</div>
-													</th>
-												</tr>
-											</thead>
-											<tbody class="text-slate-700">
-												<tr class="align-top divide-x divide-slate-200">
-													<td class="py-4 px-3.5 text-center font-bold text-slate-500">
-														1
-													</td>
-													<td class="py-4 px-4 font-bold text-slate-900 bg-slate-50/40">
-														<div class="text-sm font-bold text-slate-900"><?php echo esc_html( $major_display_name ); ?></div>
-														<span class="text-xs font-normal text-slate-500 block mt-1">Trình độ Đại học</span>
-													</td>
-													<!-- Cột Ngành Đúng -->
-													<td class="py-4 px-4 bg-emerald-50/20 leading-relaxed">
-														<p class="text-xs font-semibold text-slate-800 mb-2">Thí sinh tốt nghiệp Cao đẳng các ngành/chuyên ngành:</p>
-														<ul class="space-y-1.5 pl-4 list-disc text-slate-800 text-xs md:text-sm mb-4">
-															<?php foreach ( $target_majors_data['proper_majors'] as $p_major ) : ?>
-																<li><span class="font-medium"><?php echo esc_html( $p_major ); ?></span></li>
-															<?php endforeach; ?>
-														</ul>
-														<div class="mt-3 pt-2.5 border-t border-emerald-200/60 text-xs text-emerald-800 font-semibold">
-															✓ Không phải học bổ sung kiến thức. Thời gian học tiêu chuẩn 1.5 - 2 năm.
-														</div>
-													</td>
-													<!-- Cột Ngành Gần -->
-													<td class="py-4 px-4 bg-amber-50/20 leading-relaxed">
-														<p class="text-xs font-semibold text-slate-800 mb-2">Thí sinh tốt nghiệp Cao đẳng các ngành:</p>
-														<p class="text-xs md:text-sm text-slate-800 leading-relaxed mb-4">
-															<?php echo esc_html( implode( '; ', $target_majors_data['near_majors'] ) ); ?>.
-														</p>
-														<div class="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed">
-															⚠️ <strong>Quy định:</strong> <?php echo esc_html( $target_majors_data['bridge_courses_note'] ?? 'Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.' ); ?>
-														</div>
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-
-									<!-- Mobile View: Danh sách 2 khối rõ ràng, không cuộn, không cắt chữ -->
-									<div class="sm:hidden p-4 space-y-4">
-										<!-- Khối Ngành Đúng -->
-										<div class="border border-emerald-200 bg-emerald-50/30 rounded-xl p-3.5">
-											<div class="flex items-center justify-between gap-1 mb-2">
-												<span class="font-bold text-sm text-emerald-900">✓ Nhóm Ngành Đúng</span>
-												<span class="text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Không học bổ sung</span>
-											</div>
-											<p class="text-xs text-slate-600 mb-2">Tốt nghiệp CĐ các ngành/chuyên ngành:</p>
-											<ul class="text-xs text-slate-800 space-y-1 pl-4 list-disc mb-3">
-												<?php foreach ( $target_majors_data['proper_majors'] as $p_major ) : ?>
-													<li><strong><?php echo esc_html( $p_major ); ?></strong></li>
-												<?php endforeach; ?>
-											</ul>
-											<div class="text-[11px] text-emerald-800 font-semibold border-t border-emerald-200/60 pt-2">
-												✓ Vào thẳng môn chuyên ngành, thời gian học 1.5 - 2 năm.
-											</div>
-										</div>
-
-										<!-- Khối Ngành Gần -->
-										<div class="border border-amber-200 bg-amber-50/30 rounded-xl p-3.5">
-											<div class="flex items-center justify-between gap-1 mb-2">
-												<span class="font-bold text-sm text-amber-950">⚡ Nhóm Ngành Gần</span>
-												<span class="text-[11px] bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-semibold">+ 03 Học phần</span>
-											</div>
-											<p class="text-xs text-slate-600 mb-2">Tốt nghiệp CĐ các ngành:</p>
-											<p class="text-xs text-slate-800 leading-relaxed mb-3">
-												<?php echo esc_html( implode( '; ', $target_majors_data['near_majors'] ) ); ?>.
-											</p>
-											<div class="p-2.5 bg-amber-100/70 border border-amber-200 rounded-lg text-xs text-amber-950">
-												⚠️ <strong>Lưu ý:</strong> <?php echo esc_html( $target_majors_data['bridge_courses_note'] ?? 'Thí sinh phải học bổ sung 03 học phần theo quy chế.' ); ?>
-											</div>
-										</div>
-									</div>
-								</div>
-							<?php endif; ?>
-
 							<?php if ( $documents || $form_url ) : ?>
 								<!-- BLOCK 2: REQUIRED DOCUMENTS & ADMISSION FORM DOWNLOAD -->
 								<div class="<?php echo $requirements ? 'pt-2' : ''; ?>">
@@ -760,13 +644,6 @@ $program_tabs[] = [
 										<span class="text-base font-bold text-slate-900"><?php echo esc_html( $duration ?: '2.0 - 3.0 năm' ); ?></span>
 									</div>
 								</div>
-
-								<?php if ( ! empty( $target_majors_data['bridge_courses_count'] ) ) : ?>
-									<div class="bg-amber-50/70 border border-amber-200/60 rounded-xl p-3 text-xs text-amber-900 flex items-start gap-2">
-										<span class="text-amber-600 font-bold shrink-0 mt-0.5">⚡</span>
-										<span class="leading-relaxed"><strong>Thí sinh ngành gần:</strong> Hoàn thành thêm <strong>03 học phần bổ sung</strong> kiến thức trong quá trình học (<a href="#dieu-kien-ho-so" class="font-bold underline text-amber-950 hover:text-blue-700">xem danh mục ngành</a>).</span>
-									</div>
-								<?php endif; ?>
 							</div>
 							
 							<div class="mt-4 pt-3.5 border-t border-slate-100 text-xs md:text-sm text-slate-600 leading-relaxed">

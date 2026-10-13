@@ -179,55 +179,49 @@ function ltdh_override_field_program_requirements_tab_label( $field ) {
 	return $field;
 }
 
-// Provide intelligent defaults for Target Majors fields in Program Admin if empty
-add_filter( 'acf/load_value/name=admission_target_proper_majors', 'ltdh_default_target_proper_majors', 10, 3 );
-function ltdh_default_target_proper_majors( $value, $post_id, $field ) {
-	if ( ! empty( $value ) ) {
+// Provide intelligent defaults for Target Admissions by School in Major Admin if empty
+add_filter( 'acf/load_value/name=major_school_admission_targets', 'ltdh_default_major_target_admissions', 10, 3 );
+function ltdh_default_major_target_admissions( $value, $post_id, $field ) {
+	if ( ! empty( $value ) && is_array( $value ) ) {
 		return $value;
 	}
-	$major_id   = function_exists( 'get_field' ) ? get_field( LTDH_META_MAJOR_REL, $post_id ) : 0;
-	$major_slug = $major_id ? get_post_field( 'post_name', $major_id ) : '';
+	if ( 'major' !== get_post_type( $post_id ) ) {
+		return $value;
+	}
+	$major_slug = get_post_field( 'post_name', $post_id );
 	$title      = get_the_title( $post_id );
+
+	// Mặc định nạp dữ liệu Đề án tuyển sinh UTC cho ngành Công nghệ thông tin
 	if ( ( $major_slug && ( str_contains( $major_slug, 'thong-tin' ) || str_contains( $major_slug, 'cntt' ) ) ) || str_contains( mb_strtolower( (string) $title, 'UTF-8' ), 'thông tin' ) ) {
-		return "Khoa học máy tính\nCông nghệ thông tin\nỨng dụng phần mềm\nCông nghệ kỹ thuật máy tính\nLập trình máy tính";
+		$utc_school = get_page_by_path( 'truong-dai-hoc-giao-thong-van-tai', OBJECT, 'school' );
+		if ( ! $utc_school ) {
+			$utc_schools = get_posts( [
+				'post_type'   => 'school',
+				'title'       => 'Trường Đại học Giao thông Vận tải',
+				'numberposts' => 1,
+			] );
+			$utc_school = $utc_schools[0] ?? null;
+		}
+		$school_id = $utc_school ? $utc_school->ID : 0;
+
+		return [
+			[
+				'field_target_school'           => $school_id,
+				'field_target_regulation_title' => 'Theo Đề án tuyển sinh Trường Đại học Giao thông Vận tải (UTC)',
+				'field_target_proper_majors'    => "Khoa học máy tính\nCông nghệ thông tin\nỨng dụng phần mềm\nCông nghệ kỹ thuật máy tính\nLập trình máy tính",
+				'field_target_near_majors'      => "Kỹ thuật sửa chữa lắp ráp máy tính\nThiết kế mạch điện tử trên máy tính\nTruyền thông và mạng máy tính\nCông nghệ kỹ thuật máy tính\nĐiện tử máy tính\nĐồ họa đa phương tiện\nTin học văn phòng\nTin học viễn thông ứng dụng\nTin học ứng dụng\nXử lý dữ liệu\nQuản trị cơ sở dữ liệu\nQuản trị mạng máy tính\nvà các ngành tương đương",
+				'field_target_bridge_note'      => "Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.",
+				'field_target_bridge_count'     => 3,
+				'school'           => $school_id,
+				'regulation_title' => 'Theo Đề án tuyển sinh Trường Đại học Giao thông Vận tải (UTC)',
+				'proper_majors'    => "Khoa học máy tính\nCông nghệ thông tin\nỨng dụng phần mềm\nCông nghệ kỹ thuật máy tính\nLập trình máy tính",
+				'near_majors'      => "Kỹ thuật sửa chữa lắp ráp máy tính\nThiết kế mạch điện tử trên máy tính\nTruyền thông và mạng máy tính\nCông nghệ kỹ thuật máy tính\nĐiện tử máy tính\nĐồ họa đa phương tiện\nTin học văn phòng\nTin học viễn thông ứng dụng\nTin học ứng dụng\nXử lý dữ liệu\nQuản trị cơ sở dữ liệu\nQuản trị mạng máy tính\nvà các ngành tương đương",
+				'bridge_note'      => "Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.",
+				'bridge_count'     => 3,
+			]
+		];
 	}
 	return $value;
-}
-
-add_filter( 'acf/load_value/name=admission_target_near_majors', 'ltdh_default_target_near_majors', 10, 3 );
-function ltdh_default_target_near_majors( $value, $post_id, $field ) {
-	if ( ! empty( $value ) ) {
-		return $value;
-	}
-	$major_id   = function_exists( 'get_field' ) ? get_field( LTDH_META_MAJOR_REL, $post_id ) : 0;
-	$major_slug = $major_id ? get_post_field( 'post_name', $major_id ) : '';
-	$title      = get_the_title( $post_id );
-	if ( ( $major_slug && ( str_contains( $major_slug, 'thong-tin' ) || str_contains( $major_slug, 'cntt' ) ) ) || str_contains( mb_strtolower( (string) $title, 'UTF-8' ), 'thông tin' ) ) {
-		return "Kỹ thuật sửa chữa lắp ráp máy tính\nThiết kế mạch điện tử trên máy tính\nTruyền thông và mạng máy tính\nCông nghệ kỹ thuật máy tính\nĐiện tử máy tính\nĐồ họa đa phương tiện\nTin học văn phòng\nTin học viễn thông ứng dụng\nTin học ứng dụng\nXử lý dữ liệu\nQuản trị cơ sở dữ liệu\nQuản trị mạng máy tính\nvà các ngành tương đương";
-	}
-	return $value;
-}
-
-add_filter( 'acf/load_value/name=admission_bridge_courses_note', 'ltdh_default_target_bridge_note', 10, 3 );
-function ltdh_default_target_bridge_note( $value, $post_id, $field ) {
-	if ( ! empty( $value ) ) {
-		return $value;
-	}
-	$major_id   = function_exists( 'get_field' ) ? get_field( LTDH_META_MAJOR_REL, $post_id ) : 0;
-	$major_slug = $major_id ? get_post_field( 'post_name', $major_id ) : '';
-	$title      = get_the_title( $post_id );
-	if ( ( $major_slug && ( str_contains( $major_slug, 'thong-tin' ) || str_contains( $major_slug, 'cntt' ) ) ) || str_contains( mb_strtolower( (string) $title, 'UTF-8' ), 'thông tin' ) ) {
-		return "Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.";
-	}
-	return $value;
-}
-
-add_filter( 'acf/load_value/name=admission_bridge_courses_count', 'ltdh_default_target_bridge_count', 10, 3 );
-function ltdh_default_target_bridge_count( $value, $post_id, $field ) {
-	if ( ! empty( $value ) || ( is_numeric( $value ) && (int) $value === 0 ) ) {
-		return $value;
-	}
-	return 3;
 }
 
 // Remove/hide unwanted program & major fields in admin area dynamically

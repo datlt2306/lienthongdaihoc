@@ -61,6 +61,23 @@ function ltdh_get_current_context_school_id(): int {
 		} else {
 			$cpt_school = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
 			$s_post     = get_page_by_path( sanitize_title( $school_param ), OBJECT, $cpt_school );
+			if ( ! $s_post ) {
+				$found_by_code = get_posts( [
+					'post_type'   => $cpt_school,
+					'post_status' => 'publish',
+					'numberposts' => 1,
+					'meta_query'  => [
+						[
+							'key'     => 'school_code',
+							'value'   => sanitize_text_field( $school_param ),
+							'compare' => '=',
+						],
+					],
+				] );
+				if ( ! empty( $found_by_code ) ) {
+					$s_post = $found_by_code[0];
+				}
+			}
 			if ( $s_post && 'publish' === $s_post->post_status && $cpt_school === $s_post->post_type ) {
 				return (int) $s_post->ID;
 			}
@@ -292,10 +309,21 @@ function ltdh_get_program_school_id( int $program_id ): int {
 	foreach ( $all_schools as $school ) {
 		$clean_school_slug = str_replace( 'truong-dai-hoc-', '', $school->post_name );
 		$clean_school_slug = str_replace( 'hoc-vien-', '', $clean_school_slug );
+		$clean_school_slug = str_replace( 'dai-hoc-', '', $clean_school_slug );
 		$school_code       = strtolower( (string) get_post_meta( $school->ID, 'school_code', true ) );
 
-		if ( ( ! empty( $clean_school_slug ) && false !== strpos( $slug, $clean_school_slug ) ) ||
-		     ( ! empty( $school_code ) && false !== strpos( $slug, $school_code ) ) ) {
+		// Strict suffix matching: program slug ends with -$school_code, -$post_name, or -$clean_school_slug
+		// E.g. "...-tmu", "...-tvu", "...-dai-hoc-thai-nguyen", "...-intracom", "...-utc"
+		$matched = false;
+		if ( ! empty( $school_code ) && preg_match( '/-' . preg_quote( $school_code, '/' ) . '$/i', $slug ) ) {
+			$matched = true;
+		} elseif ( preg_match( '/-' . preg_quote( $school->post_name, '/' ) . '$/i', $slug ) ) {
+			$matched = true;
+		} elseif ( ! empty( $clean_school_slug ) && preg_match( '/-' . preg_quote( $clean_school_slug, '/' ) . '$/i', $slug ) ) {
+			$matched = true;
+		}
+
+		if ( $matched ) {
 			$meta_key = defined( 'LTDH_META_SCHOOL_REL' ) ? LTDH_META_SCHOOL_REL : 'school_relationship';
 			update_post_meta( $program_id, $meta_key, $school->ID );
 			return $school->ID;
@@ -1855,13 +1883,35 @@ function ltdh_format_admission_fee( $fee ): array {
 }
 
 /**
- * Lấy dữ liệu phân loại đối tượng tuyển sinh theo văn bằng (Ngành đúng / Ngành gần / Học bổ sung)
+ * Lấy mã viết tắt của trường (school_code) như UTC, TNU, NEU...
  *
- * @param int $program_id
- * @return array|null
+ * @param int $school_id
+ * @return string
  */
-function ltdh_get_program_target_majors( int $program_id ): ?array {
-	// Helper tách chuỗi thành mảng danh sách ngành
+function ltdh_get_school_code( int $school_id ): string {
+	if ( ! $school_id ) {
+		return '';
+	}
+	$code = get_post_meta( $school_id, 'school_code', true );
+	if ( ! empty( $code ) ) {
+		return strtoupper( trim( (string) $code ) );
+	}
+	if ( function_exists( 'get_field' ) ) {
+		$acf_code = get_field( 'school_code', $school_id );
+		if ( ! empty( $acf_code ) ) {
+			return strtoupper( trim( (string) $acf_code ) );
+		}
+	}
+	return '';
+}
+
+/**
+ * Lấy danh sách quy định đối tượng tuyển sinh (Ngành đúng / Ngành gần) theo từng trường của ngành đào tạo
+ *
+ * @param int $major_id
+ * @return array Danh sách các trường có quy định ngành gần
+ */
+function ltdh_get_major_target_admissions( int $major_id ): array {
 	$parse_items = function( $val ) {
 		if ( is_array( $val ) ) {
 			return array_values( array_filter( array_map( 'trim', $val ) ) );
@@ -1873,70 +1923,102 @@ function ltdh_get_program_target_majors( int $program_id ): ?array {
 		return array_values( array_filter( array_map( 'trim', $lines ) ) );
 	};
 
-	// 1. Kiểm tra ACF fields nếu được lưu trong admin
-	$custom_proper = function_exists( 'get_field' ) ? get_field( 'admission_target_proper_majors', $program_id ) : get_post_meta( $program_id, 'admission_target_proper_majors', true );
-	$custom_near   = function_exists( 'get_field' ) ? get_field( 'admission_target_near_majors', $program_id ) : get_post_meta( $program_id, 'admission_target_near_majors', true );
-	$custom_note   = function_exists( 'get_field' ) ? get_field( 'admission_bridge_courses_note', $program_id ) : get_post_meta( $program_id, 'admission_bridge_courses_note', true );
-	$custom_cnt    = function_exists( 'get_field' ) ? get_field( 'admission_bridge_courses_count', $program_id ) : get_post_meta( $program_id, 'admission_bridge_courses_count', true );
+	$results = [];
 
-	$major_id   = function_exists( 'get_field' ) ? get_field( LTDH_META_MAJOR_REL, $program_id ) : 0;
-	$major_name = $major_id ? get_the_title( $major_id ) : get_the_title( $program_id );
+	// 1. Kiểm tra repeater trong Major CPT: major_school_admission_targets
+	$repeater = function_exists( 'get_field' ) ? get_field( 'major_school_admission_targets', $major_id ) : get_post_meta( $major_id, 'major_school_admission_targets', true );
 
-	if ( ! empty( $custom_proper ) || ! empty( $custom_near ) ) {
-		return [
-			'title'                => 'Quy định đối tượng tuyển sinh liên thông (Từ Cao đẳng lên Đại học)',
-			'major_name'           => $major_name ?: 'Công nghệ thông tin',
-			'proper_majors'        => $parse_items( $custom_proper ),
-			'near_majors'          => $parse_items( $custom_near ),
-			'bridge_courses_count' => is_numeric( $custom_cnt ) ? (int) $custom_cnt : 3,
-			'bridge_courses_note'  => $custom_note ?: 'Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.',
-		];
-	}
+	if ( ! empty( $repeater ) && is_array( $repeater ) ) {
+		foreach ( $repeater as $row ) {
+			$school_raw   = $row['school'] ?? ( $row['field_target_school'] ?? 0 );
+			$school_id    = is_object( $school_raw ) ? $school_raw->ID : (int) $school_raw;
+			$school_title = $school_id ? get_the_title( $school_id ) : '';
+			$school_slug  = $school_id ? get_post_field( 'post_name', $school_id ) : '';
+			$school_badge = $school_id && function_exists( 'ltdh_get_school_code' ) ? ltdh_get_school_code( $school_id ) : '';
 
-	// 2. Tự động nhận diện theo ngành của chương trình nếu admin chưa nhập riêng
-	$major_slug = $major_id ? get_post_field( 'post_name', $major_id ) : '';
-	$is_cntt    = false;
-	if ( $major_slug && ( str_contains( $major_slug, 'cong-nghe-thong-tin' ) || str_contains( $major_slug, 'cntt' ) || str_contains( $major_slug, 'tin-hoc' ) ) ) {
-		$is_cntt = true;
-	} else {
-		$prog_title_lower = mb_strtolower( (string) $major_name, 'UTF-8' );
-		if ( str_contains( $prog_title_lower, 'công nghệ thông tin' ) || str_contains( $prog_title_lower, 'cntt' ) ) {
-			$is_cntt = true;
+			$proper    = $parse_items( $row['proper_majors'] ?? ( $row['field_target_proper_majors'] ?? '' ) );
+			$near      = $parse_items( $row['near_majors'] ?? ( $row['field_target_near_majors'] ?? '' ) );
+			$note      = trim( (string) ( $row['bridge_note'] ?? ( $row['field_target_bridge_note'] ?? '' ) ) );
+			$count     = $row['bridge_count'] ?? ( $row['field_target_bridge_count'] ?? 3 );
+			$reg_title = trim( (string) ( $row['regulation_title'] ?? ( $row['field_target_regulation_title'] ?? '' ) ) );
+
+			if ( ! empty( $proper ) || ! empty( $near ) ) {
+				$results[] = [
+					'school_id'        => $school_id,
+					'school_title'     => $school_title ?: ( $reg_title ?: 'Nhà trường' ),
+					'school_slug'      => $school_slug,
+					'school_badge'     => $school_badge,
+					'regulation_title' => $reg_title ?: ( $school_title ? 'Theo Đề án tuyển sinh ' . $school_title : 'Quy chế tuyển sinh' ),
+					'proper_majors'    => $proper,
+					'near_majors'      => $near,
+					'bridge_note'      => $note ?: 'Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.',
+					'bridge_count'     => is_numeric( $count ) ? (int) $count : 3,
+				];
+			}
 		}
 	}
 
-	if ( $is_cntt ) {
-		return [
-			'title'                => 'Quy định đối tượng tuyển sinh liên thông (Từ Cao đẳng lên Đại học)',
-			'major_name'           => 'Công nghệ thông tin',
-			'proper_majors'        => [
-				'Khoa học máy tính',
-				'Công nghệ thông tin',
-				'Ứng dụng phần mềm',
-				'Công nghệ kỹ thuật máy tính',
-				'Lập trình máy tính',
-			],
-			'near_majors'          => [
-				'Kỹ thuật sửa chữa lắp ráp máy tính',
-				'Thiết kế mạch điện tử trên máy tính',
-				'Truyền thông và mạng máy tính',
-				'Công nghệ kỹ thuật máy tính',
-				'Điện tử máy tính',
-				'Đồ họa đa phương tiện',
-				'Tin học văn phòng',
-				'Tin học viễn thông ứng dụng',
-				'Tin học ứng dụng',
-				'Xử lý dữ liệu',
-				'Quản trị cơ sở dữ liệu',
-				'Quản trị mạng máy tính',
-				'và các ngành tương đương',
-			],
-			'bridge_courses_count' => 3,
-			'bridge_courses_note'  => 'Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.',
-		];
+	// 2. Fallback nếu chưa lưu trong admin và là ngành CNTT (Mặc định cho trường UTC như đề án)
+	if ( empty( $results ) ) {
+		$major_slug = get_post_field( 'post_name', $major_id );
+		$major_name = get_the_title( $major_id );
+		$is_cntt    = false;
+		if ( $major_slug && ( str_contains( $major_slug, 'cong-nghe-thong-tin' ) || str_contains( $major_slug, 'cntt' ) || str_contains( $major_slug, 'tin-hoc' ) ) ) {
+			$is_cntt = true;
+		} else {
+			$prog_title_lower = mb_strtolower( (string) $major_name, 'UTF-8' );
+			if ( str_contains( $prog_title_lower, 'công nghệ thông tin' ) || str_contains( $prog_title_lower, 'cntt' ) ) {
+				$is_cntt = true;
+			}
+		}
+
+		if ( $is_cntt ) {
+			$utc_school = get_page_by_path( 'truong-dai-hoc-giao-thong-van-tai', OBJECT, 'school' );
+			if ( ! $utc_school ) {
+				$utc_schools = get_posts( [
+					'post_type'   => 'school',
+					'title'       => 'Trường Đại học Giao thông Vận tải',
+					'numberposts' => 1,
+				] );
+				$utc_school = $utc_schools[0] ?? null;
+			}
+			$utc_id = $utc_school ? $utc_school->ID : 0;
+
+			$results[] = [
+				'school_id'        => $utc_id,
+				'school_title'     => $utc_school ? get_the_title( $utc_id ) : 'Trường Đại học Giao thông Vận tải',
+				'school_slug'      => $utc_school ? $utc_school->post_name : 'truong-dai-hoc-giao-thong-van-tai',
+				'school_badge'     => 'UTC',
+				'regulation_title' => 'Theo Đề án tuyển sinh Trường Đại học Giao thông Vận tải (UTC)',
+				'proper_majors'    => [
+					'Khoa học máy tính',
+					'Công nghệ thông tin',
+					'Ứng dụng phần mềm',
+					'Công nghệ kỹ thuật máy tính',
+					'Lập trình máy tính',
+				],
+				'near_majors'      => [
+					'Kỹ thuật sửa chữa lắp ráp máy tính',
+					'Thiết kế mạch điện tử trên máy tính',
+					'Truyền thông và mạng máy tính',
+					'Công nghệ kỹ thuật máy tính',
+					'Điện tử máy tính',
+					'Đồ họa đa phương tiện',
+					'Tin học văn phòng',
+					'Tin học viễn thông ứng dụng',
+					'Tin học ứng dụng',
+					'Xử lý dữ liệu',
+					'Quản trị cơ sở dữ liệu',
+					'Quản trị mạng máy tính',
+					'và các ngành tương đương',
+				],
+				'bridge_note'      => 'Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.',
+				'bridge_count'     => 3,
+			];
+		}
 	}
 
-	return null;
+	return $results;
 }
 
 /**

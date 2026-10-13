@@ -47,6 +47,23 @@ if ( ! empty( $school_param ) ) {
 		$context_school = get_post( intval( $school_param ) );
 	} else {
 		$context_school = get_page_by_path( sanitize_title( $school_param ), OBJECT, LTDH_CPT_SCHOOL );
+		if ( ! $context_school ) {
+			$school_by_code = get_posts( [
+				'post_type'   => LTDH_CPT_SCHOOL,
+				'post_status' => 'publish',
+				'numberposts' => 1,
+				'meta_query'  => [
+					[
+						'key'     => 'school_code',
+						'value'   => sanitize_text_field( $school_param ),
+						'compare' => '=',
+					],
+				],
+			] );
+			if ( ! empty( $school_by_code ) ) {
+				$context_school = $school_by_code[0];
+			}
+		}
 	}
 	if ( $context_school && 'publish' === $context_school->post_status ) {
 		$selected_school_slug = $context_school->post_name;
@@ -97,7 +114,70 @@ $all_major_programs = array_unique( array_filter( array_merge(
 $global_zalo = ltdh_get_zalo_url();
 $hotline     = ltdh_get_hotline();
 
-// Dynamically construct sticky navigation tabs matching reference mockup
+// Chỉ hiển thị khối đối tượng tuyển sinh (ngành đúng & ngành gần) khi truy cập ngành đúng với trường có quy định đó.
+// Bình thường (không có tham số trường hoặc trường không có quy định ngành gần) thì không hiển thị.
+$active_target_admission = null;
+
+if ( ! empty( $school_param ) ) {
+	$target_admissions_list = function_exists( 'ltdh_get_major_target_admissions' ) ? ltdh_get_major_target_admissions( (int) $major_id ) : [];
+
+	if ( ! empty( $target_admissions_list ) ) {
+		$target_school_matcher = function( array $target_item, $school, string $param, string $selected_slug ): bool {
+			if ( empty( $target_item ) ) {
+				return false;
+			}
+
+			$target_school_id    = (int) ( $target_item['school_id'] ?? 0 );
+			$target_school_slug  = sanitize_title( (string) ( $target_item['school_slug'] ?? '' ) );
+			$target_school_badge = strtoupper( trim( (string) ( $target_item['school_badge'] ?? '' ) ) );
+
+			$param_clean = sanitize_title( $param );
+			$param_code  = strtoupper( trim( $param ) );
+
+			// 1. By School Post ID
+			if ( $school && $target_school_id > 0 && (int) $school->ID === $target_school_id ) {
+				return true;
+			}
+			if ( is_numeric( $param ) && $target_school_id > 0 && (int) $param === $target_school_id ) {
+				return true;
+			}
+
+			// 2. By School Code (e.g. UTC, TNU, NEU)
+			if ( $school ) {
+				$school_code = strtoupper( trim( (string) get_post_meta( $school->ID, 'school_code', true ) ) );
+				if ( ! empty( $school_code ) && ! empty( $target_school_badge ) && $school_code === $target_school_badge ) {
+					return true;
+				}
+			}
+			if ( ! empty( $target_school_badge ) && ( $param_code === $target_school_badge || str_contains( $param_code, $target_school_badge ) ) ) {
+				return true;
+			}
+
+			// 3. By School Slug
+			$slugs_to_check = array_filter( [
+				$selected_slug ? sanitize_title( $selected_slug ) : '',
+				$school ? sanitize_title( $school->post_name ) : '',
+				$param_clean,
+			] );
+
+			foreach ( $slugs_to_check as $chk_slug ) {
+				if ( ! empty( $target_school_slug ) && ( $chk_slug === $target_school_slug || str_contains( $chk_slug, $target_school_slug ) || str_contains( $target_school_slug, $chk_slug ) ) ) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		foreach ( $target_admissions_list as $t_candidate ) {
+			if ( $target_school_matcher( $t_candidate, $context_school, $school_param, $selected_school_slug ) ) {
+				$active_target_admission = $t_candidate;
+				break;
+			}
+		}
+	}
+}
+
 $major_tabs = [];
 
 $major_tabs[] = [
@@ -113,6 +193,15 @@ $major_tabs[] = [
 	'subtitle' => 'Bộ lọc & Các trường',
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>',
 ];
+
+if ( ! empty( $active_target_admission ) ) {
+	$major_tabs[] = [
+		'id'       => 'doi-tuong-tuyen-sinh',
+		'title'    => 'Đối tượng tuyển sinh',
+		'subtitle' => 'Ngành đúng & ngành gần',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>',
+	];
+}
 
 $major_tabs[] = [
 	'id'       => 'quy-trinh-tuyen-sinh',
@@ -337,6 +426,94 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 						</div>
 					</div>
 				</section>
+
+				<!-- SECTION: ĐỐI TƯỢNG TUYỂN SINH (NGÀNH ĐÚNG & NGÀNH GẦN THEO TRƯỜNG ĐANG TRUY CẬP) -->
+				<?php if ( ! empty( $active_target_admission ) ) : 
+					$t_item = $active_target_admission;
+				?>
+					<section id="doi-tuong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
+						<div class="border-b border-slate-100 pb-3 mb-5">
+							<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
+								Đối tượng tuyển sinh: Ngành đúng & Ngành gần
+							</h2>
+							<p class="text-xs md:text-sm text-slate-500 mt-1">
+								Quy định phân loại văn bằng tốt nghiệp Cao đẳng và điều kiện học phần bổ sung của <?php echo esc_html( $t_item['school_title'] ); ?>
+							</p>
+						</div>
+
+						<div class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+							<!-- Header thẻ quy định của trường -->
+							<div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+								<div class="flex items-center gap-2">
+									<span class="w-6 h-6 rounded-lg bg-[#00308b] text-white flex items-center justify-center font-bold text-xs shrink-0">
+										🏛️
+									</span>
+									<h3 class="font-bold text-slate-900 text-sm md:text-base">
+										<?php echo esc_html( $t_item['school_title'] ); ?>
+									</h3>
+								</div>
+								<span class="text-xs font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+									<?php echo esc_html( $t_item['regulation_title'] ); ?>
+								</span>
+							</div>
+
+							<!-- BẢNG 2 CỘT CHUẨN: CHỈ CÓ NGÀNH ĐÚNG VS NGÀNH GẦN (KHÔNG STT, KHÔNG CỘT NGÀNH DỰ TUYỂN) -->
+							<div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+								
+								<!-- CỘT 1: NHÓM NGÀNH ĐÚNG -->
+								<div class="p-4 sm:p-5 bg-emerald-50/15 flex flex-col justify-between">
+									<div>
+										<div class="flex items-center justify-between gap-2 border-b border-emerald-100 pb-3 mb-3.5">
+											<div class="flex items-center gap-2">
+												<span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">✓</span>
+												<h4 class="font-bold text-slate-900 text-sm md:text-base">Nhóm Ngành Đúng</h4>
+											</div>
+											<span class="px-2.5 py-1 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-200">
+												Không học bổ sung
+											</span>
+										</div>
+
+										<p class="text-xs text-slate-600 mb-2.5 font-medium">Thí sinh tốt nghiệp Cao đẳng các chuyên ngành:</p>
+										<ul class="space-y-2 pl-4 list-disc text-slate-800 text-xs sm:text-sm mb-4">
+											<?php foreach ( $t_item['proper_majors'] as $p_major ) : ?>
+												<li><span class="font-semibold text-slate-900"><?php echo esc_html( $p_major ); ?></span></li>
+											<?php endforeach; ?>
+										</ul>
+									</div>
+
+									<div class="mt-4 pt-3 border-t border-emerald-200/60 text-xs text-emerald-800 font-semibold bg-emerald-50/70 p-2.5 rounded-lg leading-relaxed">
+										🎉 Vào học thẳng môn chuyên ngành. Thời gian đào tạo tiêu chuẩn (1.5 - 2 năm), không phải học bổ sung môn chuyển đổi.
+									</div>
+								</div>
+
+								<!-- CỘT 2: NHÓM NGÀNH GẦN -->
+								<div class="p-4 sm:p-5 bg-amber-50/15 flex flex-col justify-between">
+									<div>
+										<div class="flex items-center justify-between gap-2 border-b border-amber-100 pb-3 mb-3.5">
+											<div class="flex items-center gap-2">
+												<span class="w-6 h-6 rounded-md bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-xs shrink-0">⚡</span>
+												<h4 class="font-bold text-slate-900 text-sm md:text-base">Nhóm Ngành Gần</h4>
+											</div>
+											<span class="px-2.5 py-1 bg-amber-50 text-amber-900 text-xs font-bold rounded-lg border border-amber-200">
+												+ <?php echo sprintf( '%02d', (int) ( $t_item['bridge_count'] ?: 3 ) ); ?> Học phần bổ sung
+											</span>
+										</div>
+
+										<p class="text-xs text-slate-600 mb-2.5 font-medium">Thí sinh tốt nghiệp Cao đẳng các ngành:</p>
+										<p class="text-xs sm:text-sm text-slate-800 leading-relaxed mb-4">
+											<?php echo esc_html( implode( '; ', $t_item['near_majors'] ) ); ?>.
+										</p>
+									</div>
+
+									<div class="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed font-medium">
+										⚠️ <strong>Quy định bắt buộc:</strong> <?php echo esc_html( $t_item['bridge_note'] ); ?>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</section>
+				<?php endif; ?>
 
 				<!-- SECTION: ADMISSION PROCESS -->
 				<?php 

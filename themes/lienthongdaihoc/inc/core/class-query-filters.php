@@ -774,7 +774,29 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 
 					<!-- Training Forms (Clickable buttons) -->
 					<div class="flex items-center flex-wrap sm:justify-end gap-1.5 sm:gap-2 shrink-0 sm:max-w-[310px]">
-						<?php foreach ( $school['programs'] as $prog ) : 
+						<?php 
+						// Prioritize active programs over 'tam-ngung'
+						$sorted_programs = $school['programs'];
+						usort( $sorted_programs, function( $a, $b ) {
+							$a_suspended = ( 'tam-ngung' === ( $a['status'] ?? '' ) );
+							$b_suspended = ( 'tam-ngung' === ( $b['status'] ?? '' ) );
+							if ( $a_suspended && ! $b_suspended ) {
+								return 1;
+							}
+							if ( ! $a_suspended && $b_suspended ) {
+								return -1;
+							}
+							return 0;
+						} );
+
+						$rendered_training_types = [];
+						foreach ( $sorted_programs as $prog ) : 
+							$type_key = ! empty( $prog['he'] ) ? $prog['he'] : ( ! empty( $prog['type_name'] ) ? sanitize_title( $prog['type_name'] ) : 'default' );
+							if ( isset( $rendered_training_types[ $type_key ] ) ) {
+								continue;
+							}
+							$rendered_training_types[ $type_key ] = true;
+
 							$type_name_lower = mb_strtolower( trim( $prog['type_name'] ), 'UTF-8' );
 							$dot_class = 'bg-blue-500';
 							$btn_style = 'bg-blue-50 text-[#00308b] border-blue-200/80 hover:bg-[#00308b] hover:text-white hover:border-[#00308b]';

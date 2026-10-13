@@ -269,6 +269,81 @@
                 "return_format": "id",
                 "ui": 1,
                 "instructions": "Chọn các ngành học liên quan (Hiển thị tại Section 'Ngành đào tạo liên quan' ngoài website & dùng cho thuật toán xét tuyển liên thông)"
+            },
+            {
+                "key": "field_tab_major_target_admissions",
+                "label": "Đối tượng tuyển sinh theo trường",
+                "name": "",
+                "type": "tab",
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_major_school_admission_targets",
+                "label": "Quy định ngành đúng / ngành gần theo từng trường",
+                "name": "major_school_admission_targets",
+                "type": "repeater",
+                "instructions": "Chỉ thiết lập cho những trường có ban hành đề án/tài liệu quy định chi tiết về đối tượng tuyển sinh ngành đúng và ngành gần.",
+                "button_label": "+ Thêm trường có quy định ngành gần",
+                "layout": "block",
+                "sub_fields": [
+                    {
+                        "key": "field_target_school",
+                        "label": "Trường đại học áp dụng",
+                        "name": "school",
+                        "type": "post_object",
+                        "post_type": [
+                            "school"
+                        ],
+                        "allow_null": 0,
+                        "multiple": 0,
+                        "return_format": "id",
+                        "ui": 1,
+                        "instructions": "Chọn trường đại học ban hành quy định này (ví dụ: Trường Đại học Giao thông Vận tải)"
+                    },
+                    {
+                        "key": "field_target_regulation_title",
+                        "label": "Căn cứ đề án / Thông báo tuyển sinh",
+                        "name": "regulation_title",
+                        "type": "text",
+                        "placeholder": "Ví dụ: Theo Đề án tuyển sinh Trường Đại học Giao thông Vận tải (UTC)"
+                    },
+                    {
+                        "key": "field_target_proper_majors",
+                        "label": "Nhóm Ngành đúng (Cao đẳng)",
+                        "name": "proper_majors",
+                        "type": "textarea",
+                        "rows": 4,
+                        "instructions": "Danh sách các ngành/chuyên ngành đúng tốt nghiệp Cao đẳng (mỗi ngành 1 dòng hoặc cách nhau bằng dấu chấm phẩy ;). Thí sinh nhóm này xét tuyển thẳng vào chuyên ngành.",
+                        "placeholder": "Khoa học máy tính\nCông nghệ thông tin\nỨng dụng phần mềm\nCông nghệ kỹ thuật máy tính\nLập trình máy tính"
+                    },
+                    {
+                        "key": "field_target_near_majors",
+                        "label": "Nhóm Ngành gần (Cao đẳng)",
+                        "name": "near_majors",
+                        "type": "textarea",
+                        "rows": 6,
+                        "instructions": "Danh sách các ngành gần tốt nghiệp Cao đẳng (mỗi ngành 1 dòng hoặc cách nhau bằng dấu chấm phẩy ;).",
+                        "placeholder": "Kỹ thuật sửa chữa lắp ráp máy tính\nThiết kế mạch điện tử trên máy tính\nTruyền thông và mạng máy tính\nCông nghệ kỹ thuật máy tính\nĐiện tử máy tính\nĐồ họa đa phương tiện\nTin học văn phòng\nTin học viễn thông ứng dụng\nTin học ứng dụng\nXử lý dữ liệu\nQuản trị cơ sở dữ liệu\nQuản trị mạng máy tính\nvà các ngành tương đương"
+                    },
+                    {
+                        "key": "field_target_bridge_note",
+                        "label": "Quy định học phần bổ sung cho ngành gần",
+                        "name": "bridge_note",
+                        "type": "textarea",
+                        "rows": 3,
+                        "instructions": "Quy định học phần bổ sung/chuyển đổi kiến thức cho thí sinh ngành gần.",
+                        "placeholder": "Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo."
+                    },
+                    {
+                        "key": "field_target_bridge_count",
+                        "label": "Số học phần bổ sung (ngành gần)",
+                        "name": "bridge_count",
+                        "type": "number",
+                        "default_value": 3,
+                        "instructions": "Số lượng học phần cần học bổ sung (ví dụ: 3)."
+                    }
+                ]
             }
         ],
         "location": [
@@ -473,41 +548,6 @@
                 "label": "Điều kiện xét tuyển",
                 "name": "admission_requirements",
                 "type": "wysiwyg"
-            },
-            {
-                "key": "field_program_target_proper_majors",
-                "label": "Đối tượng tuyển sinh: Nhóm Ngành đúng (Cao đẳng)",
-                "name": "admission_target_proper_majors",
-                "type": "textarea",
-                "instructions": "Danh sách các ngành/chuyên ngành đúng tốt nghiệp Cao đẳng (mỗi ngành 1 dòng hoặc cách nhau bằng dấu chấm phẩy ;). Thí sinh nhóm này vào học thẳng chuyên ngành.",
-                "rows": 4,
-                "placeholder": "Khoa học máy tính\nCông nghệ thông tin\nỨng dụng phần mềm\nCông nghệ kỹ thuật máy tính\nLập trình máy tính"
-            },
-            {
-                "key": "field_program_target_near_majors",
-                "label": "Đối tượng tuyển sinh: Nhóm Ngành gần (Cao đẳng)",
-                "name": "admission_target_near_majors",
-                "type": "textarea",
-                "instructions": "Danh sách các ngành gần tốt nghiệp Cao đẳng (mỗi ngành 1 dòng hoặc cách nhau bằng dấu chấm phẩy ;).",
-                "rows": 6,
-                "placeholder": "Kỹ thuật sửa chữa lắp ráp máy tính\nThiết kế mạch điện tử trên máy tính\nTruyền thông và mạng máy tính\nCông nghệ kỹ thuật máy tính\nĐiện tử máy tính\nĐồ họa đa phương tiện\nTin học văn phòng\nTin học viễn thông ứng dụng\nTin học ứng dụng\nXử lý dữ liệu\nQuản trị cơ sở dữ liệu\nQuản trị mạng máy tính"
-            },
-            {
-                "key": "field_program_target_bridge_note",
-                "label": "Quy định học phần bổ sung cho ngành gần",
-                "name": "admission_bridge_courses_note",
-                "type": "textarea",
-                "instructions": "Quy định học phần bổ sung/chuyển đổi kiến thức cho thí sinh ngành gần.",
-                "rows": 3,
-                "placeholder": "Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo."
-            },
-            {
-                "key": "field_program_target_bridge_count",
-                "label": "Số học phần bổ sung (ngành gần)",
-                "name": "admission_bridge_courses_count",
-                "type": "number",
-                "instructions": "Số lượng học phần cần học bổ sung (mặc định: 3).",
-                "placeholder": "3"
             },
             {
                 "key": "field_program_documents",
