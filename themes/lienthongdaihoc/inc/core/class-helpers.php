@@ -437,6 +437,10 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 			<textarea name="your-message" rows="3" class="w-full border border-slate-200 rounded-lg px-3 py-3 text-sm focus:border-brand-primary focus:outline-none" placeholder="<?php esc_attr_e('Nhập câu hỏi hoặc yêu cầu cụ thể...'); ?>"></textarea>
 		</div>
 
+		<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
+			<?php ltdh_render_recaptcha_field( 'native_lead' ); ?>
+		<?php endif; ?>
+
 		<button type="submit" class="w-full bg-brand-primary text-white py-3.5 rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-brand-darkBlue transition-all mt-2 min-h-[44px] flex items-center justify-center">
 			<?php echo 'contact' === $type ? esc_html__('Gửi Liên Hệ') : esc_html__('Gửi Thông Tin Ngay'); ?>
 		</button>

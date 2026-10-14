@@ -1,0 +1,157 @@
+<?php
+/**
+ * The base configuration for WordPress
+ *
+ * The wp-config.php creation script uses this file during the installation.
+ * You don't have to use the web site, you can copy this file to "wp-config.php"
+ * and fill in the values.
+ *
+ * This file contains the following configurations:
+ *
+ * * Database settings
+ * * Secret keys
+ * * Database table prefix
+ * * Localized language
+ * * ABSPATH
+ *
+ * @link https://wordpress.org/support/article/editing-wp-config-php/
+ *
+ * @package WordPress
+ */
+
+// ** Database settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define( 'DB_NAME', 'local' );
+
+/** Database username */
+define( 'DB_USER', 'root' );
+
+/** Database password */
+define( 'DB_PASSWORD', 'root' );
+
+/** Database hostname */
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	define( 'DB_HOST', 'localhost:/Users/ken/Library/Application Support/Local/run/_nsV9ehOj/mysql/mysqld.sock' );
+} else {
+	define( 'DB_HOST', 'localhost' );
+}
+
+/** Database charset to use in creating database tables. */
+define( 'DB_CHARSET', 'utf8' );
+
+/** The database collate type. Don't change this if in doubt. */
+define( 'DB_COLLATE', '' );
+
+/**#@+
+ * Authentication unique keys and salts.
+ *
+ * Change these to different unique phrases! You can generate these using
+ * the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}.
+ *
+ * You can change these at any point in time to invalidate all existing cookies.
+ * This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define( 'AUTH_KEY',          '40alwStZUeO2=}K]6Ksu/Bl8?MM5B7(eZdb$di@V2:tie2mEiic9J&M ZLNhB&{`' );
+define( 'SECURE_AUTH_KEY',   'bhABzb[IukCHugF.q7l*e?fM[@G*k_&&3&GN:+Iy$S< )~cfl+Gz*Zmg>:h<1+T|' );
+define( 'LOGGED_IN_KEY',     's]P[!y-U<4Gwu=~`82q][9zp2y}]iu5D~G|m=9r44&F&I/0K;N#KL+=NElUvt=z!' );
+define( 'NONCE_KEY',         'z~5(1F2z]DlX4K3aCJC2z^jr$}&HWb=gaf9N?gG>eWFr:V^=!|Q=oJ=$k/e^r ]9' );
+define( 'AUTH_SALT',         'r%qEf?V* 64TRBG(bN+OWrae$^q1lj Q%5nf{4Zg<<(&GU#.7aBu,xpJ XLs$WeC' );
+define( 'SECURE_AUTH_SALT',  'FuiC,lp%er%u(7>@=O&Gu3iut-:MQv`E$jHBwbHn9<;ArH>G[sc{tD>DNJ^fb>4=' );
+define( 'LOGGED_IN_SALT',    '(XL]2&%,O-YjhlTh Tfz]}eTtN:pE*FR*9Sv6_p[7]Q_mVp1w;s{[q~/7D|&q86*' );
+define( 'NONCE_SALT',        'y5|(*t#)4v%x-. )F&?n]8$aJD!iMTs5(21`=I`04m!FJdM=jPfG+OW-5&9FK?RD' );
+define( 'WP_CACHE_KEY_SALT', 'g;nciZO!EyESaG_36ixEv|q~wO.O^[QJg~1&xdHwM j7QK2*:jK)hRm{aNF1&)q[' );
+
+
+/**#@-*/
+
+/**
+ * WordPress database table prefix.
+ *
+ * You can have multiple installations in one database if you give each
+ * a unique prefix. Only numbers, letters, and underscores please!
+ */
+$table_prefix = 'wp_';
+
+
+/* Add any custom values between this line and the "stop editing" line. */
+
+/**
+ * 9Remote / Reverse Proxy Tunnel Temporary Developer Support
+ */
+if ( getenv( 'WP_REVERSE_PROXY_DEV' ) === 'true' || ( isset( $_SERVER['HTTP_X_FORWARDED_HOST'] ) && strpos( $_SERVER['HTTP_X_FORWARDED_HOST'], 'trycloudflare.com' ) !== false ) ) {
+	// 1. Detect Protocol
+	$forwarded_proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? 'http';
+	$is_ssl          = ( 'https' === strtolower( $forwarded_proto ) );
+	if ( $is_ssl ) {
+		$_SERVER['HTTPS'] = 'on';
+	}
+
+	// 2. Detect Host & Port
+	$forwarded_host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? ( $_SERVER['HTTP_HOST'] ?? 'localhost' );
+
+	// 3. Detect Path Prefix (e.g., /proxy/10028)
+	$forwarded_prefix = $_SERVER['HTTP_X_FORWARDED_PREFIX'] ?? '';
+	if ( empty( $forwarded_prefix ) && isset( $_SERVER['REQUEST_URI'] ) ) {
+		if ( preg_match( '#^(/proxy/\d+)#', $_SERVER['REQUEST_URI'], $matches ) ) {
+			$forwarded_prefix = $matches[1];
+		}
+	}
+	$forwarded_prefix = rtrim( $forwarded_prefix, '/' );
+
+	// 4. Set Home and Site URL dynamically
+	$scheme     = $is_ssl ? 'https://' : 'http://';
+	$mapped_url = $scheme . $forwarded_host . $forwarded_prefix;
+
+	if ( ! defined( 'WP_HOME' ) ) {
+		define( 'WP_HOME', $mapped_url );
+	}
+	if ( ! defined( 'WP_SITEURL' ) ) {
+		define( 'WP_SITEURL', $mapped_url );
+	}
+
+	// 5. Fix absolute asset URLs pointing to localhost inside content / options
+	ob_start( function( $buffer ) use ( $mapped_url ) {
+		return str_replace( 'http://localhost:10028', $mapped_url, $buffer );
+	} );
+}
+
+
+
+
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ *
+ * For information on other constants that can be used for debugging,
+ * visit the documentation.
+ *
+ * @link https://wordpress.org/support/article/debugging-in-wordpress/
+ */
+if ( ! defined( 'WP_DEBUG' ) ) {
+	define( 'WP_DEBUG', true );
+}
+
+if ( ! defined( 'WP_DEBUG_LOG' ) ) {
+	define( 'WP_DEBUG_LOG', true );
+}
+
+if ( ! defined( 'WP_DEBUG_DISPLAY' ) ) {
+	define( 'WP_DEBUG_DISPLAY', false );
+}
+
+define( 'WP_ENVIRONMENT_TYPE', 'local' );
+define( 'DISALLOW_FILE_EDIT', true );
+/* That's all, stop editing! Happy publishing. */
+
+/** Absolute path to the WordPress directory. */
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+
+/** Sets up WordPress vars and included files. */
+require_once ABSPATH . 'wp-settings.php';

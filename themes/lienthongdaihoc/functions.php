@@ -43,6 +43,7 @@ require_once __DIR__ . '/inc/relationship-hooks.php';
 // ----------------------------------------------------
 // 5. Modules: Business Logic
 // ----------------------------------------------------
+require_once __DIR__ . '/inc/recaptcha.php';
 require_once __DIR__ . '/inc/lead-capture.php';
 require_once __DIR__ . '/inc/crm-adapters.php';
 require_once __DIR__ . '/inc/search-engine.php';

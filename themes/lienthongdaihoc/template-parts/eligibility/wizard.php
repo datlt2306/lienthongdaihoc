@@ -101,6 +101,13 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 			</div>
 		</div>
 
+		<!-- reCAPTCHA Anti-Spam Protection -->
+		<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
+			<div class="pt-2">
+				<?php ltdh_render_recaptcha_field( 'elig_check' ); ?>
+			</div>
+		<?php endif; ?>
+
 		<!-- Submit Button -->
 		<div class="pt-6 border-t border-slate-100 flex justify-end">
 			<button type="button" id="elig-unified-submit" class="elig-btn elig-btn-primary px-8 py-3.5 text-base w-full md:w-auto" style="box-shadow: 0 4px 14px rgba(217, 119, 6, 0.25);">

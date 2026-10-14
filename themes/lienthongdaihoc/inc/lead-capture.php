@@ -223,6 +223,35 @@ function ltdh_insert_lead( array $data ): int {
 		ltdh_trigger_telegram_notification( $notification_data );
 		ltdh_increment_ip_rate_limit();
 
+		// Real-time CRM Sync: Attempt immediate sync to CRM (ERPNext / Partner CRM)
+		if ( function_exists( 'ltdh_sync_lead_to_crm' ) ) {
+			$lead_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE id = %d", $lead_id ) );
+			if ( $lead_row ) {
+				$sync_res = ltdh_sync_lead_to_crm( $lead_row );
+				if ( is_wp_error( $sync_res ) ) {
+					$wpdb->update(
+						$table_name,
+						[
+							'sync_status'   => 'failed',
+							'retry_count'   => 1,
+							'error_message' => $sync_res->get_error_message(),
+						],
+						[ 'id' => $lead_id ]
+					);
+				} elseif ( true === $sync_res ) {
+					$wpdb->update(
+						$table_name,
+						[
+							'sync_status'   => 'synced',
+							'synced_at'     => current_time( 'mysql' ),
+							'error_message' => '',
+						],
+						[ 'id' => $lead_id ]
+					);
+				}
+			}
+		}
+
 		return $lead_id;
 	}
 

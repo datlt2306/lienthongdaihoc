@@ -1143,6 +1143,10 @@ function ltdh_render_default_guide_sidebar() {
 					<label class="block text-sm font-semibold text-slate-600 mb-1">Số điện thoại *</label>
 					<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
 				</div>
+
+				<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
+					<?php ltdh_render_recaptcha_field( 'sidebar_lead' ); ?>
+				<?php endif; ?>
 				
 				<button type="submit" class="w-full bg-brand-accent text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-[#e06e00] transition-all">
 					Gửi Thông Tin Yêu Cầu

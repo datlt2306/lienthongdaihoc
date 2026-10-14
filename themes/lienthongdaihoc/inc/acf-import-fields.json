@@ -915,11 +915,42 @@
         "name": "default_crm_type",
         "type": "select",
         "choices": {
+          "erpnext": "ERPNext / Frappe CRM",
           "onschool": "OnSchool Platform",
           "aum": "AUM CRM",
           "internal": "Chỉ lưu trữ nội bộ"
         },
-        "default_value": "internal"
+        "default_value": "erpnext"
+      },
+      {
+        "key": "field_erpnext_endpoint",
+        "label": "ERPNext API Endpoint",
+        "name": "erpnext_endpoint",
+        "type": "url",
+        "conditional_logic": [
+          [
+            {
+              "field": "field_crm_type",
+              "operator": "==",
+              "value": "erpnext"
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_erpnext_token",
+        "label": "ERPNext Auth Token (api_key:api_secret)",
+        "name": "erpnext_token",
+        "type": "password",
+        "conditional_logic": [
+          [
+            {
+              "field": "field_crm_type",
+              "operator": "==",
+              "value": "erpnext"
+            }
+          ]
+        ]
       },
       {
         "key": "field_onschool_endpoint",

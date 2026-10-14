@@ -430,3 +430,46 @@ Tổng hợp toàn bộ phát hiện thành tài liệu `WEBSITE_POSITIONING_AUD
 ### Safety & Deliverables
 - [ ] Không tự ý sửa đổi hoặc xóa code trong giai đoạn audit; chỉ xuất tài liệu báo cáo phân tích và phương án sửa chữa chi tiết.
 - [ ] File báo cáo `WEBSITE_POSITIONING_AUDIT_REPORT_2026.md` được tạo đầy đủ, rõ ràng và có thể kiểm chứng độc lập.
+
+
+## 2026-10-13T13:57:06Z
+
+Diệt trừ toàn diện mã độc WordPress, gỡ bỏ tất cả webshell, rootkit plugin, persistence trong plugin, tài khoản quản trị giả mạo, bài viết spam trong database, và thiết lập cấu hình bảo mật theo checklist All-In-One WP Security (AIOS).
+
+Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public
+Integrity mode: development
+
+## Requirements
+
+### R1. Triage & Triệt phá mã độc (Malware Eradication)
+- Tìm và xóa bỏ toàn bộ file webshell và cửa hậu trong hệ thống:
+  - Plugin giả mạo rootkit `wp-content/plugins/security-baseline/` (đang ẩn danh và có cơ chế tự động hồi sinh admin).
+  - Cửa hậu persistence ngụy trang trong `wp-content/plugins/google-site-kit/gtg/wp-fd0eab.php`.
+  - Các webshell độc hại: `wp-content/requests.php`, `wp-content/sys.php`, `wp-content/clases.php`, `wp-content/footer.php`, `wp-content/easypost/`, `wp-content/uploads/wp-bb722f.php`, `wp-content/uploads/img-a36270.jpg`, `wp-content/uploads/wpcode`.
+  - File cấu hình độc hại `wp-content/uploads/.htaccess` cho phép chạy file `.jpg` thành mã PHP.
+- Quét toàn diện thư mục `wp-content` và các plugin khác để đảm bảo không còn tệp lây nhiễm hoặc backdoor ẩn.
+- Khôi phục tính toàn vẹn của git repository (loại bỏ các file độc hại đã bị commit).
+
+### R2. Thanh trừng tài khoản giả mạo & Dọn dẹp Database
+- Xóa bỏ toàn bộ tài khoản do hacker tạo ra: `manager_810d824ec56c3d30`, `manager_a7ab064f2f04a9a6`, `root`, `wps_6dbd6f3dd5` (administrator) và `anna.lewis` (subscriber).
+- Tạo một tài khoản quản trị viên mới hợp lệ cho chủ sở hữu với tên đăng nhập an toàn (không dùng `admin`), chuyển quyền sở hữu nội dung và xóa hoặc vô hiệu hóa tài khoản `admin` cũ.
+- Xóa sạch các bài viết spam (casino, adult/OnlyFans, cá cược) được chèn tự động vào `wp_posts` và `wp_postmeta`.
+- Xóa các khóa cài cắm bí mật trong `wp_options` và `wp_usermeta` (`_stat_da6522`, `_sess_2c0ae3`, `_pref_479395`,...).
+
+### R3. Thiết lập hệ thống bảo mật theo Checklist (Security Hardening)
+- Cài đặt / kích hoạt plugin **All-In-One WP Security & Firewall (AIOS)** và thiết lập các biện pháp bảo vệ theo checklist:
+  - **Kiểm tra ban đầu & Sao lưu**: Tắt hiển thị PHP error reporting ở frontend (`WP_DEBUG_DISPLAY = false`), tạo bản sao lưu an toàn cho database và file cấu hình.
+  - **User Security**: Chặn User Enumeration, kích hoạt Login Lockdown chống brute-force, tắt hoàn toàn tính năng Application Passwords.
+  - **File Security**: Cấm chỉnh sửa file mã nguồn trong admin (`DISALLOW_FILE_EDIT`), ngăn chặn tuyệt đối việc thực thi PHP trong thư mục uploads, ẩn WP generator meta.
+  - **Firewall & Rules**: Tắt Pingback / XML-RPC, cấu hình 6G Firewall rules, bảo vệ WP REST API, chặn các bot giả mạo và request bất thường.
+  - **Chống SPAM**: Thiết lập phát hiện và xử lý spam comment.
+
+## Acceptance Criteria
+
+### Xác minh khách quan độc lập (Objective Verification)
+- [ ] Lệnh `wp core verify-checksums` và `wp plugin verify-checksums --all` thành công, không phát hiện tệp tin lạ hoặc bị sửa đổi trong core và các plugin chính quy.
+- [ ] Lệnh `wp user list` chỉ chứa các tài khoản hợp lệ của chủ sở hữu, không còn tài khoản `admin` mặc định và không còn bất kỳ tài khoản giả mạo nào.
+- [ ] Gửi request HTTP trực tiếp tới các URL webshell trước đó (`/wp-content/requests.php`, `/wp-content/sys.php`, `/wp-content/clases.php`, `/wp-content/footer.php`, `/wp-content/easypost/easypost.php`, `/wp-content/uploads/wp-bb722f.php`) đều trả về mã HTTP 404.
+- [ ] Thư mục `wp-content/uploads/` được bảo vệ tuyệt đối: mọi file `.php` hoặc script ngụy trang đuôi `.jpg` khi truy cập qua web server đều bị từ chối thực thi (trả về 403 Forbidden hoặc 404).
+- [ ] Database không còn các bài viết spam casino hoặc adult (truy vấn tìm kiếm từ khóa cờ bạc/OnlyFans trong `wp_posts` trả về 0 kết quả).
+- [ ] Cấu hình trong `wp-config.php` có khai báo `DISALLOW_FILE_EDIT` là `true` và `WP_DEBUG_DISPLAY` là `false`.

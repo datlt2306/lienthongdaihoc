@@ -76,12 +76,18 @@ class LTDH_Performance {
 				'href'        => 'https://fonts.gstatic.com',
 				'crossorigin' => true,
 			];
+			$urls[] = [
+				'href'        => 'https://www.google.com',
+				'crossorigin' => false,
+			];
 		}
 
 		if ( 'dns-prefetch' === $relation_type ) {
 			$urls[] = 'https://fonts.googleapis.com';
 			$urls[] = 'https://fonts.gstatic.com';
 			$urls[] = 'https://api.telegram.org';
+			$urls[] = 'https://www.google.com';
+			$urls[] = 'https://www.gstatic.com';
 		}
 
 		return $urls;

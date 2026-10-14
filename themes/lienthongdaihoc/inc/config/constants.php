@@ -94,3 +94,40 @@ if ( ! defined( 'LTDH_TELEGRAM_BOT_TOKEN' ) ) {
 if ( ! defined( 'LTDH_TELEGRAM_CHAT_ID' ) ) {
 	define( 'LTDH_TELEGRAM_CHAT_ID', '' );
 }
+
+// ====================================================
+// CRM Integration Settings (ERPNext / Frappe CRM)
+// Can be overridden in wp-config.php for production security
+// ====================================================
+if ( ! defined( 'LTDH_DEFAULT_CRM_TYPE' ) ) {
+	define( 'LTDH_DEFAULT_CRM_TYPE', 'erpnext' );
+}
+if ( ! defined( 'LTDH_ERPNEXT_ENDPOINT' ) ) {
+	define( 'LTDH_ERPNEXT_ENDPOINT', 'http://localhost:8080/api/resource/Lead' );
+}
+if ( ! defined( 'LTDH_ERPNEXT_TOKEN' ) ) {
+	define( 'LTDH_ERPNEXT_TOKEN', '45d010c5e85cfb8:adb49e4e04a729f' );
+}
+if ( ! defined( 'LTDH_ERPNEXT_COMPANY' ) ) {
+	define( 'LTDH_ERPNEXT_COMPANY', 'Liên thông giao thông vận tải' );
+}
+
+// ====================================================
+// Google reCAPTCHA Security Settings
+// Can be overridden in wp-config.php for production security
+// ====================================================
+if ( ! defined( 'LTDH_RECAPTCHA_ENABLED' ) ) {
+	define( 'LTDH_RECAPTCHA_ENABLED', null );
+}
+if ( ! defined( 'LTDH_RECAPTCHA_VERSION' ) ) {
+	define( 'LTDH_RECAPTCHA_VERSION', 'v3' );
+}
+if ( ! defined( 'LTDH_RECAPTCHA_SITE_KEY' ) ) {
+	define( 'LTDH_RECAPTCHA_SITE_KEY', '' );
+}
+if ( ! defined( 'LTDH_RECAPTCHA_SECRET_KEY' ) ) {
+	define( 'LTDH_RECAPTCHA_SECRET_KEY', '' );
+}
+if ( ! defined( 'LTDH_RECAPTCHA_MIN_SCORE' ) ) {
+	define( 'LTDH_RECAPTCHA_MIN_SCORE', 0.5 );
+}

@@ -913,6 +913,10 @@ $program_tabs[] = [
 
 			<div id="ltdh-lm-error" class="hidden text-xs text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-200"></div>
 
+			<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
+				<?php ltdh_render_recaptcha_field( 'lead_magnet' ); ?>
+			<?php endif; ?>
+
 			<button type="submit" id="ltdh-lm-submit-btn" class="w-full bg-[#00308b] hover:bg-[#002266] text-white py-3 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
 				<span>Tải Tài Liệu Miễn Phí</span>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -971,7 +975,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	};
 
-	window.ltdhSubmitLeadMagnet = function(e) {
+	window.ltdhSubmitLeadMagnet = async function(e) {
 		e.preventDefault();
 		const form = document.getElementById('ltdh-lead-magnet-form');
 		if (!form) return;
@@ -984,6 +988,25 @@ document.addEventListener('DOMContentLoaded', function() {
 			submitBtn.innerHTML = '<span>Đang gửi thông tin...</span>';
 		}
 		if (errorEl) errorEl.classList.add('hidden');
+
+		if (window.ltdhGetRecaptchaToken) {
+			try {
+				const recaptchaToken = await window.ltdhGetRecaptchaToken('lead_magnet', form);
+				if (recaptchaToken) {
+					formData.set('g-recaptcha-response', recaptchaToken);
+				}
+			} catch (recaptchaErr) {
+				if (submitBtn) {
+					submitBtn.disabled = false;
+					submitBtn.innerHTML = '<span>Tải Tài Liệu Miễn Phí</span>';
+				}
+				if (errorEl) {
+					errorEl.textContent = recaptchaErr.message || 'Vui lòng xác thực ô "Tôi không phải là người máy".';
+					errorEl.classList.remove('hidden');
+				}
+				return;
+			}
+		}
 
 		fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', {
 			method: 'POST',

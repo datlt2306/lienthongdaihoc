@@ -89,9 +89,37 @@ function ltdh_process_lead_queue() {
 // 3. CRM Sync Router & Adapters
 // ----------------------------------------------------
 function ltdh_sync_lead_to_crm( $lead ) {
-	// [CBR-02]: General leads without a designated school are stored locally and notified to master Telegram only.
-	// They must NEVER be dispatched to third-party partner CRMs.
+	// Determine default CRM type from ACF options or constants
+	$default_crm_type = function_exists( 'get_field' ) ? get_field( 'default_crm_type', 'options' ) : '';
+	if ( empty( $default_crm_type ) && defined( 'LTDH_DEFAULT_CRM_TYPE' ) ) {
+		$default_crm_type = LTDH_DEFAULT_CRM_TYPE;
+	}
+
+	// [CBR-02]: Handle general leads without a designated school.
+	// Only our master internal CRM (ERPNext) receives general leads.
+	// Third-party partner CRMs (OnSchool, AUM) must NEVER receive general leads.
 	if ( empty( $lead->school_id ) ) {
+		if ( 'erpnext' === $default_crm_type ) {
+			$program_name = $lead->program_id ? get_the_title( $lead->program_id ) : 'Tư vấn tuyển sinh chung';
+			$school_name  = 'Cổng tuyển sinh Liên thông Đại học';
+			$major_name   = $lead->major_id ? get_the_title( $lead->major_id ) : 'Chưa chọn';
+
+			$payload = [
+				'name'          => $lead->name,
+				'phone'         => $lead->phone,
+				'email'         => $lead->email,
+				'program'       => $program_name,
+				'school'        => $school_name,
+				'major'         => $major_name,
+				'training_type' => $lead->training_type,
+				'campus'        => $lead->campus,
+				'referrer'      => $lead->referral_source,
+				'message'       => $lead->message ?? '',
+			];
+
+			return ltdh_sync_erpnext_adapter( $payload );
+		}
+
 		return true; // Handled internally
 	}
 
@@ -104,7 +132,7 @@ function ltdh_sync_lead_to_crm( $lead ) {
 		$endpoint = get_field( 'crm_endpoint', $school_id );
 		$token    = get_field( 'crm_token', $school_id );
 	} else {
-		$crm_type = function_exists( 'get_field' ) ? get_field( 'default_crm_type', 'options' ) : '';
+		$crm_type = $default_crm_type;
 		$endpoint = '';
 		$token    = '';
 	}
@@ -240,40 +268,89 @@ function ltdh_sync_aum_adapter( $payload, $endpoint = '', $token = '' ) {
 }
 
 /**
- * ERPNext Webhook API Adapter
+ * ERPNext Webhook / REST API Adapter
  */
 function ltdh_sync_erpnext_adapter( $payload, $endpoint = '', $token = '' ) {
 	if ( empty( $endpoint ) && function_exists( 'get_field' ) ) {
 		$endpoint = get_field( 'erpnext_endpoint', 'options' );
 	}
+	if ( empty( $endpoint ) && defined( 'LTDH_ERPNEXT_ENDPOINT' ) ) {
+		$endpoint = LTDH_ERPNEXT_ENDPOINT;
+	}
+
 	if ( empty( $token ) && function_exists( 'get_field' ) ) {
 		$token = get_field( 'erpnext_token', 'options' );
 	}
-
-	if ( empty( $endpoint ) ) {
-		return new WP_Error( 'missing_config', 'Thiếu ERPNext Webhook Endpoint.' );
+	if ( empty( $token ) && defined( 'LTDH_ERPNEXT_TOKEN' ) ) {
+		$token = LTDH_ERPNEXT_TOKEN;
 	}
 
-	$response = wp_safe_remote_post( $endpoint, [
-		'headers' => [
+	if ( empty( $endpoint ) ) {
+		return new WP_Error( 'missing_config', 'Thiếu ERPNext Webhook / REST Endpoint.' );
+	}
+	if ( empty( $token ) ) {
+		return new WP_Error( 'missing_config', 'Thiếu ERPNext Auth Token.' );
+	}
+
+	// Construct comprehensive notes for ERPNext CRM Note child table
+	$note_lines = [];
+	if ( ! empty( $payload['program'] ) && 'Không xác định' !== $payload['program'] ) {
+		$note_lines[] = 'Chương trình: ' . $payload['program'];
+	}
+	if ( ! empty( $payload['school'] ) && 'Không xác định' !== $payload['school'] ) {
+		$note_lines[] = 'Trường đào tạo: ' . $payload['school'];
+	}
+	if ( ! empty( $payload['major'] ) && 'Không xác định' !== $payload['major'] ) {
+		$note_lines[] = 'Ngành đào tạo: ' . $payload['major'];
+	}
+	if ( ! empty( $payload['training_type'] ) ) {
+		$note_lines[] = 'Hình thức đào tạo: ' . $payload['training_type'];
+	}
+	if ( ! empty( $payload['campus'] ) ) {
+		$note_lines[] = 'Cơ sở / Khu vực: ' . $payload['campus'];
+	}
+	if ( ! empty( $payload['referrer'] ) ) {
+		$note_lines[] = 'Nguồn giới thiệu: ' . $payload['referrer'];
+	}
+	if ( ! empty( $payload['message'] ) ) {
+		$note_lines[] = 'Ghi chú / Lời nhắn: ' . $payload['message'];
+	}
+
+	$notes = [];
+	if ( ! empty( $note_lines ) ) {
+		$notes[] = [
+			'doctype' => 'CRM Note',
+			'note'    => implode( "\n", $note_lines ),
+		];
+	}
+
+	$company = defined( 'LTDH_ERPNEXT_COMPANY' ) ? LTDH_ERPNEXT_COMPANY : 'Liên thông giao thông vận tải';
+
+	$body_data = [
+		'naming_series'        => 'CRM-LEAD-.YYYY.-',
+		'lead_name'            => $payload['name'],
+		'mobile_no'            => $payload['phone'],
+		'phone'                => $payload['phone'],
+		'email_id'             => ! empty( $payload['email'] ) ? $payload['email'] : '',
+		'company'              => $company,
+		'territory'            => 'Vietnam',
+		'utm_source'           => 'Website',
+		'status'               => 'Lead',
+		'qualification_status' => 'Unqualified',
+	];
+
+	if ( ! empty( $notes ) ) {
+		$body_data['notes'] = $notes;
+	}
+
+	$response = wp_remote_post( $endpoint, [
+		'headers'            => [
 			'Content-Type'  => 'application/json',
 			'Authorization' => 'token ' . $token,
 		],
-		'body'    => wp_json_encode( [
-			'naming_series'   => 'CRM-LEAD-.YYYY.-',
-			'lead_name'       => $payload['name'],
-			'phone'           => $payload['phone'],
-			'email_id'        => $payload['email'],
-			'custom_program'  => $payload['program'],
-			'custom_school'   => $payload['school'],
-			'custom_major'    => $payload['major'],
-			'custom_training' => $payload['training_type'],
-			'custom_campus'   => $payload['campus'],
-			'source'          => 'lienthongdaihoc.com',
-			'custom_referrer' => $payload['referrer'],
-			'notes'           => $payload['message'],
-		] ),
-		'timeout' => 15,
+		'body'               => wp_json_encode( $body_data ),
+		'timeout'            => 15,
+		'reject_unsafe_urls' => false,
 	] );
 
 	if ( is_wp_error( $response ) ) {
@@ -282,7 +359,8 @@ function ltdh_sync_erpnext_adapter( $payload, $endpoint = '', $token = '' ) {
 
 	$code = wp_remote_retrieve_response_code( $response );
 	if ( $code < 200 || $code >= 300 ) {
-		return new WP_Error( 'api_error', 'ERPNext Webhook returned HTTP code ' . $code );
+		$body = wp_remote_retrieve_body( $response );
+		return new WP_Error( 'api_error', 'ERPNext API returned HTTP code ' . $code . ': ' . wp_strip_all_tags( $body ) );
 	}
 
 	return true;
