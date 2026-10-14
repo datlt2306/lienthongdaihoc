@@ -419,10 +419,11 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 
 					$prog_types       = wp_get_post_terms( $prog_id, 'training_type' );
 					$type_name        = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->name : '';
-					$type_slug        = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->slug : '';
 					$clean_type_name  = preg_replace( '/^hệ\s+/iu', '', trim( $type_name ) );
 					$card_headline    = 'Liên thông ngành ' . $clean_major_name . ( $clean_type_name ? ' - ' . $clean_type_name : '' );
-					$admission_status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
+					$admission_status = function_exists( 'ltdh_get_program_admission_status' ) 
+						? ltdh_get_program_admission_status( $prog_id ) 
+						: ( get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh' );
 
 					// Badge classes based on training type
 					$badge_class = 'bg-orange-50 text-orange-600 border border-orange-200';

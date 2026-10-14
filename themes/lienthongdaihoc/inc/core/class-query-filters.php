@@ -377,7 +377,9 @@ function ltdh_ajax_filter_programs() {
 			$t_slug           = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->slug : '';
 			$clean_type_name  = preg_replace( '/^hệ\s+/iu', '', trim( $t_name ) );
 			$card_headline    = 'Liên thông ngành ' . $clean_major_name . ( $clean_type_name ? ' - ' . $clean_type_name : '' );
-			$admission_status = get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh';
+			$admission_status = function_exists( 'ltdh_get_program_admission_status' ) 
+				? ltdh_get_program_admission_status( $prog_id ) 
+				: ( get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh' );
 
 			$badge_class = 'bg-orange-50 text-orange-600 border border-orange-200';
 			if ( $clean_type_name ) {
@@ -695,7 +697,9 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 				];
 			}
 
-			$status            = get_post_meta( $prog_id, LTDH_META_ADMISSION_STATUS, true ) ?: 'tuyen-sinh';
+			$status            = function_exists( 'ltdh_get_program_admission_status' ) 
+				? ltdh_get_program_admission_status( $prog_id ) 
+				: ( get_post_meta( $prog_id, LTDH_META_ADMISSION_STATUS, true ) ?: 'tuyen-sinh' );
 			$types             = wp_get_post_terms( $prog_id, LTDH_TAX_TRAINING_TYPE );
 			$type_name         = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
 			$clean_type_name   = preg_replace( '/^hệ\s+/iu', '', trim( $type_name ) );

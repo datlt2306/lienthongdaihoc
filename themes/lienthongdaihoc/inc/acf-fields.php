@@ -1030,10 +1030,190 @@ function ltdh_admin_verification_quick_actions() {
 						.show();
 				}
 			}
+
+			// -------------------------------------------------------------------
+			// 2-Way Sync & Ràng buộc tự động giữa Tab 1 (Trạng thái tuyển sinh) & Tab 2 (Các đợt tuyển sinh)
+			// -------------------------------------------------------------------
+			function ltdhEvaluateAdmissionBatches(triggerSource) {
+				var $batchWrapper = $('[data-name="admission_batches"], [data-key="field_program_admission_batches"]');
+				if (!$batchWrapper.length) return;
+
+				var $rows = $batchWrapper.find('tbody tr.acf-row:not(.acf-clone)');
+				var total = $rows.length;
+				if (total === 0) return;
+
+				var countOpen = 0;
+				var countUpcoming = 0;
+				var countClosed = 0;
+
+				$rows.each(function() {
+					var val = $(this).find('[data-name="batch_status"] select, select[name*="batch_status"]').val();
+					if (val === 'dang-nhan') {
+						countOpen++;
+					} else if (val === 'sap-mo') {
+						countUpcoming++;
+					} else if (val === 'da-dong') {
+						countClosed++;
+					}
+				});
+
+				var $statusField = $('[data-name="admission_status"], [data-key="field_program_admission_status"]');
+				var $statusSelect = $statusField.find('select');
+				if (!$statusSelect.length) return;
+				var curStatus = $statusSelect.val();
+
+				var $notice = $('#ltdh-batch-constraint-notice');
+				if (!$notice.length) {
+					$notice = $('<div id="ltdh-batch-constraint-notice" style="margin-top:8px;padding:8px 12px;border-radius:6px;font-size:12px;line-height:1.5;display:none;"></div>');
+					$statusField.find('.acf-input').append($notice);
+				}
+
+				if (countClosed === total) {
+					// TẤT CẢ CÁC ĐỢT ĐÃ ĐÓNG
+					if (curStatus !== 'tam-ngung') {
+						$statusSelect.val('tam-ngung').trigger('change');
+						$notice.html('⚡ <strong>Ràng buộc tự động:</strong> Tất cả ' + total + ' đợt tuyển sinh ở Tab "Các đợt tuyển sinh" đều đã đóng. Hệ thống đã tự động chuyển sang <strong>"Tạm ngưng tuyển sinh (Đã hết chỉ tiêu)"</strong>.')
+							   .css({'background': '#fef2f2', 'color': '#991b1b', 'border': '1px solid #fecaca', 'display': 'block'});
+					} else {
+						$notice.html('ℹ️ Tất cả ' + total + ' đợt tuyển sinh đều đã đóng. Trạng thái chương trình đang là <strong>Tạm ngưng tuyển sinh</strong>.')
+							   .css({'background': '#f8fafc', 'color': '#475569', 'border': '1px solid #e2e8f0', 'display': 'block'});
+					}
+				} else if (countOpen > 0) {
+					// CÓ ĐỢT ĐANG NHẬN HỒ SƠ
+					if (curStatus === 'tam-ngung') {
+						$statusSelect.val('tuyen-sinh').trigger('change');
+						$notice.html('⚡ <strong>Ràng buộc tự động:</strong> Có ' + countOpen + ' đợt đang mở nhận hồ sơ. Hệ thống đã tự động chuyển sang <strong>"Đang tuyển sinh (Còn chỉ tiêu)"</strong>.')
+							   .css({'background': '#ecfdf5', 'color': '#065f46', 'border': '1px solid #a7f3d0', 'display': 'block'});
+					} else {
+						$notice.hide();
+					}
+				} else if (countUpcoming > 0 && countOpen === 0) {
+					// CÓ ĐỢT SẮP MỞ
+					if (curStatus === 'tam-ngung') {
+						$statusSelect.val('sap-mo').trigger('change');
+						$notice.html('⚡ <strong>Ràng buộc tự động:</strong> Có đợt sắp mở nhận hồ sơ. Hệ thống đã tự động chuyển sang <strong>"Sắp mở tuyển sinh"</strong>.')
+							   .css({'background': '#eff6ff', 'color': '#1e40af', 'border': '1px solid #bfdbfe', 'display': 'block'});
+					} else {
+						$notice.hide();
+					}
+				}
+			}
+
+			// Lắng nghe khi thay đổi trạng thái đợt
+			$(document).on('change', '[data-name="admission_batches"] [data-name="batch_status"] select, [data-key="field_program_admission_batches"] select[name*="batch_status"]', function() {
+				ltdhEvaluateAdmissionBatches('batch_status_changed');
+			});
+
+			// Lắng nghe khi thêm/xóa hàng trong bảng đợt
+			if (window.acf) {
+				window.acf.addAction('remove', function($el) {
+					setTimeout(function() { ltdhEvaluateAdmissionBatches('batch_row_removed'); }, 150);
+				});
+				window.acf.addAction('append', function($el) {
+					setTimeout(function() { ltdhEvaluateAdmissionBatches('batch_row_added'); }, 150);
+				});
+			}
+
+			// Lắng nghe khi người dùng thủ công đổi Trạng thái tuyển sinh ở Tab 1
+			$(document).on('change', '[data-name="admission_status"] select, [data-key="field_program_admission_status"] select', function() {
+				var val = $(this).val();
+				var $batchWrapper = $('[data-name="admission_batches"], [data-key="field_program_admission_batches"]');
+				if (!$batchWrapper.length) return;
+
+				var $rows = $batchWrapper.find('tbody tr.acf-row:not(.acf-clone)');
+				if (!$rows.length) return;
+
+				var countOpen = 0;
+				var countClosed = 0;
+				$rows.each(function() {
+					var st = $(this).find('[data-name="batch_status"] select, select[name*="batch_status"]').val();
+					if (st === 'dang-nhan') countOpen++;
+					if (st === 'da-dong') countClosed++;
+				});
+
+				var $notice = $('#ltdh-batch-constraint-notice');
+				if (!$notice.length) {
+					$notice = $('<div id="ltdh-batch-constraint-notice" style="margin-top:8px;padding:8px 12px;border-radius:6px;font-size:12px;line-height:1.5;display:none;"></div>');
+					$(this).closest('.acf-input').append($notice);
+				}
+
+				if (val === 'tam-ngung' && countOpen > 0) {
+					$notice.html('⚠️ <strong>Chú ý:</strong> Bạn đang chọn "Tạm ngưng tuyển sinh" nhưng ở Tab "Các đợt tuyển sinh" vẫn còn ' + countOpen + ' đợt đang mở. <button type="button" id="ltdh-btn-close-all-batches" class="button button-small" style="margin-left:6px;color:#b91c1c;border-color:#fca5a5;">Đóng tất cả các đợt ngay</button>')
+						   .css({'background': '#fffbeb', 'color': '#92400e', 'border': '1px solid #fde68a', 'display': 'block'});
+				} else if (val === 'tuyen-sinh' && countClosed === $rows.length) {
+					$notice.html('⚠️ <strong>Chú ý:</strong> Bạn đang chọn "Đang tuyển sinh" nhưng toàn bộ ' + countClosed + ' đợt tuyển sinh ở Tab 2 đều đang "Đã đóng". Vui lòng mở lại ít nhất 1 đợt hoặc tạo đợt mới.')
+						   .css({'background': '#fffbeb', 'color': '#92400e', 'border': '1px solid #fde68a', 'display': 'block'});
+				} else {
+					$notice.hide();
+				}
+			});
+
+			// Xử lý nút bấm đóng tất cả các đợt ngay
+			$(document).on('click', '#ltdh-btn-close-all-batches', function(e) {
+				e.preventDefault();
+				var $batchWrapper = $('[data-name="admission_batches"], [data-key="field_program_admission_batches"]');
+				$batchWrapper.find('tbody tr.acf-row:not(.acf-clone)').each(function() {
+					$(this).find('[data-name="batch_status"] select, select[name*="batch_status"]').val('da-dong').trigger('change');
+				});
+				$('#ltdh-batch-constraint-notice')
+					.html('✓ Đã đồng bộ đóng tất cả các đợt tuyển sinh.')
+					.css({'background': '#ecfdf5', 'color': '#065f46', 'border': '1px solid #a7f3d0'});
+			});
+
+			// Kiểm tra ban đầu khi load trang
+			setTimeout(function() {
+				ltdhEvaluateAdmissionBatches('initial_load');
+			}, 600);
 		}, 300);
 	});
 	</script>
 	<?php
+}
+
+/**
+ * Tự động đồng bộ ràng buộc giữa Trạng thái tuyển sinh (Tab 1) và Các đợt tuyển sinh (Tab 2) khi lưu bài.
+ */
+add_action( 'acf/save_post', 'ltdh_sync_program_admission_status_batches', 20 );
+function ltdh_sync_program_admission_status_batches( $post_id ) {
+	if ( 'program' !== get_post_type( $post_id ) ) {
+		return;
+	}
+
+	$batches = get_field( 'admission_batches', $post_id );
+	if ( ! is_array( $batches ) || empty( $batches ) ) {
+		return;
+	}
+
+	$has_open     = false;
+	$has_upcoming = false;
+	$all_closed   = true;
+
+	foreach ( $batches as $b ) {
+		$b_status = $b['batch_status'] ?? 'dang-nhan';
+		if ( 'dang-nhan' === $b_status ) {
+			$has_open   = true;
+			$all_closed = false;
+		} elseif ( 'sap-mo' === $b_status ) {
+			$has_upcoming = true;
+			$all_closed   = false;
+		}
+	}
+
+	$current_status = get_post_meta( $post_id, 'admission_status', true ) ?: 'tuyen-sinh';
+
+	if ( $all_closed ) {
+		if ( 'tam-ngung' !== $current_status ) {
+			update_post_meta( $post_id, 'admission_status', 'tam-ngung' );
+		}
+		$cur_period = get_post_meta( $post_id, 'enrollment_period', true );
+		if ( empty( $cur_period ) || in_array( trim( $cur_period ), [ 'Đang nhận hồ sơ', 'Tuyển sinh theo đợt' ], true ) ) {
+			update_post_meta( $post_id, 'enrollment_period', 'Đã hết chỉ tiêu tuyển sinh' );
+		}
+	} elseif ( $has_open && 'tam-ngung' === $current_status ) {
+		update_post_meta( $post_id, 'admission_status', 'tuyen-sinh' );
+	} elseif ( ! $has_open && $has_upcoming && 'tam-ngung' === $current_status ) {
+		update_post_meta( $post_id, 'admission_status', 'sap-mo' );
+	}
 }
 
 // ----------------------------------------------------
@@ -1084,14 +1264,14 @@ function ltdh_render_program_admin_columns( $column, $post_id ) {
 	} elseif ( 'data_completeness' === $column ) {
 		$completeness = ltdh_get_program_data_completeness( $post_id );
 		if ( $completeness['is_p0_valid'] ) {
-			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:600;font-size:11px;" title="Đầy đủ 100% các trường bắt buộc P0">✓ Đạt chuẩn</span>';
+			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:600;font-size:11px;" title="Đầy đủ 100% các trường thông tin bắt buộc">✓ Đủ điều kiện</span>';
 			if ( ! empty( $completeness['warnings'] ) ) {
 				echo '<div style="font-size:10px;color:#d97706;margin-top:2px;" title="' . esc_attr( implode( '; ', $completeness['warnings'] ) ) . '">⚠ Cảnh báo dữ liệu</div>';
 			}
 		} else {
 			$count = count( $completeness['p0_missing'] );
 			$title = implode( "\n• ", $completeness['p0_missing'] );
-			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:600;font-size:11px;cursor:help;" title="Thiếu các trường P0:&#10;• ' . esc_attr( $title ) . '">⚠ Thiếu ' . $count . ' trường P0</span>';
+			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:600;font-size:11px;cursor:help;" title="Chưa đủ thông tin để xuất bản:&#10;• ' . esc_attr( $title ) . '">⚠ Thiếu ' . $count . ' mục</span>';
 		}
 	}
 }
@@ -1113,9 +1293,9 @@ function ltdh_filter_programs_dropdowns( $post_type ) {
 	$selected_comp = isset( $_GET['filter_data_completeness'] ) ? sanitize_text_field( $_GET['filter_data_completeness'] ) : '';
 	?>
 	<select name="filter_data_completeness">
-		<option value="">Tất cả chất lượng dữ liệu</option>
-		<option value="complete" <?php selected( $selected_comp, 'complete' ); ?>>Đạt chuẩn P0</option>
-		<option value="incomplete" <?php selected( $selected_comp, 'incomplete' ); ?>>Thiếu trường P0</option>
+		<option value="">Tất cả điều kiện xuất bản</option>
+		<option value="complete" <?php selected( $selected_comp, 'complete' ); ?>>Đủ điều kiện xuất bản</option>
+		<option value="incomplete" <?php selected( $selected_comp, 'incomplete' ); ?>>Thiếu thông tin bắt buộc</option>
 	</select>
 	<?php
 }
@@ -1205,89 +1385,95 @@ function ltdh_get_program_data_completeness( $post_id ) {
 	if ( ! $post_id || 'program' !== get_post_type( $post_id ) ) {
 		return [
 			'is_p0_valid' => false,
-			'p0_missing'  => [ 'Bản ghi không tồn tại hoặc không phải là chương trình' ],
+			'p0_missing'  => [ 'Bản ghi không tồn tại hoặc không phải là chương trình đào tạo' ],
 			'p1_missing'  => [],
 			'warnings'    => [],
 			'score'       => 0,
 		];
 	}
 
-	// 1. Kiểm tra P0: Thực thể liên kết (Trường và Ngành bắt buộc phải tồn tại và đang ở trạng thái publish)
+	// 1. Kiểm tra: Thực thể liên kết (Trường và Ngành bắt buộc phải chọn và ở trạng thái công khai)
 	$school_id = get_post_meta( $post_id, 'school_relationship', true );
 	if ( empty( $school_id ) ) {
-		$p0_missing[] = 'Trường đào tạo (school_relationship rỗng)';
+		$p0_missing[] = 'Trường "Trường đào tạo (Liên kết)" (Tab Tổng quan chương trình): Chưa chọn trường đại học liên kết.';
 	} else {
 		$school_post = get_post( $school_id );
 		if ( ! $school_post || 'publish' !== $school_post->post_status || 'school' !== $school_post->post_type ) {
-			$p0_missing[] = 'Trường đào tạo liên kết không hợp lệ hoặc không ở trạng thái công khai';
+			$p0_missing[] = 'Trường "Trường đào tạo (Liên kết)" (Tab Tổng quan chương trình): Trường được chọn không ở trạng thái công khai hoặc đã bị xóa.';
 		}
 	}
 
 	$major_id = get_post_meta( $post_id, 'major_relationship', true );
 	if ( empty( $major_id ) ) {
-		$p0_missing[] = 'Ngành đào tạo (major_relationship rỗng)';
+		$p0_missing[] = 'Trường "Ngành đào tạo (Liên kết)" (Tab Tổng quan chương trình): Chưa chọn ngành đào tạo.';
 	} else {
 		$major_post = get_post( $major_id );
 		if ( ! $major_post || 'publish' !== $major_post->post_status || 'major' !== $major_post->post_type ) {
-			$p0_missing[] = 'Ngành đào tạo liên kết không hợp lệ hoặc đã bị xóa vào thùng rác (trash)';
+			$p0_missing[] = 'Trường "Ngành đào tạo (Liên kết)" (Tab Tổng quan chương trình): Ngành được chọn không hợp lệ hoặc đã bị xóa vào thùng rác.';
 		}
 	}
 
-	// 2. Kiểm tra P0: Taxonomies
+	// 2. Kiểm tra: Phân loại Taxonomies
 	$tt = get_the_terms( $post_id, 'training_type' );
 	if ( empty( $tt ) || is_wp_error( $tt ) ) {
-		$p0_missing[] = 'Hình thức đào tạo (Taxonomy training_type)';
+		$p0_missing[] = 'Mục "Hình thức đào tạo" (ở cột bên phải): Vui lòng tick chọn ít nhất một hình thức (ví dụ: Liên thông chính quy, Vừa học vừa làm, Từ xa...).';
 	}
 
 	$cp = get_the_terms( $post_id, 'campus' );
 	if ( empty( $cp ) || is_wp_error( $cp ) ) {
-		$p0_missing[] = 'Cơ sở đào tạo (Taxonomy campus)';
+		$p0_missing[] = 'Mục "Cơ sở đào tạo" (ở cột bên phải): Vui lòng tick chọn cơ sở đào tạo (ví dụ: Hà Nội, TP.HCM...).';
 	}
 
-	// 3. Kiểm tra P0: Học phí
+	// 3. Kiểm tra: Học phí
 	$tuition_fee = get_post_meta( $post_id, 'tuition_fee', true );
 	if ( empty( $tuition_fee ) ) {
-		$p0_missing[] = 'Học phí hiển thị (tuition_fee)';
+		$p0_missing[] = 'Trường "Học phí chỉ từ" (Tab Học phí & Thời gian học): Đang để trống (ví dụ: "450.000đ/tín chỉ" hoặc "15 triệu/học kỳ").';
 	}
 
 	$tuition_amount = get_post_meta( $post_id, 'tuition_amount', true );
 	if ( '' === $tuition_amount || null === $tuition_amount || ! is_numeric( $tuition_amount ) || intval( $tuition_amount ) < 1000 ) {
-		$p0_missing[] = 'Mức học phí định mức (tuition_amount)';
+		$p0_missing[] = 'Trường "Mức học phí định mức (số tiền)" (Tab Học phí & Thời gian học): Vui lòng nhập số tiền VNĐ đầy đủ (tối thiểu 1.000đ, chỉ nhập số nguyên).';
 	}
 
 	$tuition_unit = get_post_meta( $post_id, 'tuition_unit', true );
 	if ( empty( $tuition_unit ) ) {
-		$p0_missing[] = 'Đơn vị tính học phí (tuition_unit)';
+		$p0_missing[] = 'Trường "Đơn vị tính học phí" (Tab Học phí & Thời gian học): Vui lòng chọn đơn vị tính (ví dụ: /tín chỉ, /học kỳ...).';
 	}
 
-	// 4. Kiểm tra P0: Thời gian học & Trạng thái tuyển sinh
+	// 4. Kiểm tra: Thời gian học & Trạng thái tuyển sinh
 	$duration = get_post_meta( $post_id, 'duration', true );
 	if ( empty( $duration ) ) {
-		$p0_missing[] = 'Thời gian học chuẩn (duration)';
+		$p0_missing[] = 'Trường "Thời gian học" (Tab Học phí & Thời gian học): Đang để trống (ví dụ: "1.5 - 2 năm").';
 	}
 
 	$status = get_post_meta( $post_id, 'admission_status', true );
 	if ( empty( $status ) ) {
-		$p0_missing[] = 'Trạng thái tuyển sinh (admission_status)';
+		$p0_missing[] = 'Trường "Trạng thái tuyển sinh" (Tab Tổng quan chương trình): Vui lòng chọn trạng thái (ví dụ: Đang nhận hồ sơ, Sắp khai giảng...).';
 	}
 
-	// 5. Kiểm tra P0: Yêu cầu & Hồ sơ
+	// 5. Kiểm tra: Yêu cầu & Hồ sơ
 	$req = get_post_meta( $post_id, 'admission_requirements', true );
 	$req_clean = trim( strip_tags( (string) $req ) );
-	if ( empty( $req_clean ) || strlen( $req_clean ) < 80 || str_contains( $req_clean, 'THPT' ) ) {
-		$p0_missing[] = 'Điều kiện xét tuyển (admission_requirements rỗng, sơ sài hoặc còn dính THPT)';
+	if ( empty( $req_clean ) ) {
+		$p0_missing[] = 'Trường "Điều kiện xét tuyển" (Tab Điều kiện & Hồ sơ xét tuyển): Đang để trống.';
+	} elseif ( strlen( $req_clean ) < 80 ) {
+		$p0_missing[] = 'Trường "Điều kiện xét tuyển" (Tab Điều kiện & Hồ sơ xét tuyển): Nội dung quá ngắn (cần tối thiểu 80 ký tự để mô tả chi tiết đối tượng tuyển sinh).';
+	} elseif ( str_contains( $req_clean, 'THPT' ) ) {
+		$p0_missing[] = 'Trường "Điều kiện xét tuyển" (Tab Điều kiện & Hồ sơ xét tuyển): Còn chứa từ khóa "THPT". Hệ liên thông chỉ tuyển sinh thí sinh đã tốt nghiệp Trung cấp hoặc Cao đẳng, vui lòng điều chỉnh lại.';
 	}
 
 	$docs = get_post_meta( $post_id, 'required_documents', true );
 	$docs_clean = trim( strip_tags( (string) $docs ) );
-	if ( empty( $docs_clean ) || strlen( $docs_clean ) < 80 ) {
-		$p0_missing[] = 'Hồ sơ xét tuyển (required_documents rỗng hoặc chưa hoàn thiện)';
+	if ( empty( $docs_clean ) ) {
+		$p0_missing[] = 'Trường "Hồ sơ xét tuyển cần thiết" (Tab Điều kiện & Hồ sơ xét tuyển): Đang để trống.';
+	} elseif ( strlen( $docs_clean ) < 80 ) {
+		$p0_missing[] = 'Trường "Hồ sơ xét tuyển cần thiết" (Tab Điều kiện & Hồ sơ xét tuyển): Nội dung quá ngắn (cần tối thiểu 80 ký tự để hướng dẫn hồ sơ giấy tờ cần nộp).';
 	}
 
-	// 6. Kiểm tra P0: Đợt tuyển sinh
+	// 6. Kiểm tra: Đợt tuyển sinh
 	$batches = get_field( 'admission_batches', $post_id );
 	if ( empty( $batches ) || ! is_array( $batches ) ) {
-		$p0_missing[] = 'Các đợt tuyển sinh (admission_batches chưa khai báo)';
+		$p0_missing[] = 'Trường "Các đợt tuyển sinh" (Tab Các đợt tuyển sinh): Chưa thêm đợt tuyển sinh nào (bấm "Thêm dòng" để khai báo).';
 	}
 
 	$verif_status = get_post_meta( $post_id, 'verification_status', true );
@@ -1295,19 +1481,19 @@ function ltdh_get_program_data_completeness( $post_id ) {
 		$source = get_post_meta( $post_id, 'verification_source', true );
 		$date   = get_post_meta( $post_id, 'last_verified_at', true );
 		if ( empty( $source ) ) {
-			$p1_missing[] = 'Nguồn xác minh chính thức (verification_source)';
+			$p1_missing[] = 'Trường "Nguồn xác minh (URL)" (Tab Xác minh thông tin): Đã chọn Đã xác minh nhưng chưa nhập link tài liệu/thông báo.';
 		}
 		if ( empty( $date ) ) {
-			$p1_missing[] = 'Ngày xác minh gần nhất (last_verified_at)';
+			$p1_missing[] = 'Trường "Ngày xác minh gần nhất" (Tab Xác minh thông tin): Đang để trống ngày xác minh.';
 		}
 	}
 
 	// 7. Cảnh báo dữ liệu bất thường (Sanity Warnings)
 	if ( $duration && ( preg_match( '/\d{4}-\d{2}-\d{2}/', (string) $duration ) || str_contains( (string) $duration, '00:00:00' ) ) ) {
-		$warnings[] = 'Thời gian học dính lỗi định dạng ngày tháng Excel rác: ' . esc_html( $duration );
+		$warnings[] = 'Thời gian học dính lỗi định dạng ngày tháng Excel: ' . esc_html( $duration );
 	}
 	if ( $tuition_fee && preg_match( '/\b\d+\.0\b/', (string) $tuition_fee ) ) {
-		$warnings[] = 'Học phí bị cắt cụt số thực (.0): ' . esc_html( $tuition_fee );
+		$warnings[] = 'Học phí bị dính định dạng số thực lẻ (.0): ' . esc_html( $tuition_fee );
 	}
 
 	$form_file = get_post_meta( $post_id, 'admission_form_file', true );
@@ -1332,7 +1518,7 @@ function ltdh_get_program_data_completeness( $post_id ) {
 }
 
 /**
- * Hiển thị thông báo hướng dẫn hoàn thiện trường dữ liệu bắt buộc P0 trên màn hình sửa bài viết.
+ * Hiển thị thông báo hướng dẫn hoàn thiện trường dữ liệu bắt buộc trên màn hình sửa bài viết.
  */
 add_action( 'admin_notices', 'ltdh_program_admin_edit_completeness_notice' );
 function ltdh_program_admin_edit_completeness_notice() {
@@ -1347,25 +1533,25 @@ function ltdh_program_admin_edit_completeness_notice() {
 	$completeness = ltdh_get_program_data_completeness( $post_id );
 	if ( ! $completeness['is_p0_valid'] ) {
 		?>
-		<div class="notice notice-warning is-dismissible" style="border-left-color: #f59e0b; padding: 12px 16px;">
-			<p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #92400e;">
-				⚠️ QUY CHUẨN DỮ LIỆU CHƯƠNG TRÌNH (REG-DATA-PROGRAM-2026):
+		<div class="notice notice-warning is-dismissible" style="border-left-color: #f59e0b; padding: 14px 18px; background: #fffdf5; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+			<p style="margin: 0 0 6px 0; font-size: 14px; font-weight: 700; color: #92400e; display: flex; align-items: center; gap: 6px;">
+				<span>⚠️</span> THÔNG TIN CẦN BỔ SUNG TRƯỚC KHI XUẤT BẢN:
 			</p>
-			<p style="margin: 0 0 6px 0; color: #1e293b;">
-				Chương trình này đang thiếu <strong><?php echo count( $completeness['p0_missing'] ); ?> trường bắt buộc cấp độ P0</strong>:
+			<p style="margin: 0 0 8px 0; color: #1e293b; font-size: 13px;">
+				Chương trình này đang còn <strong><?php echo count( $completeness['p0_missing'] ); ?> mục thông tin bắt buộc</strong> chưa hoàn thiện (cần bổ sung để đủ điều kiện Xuất bản):
 			</p>
-			<ul style="margin: 0 0 8px 18px; list-style-type: disc; color: #dc2626; font-size: 13px;">
+			<ul style="margin: 0 0 10px 20px; list-style-type: disc; color: #dc2626; font-size: 13px; line-height: 1.6;">
 				<?php foreach ( $completeness['p0_missing'] as $miss ) : ?>
-					<li><strong><?php echo esc_html( $miss ); ?></strong></li>
+					<li style="margin-bottom: 4px;"><?php echo esc_html( $miss ); ?></li>
 				<?php endforeach; ?>
 			</ul>
 			<?php if ( ! empty( $completeness['warnings'] ) ) : ?>
-				<p style="margin: 4px 0; color: #b45309; font-size: 12px;">
-					<strong>Cảnh báo chất lượng dữ liệu:</strong> <?php echo esc_html( implode( ' | ', $completeness['warnings'] ) ); ?>
+				<p style="margin: 6px 0; color: #b45309; font-size: 12px; background: #fef3c7; padding: 6px 10px; border-radius: 4px;">
+					<strong>⚠️ Lưu ý chất lượng dữ liệu:</strong> <?php echo esc_html( implode( ' | ', $completeness['warnings'] ) ); ?>
 				</p>
 			<?php endif; ?>
-			<p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
-				<em>* Bạn có thể lưu bản nháp (Draft), nhưng hệ thống sẽ yêu cầu hoàn thiện đầy đủ các trường P0 trên khi bấm Xuất bản (Publish).</em>
+			<p style="margin: 6px 0 0 0; font-size: 12px; color: #64748b; line-height: 1.5;">
+				💡 <em>Ghi chú: Bạn vẫn có thể bấm <strong>"Lưu bản nháp" (Save Draft)</strong> để lưu tiến độ. Hệ thống chỉ yêu cầu hoàn thiện đầy đủ các mục trên khi bạn bấm <strong>"Xuất bản" (Publish)</strong>.</em>
 			</p>
 		</div>
 		<?php
@@ -1373,7 +1559,7 @@ function ltdh_program_admin_edit_completeness_notice() {
 }
 
 /**
- * Kiểm thực chặn xuất bản bài viết nếu thiếu các trường bắt buộc P0 trên giao diện ACF Admin.
+ * Kiểm thực chặn xuất bản bài viết nếu thiếu các trường bắt buộc trên giao diện ACF Admin.
  */
 add_action( 'acf/validate_save_post', 'ltdh_validate_program_acf_publish_fields', 10 );
 function ltdh_validate_program_acf_publish_fields() {
@@ -1398,51 +1584,51 @@ function ltdh_validate_program_acf_publish_fields() {
 
 	// 1. School relationship
 	if ( empty( $acf['field_program_school'] ) ) {
-		acf_add_validation_error( 'acf[field_program_school]', 'Vui lòng chọn Trường đào tạo liên kết (Trường bắt buộc P0).' );
+		acf_add_validation_error( 'acf[field_program_school]', 'Vui lòng chọn trường "Trường đào tạo (Liên kết)" ở Tab "Tổng quan chương trình" trước khi Xuất bản.' );
 	}
 
 	// 2. Major relationship
 	if ( empty( $acf['field_program_major'] ) ) {
-		acf_add_validation_error( 'acf[field_program_major]', 'Vui lòng chọn Ngành đào tạo liên kết (Trường bắt buộc P0).' );
+		acf_add_validation_error( 'acf[field_program_major]', 'Vui lòng chọn trường "Ngành đào tạo (Liên kết)" ở Tab "Tổng quan chương trình" trước khi Xuất bản.' );
 	}
 
 	// 3. Tuition Fee
 	if ( empty( $acf['field_program_tuition'] ) ) {
-		acf_add_validation_error( 'acf[field_program_tuition]', 'Vui lòng nhập Học phí hiển thị (Trường bắt buộc P0).' );
+		acf_add_validation_error( 'acf[field_program_tuition]', 'Vui lòng nhập trường "Học phí chỉ từ" ở Tab "Học phí & Thời gian học" trước khi Xuất bản.' );
 	}
 
 	// 4. Tuition Amount
 	if ( empty( $acf['field_program_tuition_amount'] ) || intval( $acf['field_program_tuition_amount'] ) < 1000 ) {
-		acf_add_validation_error( 'acf[field_program_tuition_amount]', 'Vui lòng nhập Mức học phí định mức bằng số tiền VNĐ đầy đủ (Trường bắt buộc P0).' );
+		acf_add_validation_error( 'acf[field_program_tuition_amount]', 'Vui lòng nhập trường "Mức học phí định mức (số tiền)" bằng số tiền VNĐ đầy đủ (tối thiểu 1.000đ) ở Tab "Học phí & Thời gian học".' );
 	}
 
 	// 5. Tuition Unit
 	if ( empty( $acf['field_program_tuition_unit'] ) ) {
-		acf_add_validation_error( 'acf[field_program_tuition_unit]', 'Vui lòng chọn Đơn vị tính học phí (Trường bắt buộc P0).' );
+		acf_add_validation_error( 'acf[field_program_tuition_unit]', 'Vui lòng chọn trường "Đơn vị tính học phí" ở Tab "Học phí & Thời gian học" trước khi Xuất bản.' );
 	}
 
 	// 6. Duration
 	if ( empty( $acf['field_program_duration'] ) ) {
-		acf_add_validation_error( 'acf[field_program_duration]', 'Vui lòng nhập Thời gian học chuẩn (Trường bắt buộc P0).' );
+		acf_add_validation_error( 'acf[field_program_duration]', 'Vui lòng nhập trường "Thời gian học" ở Tab "Học phí & Thời gian học" trước khi Xuất bản.' );
 	} elseif ( preg_match( '/\d{4}-\d{2}-\d{2}/', (string) $acf['field_program_duration'] ) ) {
 		acf_add_validation_error( 'acf[field_program_duration]', 'Thời gian học bị dính lỗi định dạng ngày tháng Excel. Vui lòng nhập khoảng thời gian dạng "1.5 - 2 năm".' );
 	}
 
 	// 7. Admission status
 	if ( empty( $acf['field_program_admission_status'] ) ) {
-		acf_add_validation_error( 'acf[field_program_admission_status]', 'Vui lòng chọn Trạng thái tuyển sinh (Trường bắt buộc P0).' );
+		acf_add_validation_error( 'acf[field_program_admission_status]', 'Vui lòng chọn trường "Trạng thái tuyển sinh" ở Tab "Tổng quan chương trình" trước khi Xuất bản.' );
 	}
 
 	// 8. Requirements
 	$req_text = isset( $acf['field_program_requirements'] ) ? trim( strip_tags( (string) $acf['field_program_requirements'] ) ) : '';
 	if ( empty( $req_text ) ) {
-		acf_add_validation_error( 'acf[field_program_requirements]', 'Vui lòng nhập nội dung Điều kiện xét tuyển (Trường bắt buộc P0).' );
+		acf_add_validation_error( 'acf[field_program_requirements]', 'Vui lòng nhập nội dung trường "Điều kiện xét tuyển" ở Tab "Điều kiện & Hồ sơ xét tuyển" trước khi Xuất bản.' );
 	}
 
 	// 9. Required documents
 	$doc_text = isset( $acf['field_program_documents'] ) ? trim( strip_tags( (string) $acf['field_program_documents'] ) ) : '';
 	if ( empty( $doc_text ) ) {
-		acf_add_validation_error( 'acf[field_program_documents]', 'Vui lòng nhập danh mục Hồ sơ xét tuyển cần thiết (Trường bắt buộc P0).' );
+		acf_add_validation_error( 'acf[field_program_documents]', 'Vui lòng nhập danh mục trường "Hồ sơ xét tuyển cần thiết" ở Tab "Điều kiện & Hồ sơ xét tuyển" trước khi Xuất bản.' );
 	}
 }
 

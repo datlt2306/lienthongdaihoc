@@ -1749,12 +1749,62 @@ function ltdh_get_program_tuition_display(int $program_id, bool $include_year = 
 }
 
 /**
+ * Lấy trạng thái tuyển sinh thực tế của chương trình đào tạo.
+ * Thiết lập ràng buộc và tự động đồng bộ giữa:
+ * - Tab 1: Trạng thái tuyển sinh tổng thể (admission_status)
+ * - Tab 2: Trạng thái các đợt tuyển sinh con (admission_batches)
+ *
+ * @param int $program_id ID của bài viết program.
+ * @return string 'tuyen-sinh' | 'tam-ngung' | 'sap-mo'
+ */
+function ltdh_get_program_admission_status( int $program_id ): string {
+	$raw_status = get_post_meta( $program_id, 'admission_status', true ) ?: 'tuyen-sinh';
+	$batches    = get_field( 'admission_batches', $program_id );
+
+	if ( is_array( $batches ) && ! empty( $batches ) ) {
+		$has_open     = false;
+		$has_upcoming = false;
+		$all_closed   = true;
+
+		foreach ( $batches as $b ) {
+			$b_status = $b['batch_status'] ?? 'dang-nhan';
+			if ( 'dang-nhan' === $b_status ) {
+				$has_open   = true;
+				$all_closed = false;
+			} elseif ( 'sap-mo' === $b_status ) {
+				$has_upcoming = true;
+				$all_closed   = false;
+			}
+		}
+
+		// Ràng buộc 1: Nếu TẤT CẢ các đợt đã đóng -> Bắt buộc coi là tạm ngưng tuyển sinh (đã hết chỉ tiêu)
+		if ( $all_closed ) {
+			return 'tam-ngung';
+		}
+
+		// Ràng buộc 2: Nếu có ít nhất 1 đợt đang nhận hồ sơ -> Bắt buộc coi là đang tuyển sinh
+		if ( $has_open && 'tam-ngung' === $raw_status ) {
+			return 'tuyen-sinh';
+		}
+
+		// Ràng buộc 3: Nếu không có đợt nhận nhưng có đợt sắp mở -> Sắp mở
+		if ( ! $has_open && $has_upcoming && 'tam-ngung' === $raw_status ) {
+			return 'sap-mo';
+		}
+	}
+
+	return $raw_status;
+}
+
+/**
  * Get dynamic admission deadline display based on batches or enrollment_period.
  */
 function ltdh_get_program_admission_deadline_display(int $program_id): string {
 	$batches = get_field('admission_batches', $program_id);
 	if (is_array($batches) && ! empty($batches)) {
 		$sap_mo_batches = [];
+		$all_closed     = true;
+
 		foreach ($batches as $b) {
 			$status             = $b['batch_status'] ?? '';
 			$batch_name         = $b['batch_name'] ?? '';
@@ -1763,6 +1813,9 @@ function ltdh_get_program_admission_deadline_display(int $program_id): string {
 			
 			if ($status === 'dang-nhan') {
 				return esc_html($clean_name) . ': ' . esc_html($application_period);
+			}
+			if ($status !== 'da-dong') {
+				$all_closed = false;
 			}
 			$sap_mo_batches[] = [
 				'status' => $status,
@@ -1777,10 +1830,19 @@ function ltdh_get_program_admission_deadline_display(int $program_id): string {
 				return esc_html($b['name']) . ' (Sắp mở): ' . esc_html($b['period']);
 			}
 		}
+
+		// Nếu tất cả các đợt đã đóng ('da-dong')
+		if ($all_closed) {
+			return 'Đã hết chỉ tiêu tuyển sinh';
+		}
 	}
 
 	// Fallback to legacy enrollment_period
 	$legacy_period = get_field('enrollment_period', $program_id);
+	$status        = ltdh_get_program_admission_status($program_id);
+	if ('tam-ngung' === $status) {
+		return (! empty($legacy_period) && $legacy_period !== 'Tuyển sinh theo đợt') ? $legacy_period : 'Đã hết chỉ tiêu tuyển sinh';
+	}
 	return ! empty($legacy_period) ? $legacy_period : 'Đang nhận hồ sơ';
 }
 
