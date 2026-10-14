@@ -80,6 +80,10 @@ $years = range( $current_year, $current_year - 25 );
 			<label for="elig-consent-data">Tôi đồng ý cho phép xử lý dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP để nhận thông tin tư vấn tuyển sinh.</label>
 		</div>
 
+		<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
+			<?php ltdh_render_recaptcha_field( 'elig_lead' ); ?>
+		<?php endif; ?>
+
 		<button type="submit" id="elig-lead-submit-btn" class="elig-btn elig-btn-primary elig-btn-full w-full py-3.5 text-sm font-bold flex justify-center items-center gap-2">
 			<span>GỬI YÊU CẦU KIỂM TRA HỒ SƠ</span>
 		</button>
@@ -136,6 +140,10 @@ $years = range( $current_year, $current_year - 25 );
 					</div>
 				</div>
 			</div>
+
+			<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
+				<?php ltdh_render_recaptcha_field( 'elig_verify' ); ?>
+			<?php endif; ?>
 
 			<button type="submit" id="elig-advanced-submit-btn" class="elig-btn elig-btn-secondary elig-btn-full w-full py-3.5 text-sm font-bold flex justify-center items-center gap-2">
 				<span>GỬI HỒ SƠ XÁC MINH</span>

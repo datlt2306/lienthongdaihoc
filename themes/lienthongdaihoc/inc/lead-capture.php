@@ -510,6 +510,15 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 		return;
 	}
 
+	// Verify Google reCAPTCHA if provided in CF7 submission
+	if ( function_exists( 'ltdh_is_recaptcha_enabled' ) && ltdh_is_recaptcha_enabled() ) {
+		$recaptcha_token = isset( $posted_data['g-recaptcha-response'] ) ? sanitize_text_field( $posted_data['g-recaptcha-response'] ) : '';
+		if ( ! empty( $recaptcha_token ) && ! ltdh_verify_recaptcha( $recaptcha_token, 'cf7' ) ) {
+			$abort = true;
+			return;
+		}
+	}
+
 	if ( empty( $name ) || empty( $phone ) ) {
 		return;
 	}
@@ -559,12 +568,24 @@ function ltdh_handle_native_form_submit() {
 		);
 	}
 
+	// 2. Kiểm tra xác thực Google reCAPTCHA nếu kích hoạt
+	if ( function_exists( 'ltdh_is_recaptcha_enabled' ) && ltdh_is_recaptcha_enabled() ) {
+		$recaptcha_token = isset( $_POST['g-recaptcha-response'] ) ? sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ) ) : '';
+		if ( ! ltdh_verify_recaptcha( $recaptcha_token, 'native_form' ) ) {
+			wp_die(
+				esc_html__( 'Xác thực bảo mật reCAPTCHA không thành công hoặc nghi ngờ tự động. Vui lòng tải lại trang và thử lại.', 'lienthongdaihoc' ),
+				esc_html__( 'Lỗi Bảo Mật reCAPTCHA', 'lienthongdaihoc' ),
+				[ 'response' => 403 ]
+			);
+		}
+	}
+
 	$name    = sanitize_text_field( wp_unslash( $_POST['your-name'] ) );
 	$phone   = sanitize_text_field( wp_unslash( $_POST['your-phone'] ) );
 	$email   = isset( $_POST['your-email'] ) ? sanitize_email( wp_unslash( $_POST['your-email'] ) ) : '';
 	$message = isset( $_POST['your-message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['your-message'] ) ) : '';
 
-	// 2. Kiểm tra spam & honeypot
+	// 3. Kiểm tra spam & honeypot
 	if ( function_exists( 'ltdh_is_spam_submission' ) && ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $message ] ) ) {
 		wp_die(
 			esc_html__( 'Yêu cầu của bạn bị chặn do nghi ngờ spam. Vui lòng liên hệ hotline.', 'lienthongdaihoc' ),
@@ -577,7 +598,7 @@ function ltdh_handle_native_form_submit() {
 		return;
 	}
 
-	// 3. Trích xuất tham số ID an toàn hỗ trợ tương thích ngược
+	// 4. Trích xuất tham số ID an toàn hỗ trợ tương thích ngược
 	$program_id    = isset( $_POST['program_id'] ) ? absint( $_POST['program_id'] ) : ( isset( $_POST['current_program_id'] ) ? absint( $_POST['current_program_id'] ) : 0 );
 	$school_id     = isset( $_POST['school_id'] ) ? absint( $_POST['school_id'] ) : ( isset( $_POST['current_school_id'] ) ? absint( $_POST['current_school_id'] ) : 0 );
 	$major_id      = isset( $_POST['major_id'] ) ? absint( $_POST['major_id'] ) : ( isset( $_POST['current_major_id'] ) ? absint( $_POST['current_major_id'] ) : 0 );
@@ -629,6 +650,14 @@ function ltdh_handle_lead_magnet_download() {
 
 	if ( ! empty( $hp_val ) || ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'hp_website' => $hp_val ] ) ) {
 		wp_send_json_error( [ 'message' => 'Yêu cầu không hợp lệ hoặc bị nghi ngờ là spam.' ] );
+	}
+
+	// Verify Google reCAPTCHA
+	if ( function_exists( 'ltdh_is_recaptcha_enabled' ) && ltdh_is_recaptcha_enabled() ) {
+		$recaptcha_token = isset( $_POST['g-recaptcha-response'] ) ? sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ) ) : '';
+		if ( ! ltdh_verify_recaptcha( $recaptcha_token, 'lead_magnet' ) ) {
+			wp_send_json_error( [ 'message' => 'Xác thực bảo mật reCAPTCHA thất bại. Vui lòng tải lại trang và thử lại.' ] );
+		}
 	}
 
 	if ( empty( $name ) || empty( $phone ) ) {

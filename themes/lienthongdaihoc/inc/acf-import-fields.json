@@ -1034,6 +1034,71 @@
         "type": "text",
         "instructions": "Nhập Chat ID hoặc ID của Group nhận thông báo. Hệ thống sẽ ưu tiên nếu hằng số constants.php không khai báo.",
         "placeholder": "Ví dụ: 233224973 hoặc -100123456789"
+      },
+      {
+        "key": "field_tab_recaptcha",
+        "label": "Bảo Mật Google reCAPTCHA",
+        "type": "tab",
+        "placement": "top",
+        "endpoint": 0
+      },
+      {
+        "key": "field_recaptcha_enabled",
+        "label": "Kích hoạt Google reCAPTCHA",
+        "name": "recaptcha_enabled",
+        "type": "true_false",
+        "instructions": "Bật/Tắt tính năng xác thực chống spam reCAPTCHA cho toàn bộ các form đăng ký & tư vấn.",
+        "default_value": 0,
+        "ui": 1
+      },
+      {
+        "key": "field_recaptcha_version",
+        "label": "Phiên bản reCAPTCHA",
+        "name": "recaptcha_version",
+        "type": "select",
+        "instructions": "Chọn phiên bản reCAPTCHA (v3: tự động đánh giá hành vi ẩn không cần checkbox, khuyến nghị trải nghiệm cao nhất; v2: checkbox 'Tôi không phải là người máy').",
+        "choices": {
+          "v3": "reCAPTCHA v3 (Tự động / Ẩn - Khuyến nghị)",
+          "v2": "reCAPTCHA v2 (Hộp kiểm Checkbox 'Tôi không phải người máy')"
+        },
+        "default_value": "v3",
+        "allow_null": 0
+      },
+      {
+        "key": "field_recaptcha_site_key",
+        "label": "Site Key (Khóa Trang web)",
+        "name": "recaptcha_site_key",
+        "type": "text",
+        "instructions": "Khóa Site Key nhận từ Google reCAPTCHA Console.",
+        "placeholder": "Ví dụ: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+      },
+      {
+        "key": "field_recaptcha_secret_key",
+        "label": "Secret Key (Khóa Bí mật)",
+        "name": "recaptcha_secret_key",
+        "type": "password",
+        "instructions": "Khóa Secret Key bảo mật dùng để xác thực phía máy chủ.",
+        "placeholder": "Ví dụ: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+      },
+      {
+        "key": "field_recaptcha_min_score",
+        "label": "Ngưỡng điểm tối thiểu (Chỉ dành cho v3)",
+        "name": "recaptcha_min_score",
+        "type": "number",
+        "instructions": "Điểm từ 0.0 (chắc chắn là bot) đến 1.0 (người dùng thật). Mặc định khuyến nghị: 0.5.",
+        "default_value": "0.5",
+        "min": 0.1,
+        "max": 1.0,
+        "step": 0.1,
+        "conditional_logic": [
+          [
+            {
+              "field": "field_recaptcha_version",
+              "operator": "==",
+              "value": "v3"
+            }
+          ]
+        ]
       }
     ],
     "location": [

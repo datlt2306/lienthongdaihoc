@@ -199,6 +199,14 @@ function ltdh_elig_ajax_check() {
 		wp_send_json_error( [ 'message' => 'Yêu cầu quá nhanh. Vui lòng thử lại sau.' ], 429 );
 	}
 
+	// Google reCAPTCHA check
+	if ( function_exists( 'ltdh_is_recaptcha_enabled' ) && ltdh_is_recaptcha_enabled() ) {
+		$recaptcha_token = sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ?? '' ) );
+		if ( ! ltdh_verify_recaptcha( $recaptcha_token, 'elig_check' ) ) {
+			wp_send_json_error( [ 'message' => 'Xác thực reCAPTCHA không thành công hoặc nghi ngờ tự động.' ], 403 );
+		}
+	}
+
 	// Process file upload if any
 	$degree_file_url = '';
 	if ( ! empty( $_FILES['degree_file'] ) && ! empty( $_FILES['degree_file']['name'] ) ) {
@@ -825,6 +833,14 @@ function ltdh_elig_ajax_lead() {
 		wp_send_json_error( [ 'message' => 'Yêu cầu quá nhanh. Vui lòng thử lại sau.' ], 429 );
 	}
 
+	// Google reCAPTCHA check
+	if ( function_exists( 'ltdh_is_recaptcha_enabled' ) && ltdh_is_recaptcha_enabled() ) {
+		$recaptcha_token = sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ?? '' ) );
+		if ( ! ltdh_verify_recaptcha( $recaptcha_token, 'elig_lead' ) ) {
+			wp_send_json_error( [ 'message' => 'Xác thực reCAPTCHA không thành công hoặc nghi ngờ tự động.' ], 403 );
+		}
+	}
+
 	$name  = sanitize_text_field( $_POST['cf_name'] ?? '' );
 	$phone = sanitize_text_field( $_POST['cf_phone'] ?? '' );
 	$email = sanitize_email( $_POST['cf_email'] ?? '' );
@@ -916,6 +932,14 @@ function ltdh_elig_ajax_advanced_verify() {
 	$expected_token = hash_hmac( 'sha256', (string) $lead_id, wp_salt( 'auth' ) );
 	if ( ! hash_equals( $expected_token, $lead_token ) ) {
 		wp_send_json_error( [ 'message' => 'Bạn không có quyền cập nhật hồ sơ này.' ] );
+	}
+
+	// Google reCAPTCHA check if enabled
+	if ( function_exists( 'ltdh_is_recaptcha_enabled' ) && ltdh_is_recaptcha_enabled() ) {
+		$recaptcha_token = sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ?? '' ) );
+		if ( ! empty( $recaptcha_token ) && ! ltdh_verify_recaptcha( $recaptcha_token, 'elig_verify' ) ) {
+			wp_send_json_error( [ 'message' => 'Xác thực reCAPTCHA không thành công.' ], 403 );
+		}
 	}
 
 	$previous_school = sanitize_text_field( $_POST['previous_school'] ?? '' );

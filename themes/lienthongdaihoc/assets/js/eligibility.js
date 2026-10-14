@@ -319,10 +319,20 @@
 		data.append('phone', '');
 		data.append('email', '');
 
-		fetch(ltdh_elig.ajax_url, {
-			method: 'POST',
-			body: data,
-			credentials: 'same-origin'
+		var tokenPromise = window.ltdhGetRecaptchaToken
+			? window.ltdhGetRecaptchaToken('elig_check', unifiedForm)
+			: Promise.resolve('');
+
+		tokenPromise.then(function (recaptchaToken) {
+			if (recaptchaToken) {
+				data.append('g-recaptcha-response', recaptchaToken);
+			}
+
+			return fetch(ltdh_elig.ajax_url, {
+				method: 'POST',
+				body: data,
+				credentials: 'same-origin'
+			});
 		})
 		.then(function (response) { return response.json(); })
 		.then(function (json) {
@@ -336,7 +346,7 @@
 		})
 		.catch(function (err) {
 			console.error('Eligibility check error:', err);
-			alert('Có lỗi xảy ra. Vui lòng thử lại.');
+			alert(err && err.message ? err.message : 'Có lỗi xảy ra. Vui lòng thử lại.');
 		})
 		.finally(function () {
 			submitBtn.disabled = false;
@@ -587,10 +597,20 @@
 			data.append('action', 'ltdh_elig_lead');
 			data.append('nonce', ltdh_elig.nonce);
 
-			fetch(ltdh_elig.ajax_url, {
-				method: 'POST',
-				body: data,
-				credentials: 'same-origin'
+			var tokenPromise = window.ltdhGetRecaptchaToken
+				? window.ltdhGetRecaptchaToken('elig_lead', formEl)
+				: Promise.resolve('');
+
+			tokenPromise.then(function (recaptchaToken) {
+				if (recaptchaToken) {
+					data.append('g-recaptcha-response', recaptchaToken);
+				}
+
+				return fetch(ltdh_elig.ajax_url, {
+					method: 'POST',
+					body: data,
+					credentials: 'same-origin'
+				});
 			})
 			.then(function (r) { return r.json(); })
 			.then(function (json) {
@@ -615,6 +635,7 @@
 			})
 			.catch(function (err) {
 				console.error('Lead capture error:', err);
+				alert(err && err.message ? err.message : 'Có lỗi xảy ra.');
 				if (submitBtn) submitBtn.disabled = false;
 			});
 		});
@@ -647,10 +668,20 @@
 				data.append('degree_file', fileInput.files[0]);
 			}
 
-			fetch(ltdh_elig.ajax_url, {
-				method: 'POST',
-				body: data,
-				credentials: 'same-origin'
+			var tokenPromise = window.ltdhGetRecaptchaToken
+				? window.ltdhGetRecaptchaToken('elig_verify', advForm)
+				: Promise.resolve('');
+
+			tokenPromise.then(function (recaptchaToken) {
+				if (recaptchaToken) {
+					data.append('g-recaptcha-response', recaptchaToken);
+				}
+
+				return fetch(ltdh_elig.ajax_url, {
+					method: 'POST',
+					body: data,
+					credentials: 'same-origin'
+				});
 			})
 			.then(function (r) { return r.json(); })
 			.then(function (json) {
@@ -663,6 +694,7 @@
 			})
 			.catch(function (err) {
 				console.error('Advanced verification error:', err);
+				alert(err && err.message ? err.message : 'Có lỗi xảy ra.');
 				if (submitBtn) submitBtn.disabled = false;
 			});
 		});
