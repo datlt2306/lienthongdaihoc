@@ -36,6 +36,7 @@
 			}
 		});
 	};
+	window.ltdhRenderRecaptchaWidgets = window.ltdhOnRecaptchaLoad;
 
 	/**
 	 * Asynchronously retrieve a reCAPTCHA token for submission verification.

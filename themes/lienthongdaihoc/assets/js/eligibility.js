@@ -183,16 +183,30 @@
 	}
 
 	function initFileUpload() {
-		var fileInput = document.getElementById('degree-file-input');
-		var fileLabel = document.getElementById('degree-file-label');
-		if (fileInput && fileLabel) {
-			fileInput.addEventListener('change', function () {
-				if (fileInput.files.length > 0) {
-					fileLabel.textContent = "Đã chọn: " + fileInput.files[0].name;
-					fileLabel.style.color = '#10b981'; // emerald-500
+		var degreeInput = document.getElementById('degree-file-input');
+		var degreeLabel = document.getElementById('degree-file-label');
+		if (degreeInput && degreeLabel) {
+			degreeInput.addEventListener('change', function () {
+				if (degreeInput.files.length > 0) {
+					degreeLabel.textContent = "Đã chọn: " + degreeInput.files[0].name;
+					degreeLabel.style.color = '#10b981'; // emerald-500
 				} else {
-					fileLabel.textContent = "Tải ảnh hoặc PDF bằng cấp lên";
-					fileLabel.style.color = '';
+					degreeLabel.textContent = "Tải ảnh hoặc PDF bằng cấp lên";
+					degreeLabel.style.color = '';
+				}
+			});
+		}
+
+		var transInput = document.getElementById('transcript-file-input');
+		var transLabel = document.getElementById('transcript-file-label');
+		if (transInput && transLabel) {
+			transInput.addEventListener('change', function () {
+				if (transInput.files.length > 0) {
+					transLabel.textContent = "Đã chọn: " + transInput.files[0].name;
+					transLabel.style.color = '#10b981'; // emerald-500
+				} else {
+					transLabel.textContent = "Tải ảnh hoặc PDF bảng điểm lên";
+					transLabel.style.color = '';
 				}
 			});
 		}
@@ -349,7 +363,12 @@
 		var wizard = document.getElementById('elig-wizard');
 		var resultsEl = document.getElementById('elig-results');
 		if (wizard) wizard.classList.add('hidden');
-		if (resultsEl) resultsEl.classList.remove('hidden');
+		if (resultsEl) {
+			resultsEl.classList.remove('hidden');
+			if (window.ltdhRenderRecaptchaWidgets) {
+				window.ltdhRenderRecaptchaWidgets();
+			}
+		}
 
 		// Scroll to top
 		var container = document.getElementById('eligibility-app');
@@ -422,6 +441,7 @@
 
 		// Lead form submission
 		initLeadForm();
+		initFileUpload();
 		initCardVerifyListeners();
 	}
 
@@ -581,7 +601,30 @@
 		formEl.addEventListener('submit', function (e) {
 			e.preventDefault();
 			var submitBtn = document.getElementById('elig-lead-submit-btn');
+			var btnText = submitBtn ? submitBtn.querySelector('.elig-btn-text') : null;
+			var btnLoading = submitBtn ? submitBtn.querySelector('.elig-btn-loading') : null;
+
+			function resetBtn() {
+				if (submitBtn) submitBtn.disabled = false;
+				if (btnText) btnText.classList.remove('hidden');
+				if (btnLoading) btnLoading.classList.add('hidden');
+			}
+
+			// Validate file sizes (max 5MB each)
+			var degreeInput = document.getElementById('degree-file-input');
+			if (degreeInput && degreeInput.files.length > 0 && degreeInput.files[0].size > 5 * 1024 * 1024) {
+				alert('Dung lượng tệp bằng cấp vượt quá giới hạn 5MB cho phép.');
+				return;
+			}
+			var transInput = document.getElementById('transcript-file-input');
+			if (transInput && transInput.files.length > 0 && transInput.files[0].size > 5 * 1024 * 1024) {
+				alert('Dung lượng tệp bảng điểm vượt quá giới hạn 5MB cho phép.');
+				return;
+			}
+
 			if (submitBtn) submitBtn.disabled = true;
+			if (btnText) btnText.classList.add('hidden');
+			if (btnLoading) btnLoading.classList.remove('hidden');
 
 			var data = new FormData(formEl);
 			data.append('action', 'ltdh_elig_lead');
@@ -608,25 +651,20 @@
 					currentLeadId = json.data.lead_id;
 					currentLeadToken = json.data.lead_token || '';
 					
-					// Hide standard form elements and show success
-					formEl.innerHTML = '<div class="elig-lead-success bg-emerald-50 text-emerald-700 p-4 rounded-xl border border-emerald-100 font-bold mb-4">✅ Gửi yêu cầu thành công! Tư vấn viên sẽ liên hệ với bạn trong 24 giờ.</div>';
-					
-					// Show Advanced Verification section
-					var advSection = document.getElementById('elig-advanced-verification-section');
-					if (advSection) {
-						advSection.classList.remove('hidden');
-						advSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-					}
-					initAdvancedVerificationForm();
+					formEl.innerHTML = '<div class="elig-lead-success bg-emerald-50 border border-emerald-200 text-emerald-900 p-6 md:p-8 rounded-2xl text-center space-y-3 animate-fade-in shadow-sm">' +
+						'<div class="text-4xl">🎉</div>' +
+						'<h4 class="text-xl font-black text-emerald-900">Gửi yêu cầu đối chiếu hồ sơ thành công!</h4>' +
+						'<p class="text-sm text-emerald-700 max-w-lg mx-auto leading-relaxed">Hệ thống đã tiếp nhận đầy đủ thông tin và tài liệu của bạn. Ban tư vấn chuyên môn sẽ thẩm định hồ sơ, đối chiếu điều kiện nhập học thực tế và liên hệ hỗ trợ bạn trong vòng 24 giờ làm việc.</p>' +
+					'</div>';
 				} else {
 					alert(json.data && json.data.message ? json.data.message : 'Có lỗi xảy ra.');
-					if (submitBtn) submitBtn.disabled = false;
+					resetBtn();
 				}
 			})
 			.catch(function (err) {
 				console.error('Lead capture error:', err);
-				alert(err && err.message ? err.message : 'Có lỗi xảy ra.');
-				if (submitBtn) submitBtn.disabled = false;
+				alert(err && err.message ? err.message : 'Có lỗi xảy ra khi gửi hồ sơ.');
+				resetBtn();
 			});
 		});
 	}

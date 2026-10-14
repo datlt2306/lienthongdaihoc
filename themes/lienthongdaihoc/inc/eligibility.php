@@ -843,6 +843,66 @@ function ltdh_elig_ajax_lead() {
 		wp_send_json_error( [ 'message' => 'Vui lòng nhập họ tên và số điện thoại.' ] );
 	}
 
+	$previous_school = sanitize_text_field( $_POST['previous_school'] ?? '' );
+	$graduation      = intval( $_POST['graduation'] ?? 0 );
+	$user_message    = sanitize_textarea_field( $_POST['cf_message'] ?? '' );
+	$degree_link     = esc_url_raw( trim( wp_unslash( $_POST['degree_link'] ?? '' ) ) );
+	$transcript_link = esc_url_raw( trim( wp_unslash( $_POST['transcript_link'] ?? '' ) ) );
+
+	$allowed_mimes = [
+		'jpg|jpeg|jpe' => 'image/jpeg',
+		'png'          => 'image/png',
+		'webp'         => 'image/webp',
+		'pdf'          => 'application/pdf',
+	];
+	$max_file_size = 5 * 1024 * 1024;
+
+	// Process degree file upload if any
+	$degree_file_path = '';
+	if ( ! empty( $_FILES['degree_file'] ) && ! empty( $_FILES['degree_file']['name'] ) ) {
+		$file = $_FILES['degree_file'];
+		if ( isset( $file['size'] ) && $file['size'] > $max_file_size ) {
+			wp_send_json_error( [ 'message' => 'Dung lượng tệp bằng cấp vượt quá giới hạn 5MB.' ] );
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		$upload_overrides = [
+			'test_form' => false,
+			'mimes'     => $allowed_mimes,
+		];
+		$movefile = wp_handle_upload( $file, $upload_overrides );
+
+		if ( $movefile && ! isset( $movefile['error'] ) ) {
+			$degree_link      = esc_url_raw( $movefile['url'] );
+			$degree_file_path = $movefile['file'] ?? '';
+		} else {
+			wp_send_json_error( [ 'message' => 'Tệp bằng cấp: ' . ( $movefile['error'] ?? 'Định dạng tệp không được hỗ trợ.' ) ] );
+		}
+	}
+
+	// Process transcript file upload if any
+	$transcript_file_path = '';
+	if ( ! empty( $_FILES['transcript_file'] ) && ! empty( $_FILES['transcript_file']['name'] ) ) {
+		$file = $_FILES['transcript_file'];
+		if ( isset( $file['size'] ) && $file['size'] > $max_file_size ) {
+			wp_send_json_error( [ 'message' => 'Dung lượng tệp bảng điểm vượt quá giới hạn 5MB.' ] );
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		$upload_overrides = [
+			'test_form' => false,
+			'mimes'     => $allowed_mimes,
+		];
+		$movefile = wp_handle_upload( $file, $upload_overrides );
+
+		if ( $movefile && ! isset( $movefile['error'] ) ) {
+			$transcript_link      = esc_url_raw( $movefile['url'] );
+			$transcript_file_path = $movefile['file'] ?? '';
+		} else {
+			wp_send_json_error( [ 'message' => 'Tệp bảng điểm: ' . ( $movefile['error'] ?? 'Định dạng tệp không được hỗ trợ.' ) ] );
+		}
+	}
+
 	$school_id = $program_id ? intval( get_post_meta( $program_id, 'school_relationship', true ) ) : 0;
 	$major_id  = $program_id ? intval( get_post_meta( $program_id, 'major_relationship', true ) ) : 0;
 
@@ -860,25 +920,65 @@ function ltdh_elig_ajax_lead() {
 			$is_verification_required = ($program_id && get_field( 'elig_min_education', $program_id )) ? '1' : '0';
 			$ref_source = 'eligibility_checker?education_level=' . urlencode( $check_row->input_education ) . 
 				'&current_major=' . urlencode( $check_row->input_major_id ) . 
-				'&previous_school=' . urlencode( $check_row->input_previous_school ) .
+				'&previous_school=' . urlencode( $previous_school ?: $check_row->input_previous_school ) .
 				'&desired_major=' . urlencode( $check_row->input_desired_major ) . 
-				'&birth_year=' . urlencode( $check_row->input_graduation ) . 
+				'&birth_year=' . urlencode( $graduation ?: $check_row->input_graduation ) . 
 				'&verification_required=' . $is_verification_required;
 		}
 	}
 
+	// Append additional verification query parameters to referral_source
+	if ( ! empty( $previous_school ) && strpos( $ref_source, 'previous_school=' ) === false ) {
+		$ref_source .= ( strpos( $ref_source, '?' ) !== false ? '&' : '?' ) . 'previous_school=' . urlencode( $previous_school );
+	}
+	if ( ! empty( $graduation ) && strpos( $ref_source, 'birth_year=' ) === false ) {
+		$ref_source .= ( strpos( $ref_source, '?' ) !== false ? '&' : '?' ) . 'birth_year=' . $graduation;
+	}
+	if ( ! empty( $degree_link ) ) {
+		$ref_source .= ( strpos( $ref_source, '?' ) !== false ? '&' : '?' ) . 'degree_link=' . urlencode( $degree_link );
+	}
+	if ( ! empty( $transcript_link ) ) {
+		$ref_source .= ( strpos( $ref_source, '?' ) !== false ? '&' : '?' ) . 'transcript_link=' . urlencode( $transcript_link );
+	}
+
+	// Construct comprehensive notes
+	$notes = [];
+	if ( ! empty( $previous_school ) ) {
+		$notes[] = "Trường cũ: " . $previous_school;
+	}
+	if ( ! empty( $graduation ) ) {
+		$notes[] = "Năm tốt nghiệp: " . $graduation;
+	}
+	if ( ! empty( $degree_link ) ) {
+		$notes[] = "Có gửi kèm bằng cấp";
+	}
+	if ( ! empty( $transcript_link ) ) {
+		$notes[] = "Có gửi kèm bảng điểm";
+	}
+	if ( ! empty( $user_message ) ) {
+		$notes[] = "Ghi chú: " . $user_message;
+	}
+	$full_message = implode( " | ", $notes );
+
+	$lead_args = [
+		'name'                 => $name,
+		'phone'                => $phone,
+		'email'                => $email,
+		'program_id'           => $program_id,
+		'school_id'            => $school_id,
+		'major_id'             => $major_id,
+		'training_type'        => $training_val,
+		'campus'               => $campus_val,
+		'referral_source'      => $ref_source,
+		'message'              => $full_message,
+		'degree_file_path'     => $degree_file_path,
+		'degree_link'          => $degree_link,
+		'transcript_file_path' => $transcript_file_path,
+		'transcript_link'      => $transcript_link,
+	];
+
 	if ( function_exists( 'ltdh_insert_lead' ) ) {
-		$lead_id = ltdh_insert_lead( [
-			'name'            => $name,
-			'phone'           => $phone,
-			'email'           => $email,
-			'program_id'      => $program_id,
-			'school_id'       => $school_id,
-			'major_id'        => $major_id,
-			'training_type'   => $training_val,
-			'campus'          => $campus_val,
-			'referral_source' => $ref_source,
-		] );
+		$lead_id = ltdh_insert_lead( $lead_args );
 	} else {
 		global $wpdb;
 		$wpdb->insert( $wpdb->prefix . LTDH_TABLE_LEADS, [
@@ -891,6 +991,7 @@ function ltdh_elig_ajax_lead() {
 			'training_type'   => $training_val,
 			'campus'          => $campus_val,
 			'referral_source' => $ref_source,
+			'message'         => $full_message,
 			'created_at'      => current_time( 'mysql' ),
 		] );
 		$lead_id = $wpdb->insert_id;

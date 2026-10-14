@@ -125,6 +125,13 @@ run_test( 'Empty token fails when verification is forced with simulated enabled 
 } );
 
 run_test( 'reCAPTCHA v3 verify passes on score >= min_score and fails on low score', function() {
+	// Backup current settings
+	$cur_site = get_option( 'options_recaptcha_site_key' );
+	$cur_sec  = get_option( 'options_recaptcha_secret_key' );
+	$cur_en   = get_option( 'options_recaptcha_enabled' );
+	$cur_ver  = get_option( 'options_recaptcha_version' );
+	$cur_sc   = get_option( 'options_recaptcha_min_score' );
+
 	// Setup test keys
 	update_option( 'options_recaptcha_site_key', 'test_site_key_123' );
 	update_option( 'options_recaptcha_secret_key', 'test_secret_key_456' );
@@ -166,11 +173,12 @@ run_test( 'reCAPTCHA v3 verify passes on score >= min_score and fails on low sco
 
 	remove_filter( 'pre_http_request', $filter_cb );
 
-	delete_option( 'options_recaptcha_site_key' );
-	delete_option( 'options_recaptcha_secret_key' );
-	delete_option( 'options_recaptcha_enabled' );
-	delete_option( 'options_recaptcha_version' );
-	delete_option( 'options_recaptcha_min_score' );
+	// Restore original settings
+	if ( false === $cur_site ) delete_option( 'options_recaptcha_site_key' ); else update_option( 'options_recaptcha_site_key', $cur_site );
+	if ( false === $cur_sec ) delete_option( 'options_recaptcha_secret_key' ); else update_option( 'options_recaptcha_secret_key', $cur_sec );
+	if ( false === $cur_en ) delete_option( 'options_recaptcha_enabled' ); else update_option( 'options_recaptcha_enabled', $cur_en );
+	if ( false === $cur_ver ) delete_option( 'options_recaptcha_version' ); else update_option( 'options_recaptcha_version', $cur_ver );
+	if ( false === $cur_sc ) delete_option( 'options_recaptcha_min_score' ); else update_option( 'options_recaptcha_min_score', $cur_sc );
 
 	return ( true === $res_pass && false === $res_fail_score && false === $res_fail_success );
 } );
@@ -202,11 +210,13 @@ run_test( 'Eligibility wizard is kept lightweight without reCAPTCHA friction', f
 	return strpos( $wizard_code, 'ltdh_render_recaptcha_field' ) === false;
 } );
 
-run_test( 'Eligibility results forms include ltdh_render_recaptcha_field', function() {
+run_test( 'Eligibility results unified form includes ltdh_render_recaptcha_field and profile fields', function() {
 	$results_code = file_get_contents( get_template_directory() . '/template-parts/eligibility/results.php' );
 	$has_lead     = strpos( $results_code, "ltdh_render_recaptcha_field( 'elig_lead' )" ) !== false;
-	$has_verify   = strpos( $results_code, "ltdh_render_recaptcha_field( 'elig_verify' )" ) !== false;
-	return $has_lead && $has_verify;
+	$has_degree   = strpos( $results_code, 'name="degree_file"' ) !== false;
+	$has_trans    = strpos( $results_code, 'name="transcript_file"' ) !== false;
+	$has_school   = strpos( $results_code, 'name="previous_school"' ) !== false;
+	return $has_lead && $has_degree && $has_trans && $has_school;
 } );
 
 run_test( 'Backend lead-capture handlers include ltdh_verify_recaptcha', function() {

@@ -208,17 +208,20 @@ function ltdh_insert_lead( array $data ): int {
 
 		// Format and send to Telegram
 		$notification_data = [
-			'name'            => $name,
-			'phone'           => $phone,
-			'email'           => $email,
-			'program_id'      => $program_id,
-			'school_id'       => $school_id,
-			'major_id'        => $major_id,
-			'training_type'   => $training_type,
-			'campus'          => $campus,
-			'referral_source'  => $referral_source,
-			'message'          => $message,
-			'degree_file_path' => $data['degree_file_path'] ?? '',
+			'name'                 => $name,
+			'phone'                => $phone,
+			'email'                => $email,
+			'program_id'           => $program_id,
+			'school_id'            => $school_id,
+			'major_id'             => $major_id,
+			'training_type'        => $training_type,
+			'campus'               => $campus,
+			'referral_source'      => $referral_source,
+			'message'              => $message,
+			'degree_file_path'     => $data['degree_file_path'] ?? '',
+			'degree_link'          => $data['degree_link'] ?? '',
+			'transcript_file_path' => $data['transcript_file_path'] ?? '',
+			'transcript_link'      => $data['transcript_link'] ?? '',
 		];
 		ltdh_trigger_telegram_notification( $notification_data );
 		ltdh_increment_ip_rate_limit();
@@ -280,6 +283,7 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 	$is_eligibility = ( isset( $data['referral_source'] ) && strpos( $data['referral_source'], 'eligibility_checker' ) !== false );
 
 	$degree_link = '';
+	$transcript_link = '';
 	if ( ! empty( $data['referral_source'] ) ) {
 		$query_str = parse_url( $data['referral_source'], PHP_URL_QUERY );
 		if ( $query_str ) {
@@ -287,10 +291,16 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 			if ( ! empty( $query_params['degree_link'] ) ) {
 				$degree_link = $query_params['degree_link'];
 			}
+			if ( ! empty( $query_params['transcript_link'] ) ) {
+				$transcript_link = $query_params['transcript_link'];
+			}
 		}
 	}
 	if ( empty( $degree_link ) && ! empty( $data['degree_link'] ) ) {
 		$degree_link = $data['degree_link'];
+	}
+	if ( empty( $transcript_link ) && ! empty( $data['transcript_link'] ) ) {
+		$transcript_link = $data['transcript_link'];
 	}
 
 	$name    = ! empty( $data['name'] ) ? $data['name'] : 'N/A';
@@ -332,6 +342,9 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		if ( ! empty( $degree_link ) ) {
 			$msg_text .= "📎 <b>Ảnh bằng cấp:</b> " . esc_url( $degree_link ) . "\n";
 		}
+		if ( ! empty( $transcript_link ) ) {
+			$msg_text .= "📊 <b>Ảnh/link bảng điểm:</b> " . esc_url( $transcript_link ) . "\n";
+		}
 	} else {
 		// Notification for Free & Program Consultation forms
 		$school_title = ! empty( $data['school_id'] ) ? get_the_title( $data['school_id'] ) : '';
@@ -362,6 +375,9 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		}
 		if ( ! empty( $degree_link ) ) {
 			$msg_text .= "📎 <b>Ảnh bằng cấp:</b> " . esc_url( $degree_link ) . "\n";
+		}
+		if ( ! empty( $transcript_link ) ) {
+			$msg_text .= "📊 <b>Ảnh/link bảng điểm:</b> " . esc_url( $transcript_link ) . "\n";
 		}
 	}
 	
@@ -437,6 +453,24 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		}
 		// Unlink file from local disk immediately after transmission
 		@unlink( $data['degree_file_path'] );
+	}
+
+	// [CBR-10]: Ephemeral Transcript File forwarding & cleanup (Decree 13/2023/ND-CP)
+	if ( ! empty( $data['transcript_file_path'] ) && file_exists( $data['transcript_file_path'] ) ) {
+		$caption = '📊 Bảng điểm đính kèm: ' . esc_html( $name ) . ' (' . esc_html( $phone ) . ')';
+		foreach ( $chat_ids as $m_chat_id ) {
+			ltdh_telegram_send_document( $clean_token, $m_chat_id, $data['transcript_file_path'], $caption );
+		}
+		if ( ! empty( $school_chat_id ) && ! empty( $dispatch_token ) && ! empty( $school_chat_ids ) ) {
+			foreach ( $school_chat_ids as $s_chat_id ) {
+				if ( in_array( $s_chat_id, $chat_ids, true ) && $dispatch_token === $clean_token ) {
+					continue;
+				}
+				ltdh_telegram_send_document( $dispatch_token, $s_chat_id, $data['transcript_file_path'], $caption );
+			}
+		}
+		// Unlink file from local disk immediately after transmission
+		@unlink( $data['transcript_file_path'] );
 	}
 }
 
