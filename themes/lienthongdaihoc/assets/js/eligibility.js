@@ -319,20 +319,10 @@
 		data.append('phone', '');
 		data.append('email', '');
 
-		var tokenPromise = window.ltdhGetRecaptchaToken
-			? window.ltdhGetRecaptchaToken('elig_check', unifiedForm)
-			: Promise.resolve('');
-
-		tokenPromise.then(function (recaptchaToken) {
-			if (recaptchaToken) {
-				data.append('g-recaptcha-response', recaptchaToken);
-			}
-
-			return fetch(ltdh_elig.ajax_url, {
-				method: 'POST',
-				body: data,
-				credentials: 'same-origin'
-			});
+		fetch(ltdh_elig.ajax_url, {
+			method: 'POST',
+			body: data,
+			credentials: 'same-origin'
 		})
 		.then(function (response) { return response.json(); })
 		.then(function (json) {

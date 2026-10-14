@@ -197,9 +197,9 @@ run_test( 'Lead Magnet modal form includes ltdh_render_recaptcha_field', functio
 	return $has_render && $has_token_js;
 } );
 
-run_test( 'Eligibility wizard form includes ltdh_render_recaptcha_field', function() {
+run_test( 'Eligibility wizard is kept lightweight without reCAPTCHA friction', function() {
 	$wizard_code = file_get_contents( get_template_directory() . '/template-parts/eligibility/wizard.php' );
-	return strpos( $wizard_code, "ltdh_render_recaptcha_field( 'elig_check' )" ) !== false;
+	return strpos( $wizard_code, 'ltdh_render_recaptcha_field' ) === false;
 } );
 
 run_test( 'Eligibility results forms include ltdh_render_recaptcha_field', function() {
@@ -216,11 +216,11 @@ run_test( 'Backend lead-capture handlers include ltdh_verify_recaptcha', functio
 	return $has_native && $has_magnet;
 } );
 
-run_test( 'Backend eligibility AJAX handlers include ltdh_verify_recaptcha', function() {
+run_test( 'Backend eligibility lead capture handler includes ltdh_verify_recaptcha', function() {
 	$elig_code    = file_get_contents( get_template_directory() . '/inc/eligibility.php' );
-	$has_check    = strpos( $elig_code, "ltdh_verify_recaptcha( \$recaptcha_token, 'elig_check' )" ) !== false;
 	$has_lead     = strpos( $elig_code, "ltdh_verify_recaptcha( \$recaptcha_token, 'elig_lead' )" ) !== false;
-	return $has_check && $has_lead;
+	$has_verify   = strpos( $elig_code, "ltdh_verify_recaptcha( \$recaptcha_token, 'elig_verify' )" ) !== false;
+	return $has_lead && $has_verify;
 } );
 
 run_test( 'Frontend script assets/js/recaptcha.js exists and is valid JS', function() {
