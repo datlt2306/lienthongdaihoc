@@ -39,13 +39,21 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	$banner_image    = get_field( 'school_banner' ) ?: get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'major' ) ) {
 	$raw_title       = get_the_title();
-	$banner_title    = ( 0 === stripos( trim( $raw_title ), 'ngành' ) ) ? $raw_title : 'Ngành ' . $raw_title;
+	$clean_major     = preg_replace( '/^ngành\s+/iu', '', trim( (string) $raw_title ) );
+	$year            = (int) date( 'Y' );
+	$banner_title    = 'Tuyển sinh Liên thông Đại học ngành ' . $clean_major;
 	$major_code      = get_field( 'major_code', get_the_ID() );
 	$code_suffix     = $major_code ? ' • Mã ngành: ' . $major_code : '';
-	$banner_subtitle = 'Tìm hiểu chương trình đào tạo, cơ hội nghề nghiệp và thông tin tuyển sinh' . $code_suffix;
+	$banner_subtitle = 'Thông tin các trường đào tạo, lộ trình công nhận tín chỉ và học phí liên thông ngành ' . $clean_major . ' năm ' . $year . $code_suffix;
 	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'program' ) ) {
-	$banner_title    = get_the_title();
+	$raw_prog_title  = get_the_title();
+	$clean_prog      = trim( (string) $raw_prog_title );
+	if ( ! preg_match( '/^(?:tuyển sinh\s+)?liên thông/iu', $clean_prog ) ) {
+		$banner_title = 'Tuyển sinh Liên thông ' . $clean_prog;
+	} else {
+		$banner_title = $clean_prog;
+	}
 	$school_id       = get_field( 'school_relationship' );
 	if ( is_array( $school_id ) ) {
 		$school_id = ! empty( $school_id ) ? $school_id[0] : 0;
@@ -55,7 +63,17 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	}
 	$school_id = intval( $school_id );
 
-	$banner_subtitle = $school_id ? get_the_title( $school_id ) : 'Chương trình đào tạo chất lượng cao';
+	$training_type = '';
+	$terms = wp_get_post_terms( get_the_ID(), 'training_type' );
+	if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+		$training_type = $terms[0]->name;
+	}
+	$school_name     = $school_id ? get_the_title( $school_id ) : '';
+	$banner_subtitle = sprintf(
+		'Chương trình tuyển sinh Liên thông Đại học (%s) tại %s. Chuẩn quy chế tuyển sinh của Bộ GD&ĐT.',
+		$training_type ?: 'Chính quy & Từ xa',
+		$school_name ?: 'trường đối tác'
+	);
 	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: ( $school_id ? get_field( 'school_banner', $school_id ) : '' ) ?: '';
 } elseif ( is_post_type_archive( 'school' ) ) {
 	$banner_title    = 'Trường Đại học Đối tác';

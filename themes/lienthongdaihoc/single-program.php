@@ -254,6 +254,22 @@ $program_tabs[] = [
 				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Tổng quan chương trình</h2>
 					<?php ltdh_render_program_verification_badge( $program_id, 'detail' ); ?>
+
+					<?php
+					$learning_details = ltdh_get_program_learning_details( $program_id );
+					$tuition_year     = get_field( 'tuition_academic_year', $program_id );
+					$degree_val       = get_field( 'degree_type', $program_id ) ?: get_post_meta( $program_id, 'degree_type', true );
+					$clean_major      = preg_replace( '/^ngành\s+/iu', '', trim( (string) $major_title ) );
+					if ( empty( $degree_val ) ) {
+						$degree_val  = ! empty( $clean_major ) ? 'Cử nhân ' . $clean_major : 'Cử nhân / Kỹ sư';
+					}
+					$prog_clean_name   = get_the_title( $program_id );
+					$prog_school_name  = $school_title ?: 'trường đối tác';
+					$prog_mode_name    = ! empty( $learning_details['mode'] ) ? $learning_details['mode'] : 'Liên thông Đại học';
+					$prog_dur_name     = $duration ?: '1.5 – 2.0 năm';
+					$prog_fee_name     = $tuition ?: 'Theo thông báo tuyển sinh';
+					?>
+
 					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 						<?php the_content(); ?>
 					</div>
@@ -266,15 +282,6 @@ $program_tabs[] = [
 						</div>
 					<?php endif; ?>
 
-					<?php
-					$learning_details = ltdh_get_program_learning_details( $program_id );
-					$tuition_year     = get_field( 'tuition_academic_year', $program_id );
-					$degree_val       = get_field( 'degree_type', $program_id ) ?: get_post_meta( $program_id, 'degree_type', true );
-					if ( empty( $degree_val ) ) {
-						$clean_major = preg_replace( '/^ngành\s+/iu', '', trim( (string) $major_title ) );
-						$degree_val  = ! empty( $clean_major ) ? 'Cử nhân ' . $clean_major : 'Cử nhân / Kỹ sư';
-					}
-					?>
 					<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí</span>
@@ -324,6 +331,21 @@ $program_tabs[] = [
 							<span class="font-bold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
 					</div>
+
+					<!-- Semantic HTML Table for Search Engine Snippets & AI LLM Crawlers -->
+					<table class="sr-only" aria-label="Bảng tóm tắt thông số chương trình tuyển sinh">
+						<caption>Thông số kỹ thuật chương trình tuyển sinh Liên thông</caption>
+						<tbody>
+							<tr><th>Trường đào tạo</th><td><?php echo esc_html( $prog_school_name ); ?></td></tr>
+							<tr><th>Chuyên ngành</th><td><?php echo esc_html( $clean_major ?: $prog_clean_name ); ?></td></tr>
+							<tr><th>Hình thức đào tạo</th><td><?php echo esc_html( $prog_mode_name ); ?></td></tr>
+							<tr><th>Đối tượng đầu vào</th><td>Trung cấp / Cao đẳng</td></tr>
+							<tr><th>Thời gian đào tạo</th><td><?php echo esc_html( $prog_dur_name ); ?></td></tr>
+							<tr><th>Mức học phí</th><td><?php echo esc_html( $prog_fee_name ); ?></td></tr>
+							<tr><th>Danh hiệu văn bằng</th><td><?php echo esc_html( $degree_val ); ?></td></tr>
+							<tr><th>Hạn nộp hồ sơ</th><td><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></td></tr>
+						</tbody>
+					</table>
 
 					<!-- Thông tin pháp lý văn bằng & Giá trị toàn quốc (Thông tư 27/2019/TT-BGDĐT) -->
 					<div class="mt-4 bg-emerald-50/50 rounded-xl p-4 text-xs md:text-sm text-slate-700 space-y-2 leading-relaxed">

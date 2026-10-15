@@ -269,6 +269,9 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 				<!-- OVERVIEW -->
 				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan về ngành</h2>
+					<?php 
+					$clean_m_name = preg_replace( '/^ngành\s+/iu', '', trim( (string) get_the_title( $major_id ) ) );
+					?>
 					<div class="relative">
 						<div id="major-intro-content" class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base overflow-hidden transition-all duration-500 max-h-[350px] relative">
 							<?php 
@@ -393,8 +396,14 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 					<!-- Header -->
 					<div class="mb-5 sm:mb-6">
 						<h2 id="ltdh-major-programs-title" class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
-							Trường đang tuyển sinh liên thông
+							Các trường đang tuyển sinh Liên thông ngành <?php echo esc_html( $clean_m_name ); ?>
 						</h2>
+						<p class="text-xs sm:text-sm text-slate-500 mt-1.5 flex items-center gap-1.5">
+							<svg class="w-4 h-4 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+							</svg>
+							<span>Nhấp vào chương trình để xem thời gian, học phí và lộ trình đào tạo cụ thể của từng trường.</span>
+						</p>
 					</div>
 
 					<!-- Filter Bar (Only show if there are 2 or more training types available) -->
