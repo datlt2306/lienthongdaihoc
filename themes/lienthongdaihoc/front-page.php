@@ -518,16 +518,16 @@ $zalo    = ltdh_get_zalo_url();
 		$c_right_content = get_field('hp_cert_right_content', 'options') ?: '';
 	}
 	?>
-	<section class="py-16 bg-white overflow-hidden">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 lg:space-y-24">
+	<section class="py-8 sm:py-12 md:py-16 bg-white overflow-hidden">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 lg:space-y-20">
 			
 			<!-- Row 1: [Text Content] [Slider] -->
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
 				<!-- Left column: Text Content -->
-				<div class="space-y-6">
-					<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider"><?php echo esc_html($c_left_badge ?: 'BẰNG CẤP TƯƠNG ĐƯƠNG'); ?></span>
+				<div class="space-y-4 sm:space-y-6">
+					<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg uppercase tracking-wider"><?php echo esc_html($c_left_badge ?: 'BẰNG CẤP TƯƠNG ĐƯƠNG'); ?></span>
 					
-					<h2 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+					<h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-tight">
 						<?php 
 						$heading = $c_left_heading ?: 'Không ghi hình thức đào tạo';
 						$words = explode(' ', $heading);
@@ -541,36 +541,36 @@ $zalo    = ltdh_get_zalo_url();
 						?>
 					</h2>
 
-					<div class="space-y-4 text-slate-600 text-sm md:text-base leading-relaxed">
+					<div class="space-y-2 sm:space-y-3 text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed">
 						<p>Từ ngày <strong>01/03/2020</strong>, bằng tốt nghiệp đại học sẽ không còn phân biệt hình thức đào tạo như chính quy, tại chức, từ xa...</p>
 						<p>Theo <strong>Thông tư 27/2019/TT-BGDĐT</strong>, trên văn bằng sẽ vẫn ghi các nội dung cũ nhưng không ghi thông tin về hình thức đào tạo.</p>
 					</div>
 
-					<div class="pt-4 border-t border-slate-100">
-						<h3 class="font-bold text-slate-800 text-lg mb-4">Có Giá Trị Sử Dụng Suốt Đời Trên Toàn Quốc</h3>
+					<div class="pt-3 sm:pt-4 border-t border-slate-100">
+						<h3 class="font-bold text-slate-800 text-sm sm:text-base md:text-lg mb-2.5 sm:mb-4">Có Giá Trị Sử Dụng Suốt Đời Trên Toàn Quốc</h3>
 						
-						<div class="space-y-4">
-							<div class="flex gap-4">
-								<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-									<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+						<div class="space-y-2.5 sm:space-y-3.5">
+							<div class="flex items-start gap-2.5 sm:gap-3.5">
+								<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+									<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 									</svg>
 								</div>
 								<div>
-									<h4 class="font-bold text-slate-900 text-base">Bằng Cử nhân / Kỹ sư chính thức</h4>
-									<p class="text-slate-500 text-sm leading-relaxed">Sau khi hoàn thành chương trình, học viên sẽ được trường Đại học cấp bằng Cử nhân/Kỹ sư theo quy định của Bộ GD&ĐT, có giá trị pháp lý trên toàn quốc.</p>
+									<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Bằng Cử nhân / Kỹ sư chính thức</h4>
+									<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Sau khi hoàn thành chương trình, học viên sẽ được trường Đại học cấp bằng Cử nhân/Kỹ sư theo quy định của Bộ GD&ĐT, có giá trị pháp lý trên toàn quốc.</p>
 								</div>
 							</div>
 
-							<div class="flex gap-4">
-								<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-									<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+							<div class="flex items-start gap-2.5 sm:gap-3.5">
+								<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+									<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 									</svg>
 								</div>
 								<div>
-									<h4 class="font-bold text-slate-900 text-base">Có Thể Dùng Để Học Lên Các Bậc Cao Hơn</h4>
-									<p class="text-slate-500 text-sm leading-relaxed">Thi công chức nhà nước, xét nâng bậc lương, đi du học.</p>
+									<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Có Thể Dùng Để Học Lên Các Bậc Cao Hơn</h4>
+									<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Thi công chức nhà nước, xét nâng bậc lương, đi du học.</p>
 								</div>
 							</div>
 						</div>
@@ -587,8 +587,14 @@ $zalo    = ltdh_get_zalo_url();
 							aspect-ratio: 1.4; /* Perfect aspect ratio for certificate documents */
 							border-radius: 1.5rem; /* rounded-3xl */
 							overflow: hidden;
-							box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
+							box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
 							background-color: #ffffff; /* match white degree background */
+						}
+						@media (max-width: 640px) {
+							.cert-slider-wrapper {
+								border-radius: 1rem;
+								box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+							}
 						}
 						.cert-swiper {
 							width: 100%;
@@ -603,8 +609,8 @@ $zalo    = ltdh_get_zalo_url();
 						.cert-swiper .swiper-pagination-bullet {
 							background: rgba(0, 48, 139, 0.3) !important;
 							opacity: 1 !important;
-							width: 10px;
-							height: 10px;
+							width: 8px;
+							height: 8px;
 							transition: all 0.3s ease;
 						}
 						.cert-swiper .swiper-pagination-bullet-active {
@@ -612,7 +618,7 @@ $zalo    = ltdh_get_zalo_url();
 							transform: scale(1.2);
 						}
 					</style>
-					<div class="cert-slider-wrapper">
+					<div class="cert-slider-wrapper border border-slate-100">
 						<!-- Slider Container -->
 						<div class="swiper cert-swiper">
 							<div class="swiper-wrapper">
@@ -648,23 +654,23 @@ $zalo    = ltdh_get_zalo_url();
 
 							<!-- Swiper Pagination -->
 							<?php if ( count($slides) > 1 ) : ?>
-								<div class="swiper-pagination !bottom-6 !right-6 !left-auto !w-auto flex gap-2"></div>
+								<div class="swiper-pagination !bottom-2.5 !right-2.5 sm:!bottom-5 sm:!right-5 !left-auto !w-auto flex gap-1.5 sm:gap-2"></div>
 							<?php endif; ?>
 						</div>
 
 						<!-- Orange badge -->
-						<div class="absolute bottom-6 left-6 bg-[#f97316] text-white p-5 rounded-2xl shadow-xl flex flex-col justify-center max-w-[160px] z-20 hover:scale-105 transition-transform duration-300 pointer-events-none">
-							<span class="text-3xl font-black leading-none">100%</span>
-							<span class="text-xs font-extrabold tracking-wider uppercase mt-2 leading-tight">VĂN BẰNG CHUẨN<br>BỘ GD&ĐT</span>
+						<div class="absolute bottom-2.5 left-2.5 sm:bottom-5 sm:left-5 bg-[#f97316] text-white p-2.5 sm:p-4 md:p-5 rounded-xl sm:rounded-2xl shadow-lg flex flex-col justify-center max-w-[115px] sm:max-w-[160px] z-20 hover:scale-105 transition-transform duration-300 pointer-events-none">
+							<span class="text-lg sm:text-2xl md:text-3xl font-black leading-none">100%</span>
+							<span class="text-[9px] sm:text-xs font-extrabold tracking-wider uppercase mt-1 sm:mt-2 leading-tight">VĂN BẰNG CHUẨN<br>BỘ GD&ĐT</span>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- Row 2: [Video Card] [Text Content] -->
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-				<!-- Left column: Video Card -->
-				<div class="rounded-2xl relative overflow-hidden rounded-3xl shadow-lg aspect-video group bg-slate-800 flex items-center justify-center <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
+				<!-- Video Card (Mobile: 2nd after Text; Desktop: Left col) -->
+				<div class="rounded-xl sm:rounded-3xl relative overflow-hidden shadow-lg aspect-video group bg-slate-800 flex items-center justify-center order-2 lg:order-1 <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
 					<?php
 					$video_raw_thumb = $c_left_image ?: home_url('wp-content/uploads/2026/07/vtv-news-thumb.png');
 					$video_opt_thumb = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $video_raw_thumb ) : $video_raw_thumb;
@@ -674,29 +680,27 @@ $zalo    = ltdh_get_zalo_url();
 					<?php if (!empty($c_left_youtube)): ?>
 						<!-- Play button overlay -->
 						<div class="absolute inset-0 bg-slate-950/20 flex items-center justify-center">
-							<div class="w-16 h-16 bg-[#e11d48] text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
-								<svg class="w-8 h-8 fill-current translate-x-0.5" viewBox="0 0 24 24">
+							<div class="w-12 h-12 sm:w-16 sm:h-16 bg-[#e11d48] text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
+								<svg class="w-6 h-6 sm:w-8 sm:h-8 fill-current translate-x-0.5" viewBox="0 0 24 24">
 									<path d="M8 5v14l11-7z"/>
 								</svg>
 							</div>
 						</div>
 					<?php endif; ?>
-
-					
 				</div>
 
-				<!-- Right column: Text Content -->
-				<div class="space-y-6">
+				<!-- Text Content (Mobile: 1st before Video; Desktop: Right col) -->
+				<div class="space-y-4 sm:space-y-6 order-1 lg:order-2">
 					<?php if (!empty($c_right_content)): ?>
-						<div class="prose max-w-none text-slate-700 text-sm md:text-base leading-relaxed">
+						<div class="prose max-w-none text-slate-700 text-xs sm:text-sm md:text-base leading-relaxed">
 							<?php echo wp_kses_post($c_right_content); ?>
 						</div>
 					<?php else: ?>
-						<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">
+						<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg uppercase tracking-wider">
 							Bạn có thể sử dụng văn bằng để làm gì?
 						</span>
 						
-						<h2 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+						<h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-tight">
 							<?php 
 							$right_heading = 'Văn bằng sau tốt nghiệp';
 							$words_right = explode(' ', $right_heading);
@@ -710,47 +714,47 @@ $zalo    = ltdh_get_zalo_url();
 							?>
 						</h2>
 
-						<div class="space-y-4 text-slate-600 text-sm md:text-base leading-relaxed">
+						<div class="space-y-2 sm:space-y-3 text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed">
 							<p>Sau khi tốt nghiệp, người học được cấp văn bằng theo quy định hiện hành và có thể sử dụng để phục vụ các mục tiêu học tập, nghề nghiệp theo điều kiện của từng đơn vị tiếp nhận.</p>
 						</div>
 
-						<div class="pt-4 border-t border-slate-100">
-							<h3 class="font-bold text-slate-800 text-lg mb-4">Giá trị sử dụng của văn bằng</h3>
+						<div class="pt-3 sm:pt-4 border-t border-slate-100">
+							<h3 class="font-bold text-slate-800 text-sm sm:text-base md:text-lg mb-2.5 sm:mb-4">Giá trị sử dụng của văn bằng</h3>
 							
-							<div class="space-y-4">
-								<div class="flex gap-4">
-									<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-										<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+							<div class="space-y-2.5 sm:space-y-3.5">
+								<div class="flex items-start gap-2.5 sm:gap-3.5">
+									<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+										<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 										</svg>
 									</div>
 									<div>
-										<h4 class="font-bold text-slate-900 text-base">Học tiếp lên trình độ cao hơn</h4>
-										<p class="text-slate-500 text-sm leading-relaxed">Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.</p>
+										<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Học tiếp lên trình độ cao hơn</h4>
+										<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.</p>
 									</div>
 								</div>
 
-								<div class="flex gap-4">
-									<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-										<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+								<div class="flex items-start gap-2.5 sm:gap-3.5">
+									<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+										<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 										</svg>
 									</div>
 									<div>
-										<h4 class="font-bold text-slate-900 text-base">Bổ sung và hoàn thiện hồ sơ nghề nghiệp</h4>
-										<p class="text-slate-500 text-sm leading-relaxed">Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.</p>
+										<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Bổ sung và hoàn thiện hồ sơ nghề nghiệp</h4>
+										<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.</p>
 									</div>
 								</div>
 
-								<div class="flex gap-4">
-									<div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-										<svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+								<div class="flex items-start gap-2.5 sm:gap-3.5">
+									<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+										<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 										</svg>
 									</div>
 									<div>
-										<h4 class="font-bold text-slate-900 text-base">Tham gia tuyển dụng, thi tuyển</h4>
-										<p class="text-slate-500 text-sm leading-relaxed">Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.</p>
+										<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Tham gia tuyển dụng, thi tuyển</h4>
+										<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.</p>
 									</div>
 								</div>
 							</div>
@@ -993,7 +997,7 @@ $zalo    = ltdh_get_zalo_url();
 						[
 							'name'         => 'Hoàng Thị Độ',
 							'workplace'    => 'Product Owner',
-							'role'         => 'Liên thông công nghệ thông tin',
+							'role'         => 'Liên thông Công nghệ thông tin',
 							'graduation'   => 'Khóa 29.1 - ĐH Giao thông Vận tải',
 							'status'       => 'graduated',
 							'status_label' => 'Đã tốt nghiệp',
@@ -1004,7 +1008,7 @@ $zalo    = ltdh_get_zalo_url();
 						[
 							'name'         => 'Phạm Văn Dũng',
 							'workplace'    => 'Leader SEO tại CAR BOSS Việt Nam',
-							'role'         => 'Thương mại điện tử',
+							'role'         => 'Liên thông Thương mại điện tử',
 							'graduation'   => 'Khóa K10 - ĐH Thương Mại',
 							'status'       => 'studying',
 							'status_label' => 'Sắp tốt nghiệp',
