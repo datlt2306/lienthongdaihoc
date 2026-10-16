@@ -606,7 +606,7 @@ $has_active_filters  = $active_filter_count > 0;
 					$type_slug        = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->slug : '';
 					$clean_type_name     = preg_replace( '/^hệ\s+/iu', '', trim( $type_name ) );
 					$major_display_title = 'Liên thông ngành ' . $clean_major_name;
-					$card_headline       = $major_display_title . ( $clean_type_name ? ' (' . $clean_type_name . ')' : '' );
+					$card_headline       = 'Liên thông ngành ' . $clean_major_name . ( $clean_type_name ? ' - ' . $clean_type_name : '' );
 					$admission_status    = function_exists( 'ltdh_get_program_admission_status' ) 
 						? ltdh_get_program_admission_status( $prog_id ) 
 						: ( get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh' );
@@ -695,24 +695,19 @@ $has_active_filters  = $active_filter_count > 0;
 									</div>
 								</a>
 
-								<!-- Program Name (Primary Hero Headline) -->
-								<div class="mb-2 sm:mb-3">
+								<!-- Program Name (Primary Hero Headline with distinct Training Type) -->
+								<div class="mb-2.5 sm:mb-3.5">
 									<h2 class="font-black text-slate-900 text-xs sm:text-base md:text-lg hover:text-brand-primary leading-tight sm:leading-snug line-clamp-2 min-h-[32px] sm:min-h-[44px] transition-colors">
-										<a href="<?php the_permalink(); ?>"><?php echo esc_html( $major_display_title ); ?></a>
+										<a href="<?php the_permalink(); ?>"><?php echo esc_html( $card_headline ); ?></a>
 									</h2>
-									<div class="mt-1.5 flex flex-wrap items-center gap-1 sm:gap-1.5">
-										<?php if ( ! empty( $clean_type_name ) ) : ?>
-											<span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md <?php echo esc_attr( $badge_class ); ?>">
-												🎓 Hệ <?php echo esc_html( $clean_type_name ); ?>
-											</span>
-										<?php endif; ?>
-										<?php if ( 'tam-ngung' === $admission_status ) : ?>
-											<span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-red-700 bg-red-50 border border-red-200/80 px-2 py-0.5 rounded-md">
-												<span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span> Tạm dừng
-											</span>
-										<?php endif; ?>
-										<?php ltdh_render_program_verification_badge( $prog_id, 'card' ); ?>
-									</div>
+									<?php
+									$verification_badge_html = function_exists( 'ltdh_get_program_verification_badge_html' ) ? ltdh_get_program_verification_badge_html( $prog_id, 'card' ) : '';
+									if ( ! empty( $verification_badge_html ) ) :
+									?>
+										<div class="mt-1.5 flex flex-wrap items-center gap-1">
+											<?php echo $verification_badge_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+										</div>
+									<?php endif; ?>
 								</div>
 
 								<!-- Key Information List -->
@@ -736,12 +731,11 @@ $has_active_filters  = $active_filter_count > 0;
 						<!-- Card Footer Action Buttons -->
 						<div class="p-3 sm:p-5 pt-0">
 							<div class="pt-2 sm:pt-3 border-t border-slate-100 flex items-stretch gap-1.5 sm:gap-2">
-								<a href="<?php the_permalink(); ?>" class="text-[11px] sm:text-xs md:text-sm py-2 sm:py-2.5 px-2 sm:px-4 rounded-xl font-bold ltdh-btn-details min-h-[38px] sm:min-h-[42px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap gap-1">
-									<span>Xem chi tiết</span>
-									<svg class="w-3.5 h-3.5 hidden sm:inline-block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-2 sm:py-2.5 px-1 sm:px-4 rounded-lg sm:rounded-xl font-bold ltdh-btn-details min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
+									Tìm hiểu
 								</a>
 								<button type="button"
-										class="ltdh-compare-toggle text-[11px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 transition-all min-h-[38px] sm:min-h-[42px] flex items-center justify-center bg-white hover:bg-slate-50 text-center whitespace-nowrap gap-1 cursor-pointer"
+										class="ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-1 sm:px-3 transition-all min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap"
 										data-compare-type="program"
 										data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 										data-compare-title="<?php echo esc_attr( $card_headline ); ?>"
@@ -750,8 +744,7 @@ $has_active_filters  = $active_filter_count > 0;
 										data-compare-nganh="<?php echo esc_attr( $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '' ); ?>"
 										data-compare-major-name="<?php echo esc_attr( $clean_major_name ); ?>"
 										data-compare-school-name="<?php echo esc_attr( $school_name ); ?>">
-									<svg class="w-3.5 h-3.5 hidden sm:inline-block shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-									<span>So sánh</span>
+									So sánh
 								</button>
 							</div>
 						</div>

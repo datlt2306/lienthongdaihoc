@@ -172,9 +172,9 @@ foreach ( $metric_labels as $label ) {
 
 // 2.5 Action buttons (Details CTA & Compare Toggle)
 $action_tokens = [
-	'ltdh-btn-details min-h-[38px] sm:min-h-[42px] flex items-center justify-center flex-1',
-	'ltdh-compare-toggle text-[11px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 transition-all min-h-[38px] sm:min-h-[42px] flex items-center justify-center bg-white hover:bg-slate-50 text-center whitespace-nowrap gap-1 cursor-pointer',
-	'Xem chi tiết',
+	'ltdh-btn-details min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1',
+	'ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-1 sm:px-3 transition-all min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap',
+	'Tìm hiểu',
 	'So sánh',
 ];
 
