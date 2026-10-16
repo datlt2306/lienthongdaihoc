@@ -54,6 +54,7 @@ function ltdh_seo_archive_document_title( $title ) {
 	$request_uri  = $_SERVER['REQUEST_URI'] ?? '';
 	$request_path = parse_url( $request_uri, PHP_URL_PATH );
 	$site_name    = get_bloginfo( 'name' );
+	$year         = (int) date( 'Y' );
 
 	if (
 		is_post_type_archive( 'program' ) ||
@@ -62,54 +63,56 @@ function ltdh_seo_archive_document_title( $title ) {
 		is_tax( 'region' ) ||
 		( ! empty( $request_path ) && preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao|chuong-trinh)/?#i', $request_path ) )
 	) {
-		$page_title = 'Hình thức đào tạo';
-
 		if ( is_tax( 'training_type' ) ) {
 			$term = get_queried_object();
 			if ( $term && isset( $term->name ) ) {
 				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
-				$page_title = 'Liên thông ' . $clean_term_name;
+				return sprintf( 'Tuyển Sinh Liên Thông Đại Học %s %d | Danh Sách Trường & Học Phí', $clean_term_name, $year );
 			}
 		} elseif ( ! empty( $request_path ) && preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
 			$slug = sanitize_text_field( $m[1] );
 			$term = get_term_by( 'slug', $slug, 'training_type' );
 			if ( $term && ! is_wp_error( $term ) && isset( $term->name ) ) {
 				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
-				$page_title = 'Liên thông ' . $clean_term_name;
+				return sprintf( 'Tuyển Sinh Liên Thông Đại Học %s %d | Danh Sách Trường & Học Phí', $clean_term_name, $year );
 			}
 		} elseif ( is_tax( 'major_cat' ) ) {
 			$term = get_queried_object();
 			if ( $term && isset( $term->name ) ) {
-				$page_title = 'Ngành học: ' . $term->name;
+				return sprintf( 'Nhóm Ngành %s – Tuyển Sinh Liên Thông Đại Học %d | %s', $term->name, $year, $site_name );
 			}
 		} elseif ( is_tax( 'region' ) ) {
 			$term = get_queried_object();
 			if ( $term && isset( $term->name ) ) {
-				$page_title = 'Tuyển sinh Liên thông Đại học ' . $term->name;
+				return sprintf( 'Tuyển Sinh Liên Thông Đại Học %s %d | Các Trường Đào Tạo', $term->name, $year );
 			}
 		}
 
-		return $page_title . ' | ' . $site_name;
+		return sprintf( 'Các Hình Thức Tuyển Sinh Liên Thông Đại Học %d: Từ Xa, Vừa Học Vừa Làm, Chính Quy', $year );
 	}
 
 	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/nganh-hoc/?#i', $request_path ) ) ) {
-		return 'Ngành học | ' . $site_name;
+		return sprintf( 'Các Ngành Tuyển Sinh Liên Thông Đại Học %d | Danh Sách Mới Nhất', $year );
 	}
 
-	if ( is_post_type_archive( 'school' ) || ( ! empty( $request_path ) && preg_match( '#^/truong-da-hoc/?#i', $request_path ) ) ) {
-		return 'Trường đối tác | ' . $site_name;
+	if ( is_post_type_archive( 'school' ) || ( ! empty( $request_path ) && preg_match( '#^/(?:truong-da-hoc|truong-doi-tac)/?#i', $request_path ) ) ) {
+		return sprintf( 'Danh Sách Các Trường Tuyển Sinh Liên Thông Đại Học %d | %s', $year, $site_name );
 	}
 
 	return $title;
 }
 add_filter( 'rank_math/frontend/title', 'ltdh_seo_archive_document_title', 20 );
+add_filter( 'rank_math/opengraph/facebook/title', 'ltdh_seo_archive_document_title', 20 );
+add_filter( 'rank_math/opengraph/twitter/title', 'ltdh_seo_archive_document_title', 20 );
 add_filter( 'pre_get_document_title', 'ltdh_seo_archive_document_title', 20 );
 add_filter( 'wp_title', 'ltdh_seo_archive_document_title', 20 );
 
 // ----------------------------------------------------
-// 2. Dynamic Meta Description for Programs
+// 2. Dynamic Meta Description for Programs & Archives
 // ----------------------------------------------------
 function ltdh_seo_dynamic_description( $desc ) {
+	$year = (int) date( 'Y' );
+
 	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
 		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
@@ -145,9 +148,86 @@ function ltdh_seo_dynamic_description( $desc ) {
 			$tuition
 		);
 	}
+
+	$request_uri  = $_SERVER['REQUEST_URI'] ?? '';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+
+	// 1. Archive Major (/nganh-hoc/)
+	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/nganh-hoc/?#i', $request_path ) ) ) {
+		return sprintf(
+			'Tổng hợp danh sách các ngành tuyển sinh liên thông đại học năm %d: Công nghệ thông tin, Quản trị kinh doanh, Kế toán, Ngôn ngữ Anh... Xem chỉ tiêu, điều kiện xét tuyển và học phí chi tiết.',
+			$year
+		);
+	}
+
+	// 2. Archive School (/truong-da-hoc/, /truong-doi-tac/)
+	if ( is_post_type_archive( 'school' ) || ( ! empty( $request_path ) && preg_match( '#^/(?:truong-da-hoc|truong-doi-tac)/?#i', $request_path ) ) ) {
+		return sprintf(
+			'Tổng hợp danh sách các trường đại học công lập và trường đào tạo liên thông chính quy, vừa học vừa làm, đào tạo từ xa uy tín hàng đầu toàn quốc năm %d.',
+			$year
+		);
+	}
+
+	// 3. Training Type Archive (/hinh-thuc-dao-tao/) & Taxonomies
+	if (
+		is_post_type_archive( 'program' ) ||
+		is_tax( 'training_type' ) ||
+		is_tax( 'major_cat' ) ||
+		is_tax( 'region' ) ||
+		( ! empty( $request_path ) && preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao|chuong-trinh)/?#i', $request_path ) )
+	) {
+		if ( is_tax( 'training_type' ) ) {
+			$term = get_queried_object();
+			if ( $term && isset( $term->name ) ) {
+				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
+				return sprintf(
+					'Danh sách các chương trình tuyển sinh Liên thông Đại học hình thức %s năm %d. Học phí chi tiết, lộ trình công nhận tín chỉ và hướng dẫn nộp hồ sơ xét tuyển.',
+					$clean_term_name,
+					$year
+				);
+			}
+		} elseif ( ! empty( $request_path ) && preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
+			$slug = sanitize_text_field( $m[1] );
+			$term = get_term_by( 'slug', $slug, 'training_type' );
+			if ( $term && ! is_wp_error( $term ) && isset( $term->name ) ) {
+				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
+				return sprintf(
+					'Danh sách các chương trình tuyển sinh Liên thông Đại học hình thức %s năm %d. Học phí chi tiết, lộ trình công nhận tín chỉ và hướng dẫn nộp hồ sơ xét tuyển.',
+					$clean_term_name,
+					$year
+				);
+			}
+		} elseif ( is_tax( 'major_cat' ) ) {
+			$term = get_queried_object();
+			if ( $term && isset( $term->name ) ) {
+				return sprintf(
+					'Danh sách các ngành đào tạo thuộc nhóm %s tuyển sinh liên thông đại học năm %d. Thông tin chỉ tiêu, trường đào tạo và thời gian nhận hồ sơ.',
+					$term->name,
+					$year
+				);
+			}
+		} elseif ( is_tax( 'region' ) ) {
+			$term = get_queried_object();
+			if ( $term && isset( $term->name ) ) {
+				return sprintf(
+					'Tổng hợp các trường và chương trình tuyển sinh liên thông đại học tại khu vực %s năm %d. Danh sách địa điểm học, học phí và lịch xét tuyển.',
+					$term->name,
+					$year
+				);
+			}
+		}
+
+		return sprintf(
+			'So sánh chi tiết học phí, thời gian và văn bằng tốt nghiệp các hình thức đào tạo liên thông đại học năm %d: Đào tạo từ xa (online 100%%), Vừa học vừa làm (học tối & cuối tuần), Chính quy.',
+			$year
+		);
+	}
+
 	return $desc;
 }
 add_filter( 'rank_math/frontend/description', 'ltdh_seo_dynamic_description' );
+add_filter( 'rank_math/opengraph/facebook/description', 'ltdh_seo_dynamic_description' );
+add_filter( 'rank_math/opengraph/twitter/description', 'ltdh_seo_dynamic_description' );
 
 /**
  * Enforce flat Canonical URL for program and school posts (/%slug%/),
