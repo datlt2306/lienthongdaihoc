@@ -3295,9 +3295,6 @@
   .pt-8 {
     padding-top: calc(var(--spacing) * 8);
   }
-  .pt-16 {
-    padding-top: calc(var(--spacing) * 16);
-  }
   .pr-3 {
     padding-right: calc(var(--spacing) * 3);
   }
@@ -3333,9 +3330,6 @@
   }
   .pb-12 {
     padding-bottom: calc(var(--spacing) * 12);
-  }
-  .pb-28 {
-    padding-bottom: calc(var(--spacing) * 28);
   }
   .pl-0 {
     padding-left: 0px;
@@ -5894,37 +5888,107 @@ div#ez-toc-container p.ez-toc-title {
   font-size: 1.05rem !important;
   line-height: 1 !important;
 }
-#ez-toc-container .ez-toc-title-toggle {
+#ez-toc-container .ez-toc-title-toggle,
+div#ez-toc-container .ez-toc-title-toggle {
   display: inline-flex !important;
   align-items: center !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
-#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle {
+#ez-toc-container .ez-toc-title-toggle .ez-toc-js-icon-con,
+#ez-toc-container .ez-toc-title-toggle .ez-toc-cssicon,
+#ez-toc-container .ez-toc-title-toggle .ez-toc-icon-toggle-span,
+#ez-toc-container .ez-toc-title-toggle label,
+div#ez-toc-container .ez-toc-title-toggle .ez-toc-js-icon-con,
+div#ez-toc-container .ez-toc-title-toggle .ez-toc-cssicon,
+div#ez-toc-container .ez-toc-title-toggle .ez-toc-icon-toggle-span,
+div#ez-toc-container .ez-toc-title-toggle label {
+  float: none !important;
+  position: static !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
   display: inline-flex !important;
   align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle,
+div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   gap: 0.35rem !important;
   padding: 0.3rem 0.75rem !important;
-  background: #ffffff !important;
+  background-color: #ffffff !important;
   border: 1px solid #cbd5e1 !important;
   border-radius: 9999px !important;
   font-size: 0.75rem !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   color: #475569 !important;
   text-decoration: none !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  text-shadow: none !important;
   cursor: pointer !important;
-  line-height: 1.2 !important;
+  line-height: 1 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  outline: none !important;
 }
-#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle:hover {
-  background: #eff6ff !important;
-  color: #00308b !important;
+#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle:hover,
+div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle:hover {
+  background-color: #f0f7ff !important;
   border-color: #93c5fd !important;
-  box-shadow: 0 2px 4px rgba(0, 48, 139, 0.08) !important;
+  color: #00308b !important;
+  box-shadow: 0 2px 6px -1px rgba(0, 48, 139, 0.12) !important;
 }
-#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle svg {
+#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle:active,
+div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle:active {
+  transform: scale(0.97) !important;
+}
+#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle svg,
+div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle svg {
+  display: inline-block !important;
   fill: currentColor !important;
   color: currentColor !important;
+  vertical-align: middle !important;
   transition: transform 0.2s ease !important;
+  margin: 0 !important;
+}
+#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle .list-377408 {
+  width: 14px !important;
+  height: 14px !important;
+}
+#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle .arrow-unsorted-368013 {
+  width: 9px !important;
+  height: 9px !important;
+}
+#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle::after,
+div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle::after {
+  content: "Thu gọn" !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+}
+#ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle::after,
+div#ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle::after {
+  content: "Mở rộng" !important;
+}
+#ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle .arrow-unsorted-368013,
+div#ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle .arrow-unsorted-368013 {
+  transform: rotate(180deg) !important;
 }
 #ez-toc-container nav {
   display: block !important;
