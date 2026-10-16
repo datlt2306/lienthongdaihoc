@@ -429,8 +429,9 @@ function ltdh_ajax_filter_programs() {
 
 			$prog_types       = wp_get_post_terms( $prog_id, 'training_type' );
 			$type_name        = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->name : '';
+			$t_name           = $type_name;
 			$type_slug        = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->slug : '';
-			$clean_type_name  = preg_replace( '/^hệ\s+/iu', '', trim( $type_name ) );
+			$clean_type_name  = preg_replace( '/^hệ\s+/iu', '', trim( $t_name ) );
 			$major_display_title = 'Liên thông ngành ' . $clean_major_name;
 			$card_headline       = 'Liên thông ngành ' . $clean_major_name . ( $clean_type_name ? ' - ' . $clean_type_name : '' );
 			$admission_status    = function_exists( 'ltdh_get_program_admission_status' ) 
