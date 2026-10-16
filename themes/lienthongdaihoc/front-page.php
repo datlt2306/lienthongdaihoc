@@ -972,68 +972,102 @@ $zalo    = ltdh_get_zalo_url();
 				<p class="text-slate-500 text-sm">Chia sẻ thực tế từ người học đã được tư vấn và hỗ trợ chuẩn bị hồ sơ xét tuyển liên thông đại học.</p>
 			</div>
 
-			<div class="flex md:grid overflow-x-auto md:overflow-x-visible snap-x snap-mandatory md:snap-none gap-6 pb-4 md:pb-0 no-scrollbar md:grid-cols-3">
+			<div class="flex md:grid overflow-x-auto md:overflow-x-visible snap-x snap-mandatory md:snap-none gap-4 sm:gap-6 pb-4 md:pb-0 no-scrollbar md:grid-cols-2 lg:grid-cols-4">
 				<?php
 				$testimonials = [];
 				if (function_exists('get_field')) {
 					$testimonials = get_field('testimonials', 'options') ?: [];
 				}
 				if (empty($testimonials)) {
-					// Fallback testimonials (6 tiêu biểu phủ 6 ngành chủ lực)
+					// Fallback testimonials (6 học viên đã tốt nghiệp + 2 tân sinh viên / đang theo học)
 					$testimonials = [
 						[
-							'name'       => 'Nguyễn Hương',
-							'workplace'  => 'Kỹ sư phần mềm tại FPT Software',
-							'role'       => 'Liên thông Đại học CNTT',
-							'graduation' => 'Khóa 2022 - ĐH Giao thông Vận tải',
-							'initials'   => 'NH',
-							'image'      => get_template_directory_uri() . '/assets/images/student-huong.jpg',
-							'content'    => 'Mình đã học Liên thông CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
+							'name'         => 'Nguyễn Hương',
+							'workplace'    => 'Kỹ sư phần mềm tại FPT Software',
+							'role'         => 'Liên thông Đại học CNTT',
+							'graduation'   => 'Khóa 2022 - ĐH Giao thông Vận tải',
+							'status'       => 'graduated',
+							'status_label' => 'Đã tốt nghiệp',
+							'initials'     => 'NH',
+							'image'        => get_template_directory_uri() . '/assets/images/student-huong.jpg',
+							'content'      => 'Mình đã học Liên thông CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
 						],
 						[
-							'name'       => 'Trần Minh',
-							'workplace'  => 'Trưởng nhóm Kinh doanh tại Viettel Post',
-							'role'       => 'Đại học Từ xa - Quản trị kinh doanh',
-							'graduation' => 'Khóa 2021 - ĐH Kinh tế Quốc dân',
-							'initials'   => 'TM',
-							'image'      => get_template_directory_uri() . '/assets/images/student-minh.jpg',
-							'content'    => 'Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy.'
+							'name'         => 'Trần Minh',
+							'workplace'    => 'Trưởng nhóm Kinh doanh tại Viettel Post',
+							'role'         => 'Đại học Từ xa - Quản trị kinh doanh',
+							'graduation'   => 'Khóa 2021 - ĐH Kinh tế Quốc dân',
+							'status'       => 'graduated',
+							'status_label' => 'Đã tốt nghiệp',
+							'initials'     => 'TM',
+							'image'        => get_template_directory_uri() . '/assets/images/student-minh.jpg',
+							'content'      => 'Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy.'
 						],
 						[
-							'name'       => 'Lê Phương',
-							'workplace'  => 'Kế toán tổng hợp tại VPBank',
-							'role'       => 'Liên thông Đại học - Kế toán',
-							'graduation' => 'Khóa 2022 - ĐH Thương Mại',
-							'initials'   => 'LP',
-							'image'      => get_template_directory_uri() . '/assets/images/student-phuong.jpg',
-							'content'    => 'Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận.'
+							'name'         => 'Lê Phương',
+							'workplace'    => 'Kế toán tổng hợp tại VPBank',
+							'role'         => 'Liên thông Đại học - Kế toán',
+							'graduation'   => 'Khóa 2022 - ĐH Thương Mại',
+							'status'       => 'graduated',
+							'status_label' => 'Đã tốt nghiệp',
+							'initials'     => 'LP',
+							'image'        => get_template_directory_uri() . '/assets/images/student-phuong.jpg',
+							'content'      => 'Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận.'
 						],
 						[
-							'name'       => 'Hoàng Dũng',
-							'workplace'  => 'Kỹ sư giám sát tại Coteccons',
-							'role'       => 'Liên thông Kỹ thuật Xây dựng',
-							'graduation' => 'Khóa 2021 - ĐH Giao thông Vận tải',
-							'initials'   => 'HD',
-							'image'      => get_template_directory_uri() . '/assets/images/student-dung.jpg',
-							'content'    => 'Vừa đi công trình vừa học trực tuyến buổi tối rất tiện lợi. Bài giảng thực tế bám sát công việc hàng ngày. Nhận bằng ĐH chính quy giúp mình đủ điều kiện ký hồ sơ năng lực dự án lớn.'
+							'name'         => 'Hoàng Dũng',
+							'workplace'    => 'Kỹ sư giám sát tại Coteccons',
+							'role'         => 'Liên thông Kỹ thuật Xây dựng',
+							'graduation'   => 'Khóa 2021 - ĐH Giao thông Vận tải',
+							'status'       => 'graduated',
+							'status_label' => 'Đã tốt nghiệp',
+							'initials'     => 'HD',
+							'image'        => get_template_directory_uri() . '/assets/images/student-dung.jpg',
+							'content'      => 'Vừa đi công trình vừa học trực tuyến buổi tối rất tiện lợi. Bài giảng thực tế bám sát công việc hàng ngày. Nhận bằng ĐH chính quy giúp mình đủ điều kiện ký hồ sơ năng lực dự án lớn.'
 						],
 						[
-							'name'       => 'Thu Thảo',
-							'workplace'  => 'Chuyên viên Pháp chế tại Sun Group',
-							'role'       => 'Đại học Từ xa - Luật Kinh tế',
-							'graduation' => 'Khóa 2022 - ĐH Thái Nguyên',
-							'initials'   => 'TT',
-							'image'      => get_template_directory_uri() . '/assets/images/student-thao.jpg',
-							'content'    => 'Chương trình Luật Kinh tế trang bị kiến thức pháp lý doanh nghiệp rất sâu. Giảng viên hỗ trợ giải đáp thắc mắc nhiệt tình. Tấm bằng đại học đã giúp mình chuyển từ hành chính sang đúng ban pháp chế.'
+							'name'         => 'Thu Thảo',
+							'workplace'    => 'Chuyên viên Pháp chế tại Sun Group',
+							'role'         => 'Đại học Từ xa - Luật Kinh tế',
+							'graduation'   => 'Khóa 2022 - ĐH Thái Nguyên',
+							'status'       => 'graduated',
+							'status_label' => 'Đã tốt nghiệp',
+							'initials'     => 'TT',
+							'image'        => get_template_directory_uri() . '/assets/images/student-thao.jpg',
+							'content'      => 'Chương trình Luật Kinh tế trang bị kiến thức pháp lý doanh nghiệp rất sâu. Giảng viên hỗ trợ giải đáp thắc mắc nhiệt tình. Tấm bằng đại học đã giúp mình chuyển từ hành chính sang đúng ban pháp chế.'
 						],
 						[
-							'name'       => 'Quốc Anh',
-							'workplace'  => 'Quản lý Đào tạo tại ILA Vietnam',
-							'role'       => 'Đại học Từ xa - Ngôn ngữ Anh',
-							'graduation' => 'Khóa 2022 - ĐH Mở Hà Nội',
-							'initials'   => 'QA',
-							'image'      => get_template_directory_uri() . '/assets/images/student-quocanh.jpg',
-							'content'    => 'Mình tốt nghiệp Cao đẳng du lịch, sau đó học từ xa Ngôn ngữ Anh để nâng chuẩn. Học online 100% tiết kiệm chi phí và thời gian đi lại rất nhiều. Bằng cấp được công nhận rộng rãi trên toàn quốc.'
+							'name'         => 'Quốc Anh',
+							'workplace'    => 'Quản lý Đào tạo tại ILA Vietnam',
+							'role'         => 'Đại học Từ xa - Ngôn ngữ Anh',
+							'graduation'   => 'Khóa 2022 - ĐH Mở Hà Nội',
+							'status'       => 'graduated',
+							'status_label' => 'Đã tốt nghiệp',
+							'initials'     => 'QA',
+							'image'        => get_template_directory_uri() . '/assets/images/student-quocanh.jpg',
+							'content'      => 'Mình tốt nghiệp Cao đẳng du lịch, sau đó học từ xa Ngôn ngữ Anh để nâng chuẩn. Học online 100% tiết kiệm chi phí và thời gian đi lại rất nhiều. Bằng cấp được công nhận rộng rãi trên toàn quốc.'
+						],
+						[
+							'name'         => 'Bùi Đức Anh',
+							'workplace'    => 'Chuyên viên Kỹ thuật tại VNPT',
+							'role'         => 'Liên thông ĐH Điện tử Viễn thông',
+							'graduation'   => 'Khóa 2024 - ĐH Giao thông Vận tải',
+							'status'       => 'new',
+							'status_label' => 'Tân sinh viên K2024',
+							'initials'     => 'DA',
+							'image'        => get_template_directory_uri() . '/assets/images/student-ducanh.jpg',
+							'content'      => 'Mình vừa hoàn thiện hồ sơ xét tuyển đợt tháng 9 vừa rồi. Tư vấn viên hướng dẫn rất chi tiết, chỉ 3 ngày là xong thủ tục và có giấy báo nhập học. Đang học kỳ 1 online buổi tối thấy rất chủ động.'
+						],
+						[
+							'name'         => 'Đặng Hà My',
+							'workplace'    => 'Trợ lý Dự án tại Vingroup',
+							'role'         => 'Đại học Từ xa - Ngôn ngữ Anh',
+							'graduation'   => 'Khóa 2024 - ĐH Thái Nguyên',
+							'status'       => 'studying',
+							'status_label' => 'Đang học Kỳ 2',
+							'initials'     => 'HM',
+							'image'        => get_template_directory_uri() . '/assets/images/student-hamy.jpg',
+							'content'      => 'Hệ thống học trực tuyến E-learning rất trực quan, bài giảng video rõ ràng và có thể xem lại bất cứ lúc nào. Giảng viên hỗ trợ giải đáp nhanh nên dù vừa đi làm vừa học vẫn theo kịp tiến độ.'
 						],
 					];
 				}
@@ -1050,64 +1084,83 @@ $zalo    = ltdh_get_zalo_url();
 							$avatar_url = $t['image'];
 						}
 					}
-					$workplace  = $t['workplace'] ?? $t['company'] ?? $t['job'] ?? '';
-					$graduation = $t['graduation'] ?? $t['school'] ?? $t['batch'] ?? 'Bằng chuẩn Bộ GD&ĐT';
+					$workplace    = $t['workplace'] ?? $t['company'] ?? $t['job'] ?? '';
+					$graduation   = $t['graduation'] ?? $t['school'] ?? $t['batch'] ?? 'Bằng chuẩn Bộ GD&ĐT';
+					$status       = $t['status'] ?? 'graduated';
+					$is_studying  = in_array($status, ['studying', 'new', 'enrolled'], true);
+					$status_label = $t['status_label'] ?? ($is_studying ? 'Đang theo học' : 'Đã tốt nghiệp');
 				?>
-					<div class="shrink-0 w-[85vw] sm:w-[360px] md:w-auto snap-center bg-slate-50/80 hover:bg-white border border-slate-200/80 hover:border-blue-300 rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+					<div class="shrink-0 w-[85vw] sm:w-[340px] md:w-auto snap-center bg-slate-50/80 hover:bg-white border border-slate-200/80 hover:border-blue-300 rounded-2xl p-5 sm:p-6 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
 						<div>
-							<!-- Student Profile Header with Large Photo (96px) -->
-							<div class="flex items-start gap-4 mb-4">
+							<!-- Student Profile Header with Large Photo -->
+							<div class="flex items-start gap-3.5 mb-4">
 								<div class="relative shrink-0">
 									<?php if ($avatar_url) : ?>
-										<img class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-2 ring-slate-100 shadow-md group-hover:ring-brand-primary/20 transition-all duration-300" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>" loading="lazy" width="96" height="96">
+										<img class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover ring-2 ring-slate-100 shadow-md group-hover:ring-brand-primary/20 transition-all duration-300" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>" loading="lazy" width="80" height="80">
 									<?php else : ?>
-										<div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-brand-primary to-blue-700 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-md ring-2 ring-slate-100"><?php echo esc_html($initials); ?></div>
+										<div class="w-18 h-18 sm:w-20 sm:h-20 bg-gradient-to-br from-brand-primary to-blue-700 text-white rounded-2xl flex items-center justify-center font-bold text-lg shadow-md ring-2 ring-slate-100"><?php echo esc_html($initials); ?></div>
 									<?php endif; ?>
-									<span class="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-full ring-2 ring-white shadow-xs" title="Học viên đã tốt nghiệp">
-										<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-											<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-										</svg>
-									</span>
+
+									<?php if ($is_studying) : ?>
+										<span class="absolute -bottom-1 -right-1 bg-blue-600 text-white p-1 rounded-full ring-2 ring-white shadow-xs" title="<?php echo esc_attr($status_label); ?>">
+											<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+												<path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a10.993 10.993 0 00-.25 2.302c0 1.109.2 2.16.564 3.125a1 1 0 00.916.622h7.04a1 1 0 00.916-.622c.364-.965.564-2.016.564-3.125 0-.796-.09-1.57-.25-2.302l2.644-1.131a1 1 0 000-1.84l-7-3zM10 4.218l4.157 1.782L10 7.782 5.843 6 10 4.218z"/>
+											</svg>
+										</span>
+									<?php else : ?>
+										<span class="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-full ring-2 ring-white shadow-xs" title="Học viên đã tốt nghiệp">
+											<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+												<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+											</svg>
+										</span>
+									<?php endif; ?>
 								</div>
 								<div class="min-w-0 flex-1">
 									<div class="flex items-center gap-0.5 text-amber-400 mb-1" aria-label="5 trên 5 sao">
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-										<span class="text-xs font-bold text-amber-600 ml-1">5.0</span>
+										<svg class="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<svg class="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<svg class="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<svg class="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<svg class="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<span class="text-[11px] font-bold text-amber-600 ml-1">5.0</span>
 									</div>
-									<h3 class="font-bold text-base sm:text-lg text-slate-900 group-hover:text-brand-primary transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
+									<h3 class="font-bold text-sm sm:text-base text-slate-900 group-hover:text-brand-primary transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
 									<?php if (!empty($workplace)) : ?>
-										<p class="text-xs sm:text-[13px] font-semibold text-slate-700 flex items-center gap-1 mt-0.5 truncate" title="<?php echo esc_attr($workplace); ?>">
-											<svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<p class="text-xs font-semibold text-slate-700 flex items-center gap-1 mt-0.5 truncate" title="<?php echo esc_attr($workplace); ?>">
+											<svg class="w-3 h-3 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
 											</svg>
 											<span class="truncate"><?php echo esc_html($workplace); ?></span>
 										</p>
 									<?php endif; ?>
-									<p class="text-xs text-brand-primary font-medium mt-0.5 line-clamp-1"><?php echo esc_html($t['role'] ?? ''); ?></p>
+									<p class="text-[11px] text-brand-primary font-medium mt-0.5 line-clamp-1"><?php echo esc_html($t['role'] ?? ''); ?></p>
 								</div>
 							</div>
 
 							<!-- Quote Body with decorative quote mark -->
-							<div class="relative pt-2">
-								<svg class="w-8 h-8 text-blue-100 mb-2 -mt-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-								<p class="text-sm sm:text-[15px] text-slate-600 leading-relaxed italic">"<?php echo esc_html($t['content'] ?? ''); ?>"</p>
+							<div class="relative pt-1">
+								<svg class="w-6 h-6 text-blue-100 mb-1.5 -mt-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+								<p class="text-xs sm:text-[13.5px] text-slate-600 leading-relaxed italic line-clamp-4">"<?php echo esc_html($t['content'] ?? ''); ?>"</p>
 							</div>
 						</div>
 
 						<!-- Card Bottom / Trust signal with Graduation Batch & University (Mục 2) -->
-						<div class="mt-5 pt-3.5 border-t border-slate-200/80 flex items-center justify-between text-xs gap-2">
-							<span class="inline-flex items-center gap-1.5 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md shrink-0">
-								<svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-								</svg>
-								Đã tốt nghiệp
-							</span>
-							<span class="text-slate-600 font-medium flex items-center gap-1 truncate" title="<?php echo esc_attr($graduation); ?>">
-								<svg class="w-3.5 h-3.5 text-brand-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<div class="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs gap-1.5">
+							<?php if ($is_studying) : ?>
+								<span class="inline-flex items-center gap-1 font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md shrink-0 border border-blue-100/80 text-[11px]">
+									<span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+									<?php echo esc_html($status_label); ?>
+								</span>
+							<?php else : ?>
+								<span class="inline-flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md shrink-0 text-[11px]">
+									<svg class="w-3 h-3 text-emerald-600 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+									</svg>
+									Đã tốt nghiệp
+								</span>
+							<?php endif; ?>
+							<span class="text-slate-500 font-medium flex items-center gap-1 truncate text-[11px]" title="<?php echo esc_attr($graduation); ?>">
+								<svg class="w-3 h-3 text-brand-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
 								</svg>
@@ -1120,7 +1173,7 @@ $zalo    = ltdh_get_zalo_url();
 
 			<!-- Mobile swipe indicator -->
 			<div class="md:hidden flex items-center justify-center gap-2 mt-4 text-xs font-semibold text-slate-500">
-				<span>Vuốt xem 6 học viên tiêu biểu</span>
+				<span>Vuốt xem 8 học viên tiêu biểu</span>
 				<svg class="w-4 h-4 text-brand-primary animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
 				</svg>

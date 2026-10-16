@@ -238,16 +238,29 @@ if ( ! empty( $contact ) ) {
 								</svg>
 							</button>
 						</div>
+
+						<!-- FLOATING STICKY COLLAPSE PILL (Active when expanded & scrolling content) -->
+						<div id="school-intro-sticky-bar" class="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:bottom-8 left-1/2 -translate-x-1/2 z-40 transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
+							<button type="button" id="school-intro-sticky-btn" class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200/90 bg-white/95 backdrop-blur-md text-sm font-bold text-slate-700 hover:text-brand-accent hover:border-slate-300 hover:bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all focus:outline-none ring-4 ring-black/5 active:scale-95 cursor-pointer">
+								<span>Thu gọn</span>
+								<svg class="w-4 h-4 text-slate-600 transition-transform duration-300 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+								</svg>
+							</button>
+						</div>
 					</div>
 
 					<script>
 					(function() {
+						var section = document.getElementById('gioi-thieu');
 						var content = document.getElementById('school-intro-content');
 						var overlay = document.getElementById('school-intro-overlay');
 						var container = document.getElementById('school-intro-btn-container');
 						var button = document.getElementById('school-intro-toggle');
 						var btnText = document.getElementById('school-intro-btn-text');
 						var btnIcon = document.getElementById('school-intro-btn-icon');
+						var stickyBar = document.getElementById('school-intro-sticky-bar');
+						var stickyBtn = document.getElementById('school-intro-sticky-btn');
 						
 						if (!content || !overlay || !container || !button) return;
 						
@@ -259,6 +272,89 @@ if ( ! empty( $contact ) ) {
 							isExpanded = localStorage.getItem(storageKey) === 'true';
 						} catch (e) {}
 
+						function updateStickyVisibility() {
+							if (!stickyBar) return;
+							if (!isExpanded) {
+								stickyBar.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+								stickyBar.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+								return;
+							}
+							if (!section) return;
+
+							var sectionRect = section.getBoundingClientRect();
+							var containerRect = container.getBoundingClientRect();
+							var winH = window.innerHeight || document.documentElement.clientHeight;
+
+							// Check if user is actively reading within the section
+							var inSection = (sectionRect.top < winH - 80) && (sectionRect.bottom > 120);
+							// Check if in-place button at bottom is already visible on screen
+							var isBottomBtnVisible = (containerRect.top < winH - 30) && (containerRect.bottom > 0);
+
+							if (inSection && !isBottomBtnVisible) {
+								stickyBar.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+								stickyBar.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+							} else {
+								stickyBar.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+								stickyBar.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+							}
+						}
+
+						function scrollToSectionTop() {
+							if (!section) return;
+							var header = document.getElementById('masthead');
+							var nav = document.getElementById('ltdh-school-sticky-nav');
+							var offset = (header ? header.offsetHeight : 64) + (nav ? nav.offsetHeight : 54) + 16;
+							var sectionTop = section.getBoundingClientRect().top + window.pageYOffset;
+							var targetY = Math.max(0, sectionTop - offset);
+							
+							if (window.pageYOffset > targetY) {
+								window.scrollTo({
+									top: targetY,
+									behavior: 'smooth'
+								});
+							}
+						}
+
+						function collapse() {
+							isExpanded = false;
+							try {
+								localStorage.setItem(storageKey, 'false');
+							} catch (e) {}
+
+							updateStickyVisibility();
+
+							overlay.style.display = 'block';
+							content.style.maxHeight = content.scrollHeight + 'px';
+							content.offsetHeight; // Force reflow
+							content.style.maxHeight = limit + 'px';
+							overlay.classList.remove('opacity-0');
+							btnText.textContent = 'Xem thêm giới thiệu';
+							btnIcon.classList.remove('rotate-180');
+
+							scrollToSectionTop();
+						}
+
+						function expand() {
+							isExpanded = true;
+							try {
+								localStorage.setItem(storageKey, 'true');
+							} catch (e) {}
+
+							content.style.maxHeight = content.scrollHeight + 'px';
+							overlay.style.display = 'block';
+							overlay.classList.add('opacity-0');
+							setTimeout(function() {
+								if (isExpanded) {
+									content.style.maxHeight = 'none';
+									overlay.style.display = 'none';
+								}
+							}, 500);
+							btnText.textContent = 'Thu gọn';
+							btnIcon.classList.add('rotate-180');
+
+							updateStickyVisibility();
+						}
+
 						function applyState() {
 							var needsToggle = content.scrollHeight > limit + 30;
 							if (!needsToggle) {
@@ -266,11 +362,13 @@ if ( ! empty( $contact ) ) {
 								container.classList.add('hidden');
 								content.style.maxHeight = 'none';
 								overlay.style.display = 'none';
+								if (stickyBar) stickyBar.classList.add('hidden');
 								return;
 							}
 							
 							container.classList.remove('hidden');
 							container.classList.add('flex');
+							if (stickyBar) stickyBar.classList.remove('hidden');
 							
 							if (isExpanded) {
 								content.style.maxHeight = 'none';
@@ -285,47 +383,41 @@ if ( ! empty( $contact ) ) {
 								btnText.textContent = 'Xem thêm giới thiệu';
 								btnIcon.classList.remove('rotate-180');
 							}
+
+							updateStickyVisibility();
 						}
 						
 						applyState();
 						window.addEventListener('load', applyState);
 						
 						button.addEventListener('click', function() {
-							isExpanded = !isExpanded;
-							try {
-								localStorage.setItem(storageKey, isExpanded);
-							} catch (e) {}
-
 							if (isExpanded) {
-								content.style.maxHeight = content.scrollHeight + 'px';
-								overlay.style.display = 'block';
-								overlay.classList.add('opacity-0');
-								setTimeout(function() {
-									if (isExpanded) {
-										content.style.maxHeight = 'none';
-										overlay.style.display = 'none';
-									}
-								}, 500);
-								btnText.textContent = 'Thu gọn';
-								btnIcon.classList.add('rotate-180');
+								collapse();
 							} else {
-								overlay.style.display = 'block';
-								content.style.maxHeight = content.scrollHeight + 'px';
-								content.offsetHeight; // Force reflow
-								content.style.maxHeight = limit + 'px';
-								overlay.classList.remove('opacity-0');
-								btnText.textContent = 'Xem thêm giới thiệu';
-								btnIcon.classList.remove('rotate-180');
-								
-								var rect = content.getBoundingClientRect();
-								if (rect.top < 0) {
-									window.scrollTo({
-										top: window.pageYOffset + rect.top - 20,
-										behavior: 'smooth'
-									});
-								}
+								expand();
 							}
 						});
+
+						if (stickyBtn) {
+							stickyBtn.addEventListener('click', function() {
+								collapse();
+							});
+						}
+
+						var ticking = false;
+						function handleScroll() {
+							if (!isExpanded) return;
+							if (!ticking) {
+								window.requestAnimationFrame(function() {
+									updateStickyVisibility();
+									ticking = false;
+								});
+								ticking = true;
+							}
+						}
+
+						window.addEventListener('scroll', handleScroll, { passive: true });
+						window.addEventListener('resize', handleScroll, { passive: true });
 					})();
 					</script>
 				</section>
