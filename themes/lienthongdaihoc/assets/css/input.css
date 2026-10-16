@@ -204,7 +204,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     min-width: 38px;
     min-height: 38px;
     padding: 0;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #fff;
     background: #f8fafc;
     cursor: pointer;
     border-radius: 0.625rem;
@@ -233,7 +233,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-menu-item-row .mobile-submenu-toggle,
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-submenu-toggle {
     background-color: #eff6ff;
-    border-color: #bfdbfe;
+    border-color: #fff;
     color: #00308b;
 }
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-menu-item-row .mobile-submenu-toggle svg,

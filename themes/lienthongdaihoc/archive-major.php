@@ -47,6 +47,41 @@ if ( 12 !== $selected_limit ) {
 }
 
 $all_tab_url = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $archive_link ) : $archive_link;
+
+// Compute active filter items for badge counter and mobile chips
+$active_filter_items = [];
+if ( ! empty( $selected_search ) ) {
+	$active_filter_items[] = [
+		'label' => 'Từ khóa: "' . $selected_search . '"',
+		'key'   => 's',
+	];
+}
+if ( ! empty( $selected_cat ) ) {
+	$cat_label = $active_cat_term ? $active_cat_term->name : $selected_cat;
+	$active_filter_items[] = [
+		'label' => 'Nhóm: ' . $cat_label,
+		'key'   => 'nhom_nganh',
+	];
+}
+if ( ! empty( $selected_sort ) ) {
+	$sort_labels = [
+		'title_asc'  => 'A-Z',
+		'title_desc' => 'Z-A',
+		'date_desc'  => 'Mới nhất',
+	];
+	$active_filter_items[] = [
+		'label' => 'Xếp: ' . ( $sort_labels[ $selected_sort ] ?? $selected_sort ),
+		'key'   => 'sort',
+	];
+}
+if ( 12 !== $selected_limit ) {
+	$active_filter_items[] = [
+		'label' => $selected_limit . ' ngành/trang',
+		'key'   => 'limit',
+	];
+}
+$active_filter_count = count( $active_filter_items );
+$has_active_filters  = $active_filter_count > 0;
 ?>
 
 <main id="primary" class="site-main bg-slate-50 min-h-screen">
@@ -55,10 +90,10 @@ $all_tab_url = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $arc
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
 
 		<!-- ============ TOP FILTER BAR (FULL-WIDTH) ============ -->
-		<div class="bg-white border border-slate-100 rounded-2xl p-5 md:p-6 shadow-sm mb-8 transition-all">
+		<div class="bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm mb-8 transition-all">
 			
-			<!-- Header inside Filter: Title, Found Counter & Reset Action -->
-			<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-5 border-b border-slate-100 gap-3">
+			<!-- Header inside Filter: Title, Found Counter & Desktop Reset Action -->
+			<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 sm:pb-5 border-b border-slate-100 gap-3">
 				<div>
 					<h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
 						<?php echo $active_cat_term ? 'Nhóm ngành: ' . esc_html( $active_cat_term->name ) : 'Danh sách Ngành đào tạo Liên thông Đại học'; ?>
@@ -68,7 +103,7 @@ $all_tab_url = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $arc
 					</p>
 				</div>
 				<?php if ( $has_active_filters ) : ?>
-					<div>
+					<div class="hidden sm:block">
 						<a href="<?php echo esc_url( $archive_link ); ?>" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]">
 							<span>✕</span> <span>Xóa tất cả bộ lọc</span>
 						</a>
@@ -76,11 +111,60 @@ $all_tab_url = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $arc
 				<?php endif; ?>
 			</div>
 
-			<!-- Filter Form Controls -->
-			<form id="major-filter-form" action="<?php echo esc_url( $archive_link ); ?>" method="GET" class="space-y-4">
-				
-				<!-- Row 1: Search + Nhóm ngành Dropdown + Sort Dropdown + Limit Dropdown -->
-				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+			<!-- Mobile Filter Bar: Toggle Trigger & Active Filter Chips (Visible only on < md) -->
+			<div class="md:hidden mt-3">
+				<div class="flex items-center gap-2">
+					<button type="button" 
+							id="ltdh-mobile-filter-btn" 
+							aria-expanded="false" 
+							aria-controls="major-filter-body"
+							class="flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs <?php echo $has_active_filters ? 'bg-blue-50/90 border-blue-200/90 text-[#00308b]' : 'bg-slate-50 hover:bg-slate-100 border-slate-200/80 text-slate-700'; ?>">
+						<div class="flex items-center gap-2 min-w-0">
+							<svg class="w-4 h-4 text-current shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+							</svg>
+							<span id="ltdh-mobile-filter-btn-text">Bộ lọc &amp; Tìm kiếm</span>
+							<?php if ( $active_filter_count > 0 ) : ?>
+								<span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[11px] font-black rounded-full bg-[#EA580C] text-white shrink-0 min-w-[20px] shadow-2xs">
+									<?php echo esc_html( $active_filter_count ); ?>
+								</span>
+							<?php endif; ?>
+						</div>
+						<svg id="ltdh-mobile-filter-chevron" class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+						</svg>
+					</button>
+
+					<?php if ( $has_active_filters ) : ?>
+						<a href="<?php echo esc_url( $archive_link ); ?>" 
+						   class="js-ltdh-reset-filter flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 min-h-[44px] transition-colors shrink-0"
+						   title="Xóa tất cả bộ lọc">
+							<span>✕ Xóa lọc</span>
+						</a>
+					<?php endif; ?>
+				</div>
+
+				<!-- Active Filter Chips (Scrollable row) -->
+				<?php if ( ! empty( $active_filter_items ) ) : ?>
+					<div class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pt-2.5 pb-0.5">
+						<?php foreach ( $active_filter_items as $item ) : 
+							$remove_url = remove_query_arg( $item['key'] );
+						?>
+							<a href="<?php echo esc_url( $remove_url ); ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200/60 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-colors shrink-0 select-none">
+								<span class="truncate max-w-[140px]"><?php echo esc_html( $item['label'] ); ?></span>
+								<span class="text-blue-400 hover:text-rose-600 font-bold ml-0.5">✕</span>
+							</a>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
+			</div>
+
+			<!-- Filter Form Controls (Collapsible on mobile, fully visible on desktop) -->
+			<div id="major-filter-body" class="hidden md:block pt-4 md:pt-0">
+				<form id="major-filter-form" action="<?php echo esc_url( $archive_link ); ?>" method="GET" class="space-y-4">
+					
+					<!-- Row 1: Search + Nhóm ngành Dropdown + Sort Dropdown + Limit Dropdown -->
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
 					
 					<!-- 1. Search Box -->
 					<div class="relative">
@@ -162,8 +246,51 @@ $all_tab_url = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $arc
 					<?php endif; ?>
 				</div>
 
+				<!-- Mobile Action Buttons (Visible inside open filter on < md) -->
+				<div class="pt-3 border-t border-slate-100 flex items-center gap-2 md:hidden">
+					<button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-[#00308b] hover:bg-blue-900 text-white font-extrabold text-sm shadow-sm transition-all flex items-center justify-center gap-2 min-h-[46px] cursor-pointer">
+						<svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+						<span>Áp dụng bộ lọc (<?php echo esc_html( $wp_query->found_posts ); ?>)</span>
+					</button>
+					<button type="button" id="ltdh-mobile-filter-close" class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm min-h-[46px] transition-colors cursor-pointer">
+						Đóng
+					</button>
+				</div>
+
 			</form>
-		</div>
+		</div><!-- #major-filter-body -->
+
+		<script>
+		(function() {
+			var btn = document.getElementById('ltdh-mobile-filter-btn');
+			var body = document.getElementById('major-filter-body');
+			var chevron = document.getElementById('ltdh-mobile-filter-chevron');
+			var btnText = document.getElementById('ltdh-mobile-filter-btn-text');
+			var closeBtn = document.getElementById('ltdh-mobile-filter-close');
+			if (!btn || !body) return;
+
+			function toggleFilter() {
+				var isHidden = body.classList.contains('hidden');
+				if (isHidden) {
+					body.classList.remove('hidden');
+					btn.setAttribute('aria-expanded', 'true');
+					if (chevron) chevron.classList.add('rotate-180');
+					if (btnText) btnText.textContent = 'Thu gọn bộ lọc';
+				} else {
+					body.classList.add('hidden');
+					btn.setAttribute('aria-expanded', 'false');
+					if (chevron) chevron.classList.remove('rotate-180');
+					if (btnText) btnText.textContent = 'Bộ lọc & Tìm kiếm';
+				}
+			}
+
+			btn.addEventListener('click', toggleFilter);
+			if (closeBtn) {
+				closeBtn.addEventListener('click', toggleFilter);
+			}
+		})();
+		</script>
+	</div>
 
 		<!-- ============ MAJORS RESULTS GRID (FULL-WIDTH 3 COLUMNS) ============ -->
 		<div id="major-results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
