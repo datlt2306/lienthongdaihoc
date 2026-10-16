@@ -982,15 +982,15 @@ $zalo    = ltdh_get_zalo_url();
 					// 6 học viên tiêu biểu: 4 đã tốt nghiệp + 2 tân sinh viên / đang theo học
 					$testimonials = [
 						[
-							'name'         => 'Nguyễn Hương',
-							'workplace'    => 'Kỹ sư phần mềm tại FPT Software',
-							'role'         => 'Liên thông Đại học CNTT',
-							'graduation'   => 'Khóa 2022 - ĐH Giao thông Vận tải',
+							'name'         => 'Hoàng Thị Độ',
+							'workplace'    => 'Product Owner',
+							'role'         => 'Liên thông CĐ lên ĐH - CNTT',
+							'graduation'   => 'Khóa 29.1 - ĐH Giao thông Vận tải',
 							'status'       => 'graduated',
 							'status_label' => 'Đã tốt nghiệp',
-							'initials'     => 'NH',
-							'image'        => get_template_directory_uri() . '/assets/images/student-huong.jpg',
-							'content'      => 'Mình đã học Liên thông CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
+							'initials'     => 'HĐ',
+							'image'        => get_template_directory_uri() . '/assets/images/student-do.jpg',
+							'content'      => 'Mình liên thông Cao Đẳng lên đại học. Lịch học được sắp xếp ngoài giờ hành chính, tạo điều kiện thuận lợi cho những người đang đi làm như mình có thể vừa hoàn thành công việc, vừa tiếp tục học tập. Bên cạnh đó, thầy cô luôn nhiệt tình hỗ trợ và tạo điều kiện để sinh viên cân bằng giữa công việc và việc học.'
 						],
 						[
 							'name'         => 'Trần Minh',
