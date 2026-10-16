@@ -1169,7 +1169,7 @@ $zalo    = ltdh_get_zalo_url();
 	</section>
 
 	<!-- 8.5. ADMISSION PROCESS SECTION -->
-	<section class="py-12 md:py-16 bg-slate-50 border-t border-slate-100">
+	<section class="py-8 sm:py-12 md:py-16 bg-slate-50 border-t border-slate-100">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<?php
 			get_template_part(

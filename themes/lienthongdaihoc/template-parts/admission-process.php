@@ -25,7 +25,7 @@ $args = isset( $args ) && is_array( $args ) ? wp_parse_args( $args, $defaults ) 
 
 // Determine grid column layout based on page context or explicit argument
 $columns = ! empty( $args['columns'] ) ? intval( $args['columns'] ) : ( is_singular( [ 'program', 'school', 'major' ] ) ? 2 : 4 );
-$grid_class = ( 2 === $columns ) ? 'grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5';
+$grid_class = ( 2 === $columns ) ? 'grid-cols-2 gap-2.5 sm:gap-4 md:gap-5' : 'grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5';
 
 $steps = [
 	[
@@ -58,19 +58,19 @@ $steps = [
 		'desc'        => 'Nhận Giấy báo trúng tuyển chính thức từ nhà trường, cấp tài khoản hệ thống E-Learning (LMS) và bắt đầu học tập ngay.',
 		'tag'         => 'Bằng chuẩn Bộ GD&ĐT',
 		'detail_meta' => 'Học online linh hoạt',
-		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>',
+		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>',
 	],
 ];
 ?>
 
-<section id="<?php echo esc_attr( $args['section_id'] ); ?>" class="scroll-mt-36 md:scroll-mt-40 <?php echo esc_attr( $args['card_bg'] ); ?> rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 transition-all">
+<section id="<?php echo esc_attr( $args['section_id'] ); ?>" class="scroll-mt-36 md:scroll-mt-40 <?php echo esc_attr( $args['card_bg'] ); ?> rounded-2xl shadow-sm border border-slate-100 p-3.5 sm:p-4 md:p-6 transition-all">
 	<!-- Section Header -->
-	<div class="border-b border-slate-100 pb-4 mb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+	<div class="border-b border-slate-100 pb-3 sm:pb-4 mb-3.5 sm:mb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-3">
 		<div>
-			<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-blue-50 text-[#00308b] text-[11px] font-extrabold uppercase tracking-wider rounded-md mb-2">
+			<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-blue-50 text-[#00308b] text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider rounded-md mb-1.5 sm:mb-2">
 				<span>Quy trình tuyển sinh</span>
 			</div>
-			<h2 class="text-xl md:text-2xl font-bold text-slate-900 leading-tight">
+			<h2 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 leading-tight">
 				<?php echo esc_html( $args['title'] ); ?>
 			</h2>
 			<p class="text-xs md:text-sm text-slate-500 mt-1 max-w-2xl leading-relaxed">
@@ -80,62 +80,60 @@ $steps = [
 
 	</div>
 
-	<!-- STEPS GRID CONTAINER -->
+	<!-- STEPS GRID CONTAINER (2 COLUMNS / 2 ROWS ON MOBILE) -->
 	<div class="grid <?php echo esc_attr( $grid_class ); ?> relative">
 		<?php foreach ( $steps as $index => $step_item ) : 
 			$is_last = ( $index === count( $steps ) - 1 );
 		?>
-			<div class="group relative flex flex-col justify-between bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-4 md:p-5 transition-all duration-200 shadow-xs hover:shadow-sm">
+			<div class="group relative flex flex-col justify-between bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-3 sm:p-4 md:p-5 transition-all duration-200 shadow-xs hover:shadow-sm">
 				
 				<!-- Top Content -->
 				<div>
-					<div class="flex items-center justify-between gap-2 mb-3">
+					<div class="flex items-center justify-between gap-1.5 mb-2 sm:mb-3">
 						<!-- Brand Primary Step Badge -->
-						<div class="w-9 h-9 rounded-lg bg-brand-accent text-white font-extrabold text-xs flex items-center justify-center shadow-xs shrink-0">
+						<div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg bg-brand-accent text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">
 							<?php echo esc_html( $step_item['step'] ); ?>
 						</div>
 
 						<!-- Clean Neutral Tag Pill -->
-						<span class="inline-block text-[11px] font-bold text-slate-600 bg-white/80 px-2.5 py-0.5 rounded-md shadow-2xs shrink-0">
+						<span class="inline-block text-[10px] sm:text-[11px] font-bold text-slate-600 bg-white/90 border border-slate-200/60 px-1.5 sm:px-2.5 py-0.5 rounded-md shadow-2xs truncate max-w-[100px] sm:max-w-none shrink-0">
 							<?php echo esc_html( $step_item['tag'] ); ?>
 						</span>
 					</div>
 
 					<!-- Step Title -->
-					<h3 class="font-bold text-slate-900 text-sm md:text-base mb-1.5 group-hover:text-[#00308b] transition-colors leading-snug">
+					<h3 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base mb-1 group-hover:text-[#00308b] transition-colors leading-snug line-clamp-2">
 						<?php echo esc_html( $step_item['title'] ); ?>
 					</h3>
 
 					<!-- Step Description -->
-					<p class="text-sm md:text-sm text-slate-600 leading-relaxed font-normal">
+					<p class="text-[11px] sm:text-xs md:text-sm text-slate-500 leading-relaxed font-normal line-clamp-3 sm:line-clamp-none">
 						<?php echo esc_html( $step_item['desc'] ); ?>
 					</p>
 				</div>
 
-				
-
 				<!-- Top Accent Line (Brand Primary) -->
-				<div class="absolute top-0 left-4 right-4 h-[2px] rounded-t-full bg-[#00308b] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+				<div class="absolute top-0 left-3 right-3 sm:left-4 sm:right-4 h-[2px] rounded-t-full bg-[#00308b] opacity-0 group-hover:opacity-100 transition-opacity"></div>
 			</div>
 		<?php endforeach; ?>
 	</div>
 
 	<!-- Bottom Action Bar -->
 	<?php if ( $args['show_cta'] ) : ?>
-		<div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-blue-50/50 p-3.5 md:p-4 rounded-xl">
-			<div class="flex items-center gap-3 text-center sm:text-left">
-				<div class="w-9 h-9 rounded-lg bg-[#00308b] text-white flex items-center justify-center shrink-0 shadow-2xs hidden sm:flex">
-					<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+		<div class="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-blue-50/50 p-3 sm:p-4 rounded-xl">
+			<div class="flex items-center gap-2.5 sm:gap-3 text-left">
+				<div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#00308b] text-white flex items-center justify-center shrink-0 shadow-2xs">
+					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
 				</div>
 				<div>
-					<p class="font-bold text-slate-900 text-sm mb-0.5">Bạn muốn kiểm tra điều kiện & dự kiến số tín chỉ được miễn giảm?</p>
-					<p class="text-xs text-slate-500">Đội ngũ chuyên viên tư vấn sẽ liên hệ hỗ trợ hướng dẫn thông tin chi tiết hoàn toàn miễn phí.</p>
+					<p class="font-bold text-slate-900 text-xs sm:text-sm mb-0.5">Kiểm tra điều kiện & dự kiến số tín chỉ miễn giảm?</p>
+					<p class="text-[11px] sm:text-xs text-slate-500">Chuyên viên tư vấn sẽ liên hệ hướng dẫn lộ trình miễn phí.</p>
 				</div>
 			</div>
 			
-			<a href="<?php echo esc_url( $args['cta_link'] ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer">
+			<a href="<?php echo esc_url( $args['cta_link'] ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-4.5 sm:py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer min-h-[38px] sm:min-h-[40px]">
 				<span><?php echo esc_html( $args['cta_text'] ); ?></span>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
 			</a>
 		</div>
 	<?php endif; ?>
