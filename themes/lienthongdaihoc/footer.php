@@ -151,15 +151,10 @@ $messenger = ltdh_get_messenger_url();
 	</a>
 </div>
 
-<!-- FIXED MOBILE CTA BAR (ALL PAGES EXCEPT SINGLE PROGRAM & COMPARE) -->
-<?php
-$is_compare = ( get_query_var( 'ltdh_compare' ) === 'program' ) || ( str_contains( $_SERVER['REQUEST_URI'] ?? '', '/so-sanh/' ) );
-$should_render_global_mobile_bar = ! is_singular( 'program' ) && ! $is_compare;
-
-if ( $should_render_global_mobile_bar ) : ?>
-<div class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 p-2.5 flex items-center justify-between gap-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] md:hidden">
+<!-- FIXED MOBILE CTA BAR (ALL PAGES) -->
+<div id="ltdh-global-mobile-bar" class="fixed bottom-0 left-0 right-0 z-40 bg-white/98 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-3 sm:px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))] flex items-center justify-between gap-2.5 sm:gap-3 md:hidden">
 	<!-- Messenger Button -->
-	<a href="<?php echo esc_url( $messenger ); ?>" target="_blank" rel="noopener" class="flex items-center justify-center h-12 w-12 bg-orange-500 hover:bg-orange-600 rounded-xl shrink-0 transition-colors" aria-label="Messenger">
+	<a href="<?php echo esc_url( $messenger ); ?>" target="_blank" rel="noopener" class="flex items-center justify-center h-12 w-12 bg-orange-500 hover:bg-orange-600 active:scale-95 rounded-2xl shrink-0 transition-all shadow-sm shadow-orange-500/20" aria-label="Messenger">
 		<svg class="w-6 h-6 fill-current text-white" viewBox="0 0 24 24">
 			<path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.914 1.448 5.518 3.7 7.205V22l3.39-1.859c.91.253 1.87.392 2.87.392 5.523 0 10-4.146 10-9.258C22 6.145 17.523 2 12 2zm1.26 12.18l-2.45-2.61-4.78 2.61 5.26-5.59 2.5 2.61 4.73-2.61-5.26 5.59z"/>
 		</svg>
@@ -171,25 +166,24 @@ if ( $should_render_global_mobile_bar ) : ?>
 		$register_link = home_url( '/lien-he/' );
 	}
 	?>
-	<a href="<?php echo esc_url( $register_link ); ?>" class="flex-1 flex items-center justify-center gap-1.5 bg-[#00a2f4] text-white font-extrabold text-sm h-12 rounded-xl hover:bg-[#0091db] transition-colors">
+	<a href="<?php echo esc_url( $register_link ); ?>" class="flex-1 flex items-center justify-center gap-2 bg-[#00a2f4] hover:bg-[#0091db] active:scale-[0.98] text-white font-extrabold text-sm sm:text-base h-12 px-3 rounded-2xl shadow-md shadow-[#00a2f4]/30 transition-all">
 		<svg class="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 20 20">
 			<path fill-rule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.259-.966zM2.429 4.74a1 1 0 10-.518 1.932l.966.259a1 1 0 00.518-1.932l-.966-.259zm8.839 2.517a1 1 0 00-1.042-.018l-7 4a1 1 0 00-.086 1.707l3.183 2.122 2.122 3.183a1 1 0 001.707-.086l4-7a1 1 0 00-.018-1.042l-3.866-3.866zM7.17 11.232l4.896-2.797 2.797 4.896-4.896 2.797-2.797-4.896z" clip-rule="evenodd" />
 		</svg>
-		Đăng ký tư vấn ngay
+		<span class="truncate">Đăng ký tư vấn ngay</span>
 	</a>
 	<!-- Hotline Button -->
-	<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex items-center justify-center h-12 w-12 bg-orange-500 hover:bg-orange-600 rounded-xl shrink-0 transition-colors" aria-label="Hotline">
-		<svg class="w-6 h-6 fill-none stroke-current text-white" stroke-width="2" viewBox="0 0 24 24">
+	<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex items-center justify-center h-12 w-12 bg-orange-500 hover:bg-orange-600 active:scale-95 rounded-2xl shrink-0 transition-all shadow-sm shadow-orange-500/20" aria-label="Hotline">
+		<svg class="w-6 h-6 fill-none stroke-current text-white" stroke-width="2.2" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
 		</svg>
 	</a>
 </div>
-<?php endif; ?>
 
 <style>
 @media (max-width: 767px) {
   body {
-    padding-bottom: 72px !important;
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
   }
   
   /* Mobile footer overrides - keeps desktop HTML completely unchanged */

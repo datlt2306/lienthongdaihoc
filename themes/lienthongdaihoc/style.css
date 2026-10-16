@@ -704,13 +704,6 @@ body.admin-bar #ltdh-program-sticky-nav {
     color: #ffffff !important;
 }
 
-/* Avoid mobile sticky bar collision on single program page */
-@media (max-width: 1023px) {
-    body.single-program #ltdh-compare-tray {
-        display: none !important;
-    }
-}
-
 /* Prevent horizontal viewport overflow across all devices */
 html, body {
     overflow-x: hidden;

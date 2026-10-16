@@ -247,17 +247,14 @@
 
 		if (totalCount < 1) {
 			tray.classList.add('hidden');
-			document.body.style.paddingBottom = '';
+			document.body.style.removeProperty('padding-bottom');
 			return;
 		}
 
 		tray.classList.remove('hidden');
 		setTimeout(function () {
 			if (tray && !tray.classList.contains('hidden')) {
-				if (document.body.classList.contains('single-program') && window.innerWidth < 1024) {
-					return; // Mobile single program has its own bottom sticky CTA
-				}
-				document.body.style.paddingBottom = (tray.offsetHeight || 80) + 'px';
+				document.body.style.setProperty('padding-bottom', (tray.offsetHeight || 80) + 'px', 'important');
 			}
 		}, 50);
 

@@ -407,10 +407,10 @@ function ltdh_render_contact_form(): void {
  */
 function ltdh_render_native_form(string $type = 'consultation', array $hidden_fields = []): void {
 ?>
-	<form action="" method="POST" class="space-y-3 sm:space-y-3.5">
+	<form action="" method="POST" class="space-y-3 lg:space-y-4">
 		<?php wp_nonce_field( 'ltdh_native_lead_submit_action', 'ltdh_native_lead_nonce' ); ?>
 		<?php if ( isset( $_GET['submit_success'] ) && '1' === $_GET['submit_success'] ) : ?>
-			<div class="p-3 mb-3 text-xs sm:text-sm text-emerald-800 rounded-xl bg-emerald-50 border border-emerald-200" role="alert">
+			<div class="p-3 lg:p-4 mb-3 lg:mb-4 text-xs lg:text-sm text-green-800 rounded-xl lg:rounded-lg bg-green-50 border border-green-200" role="alert">
 				<span class="font-bold">Gửi thông tin thành công!</span> Đội ngũ tư vấn tuyển sinh sẽ liên hệ với bạn trong thời gian sớm nhất.
 			</div>
 		<?php endif; ?>
@@ -425,31 +425,30 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 		</div>
 
 		<div>
-			<label class="block text-xs font-bold text-slate-700 mb-1"><?php esc_html_e('Họ và tên *'); ?></label>
-			<input type="text" name="your-name" required class="w-full border border-slate-200/90 bg-slate-50/60 hover:bg-white focus:bg-white rounded-xl px-3.5 py-2.5 sm:py-3 text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 focus:outline-none transition-all placeholder-slate-400 font-medium" placeholder="<?php esc_attr_e('Ví dụ: Nguyễn Văn An'); ?>">
+			<label class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Họ và tên *'); ?></label>
+			<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Họ và tên của bạn'); ?>">
 		</div>
 		<div>
-			<label class="block text-xs font-bold text-slate-700 mb-1"><?php esc_html_e('Số điện thoại *'); ?></label>
-			<input type="tel" name="your-phone" required class="w-full border border-slate-200/90 bg-slate-50/60 hover:bg-white focus:bg-white rounded-xl px-3.5 py-2.5 sm:py-3 text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 focus:outline-none transition-all placeholder-slate-400 font-medium" placeholder="<?php esc_attr_e('Ví dụ: 0988xxxxxx'); ?>">
+			<label class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Số điện thoại *'); ?></label>
+			<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Số điện thoại liên hệ'); ?>">
 		</div>
 		<div>
 			<div class="flex items-center justify-between mb-1">
-				<label class="block text-xs font-bold text-slate-700"><?php esc_html_e('Nội dung cần tư vấn'); ?></label>
-				<span class="text-[10px] text-slate-400">Không bắt buộc</span>
+				<label class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600"><?php esc_html_e('Nội dung cần tư vấn'); ?></label>
+				<span class="text-[10px] text-slate-400 lg:hidden">Không bắt buộc</span>
 			</div>
-			<textarea name="your-message" rows="2" class="w-full border border-slate-200/90 bg-slate-50/60 hover:bg-white focus:bg-white rounded-xl px-3.5 py-2 sm:py-2.5 text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 focus:outline-none transition-all placeholder-slate-400 font-medium resize-none" placeholder="<?php esc_attr_e('Bạn quan tâm trường nào, hệ đào tạo gì?'); ?>"></textarea>
+			<textarea name="your-message" rows="2" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all lg:h-24 resize-none" placeholder="<?php esc_attr_e('Nhập câu hỏi hoặc yêu cầu cụ thể...'); ?>"></textarea>
 		</div>
 
 		<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
 			<?php ltdh_render_recaptcha_field( 'native_lead' ); ?>
 		<?php endif; ?>
 
-		<button type="submit" class="w-full bg-[#00308b] hover:bg-[#00246b] active:scale-[0.98] text-white py-3 sm:py-3.5 rounded-xl text-sm font-black shadow-md shadow-blue-900/15 hover:shadow-lg transition-all mt-1 min-h-[44px] flex items-center justify-center gap-2 tracking-wide uppercase">
+		<button type="submit" class="w-full bg-brand-primary text-white py-3 lg:py-3.5 rounded-xl lg:rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-brand-darkBlue active:scale-[0.98] transition-all mt-1 lg:mt-2 min-h-[44px] flex items-center justify-center gap-2">
 			<span><?php echo 'contact' === $type ? esc_html__('Gửi Liên Hệ') : esc_html__('Gửi Thông Tin Ngay'); ?></span>
-			<svg class="w-4 h-4 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
 		</button>
 
-		<div class="flex items-center justify-center gap-3 text-[11px] text-slate-400 pt-0.5">
+		<div class="flex lg:hidden items-center justify-center gap-3 text-[11px] text-slate-400 pt-0.5">
 			<span class="inline-flex items-center gap-1 font-medium">
 				<svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"/></svg>
 				Bảo mật 100%
