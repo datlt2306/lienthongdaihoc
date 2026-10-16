@@ -970,7 +970,7 @@ if ( ! empty( $contact ) ) {
 							<div class="flex items-center gap-2.5">
 								<span class="text-xl">💡</span>
 								<div>
-									<h4 class="font-bold text-xs sm:text-sm text-slate-900">Bạn còn câu hỏi nào khác về tuyển sinh của trường?</h4>
+									<h3 class="font-bold text-xs sm:text-sm text-slate-900">Bạn còn câu hỏi nào khác về tuyển sinh của trường?</h3>
 									<p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Đội ngũ cán bộ tuyển sinh luôn sẵn sàng hỗ trợ kiểm tra bằng cấp và tư vấn lộ trình học phù hợp nhất.</p>
 								</div>
 							</div>

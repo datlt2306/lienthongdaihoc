@@ -14,9 +14,9 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 		
 		<!-- Section 1: Hồ sơ hiện tại của bạn -->
 		<div class="elig-section space-y-4">
-			<h3 class="text-lg font-extrabold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2">
+			<h2 class="text-lg font-extrabold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2">
 				<span class="text-xl">🎓</span> 1. Hồ sơ học vấn hiện tại của bạn
-			</h3>
+			</h2>
 			
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<!-- Trình độ học vấn -->
@@ -48,9 +48,9 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 
 		<!-- Section 2: Nhu cầu học tập mong muốn -->
 		<div class="elig-section space-y-4 pt-4 border-t border-slate-100">
-			<h3 class="text-lg font-extrabold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2">
+			<h2 class="text-lg font-extrabold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-2">
 				<span class="text-xl">🎯</span> 2. Nhu cầu học tập mong muốn
-			</h3>
+			</h2>
 			
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 				<!-- Ngành mong muốn -->

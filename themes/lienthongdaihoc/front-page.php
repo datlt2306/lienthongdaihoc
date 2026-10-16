@@ -217,7 +217,7 @@ $zalo    = ltdh_get_zalo_url();
 							<div class="h-12 w-12 <?php echo $c['icon_bg']; ?> <?php echo $c['icon_text']; ?> rounded-xl flex items-center justify-center mb-3 text-xl group-hover:scale-110 transition-transform">
 								<?php echo $icon; ?>
 							</div>
-							<h4 class="font-semibold text-slate-700 leading-snug line-clamp-2"><?php echo esc_html($maj->post_title); ?></h4>
+							<h3 class="font-semibold text-slate-700 leading-snug line-clamp-2"><?php echo esc_html($maj->post_title); ?></h3>
 						</a>
 				<?php
 					endforeach;
@@ -978,83 +978,93 @@ $zalo    = ltdh_get_zalo_url();
 				if (function_exists('get_field')) {
 					$testimonials = get_field('testimonials', 'options') ?: [];
 				}
-				if (! empty($testimonials)) :
-					foreach ($testimonials as $t) :
-						$initials = strtoupper(substr($t['initials'] ?? 'U', 0, 2));
-						$avatar_url = '';
-						if (!empty($t['image'])) {
-							if (is_array($t['image'])) {
-								$avatar_url = $t['image']['sizes']['thumbnail'] ?? $t['image']['url'] ?? '';
-							} elseif (is_numeric($t['image'])) {
-								$avatar_url = wp_get_attachment_image_url($t['image'], 'thumbnail');
-							} else {
-								$avatar_url = $t['image'];
-							}
-						}
-				?>
-						<div class="shrink-0 w-[85vw] md:w-auto snap-center bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
-							<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
-							<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"<?php echo esc_html($t['content'] ?? ''); ?>"</p>
-							<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
-								<?php if ($avatar_url) : ?>
-									<img class="h-10 w-10 rounded-full object-cover border border-slate-200" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>">
-								<?php else : ?>
-									<div class="h-10 w-10 bg-brand-accent text-white rounded-full flex items-center justify-center font-bold text-sm"><?php echo esc_html($initials); ?></div>
-								<?php endif; ?>
-								<div>
-									<p class="font-bold text-sm text-slate-800"><?php echo esc_html($t['name'] ?? ''); ?></p>
-									<p class="text-sm text-slate-400"><?php echo esc_html($t['role'] ?? ''); ?></p>
-								</div>
-							</div>
-						</div>
-					<?php
-					endforeach;
-				else :
-					// Fallback hardcoded testimonials when ACF not populated.
-					$fallback_testimonials = [
+				if (empty($testimonials)) {
+					// Fallback testimonials when ACF not populated.
+					$testimonials = [
 						[
-							'name' => 'Nguyễn Hương',
-							'role' => 'Liên thông Công nghệ thông tin',
+							'name'     => 'Nguyễn Hương',
+							'role'     => 'Liên thông Công nghệ thông tin',
 							'initials' => 'NH',
-							'image' => get_template_directory_uri() . '/assets/images/student-huong.jpg',
-							'content' => 'Mình đã học Liên thông CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
+							'image'    => get_template_directory_uri() . '/assets/images/student-huong.jpg',
+							'content'  => 'Mình đã học Liên thông CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
 						],
 						[
-							'name' => 'Trần Minh',
-							'role' => 'Đại học Từ xa - Quản trị kinh doanh',
+							'name'     => 'Trần Minh',
+							'role'     => 'Đại học Từ xa - Quản trị kinh doanh',
 							'initials' => 'TM',
-							'image' => get_template_directory_uri() . '/assets/images/student-minh.jpg',
-							'content' => 'Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy.'
+							'image'    => get_template_directory_uri() . '/assets/images/student-minh.jpg',
+							'content'  => 'Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy.'
 						],
 						[
-							'name' => 'Lê Phương',
-							'role' => 'Liên thông Đại học - Kế toán',
+							'name'     => 'Lê Phương',
+							'role'     => 'Liên thông Đại học - Kế toán',
 							'initials' => 'LP',
-							'image' => get_template_directory_uri() . '/assets/images/student-phuong.jpg',
-							'content' => 'Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận.'
+							'image'    => get_template_directory_uri() . '/assets/images/student-phuong.jpg',
+							'content'  => 'Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận.'
 						],
 					];
-					foreach ($fallback_testimonials as $t) :
-					?>
-						<div class="shrink-0 w-[85vw] md:w-auto snap-center bg-slate-50 border border-slate-100 rounded-xl p-6 relative">
-							<div class="text-yellow-400 text-lg mb-3">★★★★★</div>
-							<p class="text-sm text-slate-600 leading-relaxed mb-4 italic">"<?php echo esc_html($t['content']); ?>"</p>
-							<div class="flex items-center gap-3 pt-4 border-t border-slate-200">
-								<?php if (!empty($t['image'])) : ?>
-									<img class="h-10 w-10 rounded-full object-cover border border-slate-200" src="<?php echo esc_url($t['image']); ?>" alt="<?php echo esc_attr($t['name']); ?>">
-								<?php else : ?>
-									<div class="h-10 w-10 bg-brand-accent text-white rounded-full flex items-center justify-center font-bold text-sm"><?php echo esc_html($t['initials']); ?></div>
-								<?php endif; ?>
-								<div>
-									<p class="font-bold text-sm text-slate-800"><?php echo esc_html($t['name']); ?></p>
-									<p class="text-sm text-slate-400"><?php echo esc_html($t['role']); ?></p>
+				}
+
+				foreach ($testimonials as $t) :
+					$initials = strtoupper(substr($t['initials'] ?? $t['name'] ?? 'U', 0, 2));
+					$avatar_url = '';
+					if (!empty($t['image'])) {
+						if (is_array($t['image'])) {
+							$avatar_url = $t['image']['sizes']['medium'] ?? $t['image']['sizes']['thumbnail'] ?? $t['image']['url'] ?? '';
+						} elseif (is_numeric($t['image'])) {
+							$avatar_url = wp_get_attachment_image_url($t['image'], 'medium') ?: wp_get_attachment_image_url($t['image'], 'thumbnail');
+						} else {
+							$avatar_url = $t['image'];
+						}
+					}
+				?>
+					<div class="shrink-0 w-[85vw] sm:w-[360px] md:w-auto snap-center bg-slate-50/80 hover:bg-white border border-slate-200/80 hover:border-blue-300 rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+						<div>
+							<!-- Student Profile Header with Large Photo (96px) -->
+							<div class="flex items-center gap-4 mb-4">
+								<div class="relative shrink-0">
+									<?php if ($avatar_url) : ?>
+										<img class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-2 ring-slate-100 shadow-md group-hover:ring-brand-primary/20 transition-all duration-300" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>" loading="lazy" width="96" height="96">
+									<?php else : ?>
+										<div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-brand-primary to-blue-700 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-md ring-2 ring-slate-100"><?php echo esc_html($initials); ?></div>
+									<?php endif; ?>
+									<span class="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-full ring-2 ring-white shadow-xs" title="Học viên đã tốt nghiệp">
+										<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+											<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+										</svg>
+									</span>
+								</div>
+								<div class="min-w-0 flex-1">
+									<div class="flex items-center gap-0.5 text-amber-400 mb-1.5" aria-label="5 trên 5 sao">
+										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<span class="text-xs font-bold text-amber-600 ml-1">5.0</span>
+									</div>
+									<h3 class="font-bold text-base sm:text-lg text-slate-900 group-hover:text-brand-primary transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
+									<p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 line-clamp-2"><?php echo esc_html($t['role'] ?? ''); ?></p>
 								</div>
 							</div>
+
+							<!-- Quote Body with decorative quote mark -->
+							<div class="relative pt-2">
+								<svg class="w-8 h-8 text-blue-100 mb-2 -mt-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+								<p class="text-sm sm:text-[15px] text-slate-600 leading-relaxed italic">"<?php echo esc_html($t['content'] ?? ''); ?>"</p>
+							</div>
 						</div>
-				<?php
-					endforeach;
-				endif;
-				?>
+
+						<!-- Card Bottom / Trust signal -->
+						<div class="mt-6 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
+							<span class="inline-flex items-center gap-1.5 text-emerald-600 font-semibold">
+								<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+								Học viên thực tế
+							</span>
+							<span class="text-slate-400 font-medium">Bằng chuẩn Bộ GD&ĐT</span>
+						</div>
+					</div>
+				<?php endforeach; ?>
 			</div>
 		</div>
 	</section>
@@ -1147,9 +1157,9 @@ $zalo    = ltdh_get_zalo_url();
 							<div class="p-4 flex-1 flex flex-col justify-between">
 								<div>
 									<span class="text-xs font-bold text-brand-primary uppercase tracking-wider block mb-1"><?php echo esc_html($category_name); ?></span>
-									<h4 class="font-extrabold text-slate-800 text-sm line-clamp-2 hover:text-[#00308b] transition-colors leading-snug">
+									<h3 class="font-extrabold text-slate-800 text-sm line-clamp-2 hover:text-[#00308b] transition-colors leading-snug">
 										<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-									</h4>
+									</h3>
 								</div>
 								<time class="text-xs text-slate-400 mt-3 block"><?php echo get_the_date('d/m/Y'); ?></time>
 							</div>
@@ -1166,7 +1176,7 @@ $zalo    = ltdh_get_zalo_url();
 						<div class="bg-white border border-slate-100 rounded-lg p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
 							<div>
 								<span class="text-xs font-bold text-brand-primary uppercase tracking-wider block mb-1">Hướng dẫn</span>
-								<h4 class="font-bold text-slate-800 text-sm line-clamp-2 leading-snug"><?php echo esc_html($mn['title']); ?></h4>
+								<h3 class="font-bold text-slate-800 text-sm line-clamp-2 leading-snug"><?php echo esc_html($mn['title']); ?></h3>
 								<p class="text-sm text-slate-400 leading-normal line-clamp-3 mt-2"><?php echo esc_html($mn['desc']); ?></p>
 							</div>
 							<time class="text-xs text-slate-400 mt-3 block"><?php echo esc_html($mn['date']); ?></time>

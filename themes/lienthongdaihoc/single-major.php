@@ -605,9 +605,9 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 							<div class="flex items-center gap-2.5">
 								<span class="text-xl">💡</span>
 								<div>
-									<h4 class="font-bold text-xs sm:text-sm text-slate-900">
+									<h3 class="font-bold text-xs sm:text-sm text-slate-900">
 										<?php echo $context_school ? 'Cần hỗ trợ hồ sơ xét tuyển tại ' . esc_html( $faq_context_school_name ) . '?' : 'Chưa rõ bằng cấp của bạn có đủ điều kiện xét tuyển?'; ?>
-									</h4>
+									</h3>
 									<p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">
 										Chuyên viên tư vấn sẽ rà soát bảng điểm Cao đẳng và hỗ trợ kiểm tra môn miễn giảm hoàn toàn miễn phí.
 									</p>

@@ -109,10 +109,10 @@ if ( count( $unique_majors ) === 1 ) {
 				<div class="space-y-4">
 					<?php foreach ( $faqs as $faq ) : ?>
 						<div class="border-b border-slate-100 pb-4">
-							<h4 class="font-semibold text-slate-800 text-sm mb-1.5 flex items-start gap-2">
+							<h3 class="font-semibold text-slate-800 text-sm mb-1.5 flex items-start gap-2">
 								<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
 								<span><?php echo esc_html( $faq['question'] ); ?></span>
-							</h4>
+							</h3>
 							<p class="text-slate-600 text-sm pl-7 leading-relaxed">
 								<?php echo esc_html( $faq['answer'] ); ?>
 							</p>
@@ -123,7 +123,7 @@ if ( count( $unique_majors ) === 1 ) {
 
 			<!-- Related Comparisons -->
 			<section class="mt-8 text-center">
-				<h3 class="text-lg font-bold text-slate-800 mb-4">So sánh tương tự</h3>
+				<h2 class="text-lg font-bold text-slate-800 mb-4">So sánh tương tự</h2>
 				<div class="flex flex-wrap justify-center gap-2">
 					<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-slate-600 text-sm font-semibold px-4 py-2 rounded-lg hover:border-brand-primary hover:text-brand-primary transition-all">
 						Xem tất cả chương trình →

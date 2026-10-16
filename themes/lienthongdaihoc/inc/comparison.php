@@ -20,6 +20,13 @@ add_filter( 'query_vars', 'ltdh_compare_register_query_vars' );
 add_action( 'template_redirect', 'ltdh_compare_template_redirect' );
 
 function ltdh_compare_register_rewrite_rules() {
+	// Base comparison page: /so-sanh/chuong-trinh/ or /so-sanh/
+	add_rewrite_rule(
+		'^so-sanh(?:/chuong-trinh)?/?$',
+		'index.php?ltdh_compare=program&ltdh_compare_slug=',
+		'top'
+	);
+
 	// SEO-friendly: /so-sanh/chuong-trinh/slug-vs-slug/
 	add_rewrite_rule(
 		'so-sanh/chuong-trinh/(.+?)/?$',
@@ -44,7 +51,14 @@ function ltdh_compare_template_redirect() {
 	}
 
 	$slug = get_query_var( 'ltdh_compare_slug' );
-	if ( ! $slug ) {
+	if ( empty( $slug ) ) {
+		global $ltdh_compare_ids;
+		$ltdh_compare_ids = [];
+		$template = get_template_directory() . '/page-compare-' . $type . '.php';
+		if ( file_exists( $template ) ) {
+			include $template;
+			exit;
+		}
 		return;
 	}
 

@@ -210,7 +210,7 @@ if ( ! empty( $faqs ) ) {
 					<div class="bg-red-50 text-red-800 rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
 						<svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
 						<div>
-							<h4 class="font-bold text-red-900 text-sm">Đã hết chỉ tiêu tuyển sinh năm nay</h4>
+							<p class="font-bold text-red-900 text-sm">Đã hết chỉ tiêu tuyển sinh năm nay</p>
 							<p class="text-xs text-red-700 mt-1">Chương trình tuyển sinh Liên thông của trường hiện đã nhận đủ chỉ tiêu cho đợt này. Quý học viên vui lòng tham khảo các chương trình liên quan hoặc để lại thông tin đăng ký tư vấn để được hướng dẫn lộ trình phù hợp.</p>
 						</div>
 					</div>
@@ -218,7 +218,7 @@ if ( ! empty( $faqs ) ) {
 					<div class="bg-blue-50 text-blue-800 rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
 						<svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
 						<div>
-							<h4 class="font-bold text-blue-900 text-sm">Chương trình chuẩn bị mở tuyển sinh đợt mới</h4>
+							<p class="font-bold text-blue-900 text-sm">Chương trình chuẩn bị mở tuyển sinh đợt mới</p>
 							<p class="text-xs text-blue-700 mt-1">Đợt tuyển sinh tiếp theo đang chuẩn bị mở tiếp nhận hồ sơ. Quý học viên có thể để lại thông tin để nhận thông báo sớm nhất ngay khi mở cổng đăng ký.</p>
 						</div>
 					</div>
@@ -238,7 +238,7 @@ if ( ! empty( $faqs ) ) {
 								</div>
 								<div class="min-w-0">
 									<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none mb-0.5">Trường đào tạo</span>
-									<h4 class="font-extrabold text-slate-800 text-xs truncate leading-tight"><?php echo esc_html( $school_title ); ?></h4>
+									<p class="font-extrabold text-slate-800 text-xs truncate leading-tight"><?php echo esc_html( $school_title ); ?></p>
 								</div>
 							</div>
 							<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-lg transition-all shrink-0">
@@ -638,7 +638,7 @@ if ( ! empty( $faqs ) ) {
 														📄
 													</div>
 													<div>
-														<h4 class="font-bold text-slate-900 text-sm mb-0.5">Tải mẫu phiếu đăng ký tuyển sinh</h4>
+														<p class="font-bold text-slate-900 text-sm mb-0.5">Tải mẫu phiếu đăng ký tuyển sinh</p>
 														<p class="text-xs text-slate-500">Mẫu phiếu đăng ký tuyển sinh chính thức để in và làm hồ sơ</p>
 													</div>
 												</div>
@@ -774,9 +774,9 @@ if ( ! empty( $faqs ) ) {
 							<div class="bg-blue-50/40 rounded-2xl p-5">
 								<div class="flex items-center gap-2 border-b border-blue-100/60 pb-3 mb-3">
 									<svg class="w-6 h-6 text-blue-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222M12 14v8"></path></svg>
-									<h4 class="font-extrabold text-blue-950 text-base md:text-lg">
+									<h3 class="font-extrabold text-blue-950 text-base md:text-lg">
 										<?php echo esc_html( $exemption_title ?: 'Quy định miễn môn & Chuyển đổi tín chỉ' ); ?>
-									</h4>
+									</h3>
 								</div>
 								<?php if ( $exemption_intro ) : ?>
 									<p class="text-xs md:text-sm text-blue-950 font-medium mb-4 leading-relaxed">
@@ -847,7 +847,7 @@ if ( ! empty( $faqs ) ) {
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
 									</div>
 									<div>
-										<h4 class="font-extrabold text-slate-900 text-sm group-hover:text-blue-900 transition-colors">Xem ảnh Khung chương trình đào tạo chi tiết</h4>
+										<h3 class="font-extrabold text-slate-900 text-sm group-hover:text-blue-900 transition-colors">Xem ảnh Khung chương trình đào tạo chi tiết</h3>
 										<p class="text-xs text-slate-500 mt-0.5">Click để mở xem ảnh lộ trình các học kỳ & môn học kích thước chuẩn</p>
 									</div>
 								</div>
@@ -864,7 +864,7 @@ if ( ! empty( $faqs ) ) {
 										PDF
 									</div>
 									<div class="min-w-0">
-										<h4 class="font-bold text-slate-900 text-sm sm:text-base mb-1 truncate">Khung chương trình đào tạo chi tiết</h4>
+										<h3 class="font-bold text-slate-900 text-sm sm:text-base mb-1 truncate">Khung chương trình đào tạo chi tiết</h3>
 										<p class="text-xs text-slate-500">Bản PDF chính thức từ nhà trường liệt kê lộ trình các học kỳ và danh sách môn học</p>
 									</div>
 								</div>
@@ -900,10 +900,10 @@ if ( ! empty( $faqs ) ) {
 						<div class="space-y-4">
 							<?php foreach ( $faqs as $index => $item ) : ?>
 								<div class="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-									<h4 class="font-semibold text-slate-800 text-base mb-1.5 flex items-start gap-2">
+									<h3 class="font-semibold text-slate-800 text-base mb-1.5 flex items-start gap-2">
 										<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
 										<span><?php echo esc_html( $item['question'] ); ?></span>
-									</h4>
+									</h3>
 									<p class="text-slate-600 text-sm pl-7 leading-relaxed"><?php echo esc_html( $item['answer'] ); ?></p>
 								</div>
 							<?php endforeach; ?>
@@ -930,7 +930,7 @@ if ( ! empty( $faqs ) ) {
 		$clean_mob_major = $major_title ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major_title ) ) : '';
 		$mob_title       = $clean_mob_major ? ( $clean_mob_major . ( ! empty( $learning_details['mode'] ) ? ' (' . $learning_details['mode'] . ')' : '' ) ) : get_the_title();
 		?>
-		<h4 class="font-bold text-slate-800 text-xs sm:text-sm truncate leading-tight"><?php echo esc_html( $mob_title ); ?></h4>
+		<p class="font-bold text-slate-800 text-xs sm:text-sm truncate leading-tight"><?php echo esc_html( $mob_title ); ?></p>
 	</div>
 	<div class="flex items-center gap-2 shrink-0">
 		<?php if ( ! empty( $form_url ) ) : ?>

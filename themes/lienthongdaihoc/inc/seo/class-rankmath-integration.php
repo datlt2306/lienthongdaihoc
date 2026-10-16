@@ -232,7 +232,7 @@ function ltdh_seo_dynamic_description( $desc ) {
 	// 1. Archive Major (/nganh-hoc/)
 	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/nganh-hoc/?#i', $request_path ) ) ) {
 		return sprintf(
-			'Tổng hợp danh sách các ngành tuyển sinh liên thông đại học năm %d: Công nghệ thông tin, Quản trị kinh doanh, Kế toán, Ngôn ngữ Anh... Xem chỉ tiêu, điều kiện xét tuyển và học phí chi tiết.',
+			'Danh sách ngành tuyển sinh liên thông đại học năm %d: CNTT, Quản trị kinh doanh, Kế toán, Ngôn ngữ Anh... Xem chỉ tiêu, điều kiện và học phí chi tiết.',
 			$year
 		);
 	}
@@ -358,6 +358,11 @@ function ltdh_seo_enforce_canonical_url( $canonical ) {
 
 		// Default clean base canonical for filter combinations
 		return home_url( '/hinh-thuc-dao-tao/' );
+	}
+
+	// Protect Comparison routes with clean self-referencing canonical
+	if ( get_query_var( 'ltdh_compare' ) || ( ! empty( $request_path ) && preg_match( '#^/so-sanh#i', $request_path ) ) ) {
+		return home_url( trailingslashit( $request_path ) );
 	}
 
 	return $canonical;
@@ -691,16 +696,33 @@ function ltdh_seo_compare_title( $title ) {
 
 	$items = function_exists( 'ltdh_compare_get_items' ) ? ltdh_compare_get_items() : [];
 	if ( count( $items ) < 1 ) {
-		return $title;
+		return 'So Sánh Các Chương Trình Liên Thông Đại Học | LTDH';
 	}
 
-	$names      = array_map( fn( $item ) => $item['title'], $items );
-	$type_labels = [ 'program' => 'chương trình', 'school' => 'trường' ];
-	$type_label  = $type_labels[ $type ] ?? 'chương trình';
+	$names = array_map( fn( $item ) => $item['title'], $items );
+	$candidate = sprintf( 'So sánh %s | LTDH', implode( ' vs ', $names ) );
+	if ( mb_strlen( $candidate ) <= 65 ) {
+		return $candidate;
+	}
 
-	return sprintf( 'So sánh %s %s | LTDH', implode( ' vs ', $names ), $type_label );
+	// Shorten names for SERP
+	$short_names = array_map( function( $item ) {
+		$t = $item['title'] ?? '';
+		$t = preg_replace( '/\s*–\s*.*$/iu', '', $t );
+		return trim( $t );
+	}, $items );
+
+	$candidate = sprintf( 'So sánh %s | LTDH', implode( ' vs ', $short_names ) );
+	if ( mb_strlen( $candidate ) <= 65 ) {
+		return $candidate;
+	}
+
+	return mb_substr( $candidate, 0, 62 ) . '...';
 }
-add_filter( 'rank_math/frontend/title', 'ltdh_seo_compare_title' );
+add_filter( 'rank_math/frontend/title', 'ltdh_seo_compare_title', 25 );
+add_filter( 'rank_math/opengraph/facebook/title', 'ltdh_seo_compare_title', 25 );
+add_filter( 'rank_math/opengraph/twitter/title', 'ltdh_seo_compare_title', 25 );
+add_filter( 'pre_get_document_title', 'ltdh_seo_compare_title', 25 );
 
 function ltdh_seo_compare_description( $desc ) {
 	$type = get_query_var( LTDH_QV_COMPARE );
@@ -710,16 +732,37 @@ function ltdh_seo_compare_description( $desc ) {
 
 	$items = function_exists( 'ltdh_compare_get_items' ) ? ltdh_compare_get_items() : [];
 	if ( count( $items ) < 1 ) {
-		return $desc;
+		return 'Công cụ so sánh chi tiết các chương trình đào tạo liên thông đại học chính quy, từ xa và vừa học vừa làm năm 2026.';
 	}
 
 	$names = array_map( fn( $item ) => $item['title'], $items );
-	return sprintf(
+	$desc_candidate = sprintf(
 		'So sánh chi tiết %s. Xem học phí, thời gian đào tạo, điều kiện tuyển sinh và cơ hội việc làm.',
-		implode( ', ', $names )
+		implode( ' và ', $names )
 	);
+	if ( mb_strlen( $desc_candidate ) <= 165 ) {
+		return $desc_candidate;
+	}
+
+	$short_names = array_map( function( $item ) {
+		$t = $item['title'] ?? '';
+		$t = preg_replace( '/\s*–\s*.*$/iu', '', $t );
+		return trim( $t );
+	}, $items );
+
+	$fallback = sprintf(
+		'So sánh chi tiết %s. Học phí, thời gian đào tạo và điều kiện tuyển sinh liên thông 2026.',
+		implode( ' và ', $short_names )
+	);
+	if ( mb_strlen( $fallback ) <= 165 ) {
+		return $fallback;
+	}
+
+	return mb_substr( $fallback, 0, 160 ) . '...';
 }
-add_filter( 'rank_math/frontend/description', 'ltdh_seo_compare_description' );
+add_filter( 'rank_math/frontend/description', 'ltdh_seo_compare_description', 25 );
+add_filter( 'rank_math/opengraph/facebook/description', 'ltdh_seo_compare_description', 25 );
+add_filter( 'rank_math/opengraph/twitter/description', 'ltdh_seo_compare_description', 25 );
 
 // ----------------------------------------------------
 // 6. Comparison Schema
