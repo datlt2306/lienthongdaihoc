@@ -243,6 +243,25 @@
         "instructions": "Mã ngành đào tạo chuẩn của Bộ GD&ĐT (Hiển thị tại Banner đầu trang, ví dụ: 7480201)"
       },
       {
+        "key": "field_major_overview",
+        "label": "Nội dung Tổng quan về ngành (Chi tiết chuẩn SEO)",
+        "name": "major_overview",
+        "type": "wysiwyg",
+        "instructions": "Nhập nội dung bài viết Tổng quan chi tiết về ngành học (Hỗ trợ định dạng Tiêu đề H2, H3, Bảng biểu, danh sách, shortcode [ez-toc] mục lục tự động). Nội dung này hiển thị trực tiếp tại mục \"Tổng quan về ngành\" ở trang chi tiết.",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "default_value": "",
+        "tabs": "all",
+        "toolbar": "full",
+        "media_upload": 1,
+        "delay": 0
+      },
+      {
         "key": "field_major_entry_roadmaps",
         "label": "Bảng lộ trình đào tạo theo đối tượng đầu vào",
         "name": "major_entry_roadmaps",
@@ -425,6 +444,9 @@
     "style": "default",
     "label_placement": "top",
     "instruction_placement": "label",
+    "hide_on_screen": [
+      "the_content"
+    ],
     "active": true,
     "description": "",
     "show_in_rest": 0

@@ -282,10 +282,14 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan về ngành</h2>
 					<?php 
 					$clean_m_name = preg_replace( '/^ngành\s+/iu', '', trim( (string) get_the_title( $major_id ) ) );
+					$major_overview_raw = get_field( 'major_overview', $major_id );
+					$overview_markup    = ( ! empty( $major_overview_raw ) && is_string( $major_overview_raw ) && '' !== trim( $major_overview_raw ) ) 
+						? $major_overview_raw 
+						: get_the_content( null, false, $major_id );
 					?>
 					<div class="relative">
 						<div id="major-intro-content" class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base overflow-hidden transition-all duration-500 max-h-[350px] relative">
-							<?php the_content(); ?>
+							<?php echo apply_filters( 'the_content', $overview_markup ); ?>
 							<!-- Gradient Overlay for fade-out effect -->
 							<div id="major-intro-overlay" class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none transition-opacity duration-300"></div>
 						</div>
@@ -472,6 +476,18 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 						if (stickyBtn) {
 							stickyBtn.addEventListener('click', function() {
 								collapse();
+							});
+						}
+
+						// Auto expand if user clicks any link in EZ-TOC
+						if (content) {
+							content.addEventListener('click', function(e) {
+								var a = e.target.closest('a');
+								if (a && a.getAttribute('href') && a.getAttribute('href').startsWith('#')) {
+									if (!isExpanded) {
+										expand();
+									}
+								}
 							});
 						}
 

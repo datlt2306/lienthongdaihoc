@@ -54,6 +54,7 @@ function ltdh_load_acf_field_groups_from_json() {
 			'style'                => $item['style'] ?? 'default',
 			'label_placement'      => $item['label_placement'] ?? 'top',
 			'instruction_placement'=> $item['instruction_placement'] ?? 'label',
+			'hide_on_screen'       => $item['hide_on_screen'] ?? [],
 			'active'               => true,
 			'description'          => $item['description'] ?? '',
 			'show_in_rest'         => $item['show_in_rest'] ?? 0,
@@ -156,6 +157,30 @@ function ltdh_register_major_faq_acf_fields() {
 				'rows'  => 3,
 			],
 		],
+	] );
+}
+
+/**
+ * Ensure Major Overview WYSIWYG Field is registered directly to group_major_details.
+ */
+add_action( 'acf/init', 'ltdh_register_major_overview_acf_field', 20 );
+function ltdh_register_major_overview_acf_field() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	acf_add_local_field( [
+		'key'          => 'field_major_overview',
+		'label'        => 'Nội dung Tổng quan về ngành (Chi tiết chuẩn SEO)',
+		'name'         => 'major_overview',
+		'type'         => 'wysiwyg',
+		'parent'       => 'group_major_details',
+		'instructions' => 'Nhập nội dung bài viết Tổng quan chi tiết về ngành học (Hỗ trợ định dạng Tiêu đề H2, H3, Bảng biểu, danh sách, shortcode [ez-toc] mục lục tự động). Nội dung này hiển thị trực tiếp tại mục "Tổng quan về ngành" ở trang chi tiết.',
+		'required'     => 0,
+		'tabs'         => 'all',
+		'toolbar'      => 'full',
+		'media_upload' => 1,
+		'delay'        => 0,
 	] );
 }
 
@@ -967,6 +992,49 @@ function ltdh_acf_auto_promote_verification_status( $post_id ) {
 	$status = get_post_meta( $post_id, 'verification_status', true );
 	if ( ! empty( $source ) && ( empty( $status ) || 'unverified' === $status ) ) {
 		update_post_meta( $post_id, 'verification_status', 'verified' );
+	}
+}
+
+/**
+ * Synchronize major_overview ACF WYSIWYG field to wp_posts.post_content
+ * and ensure both sources remain 100% in sync for SEO, feed, search, and frontend rendering.
+ */
+add_action( 'acf/save_post', 'ltdh_sync_major_overview_content', 30 );
+function ltdh_sync_major_overview_content( $post_id ) {
+	if ( ! is_numeric( $post_id ) || (int) $post_id <= 0 ) {
+		return;
+	}
+	if ( get_post_type( $post_id ) !== 'major' ) {
+		return;
+	}
+
+	$overview = get_field( 'major_overview', $post_id, false );
+	if ( false !== $overview && null !== $overview && '' !== trim( (string) $overview ) ) {
+		remove_action( 'acf/save_post', 'ltdh_sync_major_overview_content', 30 );
+		wp_update_post( [
+			'ID'           => (int) $post_id,
+			'post_content' => $overview,
+		] );
+		add_action( 'acf/save_post', 'ltdh_sync_major_overview_content', 30 );
+	}
+}
+
+/**
+ * Fallback sync: When a major post is saved outside ACF,
+ * preserve existing content bidirectionally so content is never lost.
+ */
+add_action( 'save_post_major', 'ltdh_fallback_sync_major_content', 35, 2 );
+function ltdh_fallback_sync_major_content( $post_id, $post ) {
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+	$major_overview = get_post_meta( $post_id, 'major_overview', true );
+	if ( empty( $major_overview ) && ! empty( $post->post_content ) ) {
+		update_post_meta( $post_id, 'major_overview', $post->post_content );
+		update_post_meta( $post_id, '_major_overview', 'field_major_overview' );
 	}
 }
 
