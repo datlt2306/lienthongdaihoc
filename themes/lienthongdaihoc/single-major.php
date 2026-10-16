@@ -577,7 +577,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 
 						<div class="divide-y divide-slate-100">
 							<?php foreach ( $major_faqs as $f_idx => $faq_item ) : 
-								$is_first_open = ( 0 === $f_idx ) ? 'open' : '';
+								$is_first_open = ( 0 === $f_idx ) ? '' : '';
 							?>
 								<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors">
 									<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-[15px] list-none select-none hover:text-[#00308b] transition-colors">
