@@ -1002,15 +1002,15 @@ $zalo    = ltdh_get_zalo_url();
 							'content'      => 'Điều mình hài lòng nhất khi học liên thông là lịch học ngoài giờ hành chính, rất thuận tiện cho người đang đi làm. Mình có thể vừa hoàn thành công việc, vừa tiếp tục nâng cao trình độ. Thầy cô cũng rất nhiệt tình, luôn sẵn sàng hỗ trợ để sinh viên yên tâm học tập và hoàn thành chương trình.'
 						],
 						[
-							'name'         => 'Trần Minh',
-							'workplace'    => 'Trưởng nhóm Kinh doanh tại Viettel Post',
-							'role'         => 'Đại học Từ xa - Quản trị kinh doanh',
-							'graduation'   => 'Khóa 2021 - ĐH Kinh tế Quốc dân',
-							'status'       => 'graduated',
-							'status_label' => 'Đã tốt nghiệp',
-							'initials'     => 'TM',
-							'image'        => get_template_directory_uri() . '/assets/images/student-minh.jpg',
-							'content'      => 'Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy.'
+							'name'         => 'Phạm Văn Dũng',
+							'workplace'    => 'Leader SEO tại CAR BOSS Việt Nam',
+							'role'         => 'Liên thông Đại học Thương Mại (TMU)',
+							'graduation'   => 'Khóa K10 - ĐH Thương Mại',
+							'status'       => 'studying',
+							'status_label' => 'Sắp tốt nghiệp',
+							'initials'     => 'PD',
+							'image'        => get_template_directory_uri() . '/assets/images/student-dung.jpg',
+							'content'      => 'Nhờ thầy Đạt hướng dẫn tận tình từ khâu tìm hiểu chương trình, chuẩn bị hồ sơ đến hoàn tất thủ tục nhập học, em đã đăng ký học liên thông lên Đại học TMU thuận lợi và nhanh chóng. Thầy luôn giải đáp thắc mắc kịp thời, giúp em yên tâm hơn trong suốt quá trình đăng ký.'
 						],
 						[
 							'name'         => 'Lê Phương',
