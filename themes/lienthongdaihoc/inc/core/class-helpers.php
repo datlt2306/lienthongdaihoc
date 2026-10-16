@@ -2915,3 +2915,29 @@ function ltdh_get_major_faqs( int $major_id, ?int $school_id = null ): array {
 		],
 	];
 }
+
+/**
+ * Prevent wpautop from injecting <br> or unwanted empty <p> inside links/buttons and custom callouts in post content.
+ */
+add_filter( 'the_content', function( $content ) {
+	if ( empty( $content ) || ! is_string( $content ) ) {
+		return $content;
+	}
+
+	// Remove <br /> directly inside <a> tags
+	$content = preg_replace_callback( '/<a\b[^>]*>(.*?)<\/a>/is', function( $matches ) {
+		$inner = preg_replace( '/<br\s*\/?>/i', ' ', $matches[1] );
+		return str_replace( $matches[1], $inner, $matches[0] );
+	}, $content );
+
+	// Remove <br /> between sibling <a> tags (e.g. inside flex button groups)
+	$content = preg_replace( '/(<\/a>)\s*<br\s*\/?>\s*(<a\b)/i', '$1 $2', $content );
+
+	// Unwrap inline-flex buttons from accidental <p> tags created by wpautop
+	$content = preg_replace( '/<p>\s*(<a\b[^>]*class="[^"]*inline-flex[^"]*"[^>]*>.*?<\/a>)\s*<\/p>/is', '$1', $content );
+
+	// Clean up empty <p></p> or <p><br /></p>
+	$content = preg_replace( '/<p>\s*(?:<br\s*\/?>)?\s*<\/p>/i', '', $content );
+
+	return $content;
+}, 99 );
