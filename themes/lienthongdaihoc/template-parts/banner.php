@@ -39,14 +39,154 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	$banner_subtitle = 'Thông tin chi tiết về trường đào tạo đối tác';
 	$banner_image    = get_field( 'school_banner' ) ?: get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'major' ) ) {
-	$raw_title       = get_the_title();
-	$clean_major     = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( (string) $raw_title ) );
-	$year            = (int) date( 'Y' );
-	$banner_title    = 'Liên thông ' . $clean_major;
-	$major_code      = get_field( 'major_code', get_the_ID() ) ?: get_post_meta( get_the_ID(), 'major_code', true );
-	$code_suffix     = $major_code ? ' • Mã ngành: ' . $major_code : '';
-	$banner_subtitle = 'Danh sách trường đào tạo, lộ trình công nhận tín chỉ và học phí năm ' . $year . $code_suffix;
-	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
+	$major_id    = get_the_ID();
+	$raw_title   = get_the_title( $major_id );
+	$clean_major = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( (string) $raw_title ) );
+	$major_code  = get_field( 'major_code', $major_id ) ?: get_post_meta( $major_id, 'major_code', true );
+	$year        = (int) date( 'Y' );
+
+	// 1. Resolve Context School
+	$school = $args['school'] ?? null;
+	if ( ! $school ) {
+		$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
+
+		if ( ! empty( $school_param ) ) {
+			if ( is_numeric( $school_param ) ) {
+				$school = get_post( intval( $school_param ) );
+			} else {
+				$school = get_page_by_path( sanitize_title( $school_param ), OBJECT, defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' );
+				if ( ! $school ) {
+					$school_by_code = get_posts( [
+						'post_type'   => defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school',
+						'post_status' => 'publish',
+						'numberposts' => 1,
+						'meta_query'  => [
+							[
+								'key'     => 'school_code',
+								'value'   => sanitize_text_field( $school_param ),
+								'compare' => '=',
+							],
+						],
+					] );
+					if ( ! empty( $school_by_code ) ) {
+						$school = $school_by_code[0];
+					}
+				}
+			}
+		}
+	}
+
+	// If no query param, check if all programs of this major belong to a SINGLE school
+	if ( ! $school ) {
+		$offered_pids = get_post_meta( $major_id, defined( 'LTDH_META_OFFERED_PROGRAMS' ) ? LTDH_META_OFFERED_PROGRAMS : 'offered_programs', true );
+		$direct_pids  = get_posts( [
+			'post_type'   => defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program',
+			'post_status' => 'publish',
+			'numberposts' => -1,
+			'meta_query'  => [
+				[
+					'key'     => defined( 'LTDH_META_MAJOR_REL' ) ? LTDH_META_MAJOR_REL : 'major_relationship',
+					'value'   => $major_id,
+					'compare' => '=',
+				],
+			],
+			'fields'      => 'ids',
+		] );
+		$all_pids = array_unique( array_filter( array_merge(
+			is_array( $offered_pids ) ? $offered_pids : [],
+			is_array( $direct_pids ) ? $direct_pids : []
+		) ) );
+
+		if ( ! empty( $all_pids ) ) {
+			$distinct_schools = [];
+			foreach ( $all_pids as $pid ) {
+				$sid = get_field( defined( 'LTDH_META_SCHOOL_REL' ) ? LTDH_META_SCHOOL_REL : 'school_relationship', $pid ) ?: get_post_meta( $pid, 'school_relationship', true );
+				if ( is_array( $sid ) ) $sid = $sid[0] ?? 0;
+				if ( is_object( $sid ) ) $sid = $sid->ID;
+				$sid = intval( $sid );
+				if ( $sid > 0 ) {
+					$distinct_schools[ $sid ] = $sid;
+				}
+			}
+			if ( count( $distinct_schools ) === 1 ) {
+				$school = get_post( reset( $distinct_schools ) );
+			}
+		}
+	}
+
+	// 2. Training type context (e.g. ?he=tu-xa or from $args)
+	$selected_he = $args['selected_he'] ?? ( isset( $_GET['he'] ) ? sanitize_text_field( wp_unslash( $_GET['he'] ) ) : '' );
+	$clean_type  = '';
+	if ( ! empty( $selected_he ) ) {
+		$slug_lookup = ( 'tu-xa' === $selected_he ) ? 'dao-tao-tu-xa' : $selected_he;
+		$term = get_term_by( 'slug', $slug_lookup, 'training_type' ) ?: get_term_by( 'slug', $selected_he, 'training_type' );
+		if ( $term ) {
+			$clean_type = preg_replace( '/^hệ\s+/iu', '', trim( (string) $term->name ) );
+		}
+	}
+	$type_part = ! empty( $clean_type ) ? ' (' . $clean_type . ')' : '';
+
+	// 3. Eyebrow Badge Pill, Subtitle & Banner Image
+	if ( $school && 'publish' === $school->post_status ) {
+		$school_name      = get_the_title( $school->ID );
+		$school_code      = get_field( 'school_code', $school->ID ) ?: get_post_meta( $school->ID, 'school_code', true );
+		$school_permalink = get_permalink( $school->ID );
+		$school_label     = $school_name . ( $school_code ? ' (' . $school_code . ')' : '' );
+
+		$banner_eyebrow = [
+			'text' => $school_label,
+			'url'  => $school_permalink,
+		];
+
+		if ( ! empty( $clean_type ) ) {
+			$banner_subtitle = sprintf(
+				'Chương trình đào tạo Liên thông Đại học (%s) ngành %s tại %s. Chuẩn quy chế tuyển sinh & công nhận tín chỉ của Bộ GD&ĐT.',
+				$clean_type,
+				$clean_major,
+				$school_label
+			);
+		} else {
+			$banner_subtitle = sprintf(
+				'Chương trình đào tạo Liên thông Đại học ngành %s tại %s. Chuẩn quy chế tuyển sinh & công nhận tín chỉ của Bộ GD&ĐT.',
+				$clean_major,
+				$school_label
+			);
+		}
+
+		$banner_image = ( get_field( 'school_banner', $school->ID ) ?: '' ) ?: ( get_the_post_thumbnail_url( $school->ID, 'full' ) ?: ( get_the_post_thumbnail_url( $major_id, 'full' ) ?: '' ) );
+
+	} else {
+		// General Major Eyebrow Pill
+		if ( ! empty( $major_code ) ) {
+			$banner_eyebrow = [
+				'text' => 'Ngành đào tạo chuẩn Bộ GD&ĐT • Mã: ' . $major_code,
+				'url'  => '#truong-tuyen-sinh',
+			];
+		} else {
+			$banner_eyebrow = [
+				'text' => 'Hệ thống đào tạo Liên thông Đại học',
+				'url'  => '#truong-tuyen-sinh',
+			];
+		}
+
+		$code_suffix = $major_code ? ' • Mã ngành: ' . $major_code : '';
+		if ( ! empty( $clean_type ) ) {
+			$banner_subtitle = sprintf(
+				'Chương trình đào tạo Liên thông Đại học (%s) ngành %s. Danh sách trường đào tạo, lộ trình công nhận tín chỉ và học phí năm %d%s.',
+				$clean_type,
+				$clean_major,
+				$year,
+				$code_suffix
+			);
+		} else {
+			$banner_subtitle = 'Danh sách các trường đại học tuyển sinh, lộ trình công nhận tín chỉ và học phí năm ' . $year . $code_suffix;
+		}
+
+		$banner_image = get_the_post_thumbnail_url( $major_id, 'full' ) ?: '';
+	}
+
+	// 4. Banner Title
+	$banner_title = 'Liên thông ' . $clean_major . $type_part;
 } elseif ( is_singular( 'program' ) ) {
 	$program_id      = get_the_ID();
 	$school_id       = get_field( 'school_relationship', $program_id ) ?: get_post_meta( $program_id, 'school_relationship', true );

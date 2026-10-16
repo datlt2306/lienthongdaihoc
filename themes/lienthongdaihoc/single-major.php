@@ -233,7 +233,16 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 ?>
 
 <main id="primary" class="site-main bg-slate-50">
-	<?php get_template_part( 'template-parts/banner' ); ?>
+	<?php 
+	get_template_part( 
+		'template-parts/banner', 
+		null, 
+		[ 
+			'school'      => $context_school,
+			'selected_he' => $selected_he,
+		] 
+	); 
+	?>
 
 	<!-- STICKY SECTION TAB NAVIGATION (Redesigned with UI/UX Pro Max) -->
 	<div id="ltdh-major-sticky-nav" class="ltdh-sticky-nav sticky top-16 sm:top-20 z-40 bg-white/98 backdrop-blur-md border-b border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-all duration-200">

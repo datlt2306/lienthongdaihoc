@@ -681,6 +681,28 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 		}
 	}
 
+	// ---- Single major: If school context exists, append school to crumb ----
+	if ( is_singular( 'major' ) ) {
+		$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
+		if ( ! empty( $school_param ) ) {
+			$school_obj = is_numeric( $school_param ) ? get_post( intval( $school_param ) ) : get_page_by_path( sanitize_title( $school_param ), OBJECT, 'school' );
+			if ( ! $school_obj ) {
+				$by_code = get_posts( [ 'post_type' => 'school', 'meta_key' => 'school_code', 'meta_value' => sanitize_text_field( $school_param ), 'numberposts' => 1 ] );
+				if ( ! empty( $by_code ) ) {
+					$school_obj = $by_code[0];
+				}
+			}
+			if ( $school_obj ) {
+				$s_code = get_post_meta( $school_obj->ID, 'school_code', true );
+				$s_name = $s_code ? $s_code : preg_replace( '/^trường\s+đại\s+học\s+/iu', 'ĐH ', get_the_title( $school_obj->ID ) );
+				$last_idx = count( $crumbs ) - 1;
+				if ( $last_idx >= 0 && ! str_contains( $crumbs[ $last_idx ][0], '–' ) && ! str_contains( $crumbs[ $last_idx ][0], '-' ) ) {
+					$crumbs[ $last_idx ][0] .= ' – ' . $s_name;
+				}
+			}
+		}
+	}
+
 	return $crumbs;
 }
 add_filter( 'rank_math/frontend/breadcrumb/items', 'ltdh_seo_override_breadcrumb_items', 10, 2 );
