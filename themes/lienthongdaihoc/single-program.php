@@ -926,7 +926,11 @@ if ( ! empty( $faqs ) ) {
 <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] py-2.5 px-4 flex items-center justify-between lg:hidden">
 	<div class="flex-1 mr-3 min-w-0">
 		<span class="text-[10px] text-slate-400 block font-bold uppercase tracking-wider truncate mb-0.5"><?php echo esc_html( $school_title ); ?></span>
-		<h4 class="font-bold text-slate-800 text-xs sm:text-sm truncate leading-tight"><?php the_title(); ?></h4>
+		<?php
+		$clean_mob_major = $major_title ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major_title ) ) : '';
+		$mob_title       = $clean_mob_major ? ( $clean_mob_major . ( ! empty( $learning_details['mode'] ) ? ' (' . $learning_details['mode'] . ')' : '' ) ) : get_the_title();
+		?>
+		<h4 class="font-bold text-slate-800 text-xs sm:text-sm truncate leading-tight"><?php echo esc_html( $mob_title ); ?></h4>
 	</div>
 	<div class="flex items-center gap-2 shrink-0">
 		<?php if ( ! empty( $form_url ) ) : ?>

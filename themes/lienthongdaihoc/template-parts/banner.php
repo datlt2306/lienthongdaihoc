@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $banner_image    = '';
 $banner_title    = '';
 $banner_subtitle = '';
+$banner_eyebrow  = null;
 
 $type = get_query_var( 'ltdh_compare' );
 $request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
@@ -41,20 +42,14 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	$raw_title       = get_the_title();
 	$clean_major     = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( (string) $raw_title ) );
 	$year            = (int) date( 'Y' );
-	$banner_title    = 'Liên thông Đại học ngành ' . $clean_major;
+	$banner_title    = 'Liên thông ngành ' . $clean_major;
 	$major_code      = get_field( 'major_code', get_the_ID() ) ?: get_post_meta( get_the_ID(), 'major_code', true );
 	$code_suffix     = $major_code ? ' • Mã ngành: ' . $major_code : '';
 	$banner_subtitle = 'Danh sách trường đào tạo, lộ trình công nhận tín chỉ và học phí năm ' . $year . $code_suffix;
 	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'program' ) ) {
-	$raw_prog_title  = get_the_title();
-	$clean_prog      = trim( (string) $raw_prog_title );
-	if ( ! preg_match( '/^(?:tuyển sinh\s+)?liên thông/iu', $clean_prog ) ) {
-		$banner_title = 'Tuyển sinh Liên thông ' . $clean_prog;
-	} else {
-		$banner_title = $clean_prog;
-	}
-	$school_id       = get_field( 'school_relationship' );
+	$program_id      = get_the_ID();
+	$school_id       = get_field( 'school_relationship', $program_id ) ?: get_post_meta( $program_id, 'school_relationship', true );
 	if ( is_array( $school_id ) ) {
 		$school_id = ! empty( $school_id ) ? $school_id[0] : 0;
 	}
@@ -63,18 +58,65 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	}
 	$school_id = intval( $school_id );
 
+	$major_id        = get_field( 'major_relationship', $program_id ) ?: get_post_meta( $program_id, 'major_relationship', true );
+	if ( is_array( $major_id ) ) {
+		$major_id = ! empty( $major_id ) ? $major_id[0] : 0;
+	}
+	if ( is_object( $major_id ) ) {
+		$major_id = $major_id->ID;
+	}
+	$major_id = intval( $major_id );
+
 	$training_type = '';
-	$terms = wp_get_post_terms( get_the_ID(), 'training_type' );
+	$terms = wp_get_post_terms( $program_id, 'training_type' );
 	if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 		$training_type = $terms[0]->name;
 	}
-	$school_name     = $school_id ? get_the_title( $school_id ) : '';
+	$clean_type = preg_replace( '/^hệ\s+/iu', '', trim( (string) $training_type ) );
+
+	$school_name      = $school_id ? get_the_title( $school_id ) : '';
+	$school_code      = $school_id ? ( get_field( 'school_code', $school_id ) ?: get_post_meta( $school_id, 'school_code', true ) ) : '';
+	$school_permalink = $school_id ? get_permalink( $school_id ) : '';
+
+	// UI/UX Eyebrow Badge: Highlight School entity with clean link
+	if ( ! empty( $school_name ) ) {
+		$school_label   = $school_name . ( $school_code ? ' (' . $school_code . ')' : '' );
+		$banner_eyebrow = [
+			'text' => $school_label,
+			'url'  => $school_permalink,
+		];
+	}
+
+	$major_name  = $major_id ? get_the_title( $major_id ) : '';
+	$clean_major = $major_name ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major_name ) ) : '';
+
+	$type_part = ! empty( $clean_type ) ? ' (' . $clean_type . ')' : '';
+
+	// Concise H1 formula for single program
+	if ( ! empty( $clean_major ) ) {
+		$banner_title = 'Liên thông ' . $clean_major . $type_part;
+	} else {
+		$raw_prog_title = get_the_title( $program_id );
+		$clean_prog     = trim( (string) $raw_prog_title );
+		$clean_prog     = preg_replace( '/^(?:tuyển sinh\s+)+/iu', '', $clean_prog );
+		if ( $school_name ) {
+			$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_prog );
+		}
+		if ( ! empty( $school_code ) ) {
+			$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
+		}
+		if ( ! preg_match( '/^liên thông/iu', $clean_prog ) ) {
+			$clean_prog = 'Liên thông ' . $clean_prog;
+		}
+		$banner_title = $clean_prog;
+	}
+
+	// Clean subtitle without repeating school name
 	$banner_subtitle = sprintf(
-		'Chương trình tuyển sinh Liên thông Đại học (%s) tại %s. Chuẩn quy chế tuyển sinh của Bộ GD&ĐT.',
-		$training_type ?: 'Chính quy & Từ xa',
-		$school_name ?: 'trường đối tác'
+		'Chương trình đào tạo Liên thông Đại học (%s). Chuẩn quy chế tuyển sinh & công nhận tín chỉ của Bộ GD&ĐT.',
+		$clean_type ?: 'Chính quy & Từ xa'
 	);
-	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: ( $school_id ? get_field( 'school_banner', $school_id ) : '' ) ?: '';
+	$banner_image    = get_the_post_thumbnail_url( $program_id, 'full' ) ?: ( $school_id ? get_field( 'school_banner', $school_id ) : '' ) ?: '';
 } elseif ( is_post_type_archive( 'school' ) ) {
 	$banner_title    = 'Trường Đại học Đối tác';
 	$banner_subtitle = 'Hệ thống các trường đại học uy tín hàng đầu Việt Nam';
@@ -164,6 +206,25 @@ if ( empty( $banner_image ) ) {
 	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-primary/20 rounded-full blur-3xl pointer-events-none"></div>
 
 	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+		<?php if ( ! empty( $banner_eyebrow ) ) : ?>
+			<div class="mb-3 sm:mb-4">
+				<?php if ( ! empty( $banner_eyebrow['url'] ) ) : ?>
+					<a href="<?php echo esc_url( $banner_eyebrow['url'] ); ?>" 
+					   title="<?php echo esc_attr( $banner_eyebrow['text'] ); ?>"
+					   class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md transition-all duration-200 no-underline shadow-xs hover:border-white/30 group">
+						<svg class="w-4 h-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
+						<span class="truncate max-w-[280px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
+						<span class="text-white/60 group-hover:text-white transition-colors text-xs font-normal shrink-0">→</span>
+					</a>
+				<?php else : ?>
+					<span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md shadow-xs">
+						<svg class="w-4 h-4 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
+						<span class="truncate max-w-[280px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
+					</span>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
+
 		<h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
 			<?php echo esc_html( $banner_title ); ?>
 		</h1>
