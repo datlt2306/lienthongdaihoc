@@ -6,6 +6,8 @@ uploads/
 !uploads/.gitkeep
 
 # Backups and sensitive dumps
+scripts/
+*.sh
 *.sql
 *.wpress
 *_backup.txt
