@@ -389,11 +389,105 @@ function ltdhInitTheme() {
                 }
             });
 
-            doFilter(false);
+        doFilter(false);
         });
     }
 
     initMajorPageFilter();
+
+    // ----------------------------------------------------
+    // 5. Scroll-triggered KPI Number Counter Animation
+    // ----------------------------------------------------
+    function initStatsCounter() {
+        const grid = document.getElementById('ltdh-kpi-metrics-grid');
+        const counterElements = grid ? grid.querySelectorAll('.ltdh-counter') : document.querySelectorAll('.ltdh-counter');
+        if (!counterElements || !counterElements.length) return;
+
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            return;
+        }
+
+        function animateCounter(el) {
+            if (el.dataset.animated === 'true') return;
+            el.dataset.animated = 'true';
+
+            const rawTarget = el.getAttribute('data-target') || el.textContent.trim();
+            const match = rawTarget.match(/^([^\d]*)([\d,\.]+)(.*)$/);
+            if (!match) return;
+
+            const prefix = match[1] || '';
+            const numStr = match[2];
+            const suffix = match[3] || '';
+
+            const hasDotSeparator = numStr.includes('.') && !numStr.includes(',');
+            const hasCommaSeparator = numStr.includes(',') && !numStr.includes('.');
+            const cleanNum = numStr.replace(/[\.,]/g, '');
+            const targetNum = parseInt(cleanNum, 10);
+            if (isNaN(targetNum)) return;
+
+            const duration = targetNum <= 10 ? 900 : 1400;
+            const startTime = performance.now();
+
+            function formatNumber(val) {
+                if (hasDotSeparator) {
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                }
+                if (hasCommaSeparator) {
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }
+                return val.toString();
+            }
+
+            function easeOutExpo(t) {
+                return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+            }
+            function easeOutQuad(t) {
+                return 1 - (1 - t) * (1 - t);
+            }
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const ease = targetNum <= 10 ? easeOutQuad(progress) : easeOutExpo(progress);
+
+                const currentVal = Math.round(ease * targetNum);
+                el.textContent = prefix + formatNumber(currentVal) + suffix;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    el.textContent = rawTarget;
+                }
+            }
+
+            el.textContent = prefix + '0' + suffix;
+            requestAnimationFrame(update);
+        }
+
+        function triggerAll() {
+            counterElements.forEach(el => animateCounter(el));
+        }
+
+        const observeTarget = grid || counterElements[0];
+        if ('IntersectionObserver' in window && observeTarget) {
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        obs.unobserve(entry.target);
+                        triggerAll();
+                    }
+                });
+            }, {
+                threshold: 0.15,
+                rootMargin: '0px 0px -40px 0px'
+            });
+            observer.observe(observeTarget);
+        } else {
+            triggerAll();
+        }
+    }
+
+    initStatsCounter();
 }
 
 if (document.readyState === 'loading') {

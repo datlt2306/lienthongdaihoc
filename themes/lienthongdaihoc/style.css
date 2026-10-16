@@ -704,15 +704,6 @@ body.admin-bar #ltdh-program-sticky-nav {
     color: #ffffff !important;
 }
 
-/* Prevent horizontal viewport overflow across all devices */
-html, body {
-    overflow-x: hidden;
-    max-width: 100vw;
-}
-#page {
-    overflow-x: hidden;
-    width: 100%;
-}
 
 /* ==========================================================================
    WordPress Widgets & Sidebar Styling
