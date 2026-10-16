@@ -112,23 +112,7 @@ $steps = [
 					</p>
 				</div>
 
-				<!-- Step Card Footer Meta -->
-				<div class="mt-4 pt-3 border-t border-slate-200/50 flex items-center justify-between text-xs font-medium text-slate-500">
-					<span class="inline-flex items-center gap-1.5 text-[11px] text-slate-600">
-						<span class="text-[#00308b]"><?php echo $step_item['icon_svg']; ?></span>
-						<span><?php echo esc_html( $step_item['detail_meta'] ); ?></span>
-					</span>
-
-					<?php if ( ! $is_last ) : ?>
-						<span class="text-slate-300 group-hover:text-[#00308b] transition-colors font-bold text-xs">
-							➔
-						</span>
-					<?php else : ?>
-						<span class="text-[11px] font-bold text-[#00308b] bg-blue-50 px-2 py-0.5 rounded">
-							Hoàn tất
-						</span>
-					<?php endif; ?>
-				</div>
+				
 
 				<!-- Top Accent Line (Brand Primary) -->
 				<div class="absolute top-0 left-4 right-4 h-[2px] rounded-t-full bg-[#00308b] opacity-0 group-hover:opacity-100 transition-opacity"></div>
