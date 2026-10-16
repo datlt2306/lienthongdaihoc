@@ -117,7 +117,7 @@ function ltdh_program_request_guard( $query_vars ) {
 		$is_nganh_prefix = true;
 	}
 
-	$cache_key = 'ltdh_slug_type_' . $raw_slug;
+	$cache_key = 'ltdh_slug_type_v2_' . $raw_slug;
 	$slug_type = wp_cache_get( $cache_key, 'ltdh_rewrites' );
 
 	if ( false === $slug_type ) {
@@ -141,6 +141,34 @@ function ltdh_program_request_guard( $query_vars ) {
 				"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'program' AND post_status = 'publish' LIMIT 1",
 				$raw_slug
 			) );
+
+			// Self-healing fallback: If not found by new slug in DB (e.g. production DB not yet migrated), check legacy mapped slug
+			if ( ! $program_id ) {
+				$legacy_reverse_map = [
+					'lien-thong-cong-nghe-thong-tin-chinh-quy-utc'       => 'cu-nhan-cong-nghe-thong-tin-lien-thong-chinh-quy-chinh-quy-utc',
+					'lien-thong-cong-nghe-thong-tin-tu-xa-utc'           => 'cu-nhan-cong-nghe-thong-tin-dao-tao-tu-xa-tu-xa-utc',
+					'lien-thong-cong-nghe-thong-tin-vua-hoc-vua-lam-utc' => 'cu-nhan-cong-nghe-thong-tin-vua-hoc-vua-lam-vua-hoc-vua-lam-utc',
+				];
+				if ( isset( $legacy_reverse_map[ $raw_slug ] ) ) {
+					$old_slug    = $legacy_reverse_map[ $raw_slug ];
+					$old_post_id = (int) $wpdb->get_var( $wpdb->prepare(
+						"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'program' AND post_status = 'publish' LIMIT 1",
+						$old_slug
+					) );
+					if ( $old_post_id > 0 ) {
+						// Auto-migrate post_name directly in DB so future lookups succeed instantly
+						$wpdb->update(
+							$wpdb->posts,
+							[ 'post_name' => $raw_slug ],
+							[ 'ID' => $old_post_id ],
+							[ '%s' ],
+							[ '%d' ]
+						);
+						clean_post_cache( $old_post_id );
+						$program_id = $old_post_id;
+					}
+				}
+			}
 
 			if ( $program_id > 0 ) {
 				$slug_type = 'program';
@@ -355,7 +383,23 @@ function ltdh_redirect_taxonomy_base() {
 	];
 	$trimmed_slug = trim( $request_path, '/' );
 	if ( isset( $legacy_program_slug_map[ $trimmed_slug ] ) ) {
-		$target_url = home_url( '/' . $legacy_program_slug_map[ $trimmed_slug ] . '/' );
+		$target_slug = $legacy_program_slug_map[ $trimmed_slug ];
+		global $wpdb;
+		$old_post_id = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'program' LIMIT 1",
+			$trimmed_slug
+		) );
+		if ( $old_post_id > 0 ) {
+			$wpdb->update(
+				$wpdb->posts,
+				[ 'post_name' => $target_slug ],
+				[ 'ID' => $old_post_id ],
+				[ '%s' ],
+				[ '%d' ]
+			);
+			clean_post_cache( $old_post_id );
+		}
+		$target_url = home_url( '/' . $target_slug . '/' );
 		if ( ! empty( $_GET ) ) {
 			$target_url = add_query_arg( $_GET, $target_url );
 		}
@@ -364,6 +408,43 @@ function ltdh_redirect_taxonomy_base() {
 	}
 }
 add_action( 'template_redirect', 'ltdh_redirect_taxonomy_base' );
+
+/**
+ * Auto-migrate legacy program slugs in database on init (production self-healing).
+ */
+function ltdh_auto_migrate_legacy_program_slugs() {
+	$migrated = (int) get_option( 'ltdh_legacy_program_slugs_migrated_v1', 0 );
+	if ( $migrated >= 1 ) {
+		return;
+	}
+
+	global $wpdb;
+	$slug_map = [
+		'cu-nhan-cong-nghe-thong-tin-lien-thong-chinh-quy-chinh-quy-utc'   => 'lien-thong-cong-nghe-thong-tin-chinh-quy-utc',
+		'cu-nhan-cong-nghe-thong-tin-dao-tao-tu-xa-tu-xa-utc'             => 'lien-thong-cong-nghe-thong-tin-tu-xa-utc',
+		'cu-nhan-cong-nghe-thong-tin-vua-hoc-vua-lam-vua-hoc-vua-lam-utc' => 'lien-thong-cong-nghe-thong-tin-vua-hoc-vua-lam-utc',
+	];
+
+	foreach ( $slug_map as $old_slug => $new_slug ) {
+		$old_post_id = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'program' LIMIT 1",
+			$old_slug
+		) );
+		if ( $old_post_id > 0 ) {
+			$wpdb->update(
+				$wpdb->posts,
+				[ 'post_name' => $new_slug ],
+				[ 'ID' => $old_post_id ],
+				[ '%s' ],
+				[ '%d' ]
+			);
+			clean_post_cache( $old_post_id );
+		}
+	}
+
+	update_option( 'ltdh_legacy_program_slugs_migrated_v1', 1 );
+}
+add_action( 'init', 'ltdh_auto_migrate_legacy_program_slugs', 5 );
 
 // ----------------------------------------------------
 // 4. Custom Archive Templates Loader for /hinh-thuc-dao-tao/, /nganh-hoc/, /truong-da-hoc/
