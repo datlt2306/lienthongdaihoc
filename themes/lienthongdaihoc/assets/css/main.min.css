@@ -3895,6 +3895,10 @@
     --tw-shadow: 0 8px 30px var(--tw-shadow-color, rgb(0,0,0,0.12));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
+  .shadow-\[0_12px_30px_-4px_rgba\(0\,48\,139\,0\.45\)\,0_6px_12px_-4px_rgba\(0\,0\,0\,0\.15\)\] {
+    --tw-shadow: 0 12px 30px -4px var(--tw-shadow-color, rgba(0,48,139,0.45)), 0 6px 12px -4px var(--tw-shadow-color, rgba(0,0,0,0.15));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
   .shadow-lg {
     --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
@@ -4172,6 +4176,10 @@
   @media (hover: hover) {
     .group-hover\:translate-x-1:is(:where(.group):hover *) {
       --tw-translate-x: var(--spacing);
+      translate: var(--tw-translate-x) var(--tw-translate-y);
+    }
+    .group-hover\:-translate-y-0\.5:is(:where(.group):hover *) {
+      --tw-translate-y: calc(var(--spacing) * -0.5);
       translate: var(--tw-translate-x) var(--tw-translate-y);
     }
     .group-hover\:scale-105:is(:where(.group):hover *) {

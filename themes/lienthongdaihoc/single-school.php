@@ -240,12 +240,14 @@ if ( ! empty( $contact ) ) {
 						</div>
 
 						<!-- FLOATING STICKY COLLAPSE PILL (Active when expanded & scrolling content) -->
-						<div id="school-intro-sticky-bar" class="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:bottom-8 left-1/2 -translate-x-1/2 z-40 transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
-							<button type="button" id="school-intro-sticky-btn" class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200/90 bg-white/95 backdrop-blur-md text-sm font-bold text-slate-700 hover:text-brand-accent hover:border-slate-300 hover:bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all focus:outline-none ring-4 ring-black/5 active:scale-95 cursor-pointer">
-								<span>Thu gọn</span>
-								<svg class="w-4 h-4 text-slate-600 transition-transform duration-300 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-								</svg>
+						<div id="school-intro-sticky-bar" class="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:bottom-8 z-40 transition-all duration-300 opacity-0 pointer-events-none translate-y-4 -translate-x-1/2">
+							<button type="button" id="school-intro-sticky-btn" class="group flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-[#00308b] text-white hover:bg-[#002266] text-sm font-bold shadow-[0_12px_30px_-4px_rgba(0,48,139,0.45),0_6px_12px_-4px_rgba(0,0,0,0.15)] ring-4 ring-white transition-all duration-200 focus:outline-none active:scale-95 cursor-pointer">
+								<span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 transition-transform group-hover:-translate-y-0.5">
+									<svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+									</svg>
+								</span>
+								<span class="tracking-wide">Thu gọn</span>
 							</button>
 						</div>
 					</div>
@@ -272,6 +274,13 @@ if ( ! empty( $contact ) ) {
 							isExpanded = localStorage.getItem(storageKey) === 'true';
 						} catch (e) {}
 
+						function updateStickyPosition() {
+							if (!stickyBar || !section) return;
+							var sectionRect = section.getBoundingClientRect();
+							var contentCenterX = Math.round(sectionRect.left + (sectionRect.width / 2));
+							stickyBar.style.left = contentCenterX + 'px';
+						}
+
 						function updateStickyVisibility() {
 							if (!stickyBar) return;
 							if (!isExpanded) {
@@ -280,6 +289,8 @@ if ( ! empty( $contact ) ) {
 								return;
 							}
 							if (!section) return;
+
+							updateStickyPosition();
 
 							var sectionRect = section.getBoundingClientRect();
 							var containerRect = container.getBoundingClientRect();
