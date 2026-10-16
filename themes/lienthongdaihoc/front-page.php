@@ -1240,8 +1240,10 @@ $zalo    = ltdh_get_zalo_url();
 						$categories = get_the_category($post_id);
 						$category_name = ! empty($categories) ? $categories[0]->name : 'Tin tuyển sinh';
 				?>
-						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
-							<div class="h-36 bg-slate-200 bg-cover bg-center" style="background-image: url('<?php echo esc_url($thumb_url); ?>');"></div>
+						<div class="bg-white border border-slate-100 rounded-lg overflow-hidden hover:shadow-md transition-all flex flex-col justify-between group">
+							<a href="<?php the_permalink(); ?>" class="aspect-[16/9] w-full bg-slate-100 overflow-hidden block shrink-0">
+								<img src="<?php echo esc_url($thumb_url); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy" class="w-full h-full object-cover object-left group-hover:scale-105 transition-transform duration-500" />
+							</a>
 							<div class="p-4 flex-1 flex flex-col justify-between">
 								<div>
 									<span class="text-xs font-bold text-brand-primary uppercase tracking-wider block mb-1"><?php echo esc_html($category_name); ?></span>

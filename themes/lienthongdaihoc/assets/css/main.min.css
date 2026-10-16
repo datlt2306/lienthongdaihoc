@@ -38,6 +38,7 @@
     --color-amber-950: oklch(27.9% 0.077 45.635);
     --color-yellow-400: oklch(85.2% 0.199 91.936);
     --color-green-50: oklch(98.2% 0.018 155.826);
+    --color-green-100: oklch(96.2% 0.044 156.743);
     --color-green-200: oklch(92.5% 0.084 155.995);
     --color-green-800: oklch(44.8% 0.119 151.328);
     --color-emerald-50: oklch(97.9% 0.021 166.113);
@@ -579,6 +580,9 @@
   }
   .col-span-5 {
     grid-column: span 5 / span 5;
+  }
+  .col-span-7 {
+    grid-column: span 7 / span 7;
   }
   .col-span-full {
     grid-column: 1 / -1;
@@ -1446,6 +1450,9 @@
   .aspect-\[4\/5\] {
     aspect-ratio: 4/5;
   }
+  .aspect-\[16\/9\] {
+    aspect-ratio: 16/9;
+  }
   .aspect-video {
     aspect-ratio: var(--aspect-video);
   }
@@ -1713,6 +1720,9 @@
   .w-\[300px\] {
     width: 300px;
   }
+  .w-\[1000px\] {
+    width: 1000px;
+  }
   .w-auto {
     width: auto;
   }
@@ -1733,6 +1743,9 @@
   }
   .max-w-7xl {
     max-width: var(--container-7xl);
+  }
+  .max-w-\[85\%\] {
+    max-width: 85%;
   }
   .max-w-\[85vw\] {
     max-width: 85vw;
@@ -1909,6 +1922,9 @@
   }
   .grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .grid-cols-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
   }
   .flex-col {
     flex-direction: column;
@@ -2790,6 +2806,9 @@
   .bg-green-50 {
     background-color: var(--color-green-50);
   }
+  .bg-green-100 {
+    background-color: var(--color-green-100);
+  }
   .bg-indigo-50 {
     background-color: var(--color-indigo-50);
   }
@@ -3351,6 +3370,9 @@
   .object-center {
     object-position: center;
   }
+  .object-left {
+    object-position: left;
+  }
   .p-0\.5 {
     padding: calc(var(--spacing) * 0.5);
   }
@@ -3386,6 +3408,9 @@
   }
   .p-8 {
     padding: calc(var(--spacing) * 8);
+  }
+  .p-10 {
+    padding: calc(var(--spacing) * 10);
   }
   .p-12 {
     padding: calc(var(--spacing) * 12);
@@ -4008,6 +4033,12 @@
   .opacity-15 {
     opacity: 15%;
   }
+  .opacity-20 {
+    opacity: 20%;
+  }
+  .opacity-25 {
+    opacity: 25%;
+  }
   .opacity-30 {
     opacity: 30%;
   }
@@ -4198,6 +4229,10 @@
   }
   .blur-\[1px\] {
     --tw-blur: blur(1px);
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .blur-\[2px\] {
+    --tw-blur: blur(2px);
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
   .blur-lg {
@@ -4841,6 +4876,14 @@
     @supports (color: color-mix(in lab, red, red)) {
       .hover\:bg-white\/25:hover {
         background-color: color-mix(in oklab, var(--color-white) 25%, transparent);
+      }
+    }
+    .hover\:bg-white\/30:hover {
+      background-color: color-mix(in srgb, #fff 30%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-white\/30:hover {
+        background-color: color-mix(in oklab, var(--color-white) 30%, transparent);
       }
     }
     .hover\:bg-white\/60:hover {
@@ -5602,6 +5645,9 @@
     .md\:col-span-5 {
       grid-column: span 5 / span 5;
     }
+    .md\:col-span-6 {
+      grid-column: span 6 / span 6;
+    }
     .md\:col-span-7 {
       grid-column: span 7 / span 7;
     }
@@ -5610,6 +5656,12 @@
     }
     .md\:mt-16 {
       margin-top: calc(var(--spacing) * 16);
+    }
+    .md\:line-clamp-3 {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
     }
     .md\:block {
       display: block;
@@ -5647,6 +5699,9 @@
     .md\:h-64 {
       height: calc(var(--spacing) * 64);
     }
+    .md\:h-full {
+      height: 100%;
+    }
     .md\:min-h-\[38px\] {
       min-height: 38px;
     }
@@ -5655,6 +5710,9 @@
     }
     .md\:min-h-\[44px\] {
       min-height: 44px;
+    }
+    .md\:min-h-\[250px\] {
+      min-height: 250px;
     }
     .md\:min-h-\[340px\] {
       min-height: 340px;
@@ -6087,6 +6145,10 @@
     .lg\:text-sm {
       font-size: var(--text-sm);
       line-height: var(--tw-leading, var(--text-sm--line-height));
+    }
+    .lg\:text-xl {
+      font-size: var(--text-xl);
+      line-height: var(--tw-leading, var(--text-xl--line-height));
     }
     .lg\:text-slate-600 {
       color: var(--color-slate-600);

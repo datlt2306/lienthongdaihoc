@@ -47,31 +47,7 @@ if ( empty( $faq_items ) || ! is_array( $faq_items ) ) {
 }
 ?>
 
-<!-- BANNER HERO -->
-<section class="relative bg-gradient-to-tr from-[#0E2038] via-[#002B66] to-[#001838] text-white py-14 md:py-20 overflow-hidden border-b border-slate-800">
-	<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(white 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
-	<div class="absolute -right-24 -bottom-24 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-	<div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-		<!-- Breadcrumb -->
-		<nav class="flex items-center justify-center gap-2 text-xs text-slate-400 mb-4 font-semibold uppercase tracking-wider" aria-label="Breadcrumb">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-white transition-colors">Trang chủ</a>
-			<span>/</span>
-			<span class="text-blue-300">Câu hỏi thường gặp</span>
-		</nav>
-
-		<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30 mb-3">
-			<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-			Giải đáp thắc mắc tuyển sinh
-		</span>
-		<h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold font-display tracking-tight text-white leading-tight uppercase">
-			CÂU HỎI THƯỜNG GẶP
-		</h1>
-		<p class="text-blue-100/90 text-sm md:text-base font-normal max-w-2xl mx-auto mt-3 leading-relaxed">
-			Giải đáp tất cả thắc mắc thường gặp về điều kiện tuyển sinh, quy trình nộp hồ sơ, học phí, hình thức học trực tuyến (Online/Từ xa) và giá trị văn bằng tốt nghiệp.
-		</p>
-	</div>
-</section>
+<?php get_template_part( 'template-parts/banner' ); ?>
 
 <main id="primary" class="site-main py-12 md:py-16 bg-slate-50">
 	<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

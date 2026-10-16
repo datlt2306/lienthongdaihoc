@@ -36,7 +36,13 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 		'text' => 'Công cụ đối chiếu điều kiện tuyển sinh 2026',
 		'url'  => '#eligibility-app',
 	];
-	$banner_image    = get_field( 'page_banner' ) ?: ( get_template_directory_uri() . '/assets/images/banner-program.jpg' );
+} elseif ( is_page_template( 'page-faq.php' ) || is_page( 'cau-hoi-thuong-gap' ) || is_page( 'faq' ) ) {
+	$banner_title    = 'Câu Hỏi Thường Gặp';
+	$banner_subtitle = get_field( 'page_banner_subtitle' ) ?: 'Giải đáp tất cả thắc mắc về điều kiện tuyển sinh, quy trình nộp hồ sơ, học phí, hình thức học trực tuyến và giá trị văn bằng tốt nghiệp.';
+	$banner_eyebrow  = [
+		'text' => 'Giải đáp thắc mắc tuyển sinh',
+	];
+	$banner_image    = get_field( 'page_banner' ) ?: '';
 } elseif ( is_page() ) {
 	// Pages: ACF banner field → featured image → default
 	$banner_image    = get_field( 'page_banner' ) ?: '';
@@ -304,13 +310,65 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	$term = get_queried_object();
 	$banner_title    = 'Cơ sở: ' . $term->name;
 	$banner_subtitle = $term->description ?: 'Các chương trình đào tạo tại cơ sở ' . $term->name;
-} elseif ( is_home() || is_category() ) {
-	$banner_title    = 'Tin Tức Tuyển Sinh';
-	$banner_subtitle = 'Cập nhật thông tin tuyển sinh, hướng dẫn nhập học và tin tức giáo dục mới nhất';
+} elseif ( is_category() ) {
+	$banner_title    = single_cat_title( '', false );
+	$cat_desc        = category_description();
+	$banner_subtitle = ! empty( $cat_desc ) ? wp_strip_all_tags( $cat_desc ) : 'Cập nhật thông tin tuyển sinh, hướng dẫn nhập học và tin tức giáo dục mới nhất';
+	$banner_eyebrow  = [
+		'text' => 'Chuyên mục tin tức',
+		'url'  => home_url( '/tin-tuc/' ),
+	];
+} elseif ( is_tag() ) {
+	$banner_title    = 'Chủ đề: ' . single_tag_title( '', false );
+	$banner_subtitle = 'Tổng hợp các bài viết liên quan đến chủ đề ' . single_tag_title( '', false );
+	$banner_eyebrow  = [
+		'text' => 'Thẻ bài viết',
+		'url'  => home_url( '/tin-tuc/' ),
+	];
+} elseif ( is_home() ) {
+	$banner_title    = 'Cẩm Nang Tuyển Sinh & Tin Tức';
+	$banner_subtitle = 'Cập nhật nhanh nhất và chính xác các quy chế thi, đề án tuyển sinh, học bổng từ các trường đại học đối tác.';
+	$banner_eyebrow  = [
+		'text' => 'Bản tin giáo dục & tuyển sinh ' . date( 'Y' ),
+	];
 } elseif ( is_singular( 'post' ) ) {
-	$banner_title    = get_the_title();
+	$post_id         = get_the_ID();
+	$banner_title    = get_the_title( $post_id );
 	$banner_subtitle = '';
-	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
+	$banner_image    = function_exists( 'ltdh_get_post_thumbnail_url' ) 
+		? ltdh_get_post_thumbnail_url( $post_id, 'full' ) 
+		: ( get_the_post_thumbnail_url( $post_id, 'full' ) ?: '' );
+
+	// Badges: Category & School
+	$post_cats = get_the_category( $post_id );
+	$post_cat  = null;
+	if ( ! empty( $post_cats ) ) {
+		foreach ( $post_cats as $pc ) {
+			if ( $pc->slug !== 'uncategorized' ) {
+				$post_cat = $pc;
+				break;
+			}
+		}
+		if ( ! $post_cat && ! empty( $post_cats[0] ) ) {
+			$post_cat = $post_cats[0];
+		}
+	}
+
+	$school_id = get_field( 'school_relationship', $post_id );
+	if ( is_array( $school_id ) ) {
+		$school_id = ! empty( $school_id ) ? $school_id[0] : 0;
+	}
+	if ( is_object( $school_id ) ) {
+		$school_id = $school_id->ID;
+	}
+	$school_id = intval( $school_id );
+	$school_name = $school_id ? get_the_title( $school_id ) : '';
+	$school_url  = $school_id ? get_permalink( $school_id ) : '';
+
+	// Reading time & word count
+	$post_content      = get_post_field( 'post_content', $post_id );
+	$post_word_count   = str_word_count( strip_tags( (string) $post_content ) );
+	$post_reading_time = max( 1, ceil( $post_word_count / 200 ) );
 } else {
 	if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $request_path ) ) {
 		$banner_title    = 'Hình thức đào tạo';
@@ -344,7 +402,7 @@ if ( empty( $banner_image ) ) {
 	<?php if ( ! empty( $banner_image ) ) : ?>
 		<!-- Banner Background Image with Gradient Overlay -->
 		<div class="absolute inset-0 z-0">
-			<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center scale-105 opacity-30 blur-[1px]" alt="<?php echo esc_attr( $banner_title ); ?>" width="1920" height="400" loading="eager" fetchpriority="high" decoding="async">
+			<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center scale-105 <?php echo is_singular( 'post' ) ? 'opacity-20 blur-[2px]' : 'opacity-25 blur-[1px]'; ?>" alt="<?php echo esc_attr( $banner_title ); ?>" width="1920" height="400" loading="eager" fetchpriority="high" decoding="async">
 			<div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/80 to-brand-primary/80"></div>
 		</div>
 	<?php endif; ?>
@@ -354,7 +412,25 @@ if ( empty( $banner_image ) ) {
 	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-primary/20 rounded-full blur-3xl pointer-events-none"></div>
 
 	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-		<?php if ( ! empty( $banner_eyebrow ) ) : ?>
+		<?php if ( is_singular( 'post' ) ) : ?>
+			<?php if ( ! empty( $post_cat ) || ! empty( $school_name ) ) : ?>
+				<div class="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
+					<?php if ( ! empty( $post_cat ) ) : ?>
+						<a href="<?php echo esc_url( get_category_link( $post_cat->term_id ) ); ?>" 
+						   class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs sm:text-sm uppercase tracking-wider backdrop-blur-md border border-white/20 transition-all duration-200 no-underline shadow-xs">
+							<span><?php echo esc_html( $post_cat->name ); ?></span>
+						</a>
+					<?php endif; ?>
+					<?php if ( ! empty( $school_name ) && ! empty( $school_url ) ) : ?>
+						<a href="<?php echo esc_url( $school_url ); ?>" 
+						   class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white/95 font-medium text-xs sm:text-sm backdrop-blur-md border border-white/15 transition-all duration-200 no-underline shadow-xs">
+							<svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9z"/></svg>
+							<span><?php echo esc_html( $school_name ); ?></span>
+						</a>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
+		<?php elseif ( ! empty( $banner_eyebrow ) ) : ?>
 			<div class="mb-3 sm:mb-4">
 				<?php if ( ! empty( $banner_eyebrow['url'] ) ) : ?>
 					<a href="<?php echo esc_url( $banner_eyebrow['url'] ); ?>" 
@@ -380,6 +456,25 @@ if ( empty( $banner_image ) ) {
 			<p class="text-slate-200/90 text-sm md:text-base font-medium max-w-2xl mt-2.5 leading-relaxed">
 				<?php echo esc_html( $banner_subtitle ); ?>
 			</p>
+		<?php endif; ?>
+		<?php if ( is_singular( 'post' ) ) : ?>
+			<!-- Meta Row for Single Post -->
+			<div class="mt-4 flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-200/90 font-medium">
+				<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-xs border border-white/10">
+					<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+					<span><?php echo get_the_date( 'd/m/Y' ); ?></span>
+				</span>
+				<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-xs border border-white/10">
+					<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+					<span><?php echo esc_html( $post_reading_time ); ?> phút đọc</span>
+				</span>
+				<?php if ( get_the_author() ) : ?>
+				<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-xs border border-white/10">
+					<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+					<span><?php the_author(); ?></span>
+				</span>
+				<?php endif; ?>
+			</div>
 		<?php endif; ?>
 		<?php if ( is_singular( 'program' ) ) :
 			$banner_verif = function_exists( 'ltdh_get_program_verification' ) ? ltdh_get_program_verification( get_the_ID() ) : null;

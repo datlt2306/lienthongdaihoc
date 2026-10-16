@@ -98,22 +98,7 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 ?>
 
 <main id="primary" class="site-main bg-slate-50/50 min-h-screen">
-	<!-- Hero Header Section (Premium Minimalist Design) -->
-	<section class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white py-14 md:py-20 overflow-hidden">
-		<!-- Dot Grid Pattern -->
-		<div class="absolute inset-0 opacity-10 pointer-events-none z-0" style="background-image: radial-gradient(white 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
-		<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-accent/20 rounded-full blur-3xl"></div>
-		
-		<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-			<nav class="text-sm text-blue-200 mb-3 flex items-center gap-2">
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-white transition-colors">Trang chủ</a>
-				<span>›</span>
-				<span class="text-white">Tin tức tuyển sinh</span>
-			</nav>
-			<h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display tracking-tight leading-tight uppercase">CẨM NANG TUYỂN SINH & TIN TỨC</h1>
-			<p class="text-blue-100 text-sm md:text-base font-semibold max-w-2xl mt-2">Cập nhật nhanh nhất và chính xác các quy chế thi, đề án tuyển sinh, học bổng từ các trường đại học đối tác.</p>
-		</div>
-	</section>
+	<?php get_template_part( 'template-parts/banner' ); ?>
 
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 		
@@ -164,21 +149,21 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 					$feat_school_id = get_field( 'school_relationship', $featured_post->ID );
 					$feat_school_name = $feat_school_id ? get_the_title( $feat_school_id ) : '';
 				?>
-				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all group grid grid-cols-1 md:grid-cols-12">
+				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all group grid grid-cols-1 md:grid-cols-12 items-stretch">
 					<!-- Thumbnail Left -->
-					<div class="md:col-span-7 relative min-h-[220px] md:min-h-[340px] bg-slate-100 overflow-hidden">
-						<div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('<?php echo esc_url( $feat_thumb ); ?>');"></div>
+					<a href="<?php echo esc_url( get_permalink( $featured_post->ID ) ); ?>" class="md:col-span-7 relative block aspect-[16/9] md:aspect-auto md:min-h-[250px] md:h-full w-full bg-slate-100 overflow-hidden shrink-0">
+						<img src="<?php echo esc_url( $feat_thumb ); ?>" alt="<?php echo esc_attr( $featured_post->post_title ); ?>" class="w-full h-full object-cover object-left group-hover:scale-105 transition-transform duration-500" />
 						<?php if ( $feat_school_name ) : ?>
-							<span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#00308b] text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">
+							<span class="absolute top-3 left-3 z-10 bg-white/90 backdrop-blur-sm text-[#00308b] text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">
 								<?php echo esc_html( $feat_school_name ); ?>
 							</span>
 						<?php endif; ?>
-					</div>
+					</a>
 					
 					<!-- Content Right -->
-					<div class="md:col-span-5 p-6 md:p-8 flex flex-col justify-between space-y-4">
-						<div class="space-y-3">
-							<div class="flex items-center gap-2">
+					<div class="md:col-span-5 p-5 lg:p-6 flex flex-col justify-between">
+						<div>
+							<div class="flex items-center gap-2 mb-2.5">
 								<span class="bg-brand-primary text-white text-xs font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
 									NỔI BẬT
 								</span>
@@ -186,16 +171,16 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 									<span class="text-xs text-slate-400 font-bold uppercase"><?php echo esc_html( $feat_cat->name ); ?></span>
 								<?php endif; ?>
 							</div>
-							<h2 class="text-base md:text-xl font-extrabold text-slate-900 leading-snug hover:text-brand-primary transition-colors">
+							<h2 class="text-base md:text-lg lg:text-xl font-extrabold text-slate-900 leading-snug hover:text-brand-primary transition-colors line-clamp-2">
 								<a href="<?php echo esc_url( get_permalink( $featured_post->ID ) ); ?>">
 									<?php echo esc_html( $featured_post->post_title ); ?>
 								</a>
 							</h2>
-							<p class="text-sm text-slate-500 line-clamp-3 leading-relaxed">
-								<?php echo esc_html( wp_trim_words( $featured_post->post_excerpt ?: $featured_post->post_content, 25 ) ); ?>
+							<p class="text-xs md:text-sm text-slate-500 line-clamp-2 leading-relaxed mt-2.5">
+								<?php echo esc_html( wp_trim_words( $featured_post->post_excerpt ?: $featured_post->post_content, 22 ) ); ?>
 							</p>
 						</div>
-						<div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs text-slate-400">
+						<div class="flex items-center justify-between pt-3 border-t border-slate-100 text-xs text-slate-400 mt-4">
 							<span><?php echo get_the_date( 'd/m/Y', $featured_post->ID ); ?></span>
 							<a href="<?php echo esc_url( get_permalink( $featured_post->ID ) ); ?>" class="text-brand-primary font-bold hover:underline">Chi tiết →</a>
 						</div>
@@ -228,11 +213,11 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 								$school_id = get_field( 'school_relationship', $post_id );
 								$school_name = $school_id ? get_the_title( $school_id ) : '';
 						?>
-							<article class="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col justify-between">
-								<a href="<?php the_permalink(); ?>" class="relative block h-28 md:h-40 bg-slate-100 overflow-hidden shrink-0">
-									<div class="w-full h-full bg-cover bg-center hover:scale-105 transition-transform duration-500" style="background-image: url('<?php echo esc_url( $post_thumb ); ?>');"></div>
+							<article class="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col justify-between group">
+								<a href="<?php the_permalink(); ?>" class="relative block aspect-[16/9] w-full bg-slate-100 overflow-hidden shrink-0">
+									<img src="<?php echo esc_url( $post_thumb ); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy" class="w-full h-full object-cover object-left group-hover:scale-105 transition-transform duration-500" />
 									<?php if ( $school_name ) : ?>
-										<span class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[#00308b] text-xs font-extrabold px-2 py-0.5 rounded-full shadow-sm line-clamp-1">
+										<span class="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur-sm text-[#00308b] text-[10px] md:text-xs font-extrabold px-2 py-0.5 rounded-full shadow-sm line-clamp-1 max-w-[85%]">
 											<?php echo esc_html( $school_name ); ?>
 										</span>
 									<?php endif; ?>
