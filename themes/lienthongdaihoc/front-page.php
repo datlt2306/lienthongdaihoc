@@ -992,23 +992,23 @@ $zalo    = ltdh_get_zalo_url();
 					$testimonials = get_field('testimonials', 'options') ?: [];
 				}
 				if (empty($testimonials)) {
-					// 6 học viên tiêu biểu: 4 đã tốt nghiệp + 2 tân sinh viên / đang theo học
+					// 3 học viên tiêu biểu có phản hồi và hình ảnh thực tế
 					$testimonials = [
 						[
 							'name'         => 'Hoàng Thị Độ',
 							'workplace'    => 'Product Owner',
-							'role'         => 'Liên thông Công nghệ thông tin',
+							'role'         => 'Liên thông CĐ lên ĐH - CNTT',
 							'graduation'   => 'Khóa 29.1 - ĐH Giao thông Vận tải',
 							'status'       => 'graduated',
 							'status_label' => 'Đã tốt nghiệp',
 							'initials'     => 'HĐ',
 							'image'        => get_template_directory_uri() . '/assets/images/student-do.jpg',
-							'content'      => 'Điều mình hài lòng nhất khi học liên thông là lịch học ngoài giờ hành chính, rất thuận tiện cho người đang đi làm. Mình có thể vừa hoàn thành công việc, vừa tiếp tục nâng cao trình độ. Thầy cô cũng rất nhiệt tình, luôn sẵn sàng hỗ trợ để sinh viên yên tâm học tập và hoàn thành chương trình.'
+							'content'      => 'Mình liên thông Cao Đẳng lên đại học. Lịch học được sắp xếp ngoài giờ hành chính, tạo điều kiện thuận lợi cho những người đang đi làm như mình có thể vừa hoàn thành công việc, vừa tiếp tục học tập. Bên cạnh đó, thầy cô luôn nhiệt tình hỗ trợ và tạo điều kiện để sinh viên cân bằng giữa công việc và việc học.'
 						],
 						[
 							'name'         => 'Phạm Văn Dũng',
 							'workplace'    => 'Leader SEO tại CAR BOSS Việt Nam',
-							'role'         => 'Liên thông Thương mại điện tử',
+							'role'         => 'Liên thông Đại học Thương Mại (TMU)',
 							'graduation'   => 'Khóa K10 - ĐH Thương Mại',
 							'status'       => 'studying',
 							'status_label' => 'Sắp tốt nghiệp',
@@ -1027,41 +1027,9 @@ $zalo    = ltdh_get_zalo_url();
 							'image'        => get_template_directory_uri() . '/assets/images/student-duy.jpg',
 							'content'      => 'Điều em hài lòng khi học liên thông là lịch học linh hoạt, phù hợp với người vừa học vừa làm. Thời gian đào tạo chỉ khoảng 1 năm 7 tháng, giúp em sớm có bằng Đại học để đáp ứng yêu cầu công việc. Bên cạnh đó, học phí hợp lý cũng là một lợi thế, đặc biệt với các bạn vừa tốt nghiệp Cao đẳng và muốn học tiếp lên Đại học.'
 						],
-						[
-							'name'         => 'Hoàng Dũng',
-							'workplace'    => 'Kỹ sư giám sát tại Coteccons',
-							'role'         => 'Liên thông Kỹ thuật Xây dựng',
-							'graduation'   => 'Khóa 2021 - ĐH Giao thông Vận tải',
-							'status'       => 'graduated',
-							'status_label' => 'Đã tốt nghiệp',
-							'initials'     => 'HD',
-							'image'        => get_template_directory_uri() . '/assets/images/student-dung.jpg',
-							'content'      => 'Vừa đi công trình vừa học trực tuyến buổi tối rất tiện lợi. Bài giảng thực tế bám sát công việc hàng ngày. Nhận bằng ĐH chính quy giúp mình đủ điều kiện ký hồ sơ năng lực dự án lớn.'
-						],
-						[
-							'name'         => 'Bùi Đức Anh',
-							'workplace'    => 'Chuyên viên Kỹ thuật tại VNPT',
-							'role'         => 'Liên thông ĐH Điện tử Viễn thông',
-							'graduation'   => 'Khóa 2024 - ĐH Giao thông Vận tải',
-							'status'       => 'new',
-							'status_label' => 'Tân sinh viên K2024',
-							'initials'     => 'DA',
-							'image'        => get_template_directory_uri() . '/assets/images/student-ducanh.jpg',
-							'content'      => 'Mình vừa hoàn thiện hồ sơ xét tuyển đợt tháng 9 vừa rồi. Tư vấn viên hướng dẫn rất chi tiết, chỉ 3 ngày là xong thủ tục và có giấy báo nhập học. Đang học kỳ 1 online buổi tối thấy rất chủ động.'
-						],
-						[
-							'name'         => 'Đặng Hà My',
-							'workplace'    => 'Trợ lý Dự án tại Vingroup',
-							'role'         => 'Đại học Từ xa - Ngôn ngữ Anh',
-							'graduation'   => 'Khóa 2024 - ĐH Thái Nguyên',
-							'status'       => 'studying',
-							'status_label' => 'Đang học Kỳ 2',
-							'initials'     => 'HM',
-							'image'        => get_template_directory_uri() . '/assets/images/student-hamy.jpg',
-							'content'      => 'Hệ thống học trực tuyến E-learning rất trực quan, bài giảng video rõ ràng và có thể xem lại bất cứ lúc nào. Giảng viên hỗ trợ giải đáp nhanh nên dù vừa đi làm vừa học vẫn theo kịp tiến độ.'
-						],
 					];
 				}
+				$testimonials = array_slice($testimonials, 0, 3);
 
 				foreach ($testimonials as $t) :
 					$initials = strtoupper(substr($t['initials'] ?? $t['name'] ?? 'U', 0, 2));
