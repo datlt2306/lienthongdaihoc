@@ -303,22 +303,25 @@
 
 /* Input Summary */
 .elig-input-summary {
-	background: #F8FAFC;
+	background: #FFFFFF;
 	border: 1px solid #E2E8F0;
-	border-radius: var(--radius-lg);
-	padding: 1.25rem;
-	margin-bottom: 2rem;
+	border-radius: 1rem;
+	padding: 1rem 1.25rem;
+	margin-bottom: 1.5rem;
 }
 .elig-summary-row {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 0.75rem;
-	flex-wrap: wrap;
+	margin-bottom: 0.75rem;
+	padding-bottom: 0.75rem;
+	border-bottom: 1px solid #F1F5F9;
 }
 .elig-summary-label {
-	font-weight: 700;
-	color: var(--slate-600);
-	font-size: 0.85rem;
+	font-weight: 800;
+	color: var(--slate-800);
+	font-size: 0.8125rem;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 }
@@ -326,22 +329,25 @@
 	display: flex;
 	gap: 0.5rem;
 	flex-wrap: wrap;
-	flex: 1;
+	width: 100%;
 }
 .elig-tag {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
 	padding: 0.35rem 0.75rem;
-	background: #EFF6FF;
-	color: var(--brand-sky);
-	border: 1px solid #DBEAFE;
+	background: #F8FAFC;
+	color: #334155;
+	border: 1px solid #E2E8F0;
 	border-radius: 999px;
-	font-size: 0.85rem;
-	font-weight: 700;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	line-height: 1.25;
 }
 .elig-tag.elig-tag-major {
-	background: #1E3A8A;
-	color: #FFFFFF;
-	border-color: #1E3A8A;
+	background: #EFF6FF;
+	color: #00308b;
+	border-color: #BFDBFE;
+	font-weight: 700;
 }
 
 /* ----------------------------------------------------
@@ -350,97 +356,35 @@
 .elig-program-list {
 	display: flex;
 	flex-direction: column;
-	gap: 1.5rem;
+	gap: 1.25rem;
 }
 .elig-card {
 	background: #FFFFFF;
 	border: 1px solid #E2E8F0;
-	border-radius: var(--radius-lg);
+	border-radius: 1rem;
 	overflow: hidden;
-	transition: all 0.3s ease;
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+	transition: all 0.25s ease;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 .elig-card:hover {
-	transform: translateY(-3px);
-	box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05), 0 8px 8px -6px rgba(0, 0, 0, 0.05);
+	box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.06);
 	border-color: #CBD5E1;
-}
-.elig-card-header {
-	padding: 1.25rem;
-}
-.elig-card-rank {
-	font-size: 0.95rem;
-	font-weight: 900;
-	color: var(--slate-400);
-}
-.elig-card-body {
-	padding: 1.5rem;
-}
-.elig-card-school {
-	display: flex;
-	align-items: center;
-	gap: 0.6rem;
-	margin-bottom: 0.75rem;
-	font-size: 0.85rem;
-	color: var(--slate-600);
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.03em;
-}
-.elig-card-school-logo {
-	width: 28px;
-	height: 28px;
-	border-radius: 8px;
-	object-fit: cover;
-	border: 1px solid #E2E8F0;
-}
-
-/* Card Meta Grid & Items */
-.elig-card-meta-grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 10px 16px;
-	background: #F8FAFC;
-	border: 1px solid #E2E8F0;
-	border-radius: 12px;
-	padding: 12px 16px;
-	margin-top: 12px;
-	font-size: 0.875rem;
-	color: #475569;
-}
-@media (max-width: 640px) {
-	.elig-card-meta-grid {
-		grid-template-columns: 1fr;
-		gap: 8px;
-	}
-}
-.elig-meta-item {
-	display: flex;
-	align-items: baseline;
-	gap: 6px;
-	flex-wrap: wrap;
-	min-width: 0;
-	word-break: break-word;
-}
-.elig-meta-val {
-	color: #00308b;
-	font-weight: 700;
 }
 
 /* Compatibility Status Styling */
 .elig-status-compatible .elig-score-label {
 	background: #ECFDF5;
-	color: var(--emerald-600);
+	color: #047857;
 	border: 1px solid #A7F3D0;
 }
 .elig-status-verification .elig-score-label {
 	background: #FFFBEB;
-	color: var(--amber-600);
+	color: #B45309;
 	border: 1px solid #FDE68A;
 }
 .elig-status-incompatible .elig-score-label {
 	background: #FFF1F2;
-	color: var(--rose-600);
+	color: #BE123C;
 	border: 1px solid #FECDD3;
 }
 
@@ -541,22 +485,22 @@
    Lead capture form
    ---------------------------------------------------- */
 .elig-lead-form {
-	margin-top: 2.5rem;
-	padding: 2rem;
+	margin-top: 2rem;
+	padding: 1.5rem;
 	background: #FFFFFF;
-	border: 2px solid var(--brand-blue);
-	border-radius: var(--radius-lg);
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+	border: 1px solid #E2E8F0;
+	border-radius: 1rem;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 .elig-lead-form h3 {
-	font-size: 1.3rem;
+	font-size: 1.25rem;
 	font-weight: 800;
-	color: var(--brand-blue);
+	color: #0F172A;
 	margin-bottom: 0.5rem;
 }
 .elig-lead-form > p {
 	color: var(--slate-600);
-	font-size: 0.9rem;
+	font-size: 0.875rem;
 	margin-bottom: 1.5rem;
 }
 .elig-form-row {
@@ -567,12 +511,12 @@
    CTA Bar & Channels
    ---------------------------------------------------- */
 .elig-cta-bar {
-	margin-top: 2.5rem;
+	margin-top: 2rem;
 }
 .elig-cta-channels {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 1rem;
+	grid-template-columns: repeat(1, 1fr);
+	gap: 0.75rem;
 }
 @media (min-width: 640px) {
 	.elig-cta-channels {
@@ -583,40 +527,25 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 0.35rem;
-	padding: 1.5rem 1rem;
-	border-radius: var(--radius-lg);
+	gap: 0.25rem;
+	padding: 1.25rem 1rem;
+	border-radius: 1rem;
 	text-decoration: none;
 	text-align: center;
 	transition: all 0.2s ease;
-	border: 1px solid transparent;
+	background: #FFFFFF;
+	border: 1px solid #E2E8F0;
 }
 .elig-cta-card:hover {
 	transform: translateY(-2px);
+	border-color: #93C5FD;
+	box-shadow: 0 4px 12px rgba(0, 48, 139, 0.08);
 }
-.elig-cta-phone {
-	background: #F0FDF4;
-	border-color: #BBF7D0;
-}
-.elig-cta-phone:hover {
-	background: #DCFCE7;
-	box-shadow: 0 4px 12px rgba(34, 197, 94, 0.12);
-}
-.elig-cta-zalo {
-	background: #EFF6FF;
-	border-color: #BFDBFE;
-}
-.elig-cta-zalo:hover {
-	background: #DBEAFE;
-	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
-}
+.elig-cta-phone,
+.elig-cta-zalo,
 .elig-cta-form {
-	background: #F0FDFA;
-	border-color: #CCFBF1;
-}
-.elig-cta-form:hover {
-	background: #CCFBF1;
-	box-shadow: 0 4px 12px rgba(20, 184, 166, 0.12);
+	background: #FFFFFF;
+	border-color: #E2E8F0;
 }
 .elig-cta-icon { font-size: 1.75rem; }
 .elig-cta-label {
