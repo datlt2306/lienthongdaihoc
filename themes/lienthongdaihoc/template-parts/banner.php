@@ -29,6 +29,14 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 } elseif ( $type === 'program' ) {
 	$banner_title    = 'So sánh chương trình đào tạo';
 	$banner_subtitle = 'So sánh chi tiết học phí, thời gian học, điều kiện tuyển sinh của các chương trình học.';
+} elseif ( is_page( 'kiem-tra-dieu-kien' ) || preg_match( '#^/kiem-tra-dieu-kien/?#i', $request_path ) ) {
+	$banner_title    = 'Kiểm tra điều kiện Liên thông Đại học';
+	$banner_subtitle = 'Chỉ với 60 giây đối chiếu thông tin để tìm đúng lộ trình liên thông từ Trung cấp hoặc Cao đẳng lên Đại học phù hợp nhất cho bạn.';
+	$banner_eyebrow  = [
+		'text' => 'Công cụ đối chiếu điều kiện tuyển sinh 2026',
+		'url'  => '#eligibility-app',
+	];
+	$banner_image    = get_field( 'page_banner' ) ?: ( get_template_directory_uri() . '/assets/images/banner-program.jpg' );
 } elseif ( is_page() ) {
 	// Pages: ACF banner field → featured image → default
 	$banner_image    = get_field( 'page_banner' ) ?: '';
