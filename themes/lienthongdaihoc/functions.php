@@ -56,6 +56,11 @@ if ( file_exists( __DIR__ . '/inc/seo/class-rankmath-integration.php' ) ) {
 }
 
 // ----------------------------------------------------
+// 6. Integrations: Easy Table of Contents
+// ----------------------------------------------------
+require_once __DIR__ . '/inc/easy-table-of-contents.php';
+
+// ----------------------------------------------------
 // 7. CLI: WP-CLI Commands
 // ----------------------------------------------------
 require_once __DIR__ . '/inc/cli-commands.php';
