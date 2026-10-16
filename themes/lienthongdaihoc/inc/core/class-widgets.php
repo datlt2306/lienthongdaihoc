@@ -1429,9 +1429,13 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 
 
 	<!-- Consultation Form -->
-	<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-		<h3 class="text-base font-extrabold text-slate-900 mb-1">Đăng ký vào <?php echo esc_html( $school_title ); ?></h3>
-		<p class="text-sm text-slate-500 mb-4">Nhận tư vấn hồ sơ miễn phí, hỗ trợ xử lý thủ tục nhập học nhanh chóng.</p>
+	<section id="register" class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 p-4.5 sm:p-5 relative overflow-hidden">
+		<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-primary/5 text-brand-primary text-[11px] font-bold tracking-wide uppercase mb-3">
+			<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+			<span>Tư vấn tuyển sinh</span>
+		</div>
+		<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-1.5 leading-snug">Đăng ký vào <?php echo esc_html( $school_title ); ?></h3>
+		<p class="text-xs sm:text-sm text-slate-500 mb-4 leading-relaxed">Nhận tư vấn hồ sơ miễn phí, hỗ trợ xử lý thủ tục nhập học nhanh chóng.</p>
 		
 		<?php 
 		if ( function_exists( 'ltdh_render_consultation_form' ) ) {
@@ -1461,7 +1465,7 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 	if ( $related_news_query->have_posts() ) :
 		$has_more = ( $related_news_query->post_count > 5 );
 	?>
-		<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+		<section class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 p-4.5 sm:p-5">
 			<h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-3">Tin tức & Thông báo mới</h3>
 			<div class="space-y-3.5">
 				<?php
@@ -1476,7 +1480,7 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 				?>
 					<div class="flex gap-3 items-start pb-3 border-b border-slate-100 last:border-b-0 last:pb-0">
 						<a href="<?php the_permalink(); ?>" class="shrink-0">
-							<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded border border-slate-100" loading="lazy">
+							<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded-xl border border-slate-100" loading="lazy">
 						</a>
 						
 						<div class="flex-1 min-w-0">
@@ -1494,7 +1498,7 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 
 			<?php if ( $has_more ) : ?>
 				<div class="mt-4 pt-3 border-t border-slate-100">
-					<a href="<?php echo esc_url( home_url( '/tin-tuc/?truong=' . $school_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
+					<a href="<?php echo esc_url( home_url( '/tin-tuc/?truong=' . $school_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200/80 text-slate-700 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
 						<span>Xem thêm tin tức</span>
 						<span>→</span>
 					</a>
@@ -1505,39 +1509,13 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 	endif;
 	?>
 
-	<!-- Zalo Community -->
-	<div class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-xl p-5 shadow-md relative overflow-hidden border border-blue-500/30">
-		<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-
-		<div class="flex items-center gap-3 mb-3 relative z-10">
-			<div class="w-10 h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center font-black text-xl shadow-xs shrink-0">
-				💬
-			</div>
-			<div>
-				<span class="text-[11px] uppercase font-bold tracking-wider text-blue-200 block">Cộng đồng sinh viên</span>
-				<h3 class="font-extrabold text-base text-white leading-tight">Nhóm Zalo Trao Đổi</h3>
-			</div>
-		</div>
-
-		<p class="text-xs text-blue-100 leading-relaxed mb-4 relative z-10">
-			Tham gia nhóm Zalo trao đổi thông tin tuyển sinh, lịch học và chia sẻ kinh nghiệm cùng cựu sinh viên <?php echo esc_html( $school_title ); ?>.
-		</p>
-
-		<a href="<?php echo esc_url( $zalo_group ); ?>"
-		   target="_blank"
-		   rel="noopener noreferrer"
-		   class="w-full bg-white hover:bg-blue-50 text-blue-700 font-extrabold text-sm py-3 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] relative z-10 hover:scale-[1.02]">
-			<span>💬 Tham gia Nhóm Zalo</span>
-			<span class="text-xs">→</span>
-		</a>
-	</div>
-
-	<!-- Contact Info Card -->
+	<!-- Bento Contact & Community -->
 	<?php
-	get_template_part( 'template-parts/sidebar-hotline', null, [
-		'hotline'  => $hotline,
-		'zalo_url' => $global_zalo,
-		'title'    => 'Văn phòng tuyển sinh',
+	get_template_part( 'template-parts/sidebar-bento-contact', null, [
+		'hotline'       => $hotline,
+		'zalo_url'      => $zalo_group,
+		'zalo_title'    => 'Nhóm SV ' . ( $school_title ?: 'Trường' ),
+		'hotline_title' => 'Tuyển sinh 24/7',
 	] );
 }
 
@@ -1578,15 +1556,19 @@ function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
 	<?php endif; ?>
 
 	<!-- Consultation Form -->
-	<section id="register" class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-		<h3 id="ltdh-sidebar-form-title" class="text-lg font-bold text-slate-900 mb-2">
+	<section id="register" class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 p-4.5 sm:p-5 relative overflow-hidden">
+		<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-primary/5 text-brand-primary text-[11px] font-bold tracking-wide uppercase mb-3">
+			<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+			<span>Tư vấn tuyển sinh</span>
+		</div>
+		<h3 id="ltdh-sidebar-form-title" class="text-base sm:text-lg font-bold text-slate-900 mb-1.5 leading-snug">
 			<?php if ( $context_school ) : ?>
 				Đăng ký tư vấn ngành <?php echo esc_html( $major_title ); ?> — <?php echo esc_html( $c_school_title ); ?>
 			<?php else : ?>
 				Đăng ký tư vấn ngành <?php echo esc_html( $major_title ); ?>
 			<?php endif; ?>
 		</h3>
-		<p id="ltdh-sidebar-form-desc" class="text-sm text-slate-500 mb-4">
+		<p id="ltdh-sidebar-form-desc" class="text-xs sm:text-sm text-slate-500 mb-4 leading-relaxed">
 			<?php if ( $context_school ) : ?>
 				Để lại thông tin, ban tuyển sinh sẽ gửi thông tin chi tiết về ngành <?php echo esc_html( $major_title ); ?> tại <strong><?php echo esc_html( $c_school_title ); ?></strong> và lộ trình học phù hợp nhất với bạn.
 			<?php else : ?>
@@ -1626,7 +1608,7 @@ function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
 	if ( $related_news_query->have_posts() ) :
 		$has_more = ( $related_news_query->post_count > 5 );
 	?>
-		<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+		<section class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 p-4.5 sm:p-5">
 			<h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-3">Tin tức & Hướng dẫn</h3>
 			<div class="space-y-3.5">
 				<?php
@@ -1641,7 +1623,7 @@ function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
 				?>
 					<div class="flex gap-3 items-start pb-3 border-b border-slate-100 last:border-b-0 last:pb-0">
 						<a href="<?php the_permalink(); ?>" class="shrink-0">
-							<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded border border-slate-100" loading="lazy">
+							<img src="<?php echo esc_url( $news_thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-12 h-12 object-cover rounded-xl border border-slate-100" loading="lazy">
 						</a>
 						
 						<div class="flex-1 min-w-0">
@@ -1659,7 +1641,7 @@ function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
 
 			<?php if ( $has_more ) : ?>
 				<div class="mt-4 pt-3 border-t border-slate-100">
-					<a href="<?php echo esc_url( home_url( '/tin-tuc/?nganh=' . $major_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
+					<a href="<?php echo esc_url( home_url( '/tin-tuc/?nganh=' . $major_id ) ); ?>" class="w-full text-center bg-slate-50 border border-slate-200/80 text-slate-700 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all flex items-center justify-center gap-1.5 min-h-[38px]">
 						<span>Xem thêm tin tức</span>
 						<span>→</span>
 					</a>
@@ -1670,39 +1652,13 @@ function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
 	endif;
 	?>
 
-	<!-- Zalo Community -->
-	<div class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-xl p-5 shadow-md relative overflow-hidden border border-blue-500/30">
-		<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-
-		<div class="flex items-center gap-3 mb-3 relative z-10">
-			<div class="w-10 h-10 rounded-xl bg-white text-blue-600 flex items-center justify-center font-black text-xl shadow-xs shrink-0">
-				💬
-			</div>
-			<div>
-				<span class="text-[11px] uppercase font-bold tracking-wider text-blue-200 block">Cộng đồng sinh viên</span>
-				<h3 class="font-extrabold text-base text-white leading-tight">Nhóm Zalo Trao Đổi</h3>
-			</div>
-		</div>
-
-		<p class="text-xs text-blue-100 leading-relaxed mb-4 relative z-10">
-			Tham gia nhóm Zalo trao đổi thông tin tuyển sinh, định hướng nghề nghiệp ngành <?php echo esc_html( $major_title ); ?>.
-		</p>
-
-		<a href="<?php echo esc_url( $global_zalo ); ?>"
-		   target="_blank"
-		   rel="noopener noreferrer"
-		   class="w-full bg-white hover:bg-blue-50 text-blue-700 font-extrabold text-sm py-3 px-4 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] relative z-10 hover:scale-[1.02]">
-			<span>💬 Tham gia Nhóm Zalo</span>
-			<span class="text-xs">→</span>
-		</a>
-	</div>
-
-	<!-- Contact Info Card -->
+	<!-- Bento Contact & Community -->
 	<?php
-	get_template_part( 'template-parts/sidebar-hotline', null, [
-		'hotline'  => $program_hotline,
-		'zalo_url' => $global_zalo,
-		'title'    => 'Văn phòng tuyển sinh',
+	get_template_part( 'template-parts/sidebar-bento-contact', null, [
+		'hotline'       => $program_hotline,
+		'zalo_url'      => $global_zalo,
+		'zalo_title'    => 'Nhóm Zalo ' . ( $major_title ?: 'Học viên' ),
+		'hotline_title' => 'Tuyển sinh 24/7',
 	] );
 }
 

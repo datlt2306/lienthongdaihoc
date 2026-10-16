@@ -254,6 +254,9 @@
 		tray.classList.remove('hidden');
 		setTimeout(function () {
 			if (tray && !tray.classList.contains('hidden')) {
+				if (document.body.classList.contains('single-program') && window.innerWidth < 1024) {
+					return; // Mobile single program has its own bottom sticky CTA
+				}
 				document.body.style.paddingBottom = (tray.offsetHeight || 80) + 'px';
 			}
 		}, 50);

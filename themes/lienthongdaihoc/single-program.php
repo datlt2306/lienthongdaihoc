@@ -833,20 +833,20 @@ if ( ! empty( $faqs ) ) {
 						</div>
 
 						<?php if ( $curriculum_type === 'image' ) : ?>
-							<!-- Clickable Label Card for Image -->
-							<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" class="flex items-center justify-between p-4 bg-slate-50/80 hover:bg-blue-50/50 rounded-xl transition-all duration-200 group shadow-xs">
-								<div class="flex items-center gap-3.5">
-									<div class="w-10 h-10 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center shrink-0">
+							<!-- Clickable Label Card for Image (Responsive & Touch-Friendly) -->
+							<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 bg-slate-50/90 hover:bg-blue-50/60 rounded-xl sm:rounded-2xl border border-slate-100 hover:border-blue-200/80 transition-all duration-200 group shadow-2xs hover:shadow-md block">
+								<div class="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0">
+									<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-100/90 text-[#00308b] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5 sm:mt-0">
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
 									</div>
-									<div>
-										<h3 class="font-extrabold text-slate-900 text-sm group-hover:text-blue-900 transition-colors">Xem ảnh Khung chương trình đào tạo chi tiết</h3>
-										<p class="text-xs text-slate-500 mt-0.5">Click để mở xem ảnh lộ trình các học kỳ & môn học kích thước chuẩn</p>
+									<div class="min-w-0 flex-1">
+										<h3 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base group-hover:text-[#00308b] transition-colors leading-snug">Xem ảnh Khung chương trình đào tạo chi tiết</h3>
+										<p class="text-[11px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-relaxed">Click để mở xem ảnh lộ trình các học kỳ & môn học kích thước chuẩn</p>
 									</div>
 								</div>
-								<span class="inline-flex items-center gap-1.5 text-xs font-bold text-[#00308b] bg-white group-hover:bg-[#00308b] group-hover:text-white px-3.5 py-2 rounded-lg shadow-2xs transition-all shrink-0">
+								<span class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-[#00308b] sm:bg-white sm:text-[#00308b] sm:border sm:border-blue-200/60 group-hover:bg-[#00308b] group-hover:text-white px-4 py-2 sm:py-2.5 rounded-lg shadow-2xs transition-all shrink-0 min-h-[38px] whitespace-nowrap">
 									<span>Xem chi tiết</span>
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
 								</span>
 							</a>
 						<?php else : ?>
@@ -915,27 +915,7 @@ if ( ! empty( $faqs ) ) {
 	</div>
 </main>
 
-<!-- SECTION 12: STICKY CTA (Mobile Bottom Sticky Bar) -->
-<div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] py-2.5 px-4 flex items-center justify-between lg:hidden">
-	<div class="flex-1 mr-3 min-w-0">
-		<span class="text-[10px] text-slate-400 block font-bold uppercase tracking-wider truncate mb-0.5"><?php echo esc_html( $school_title ); ?></span>
-		<?php
-		$clean_mob_major = $major_title ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major_title ) ) : '';
-		$mob_title       = $clean_mob_major ? ( $clean_mob_major . ( ! empty( $learning_details['mode'] ) ? ' (' . $learning_details['mode'] . ')' : '' ) ) : get_the_title();
-		?>
-		<p class="font-bold text-slate-800 text-xs sm:text-sm truncate leading-tight"><?php echo esc_html( $mob_title ); ?></p>
-	</div>
-	<div class="flex items-center gap-2 shrink-0">
-		<?php if ( ! empty( $form_url ) ) : ?>
-			<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn bg-slate-100 hover:bg-slate-200 text-slate-700 p-2.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center justify-center min-h-[40px] cursor-pointer" title="Tải phiếu tuyển sinh" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="Phiếu tuyển sinh: <?php echo esc_attr( get_the_title() ); ?>">
-				📄 <span class="hidden sm:inline ml-1">Tải phiếu</span>
-			</a>
-		<?php endif; ?>
-		<a href="#register" class="bg-[#00308b] text-white px-4 py-2.5 rounded-lg text-xs font-extrabold shadow-sm hover:bg-[#002266] transition-all flex items-center justify-center shrink-0 min-h-[40px]">
-			Đăng Ký Học
-		</a>
-	</div>
-</div>
+
 
 <!-- LEAD MAGNET MODAL COMPONENT -->
 <div id="ltdh-lead-magnet-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">

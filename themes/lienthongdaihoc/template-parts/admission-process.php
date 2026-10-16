@@ -25,7 +25,7 @@ $args = isset( $args ) && is_array( $args ) ? wp_parse_args( $args, $defaults ) 
 
 // Determine grid column layout based on page context or explicit argument
 $columns = ! empty( $args['columns'] ) ? intval( $args['columns'] ) : ( is_singular( [ 'program', 'school', 'major' ] ) ? 2 : 4 );
-$grid_class = ( 2 === $columns ) ? 'grid-cols-2 gap-2.5 sm:gap-4 md:gap-5' : 'grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5';
+$grid_class = ( 2 === $columns ) ? 'grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5';
 
 $steps = [
 	[
@@ -77,37 +77,38 @@ $steps = [
 				<?php echo esc_html( $args['subtitle'] ); ?>
 			</p>
 		</div>
-
 	</div>
 
-	<!-- STEPS GRID CONTAINER (2 COLUMNS / 2 ROWS ON MOBILE) -->
+	<!-- STEPS GRID CONTAINER (1 COL ON MOBILE, 2 COLS ON SM+) -->
 	<div class="grid <?php echo esc_attr( $grid_class ); ?> relative">
 		<?php foreach ( $steps as $index => $step_item ) : 
 			$is_last = ( $index === count( $steps ) - 1 );
 		?>
-			<div class="group relative flex flex-col justify-between bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-3 sm:p-4 md:p-5 transition-all duration-200 shadow-xs hover:shadow-sm">
+			<div class="group relative flex flex-col justify-between bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-3.5 sm:p-4 md:p-5 transition-all duration-200 border border-slate-100/80 hover:border-blue-200/60 shadow-2xs hover:shadow-xs">
 				
 				<!-- Top Content -->
 				<div>
-					<div class="flex items-center justify-between gap-1.5 mb-2 sm:mb-3">
-						<!-- Brand Primary Step Badge -->
-						<div class="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-lg bg-brand-accent text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0">
-							<?php echo esc_html( $step_item['step'] ); ?>
+					<div class="flex items-center justify-between gap-2 mb-2 sm:mb-2.5">
+						<div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
+							<!-- Brand Accent Step Badge -->
+							<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-brand-accent text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-xs shrink-0">
+								<?php echo esc_html( $step_item['step'] ); ?>
+							</div>
+
+							<!-- Step Title -->
+							<h3 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base group-hover:text-[#00308b] transition-colors leading-snug truncate">
+								<?php echo esc_html( $step_item['title'] ); ?>
+							</h3>
 						</div>
 
 						<!-- Clean Neutral Tag Pill -->
-						<span class="inline-block text-[10px] sm:text-[11px] font-bold text-slate-600 bg-white/90 border border-slate-200/60 px-1.5 sm:px-2.5 py-0.5 rounded-md shadow-2xs truncate max-w-[100px] sm:max-w-none shrink-0">
+						<span class="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-slate-600 bg-white border border-slate-200/70 px-2 py-0.5 rounded-md shadow-2xs shrink-0 whitespace-nowrap">
 							<?php echo esc_html( $step_item['tag'] ); ?>
 						</span>
 					</div>
 
-					<!-- Step Title -->
-					<h3 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base mb-1 group-hover:text-[#00308b] transition-colors leading-snug line-clamp-2">
-						<?php echo esc_html( $step_item['title'] ); ?>
-					</h3>
-
 					<!-- Step Description -->
-					<p class="text-[11px] sm:text-xs md:text-sm text-slate-500 leading-relaxed font-normal line-clamp-3 sm:line-clamp-none">
+					<p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal mt-1 sm:mt-1.5">
 						<?php echo esc_html( $step_item['desc'] ); ?>
 					</p>
 				</div>
@@ -120,18 +121,18 @@ $steps = [
 
 	<!-- Bottom Action Bar -->
 	<?php if ( $args['show_cta'] ) : ?>
-		<div class="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-blue-50/50 p-3 sm:p-4 rounded-xl">
+		<div class="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-blue-50/60 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-blue-100/60">
 			<div class="flex items-center gap-2.5 sm:gap-3 text-left">
-				<div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#00308b] text-white flex items-center justify-center shrink-0 shadow-2xs">
-					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+				<div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center shrink-0 shadow-2xs">
+					<svg class="w-4.5 h-4.5 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
 				</div>
-				<div>
-					<p class="font-bold text-slate-900 text-xs sm:text-sm mb-0.5">Kiểm tra điều kiện & dự kiến số tín chỉ miễn giảm?</p>
-					<p class="text-[11px] sm:text-xs text-slate-500">Chuyên viên tư vấn sẽ liên hệ hướng dẫn lộ trình miễn phí.</p>
+				<div class="min-w-0">
+					<p class="font-bold text-slate-900 text-xs sm:text-sm mb-0.5 leading-snug">Kiểm tra điều kiện & dự kiến số tín chỉ miễn giảm?</p>
+					<p class="text-[11px] sm:text-xs text-slate-500 leading-normal">Chuyên viên tư vấn sẽ liên hệ hướng dẫn lộ trình miễn phí.</p>
 				</div>
 			</div>
 			
-			<a href="<?php echo esc_url( $args['cta_link'] ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-4.5 sm:py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer min-h-[38px] sm:min-h-[40px]">
+			<a href="<?php echo esc_url( $args['cta_link'] ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer min-h-[40px] whitespace-nowrap">
 				<span><?php echo esc_html( $args['cta_text'] ); ?></span>
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
 			</a>

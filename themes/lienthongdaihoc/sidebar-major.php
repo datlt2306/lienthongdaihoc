@@ -28,7 +28,7 @@ if ( ! $school_id ) {
 }
 ?>
 
-<aside id="major-sidebar" class="widget-area space-y-6 sticky top-36 md:top-40" role="complementary" aria-label="<?php esc_attr_e( 'Thanh bên ngành đào tạo', 'ltdh' ); ?>">
+<aside id="major-sidebar" class="widget-area space-y-4 sm:space-y-5 sticky top-36 md:top-40" role="complementary" aria-label="<?php esc_attr_e( 'Thanh bên ngành đào tạo', 'ltdh' ); ?>">
 	<?php
 	if ( is_active_sidebar( 'sidebar-major' ) ) :
 		if ( $school_id && function_exists( 'ltdh_render_school_info_card' ) ) :
