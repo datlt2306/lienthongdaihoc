@@ -105,8 +105,8 @@ ContactInfoAdminTestSuite::assert(
 );
 
 ContactInfoAdminTestSuite::assert(
-	false !== strpos( $acf_fields_php, 'field_school_contact_info' ),
-	"inc/acf-fields.php: Hooks field_school_contact_info"
+	false === strpos( $acf_fields_php, 'field_school_contact_info' ),
+	"inc/acf-fields.php: Hook field_school_contact_info removed"
 );
 
 // 3. Check single-program.php fallback logic
