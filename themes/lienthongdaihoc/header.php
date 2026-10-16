@@ -96,6 +96,20 @@
 				</a>
 			</div>
 		</div>
+
+		<script>
+		function ltdhToggleSubmenu(btn, e) {
+			if (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+			var li = btn.closest('li.menu-item-has-children');
+			if (!li) return;
+			var isOpen = li.classList.toggle('is-open');
+			btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+			btn.setAttribute('aria-label', isOpen ? 'Thu gọn menu con' : 'Mở rộng menu con');
+		}
+		</script>
 	</header>
 
 	<?php if ( ! is_front_page() ) : ?>

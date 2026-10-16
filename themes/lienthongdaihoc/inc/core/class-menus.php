@@ -56,7 +56,20 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 			$li_classes = 'menu-item' . ($is_active ? ' current-menu-item' : '') . ($has_sub ? ' menu-item-has-children' : '');
 		?>
 			<li class="<?php echo esc_attr(trim($li_classes)); ?>">
-				<a href="<?php echo esc_url(home_url($mi['url'])); ?>"><?php echo esc_html($mi['label']); ?></a>
+				<?php if ($location === 'mobile') : ?>
+					<div class="mobile-menu-item-row">
+						<a href="<?php echo esc_url(home_url($mi['url'])); ?>"><?php echo esc_html($mi['label']); ?></a>
+						<?php if ($has_sub) : ?>
+							<button type="button" class="mobile-submenu-toggle" aria-expanded="false" aria-label="Mở rộng menu con" onclick="ltdhToggleSubmenu(this, event)">
+								<svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+								</svg>
+							</button>
+						<?php endif; ?>
+					</div>
+				<?php else : ?>
+					<a href="<?php echo esc_url(home_url($mi['url'])); ?>"><?php echo esc_html($mi['label']); ?></a>
+				<?php endif; ?>
 				<?php if ($has_sub) : ?>
 					<ul class="sub-menu">
 						<?php foreach ($mi['sub'] as $sub) :
@@ -353,3 +366,31 @@ function ltdh_get_hot_majors(): array {
 	set_transient( $cache_key, $majors, DAY_IN_SECONDS );
 	return $majors;
 }
+
+// ----------------------------------------------------
+// 6. Mobile Nav Menu Item Output Filter
+// ----------------------------------------------------
+
+/**
+ * Filter start_el for nav-mobile-menu to embed accordion toggle button directly in server HTML.
+ */
+function ltdh_mobile_nav_menu_start_el( $item_output, $item, $depth, $args ) {
+	if ( ! isset( $args->menu_class ) || strpos( $args->menu_class, 'nav-mobile-menu' ) === false ) {
+		return $item_output;
+	}
+
+	$has_children = in_array( 'menu-item-has-children', (array) $item->classes, true );
+
+	if ( $has_children ) {
+		$toggle_btn = '<button type="button" class="mobile-submenu-toggle" aria-expanded="false" aria-label="' . esc_attr__( 'Mở rộng menu con', 'ltdh' ) . '" onclick="ltdhToggleSubmenu(this, event)">'
+			. '<svg class="w-4 h-4 text-slate-500 shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">'
+			. '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />'
+			. '</svg>'
+			. '</button>';
+
+		return '<div class="mobile-menu-item-row">' . $item_output . $toggle_btn . '</div>';
+	}
+
+	return '<div class="mobile-menu-item-row">' . $item_output . '</div>';
+}
+add_filter( 'walker_nav_menu_start_el', 'ltdh_mobile_nav_menu_start_el', 10, 4 );

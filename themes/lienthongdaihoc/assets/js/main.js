@@ -5,7 +5,20 @@
  * Optimized for Google Core Web Vitals (INP < 200ms, non-blocking execution)
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+// Global toggle function accessible from HTML onclick attributes
+window.ltdhToggleSubmenu = window.ltdhToggleSubmenu || function(btn, e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const li = btn.closest('li.menu-item-has-children');
+    if (!li) return;
+    const isOpen = li.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    btn.setAttribute('aria-label', isOpen ? 'Thu gọn menu con' : 'Mở rộng menu con');
+};
+
+function ltdhInitTheme() {
     // ----------------------------------------------------
     // 1. Mobile Menu Offcanvas Drawer & Collapsible Accordion
     // ----------------------------------------------------
@@ -30,18 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('overflow-hidden');
     }
 
-    if (toggleBtn && menu && overlay) {
+    if (toggleBtn && menu && overlay && !toggleBtn._bound) {
+        toggleBtn._bound = true;
         toggleBtn.addEventListener('click', (e) => {
             e.preventDefault();
             openMenu();
         }, { passive: false });
     }
 
-    if (closeBtn) {
+    if (closeBtn && !closeBtn._bound) {
+        closeBtn._bound = true;
         closeBtn.addEventListener('click', closeMenu, { passive: true });
     }
 
-    if (overlay) {
+    if (overlay && !overlay._bound) {
+        overlay._bound = true;
         overlay.addEventListener('click', closeMenu, { passive: true });
     }
 
@@ -51,75 +67,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initialize collapsible accordions for mobile sub-menus
-    function initMobileMenuAccordions() {
-        if (!menu) return;
-        const parentItems = menu.querySelectorAll('li.menu-item-has-children');
-
-        parentItems.forEach((item) => {
-            if (item.querySelector(':scope > .mobile-menu-item-row')) return;
-
-            const directLink = item.querySelector(':scope > a');
-            const directSub  = item.querySelector(':scope > ul.sub-menu');
-            if (!directLink || !directSub) return;
-
-            // Create row wrapper
-            const row = document.createElement('div');
-            row.className = 'mobile-menu-item-row';
-
-            // Create toggle button with accessible label and rotating chevron
-            const toggleButton = document.createElement('button');
-            toggleButton.type = 'button';
-            toggleButton.className = 'mobile-submenu-toggle';
-            toggleButton.setAttribute('aria-expanded', 'false');
-            toggleButton.setAttribute('aria-label', 'Mở rộng menu con');
-            toggleButton.innerHTML = `
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-                </svg>
-            `;
-
-            // Wrap link and button in row
-            item.insertBefore(row, directSub);
-            row.appendChild(directLink);
-            row.appendChild(toggleButton);
-
-            const toggleAccordion = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const isOpen = item.classList.contains('is-open');
-                if (isOpen) {
-                    item.classList.remove('is-open');
-                    toggleButton.setAttribute('aria-expanded', 'false');
-                    toggleButton.setAttribute('aria-label', 'Mở rộng menu con');
-                } else {
-                    item.classList.add('is-open');
-                    toggleButton.setAttribute('aria-expanded', 'true');
-                    toggleButton.setAttribute('aria-label', 'Thu gọn menu con');
-                }
-            };
-
-            toggleButton.addEventListener('click', toggleAccordion);
-
-            // If parent link has hash/empty href, tapping the label text also toggles
-            const href = (directLink.getAttribute('href') || '').trim();
-            if (href === '#' || href === '' || href.startsWith('javascript:')) {
-                directLink.addEventListener('click', toggleAccordion);
-            }
-        });
-    }
-
-    initMobileMenuAccordions();
-
     // Close menu when clicking actual navigation links (delegated, ignores dummy toggles)
-    if (menu) {
+    if (menu && !menu._clickBound) {
+        menu._clickBound = true;
         menu.addEventListener('click', (e) => {
-            const link = e.target.closest('a');
-            if (!link) return;
-            const href = (link.getAttribute('href') || '').trim();
-            if (!href || href === '#' || href.startsWith('javascript:')) {
+            const toggleButton = e.target.closest('.mobile-submenu-toggle');
+            if (toggleButton) {
+                // Toggle clicked, do not navigate or close drawer
                 return;
             }
+
+            const link = e.target.closest('a');
+            if (!link) return;
+
+            const href = (link.getAttribute('href') || '').trim();
+            if (!href || href === '#' || href.startsWith('javascript:')) {
+                // Dummy/toggle link clicked - toggle accordion instead
+                const parentLi = link.closest('li.menu-item-has-children');
+                if (parentLi) {
+                    const btn = parentLi.querySelector('.mobile-submenu-toggle');
+                    if (btn) {
+                        window.ltdhToggleSubmenu(btn, e);
+                    }
+                }
+                return;
+            }
+
+            // Real navigation link clicked: close menu
             closeMenu();
         });
     }
@@ -391,5 +365,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initMajorPageFilter();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ltdhInitTheme);
+} else {
+    ltdhInitTheme();
+}
 

@@ -199,25 +199,27 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
     padding: 0;
-    border: none;
-    background: transparent;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
     cursor: pointer;
     border-radius: 0.625rem;
     color: #64748b;
-    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     flex-shrink: 0;
+    margin-right: 0.25rem;
 }
 .mobile-submenu-toggle:hover,
 .mobile-submenu-toggle:focus-visible {
-    background-color: #e2e8f0;
-    color: #0f172a;
+    background-color: #f1f5f9;
+    color: #00308b;
+    border-color: #cbd5e1;
 }
 .mobile-submenu-toggle:active {
     transform: scale(0.92);
@@ -227,6 +229,12 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     height: 1.125rem;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
+}
+.nav-mobile-menu li.menu-item-has-children.is-open > .mobile-menu-item-row .mobile-submenu-toggle,
+.nav-mobile-menu li.menu-item-has-children.is-open > .mobile-submenu-toggle {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+    color: #00308b;
 }
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-menu-item-row .mobile-submenu-toggle svg,
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-submenu-toggle svg {

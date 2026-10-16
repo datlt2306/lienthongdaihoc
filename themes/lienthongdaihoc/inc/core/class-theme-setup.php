@@ -65,10 +65,14 @@ function ltdh_enqueue_assets() {
 
 	$script_handle = 'ltdh-fallback-js';
 	if ( file_exists( get_template_directory() . '/assets/js/main.bundle.js' ) ) {
-		wp_enqueue_script( 'ltdh-theme-js', get_template_directory_uri() . '/assets/js/main.bundle.js', [], LTDH_VERSION, true );
+		$bundle_path = get_template_directory() . '/assets/js/main.bundle.js';
+		$bundle_ver  = filemtime( $bundle_path );
+		wp_enqueue_script( 'ltdh-theme-js', get_template_directory_uri() . '/assets/js/main.bundle.js', [], $bundle_ver, true );
 		$script_handle = 'ltdh-theme-js';
 	} else {
-		wp_enqueue_script( 'ltdh-fallback-js', get_template_directory_uri() . '/assets/js/main.js', [], LTDH_VERSION, true );
+		$main_js_path = get_template_directory() . '/assets/js/main.js';
+		$main_js_ver  = file_exists( $main_js_path ) ? filemtime( $main_js_path ) : LTDH_VERSION;
+		wp_enqueue_script( 'ltdh-fallback-js', get_template_directory_uri() . '/assets/js/main.js', [], $main_js_ver, true );
 	}
 
 	wp_localize_script( $script_handle, 'ltdh_ajax', [
