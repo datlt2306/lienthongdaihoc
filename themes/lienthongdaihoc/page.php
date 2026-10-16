@@ -24,9 +24,9 @@ get_header();
 				<div class="lg:col-span-3">
 					<?php while ( have_posts() ) : the_post(); ?>
 						<article id="post-<?php the_ID(); ?>" <?php post_class( 'bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8' ); ?>>
-							<h1 class="text-2xl md:text-3xl font-black text-slate-900 mb-6 border-b border-slate-100 pb-4">
+							<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-6 border-b border-slate-100 pb-4">
 								<?php the_title(); ?>
-							</h1>
+							</h2>
 							<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 								<?php the_content(); ?>
 							</div>
@@ -40,9 +40,9 @@ get_header();
 		<?php else : ?>
 			<?php while ( have_posts() ) : the_post(); ?>
 				<article id="post-<?php the_ID(); ?>" <?php post_class( 'bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8' ); ?>>
-					<h1 class="text-2xl md:text-3xl font-black text-slate-900 mb-6 border-b border-slate-100 pb-4">
+					<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-6 border-b border-slate-100 pb-4">
 						<?php the_title(); ?>
-					</h1>
+					</h2>
 					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
 						<?php the_content(); ?>
 					</div>

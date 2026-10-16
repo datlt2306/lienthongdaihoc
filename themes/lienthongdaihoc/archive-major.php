@@ -60,9 +60,9 @@ $all_tab_url = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $arc
 			<!-- Header inside Filter: Title, Found Counter & Reset Action -->
 			<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-5 border-b border-slate-100 gap-3">
 				<div>
-					<h1 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+					<h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
 						<?php echo $active_cat_term ? 'Nhóm ngành: ' . esc_html( $active_cat_term->name ) : 'Danh sách Ngành đào tạo Liên thông Đại học'; ?>
-					</h1>
+					</h2>
 					<p class="text-xs md:text-sm text-slate-500 mt-1">
 						Tìm thấy <strong class="text-brand-primary font-extrabold text-sm md:text-base"><?php echo esc_html( $wp_query->found_posts ); ?></strong> ngành học phù hợp.
 					</p>

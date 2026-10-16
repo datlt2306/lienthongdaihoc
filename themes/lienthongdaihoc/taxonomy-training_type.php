@@ -201,9 +201,9 @@ $has_active_filters = ( ! empty( $selected_type ) || ! empty( $selected_school )
 			<!-- Header inside Filter: Page Title, Found Counter & Reset Action -->
 			<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-5 border-b border-slate-100 gap-3">
 				<div>
-					<h1 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+					<h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
 						<?php echo $active_type_term ? 'Liên thông ' . esc_html( preg_replace( '/^(hệ|liên\s+thông)\s+/iu', '', $active_type_term->name ) ) : 'Chương trình tuyển sinh Liên thông Đại học'; ?>
-					</h1>
+					</h2>
 					<p class="text-xs md:text-sm text-slate-500 mt-1">
 						Tìm thấy <strong class="text-brand-primary font-extrabold text-sm md:text-base"><?php echo esc_html( $query->found_posts ); ?></strong> chương trình phù hợp.
 					</p>

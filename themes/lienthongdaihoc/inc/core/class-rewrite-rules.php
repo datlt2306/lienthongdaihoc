@@ -332,6 +332,16 @@ function ltdh_redirect_taxonomy_base() {
 		exit;
 	}
 
+	// 301 redirect: /hinh-thuc-dao-tao/tu-xa/ → /hinh-thuc-dao-tao/dao-tao-tu-xa/
+	if ( preg_match( '#^/hinh-thuc-dao-tao/tu-xa/?$#i', $request_path ) ) {
+		$redirect_url = home_url( '/hinh-thuc-dao-tao/dao-tao-tu-xa/' );
+		if ( ! empty( $_GET ) ) {
+			$redirect_url = add_query_arg( $_GET, $redirect_url );
+		}
+		wp_redirect( $redirect_url, 301 );
+		exit;
+	}
+
 	// 301 redirect: Clean empty query parameters (e.g. ?s=&truong=abc&nganh=&sort= -> ?truong=abc)
 	if ( ! empty( $_GET ) ) {
 		$cleaned_get = [];

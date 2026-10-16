@@ -314,8 +314,10 @@ $zalo    = ltdh_get_zalo_url();
 
 										<!-- Logo trường -->
 										<div class="h-14 w-14 sm:h-16 sm:w-16 bg-white rounded-2xl border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.12)] -mt-7 sm:-mt-8 ml-4 sm:ml-5 z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105">
-											<?php if ($logo_id) : ?>
-												<?php echo wp_get_attachment_image($logo_id, 'thumbnail', false, ['class' => 'h-full w-full object-contain']); ?>
+											<?php if ($logo_id) : 
+												$logo_alt = get_post_meta( $logo_id, '_wp_attachment_image_alt', true ) ?: ( 'Logo ' . ( $school['title'] ?? '' ) );
+											?>
+												<?php echo wp_get_attachment_image($logo_id, 'thumbnail', false, ['class' => 'h-full w-full object-contain', 'alt' => $logo_alt]); ?>
 											<?php else : ?>
 												<span class="font-display font-extrabold text-[#00308b] text-sm">UNI</span>
 											<?php endif; ?>

@@ -50,9 +50,9 @@ if ( count( $unique_majors ) === 1 ) {
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
 		<!-- Page Section Heading -->
-		<h1 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
+		<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
 			<?php echo esc_html( $seo_title ); ?>
-		</h1>
+		</h2>
 		<p class="text-slate-500 text-sm mb-8 flex flex-wrap items-center gap-1 font-medium">
 			<?php echo esc_html( $seo_desc ); ?>
 		</p>

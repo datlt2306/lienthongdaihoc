@@ -13,6 +13,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 // 1. Dynamic Title for Programs
 // ----------------------------------------------------
 function ltdh_seo_dynamic_title( $title ) {
+	$year         = (int) date( 'Y' );
+	$request_uri  = $_SERVER['REQUEST_URI'] ?? '';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+
+	if ( is_front_page() || ( is_home() && is_front_page() ) ) {
+		return sprintf( 'Liên Thông Đại Học %d: Hệ Từ Xa, Vừa Học Vừa Làm, Chính Quy', $year );
+	}
+
+	if ( is_page( 'cau-hoi-thuong-gap' ) || ( ! empty( $request_path ) && preg_match( '#^/cau-hoi-thuong-gap/?#i', $request_path ) ) ) {
+		return sprintf( 'Hỏi Đáp Tuyển Sinh Liên Thông Đại Học %d | Câu Hỏi Thường Gặp', $year );
+	}
+
+	if ( is_page( 'kiem-tra-dieu-kien' ) || ( ! empty( $request_path ) && preg_match( '#^/kiem-tra-dieu-kien/?#i', $request_path ) ) ) {
+		return sprintf( 'Kiểm Tra Điều Kiện Liên Thông Đại Học %d | Xét Tuyển Nhanh', $year );
+	}
+
 	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
 		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
@@ -37,15 +53,53 @@ function ltdh_seo_dynamic_title( $title ) {
 			$clean_major = trim( $clean_major, " -–\t\n\r\0\x0B" );
 		}
 
-		$year        = (int) date( 'Y' );
-		$type_part   = $clean_type ? " ($clean_type)" : '';
-		$school_part = $school ? " – $school" : '';
+		$type_part    = $clean_type ? " ($clean_type)" : '';
+		$clean_school = $school ? preg_replace( '/^trường\s+đại\s+học\s+/iu', 'ĐH ', $school ) : '';
+		$school_code  = $school_id ? get_post_meta( $school_id, 'school_code', true ) : '';
+		$school_part  = $school ? " – $school" : '';
 
-		return sprintf( 'Liên thông %s%s%s | Tuyển sinh %d', $clean_major, $type_part, $school_part, $year );
+		// Standardized formula with Year (aiming under 65 chars for optimal SERP visibility)
+		$full_candidate = sprintf( 'Liên thông %s%s%s | Tuyển sinh %d', $clean_major, $type_part, $school_part, $year );
+		if ( mb_strlen( $full_candidate ) <= 65 ) {
+			return $full_candidate;
+		}
+
+		$short_school_candidate = sprintf( 'Liên thông %s%s - %s | %d', $clean_major, $type_part, $clean_school, $year );
+		if ( mb_strlen( $short_school_candidate ) <= 65 ) {
+			return $short_school_candidate;
+		}
+
+		if ( ! empty( $school_code ) ) {
+			$code_candidate = sprintf( 'Liên thông %s%s - %s | Tuyển sinh %d', $clean_major, $type_part, $school_code, $year );
+			if ( mb_strlen( $code_candidate ) <= 65 ) {
+				return $code_candidate;
+			}
+			return sprintf( 'Liên thông %s%s - %s | %d', $clean_major, $type_part, $school_code, $year );
+		}
+
+		return $short_school_candidate;
 	}
+
+	if ( is_singular( 'school' ) ) {
+		$clean_title = preg_replace( '/(?:trường\s+)?đại\s+học\s+/iu', 'ĐH ', $title );
+		if ( mb_strlen( $clean_title ) <= 65 ) {
+			return $clean_title;
+		}
+	}
+
+	if ( is_singular( 'major' ) ) {
+		$clean_title = str_replace( 'Lộ Trình Học Liên Thông Đại Học', 'Lộ Trình Liên Thông ĐH', $title );
+		if ( mb_strlen( $clean_title ) <= 65 ) {
+			return $clean_title;
+		}
+	}
+
 	return $title;
 }
 add_filter( 'rank_math/frontend/title', 'ltdh_seo_dynamic_title' );
+add_filter( 'rank_math/opengraph/facebook/title', 'ltdh_seo_dynamic_title' );
+add_filter( 'rank_math/opengraph/twitter/title', 'ltdh_seo_dynamic_title' );
+add_filter( 'pre_get_document_title', 'ltdh_seo_dynamic_title', 15 );
 
 /**
  * Dynamic Document Title for Archive & Virtual Route Listings
@@ -67,14 +121,14 @@ function ltdh_seo_archive_document_title( $title ) {
 			$term = get_queried_object();
 			if ( $term && isset( $term->name ) ) {
 				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
-				return sprintf( 'Tuyển Sinh Liên Thông Đại Học %s %d | Danh Sách Trường & Học Phí', $clean_term_name, $year );
+				return sprintf( 'Liên Thông %s %d | Danh Sách Trường & Học Phí', $clean_term_name, $year );
 			}
 		} elseif ( ! empty( $request_path ) && preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
 			$slug = sanitize_text_field( $m[1] );
 			$term = get_term_by( 'slug', $slug, 'training_type' );
 			if ( $term && ! is_wp_error( $term ) && isset( $term->name ) ) {
 				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
-				return sprintf( 'Tuyển Sinh Liên Thông Đại Học %s %d | Danh Sách Trường & Học Phí', $clean_term_name, $year );
+				return sprintf( 'Liên Thông %s %d | Danh Sách Trường & Học Phí', $clean_term_name, $year );
 			}
 		} elseif ( is_tax( 'major_cat' ) ) {
 			$term = get_queried_object();
@@ -88,7 +142,7 @@ function ltdh_seo_archive_document_title( $title ) {
 			}
 		}
 
-		return sprintf( 'Các Hình Thức Tuyển Sinh Liên Thông Đại Học %d: Từ Xa, Vừa Học Vừa Làm, Chính Quy', $year );
+		return sprintf( 'Các Hình Thức Tuyển Sinh Liên Thông Đại Học %d: Từ Xa, VHVL, CQ', $year );
 	}
 
 	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/nganh-hoc/?#i', $request_path ) ) ) {
@@ -96,7 +150,7 @@ function ltdh_seo_archive_document_title( $title ) {
 	}
 
 	if ( is_post_type_archive( 'school' ) || ( ! empty( $request_path ) && preg_match( '#^/(?:truong-da-hoc|truong-doi-tac)/?#i', $request_path ) ) ) {
-		return sprintf( 'Danh Sách Các Trường Tuyển Sinh Liên Thông Đại Học %d | %s', $year, $site_name );
+		return sprintf( 'Các Trường Tuyển Sinh Liên Thông Đại Học %d | Danh Sách Mới', $year );
 	}
 
 	return $title;
@@ -111,7 +165,30 @@ add_filter( 'wp_title', 'ltdh_seo_archive_document_title', 20 );
 // 2. Dynamic Meta Description for Programs & Archives
 // ----------------------------------------------------
 function ltdh_seo_dynamic_description( $desc ) {
-	$year = (int) date( 'Y' );
+	$year         = (int) date( 'Y' );
+	$request_uri  = $_SERVER['REQUEST_URI'] ?? '';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+
+	if ( is_front_page() || ( is_home() && is_front_page() ) ) {
+		return sprintf(
+			'Cổng thông tin tuyển sinh Liên thông Đại học %d. Đào tạo từ xa online, vừa học vừa làm, chính quy cho người đi làm. Nhận bằng Cử nhân, Kỹ sư chuẩn Bộ GD&ĐT.',
+			$year
+		);
+	}
+
+	if ( is_page( 'cau-hoi-thuong-gap' ) || ( ! empty( $request_path ) && preg_match( '#^/cau-hoi-thuong-gap/?#i', $request_path ) ) ) {
+		return sprintf(
+			'Giải đáp chi tiết các thắc mắc về tuyển sinh liên thông đại học năm %d: điều kiện xét tuyển, thời gian đào tạo từ xa, mức học phí và giá trị bằng cấp tốt nghiệp.',
+			$year
+		);
+	}
+
+	if ( is_page( 'kiem-tra-dieu-kien' ) || ( ! empty( $request_path ) && preg_match( '#^/kiem-tra-dieu-kien/?#i', $request_path ) ) ) {
+		return sprintf(
+			'Công cụ tra cứu và đối chiếu điều kiện tuyển sinh liên thông đại học năm %d. Hướng dẫn lộ trình học cho người tốt nghiệp Trung cấp, Cao đẳng nhận bằng nhanh.',
+			$year
+		);
+	}
 
 	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
@@ -139,18 +216,18 @@ function ltdh_seo_dynamic_description( $desc ) {
 			$clean_major = trim( $clean_major, " -–\t\n\r\0\x0B" );
 		}
 
+		$school_code       = $school_id ? get_post_meta( $school_id, 'school_code', true ) : '';
+		$clean_school_desc = $school_code ?: ( $school ? preg_replace( '/^trường\s+đại\s+học\s+/iu', 'ĐH ', $school ) : 'đối tác' );
+
 		return sprintf(
-			'Thông tin tuyển sinh Liên thông Đại học ngành %s (%s) tại %s. Thời gian học %s, học phí %s. Hướng dẫn làm hồ sơ và xét miễn giảm tín chỉ.',
+			'Tuyển sinh Liên thông %s (%s) tại %s. Thời gian %s, học phí %s. Hướng dẫn hồ sơ xét tuyển và miễn giảm tín chỉ.',
 			$clean_major,
 			$clean_type ?: 'Liên thông',
-			$school ?: 'trường đối tác',
+			$clean_school_desc,
 			$duration,
 			$tuition
 		);
 	}
-
-	$request_uri  = $_SERVER['REQUEST_URI'] ?? '';
-	$request_path = parse_url( $request_uri, PHP_URL_PATH );
 
 	// 1. Archive Major (/nganh-hoc/)
 	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/nganh-hoc/?#i', $request_path ) ) ) {
@@ -181,7 +258,7 @@ function ltdh_seo_dynamic_description( $desc ) {
 			if ( $term && isset( $term->name ) ) {
 				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
 				return sprintf(
-					'Danh sách các chương trình tuyển sinh Liên thông Đại học hình thức %s năm %d. Học phí chi tiết, lộ trình công nhận tín chỉ và hướng dẫn nộp hồ sơ xét tuyển.',
+					'Danh sách tuyển sinh Liên thông Đại học %s %d. Học phí chi tiết, lộ trình công nhận tín chỉ và nộp hồ sơ xét tuyển online.',
 					$clean_term_name,
 					$year
 				);
@@ -192,7 +269,7 @@ function ltdh_seo_dynamic_description( $desc ) {
 			if ( $term && ! is_wp_error( $term ) && isset( $term->name ) ) {
 				$clean_term_name = preg_replace( '/^hệ\s+/iu', '', $term->name );
 				return sprintf(
-					'Danh sách các chương trình tuyển sinh Liên thông Đại học hình thức %s năm %d. Học phí chi tiết, lộ trình công nhận tín chỉ và hướng dẫn nộp hồ sơ xét tuyển.',
+					'Danh sách tuyển sinh Liên thông Đại học %s %d. Học phí chi tiết, lộ trình công nhận tín chỉ và nộp hồ sơ xét tuyển online.',
 					$clean_term_name,
 					$year
 				);
@@ -218,7 +295,7 @@ function ltdh_seo_dynamic_description( $desc ) {
 		}
 
 		return sprintf(
-			'So sánh chi tiết học phí, thời gian và văn bằng tốt nghiệp các hình thức đào tạo liên thông đại học năm %d: Đào tạo từ xa (online 100%%), Vừa học vừa làm (học tối & cuối tuần), Chính quy.',
+			'So sánh học phí, thời gian và văn bằng các hình thức liên thông đại học %d: Đào tạo từ xa online, Vừa học vừa làm, Chính quy chuẩn Bộ GD&ĐT.',
 			$year
 		);
 	}
@@ -850,5 +927,24 @@ function ltdh_output_native_schema_fallback() {
 		echo "\n" . '<script type="application/ld+json">' . wp_json_encode( $schemas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) . '</script>' . "\n";
 	}
 }
+
+/**
+ * 8. Fallback Alt Attribute for Attachments
+ * Ensures all images rendered via wp_get_attachment_image have valid descriptive alt text.
+ */
+add_filter( 'wp_get_attachment_image_attributes', function( $attr, $attachment ) {
+	if ( empty( trim( $attr['alt'] ?? '' ) ) ) {
+		$parent_id = wp_get_post_parent_id( $attachment->ID );
+		if ( $parent_id ) {
+			$attr['alt'] = get_the_title( $parent_id );
+		} elseif ( ! empty( $attachment->post_title ) ) {
+			$attr['alt'] = $attachment->post_title;
+		} else {
+			$attr['alt'] = get_bloginfo( 'name' );
+		}
+	}
+	return $attr;
+}, 10, 2 );
+
 
 
