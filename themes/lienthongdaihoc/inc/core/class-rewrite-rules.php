@@ -346,6 +346,22 @@ function ltdh_redirect_taxonomy_base() {
 		wp_redirect( $redirect_url, 301 );
 		exit;
 	}
+
+	// 301 redirect: Clean legacy program URLs with duplicate terms
+	$legacy_program_slug_map = [
+		'cu-nhan-cong-nghe-thong-tin-lien-thong-chinh-quy-chinh-quy-utc'   => 'lien-thong-cong-nghe-thong-tin-chinh-quy-utc',
+		'cu-nhan-cong-nghe-thong-tin-dao-tao-tu-xa-tu-xa-utc'             => 'lien-thong-cong-nghe-thong-tin-tu-xa-utc',
+		'cu-nhan-cong-nghe-thong-tin-vua-hoc-vua-lam-vua-hoc-vua-lam-utc' => 'lien-thong-cong-nghe-thong-tin-vua-hoc-vua-lam-utc',
+	];
+	$trimmed_slug = trim( $request_path, '/' );
+	if ( isset( $legacy_program_slug_map[ $trimmed_slug ] ) ) {
+		$target_url = home_url( '/' . $legacy_program_slug_map[ $trimmed_slug ] . '/' );
+		if ( ! empty( $_GET ) ) {
+			$target_url = add_query_arg( $_GET, $target_url );
+		}
+		wp_redirect( $target_url, 301 );
+		exit;
+	}
 }
 add_action( 'template_redirect', 'ltdh_redirect_taxonomy_base' );
 

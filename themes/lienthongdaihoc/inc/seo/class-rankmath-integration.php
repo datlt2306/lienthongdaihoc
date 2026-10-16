@@ -16,18 +16,32 @@ function ltdh_seo_dynamic_title( $title ) {
 	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
 		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
+		$major_id   = intval( get_field( LTDH_META_MAJOR_REL, $program_id ) ?: 0 );
 		$school     = $school_id ? get_the_title( $school_id ) : '';
+		$major      = $major_id ? get_the_title( $major_id ) : '';
 
 		$training_type = '';
 		$terms = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
 		if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 			$training_type = $terms[0]->name;
 		}
-		$clean_type = preg_replace( '/^hệ\s+/iu', '', $training_type );
-		$type_label = $clean_type ? ' - ' . $clean_type : '';
+		$clean_type = preg_replace( '/^hệ\s+/iu', '', trim( (string) $training_type ) );
 
-		$year = (int) date( 'Y' );
-		return sprintf( 'Tuyển sinh Liên thông %s%s - %s | Tuyển sinh %d', get_the_title(), $type_label, $school, $year );
+		$clean_major = $major ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major ) ) : '';
+		if ( empty( $clean_major ) ) {
+			$raw_title   = get_the_title( $program_id );
+			$clean_major = preg_replace( '/^(?:tuyển sinh\s+)?liên thông\s+(?:đại học\s+)?(?:ngành\s+)?/iu', '', $raw_title );
+			if ( $clean_type ) {
+				$clean_major = preg_replace( '/\s*[-–(]\s*' . preg_quote( $clean_type, '/' ) . '\s*[)]?/iu', '', $clean_major );
+			}
+			$clean_major = trim( $clean_major, " -–\t\n\r\0\x0B" );
+		}
+
+		$year        = (int) date( 'Y' );
+		$type_part   = $clean_type ? " ($clean_type)" : '';
+		$school_part = $school ? " – $school" : '';
+
+		return sprintf( 'Liên thông %s%s%s | Tuyển sinh %d', $clean_major, $type_part, $school_part, $year );
 	}
 	return $title;
 }
@@ -99,7 +113,9 @@ function ltdh_seo_dynamic_description( $desc ) {
 	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
 		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
+		$major_id   = intval( get_field( LTDH_META_MAJOR_REL, $program_id ) ?: 0 );
 		$school     = $school_id ? get_the_title( $school_id ) : '';
+		$major      = $major_id ? get_the_title( $major_id ) : '';
 		$tuition    = ltdh_get_program_tuition_display( $program_id );
 		$duration   = get_field( LTDH_META_DURATION, $program_id ) ?: '1.5 - 2 năm';
 
@@ -108,12 +124,23 @@ function ltdh_seo_dynamic_description( $desc ) {
 		if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 			$training_type = $terms[0]->name;
 		}
+		$clean_type = preg_replace( '/^hệ\s+/iu', '', trim( (string) $training_type ) );
+
+		$clean_major = $major ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major ) ) : '';
+		if ( empty( $clean_major ) ) {
+			$raw_title   = get_the_title( $program_id );
+			$clean_major = preg_replace( '/^(?:tuyển sinh\s+)?liên thông\s+(?:đại học\s+)?(?:ngành\s+)?/iu', '', $raw_title );
+			if ( $clean_type ) {
+				$clean_major = preg_replace( '/\s*[-–(]\s*' . preg_quote( $clean_type, '/' ) . '\s*[)]?/iu', '', $clean_major );
+			}
+			$clean_major = trim( $clean_major, " -–\t\n\r\0\x0B" );
+		}
 
 		return sprintf(
-			'Thông tin tuyển sinh Liên thông Đại học ngành %s (%s) tại trường %s. Thời gian học %s, học phí %s. Hướng dẫn làm hồ sơ và xét miễn giảm tín chỉ miễn phí.',
-			get_the_title(),
-			$training_type ?: 'Liên thông',
-			$school,
+			'Thông tin tuyển sinh Liên thông Đại học ngành %s (%s) tại %s. Thời gian học %s, học phí %s. Hướng dẫn làm hồ sơ và xét miễn giảm tín chỉ.',
+			$clean_major,
+			$clean_type ?: 'Liên thông',
+			$school ?: 'trường đối tác',
 			$duration,
 			$tuition
 		);
@@ -214,18 +241,33 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
 		$program_id = get_the_ID();
 		$school_id  = intval( get_field( LTDH_META_SCHOOL_REL, $program_id ) ?: 0 );
+		$major_id   = intval( get_field( LTDH_META_MAJOR_REL, $program_id ) ?: 0 );
 		$school     = $school_id ? get_the_title( $school_id ) : 'Đối tác';
+		$major      = $major_id ? get_the_title( $major_id ) : '';
 
 		$training_type = '';
 		$terms         = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
 		if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 			$training_type = $terms[0]->name;
 		}
+		$clean_type  = preg_replace( '/^hệ\s+/iu', '', trim( (string) $training_type ) );
+		$clean_major = $major ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major ) ) : '';
+		if ( empty( $clean_major ) ) {
+			$raw_title   = get_the_title( $program_id );
+			$clean_major = preg_replace( '/^(?:tuyển sinh\s+)?liên thông\s+(?:đại học\s+)?(?:ngành\s+)?/iu', '', $raw_title );
+			if ( $clean_type ) {
+				$clean_major = preg_replace( '/\s*[-–(]\s*' . preg_quote( $clean_type, '/' ) . '\s*[)]?/iu', '', $clean_major );
+			}
+			$clean_major = trim( $clean_major, " -–\t\n\r\0\x0B" );
+		}
+		$type_part   = $clean_type ? " ($clean_type)" : '';
+		$school_part = ( $school && 'Đối tác' !== $school ) ? " – $school" : '';
+		$schema_program_name = 'Liên thông ' . $clean_major . $type_part . $school_part;
 
 		$data['ltdh_course'] = [
 			'@context'    => 'https://schema.org',
 			'@type'       => 'Course',
-			'name'        => get_the_title(),
+			'name'        => $schema_program_name,
 			'description' => get_the_excerpt() ?: 'Chương trình đào tạo đại học tuyển sinh chất lượng cao.',
 			'provider'    => [
 				'@type' => 'CollegeOrUniversity',
@@ -238,7 +280,7 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		$data['ltdh_program'] = [
 			'@context'                     => 'https://schema.org',
 			'@type'                        => 'EducationalOccupationalProgram',
-			'name'                         => 'Tuyển sinh Liên thông: ' . get_the_title(),
+			'name'                         => $schema_program_name,
 			'description'                  => get_the_excerpt() ?: 'Chương trình tuyển sinh Liên thông Đại học chuẩn Bộ GD&ĐT.',
 			'provider'                     => [
 				'@type' => 'CollegeOrUniversity',

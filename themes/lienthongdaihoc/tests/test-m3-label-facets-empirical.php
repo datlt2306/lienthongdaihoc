@@ -1,4 +1,9 @@
 <?php
+if ( php_sapi_name() !== 'cli' ) {
+	http_response_code( 403 );
+	die( 'Forbidden: CLI access only.' );
+}
+
 /**
  * Empirical Test Harness for Milestone M3 Public Labels & Facets
  *

@@ -1,4 +1,9 @@
 <?php
+if ( php_sapi_name() !== 'cli' ) {
+	http_response_code( 403 );
+	die( 'Forbidden: CLI access only.' );
+}
+
 /**
  * Unit Test Suite for Eligibility Engine & Distance Learning Matching
  * lienthongdaihoc Theme

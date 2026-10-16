@@ -736,6 +736,9 @@ class LTDH_CLI_Commands {
 
 		// Cleanup legacy/duplicate UTC IT programs if any exist
 		$valid_slugs = [
+			'lien-thong-cong-nghe-thong-tin-vua-hoc-vua-lam-utc',
+			'lien-thong-cong-nghe-thong-tin-chinh-quy-utc',
+			'lien-thong-cong-nghe-thong-tin-tu-xa-utc',
 			'cu-nhan-cong-nghe-thong-tin-vua-hoc-vua-lam-vua-hoc-vua-lam-utc',
 			'cu-nhan-cong-nghe-thong-tin-lien-thong-chinh-quy-chinh-quy-utc',
 			'cu-nhan-cong-nghe-thong-tin-dao-tao-tu-xa-tu-xa-utc',
@@ -759,7 +762,9 @@ class LTDH_CLI_Commands {
 		// 3. Seed Programs for the 3 training types
 		$programs_data = [
 			'vua-hoc-vua-lam' => [
-				'title' => 'Cử nhân Công nghệ thông tin (Vừa học vừa làm)',
+				'title' => 'Công nghệ thông tin (Vừa học vừa làm) - ĐH GTVT',
+				'slug' => 'lien-thong-cong-nghe-thong-tin-vua-hoc-vua-lam-utc',
+				'legacy_slug' => 'cu-nhan-cong-nghe-thong-tin-vua-hoc-vua-lam-vua-hoc-vua-lam-utc',
 				'tuition' => '684.026đ / tín chỉ',
 				'tuition_amount' => 684026,
 				'tuition_unit' => 'tin-chi',
@@ -808,7 +813,9 @@ class LTDH_CLI_Commands {
 				]
 			],
 			'chinh-quy' => [
-				'title' => 'Cử nhân Công nghệ thông tin (Liên thông Chính quy)',
+				'title' => 'Công nghệ thông tin (Chính quy) - ĐH GTVT',
+				'slug' => 'lien-thong-cong-nghe-thong-tin-chinh-quy-utc',
+				'legacy_slug' => 'cu-nhan-cong-nghe-thong-tin-lien-thong-chinh-quy-chinh-quy-utc',
 				'status' => LTDH_STATUS_PAUSED,
 				'tuition' => '526.174đ / tín chỉ',
 				'tuition_amount' => 526174,
@@ -837,7 +844,7 @@ class LTDH_CLI_Commands {
 						'enrollment_time' => 'Thi tuyển 17-18/01/2026',
 						'batch_status' => 'da-dong'
 					],
-					[
+					[ 
 						'batch_name' => 'Tuyển sinh Đợt 2',
 						'release_period' => '24/03/2026 - 13/05/2026',
 						'application_period' => '25/03/2026 - 18/05/2026',
@@ -846,7 +853,7 @@ class LTDH_CLI_Commands {
 						'enrollment_time' => 'Thi tuyển 06-07/06/2026',
 						'batch_status' => 'da-dong'
 					],
-					[
+					[ 
 						'batch_name' => 'Tuyển sinh Đợt 3 (Bổ sung)',
 						'release_period' => '06/07/2026 - 13/08/2026',
 						'application_period' => '07/07/2026 - 14/08/2026',
@@ -858,7 +865,9 @@ class LTDH_CLI_Commands {
 				]
 			],
 			'tu-xa' => [
-				'title' => 'Cử nhân Công nghệ thông tin (Đào tạo từ xa)',
+				'title' => 'Công nghệ thông tin (Từ xa) - ĐH GTVT',
+				'slug' => 'lien-thong-cong-nghe-thong-tin-tu-xa-utc',
+				'legacy_slug' => 'cu-nhan-cong-nghe-thong-tin-dao-tao-tu-xa-tu-xa-utc',
 				'tuition' => '606.369đ / tín chỉ',
 				'tuition_amount' => 606369,
 				'tuition_unit' => 'tin-chi',
@@ -881,14 +890,22 @@ class LTDH_CLI_Commands {
 		];
 
 		foreach ( $programs_data as $t_slug => $p_info ) {
-			$program_title = $p_info['title'];
-			$program_name_slug = sanitize_title( $program_title . '-' . $t_slug . '-utc' );
+			$program_title     = $p_info['title'];
+			$program_name_slug = $p_info['slug'] ?? ( 'lien-thong-cong-nghe-thong-tin-' . $t_slug . '-utc' );
+			$legacy_slug       = $p_info['legacy_slug'] ?? '';
 
 			$existing_program = get_posts( [
-				'post_type'  => LTDH_CPT_PROGRAM,
-				'name'       => $program_name_slug,
+				'post_type'      => LTDH_CPT_PROGRAM,
+				'name'           => $program_name_slug,
 				'posts_per_page' => 1,
 			] );
+			if ( empty( $existing_program ) && ! empty( $legacy_slug ) ) {
+				$existing_program = get_posts( [
+					'post_type'      => LTDH_CPT_PROGRAM,
+					'name'           => $legacy_slug,
+					'posts_per_page' => 1,
+				] );
+			}
 
 			$post_content = "Chương trình đào tạo Cử nhân & Kỹ sư ngành $major_title hệ " . ( $t_slug === 'tu-xa' ? 'Đào tạo từ xa' : ( $t_slug === 'chinh-quy' ? 'Chính quy' : 'Vừa học vừa làm' ) ) . " của $school_title.";
 
@@ -897,6 +914,7 @@ class LTDH_CLI_Commands {
 				wp_update_post( [
 					'ID'           => $program_id,
 					'post_title'   => $program_title,
+					'post_name'    => $program_name_slug,
 					'post_content' => $post_content,
 				] );
 				WP_CLI::line( "Chương trình đã tồn tại (đã cập nhật tiêu đề và nội dung): $program_title" );

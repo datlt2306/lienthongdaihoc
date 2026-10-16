@@ -1,4 +1,9 @@
 <?php
+if ( php_sapi_name() !== 'cli' ) {
+	http_response_code( 403 );
+	die( 'Forbidden: CLI access only.' );
+}
+
 require_once __DIR__ . '/../../../../wp-load.php';
 
 if ( function_exists( 'update_field' ) ) {
