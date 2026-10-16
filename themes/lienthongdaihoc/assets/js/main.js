@@ -153,6 +153,35 @@ function ltdhInitTheme() {
                 },
             });
         }
+
+        const hotMajorsSwiperEl = document.querySelector('.hot-majors-swiper');
+        if (hotMajorsSwiperEl) {
+            new Swiper('.hot-majors-swiper', {
+                slidesPerView: 2.2,
+                spaceBetween: 12,
+                watchSlidesProgress: true,
+                grabCursor: true,
+                pagination: {
+                    el: '.hot-majors-pagination',
+                    clickable: true,
+                },
+                breakpoints: {
+                    480: {
+                        slidesPerView: 2.5,
+                        spaceBetween: 14,
+                    },
+                    640: {
+                        slidesPerView: 3.5,
+                        spaceBetween: 16,
+                    },
+                    1024: {
+                        slidesPerView: 5,
+                        spaceBetween: 16,
+                        allowTouchMove: false,
+                    },
+                },
+            });
+        }
     };
 
     if ('requestIdleCallback' in window) {

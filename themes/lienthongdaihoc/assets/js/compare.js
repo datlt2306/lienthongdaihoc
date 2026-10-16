@@ -238,10 +238,16 @@
 
 		if (totalCount < 1) {
 			tray.classList.add('hidden');
+			document.body.style.paddingBottom = '';
 			return;
 		}
 
 		tray.classList.remove('hidden');
+		setTimeout(function () {
+			if (tray && !tray.classList.contains('hidden')) {
+				document.body.style.paddingBottom = (tray.offsetHeight || 80) + 'px';
+			}
+		}, 50);
 
 		var listEl = tray.querySelector('.ltdh-tray-items');
 		if (!listEl) return;
@@ -293,41 +299,41 @@
 			var imgTag = '';
 			if (thumb && thumb.indexOf('cropped-logo') === -1) {
 				var safeImgUrl = thumb.replace(/"/g, '&quot;');
-				imgTag = '<img src="' + safeImgUrl + '" class="h-8 w-8 rounded object-contain p-0.5 bg-white border border-slate-200 shrink-0" alt="" onerror="this.style.display=\'none\';">';
+				imgTag = '<img src="' + safeImgUrl + '" class="h-6 w-6 sm:h-8 sm:w-8 rounded object-contain p-0.5 bg-white border border-slate-200 shrink-0" alt="" onerror="this.style.display=\'none\';">';
 			} else {
 				var sName = schoolName || (title ? title.replace(/^Liên thông ngành\s+/iu, '') : 'UNI');
 				var code = sName.replace(/^(Trường\s+)?(Đại\s+học|Học\s+viện|Cao\s+đẳng)\s+/iu, '').split(/\s+/).slice(0, 3).map(function(w) { return w ? w[0] : ''; }).join('').toUpperCase();
 				if (!code) code = 'UNI';
 				var safeCode = String(code).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-				imgTag = '<div class="h-8 w-8 rounded bg-[#00308b] text-white font-black text-[10px] flex items-center justify-center shrink-0 uppercase tracking-tighter shadow-xs border border-blue-800">' + safeCode + '</div>';
+				imgTag = '<div class="h-6 w-6 sm:h-8 sm:w-8 rounded bg-[#00308b] text-white font-black text-[9px] sm:text-[10px] flex items-center justify-center shrink-0 uppercase tracking-tighter shadow-2xs border border-blue-800">' + safeCode + '</div>';
 			}
 
 			var el = document.createElement('div');
-			el.className = 'flex items-center gap-2 bg-slate-100 rounded-lg px-3 py-1.5 text-sm shrink-0';
+			el.className = 'flex items-center gap-1.5 sm:gap-2 bg-slate-100/90 rounded-lg sm:rounded-xl px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm shrink-0 border border-slate-200/80 shadow-2xs';
 			el.title = safeTitle;
 			el.innerHTML =
 				imgTag +
-				'<span class="font-semibold text-slate-700 truncate max-w-[160px]">' + safeLabel + '</span>' +
-				'<button class="ltdh-tray-remove text-slate-400 hover:text-red-500 ml-1 text-xl leading-none w-7 h-7 flex items-center justify-center" data-type="' + activeType + '" data-id="' + id + '">&times;</button>';
+				'<span class="font-bold text-slate-800 truncate max-w-[100px] sm:max-w-[160px]">' + safeLabel + '</span>' +
+				'<button class="ltdh-tray-remove text-slate-400 hover:text-red-500 hover:bg-slate-200 rounded-md ml-0.5 text-base leading-none w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center transition-colors" data-type="' + activeType + '" data-id="' + id + '">&times;</button>';
 			listEl.appendChild(el);
 		});
 
 		saveDetailsCache(cache);
 
-		// Update tray major badge
-		var trayMajor = tray.querySelector('.ltdh-tray-major');
-		if (trayMajor) {
+		// Update tray major badges (both mobile top meta & desktop)
+		var trayMajors = tray.querySelectorAll('.ltdh-tray-major');
+		trayMajors.forEach(function (tm) {
 			if (activeMajorName) {
-				trayMajor.textContent = 'Ngành: ' + activeMajorName;
-				trayMajor.title = 'Ngành ' + activeMajorName;
-				trayMajor.classList.remove('hidden');
-				trayMajor.classList.add('inline-flex');
+				tm.textContent = 'Ngành: ' + activeMajorName;
+				tm.title = 'Ngành ' + activeMajorName;
+				tm.classList.remove('hidden');
+				tm.classList.add('inline-flex');
 			} else {
-				trayMajor.textContent = '';
-				trayMajor.classList.add('hidden');
-				trayMajor.classList.remove('inline-flex');
+				tm.textContent = '';
+				tm.classList.add('hidden');
+				tm.classList.remove('inline-flex');
 			}
-		}
+		});
 
 		// Bind remove buttons
 		listEl.querySelectorAll('.ltdh-tray-remove').forEach(function (btn) {
@@ -339,11 +345,11 @@
 			});
 		});
 
-		// Update counter
-		var counter = tray.querySelector('.ltdh-tray-count');
-		if (counter) {
-			counter.textContent = totalCount + '/' + MAX_ITEMS;
-		}
+		// Update counters (both mobile top meta & desktop)
+		var counters = tray.querySelectorAll('.ltdh-tray-count');
+		counters.forEach(function (c) {
+			c.textContent = totalCount + '/' + MAX_ITEMS;
+		});
 
 		// Update compare link
 		var link = tray.querySelector('.ltdh-tray-link');
@@ -420,8 +426,7 @@
 
 		var toast = document.createElement('div');
 		toast.id = 'ltdh-compare-toast';
-		toast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 z-[100] ' + (colors[type] || colors.info) + ' text-white px-5 py-3 rounded-xl shadow-lg text-sm font-semibold transition-all';
-		toast.style.maxWidth = '90vw';
+		toast.className = 'fixed bottom-28 sm:bottom-24 left-1/2 -translate-x-1/2 z-[100] ' + (colors[type] || colors.info) + ' text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl shadow-xl text-xs sm:text-sm font-bold transition-all backdrop-blur-md pointer-events-none whitespace-nowrap text-center max-w-[90vw]';
 		toast.textContent = message;
 		document.body.appendChild(toast);
 

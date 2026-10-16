@@ -178,56 +178,65 @@ $zalo    = ltdh_get_zalo_url();
 
 	<!-- 2. HOT PROGRAMS SECTION -->
 	<section class="py-12 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
-		<div class="max-w-7xl mx-auto relative z-10 sm:px-6 lg:px-8">
-			<div class="text-center max-w-2xl mx-auto mb-8 space-y-2 px-4">
+		<div class="max-w-7xl mx-auto relative z-10 px-4 sm:px-6 lg:px-8">
+			<div class="text-center max-w-2xl mx-auto mb-8 space-y-2">
 				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">KHÁM PHÁ NGÀNH HỌC</span>
 				<h2 class="text-xl md:text-4xl font-black text-slate-900">5 ngành đào tạo hot nhất</h2>
 				<p class="text-slate-500 text-sm">Top ngành được yêu thích nhất, phù hợp xu hướng thị trường lao động.</p>
 			</div>
 
-			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 px-4 md:px-0">
-				<?php
-				$hot_majors = ltdh_get_hot_majors();
-				$card_colors = [
-					['bg' => 'bg-blue-50',   'icon_bg' => 'bg-blue-100',   'icon_text' => 'text-blue-600',   'border' => 'border-blue-100',   'hover' => 'hover:border-blue-300'],
-					['bg' => 'bg-violet-50', 'icon_bg' => 'bg-violet-100', 'icon_text' => 'text-violet-600', 'border' => 'border-violet-100', 'hover' => 'hover:border-violet-300'],
-					['bg' => 'bg-emerald-50', 'icon_bg' => 'bg-emerald-100', 'icon_text' => 'text-emerald-600', 'border' => 'border-emerald-100', 'hover' => 'hover:border-emerald-300'],
-					['bg' => 'bg-amber-50',  'icon_bg' => 'bg-amber-100',  'icon_text' => 'text-amber-600',  'border' => 'border-amber-100',  'hover' => 'hover:border-amber-300'],
-					['bg' => 'bg-rose-50',   'icon_bg' => 'bg-rose-100',   'icon_text' => 'text-rose-600',   'border' => 'border-rose-100',   'hover' => 'hover:border-rose-300'],
-				];
+			<!-- Swiper Carousel Container (Mobile swipeable, Desktop 5 columns) -->
+			<div class="relative -mx-4 px-4 sm:mx-0 sm:px-0">
+				<div class="swiper hot-majors-swiper !overflow-visible sm:!overflow-hidden">
+					<div class="swiper-wrapper py-2">
+						<?php
+						$hot_majors = ltdh_get_hot_majors();
+						$card_colors = [
+							['bg' => 'bg-blue-50',   'icon_bg' => 'bg-blue-100',   'icon_text' => 'text-blue-600',   'border' => 'border-blue-100',   'hover' => 'hover:border-blue-300'],
+							['bg' => 'bg-violet-50', 'icon_bg' => 'bg-violet-100', 'icon_text' => 'text-violet-600', 'border' => 'border-violet-100', 'hover' => 'hover:border-violet-300'],
+							['bg' => 'bg-emerald-50', 'icon_bg' => 'bg-emerald-100', 'icon_text' => 'text-emerald-600', 'border' => 'border-emerald-100', 'hover' => 'hover:border-emerald-300'],
+							['bg' => 'bg-amber-50',  'icon_bg' => 'bg-amber-100',  'icon_text' => 'text-amber-600',  'border' => 'border-amber-100',  'hover' => 'hover:border-amber-300'],
+							['bg' => 'bg-rose-50',   'icon_bg' => 'bg-rose-100',   'icon_text' => 'text-rose-600',   'border' => 'border-rose-100',   'hover' => 'hover:border-rose-300'],
+						];
 
-				$major_icons = [
-					'cong-nghe-thong-tin' => '💻',
-					'quan-tri-kinh-doanh' => '📈',
-					'ke-toan' => '💰',
-					'thuong-mai-dien-tu' => '🏪',
-					'logistics' => '🚚',
-				];
+						$major_icons = [
+							'cong-nghe-thong-tin' => '💻',
+							'quan-tri-kinh-doanh' => '📈',
+							'ke-toan' => '💰',
+							'thuong-mai-dien-tu' => '🏪',
+							'logistics' => '🚚',
+						];
 
-				if (! empty($hot_majors)) :
-					$i = 0;
-					foreach ($hot_majors as $maj) :
-						$slug = $maj->post_name;
-						$icon = $major_icons[$slug] ?? '🎓';
-						$c = $card_colors[$i % count($card_colors)];
-						$i++;
-				?>
-						<a href="<?php echo esc_url(get_permalink($maj->ID)); ?>"
-							class="group flex flex-col items-center text-center p-4 bg-white border <?php echo $c['border']; ?> rounded-xl <?php echo $c['hover']; ?> hover:shadow-md transition-all">
-							<div class="h-12 w-12 <?php echo $c['icon_bg']; ?> <?php echo $c['icon_text']; ?> rounded-xl flex items-center justify-center mb-3 text-xl group-hover:scale-110 transition-transform">
-								<?php echo $icon; ?>
-							</div>
-							<h3 class="font-semibold text-slate-700 leading-snug line-clamp-2"><?php echo esc_html($maj->post_title); ?></h3>
-						</a>
-				<?php
-					endforeach;
-				else :
-					echo '<p class="text-sm text-slate-400 col-span-5 text-center">Chưa cấu hình ngành hot.</p>';
-				endif;
-				?>
+						if (! empty($hot_majors)) :
+							$i = 0;
+							foreach ($hot_majors as $maj) :
+								$slug = $maj->post_name;
+								$icon = $major_icons[$slug] ?? '🎓';
+								$c = $card_colors[$i % count($card_colors)];
+								$i++;
+						?>
+								<div class="swiper-slide h-auto">
+									<a href="<?php echo esc_url(get_permalink($maj->ID)); ?>"
+										class="group flex flex-col items-center text-center p-4 sm:p-5 bg-white border <?php echo $c['border']; ?> rounded-2xl <?php echo $c['hover']; ?> hover:shadow-md active:scale-95 transition-all h-full">
+										<div class="h-12 w-12 <?php echo $c['icon_bg']; ?> <?php echo $c['icon_text']; ?> rounded-xl flex items-center justify-center mb-3 text-xl group-hover:scale-110 transition-transform">
+											<?php echo $icon; ?>
+										</div>
+										<h3 class="font-bold text-slate-800 text-sm sm:text-base leading-snug line-clamp-2"><?php echo esc_html($maj->post_title); ?></h3>
+									</a>
+								</div>
+						<?php
+							endforeach;
+						else :
+							echo '<p class="text-sm text-slate-400 col-span-5 text-center">Chưa cấu hình ngành hot.</p>';
+						endif;
+						?>
+					</div>
+					<!-- Mobile Pagination Dots -->
+					<div class="swiper-pagination hot-majors-pagination !relative !bottom-0 mt-4 sm:hidden"></div>
+				</div>
 			</div>
 
-			<div class="text-center mt-8">
+			<div class="text-center mt-6 sm:mt-8">
 				<a href="<?php echo esc_url(home_url('/nganh-hoc/')); ?>"
 					class="inline-flex items-center gap-2 text-[#00308b] font-bold text-sm hover:underline">
 					Xem tất cả ngành học <span>→</span>
@@ -990,7 +999,7 @@ $zalo    = ltdh_get_zalo_url();
 							'status_label' => 'Đã tốt nghiệp',
 							'initials'     => 'HĐ',
 							'image'        => get_template_directory_uri() . '/assets/images/student-do.jpg',
-							'content'      => 'Mình liên thông Cao Đẳng lên đại học. Lịch học được sắp xếp ngoài giờ hành chính, tạo điều kiện thuận lợi cho những người đang đi làm như mình có thể vừa hoàn thành công việc, vừa tiếp tục học tập. Bên cạnh đó, thầy cô luôn nhiệt tình hỗ trợ và tạo điều kiện để sinh viên cân bằng giữa công việc và việc học.'
+							'content'      => 'Điều mình hài lòng nhất khi học liên thông là lịch học ngoài giờ hành chính, rất thuận tiện cho người đang đi làm. Mình có thể vừa hoàn thành công việc, vừa tiếp tục nâng cao trình độ. Thầy cô cũng rất nhiệt tình, luôn sẵn sàng hỗ trợ để sinh viên yên tâm học tập và hoàn thành chương trình.'
 						],
 						[
 							'name'         => 'Trần Minh',
