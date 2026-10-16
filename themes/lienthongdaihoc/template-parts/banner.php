@@ -236,12 +236,20 @@ if ( empty( $banner_image ) ) {
 		<?php if ( is_singular( 'program' ) ) :
 			$banner_verif = function_exists( 'ltdh_get_program_verification' ) ? ltdh_get_program_verification( get_the_ID() ) : null;
 			if ( ! empty( $banner_verif['is_verified'] ) ) :
+				$source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source_title'] : 'Nguồn chính thức';
 		?>
-			<div class="mt-3.5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-semibold backdrop-blur-xs select-none">
+			<div class="mt-3.5 inline-flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-semibold backdrop-blur-xs select-none">
 				<span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] font-black shrink-0">✓</span>
 				<span>Thông tin tuyển sinh đã được xác minh</span>
 				<?php if ( ! empty( $banner_verif['last_verified_at'] ) ) : ?>
 					<span class="text-emerald-300/80">• <?php echo esc_html( $banner_verif['last_verified_at'] ); ?></span>
+				<?php endif; ?>
+				<?php if ( ! empty( $banner_verif['source_url'] ) ) : ?>
+					<span class="text-emerald-300/60 hidden sm:inline">•</span>
+					<a href="<?php echo esc_url( $banner_verif['source_url'] ); ?>" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-1 text-emerald-200 hover:text-white underline underline-offset-2 transition-colors font-medium">
+						<span><?php echo esc_html( $source_label ); ?></span>
+						<svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+					</a>
 				<?php endif; ?>
 			</div>
 		<?php endif; endif; ?>

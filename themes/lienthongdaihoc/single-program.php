@@ -251,7 +251,7 @@ if ( ! empty( $faqs ) ) {
 				<!-- SECTION 2: PROGRAM OVERVIEW -->
 				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Tổng quan chương trình</h2>
-					<?php ltdh_render_program_verification_badge( $program_id, 'detail' ); ?>
+
 
 					<?php
 					$learning_details = ltdh_get_program_learning_details( $program_id );
