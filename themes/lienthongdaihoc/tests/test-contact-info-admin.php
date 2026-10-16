@@ -58,7 +58,7 @@ ContactInfoAdminTestSuite::assert(
 	"acf-import-fields.json: group_program_details exists"
 );
 
-// Check School Contact Info field
+// Check School Contact Info field (removed per request)
 $school_contact = null;
 foreach ( $school_group['fields'] ?? [] as $f ) {
 	if ( ( $f['name'] ?? '' ) === 'contact_info' ) {
@@ -68,13 +68,8 @@ foreach ( $school_group['fields'] ?? [] as $f ) {
 }
 
 ContactInfoAdminTestSuite::assert(
-	$school_contact !== null,
-	"group_school_details: Has 'contact_info' field"
-);
-
-ContactInfoAdminTestSuite::assert(
-	( $school_contact['label'] ?? '' ) === 'Thông tin liên hệ & Tiếp nhận hồ sơ',
-	"group_school_details: Field label is 'Thông tin liên hệ & Tiếp nhận hồ sơ' (was 'Thông tin liên hệ tuyển sinh')"
+	$school_contact === null,
+	"group_school_details: 'contact_info' field removed from School"
 );
 
 // Check Program Contact Info field

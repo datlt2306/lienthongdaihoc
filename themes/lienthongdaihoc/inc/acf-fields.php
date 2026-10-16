@@ -307,13 +307,6 @@ function ltdh_override_field_program_contact_info_label( $field ) {
 	return $field;
 }
 
-// Ensure School contact info field is properly labeled
-add_filter( 'acf/load_field/key=field_school_contact_info', 'ltdh_override_field_school_contact_info_label' );
-function ltdh_override_field_school_contact_info_label( $field ) {
-	$field['label'] = 'Thông tin liên hệ & Tiếp nhận hồ sơ';
-	return $field;
-}
-
 // Provide intelligent defaults for Target Admissions by School in Major Admin if empty
 add_filter( 'acf/load_value/name=major_school_admission_targets', 'ltdh_default_major_target_admissions', 10, 3 );
 function ltdh_default_major_target_admissions( $value, $post_id, $field ) {

@@ -17,7 +17,6 @@ $website    = get_field( 'website', $school_id );
 $address    = get_field( 'address', $school_id );
 $hotline    = ltdh_get_school_hotline( $school_id );
 $adm_info   = get_field( 'admission_info', $school_id );
-$contact    = get_field( 'contact_info', $school_id );
 
 // Retrieve pre-calculated list of programs offered by this school
 $offered_program_ids = get_post_meta( $school_id, LTDH_META_OFFERED_PROGRAMS, true );
@@ -76,15 +75,6 @@ if ( ! empty( $school_faqs ) ) {
 		'title'    => 'Hỏi đáp (FAQ)',
 		'subtitle' => 'Giải đáp thắc mắc',
 		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>',
-	];
-}
-
-if ( ! empty( $contact ) ) {
-	$school_tabs[] = [
-		'id'       => 'thong-tin-lien-he',
-		'title'    => 'Liên hệ',
-		'subtitle' => 'Văn phòng tuyển sinh',
-		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>',
 	];
 }
 ?>
@@ -1081,18 +1071,6 @@ if ( ! empty( $contact ) ) {
 								<span>Hỏi tư vấn viên</span>
 								<span>&rarr;</span>
 							</a>
-						</div>
-					</section>
-				<?php endif; ?>
-
-				<!-- CONTACT INFO -->
-				<?php if ( $contact ) : ?>
-					<section id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-						<!-- Hidden anchor targets for backward compatibility -->
-						<span id="phuong-thuc-tuyen-sinh" class="relative -top-36 block invisible pointer-events-none"></span>
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Thông tin liên hệ tuyển sinh</h2>
-						<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list">
-							<?php echo wp_kses_post( ltdh_format_contact_info( (string) $contact, (int) $school_id ) ); ?>
 						</div>
 					</section>
 				<?php endif; ?>

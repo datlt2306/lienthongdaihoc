@@ -115,15 +115,6 @@
         "media_upload": 1
       },
       {
-        "key": "field_school_contact_info",
-        "label": "Thông tin liên hệ & Tiếp nhận hồ sơ",
-        "name": "contact_info",
-        "type": "wysiwyg",
-        "instructions": "Địa chỉ văn phòng tuyển sinh, địa điểm tiếp nhận hồ sơ, hotline và thông tin nộp lệ phí xét tuyển của trường. Thông tin này sẽ tự động hiển thị trong mục 'Điều kiện & Hồ sơ' của tất cả các chương trình thuộc trường nếu chương trình không cấu hình riêng.",
-        "toolbar": "full",
-        "media_upload": 1
-      },
-      {
         "key": "field_school_crm_provider",
         "label": "Kênh đẩy CRM tuyển sinh",
         "name": "crm_provider",
