@@ -522,10 +522,10 @@ $zalo    = ltdh_get_zalo_url();
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 lg:space-y-20">
 			
 			<!-- Row 1: [Text Content] [Slider] -->
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 lg:items-stretch items-center">
 				<!-- Left column: Text Content -->
-				<div class="space-y-4 sm:space-y-6">
-					<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg uppercase tracking-wider"><?php echo esc_html($c_left_badge ?: 'BẰNG CẤP TƯƠNG ĐƯƠNG'); ?></span>
+				<div class="space-y-4 sm:space-y-6 flex flex-col justify-center">
+					<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg uppercase tracking-wider self-start"><?php echo esc_html($c_left_badge ?: 'BẰNG CẤP TƯƠNG ĐƯƠNG'); ?></span>
 					
 					<h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-tight">
 						<?php 
@@ -578,7 +578,7 @@ $zalo    = ltdh_get_zalo_url();
 				</div>
 
 				<!-- Right column: Slider Wrapper -->
-				<div class="relative flex justify-center w-full">
+				<div class="relative flex justify-center w-full lg:h-full">
 					<style>
 						.cert-slider-wrapper {
 							position: relative;
@@ -596,14 +596,31 @@ $zalo    = ltdh_get_zalo_url();
 								box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 							}
 						}
+						@media (min-width: 1024px) {
+							.cert-slider-wrapper {
+								max-width: 100%;
+								width: 100%;
+								height: 100%;
+								min-height: 100%;
+								aspect-ratio: auto;
+							}
+						}
 						.cert-swiper {
 							width: 100%;
 							height: 100%;
 						}
+						.cert-swiper .swiper-wrapper {
+							height: 100%;
+						}
+						.cert-swiper .swiper-slide {
+							height: 100%;
+							width: 100%;
+						}
 						.cert-swiper .swiper-slide img {
 							width: 100%;
 							height: 100%;
-							object-fit: contain;
+							object-fit: cover;
+							object-position: center;
 							background-color: #ffffff;
 						}
 						.cert-swiper .swiper-pagination-bullet {
@@ -668,14 +685,14 @@ $zalo    = ltdh_get_zalo_url();
 			</div>
 
 			<!-- Row 2: [Video Card] [Text Content] -->
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 lg:items-stretch items-center">
 				<!-- Video Card (Mobile: 2nd after Text; Desktop: Left col) -->
-				<div class="rounded-xl sm:rounded-3xl relative overflow-hidden shadow-lg aspect-video group bg-slate-800 flex items-center justify-center order-2 lg:order-1 <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
+				<div class="w-full rounded-2xl sm:rounded-3xl relative overflow-hidden shadow-xl aspect-video lg:aspect-auto lg:h-full lg:min-h-full group bg-slate-900 flex items-center justify-center order-2 lg:order-1 <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
 					<?php
 					$video_raw_thumb = $c_left_image ?: home_url('wp-content/uploads/2026/07/vtv-news-thumb.png');
 					$video_opt_thumb = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $video_raw_thumb ) : $video_raw_thumb;
 					?>
-					<img src="<?php echo esc_url($video_opt_thumb); ?>" alt="VTV24 Video Thumbnail" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+					<img src="<?php echo esc_url($video_opt_thumb); ?>" alt="VTV24 Video Thumbnail" loading="lazy" decoding="async" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
 					
 					<?php if (!empty($c_left_youtube)): ?>
 						<!-- Play button overlay -->
@@ -690,7 +707,7 @@ $zalo    = ltdh_get_zalo_url();
 				</div>
 
 				<!-- Text Content (Mobile: 1st before Video; Desktop: Right col) -->
-				<div class="space-y-4 sm:space-y-6 order-1 lg:order-2">
+				<div class="space-y-4 sm:space-y-6 order-1 lg:order-2 flex flex-col justify-center">
 					<?php if (!empty($c_right_content)): ?>
 						<div class="prose max-w-none text-slate-700 text-xs sm:text-sm md:text-base leading-relaxed">
 							<?php echo wp_kses_post($c_right_content); ?>

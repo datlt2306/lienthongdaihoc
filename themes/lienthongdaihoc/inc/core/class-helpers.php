@@ -440,6 +440,17 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 			<textarea name="your-message" rows="2" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all lg:h-24 resize-none" placeholder="<?php esc_attr_e('Nhập câu hỏi hoặc yêu cầu cụ thể...'); ?>"></textarea>
 		</div>
 
+		<?php if ( 'contact' !== $type ) : ?>
+			<div class="pt-0.5">
+				<label class="flex items-start gap-2.5 p-2.5 sm:p-3 rounded-xl bg-amber-50/80 border border-amber-200/90 cursor-pointer hover:bg-amber-100/60 transition-colors select-none">
+					<input type="checkbox" name="is_group_reg" value="1" class="mt-0.5 w-4 h-4 rounded border-amber-300 text-brand-primary focus:ring-brand-primary">
+					<span class="text-xs sm:text-sm text-slate-700 leading-snug">
+						🎁 <strong class="font-bold text-amber-900">Đăng ký theo nhóm:</strong> Tư vấn cho tôi suất học bổng đồng hành (khi cùng bạn bè tìm hiểu từ 2 người trở lên)
+					</span>
+				</label>
+			</div>
+		<?php endif; ?>
+
 		<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
 			<?php ltdh_render_recaptcha_field( 'native_lead' ); ?>
 		<?php endif; ?>

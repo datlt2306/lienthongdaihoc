@@ -160,6 +160,16 @@ $years = range( $current_year, $current_year - 25 );
 			<textarea name="cf_message" id="elig-lead-message" rows="2" class="elig-input" placeholder="Ví dụ: Mong muốn học lớp tối thứ 7 & CN, thắc mắc về miễn giảm môn học..."></textarea>
 		</div>
 
+		<!-- Group Registration Option -->
+		<div class="p-3 bg-amber-50/80 border border-amber-200/90 rounded-xl">
+			<label class="flex items-start gap-2.5 cursor-pointer select-none">
+				<input type="checkbox" name="is_group_reg" id="elig-group-reg" value="1" class="mt-0.5 rounded border-amber-300 text-brand-primary focus:ring-brand-primary">
+				<span class="text-xs text-slate-700 font-medium leading-snug">
+					🎁 <strong class="font-bold text-amber-900">Đăng ký theo nhóm:</strong> Tư vấn cho tôi suất học bổng đồng hành khi nộp hồ sơ cùng bạn bè (từ 2 người trở lên).
+				</span>
+			</label>
+		</div>
+
 		<!-- Block 5: Consent -->
 		<div class="flex items-start gap-2 pt-1 text-xs text-slate-500">
 			<input type="checkbox" name="consent_data" id="elig-consent-data" checked required class="mt-0.5 rounded border-slate-300 text-brand-primary focus:ring-brand-primary">

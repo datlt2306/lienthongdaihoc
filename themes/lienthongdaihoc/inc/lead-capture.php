@@ -159,6 +159,14 @@ function ltdh_insert_lead( array $data ): int {
 	$campus          = isset( $data['campus'] ) ? sanitize_text_field( $data['campus'] ) : '';
 	$referral_source = isset( $data['referral_source'] ) ? sanitize_text_field( $data['referral_source'] ) : '';
 	$message         = isset( $data['message'] ) ? sanitize_textarea_field( $data['message'] ) : '';
+	$is_group_reg    = ! empty( $data['is_group_reg'] );
+
+	if ( $is_group_reg ) {
+		$group_tag = '[👥 ĐĂNG KÝ THEO NHÓM - HỌC BỔNG ĐỒNG HÀNH]';
+		if ( false === strpos( $message, $group_tag ) ) {
+			$message = trim( $group_tag . ( $message ? "\n" . $message : '' ) );
+		}
+	}
 
 	// Resolve missing metadata based on program
 	if ( $program_id > 0 ) {
@@ -218,6 +226,7 @@ function ltdh_insert_lead( array $data ): int {
 			'campus'               => $campus,
 			'referral_source'      => $referral_source,
 			'message'              => $message,
+			'is_group_reg'         => $is_group_reg,
 			'degree_file_path'     => $data['degree_file_path'] ?? '',
 			'degree_link'          => $data['degree_link'] ?? '',
 			'transcript_file_path' => $data['transcript_file_path'] ?? '',
@@ -308,6 +317,8 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 	$email   = ! empty( $data['email'] ) ? $data['email'] : 'N/A';
 	$message = ! empty( $data['message'] ) ? $data['message'] : '';
 
+	$is_group = ! empty( $data['is_group_reg'] );
+
 	if ( $is_eligibility ) {
 		// Full Detail notification for Eligibility Checker
 		$training_type = ! empty( $data['training_type'] ) ? $data['training_type'] : 'N/A';
@@ -324,9 +335,19 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		}
 		$referral = $data['referral_source'];
 
-		$msg_text  = "🔔 <b>ĐÁNH GIÁ ĐIỀU KIỆN TUYỂN SINH MỚI</b> 🔔\n\n";
+		if ( $is_group ) {
+			$msg_text  = "🚨 <b>ĐÁNH GIÁ ĐIỀU KIỆN - ĐĂNG KÝ THEO NHÓM!</b> 👥\n\n";
+		} else {
+			$msg_text  = "🔔 <b>ĐÁNH GIÁ ĐIỀU KIỆN TUYỂN SINH MỚI</b> 🔔\n\n";
+		}
+
 		$msg_text .= "👤 <b>Họ và tên:</b> " . esc_html( $name ) . "\n";
 		$msg_text .= "📞 <b>Số điện thoại:</b> " . esc_html( $phone ) . "\n";
+		if ( $is_group ) {
+			$msg_text .= "🎁 <b>Hình thức:</b> 👥 <b>ĐĂNG KÝ THEO NHÓM (Học bổng đồng hành)</b>\n";
+		} else {
+			$msg_text .= "🎁 <b>Hình thức:</b> 👤 Đăng ký cá nhân\n";
+		}
 		$msg_text .= "✉ <b>Email:</b> " . esc_html( $email ) . "\n";
 		$msg_text .= "🏫 <b>Trường đối tác:</b> " . esc_html( $school_title ) . "\n";
 		$msg_text .= "🎓 <b>Chuyên ngành:</b> " . esc_html( $major_title ) . "\n";
@@ -352,9 +373,19 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		$training_val = ! empty( $data['training_type'] ) && $data['training_type'] !== 'N/A' ? $data['training_type'] : '';
 		$campus_val   = ! empty( $data['campus'] ) && $data['campus'] !== 'N/A' ? $data['campus'] : '';
 
-		$msg_text  = "🔔 <b>YÊU CẦU TƯ VẤN TUYỂN SINH MỚI</b> 🔔\n\n";
+		if ( $is_group ) {
+			$msg_text  = "🚨 <b>CÓ LEAD MỚI - ĐĂNG KÝ THEO NHÓM!</b> 👥\n\n";
+		} else {
+			$msg_text  = "🔔 <b>YÊU CẦU TƯ VẤN TUYỂN SINH MỚI</b> 🔔\n\n";
+		}
+
 		$msg_text .= "👤 <b>Họ và tên:</b> " . esc_html( $name ) . "\n";
 		$msg_text .= "📞 <b>Số điện thoại:</b> " . esc_html( $phone ) . "\n";
+		if ( $is_group ) {
+			$msg_text .= "🎁 <b>Hình thức:</b> 👥 <b>ĐĂNG KÝ THEO NHÓM (Học bổng đồng hành)</b>\n";
+		} else {
+			$msg_text .= "🎁 <b>Hình thức:</b> 👤 Đăng ký cá nhân\n";
+		}
 		if ( ! empty( $email ) && $email !== 'N/A' ) {
 			$msg_text .= "✉ <b>Email:</b> " . esc_html( $email ) . "\n";
 		}
@@ -381,6 +412,9 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		}
 	}
 	
+	if ( $is_group ) {
+		$msg_text .= "👉 <i>Gợi ý Telesale: Khách có nhu cầu học cùng bạn bè, mở lời theo gói học bổng nhóm để chốt đôi!</i>\n";
+	}
 	$msg_text .= "📅 <b>Thời gian:</b> " . current_time( 'd/m/Y H:i:s' ) . "\n";
 
 	// Split chat IDs by comma, semicolon, or space to support multiple recipients
@@ -566,6 +600,8 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 		$referral_source = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( $_SERVER['HTTP_REFERER'] ) : '';
 	}
 
+	$is_group_reg = ! empty( $posted_data['is_group_reg'] ) || ! empty( $posted_data['group_reg'] ) || ! empty( $posted_data['dang-ky-nhom'] );
+
 	ltdh_insert_lead( [
 		'name'            => $name,
 		'phone'           => $phone,
@@ -575,6 +611,7 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 		'major_id'        => $major_id,
 		'referral_source' => $referral_source,
 		'message'         => $message,
+		'is_group_reg'    => $is_group_reg,
 	] );
 }
 
@@ -644,6 +681,8 @@ function ltdh_handle_native_form_submit() {
 		$referral_source = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 	}
 
+	$is_group_reg = ! empty( $_POST['is_group_reg'] );
+
 	$inserted_id = ltdh_insert_lead( [
 		'name'            => $name,
 		'phone'           => $phone,
@@ -655,6 +694,7 @@ function ltdh_handle_native_form_submit() {
 		'campus'          => $campus,
 		'referral_source' => $referral_source,
 		'message'         => $message,
+		'is_group_reg'    => $is_group_reg,
 	] );
 
 	if ( $inserted_id ) {

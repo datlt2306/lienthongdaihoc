@@ -114,10 +114,10 @@ foreach ( $outer_classes as $cls ) {
 
 // 2.2 Cover image and badge overlay tokens
 $cover_tokens = [
-	'h-32 sm:h-64 w-full bg-slate-100 bg-cover bg-center relative overflow-hidden',
-	'bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent',
+	'h-28 sm:h-48 md:h-60 w-full bg-slate-100 relative overflow-hidden group/cover',
+	'bg-gradient-to-t from-slate-900/60 via-slate-900/15 to-transparent',
 	'tam-ngung',
-	'Đã hết chỉ tiêu',
+	'Tạm dừng',
 	'sap-mo',
 	'Sắp mở',
 ];
@@ -135,9 +135,9 @@ foreach ( $cover_tokens as $token ) {
 
 // 2.3 Institution header & typography
 $header_tokens = [
-	'w-12 h-12 bg-white border border-slate-200/90 rounded-xl flex items-center justify-center p-1.5 shrink-0 shadow-sm group-hover:border-brand-primary/40 group-hover:shadow-md transition-all -mt-7',
-	'text-xs sm:text-sm font-extrabold text-slate-800 hover:text-brand-primary transition-colors uppercase tracking-wide block truncate',
-	'font-black text-slate-900 text-base md:text-lg hover:text-brand-primary leading-snug line-clamp-2 min-h-[48px] transition-colors',
+	'w-8 h-8 sm:w-10 sm:h-10 bg-white border border-slate-200/90 rounded-lg sm:rounded-xl flex items-center justify-center p-1 shrink-0 shadow-2xs group-hover/school:border-brand-primary/40 group-hover/school:shadow-xs transition-all -mt-4 sm:-mt-6',
+	'text-[10px] sm:text-xs font-bold text-slate-500 group-hover/school:text-brand-primary uppercase tracking-tight sm:tracking-wide block truncate transition-colors',
+	'font-black text-slate-900 text-xs sm:text-base md:text-lg hover:text-brand-primary leading-tight sm:leading-snug line-clamp-2 min-h-[32px] sm:min-h-[44px] transition-colors',
 ];
 
 foreach ( $header_tokens as $token ) {
@@ -172,9 +172,9 @@ foreach ( $metric_labels as $label ) {
 
 // 2.5 Action buttons (Details CTA & Compare Toggle)
 $action_tokens = [
-	'ltdh-btn-details min-h-[44px] flex items-center justify-center flex-1',
-	'ltdh-compare-toggle text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-xl py-2.5 px-3 transition-all min-h-[44px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50',
-	'Tìm hiểu',
+	'ltdh-btn-details min-h-[38px] sm:min-h-[42px] flex items-center justify-center flex-1',
+	'ltdh-compare-toggle text-[11px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 transition-all min-h-[38px] sm:min-h-[42px] flex items-center justify-center bg-white hover:bg-slate-50 text-center whitespace-nowrap gap-1 cursor-pointer',
+	'Xem chi tiết',
 	'So sánh',
 ];
 
@@ -261,7 +261,7 @@ CardParityTestSuite::assert(
 );
 
 CardParityTestSuite::assert(
-	false !== strpos( $ajax_code, "preg_replace( '/^hệ\\s+/iu', '', trim( \$t_name ) )" ),
+	false !== strpos( $ajax_code, "preg_replace( '/^hệ\\s+/iu', '', trim( \$type_name ) )" ),
 	"AJAX executes regex stripping of 'Hệ ' prefix before badge output"
 );
 

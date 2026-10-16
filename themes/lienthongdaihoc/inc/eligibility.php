@@ -942,7 +942,11 @@ function ltdh_elig_ajax_lead() {
 	}
 
 	// Construct comprehensive notes
+	$is_group_reg = ! empty( $_POST['is_group_reg'] );
 	$notes = [];
+	if ( $is_group_reg ) {
+		$notes[] = "Hình thức: ĐĂNG KÝ THEO NHÓM (Học bổng đồng hành)";
+	}
 	if ( ! empty( $previous_school ) ) {
 		$notes[] = "Trường cũ: " . $previous_school;
 	}
@@ -971,6 +975,7 @@ function ltdh_elig_ajax_lead() {
 		'campus'               => $campus_val,
 		'referral_source'      => $ref_source,
 		'message'              => $full_message,
+		'is_group_reg'         => $is_group_reg,
 		'degree_file_path'     => $degree_file_path,
 		'degree_link'          => $degree_link,
 		'transcript_file_path' => $transcript_file_path,

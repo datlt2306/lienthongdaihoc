@@ -1144,6 +1144,15 @@ function ltdh_render_default_guide_sidebar() {
 					<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
 				</div>
 
+				<div class="pt-0.5">
+					<label class="flex items-start gap-2 p-2 rounded-lg bg-amber-50/90 border border-amber-200 cursor-pointer hover:bg-amber-100/60 transition-colors select-none">
+						<input type="checkbox" name="is_group_reg" value="1" class="mt-0.5 w-4 h-4 rounded border-amber-300 text-brand-primary focus:ring-brand-primary">
+						<span class="text-xs text-slate-700 leading-snug">
+							🎁 <strong class="font-bold text-amber-900">Đăng ký nhóm:</strong> Nhận học bổng đồng hành (từ 2 bạn)
+						</span>
+					</label>
+				</div>
+
 				<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
 					<?php ltdh_render_recaptcha_field( 'sidebar_lead' ); ?>
 				<?php endif; ?>
