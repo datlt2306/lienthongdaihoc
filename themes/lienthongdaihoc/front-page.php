@@ -939,31 +939,31 @@ $zalo    = ltdh_get_zalo_url();
 						<?php echo esc_html( $w_desc ); ?>
 					</p>
 				</div>
-				<div class="w-full lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-center">
+				<div id="ltdh-kpi-metrics-grid" class="w-full lg:w-2/3 grid grid-cols-2 gap-3 sm:gap-6 text-center">
 					<?php foreach ( $sanitized_metrics as $idx => $metric ) : 
 						$is_first = ( 0 === $idx );
 					?>
-						<div class="group bg-white/[0.07] hover:bg-white/[0.12] border border-white/10 hover:border-white/20 rounded-2xl p-5 sm:p-6 flex flex-col justify-between items-center text-center backdrop-blur-xs transition-all duration-300 shadow-sm hover:shadow-lg">
-							<div class="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-[#f5bf23] mb-3 group-hover:bg-[#f5bf23]/20 group-hover:border-[#f5bf23]/30 transition-colors">
+						<div class="group bg-white/[0.07] hover:bg-white/[0.12] border border-white/10 hover:border-white/20 rounded-2xl p-3.5 sm:p-6 flex flex-col items-center text-center backdrop-blur-xs transition-all duration-300 shadow-sm hover:shadow-lg h-full">
+							<div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-[#f5bf23] mb-2 sm:mb-3 group-hover:bg-[#f5bf23]/20 group-hover:border-[#f5bf23]/30 transition-colors shrink-0">
 								<?php if ( $is_first ) : ?>
-									<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
 									</svg>
 								<?php else : ?>
-									<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
 									</svg>
 								<?php endif; ?>
 							</div>
 
-							<span class="block font-display font-black text-3xl sm:text-4xl lg:text-5xl text-[#f5bf23] leading-none tracking-tight mb-2">
+							<span class="ltdh-counter tabular-nums block font-display font-black text-2xl sm:text-4xl lg:text-5xl text-[#f5bf23] leading-none tracking-tight mb-1.5 sm:mb-2" data-target="<?php echo esc_attr( $metric['value'] ?? '' ); ?>">
 								<?php echo esc_html( $metric['value'] ?? '' ); ?>
 							</span>
-							<span class="text-sm sm:text-base text-white font-bold block leading-snug">
+							<span class="text-xs sm:text-base text-white font-bold block leading-snug sm:leading-snug mb-auto">
 								<?php echo esc_html( $metric['label'] ?? '' ); ?>
 							</span>
 							<?php if ( ! empty( $metric['subtext'] ) ) : ?>
-								<span class="text-xs text-slate-300 font-medium block mt-1.5 leading-relaxed">
+								<span class="text-[11px] sm:text-xs text-slate-300 font-medium block mt-1.5 sm:mt-2 leading-tight sm:leading-relaxed pt-1.5 border-t border-white/5 w-full">
 									<?php echo esc_html( $metric['subtext'] ); ?>
 								</span>
 							<?php endif; ?>
@@ -1017,15 +1017,15 @@ $zalo    = ltdh_get_zalo_url();
 							'content'      => 'Nhờ thầy Đạt hướng dẫn tận tình từ khâu tìm hiểu chương trình, chuẩn bị hồ sơ đến hoàn tất thủ tục nhập học, em đã đăng ký học liên thông lên Đại học TMU thuận lợi và nhanh chóng. Thầy luôn giải đáp thắc mắc kịp thời, giúp em yên tâm hơn trong suốt quá trình đăng ký.'
 						],
 						[
-							'name'         => 'Lê Phương',
-							'workplace'    => 'Kế toán tổng hợp tại VPBank',
-							'role'         => 'Liên thông Đại học - Kế toán',
-							'graduation'   => 'Khóa 2022 - ĐH Thương Mại',
+							'name'         => 'Nguyễn Quý Duy',
+							'workplace'    => 'Front-End Developer tại VC Corp',
+							'role'         => 'Liên thông Đại học CNTT',
+							'graduation'   => 'Khóa K27 - ĐH Giao thông Vận tải',
 							'status'       => 'graduated',
 							'status_label' => 'Đã tốt nghiệp',
-							'initials'     => 'LP',
-							'image'        => get_template_directory_uri() . '/assets/images/student-phuong.jpg',
-							'content'      => 'Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận.'
+							'initials'     => 'QD',
+							'image'        => get_template_directory_uri() . '/assets/images/student-duy.jpg',
+							'content'      => 'Điều em hài lòng khi học liên thông là lịch học linh hoạt, phù hợp với người vừa học vừa làm. Thời gian đào tạo chỉ khoảng 1 năm 7 tháng, giúp em sớm có bằng Đại học để đáp ứng yêu cầu công việc. Bên cạnh đó, học phí hợp lý cũng là một lợi thế, đặc biệt với các bạn vừa tốt nghiệp Cao đẳng và muốn học tiếp lên Đại học.'
 						],
 						[
 							'name'         => 'Hoàng Dũng',
