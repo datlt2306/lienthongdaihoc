@@ -42,7 +42,7 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	$raw_title       = get_the_title();
 	$clean_major     = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( (string) $raw_title ) );
 	$year            = (int) date( 'Y' );
-	$banner_title    = 'Liên thông ngành ' . $clean_major;
+	$banner_title    = 'Liên thông ' . $clean_major;
 	$major_code      = get_field( 'major_code', get_the_ID() ) ?: get_post_meta( get_the_ID(), 'major_code', true );
 	$code_suffix     = $major_code ? ' • Mã ngành: ' . $major_code : '';
 	$banner_subtitle = 'Danh sách trường đào tạo, lộ trình công nhận tín chỉ và học phí năm ' . $year . $code_suffix;
