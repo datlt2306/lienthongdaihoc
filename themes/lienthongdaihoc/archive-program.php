@@ -673,19 +673,19 @@ $has_active_filters  = $active_filter_count > 0;
 										<a href="<?php the_permalink(); ?>"><?php echo esc_html( $card_headline ); ?></a>
 									</h2>
 									<!-- Program Badges (Admission Status, Training Type, Verification) -->
-									<div class="mt-2 sm:mt-2.5 flex flex-wrap items-center gap-1.5 min-h-[24px]">
+									<div class="mt-2 sm:mt-2.5 flex flex-col items-start gap-1.5 sm:flex-row sm:items-center sm:gap-1.5 min-h-[52px] sm:min-h-[24px]">
 										<!-- Status Badge -->
 										<?php if ( 'tam-ngung' === $admission_status ) : ?>
-											<span class="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80 shrink-0">
+											<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80 shrink-0">
 												<span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
 												Tạm dừng
 											</span>
 										<?php elseif ( 'sap-mo' === $admission_status ) : ?>
-											<span class="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80 shrink-0">
+											<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80 shrink-0">
 												Sắp mở
 											</span>
 										<?php else : ?>
-											<span class="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shrink-0">
+											<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shrink-0">
 												<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
 												Tuyển sinh
 											</span>
@@ -693,7 +693,7 @@ $has_active_filters  = $active_filter_count > 0;
 
 										<!-- Training Type Badge -->
 										<?php if ( ! empty( $clean_type_name ) ) : ?>
-											<span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold <?php echo esc_attr( $badge_class ); ?> border border-current/15 shrink-0">
+											<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold <?php echo esc_attr( $badge_class ); ?> shrink-0">
 												Hệ <?php echo esc_html( $clean_type_name ); ?>
 											</span>
 										<?php endif; ?>
@@ -708,8 +708,8 @@ $has_active_filters  = $active_filter_count > 0;
 									</div>
 								</div>
 
-								<!-- Key Information List -->
-								<div class="space-y-1 sm:space-y-1.5 text-[11px] sm:text-xs md:text-sm text-slate-600 py-2 sm:py-3 border-t border-slate-100">
+								<!-- Key Information List (Hidden on mobile for Apple-minimal compact card UX, visible on sm+) -->
+								<div class="hidden sm:block space-y-1 sm:space-y-1.5 text-[11px] sm:text-xs md:text-sm text-slate-600 py-2 sm:py-3 border-t border-slate-100">
 									<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5 sm:gap-1">
 										<span class="text-slate-400 text-[10px] sm:text-xs">Học phí:</span>
 										<span class="font-extrabold text-brand-primary text-xs sm:text-sm md:text-base leading-none truncate"><?php echo esc_html( $tuition ); ?></span>
@@ -728,7 +728,7 @@ $has_active_filters  = $active_filter_count > 0;
 
 						<!-- Card Footer Action Buttons -->
 						<div class="p-3 sm:p-5 pt-0">
-							<div class="pt-2 sm:pt-3 border-t border-slate-100 flex items-stretch gap-1.5 sm:gap-2">
+							<div class="pt-2 sm:pt-3 sm:border-t sm:border-slate-100 flex items-stretch gap-1.5 sm:gap-2">
 								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-2 sm:py-2.5 px-1 sm:px-4 rounded-lg sm:rounded-xl font-bold ltdh-btn-details min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
 									Tìm hiểu
 								</a>

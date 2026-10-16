@@ -1610,6 +1610,9 @@
   .min-h-\[48px\] {
     min-height: 48px;
   }
+  .min-h-\[52px\] {
+    min-height: 52px;
+  }
   .min-h-\[220px\] {
     min-height: 220px;
   }
@@ -5245,6 +5248,9 @@
     .sm\:h-auto {
       height: auto;
     }
+    .sm\:min-h-\[24px\] {
+      min-height: 24px;
+    }
     .sm\:min-h-\[40px\] {
       min-height: 40px;
     }
@@ -5423,6 +5429,10 @@
       border-style: var(--tw-border-style);
       border-width: 1px;
     }
+    .sm\:border-t {
+      border-top-style: var(--tw-border-style);
+      border-top-width: 1px;
+    }
     .sm\:border-r {
       border-right-style: var(--tw-border-style);
       border-right-width: 1px;
@@ -5438,6 +5448,9 @@
       .sm\:border-blue-200\/60 {
         border-color: color-mix(in oklab, var(--color-blue-200) 60%, transparent);
       }
+    }
+    .sm\:border-slate-100 {
+      border-color: var(--color-slate-100);
     }
     .sm\:bg-white {
       background-color: var(--color-white);
