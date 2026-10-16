@@ -5,8 +5,14 @@ themes/lienthongdaihoc/dist
 uploads/
 !uploads/.gitkeep
 
-# Backups
+# Backups and sensitive dumps
+*.sql
+*.wpress
+*_backup.txt
+*.bak
+aiowps_backups/
 ai1wm-backups/
+backups/
 
 # Logs
 debug.log
