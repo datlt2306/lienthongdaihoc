@@ -496,89 +496,84 @@
 		var isTopPick = (idx === 0);
 		var statusClass = prog.preliminary_status === 'compatible' ? 'elig-status-compatible' : (prog.preliminary_status === 'needs_verification' ? 'elig-status-verification' : 'elig-status-incompatible');
 		var statusLabel = prog.preliminary_status === 'compatible' ? 'Độ tương thích tốt' : (prog.preliminary_status === 'needs_verification' ? 'Cần xác minh hồ sơ' : 'Chưa tương thích');
-		var matchPriorityLabel = prog.score >= 80 ? 'Ưu tiên cao' : (prog.score >= 50 ? 'Phù hợp tốt' : 'Lựa chọn tham khảo');
+		var matchPriorityLabel = prog.score >= 80 ? 'Ưu tiên cao' : (prog.score >= 50 ? 'Phù hợp tốt' : 'Tham khảo');
 
 		var schoolCode = (prog.school && prog.school.code) ? prog.school.code.toUpperCase() : '';
 		var schoolTitle = (prog.school && prog.school.title) ? prog.school.title : 'Trường Đại học';
 		var schoolLogo = (prog.school && prog.school.logo) ? prog.school.logo : '';
 
-		var topPickBannerHtml = '';
-		if (isTopPick) {
-			topPickBannerHtml =
-				'<div class="elig-top-pick-banner" style="background: linear-gradient(135deg, #0e2038 0%, #1e3a8a 100%); color: #ffffff; padding: 8px 16px; font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">' +
-					'<span>🏆 Gợi ý hàng đầu phù hợp nhất cho bạn</span>' +
-					'<span style="background: #d97706; color: #ffffff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 900;">#1 TOP PICK</span>' +
-				'</div>';
-		}
+		var topPickAccentHtml = isTopPick
+			? '<div class="h-1 bg-gradient-to-r from-[#00308b] via-blue-500 to-indigo-600"></div>'
+			: '';
 
 		var schoolHeaderHtml =
-			'<div class="elig-card-school-bar" style="background: #f8fafc; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; gap: 12px;">' +
-				'<div style="display: flex; align-items: center; gap: 12px;">' +
+			'<div class="p-4 sm:p-5 pb-3 border-b border-slate-100 flex items-center justify-between gap-3">' +
+				'<div class="flex items-center gap-3 min-w-0">' +
 					(schoolLogo
-						? '<div style="width: 44px; height: 44px; min-width: 44px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 2px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">' +
-								'<img src="' + escAttr(schoolLogo) + '" alt="' + escAttr(schoolTitle) + '" style="max-width: 100%; max-height: 100%; object-fit: contain;">' +
+						? '<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white border border-slate-200/80 p-1 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">' +
+								'<img src="' + escAttr(schoolLogo) + '" alt="' + escAttr(schoolTitle) + '" class="max-w-full max-h-full object-contain">' +
 						  '</div>'
-						: '<div style="width: 44px; height: 44px; min-width: 44px; background: #0e2038; color: #ffffff; border-radius: 10px; font-weight: 900; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">' +
-								escHtml(schoolCode || 'UNI') +
+						: '<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#00308b] text-white font-black text-xs flex items-center justify-center shrink-0">' +
+								escHtml(schoolCode || 'ĐH') +
 						  '</div>'
 					) +
-					'<div>' +
-						'<div style="font-weight: 900; font-size: 0.95rem; color: #0e2038; line-height: 1.3; text-transform: uppercase;">' + escHtml(schoolTitle) + '</div>' +
-						(schoolCode ? '<span style="display: inline-block; margin-top: 2px; font-size: 0.75rem; font-weight: 800; background: #e0f2fe; color: #0369a1; padding: 1px 6px; border-radius: 4px;">[' + escHtml(schoolCode) + ']</span>' : '') +
+					'<div class="min-w-0">' +
+						'<div class="font-extrabold text-xs sm:text-sm text-slate-800 truncate">' + escHtml(schoolTitle) + '</div>' +
+						(schoolCode ? '<span class="inline-block text-[11px] font-bold text-slate-500">' + escHtml(schoolCode) + '</span>' : '') +
 					'</div>' +
 				'</div>' +
-				'<div class="elig-rank-pill" style="' + (isTopPick ? 'background: #fef3c7; color: #d97706; border: 1px solid #fcd34d;' : 'background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;') + ' padding: 4px 10px; border-radius: 999px; font-weight: 900; font-size: 0.8rem; flex-shrink: 0;">' +
-					(isTopPick ? '👑 Top 1' : '#' + (idx + 1)) +
-				'</div>' +
+				(isTopPick
+					? '<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-[#00308b] text-[11px] font-extrabold border border-blue-200/80 shrink-0">★ #1 Top Pick</div>'
+					: '<div class="text-xs font-bold text-slate-400 shrink-0">#' + (idx + 1) + '</div>'
+				) +
 			'</div>';
 
-		var reasonsHtml = '<div class="elig-reasons-container" style="margin-top: 14px; background: #f8fafc; border-radius: 8px; padding: 12px; border: 1px solid #f1f5f9; font-size: 0.85rem;">';
-		if (prog.match_reasons && prog.match_reasons.length > 0) {
-			prog.match_reasons.forEach(function (reason) {
-				reasonsHtml += '<div class="elig-reason-item" style="color: #059669; margin-bottom: 4px; font-weight: 600; display: flex; align-items: flex-start; gap: 6px;"><span style="font-weight: 800;">✓</span><span>' + escHtml(reason) + '</span></div>';
-			});
+		var reasonsHtml = '';
+		if ((prog.match_reasons && prog.match_reasons.length > 0) || (prog.verification_items && prog.verification_items.length > 0) || (prog.mismatch_reasons && prog.mismatch_reasons.length > 0)) {
+			reasonsHtml = '<div class="space-y-1.5 mt-3 pt-3 border-t border-slate-100 text-xs">';
+			if (prog.match_reasons && prog.match_reasons.length > 0) {
+				prog.match_reasons.forEach(function (reason) {
+					reasonsHtml += '<div class="flex items-start gap-1.5 text-emerald-700 font-medium"><svg class="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><span>' + escHtml(reason) + '</span></div>';
+				});
+			}
+			if (prog.verification_items && prog.verification_items.length > 0) {
+				prog.verification_items.forEach(function (item) {
+					reasonsHtml += '<div class="flex items-start gap-1.5 text-amber-700 font-medium"><svg class="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg><span>' + escHtml(item) + '</span></div>';
+				});
+			}
+			if (prog.mismatch_reasons && prog.mismatch_reasons.length > 0) {
+				prog.mismatch_reasons.forEach(function (reason) {
+					reasonsHtml += '<div class="flex items-start gap-1.5 text-rose-700 font-medium"><svg class="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg><span>' + escHtml(reason) + '</span></div>';
+				});
+			}
+			reasonsHtml += '</div>';
 		}
-		if (prog.verification_items && prog.verification_items.length > 0) {
-			prog.verification_items.forEach(function (item) {
-				reasonsHtml += '<div class="elig-reason-item" style="color: #d97706; margin-bottom: 4px; font-weight: 600; display: flex; align-items: flex-start; gap: 6px;"><span style="font-weight: 800;">⚠️</span><span>' + escHtml(item) + '</span></div>';
-			});
-		}
-		if (prog.mismatch_reasons && prog.mismatch_reasons.length > 0) {
-			prog.mismatch_reasons.forEach(function (reason) {
-				reasonsHtml += '<div class="elig-reason-item" style="color: #e11d48; margin-bottom: 4px; font-weight: 600; display: flex; align-items: flex-start; gap: 6px;"><span style="font-weight: 800;">✕</span><span>' + escHtml(reason) + '</span></div>';
-			});
-		}
-		reasonsHtml += '</div>';
 
 		var card = document.createElement('div');
-		card.className = 'elig-card' + (isTopPick ? ' elig-card-top-pick' : '');
-		if (isTopPick) {
-			card.style.border = '2px solid #3b82f6';
-			card.style.boxShadow = '0 10px 25px -5px rgba(59, 130, 246, 0.15), 0 4px 6px -2px rgba(0,0,0,0.05)';
-		}
+		card.className = 'elig-card bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md transition-all overflow-hidden' + (isTopPick ? ' ring-1 ring-blue-500/20' : '');
 
 		card.innerHTML =
-			topPickBannerHtml +
+			topPickAccentHtml +
 			schoolHeaderHtml +
-			'<div class="elig-card-body" style="padding: 16px;">' +
-				'<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">' +
-					'<h3 class="elig-card-title" style="margin: 0; font-weight: 800; font-size: 1.15rem; line-height: 1.35; flex: 1; min-width: 220px;">' +
-						'<a href="' + escAttr(prog.permalink) + '" style="text-decoration: none; color: #0e2038;">' + escHtml(prog.title) + '</a>' +
+			'<div class="p-4 sm:p-5 pt-3">' +
+				'<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-3">' +
+					'<h3 class="font-extrabold text-base sm:text-lg text-slate-900 leading-snug min-w-0 flex-1">' +
+						'<a href="' + escAttr(prog.permalink) + '" class="hover:text-[#00308b] transition-colors no-underline text-slate-900">' + escHtml(prog.title) + '</a>' +
 					'</h3>' +
-					'<div class="elig-card-status ' + statusClass + '" style="white-space: nowrap; font-weight: 800; font-size: 0.8rem;">' +
-						'<span class="elig-score-label" style="display: inline-block; padding: 4px 10px; border-radius: 6px;">' + statusLabel + ' (' + matchPriorityLabel + ')</span>' +
+					'<div class="' + statusClass + ' shrink-0">' +
+						'<span class="elig-score-label text-xs font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1">' + statusLabel + ' (' + matchPriorityLabel + ')</span>' +
 					'</div>' +
 				'</div>' +
-				'<div class="elig-card-meta-grid">' +
-					'<div class="elig-meta-item"><strong>💰 Học phí:</strong> <span class="elig-meta-val">' + escHtml(prog.tuition_fee || 'Liên hệ') + '</span></div>' +
-					'<div class="elig-meta-item"><strong>⏱ Thời gian:</strong> <span class="elig-meta-val">' + escHtml(prog.duration || '—') + '</span></div>' +
-					'<div class="elig-meta-item elig-meta-item-wide"><strong>📅 Lịch học:</strong> <span class="elig-meta-val">' + escHtml(prog.schedule || 'Linh hoạt') + '</span></div>' +
-					'<div class="elig-meta-item"><strong>📍 Cơ sở học:</strong> <span class="elig-meta-val">' + escHtml(prog.campus_info || '—') + '</span></div>' +
+				'<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 py-3 border-y border-slate-100 text-xs text-slate-600">' +
+					'<div><span class="text-slate-400 block mb-0.5">Học phí:</span><span class="font-bold text-slate-900">' + escHtml(prog.tuition_fee || 'Liên hệ') + '</span></div>' +
+					'<div><span class="text-slate-400 block mb-0.5">Thời gian:</span><span class="font-bold text-slate-900">' + escHtml(prog.duration || '—') + '</span></div>' +
+					'<div><span class="text-slate-400 block mb-0.5">Lịch học:</span><span class="font-bold text-slate-900">' + escHtml(prog.schedule || 'Linh hoạt') + '</span></div>' +
+					'<div><span class="text-slate-400 block mb-0.5">Cơ sở:</span><span class="font-bold text-slate-900">' + escHtml(prog.campus_info || '—') + '</span></div>' +
 				'</div>' +
 				reasonsHtml +
-				'<div class="elig-card-actions" style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px;">' +
-					'<a href="' + escAttr(prog.permalink) + '" class="elig-btn elig-btn-secondary elig-btn-sm" style="flex: 1; text-align: center; text-decoration: none; min-width: 130px; border-color: #cbd5e1; font-weight: 700;">Xem chi tiết</a>' +
-					'<a href="#elig-lead-section" class="elig-btn elig-btn-primary elig-btn-sm elig-verify-card-btn" data-program-id="' + prog.program_id + '" style="flex: 1; text-align: center; text-decoration: none; min-width: 140px; font-weight: 800; background: #d97706; border-color: #d97706;">Xác minh hồ sơ 1:1 📞</a>' +
+				'<div class="mt-4 pt-1 flex flex-col sm:flex-row items-center gap-2.5">' +
+					'<a href="' + escAttr(prog.permalink) + '" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all no-underline shadow-2xs">Xem chi tiết</a>' +
+					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-blue-900 text-white text-xs font-extrabold transition-all no-underline shadow-2xs elig-verify-card-btn" data-program-id="' + prog.program_id + '">Xác minh hồ sơ 1:1</a>' +
 				'</div>' +
 			'</div>';
 

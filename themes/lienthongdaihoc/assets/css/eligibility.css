@@ -8,16 +8,16 @@
    Core UI Variables
    ---------------------------------------------------- */
 :root {
-	--brand-blue: #0E2038;
-	--brand-sky: #3B82F6;
-	--brand-accent: #D97706;
+	--brand-blue: #00308b;
+	--brand-sky: #2563EB;
+	--brand-accent: #00308b;
 	--emerald-600: #059669;
 	--amber-600: #D97706;
 	--rose-600: #E11D48;
-	--slate-800: #1E293B;
+	--slate-800: #0F172A;
 	--slate-600: #475569;
 	--slate-400: #94A3B8;
-	--slate-100: #F1F5F9;
+	--slate-100: #F8FAFC;
 	--radius-lg: 1rem;
 	--radius-md: 0.75rem;
 }
@@ -158,22 +158,22 @@
 .elig-search-input {
 	width: 100%;
 	padding: 0.75rem 1rem;
-	border: 2px solid #E2E8F0;
+	border: 1px solid #CBD5E1;
 	border-radius: var(--radius-md);
-	font-size: 1rem;
+	font-size: 0.9375rem;
 	background: #FFFFFF;
 	transition: all 0.2s ease;
 }
 .elig-search-input:focus {
 	outline: none;
-	border-color: var(--brand-sky);
-	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+	border-color: #00308b;
+	box-shadow: 0 0 0 3px rgba(0, 48, 139, 0.12);
 }
 .elig-search-dropdown {
 	background: #FFFFFF;
 	border: 1px solid #E2E8F0;
 	border-radius: var(--radius-md);
-	box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+	box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
 	z-index: 100;
 }
 .elig-search-option-item {
@@ -181,7 +181,7 @@
 }
 .elig-search-option-item:hover {
 	background: #EFF6FF;
-	color: var(--brand-sky) !important;
+	color: #00308b !important;
 }
 
 /* ----------------------------------------------------
@@ -191,9 +191,9 @@
 .elig-input {
 	width: 100%;
 	padding: 0.75rem 1rem;
-	border: 2px solid #E2E8F0;
+	border: 1px solid #CBD5E1;
 	border-radius: var(--radius-md);
-	font-size: 1rem;
+	font-size: 0.9375rem;
 	background: #FFFFFF;
 	transition: all 0.2s ease;
 	box-sizing: border-box;
@@ -201,8 +201,8 @@
 .elig-select:focus,
 .elig-input:focus {
 	outline: none;
-	border-color: var(--brand-sky);
-	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+	border-color: #00308b;
+	box-shadow: 0 0 0 3px rgba(0, 48, 139, 0.12);
 }
 
 /* ----------------------------------------------------
@@ -225,29 +225,29 @@
 	font-weight: 800;
 	font-size: 0.95rem;
 	cursor: pointer;
-	border: 2px solid transparent;
+	border: 1px solid transparent;
 	transition: all 0.2s ease;
 }
 .elig-btn-primary {
-	background: var(--brand-accent);
+	background: #00308b;
 	color: #FFFFFF;
-	border-color: var(--brand-accent);
-	box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+	border-color: #00308b;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .elig-btn-primary:hover {
-	background: #B45309;
-	border-color: #B45309;
-	transform: translateY(-1px);
-	box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+	background: #002266;
+	border-color: #002266;
+	box-shadow: 0 4px 12px rgba(0, 48, 139, 0.2);
 }
 .elig-btn-secondary {
 	background: #FFFFFF;
 	color: var(--slate-600);
-	border-color: #E2E8F0;
+	border-color: #CBD5E1;
 }
 .elig-btn-secondary:hover {
-	border-color: #CBD5E1;
+	border-color: #94A3B8;
 	background: #F8FAFC;
+	color: var(--slate-800);
 }
 .elig-btn-sm {
 	padding: 0.6rem 1.25rem;

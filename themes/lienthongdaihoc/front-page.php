@@ -979,28 +979,61 @@ $zalo    = ltdh_get_zalo_url();
 					$testimonials = get_field('testimonials', 'options') ?: [];
 				}
 				if (empty($testimonials)) {
-					// Fallback testimonials when ACF not populated.
+					// Fallback testimonials (6 tiêu biểu phủ 6 ngành chủ lực)
 					$testimonials = [
 						[
-							'name'     => 'Nguyễn Hương',
-							'role'     => 'Liên thông Công nghệ thông tin',
-							'initials' => 'NH',
-							'image'    => get_template_directory_uri() . '/assets/images/student-huong.jpg',
-							'content'  => 'Mình đã học Liên thông CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
+							'name'       => 'Nguyễn Hương',
+							'workplace'  => 'Kỹ sư phần mềm tại FPT Software',
+							'role'       => 'Liên thông Đại học CNTT',
+							'graduation' => 'Khóa 2022 - ĐH Giao thông Vận tải',
+							'initials'   => 'NH',
+							'image'      => get_template_directory_uri() . '/assets/images/student-huong.jpg',
+							'content'    => 'Mình đã học Liên thông CNTT tại đây. Lịch học trực tuyến rất linh hoạt, giảng viên nhiệt tình và kiến thức thực tế. Sau khi tốt nghiệp mình đã được thăng chức đúng như mong đợi.'
 						],
 						[
-							'name'     => 'Trần Minh',
-							'role'     => 'Đại học Từ xa - Quản trị kinh doanh',
-							'initials' => 'TM',
-							'image'    => get_template_directory_uri() . '/assets/images/student-minh.jpg',
-							'content'  => 'Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy.'
+							'name'       => 'Trần Minh',
+							'workplace'  => 'Trưởng nhóm Kinh doanh tại Viettel Post',
+							'role'       => 'Đại học Từ xa - Quản trị kinh doanh',
+							'graduation' => 'Khóa 2021 - ĐH Kinh tế Quốc dân',
+							'initials'   => 'TM',
+							'image'      => get_template_directory_uri() . '/assets/images/student-minh.jpg',
+							'content'    => 'Từ xa giúp mình vừa đi làm vừa học đại học. Chương trình đào tạo bài bản, hồ sơ thủ tục nhanh gọn. Mình rất hài lòng với chất lượng giảng dạy.'
 						],
 						[
-							'name'     => 'Lê Phương',
-							'role'     => 'Liên thông Đại học - Kế toán',
-							'initials' => 'LP',
-							'image'    => get_template_directory_uri() . '/assets/images/student-phuong.jpg',
-							'content'  => 'Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận.'
+							'name'       => 'Lê Phương',
+							'workplace'  => 'Kế toán tổng hợp tại VPBank',
+							'role'       => 'Liên thông Đại học - Kế toán',
+							'graduation' => 'Khóa 2022 - ĐH Thương Mại',
+							'initials'   => 'LP',
+							'image'      => get_template_directory_uri() . '/assets/images/student-phuong.jpg',
+							'content'    => 'Liên thông từ Cao đẳng lên Đại học nhanh hơn mình nghĩ. Nhờ tư vấn viên hướng dẫn tận tình mà mình hoàn thành hồ sơ chỉ trong 2 tuần. Bằng cấp được bộ GD&ĐT công nhận.'
+						],
+						[
+							'name'       => 'Hoàng Dũng',
+							'workplace'  => 'Kỹ sư giám sát tại Coteccons',
+							'role'       => 'Liên thông Kỹ thuật Xây dựng',
+							'graduation' => 'Khóa 2021 - ĐH Giao thông Vận tải',
+							'initials'   => 'HD',
+							'image'      => get_template_directory_uri() . '/assets/images/student-dung.jpg',
+							'content'    => 'Vừa đi công trình vừa học trực tuyến buổi tối rất tiện lợi. Bài giảng thực tế bám sát công việc hàng ngày. Nhận bằng ĐH chính quy giúp mình đủ điều kiện ký hồ sơ năng lực dự án lớn.'
+						],
+						[
+							'name'       => 'Thu Thảo',
+							'workplace'  => 'Chuyên viên Pháp chế tại Sun Group',
+							'role'       => 'Đại học Từ xa - Luật Kinh tế',
+							'graduation' => 'Khóa 2022 - ĐH Thái Nguyên',
+							'initials'   => 'TT',
+							'image'      => get_template_directory_uri() . '/assets/images/student-thao.jpg',
+							'content'    => 'Chương trình Luật Kinh tế trang bị kiến thức pháp lý doanh nghiệp rất sâu. Giảng viên hỗ trợ giải đáp thắc mắc nhiệt tình. Tấm bằng đại học đã giúp mình chuyển từ hành chính sang đúng ban pháp chế.'
+						],
+						[
+							'name'       => 'Quốc Anh',
+							'workplace'  => 'Quản lý Đào tạo tại ILA Vietnam',
+							'role'       => 'Đại học Từ xa - Ngôn ngữ Anh',
+							'graduation' => 'Khóa 2022 - ĐH Mở Hà Nội',
+							'initials'   => 'QA',
+							'image'      => get_template_directory_uri() . '/assets/images/student-quocanh.jpg',
+							'content'    => 'Mình tốt nghiệp Cao đẳng du lịch, sau đó học từ xa Ngôn ngữ Anh để nâng chuẩn. Học online 100% tiết kiệm chi phí và thời gian đi lại rất nhiều. Bằng cấp được công nhận rộng rãi trên toàn quốc.'
 						],
 					];
 				}
@@ -1017,11 +1050,13 @@ $zalo    = ltdh_get_zalo_url();
 							$avatar_url = $t['image'];
 						}
 					}
+					$workplace  = $t['workplace'] ?? $t['company'] ?? $t['job'] ?? '';
+					$graduation = $t['graduation'] ?? $t['school'] ?? $t['batch'] ?? 'Bằng chuẩn Bộ GD&ĐT';
 				?>
 					<div class="shrink-0 w-[85vw] sm:w-[360px] md:w-auto snap-center bg-slate-50/80 hover:bg-white border border-slate-200/80 hover:border-blue-300 rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
 						<div>
 							<!-- Student Profile Header with Large Photo (96px) -->
-							<div class="flex items-center gap-4 mb-4">
+							<div class="flex items-start gap-4 mb-4">
 								<div class="relative shrink-0">
 									<?php if ($avatar_url) : ?>
 										<img class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-2 ring-slate-100 shadow-md group-hover:ring-brand-primary/20 transition-all duration-300" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>" loading="lazy" width="96" height="96">
@@ -1035,7 +1070,7 @@ $zalo    = ltdh_get_zalo_url();
 									</span>
 								</div>
 								<div class="min-w-0 flex-1">
-									<div class="flex items-center gap-0.5 text-amber-400 mb-1.5" aria-label="5 trên 5 sao">
+									<div class="flex items-center gap-0.5 text-amber-400 mb-1" aria-label="5 trên 5 sao">
 										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
 										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
 										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
@@ -1044,7 +1079,15 @@ $zalo    = ltdh_get_zalo_url();
 										<span class="text-xs font-bold text-amber-600 ml-1">5.0</span>
 									</div>
 									<h3 class="font-bold text-base sm:text-lg text-slate-900 group-hover:text-brand-primary transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
-									<p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 line-clamp-2"><?php echo esc_html($t['role'] ?? ''); ?></p>
+									<?php if (!empty($workplace)) : ?>
+										<p class="text-xs sm:text-[13px] font-semibold text-slate-700 flex items-center gap-1 mt-0.5 truncate" title="<?php echo esc_attr($workplace); ?>">
+											<svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+											</svg>
+											<span class="truncate"><?php echo esc_html($workplace); ?></span>
+										</p>
+									<?php endif; ?>
+									<p class="text-xs text-brand-primary font-medium mt-0.5 line-clamp-1"><?php echo esc_html($t['role'] ?? ''); ?></p>
 								</div>
 							</div>
 
@@ -1055,16 +1098,32 @@ $zalo    = ltdh_get_zalo_url();
 							</div>
 						</div>
 
-						<!-- Card Bottom / Trust signal -->
-						<div class="mt-6 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
-							<span class="inline-flex items-center gap-1.5 text-emerald-600 font-semibold">
-								<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-								Học viên thực tế
+						<!-- Card Bottom / Trust signal with Graduation Batch & University (Mục 2) -->
+						<div class="mt-5 pt-3.5 border-t border-slate-200/80 flex items-center justify-between text-xs gap-2">
+							<span class="inline-flex items-center gap-1.5 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md shrink-0">
+								<svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+								</svg>
+								Đã tốt nghiệp
 							</span>
-							<span class="text-slate-400 font-medium">Bằng chuẩn Bộ GD&ĐT</span>
+							<span class="text-slate-600 font-medium flex items-center gap-1 truncate" title="<?php echo esc_attr($graduation); ?>">
+								<svg class="w-3.5 h-3.5 text-brand-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+								</svg>
+								<span class="truncate"><?php echo esc_html($graduation); ?></span>
+							</span>
 						</div>
 					</div>
 				<?php endforeach; ?>
+			</div>
+
+			<!-- Mobile swipe indicator -->
+			<div class="md:hidden flex items-center justify-center gap-2 mt-4 text-xs font-semibold text-slate-500">
+				<span>Vuốt xem 6 học viên tiêu biểu</span>
+				<svg class="w-4 h-4 text-brand-primary animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+				</svg>
 			</div>
 		</div>
 	</section>
@@ -1201,7 +1260,7 @@ $zalo    = ltdh_get_zalo_url();
 	<section id="faq-section" class="py-16 md:py-20 bg-white border-t border-slate-100">
 		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 			<!-- Section Header -->
-			<div class="text-center max-w-2xl mx-auto mb-10 space-y-3">
+			<div class="text-center max-w-3xl mx-auto mb-10 space-y-3">
 				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">HỎI ĐÁP TUYỂN SINH</span>
 				<h2 class="text-2xl md:text-4xl font-black text-slate-900 tracking-tight">Câu hỏi thường gặp</h2>
 				<p class="text-slate-500 text-sm md:text-base">Giải đáp thắc mắc về điều kiện tuyển sinh liên thông, hình thức học trực tuyến, bằng cấp và học phí.</p>
