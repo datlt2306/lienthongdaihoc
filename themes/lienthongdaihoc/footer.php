@@ -157,7 +157,7 @@ $is_compare = ( get_query_var( 'ltdh_compare' ) === 'program' ) || ( str_contain
 $should_render_global_mobile_bar = ! is_singular( 'program' ) && ! $is_compare;
 
 if ( $should_render_global_mobile_bar ) : ?>
-<div class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 p-2.5 flex items-center justify-between gap-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] md:hidden">
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 p-2.5 flex items-center justify-between gap-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] md:hidden">
 	<!-- Messenger Button -->
 	<a href="<?php echo esc_url( $messenger ); ?>" target="_blank" rel="noopener" class="flex items-center justify-center h-12 w-12 bg-orange-500 hover:bg-orange-600 rounded-xl shrink-0 transition-colors" aria-label="Messenger">
 		<svg class="w-6 h-6 fill-current text-white" viewBox="0 0 24 24">

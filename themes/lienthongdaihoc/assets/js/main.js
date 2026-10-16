@@ -7,7 +7,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
-    // 1. Mobile Menu Offcanvas Drawer
+    // 1. Mobile Menu Offcanvas Drawer & Collapsible Accordion
     // ----------------------------------------------------
     const toggleBtn = document.getElementById('mobile-menu-toggle');
     const closeBtn  = document.getElementById('mobile-menu-close');
@@ -45,10 +45,84 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.addEventListener('click', closeMenu, { passive: true });
     }
 
-    const mobileLinks = document.querySelectorAll('#mobile-menu a');
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', closeMenu, { passive: true });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menu && !menu.classList.contains('translate-x-full')) {
+            closeMenu();
+        }
     });
+
+    // Initialize collapsible accordions for mobile sub-menus
+    function initMobileMenuAccordions() {
+        if (!menu) return;
+        const parentItems = menu.querySelectorAll('li.menu-item-has-children');
+
+        parentItems.forEach((item) => {
+            if (item.querySelector(':scope > .mobile-menu-item-row')) return;
+
+            const directLink = item.querySelector(':scope > a');
+            const directSub  = item.querySelector(':scope > ul.sub-menu');
+            if (!directLink || !directSub) return;
+
+            // Create row wrapper
+            const row = document.createElement('div');
+            row.className = 'mobile-menu-item-row';
+
+            // Create toggle button with accessible label and rotating chevron
+            const toggleButton = document.createElement('button');
+            toggleButton.type = 'button';
+            toggleButton.className = 'mobile-submenu-toggle';
+            toggleButton.setAttribute('aria-expanded', 'false');
+            toggleButton.setAttribute('aria-label', 'Mở rộng menu con');
+            toggleButton.innerHTML = `
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+            `;
+
+            // Wrap link and button in row
+            item.insertBefore(row, directSub);
+            row.appendChild(directLink);
+            row.appendChild(toggleButton);
+
+            const toggleAccordion = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isOpen = item.classList.contains('is-open');
+                if (isOpen) {
+                    item.classList.remove('is-open');
+                    toggleButton.setAttribute('aria-expanded', 'false');
+                    toggleButton.setAttribute('aria-label', 'Mở rộng menu con');
+                } else {
+                    item.classList.add('is-open');
+                    toggleButton.setAttribute('aria-expanded', 'true');
+                    toggleButton.setAttribute('aria-label', 'Thu gọn menu con');
+                }
+            };
+
+            toggleButton.addEventListener('click', toggleAccordion);
+
+            // If parent link has hash/empty href, tapping the label text also toggles
+            const href = (directLink.getAttribute('href') || '').trim();
+            if (href === '#' || href === '' || href.startsWith('javascript:')) {
+                directLink.addEventListener('click', toggleAccordion);
+            }
+        });
+    }
+
+    initMobileMenuAccordions();
+
+    // Close menu when clicking actual navigation links (delegated, ignores dummy toggles)
+    if (menu) {
+        menu.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (!link) return;
+            const href = (link.getAttribute('href') || '').trim();
+            if (!href || href === '#' || href.startsWith('javascript:')) {
+                return;
+            }
+            closeMenu();
+        });
+    }
 
     // ----------------------------------------------------
     // 2. Swiper Sliders Initialization (Hero & School Partners)
