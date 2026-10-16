@@ -997,7 +997,7 @@ $zalo    = ltdh_get_zalo_url();
 						[
 							'name'         => 'Hoàng Thị Độ',
 							'workplace'    => 'Product Owner',
-							'role'         => 'Liên thông CĐ lên ĐH - CNTT',
+							'role'         => 'Liên thông ngành CNTT',
 							'graduation'   => 'Khóa 29.1 - ĐH Giao thông Vận tải',
 							'status'       => 'graduated',
 							'status_label' => 'Đã tốt nghiệp',
@@ -1008,7 +1008,7 @@ $zalo    = ltdh_get_zalo_url();
 						[
 							'name'         => 'Phạm Văn Dũng',
 							'workplace'    => 'Leader SEO tại CAR BOSS Việt Nam',
-							'role'         => 'Liên thông Đại học Thương Mại (TMU)',
+							'role'         => 'Liên thông ngành TMDT',
 							'graduation'   => 'Khóa K10 - ĐH Thương Mại',
 							'status'       => 'studying',
 							'status_label' => 'Sắp tốt nghiệp',
@@ -1019,7 +1019,7 @@ $zalo    = ltdh_get_zalo_url();
 						[
 							'name'         => 'Nguyễn Quý Duy',
 							'workplace'    => 'Front-End Developer tại VC Corp',
-							'role'         => 'Liên thông Đại học CNTT',
+							'role'         => 'Liên thông ngành CNTT',
 							'graduation'   => 'Khóa K27 - ĐH Giao thông Vận tải',
 							'status'       => 'graduated',
 							'status_label' => 'Đã tốt nghiệp',
