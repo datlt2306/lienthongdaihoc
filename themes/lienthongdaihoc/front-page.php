@@ -177,9 +177,9 @@ $zalo    = ltdh_get_zalo_url();
 	</div>
 
 	<!-- 2. HOT PROGRAMS SECTION -->
-	<section class="py-12 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
+	<section class="py-8 sm:py-12 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
 		<div class="max-w-7xl mx-auto relative z-10 px-4 sm:px-6 lg:px-8">
-			<div class="text-center max-w-2xl mx-auto mb-8 space-y-2">
+			<div class="text-center max-w-2xl mx-auto mb-6 sm:mb-8 space-y-2">
 				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">KHÁM PHÁ NGÀNH HỌC</span>
 				<h2 class="text-xl md:text-4xl font-black text-slate-900">5 ngành đào tạo hot nhất</h2>
 				<p class="text-slate-500 text-sm">Top ngành được yêu thích nhất, phù hợp xu hướng thị trường lao động.</p>
@@ -246,9 +246,9 @@ $zalo    = ltdh_get_zalo_url();
 	</section>
 
 	<!-- 3. NATIONAL SCHOOLS SECTION (CAROUSEL SLIDER) -->
-	<section id="program-section" class="py-12 md:py-16 bg-white overflow-hidden">
+	<section id="program-section" class="py-8 sm:py-12 md:py-16 bg-white overflow-hidden">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8">
+			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 sm:mb-8">
 				<div class="space-y-2">
 					<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">ĐỐI TÁC ĐẠI HỌC</span>
 					<h2 class="text-xl md:text-3xl font-black text-slate-900">Trường đối tác đào tạo</h2>
@@ -431,7 +431,7 @@ $zalo    = ltdh_get_zalo_url();
 	</style>
 
 	<!-- 4. ELIGIBILITY QUICK CHECK SECTION -->
-	<section class="py-16 bg-slate-50 border-t border-slate-100">
+	<section class="py-8 sm:py-12 md:py-16 bg-slate-50 border-t border-slate-100">
 		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 			<div class="space-y-4">
 				<?php
@@ -993,7 +993,7 @@ $zalo    = ltdh_get_zalo_url();
 						[
 							'name'         => 'Hoàng Thị Độ',
 							'workplace'    => 'Product Owner',
-							'role'         => 'Liên thông CĐ lên ĐH - CNTT',
+							'role'         => 'Liên thông công nghệ thông tin',
 							'graduation'   => 'Khóa 29.1 - ĐH Giao thông Vận tải',
 							'status'       => 'graduated',
 							'status_label' => 'Đã tốt nghiệp',
@@ -1004,7 +1004,7 @@ $zalo    = ltdh_get_zalo_url();
 						[
 							'name'         => 'Phạm Văn Dũng',
 							'workplace'    => 'Leader SEO tại CAR BOSS Việt Nam',
-							'role'         => 'Liên thông Đại học Thương Mại (TMU)',
+							'role'         => 'Thương mại điện tử',
 							'graduation'   => 'Khóa K10 - ĐH Thương Mại',
 							'status'       => 'studying',
 							'status_label' => 'Sắp tốt nghiệp',
@@ -1113,7 +1113,7 @@ $zalo    = ltdh_get_zalo_url();
 									</div>
 									<h3 class="font-bold text-base sm:text-lg text-slate-900 group-hover:text-brand-primary transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
 									<?php if (!empty($workplace)) : ?>
-										<p class="text-xs sm:text-[13px] font-semibold text-slate-700 flex items-center gap-1 mt-0.5 truncate" title="<?php echo esc_attr($workplace); ?>">
+										<p class="text-xs sm:text-[13px] font-semibold text-slate-700 flex items-center gap-1 my-1.5 truncate" title="<?php echo esc_attr($workplace); ?>">
 											<svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
 											</svg>
