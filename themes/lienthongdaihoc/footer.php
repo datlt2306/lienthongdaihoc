@@ -14,7 +14,7 @@ $zalo     = ltdh_get_zalo_url();
 $messenger = ltdh_get_messenger_url();
 ?>
 
-	<footer id="colophon" class="site-footer text-slate-400 pt-16 pb-28 border-t border-slate-800/80" style="background-color: #0d192d;">
+	<footer id="colophon" class="site-footer text-slate-400 py-16 border-t border-slate-800/80" style="background-color: #0d192d;">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
 			<!-- Column 1: Brand Info -->
 			<div>
