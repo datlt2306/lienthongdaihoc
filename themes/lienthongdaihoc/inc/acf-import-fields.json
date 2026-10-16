@@ -116,9 +116,10 @@
       },
       {
         "key": "field_school_contact_info",
-        "label": "Thông tin liên hệ tuyển sinh",
+        "label": "Thông tin liên hệ & Tiếp nhận hồ sơ",
         "name": "contact_info",
         "type": "wysiwyg",
+        "instructions": "Địa chỉ văn phòng tuyển sinh, địa điểm tiếp nhận hồ sơ, hotline và thông tin nộp lệ phí xét tuyển của trường. Thông tin này sẽ tự động hiển thị trong mục 'Điều kiện & Hồ sơ' của tất cả các chương trình thuộc trường nếu chương trình không cấu hình riêng.",
         "toolbar": "full",
         "media_upload": 1
       },
@@ -170,6 +171,38 @@
         "name": "school_telegram_chat_id",
         "type": "text",
         "instructions": "Chat ID kênh/nhóm tư vấn viên tuyển sinh riêng của trường này"
+      },
+      {
+        "key": "field_tab_school_faq",
+        "label": "Hỏi đáp (FAQ)",
+        "name": "",
+        "type": "tab",
+        "placement": "top",
+        "endpoint": 0
+      },
+      {
+        "key": "field_school_faq",
+        "label": "Câu hỏi thường gặp của trường",
+        "name": "school_faq",
+        "type": "repeater",
+        "instructions": "Thêm các câu hỏi & giải đáp đặc thù về tuyển sinh liên thông riêng của trường này. Nếu để trống, hệ thống sẽ tự động hiển thị bộ câu hỏi chuẩn hóa theo thông tin của trường.",
+        "layout": "row",
+        "button_label": "Thêm câu hỏi",
+        "sub_fields": [
+          {
+            "key": "field_school_faq_question",
+            "label": "Câu hỏi",
+            "name": "question",
+            "type": "text"
+          },
+          {
+            "key": "field_school_faq_answer",
+            "label": "Câu trả lời",
+            "name": "answer",
+            "type": "textarea",
+            "rows": 3
+          }
+        ]
       }
     ],
     "location": [
@@ -342,6 +375,38 @@
             "type": "number",
             "default_value": 3,
             "instructions": "Số lượng học phần cần học bổ sung (ví dụ: 3)."
+          }
+        ]
+      },
+      {
+        "key": "field_tab_major_faq",
+        "label": "Hỏi đáp (FAQ)",
+        "name": "",
+        "type": "tab",
+        "placement": "top",
+        "endpoint": 0
+      },
+      {
+        "key": "field_major_faq",
+        "label": "Câu hỏi thường gặp về ngành",
+        "name": "major_faq",
+        "type": "repeater",
+        "instructions": "Thêm các câu hỏi & giải đáp chuyên sâu về ngành này. Nếu để trống, hệ thống sẽ tự động hiển thị cẩm nang định hướng và so sánh chuẩn hóa cho ngành.",
+        "layout": "row",
+        "button_label": "+ Thêm câu hỏi",
+        "sub_fields": [
+          {
+            "key": "field_major_faq_question",
+            "label": "Câu hỏi",
+            "name": "question",
+            "type": "text"
+          },
+          {
+            "key": "field_major_faq_answer",
+            "label": "Câu trả lời",
+            "name": "answer",
+            "type": "textarea",
+            "rows": 3
           }
         ]
       }
@@ -563,6 +628,15 @@
         "instructions": "Tải lên file Mẫu phiếu đăng ký tuyển sinh (PDF/DOCX) để sinh viên tải về.",
         "return_format": "array",
         "library": "all"
+      },
+      {
+        "key": "field_program_contact_info",
+        "label": "Thông tin liên hệ & Tiếp nhận hồ sơ",
+        "name": "contact_info",
+        "type": "wysiwyg",
+        "instructions": "Địa chỉ văn phòng tuyển sinh, địa điểm tiếp nhận hồ sơ, hotline riêng cho chương trình này. Nếu để trống, hệ thống sẽ tự động kế thừa từ Thông tin liên hệ của Trường đào tạo.",
+        "toolbar": "full",
+        "media_upload": 1
       },
       {
         "key": "field_tab_prog_tuition",

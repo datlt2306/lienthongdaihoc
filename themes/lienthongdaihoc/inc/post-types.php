@@ -121,9 +121,22 @@ function ltdh_register_post_types_and_taxonomies_from_json() {
 			'public'       => true,
 			'has_archive'  => 'cam-nang',
 			'rewrite'      => [ 'slug' => 'huong-dan', 'with_front' => false ],
-			'supports'     => [ 'title', 'editor', 'thumbnail', 'excerpt' ],
+			'supports'     => [ 'title', 'editor', 'thumbnail', 'excerpt', 'author' ],
 			'menu_icon'    => 'dashicons-book-alt',
 			'show_in_rest' => true,
 		] );
+	}
+}
+
+/**
+ * Ensure core CPTs consistently support author in admin.
+ */
+add_action( 'init', 'ltdh_enable_cpt_author_support', 99 );
+function ltdh_enable_cpt_author_support() {
+	add_post_type_support( 'program', 'author' );
+	add_post_type_support( 'school', 'author' );
+	add_post_type_support( 'major', 'author' );
+	if ( defined( 'LTDH_CPT_GUIDE' ) ) {
+		add_post_type_support( LTDH_CPT_GUIDE, 'author' );
 	}
 }

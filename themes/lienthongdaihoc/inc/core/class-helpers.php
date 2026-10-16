@@ -1711,10 +1711,10 @@ function ltdh_get_training_type_badge_html( string $type_name ): string {
 	}
 	$badge_class = 'bg-orange-50 text-orange-600 border border-orange-100';
 	$type_name_lower = mb_strtolower( trim( $type_name ), 'UTF-8' );
-	if ( false !== strpos( $type_name_lower, 'chính quy' ) ) {
-		$badge_class = 'bg-blue-50 text-blue-600 border border-blue-100';
-	} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
-		$badge_class = 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+	if ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
+		$badge_class = 'bg-blue-50 text-[#00308b] border border-blue-200';
+	} elseif ( false !== strpos( $type_name_lower, 'chính quy' ) ) {
+		$badge_class = 'bg-indigo-50 text-indigo-700 border border-indigo-200';
 	} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
 		$badge_class = 'bg-amber-50 text-amber-600 border border-amber-100';
 	}
@@ -2315,7 +2315,7 @@ function ltdh_get_major_training_types( int $major_id ): array {
 			if ( in_array( $raw_slug, [ 'tu-xa', 'dao-tao-tu-xa' ], true ) ) {
 				$canonical_slug = 'tu-xa';
 				$name           = 'Đào tạo từ xa';
-				$dot_class      = 'bg-emerald-500';
+				$dot_class      = 'bg-blue-600';
 			} elseif ( in_array( $raw_slug, [ 'vua-hoc-vua-lam', 'vhvl', 'vua-lam-vua-hoc' ], true ) ) {
 				$canonical_slug = 'vua-hoc-vua-lam';
 				$name           = 'Vừa học vừa làm';
@@ -2323,7 +2323,7 @@ function ltdh_get_major_training_types( int $major_id ): array {
 			} elseif ( in_array( $raw_slug, [ 'chinh-quy', 'chinh-quy-tap-trung' ], true ) ) {
 				$canonical_slug = 'chinh-quy';
 				$name           = 'Chính quy';
-				$dot_class      = 'bg-blue-500';
+				$dot_class      = 'bg-indigo-600';
 			}
 
 			if ( ! isset( $available_types[ $canonical_slug ] ) ) {
@@ -2553,6 +2553,323 @@ function ltdh_render_program_verification_badge( int $program_id, string $contex
 	echo ltdh_get_program_verification_badge_html( $program_id, $context );
 }
 
+/**
+ * Retrieve FAQ items for a School.
+ *
+ * Checks for custom FAQs entered in ACF ('school_faq' or 'faq').
+ * If not set or empty, dynamically synthesizes high-value, school-specific
+ * FAQ items contextualized with school name, training types, degree legal validity,
+ * entrance requirements, and tuition policies.
+ *
+ * @param int $school_id School post ID.
+ * @return array Array of associative arrays with 'question' and 'answer' keys.
+ */
+function ltdh_get_school_faqs( int $school_id ): array {
+	if ( ! $school_id ) {
+		return [];
+	}
 
+	// 1. Check custom ACF FAQs on school post
+	$custom_faqs = function_exists( 'get_field' ) 
+		? ( get_field( 'school_faq', $school_id ) ?: get_field( 'faq', $school_id ) )
+		: get_post_meta( $school_id, 'school_faq', true );
 
+	if ( ! empty( $custom_faqs ) && is_array( $custom_faqs ) ) {
+		$valid_faqs = [];
+		foreach ( $custom_faqs as $item ) {
+			$q = trim( $item['question'] ?? '' );
+			$a = trim( $item['answer'] ?? '' );
+			if ( ! empty( $q ) && ! empty( $a ) ) {
+				$valid_faqs[] = [
+					'question' => $q,
+					'answer'   => $a,
+				];
+			}
+		}
+		if ( ! empty( $valid_faqs ) ) {
+			return $valid_faqs;
+		}
+	}
 
+	// 2. Synthesize school-specific intelligent fallback FAQs
+	$school_name = get_the_title( $school_id );
+	if ( empty( $school_name ) ) {
+		return [];
+	}
+
+	$school_code  = get_post_meta( $school_id, 'school_code', true ) ?: '';
+	$school_label = $school_code ? sprintf( '%s (%s)', $school_name, $school_code ) : $school_name;
+
+	$training_types = function_exists( 'ltdh_get_school_training_types' ) 
+		? ltdh_get_school_training_types( $school_id ) 
+		: [];
+
+	$types_str = ! empty( $training_types ) 
+		? implode( ', ', array_map( function( $t ) { return preg_replace( '/^hệ\s+/iu', '', trim( $t ) ); }, $training_types ) )
+		: 'Đào tạo từ xa, Vừa học vừa làm';
+
+	return [
+		[
+			'question' => sprintf( 'Bằng tốt nghiệp Liên thông Đại học của %s có ghi hình thức đào tạo không?', $school_name ),
+			'answer'   => sprintf(
+				'<p class="mb-2"><strong>Không.</strong> Căn cứ theo Thông tư số 27/2019/TT-BGDĐT của Bộ Giáo dục & Đào tạo, từ ngày 01/03/2020 trên văn bằng tốt nghiệp Đại học của <strong>%s</strong> hoàn toàn KHÔNG ghi hình thức đào tạo. Giá trị pháp lý văn bằng được quy định như sau:</p>' .
+				'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">✓</span><span><strong>Giá trị tương đương:</strong> Bằng tốt nghiệp hệ Từ xa hoặc Vừa học vừa làm có giá trị công nhận tương đương bằng Đại học chính quy.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">✓</span><span><strong>Đầy đủ quyền lợi pháp lý:</strong> Được sử dụng để thi công chức, viên chức, xét nâng lương, nâng bậc ngạch theo đúng quy định Nhà nước.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">✓</span><span><strong>Học lên cao học:</strong> Đủ điều kiện đăng ký thi tuyển và theo học các chương trình Thạc sĩ, Tiến sĩ tại mọi cơ sở giáo dục đại học trong và ngoài nước.</span></li>' .
+				'</ul>',
+				$school_name
+			),
+		],
+		[
+			'question' => sprintf( 'Tốt nghiệp Cao đẳng nghề hoặc tốt nghiệp trái ngành có được học Liên thông tại %s không?', $school_name ),
+			'answer'   => sprintf(
+				'<p class="mb-2"><strong>Có.</strong> <strong>%s</strong> tiếp nhận xét tuyển rộng rãi các đối tượng người học theo các tiêu chí:</p>' .
+				'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>Cao đẳng chính quy & Cao đẳng nghề:</strong> Thí sinh tốt nghiệp Cao đẳng ở mọi hình thức đào tạo đều được đăng ký xét tuyển liên thông.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>Trường hợp trái ngành / ngành gần:</strong> Nhà trường hỗ trợ tổ chức học bổ sung kiến thức (chuyển đổi tín chỉ) một số học phần cơ sở trước khi vào học chuyên ngành chính thức.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold shrink-0 mt-0.5">3</span><span><strong>Phương thức xét tuyển:</strong> Xét tuyển thẳng dựa trên văn bằng và bảng điểm đã có, không phải thi tuyển đầu vào áp lực.</span></li>' .
+				'</ul>',
+				$school_name
+			),
+		],
+		[
+			'question' => sprintf( 'Hình thức học và thi kết thúc học phần tại %s diễn ra như thế nào?', $school_name ),
+			'answer'   => sprintf(
+				'<p class="mb-2">Lịch học và hình thức kiểm tra đánh giá tại <strong>%s</strong> được thiết kế linh hoạt theo từng hình thức đào tạo (<strong>%s</strong>):</p>' .
+				'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-800 text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>Hệ Đào tạo từ xa:</strong> Học 100%% online qua hệ thống E-learning của trường, sinh viên chủ động tự học mọi lúc mọi nơi theo tiến độ cá nhân.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-800 text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>Hệ Vừa học vừa làm:</strong> Lịch học bố trí linh hoạt vào các buổi tối trong tuần hoặc Thứ 7 & Chủ nhật, phù hợp người đang đi làm.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-800 text-[11px] font-bold shrink-0 mt-0.5">3</span><span><strong>Thi học phần & tốt nghiệp:</strong> Tổ chức thi tập trung định kỳ tại trụ sở chính của trường hoặc các trạm thi vệ tinh liên kết trên toàn quốc.</span></li>' .
+				'</ul>',
+				$school_name,
+				$types_str
+			),
+		],
+		[
+			'question' => sprintf( 'Học phí đào tạo Liên thông tại %s được tính và thu như thế nào?', $school_name ),
+			'answer'   => sprintf(
+				'<p class="mb-2">Chính sách thu học phí đào tạo Liên thông tại <strong>%s</strong> được thực hiện minh bạch theo các nguyên tắc:</p>' .
+				'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>Tính theo tín chỉ thực tế:</strong> Học phí thu theo số tín chỉ sinh viên đăng ký học trong từng học kỳ theo đúng quy định của Nhà nước.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>Chia đợt đóng linh hoạt:</strong> Đóng học phí theo từng học kỳ, giúp giảm tải tối đa áp lực tài chính cho người học.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">3</span><span><strong>Không phát sinh phụ phí:</strong> Mọi chi phí đào tạo được thông báo công khai ngay từ đầu khóa và cam kết không phát sinh các khoản phụ phí bất hợp lý.</span></li>' .
+				'</ul>',
+				$school_name
+			),
+		],
+		[
+			'question' => sprintf( 'Hồ sơ đăng ký xét tuyển Liên thông vào %s gồm những giấy tờ gì và nộp ở đâu?', $school_name ),
+			'answer'   => sprintf(
+				'<p class="mb-2">Hồ sơ đăng ký xét tuyển Liên thông vào <strong>%s</strong> gồm các giấy tờ cơ bản sau:</p>' .
+				'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>01 Phiếu đăng ký xét tuyển:</strong> Điền đầy đủ thông tin theo mẫu chuẩn của %s.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>02 Bản sao công chứng:</strong> Bằng tốt nghiệp và Bảng điểm Cao đẳng hoặc Trung cấp.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">3</span><span><strong>01 Bản sao công chứng:</strong> Căn cước công dân (CCCD) và 01 Bản sao Giấy khai sinh.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">4</span><span><strong>04 Ảnh thẻ cỡ 3x4:</strong> Chụp rõ mặt trong vòng 6 tháng gần nhất (ghi rõ họ tên, ngày sinh ở mặt sau).</span></li>' .
+				'</ul>' .
+				'<p class="mt-2 text-xs text-slate-500 italic">Thí sinh có thể gửi trước bản scan / ảnh chụp hồ sơ trực tuyến để được xét duyệt điều kiện, sau đó nộp hồ sơ bản cứng khi nhập học chính thức.</p>',
+				$school_name,
+				$school_name
+			),
+		],
+	];
+}
+
+/**
+ * Retrieve FAQ items for a Major.
+ *
+ * Handles 2 distinct user contexts:
+ * 1. Contextualized under a specific School ($school_id provided):
+ *    - Looks up program linking this major and school for specific FAQs.
+ *    - Falls back to school FAQs if program has no custom FAQs.
+ * 2. General Major view ($school_id not provided / null):
+ *    - Checks custom ACF FAQs on the major post ('major_faq' or 'faq').
+ *    - Synthesizes intelligent orientation & comparative buying-guide FAQs
+ *      (Degree type, credit bridge policy, duration, online practice, school comparison).
+ *
+ * @param int      $major_id  Major post ID.
+ * @param int|null $school_id Optional school post ID context.
+ * @return array Array of associative arrays with 'question' and 'answer' keys.
+ */
+function ltdh_get_major_faqs( int $major_id, ?int $school_id = null ): array {
+	if ( ! $major_id ) {
+		return [];
+	}
+
+	// ----------------------------------------------------
+	// CASE 1: Contextualized under a specific school
+	// ----------------------------------------------------
+	if ( ! empty( $school_id ) ) {
+		// 1.1 Check if a specific program exists for this school & major
+		$progs = get_posts( [
+			'post_type'      => 'program',
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'meta_query'     => [
+				'relation' => 'AND',
+				[
+					'key'     => 'school_relationship',
+					'value'   => $school_id,
+					'compare' => '=',
+				],
+				[
+					'key'     => 'major_relationship',
+					'value'   => $major_id,
+					'compare' => '=',
+				],
+			],
+		] );
+
+		if ( ! empty( $progs ) ) {
+			$prog_id   = $progs[0]->ID;
+			$prog_faqs = function_exists( 'get_field' ) ? get_field( 'faq', $prog_id ) : get_post_meta( $prog_id, 'faq', true );
+			if ( ! empty( $prog_faqs ) && is_array( $prog_faqs ) ) {
+				$valid = [];
+				foreach ( $prog_faqs as $item ) {
+					$q = trim( $item['question'] ?? '' );
+					$a = trim( $item['answer'] ?? '' );
+					if ( ! empty( $q ) && ! empty( $a ) ) {
+						$valid[] = [
+							'question' => $q,
+							'answer'   => $a,
+						];
+					}
+				}
+				if ( ! empty( $valid ) ) {
+					return $valid;
+				}
+			}
+		}
+
+		// 1.2 Fallback to school FAQs if no program-specific FAQs
+		if ( function_exists( 'ltdh_get_school_faqs' ) ) {
+			$sch_faqs = ltdh_get_school_faqs( $school_id );
+			if ( ! empty( $sch_faqs ) ) {
+				return $sch_faqs;
+			}
+		}
+	}
+
+	// ----------------------------------------------------
+	// CASE 2: General Major view (No school context)
+	// ----------------------------------------------------
+	// 2.1 Check custom ACF FAQs on the major post
+	$custom_faqs = function_exists( 'get_field' ) 
+		? ( get_field( 'major_faq', $major_id ) ?: get_field( 'faq', $major_id ) )
+		: get_post_meta( $major_id, 'major_faq', true );
+
+	if ( ! empty( $custom_faqs ) && is_array( $custom_faqs ) ) {
+		$valid_faqs = [];
+		foreach ( $custom_faqs as $item ) {
+			$q = trim( $item['question'] ?? '' );
+			$a = trim( $item['answer'] ?? '' );
+			if ( ! empty( $q ) && ! empty( $a ) ) {
+				$valid_faqs[] = [
+					'question' => $q,
+					'answer'   => $a,
+				];
+			}
+		}
+		if ( ! empty( $valid_faqs ) ) {
+			return $valid_faqs;
+		}
+	}
+
+	// 2.2 Synthesize high-value orientation & comparative FAQs for this major
+	$raw_major_title = get_the_title( $major_id );
+	if ( empty( $raw_major_title ) ) {
+		return [];
+	}
+
+	$clean_major = preg_replace( '/^ngành\s+/iu', '', trim( $raw_major_title ) );
+	$major_lower = mb_strtolower( $clean_major, 'UTF-8' );
+
+	// Determine degree credential wording based on field of study
+	$is_engineering = (
+		false !== strpos( $major_lower, 'công nghệ' ) ||
+		false !== strpos( $major_lower, 'kỹ thuật' ) ||
+		false !== strpos( $major_lower, 'xây dựng' ) ||
+		false !== strpos( $major_lower, 'điện' ) ||
+		false !== strpos( $major_lower, 'phần mềm' )
+	);
+
+	if ( $is_engineering ) {
+		$degree_answer = sprintf(
+			'<p class="mb-2">Tùy thuộc vào cơ sở đào tạo và định hướng chương trình của từng trường đại học:</p>' .
+			'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+			'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>Bằng Kỹ sư:</strong> Các trường khối kỹ thuật chuyên sâu (như Học viện Bưu chính Viễn thông PTIT, ĐH Bách Khoa, ĐH Giao thông Vận tải) thường cấp bằng Kỹ sư ngành %s với khối lượng kiến thức chuyên sâu.</span></li>' .
+			'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>Bằng Cử nhân:</strong> Các trường đại học đa ngành (như Viện ĐH Mở, ĐH Thái Nguyên) thường cấp bằng Cử nhân ngành %s tập trung vào ứng dụng thực tiễn.</span></li>' .
+			'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">✓</span><span><strong>Giá trị pháp lý:</strong> Cả bằng Cử nhân và Kỹ sư đều chuẩn trình độ Đại học theo khung văn bằng quốc gia, đủ điều kiện thi công chức, xét nâng bậc lương và học lên Thạc sĩ.</span></li>' .
+			'</ul>',
+			$clean_major,
+			$clean_major
+		);
+	} else {
+		$degree_answer = sprintf(
+			'<p class="mb-2">Sinh viên tốt nghiệp chương trình Liên thông ngành <strong>%s</strong> được cấp <strong>Bằng Cử nhân</strong> đại học chuẩn quy chế của Bộ Giáo dục & Đào tạo. Giá trị văn bằng cụ thể:</p>' .
+			'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+			'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">✓</span><span><strong>Không ghi hình thức đào tạo:</strong> Theo Thông tư 27/2019/TT-BGDĐT, bằng không phân biệt Chính quy, Vừa học vừa làm hay Từ xa.</span></li>' .
+			'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">✓</span><span><strong>Quyền lợi pháp lý đầy đủ:</strong> Được công nhận toàn quốc để thi tuyển công chức, viên chức, xét nâng ngạch bổ nhiệm cán bộ.</span></li>' .
+			'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">✓</span><span><strong>Học lên cao học:</strong> Đủ điều kiện đăng ký học tiếp lên trình độ Thạc sĩ, Tiến sĩ tại mọi trường đại học trong nước và quốc tế.</span></li>' .
+			'</ul>',
+			$clean_major
+		);
+	}
+
+	return [
+		[
+			'question' => sprintf( 'Bằng tốt nghiệp Liên thông ngành %s là bằng Cử nhân hay Kỹ sư?', $clean_major ),
+			'answer'   => $degree_answer,
+		],
+		[
+			'question' => sprintf( 'Tốt nghiệp Cao đẳng nghề hoặc trái ngành có được học Liên thông ngành %s không?', $clean_major ),
+			'answer'   => sprintf(
+				'<p class="mb-2"><strong>Có.</strong> Quy chế tuyển sinh hiện hành của Bộ GD&ĐT cho phép người học đăng ký liên thông vào ngành <strong>%s</strong> theo các diện sau:</p>' .
+				'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>Tốt nghiệp Cao đẳng đúng ngành:</strong> Xét tuyển thẳng vào chương trình chính khóa, được công nhận tối đa số tín chỉ đã tích lũy ở bậc Cao đẳng.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>Tốt nghiệp Cao đẳng nghề / Ngành gần / Trái ngành:</strong> Đều đủ điều kiện xét tuyển. Nhà trường sẽ tổ chức học bổ sung chuyển đổi tín chỉ từ 2 - 4 học phần cơ sở trước khi vào học chuyên ngành.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold shrink-0 mt-0.5">3</span><span><strong>Phương thức xét tuyển:</strong> Xét tuyển hoàn toàn theo hồ sơ văn bằng đã có, không phải thi tuyển đầu vào áp lực.</span></li>' .
+				'</ul>',
+				$clean_major
+			),
+		],
+		[
+			'question' => sprintf( 'Thời gian đào tạo Liên thông ngành %s mất bao lâu? Có được rút ngắn không?', $clean_major ),
+			'answer'   => sprintf(
+				'<p class="mb-2">Thời gian đào tạo ngành <strong>%s</strong> phụ thuộc vào văn bằng đầu vào và tiến độ tích lũy tín chỉ của bạn:</p>' .
+				'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-800 text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>Từ trình độ Cao đẳng đúng ngành:</strong> Thời gian học từ <strong>1.5 - 2 năm</strong> (tương đương 3 - 4 học kỳ chính).</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-800 text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>Từ trình độ Cao đẳng trái ngành:</strong> Thời gian học từ <strong>2 - 2.5 năm</strong> (do cần thêm 1 học kỳ bổ sung kiến thức chuyển đổi).</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-800 text-[11px] font-bold shrink-0 mt-0.5">3</span><span><strong>Cơ chế rút ngắn thời gian:</strong> Với hình thức đào tạo theo hệ thống tín chỉ, sinh viên có thể đăng ký học vượt môn trong các kỳ học hè để tốt nghiệp sớm trước hạn.</span></li>' .
+				'</ul>',
+				$clean_major
+			),
+		],
+		[
+			'question' => sprintf( 'Học trực tuyến (Từ xa) ngành %s thì học tập, thực hành và thi cử như thế nào?', $clean_major ),
+			'answer'   => sprintf(
+				'<p class="mb-2">Chương trình đào tạo từ xa ngành <strong>%s</strong> được thiết kế tối ưu cho người đi làm với quy trình học hiện đại:</p>' .
+				'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>Học lý thuyết trực tuyến 100%%:</strong> Xem video bài giảng, tài liệu điện tử và làm bài tập trắc nghiệm trên cổng E-learning mọi lúc mọi nơi.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>Thực hành & Làm bài tập lớn:</strong> Làm bài tập tình huống, đồ án môn học hoặc thực hành qua phần mềm chuyên ngành có giảng viên hướng dẫn trực tiếp qua lớp học trực tuyến (Google Meet / Zoom).</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">3</span><span><strong>Thi kết thúc học phần:</strong> Thi tập trung theo lịch thông báo trước tại trụ sở chính của trường hoặc các trạm thi vệ tinh liên kết gần nơi bạn sinh sống.</span></li>' .
+				'</ul>',
+				$clean_major
+			),
+		],
+		[
+			'question' => sprintf( 'Nên chọn trường đại học nào để học Liên thông ngành %s phù hợp nhất?', $clean_major ),
+			'answer'   => sprintf(
+				'<p class="mb-2">Mỗi trường đại học có thế mạnh đào tạo riêng về ngành <strong>%s</strong>. Bạn nên cân nhắc dựa trên 3 tiêu chí cốt lõi:</p>' .
+				'<ul class="space-y-2 my-2.5 list-none pl-0">' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>Ưu tiên thương hiệu & chuyên môn sâu:</strong> Chọn các trường đại học chuyên ngành đầu ngành để có nền tảng kiến thức vững chắc và giá trị thương hiệu bằng cấp cao.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>Ưu tiên học phí & lộ trình linh hoạt:</strong> Chọn các trường có mức học phí phù hợp với ngân sách cá nhân và chính sách hỗ trợ đóng chia kỳ linh hoạt.</span></li>' .
+				'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-[#00308b] text-[11px] font-bold shrink-0 mt-0.5">3</span><span><strong>Ưu tiên trạm thi gần nơi ở:</strong> Chọn trường có mạng lưới trạm thi vệ tinh tại khu vực bạn sinh sống để thuận tiện di chuyển trong các kỳ thi tập trung.</span></li>' .
+				'</ul>' .
+				'<p class="mt-2 text-xs text-slate-500 italic">Quý học viên có thể tham khảo bảng so sánh các trường đang tuyển sinh ngành này ở mục phía trên hoặc để lại thông tin để được cán bộ tư vấn phân tích trường phù hợp nhất.</p>',
+				$clean_major
+			),
+		],
+	];
+}

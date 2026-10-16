@@ -27,7 +27,8 @@
             "thumbnail",
             "excerpt",
             "revisions",
-            "page-attributes"
+            "page-attributes",
+            "author"
         ],
         "taxonomies": [
             "region"
@@ -83,7 +84,8 @@
             "editor",
             "thumbnail",
             "excerpt",
-            "revisions"
+            "revisions",
+            "author"
         ],
         "taxonomies": [],
         "has_archive": true,
@@ -137,7 +139,8 @@
             "editor",
             "thumbnail",
             "excerpt",
-            "revisions"
+            "revisions",
+            "author"
         ],
         "taxonomies": [
             "training_type",
@@ -226,7 +229,7 @@
         "show_in_menu": true,
         "show_in_nav_menus": true,
         "show_in_rest": true,
-        "show_admin_column": true,
+        "show_admin_column": false,
         "rewrite": true,
         "rewrite_slug": "co-so",
         "rewrite_with_front": false,

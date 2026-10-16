@@ -39,12 +39,12 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	$banner_image    = get_field( 'school_banner' ) ?: get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'major' ) ) {
 	$raw_title       = get_the_title();
-	$clean_major     = preg_replace( '/^ngành\s+/iu', '', trim( (string) $raw_title ) );
+	$clean_major     = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( (string) $raw_title ) );
 	$year            = (int) date( 'Y' );
-	$banner_title    = 'Tuyển sinh Liên thông Đại học ngành ' . $clean_major;
-	$major_code      = get_field( 'major_code', get_the_ID() );
+	$banner_title    = 'Liên thông Đại học ngành ' . $clean_major;
+	$major_code      = get_field( 'major_code', get_the_ID() ) ?: get_post_meta( get_the_ID(), 'major_code', true );
 	$code_suffix     = $major_code ? ' • Mã ngành: ' . $major_code : '';
-	$banner_subtitle = 'Thông tin các trường đào tạo, lộ trình công nhận tín chỉ và học phí liên thông ngành ' . $clean_major . ' năm ' . $year . $code_suffix;
+	$banner_subtitle = 'Danh sách trường đào tạo, lộ trình công nhận tín chỉ và học phí năm ' . $year . $code_suffix;
 	$banner_image    = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
 } elseif ( is_singular( 'program' ) ) {
 	$raw_prog_title  = get_the_title();
@@ -164,13 +164,6 @@ if ( empty( $banner_image ) ) {
 	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-primary/20 rounded-full blur-3xl pointer-events-none"></div>
 
 	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-		<!-- Breadcrumbs -->
-		<nav class="flex items-center gap-2 text-xs text-slate-300 font-semibold mb-3">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-white transition-colors">Trang chủ</a>
-			<span class="text-slate-500">/</span>
-			<span class="text-brand-accent font-bold truncate max-w-xs"><?php echo esc_html( $banner_title ); ?></span>
-		</nav>
-
 		<h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
 			<?php echo esc_html( $banner_title ); ?>
 		</h1>

@@ -287,6 +287,76 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			],
 			'telephone' => get_field( 'hotline', $school_id ) ?: '',
 		];
+
+		if ( function_exists( 'ltdh_get_school_faqs' ) ) {
+			$school_faqs = ltdh_get_school_faqs( $school_id );
+			if ( ! empty( $school_faqs ) && is_array( $school_faqs ) ) {
+				$faq_elements = [];
+				foreach ( $school_faqs as $item ) {
+					$q = trim( $item['question'] ?? '' );
+					$a = trim( $item['answer'] ?? '' );
+					if ( empty( $q ) || empty( $a ) ) {
+						continue;
+					}
+					$faq_elements[] = [
+						'@type'          => 'Question',
+						'name'           => $q,
+						'acceptedAnswer' => [
+							'@type' => 'Answer',
+							'text'  => wp_strip_all_tags( $a ),
+						],
+					];
+				}
+				if ( ! empty( $faq_elements ) ) {
+					$data['ltdh_school_faq'] = [
+						'@context'   => 'https://schema.org',
+						'@type'      => 'FAQPage',
+						'mainEntity' => $faq_elements,
+					];
+				}
+			}
+		}
+	}
+
+	if ( defined( 'LTDH_CPT_MAJOR' ) && is_singular( LTDH_CPT_MAJOR ) ) {
+		$major_id  = get_the_ID();
+		$school_id = null;
+		if ( isset( $_GET['truong'] ) && ! empty( $_GET['truong'] ) ) {
+			$school_slug = sanitize_title( wp_unslash( $_GET['truong'] ) );
+			$matched_school = get_page_by_path( $school_slug, OBJECT, defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' );
+			if ( $matched_school ) {
+				$school_id = $matched_school->ID;
+			}
+		}
+
+		if ( function_exists( 'ltdh_get_major_faqs' ) ) {
+			$major_faqs = ltdh_get_major_faqs( $major_id, $school_id );
+			if ( ! empty( $major_faqs ) && is_array( $major_faqs ) ) {
+				$faq_elements = [];
+				foreach ( $major_faqs as $item ) {
+					$q = trim( $item['question'] ?? '' );
+					$a = trim( $item['answer'] ?? '' );
+					if ( empty( $q ) || empty( $a ) ) {
+						continue;
+					}
+					$faq_elements[] = [
+						'@type'          => 'Question',
+						'name'           => $q,
+						'acceptedAnswer' => [
+							'@type' => 'Answer',
+							'text'  => wp_strip_all_tags( $a ),
+						],
+					];
+				}
+				if ( ! empty( $faq_elements ) ) {
+					$data['ltdh_major_faq'] = [
+						'@context'   => 'https://schema.org',
+						'@type'      => 'FAQPage',
+						'mainEntity' => $faq_elements,
+					];
+				}
+			}
+		}
 	}
 
 	if ( is_page( 'cau-hoi-thuong-gap' ) || is_page_template( 'page-faq.php' ) || is_page_template( 'page-cau-hoi-thuong-gap.php' ) ) {

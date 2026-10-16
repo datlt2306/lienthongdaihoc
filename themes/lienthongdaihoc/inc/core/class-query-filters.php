@@ -185,17 +185,35 @@ function ltdh_filter_school_posts_orderby( $orderby, $query ) {
 }
 
 /**
- * Add Order column to School post list in WordPress Admin.
+ * Add Order, Training Type, and Author columns to School post list in WordPress Admin.
  */
 add_filter( 'manage_school_posts_columns', 'ltdh_add_school_admin_columns' );
 function ltdh_add_school_admin_columns( $columns ) {
-	$new_columns = [];
+	$new_columns  = [];
+	$author_label = isset( $columns['author'] ) ? $columns['author'] : __( 'Author' );
+
 	foreach ( $columns as $key => $title ) {
+		if ( 'date' === $key ) {
+			$new_columns['author'] = $author_label;
+		}
+
+		if ( 'author' === $key || 'taxonomy-campus' === $key || 'taxonomy-training_type' === $key ) {
+			continue;
+		}
+
 		$new_columns[ $key ] = $title;
 		if ( 'title' === $key ) {
-			$new_columns['school_order'] = __( 'Thứ tự', 'lienthongdaihoc' );
+			$new_columns['school_order']         = __( 'Thứ tự', 'lienthongdaihoc' );
+			$new_columns['school_training_type'] = __( 'Hình thức học', 'lienthongdaihoc' );
 		}
 	}
+
+	if ( ! isset( $new_columns['author'] ) ) {
+		$new_columns['author'] = $author_label;
+	}
+
+	unset( $new_columns['taxonomy-campus'], $new_columns['taxonomy-training_type'] );
+
 	return $new_columns;
 }
 
@@ -204,12 +222,49 @@ function ltdh_render_school_admin_columns( $column, $post_id ) {
 	if ( 'school_order' === $column ) {
 		$order = function_exists( 'ltdh_get_school_order' ) ? ltdh_get_school_order( $post_id ) : intval( get_post_field( 'menu_order', $post_id ) );
 		echo $order > 0 ? '<strong style="color:#00308b; font-size:14px;">' . esc_html( $order ) . '</strong>' : '<span style="color:#94a3b8;">—</span>';
+	} elseif ( 'school_training_type' === $column ) {
+		$terms = wp_get_post_terms( $post_id, 'training_type' );
+		if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+			foreach ( $terms as $t ) {
+				$slug       = $t->slug;
+				$name       = preg_replace( '/^hệ\s+/iu', '', $t->name );
+				$filter_url = add_query_arg( [
+					'post_type'     => 'school',
+					'training_type' => $slug,
+				], admin_url( 'edit.php' ) );
+
+				if ( 'tu-xa' === $slug || 'dao-tao-tu-xa' === $slug ) {
+					echo '<a href="' . esc_url( $filter_url ) . '" style="text-decoration:none;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:600;font-size:11px;margin:2px 4px 2px 0;">' . esc_html( $name ) . '</span></a>';
+				} elseif ( 'vua-hoc-vua-lam' === $slug ) {
+					echo '<a href="' . esc_url( $filter_url ) . '" style="text-decoration:none;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#fffbeb;color:#b45309;border:1px solid #fde68a;font-weight:600;font-size:11px;margin:2px 4px 2px 0;">' . esc_html( $name ) . '</span></a>';
+				} elseif ( 'chinh-quy' === $slug ) {
+					echo '<a href="' . esc_url( $filter_url ) . '" style="text-decoration:none;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-weight:600;font-size:11px;margin:2px 4px 2px 0;">' . esc_html( $name ) . '</span></a>';
+				} else {
+					echo '<a href="' . esc_url( $filter_url ) . '" style="text-decoration:none;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;font-weight:600;font-size:11px;margin:2px 4px 2px 0;">' . esc_html( $name ) . '</span></a>';
+				}
+			}
+		} else {
+			echo '<span style="color:#94a3b8;">—</span>';
+		}
+	} elseif ( 'author' === $column ) {
+		$author_id   = (int) get_post_field( 'post_author', $post_id );
+		$author_name = get_the_author_meta( 'display_name', $author_id );
+		if ( ! empty( $author_name ) ) {
+			$filter_url = add_query_arg( [
+				'post_type' => 'school',
+				'author'    => $author_id,
+			], admin_url( 'edit.php' ) );
+			echo '<a href="' . esc_url( $filter_url ) . '">' . esc_html( $author_name ) . '</a>';
+		} else {
+			echo '<span style="color:#94a3b8;">—</span>';
+		}
 	}
 }
 
 add_filter( 'manage_edit-school_sortable_columns', 'ltdh_school_admin_sortable_columns' );
 function ltdh_school_admin_sortable_columns( $columns ) {
 	$columns['school_order'] = 'menu_order';
+	$columns['author']       = 'author';
 	return $columns;
 }
 
@@ -710,10 +765,10 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 			$badge_class = 'bg-orange-50 text-orange-700';
 			if ( $clean_type_name ) {
 				$type_name_lower = mb_strtolower( trim( $clean_type_name ), 'UTF-8' );
-				if ( false !== strpos( $type_name_lower, 'chính quy' ) ) {
+				if ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
 					$badge_class = 'bg-blue-50 text-[#00308b]';
-				} elseif ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
-					$badge_class = 'bg-emerald-50 text-emerald-700';
+				} elseif ( false !== strpos( $type_name_lower, 'chính quy' ) ) {
+					$badge_class = 'bg-indigo-50 text-indigo-700';
 				} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
 					$badge_class = 'bg-amber-50 text-amber-800';
 				}
@@ -852,12 +907,12 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 							$type_name_lower = mb_strtolower( trim( $prog['type_name'] ), 'UTF-8' );
 							
 							// Defaults (Chính quy hoặc khác)
-							$icon_svg  = '<svg class="w-4 h-4 text-blue-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
-							$btn_style = 'bg-slate-50 hover:bg-[#00308b] text-slate-800 hover:text-white border-slate-200/90 hover:border-[#00308b]';
+							$icon_svg  = '<svg class="w-4 h-4 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
+							$btn_style = 'bg-indigo-50/70 hover:bg-indigo-600 text-indigo-900 hover:text-white border-indigo-200/90 hover:border-indigo-600';
 
 							if ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
-								$icon_svg  = '<svg class="w-4 h-4 text-emerald-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
-								$btn_style = 'bg-emerald-50/50 hover:bg-emerald-600 text-emerald-900 hover:text-white border-emerald-200/80 hover:border-emerald-600';
+								$icon_svg  = '<svg class="w-4 h-4 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+								$btn_style = 'bg-blue-50/80 hover:bg-[#00308b] text-[#00308b] hover:text-white border-blue-200/90 hover:border-[#00308b]';
 							} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
 								$icon_svg  = '<svg class="w-4 h-4 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
 								$btn_style = 'bg-amber-50/50 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-200/80 hover:border-amber-600';

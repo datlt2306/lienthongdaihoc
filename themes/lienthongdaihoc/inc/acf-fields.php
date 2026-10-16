@@ -63,6 +63,102 @@ function ltdh_load_acf_field_groups_from_json() {
 	}
 }
 
+/**
+ * Ensure School FAQ Tab and Repeater are registered directly to group_school_details.
+ */
+add_action( 'acf/init', 'ltdh_register_school_faq_acf_fields', 20 );
+function ltdh_register_school_faq_acf_fields() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	// Register Tab
+	acf_add_local_field( [
+		'key'       => 'field_tab_school_faq',
+		'label'     => 'Hỏi đáp (FAQ)',
+		'name'      => '',
+		'type'      => 'tab',
+		'parent'    => 'group_school_details',
+		'placement' => 'top',
+		'endpoint'  => 0,
+	] );
+
+	// Register Repeater
+	acf_add_local_field( [
+		'key'          => 'field_school_faq',
+		'label'        => 'Câu hỏi thường gặp của trường',
+		'name'         => 'school_faq',
+		'type'         => 'repeater',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Thêm các câu hỏi & giải đáp đặc thù về tuyển sinh liên thông riêng của trường này. Nếu để trống, hệ thống sẽ tự động hiển thị bộ câu hỏi chuẩn hóa theo thông tin của trường.',
+		'layout'       => 'row',
+		'button_label' => 'Thêm câu hỏi',
+		'sub_fields'   => [
+			[
+				'key'   => 'field_school_faq_question',
+				'label' => 'Câu hỏi',
+				'name'  => 'question',
+				'type'  => 'text',
+			],
+			[
+				'key'   => 'field_school_faq_answer',
+				'label' => 'Câu trả lời',
+				'name'  => 'answer',
+				'type'  => 'textarea',
+				'rows'  => 3,
+			],
+		],
+	] );
+}
+
+/**
+ * Ensure Major FAQ Tab and Repeater are registered directly to group_major_details.
+ */
+add_action( 'acf/init', 'ltdh_register_major_faq_acf_fields', 20 );
+function ltdh_register_major_faq_acf_fields() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	// Register Tab
+	acf_add_local_field( [
+		'key'       => 'field_tab_major_faq',
+		'label'     => 'Hỏi đáp (FAQ)',
+		'name'      => '',
+		'type'      => 'tab',
+		'parent'    => 'group_major_details',
+		'placement' => 'top',
+		'endpoint'  => 0,
+	] );
+
+	// Register Repeater
+	acf_add_local_field( [
+		'key'          => 'field_major_faq',
+		'label'        => 'Câu hỏi thường gặp về ngành',
+		'name'         => 'major_faq',
+		'type'         => 'repeater',
+		'parent'       => 'group_major_details',
+		'instructions' => 'Thêm các câu hỏi & giải đáp chuyên sâu về ngành này. Nếu để trống, hệ thống sẽ tự động hiển thị cẩm nang định hướng và so sánh chuẩn hóa cho ngành.',
+		'layout'       => 'row',
+		'button_label' => '+ Thêm câu hỏi',
+		'sub_fields'   => [
+			[
+				'key'   => 'field_major_faq_question',
+				'label' => 'Câu hỏi',
+				'name'  => 'question',
+				'type'  => 'text',
+			],
+			[
+				'key'   => 'field_major_faq_answer',
+				'label' => 'Câu trả lời',
+				'name'  => 'answer',
+				'type'  => 'textarea',
+				'rows'  => 3,
+			],
+		],
+	] );
+}
+
 // Ensure ACF local JSON load points include inc directory
 add_filter( 'acf/settings/load_json', 'ltdh_acf_json_load_point' );
 function ltdh_acf_json_load_point( $paths ) {
@@ -176,6 +272,20 @@ function ltdh_override_field_program_faq_label( $field ) {
 add_filter( 'acf/load_field/key=field_tab_prog_requirements', 'ltdh_override_field_program_requirements_tab_label' );
 function ltdh_override_field_program_requirements_tab_label( $field ) {
 	$field['label'] = 'Điều kiện & Hồ sơ xét tuyển';
+	return $field;
+}
+
+// Ensure Program contact info field is properly labeled
+add_filter( 'acf/load_field/key=field_program_contact_info', 'ltdh_override_field_program_contact_info_label' );
+function ltdh_override_field_program_contact_info_label( $field ) {
+	$field['label'] = 'Thông tin liên hệ & Tiếp nhận hồ sơ';
+	return $field;
+}
+
+// Ensure School contact info field is properly labeled
+add_filter( 'acf/load_field/key=field_school_contact_info', 'ltdh_override_field_school_contact_info_label' );
+function ltdh_override_field_school_contact_info_label( $field ) {
+	$field['label'] = 'Thông tin liên hệ & Tiếp nhận hồ sơ';
 	return $field;
 }
 
@@ -620,9 +730,12 @@ function ltdh_ensure_program_acf_meta_keys() {
 			if ( ! get_post_meta( $pid, '_admission_fee', true ) ) {
 				update_post_meta( $pid, '_admission_fee', 'field_program_admission_fee' );
 			}
+			if ( ! get_post_meta( $pid, '_contact_info', true ) ) {
+				update_post_meta( $pid, '_contact_info', 'field_program_contact_info' );
+			}
 		}
 	}
-	set_transient( 'ltdh_program_meta_keys_synced_v2', 1, DAY_IN_SECONDS * 30 );
+	set_transient( 'ltdh_program_meta_keys_synced_v3', 1, DAY_IN_SECONDS * 30 );
 }
 
 /**
@@ -663,6 +776,10 @@ function ltdh_is_repeater_or_complex_field( $key_or_name ) {
 		'exemption_items',
 		'field_program_faq',
 		'faq',
+		'field_school_faq',
+		'school_faq',
+		'field_major_faq',
+		'major_faq',
 		'field_major_entry_roadmaps',
 		'major_entry_roadmaps',
 		'field_major_specializations',
@@ -1226,25 +1343,97 @@ function ltdh_sync_program_admission_status_batches( $post_id ) {
 add_filter( 'manage_edit-program_columns', 'ltdh_add_program_admin_columns', 20 );
 function ltdh_add_program_admin_columns( $columns ) {
 	$new_columns = [];
+	$author_label = isset( $columns['author'] ) ? $columns['author'] : __( 'Author' );
+
 	foreach ( $columns as $key => $title ) {
+		if ( 'date' === $key ) {
+			$new_columns['author'] = $author_label;
+		}
+
+		if ( 'author' === $key || 'taxonomy-campus' === $key || 'program_tuition' === $key || 'taxonomy-training_type' === $key ) {
+			continue;
+		}
+
 		$new_columns[ $key ] = $title;
 		if ( 'title' === $key ) {
-			$new_columns['verification_status'] = 'Xác minh thông tin';
-			$new_columns['data_completeness']   = 'Chuẩn dữ liệu P0';
+			$new_columns['program_school']        = 'Trường đối tác';
+			$new_columns['program_major']         = 'Chuyên ngành';
+			$new_columns['program_training_type'] = 'Hình thức học';
+			$new_columns['verification_status']   = 'Xác minh';
+			$new_columns['data_completeness']     = 'Chuẩn P0';
 		}
 	}
-	if ( ! isset( $new_columns['verification_status'] ) ) {
-		$new_columns['verification_status'] = 'Xác minh thông tin';
+
+	if ( ! isset( $new_columns['author'] ) ) {
+		$new_columns['author'] = $author_label;
 	}
-	if ( ! isset( $new_columns['data_completeness'] ) ) {
-		$new_columns['data_completeness']   = 'Chuẩn dữ liệu P0';
-	}
+
+	unset( $new_columns['program_tuition'], $new_columns['taxonomy-campus'], $new_columns['taxonomy-training_type'] );
+
 	return $new_columns;
+}
+
+add_filter( 'manage_edit-program_sortable_columns', 'ltdh_program_admin_sortable_columns' );
+function ltdh_program_admin_sortable_columns( $columns ) {
+	$columns['author'] = 'author';
+	return $columns;
 }
 
 add_action( 'manage_program_posts_custom_column', 'ltdh_render_program_admin_columns', 10, 2 );
 function ltdh_render_program_admin_columns( $column, $post_id ) {
-	if ( 'verification_status' === $column ) {
+	if ( 'program_school' === $column ) {
+		$school_id = (int) ( get_field( 'school_relationship', $post_id ) ?: get_post_meta( $post_id, 'school_relationship', true ) );
+		if ( is_array( $school_id ) ) {
+			$school_id = ! empty( $school_id ) ? (int) $school_id[0] : 0;
+		}
+		if ( $school_id ) {
+			$school_title = get_the_title( $school_id );
+			$edit_url     = get_edit_post_link( $school_id );
+			echo '<a href="' . esc_url( $edit_url ) . '" style="font-weight:600; color:#00308b; text-decoration:none;">' . esc_html( $school_title ) . '</a>';
+		} else {
+			echo '<span style="color:#94a3b8;">Chưa chọn trường</span>';
+		}
+	} elseif ( 'program_major' === $column ) {
+		$major_id = (int) ( get_field( 'major_relationship', $post_id ) ?: get_post_meta( $post_id, 'major_relationship', true ) );
+		if ( is_array( $major_id ) ) {
+			$major_id = ! empty( $major_id ) ? (int) $major_id[0] : 0;
+		}
+		if ( $major_id ) {
+			$major_title = get_the_title( $major_id );
+			$clean_m     = preg_replace( '/^ngành\s+/iu', '', $major_title );
+			$edit_url    = get_edit_post_link( $major_id );
+			echo '<a href="' . esc_url( $edit_url ) . '" style="color:#334155; text-decoration:none; font-weight:500;">' . esc_html( $clean_m ) . '</a>';
+		} else {
+			echo '<span style="color:#94a3b8;">Chưa chọn ngành</span>';
+		}
+	} elseif ( 'program_training_type' === $column ) {
+		$terms = wp_get_post_terms( $post_id, 'training_type' );
+		if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+			foreach ( $terms as $t ) {
+				$slug = $t->slug;
+				$name = preg_replace( '/^hệ\s+/iu', '', $t->name );
+				$filter_url = add_query_arg( [
+					'post_type'     => 'program',
+					'training_type' => $slug,
+				], admin_url( 'edit.php' ) );
+
+				if ( 'tu-xa' === $slug || 'dao-tao-tu-xa' === $slug ) {
+					echo '<a href="' . esc_url( $filter_url ) . '" style="text-decoration:none;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:600;font-size:11px;margin:2px 0;">' . esc_html( $name ) . '</span></a>';
+				} elseif ( 'vua-hoc-vua-lam' === $slug ) {
+					echo '<a href="' . esc_url( $filter_url ) . '" style="text-decoration:none;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#fffbeb;color:#b45309;border:1px solid #fde68a;font-weight:600;font-size:11px;margin:2px 0;">' . esc_html( $name ) . '</span></a>';
+				} elseif ( 'chinh-quy' === $slug ) {
+					echo '<a href="' . esc_url( $filter_url ) . '" style="text-decoration:none;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-weight:600;font-size:11px;margin:2px 0;">' . esc_html( $name ) . '</span></a>';
+				} else {
+					echo '<a href="' . esc_url( $filter_url ) . '" style="text-decoration:none;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;font-weight:600;font-size:11px;margin:2px 0;">' . esc_html( $name ) . '</span></a>';
+				}
+			}
+		} else {
+			echo '<span style="color:#94a3b8;">—</span>';
+		}
+	} elseif ( 'program_tuition' === $column ) {
+		$fee = function_exists( 'ltdh_get_program_tuition_display' ) ? ltdh_get_program_tuition_display( $post_id ) : ( get_field( 'tuition_fee', $post_id ) ?: '' );
+		echo ! empty( $fee ) ? '<strong style="color:#00308b;font-size:12px;">' . esc_html( $fee ) . '</strong>' : '<span style="color:#94a3b8;">Chưa cập nhật</span>';
+	} elseif ( 'verification_status' === $column ) {
 		$verif = ltdh_get_program_verification( $post_id );
 
 		if ( $verif['is_verified'] ) {
@@ -1272,6 +1461,18 @@ function ltdh_render_program_admin_columns( $column, $post_id ) {
 			$count = count( $completeness['p0_missing'] );
 			$title = implode( "\n• ", $completeness['p0_missing'] );
 			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:600;font-size:11px;cursor:help;" title="Chưa đủ thông tin để xuất bản:&#10;• ' . esc_attr( $title ) . '">⚠ Thiếu ' . $count . ' mục</span>';
+		}
+	} elseif ( 'author' === $column ) {
+		$author_id   = (int) get_post_field( 'post_author', $post_id );
+		$author_name = get_the_author_meta( 'display_name', $author_id );
+		if ( ! empty( $author_name ) ) {
+			$filter_url = add_query_arg( [
+				'post_type' => 'program',
+				'author'    => $author_id,
+			], admin_url( 'edit.php' ) );
+			echo '<a href="' . esc_url( $filter_url ) . '">' . esc_html( $author_name ) . '</a>';
+		} else {
+			echo '<span style="color:#94a3b8;">—</span>';
 		}
 	}
 }

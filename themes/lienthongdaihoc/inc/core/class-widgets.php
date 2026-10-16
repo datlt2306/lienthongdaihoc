@@ -1426,54 +1426,6 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 	}
 	$initials = mb_strtoupper( $initials );
 	?>
-	<div class="hidden lg:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-sm transition-all">
-		<!-- Banner Cover -->
-		<div class="h-28 sm:h-32 bg-gradient-to-r from-[#00308b] to-[#001a4d] bg-cover bg-center relative" <?php echo $school_cover_url ? 'style="background-image: url(\'' . esc_url( $school_cover_url ) . '\');"' : ''; ?>>
-			<div class="absolute inset-0 bg-blue-950/20"></div>
-		</div>
-		
-		<!-- Overlapping Logo Wrapper -->
-		<div class="relative flex justify-center -mt-10 mb-3">
-			<div class="w-20 h-20 bg-white p-1 rounded-2xl shadow-md border border-slate-100 flex items-center justify-center overflow-hidden shrink-0">
-				<?php if ( $school_logo_url ) : ?>
-					<img src="<?php echo esc_url( $school_logo_url ); ?>" alt="<?php echo esc_attr( $school_title ); ?>" class="max-w-full max-h-full object-contain" loading="lazy">
-				<?php else : ?>
-					<div class="w-full h-full bg-[#00308b] text-white flex items-center justify-center font-black text-base rounded-xl uppercase tracking-wider">
-						<?php echo esc_html( $initials ?: 'ĐH' ); ?>
-					</div>
-				<?php endif; ?>
-			</div>
-		</div>
-		
-		<!-- School Info details -->
-		<div class="px-5 pb-5 text-center">
-			<h4 class="font-extrabold text-slate-800 text-sm sm:text-base leading-snug uppercase tracking-tight mb-2">
-				<?php echo esc_html( $school_title ); ?>
-			</h4>
-			
-			<?php if ( $website ) : ?>
-				<p class="text-xs text-slate-500 mb-2 font-medium">
-					Website: <a href="<?php echo esc_url( $website ); ?>" target="_blank" rel="noopener noreferrer" class="text-brand-primary hover:underline font-semibold"><?php echo esc_html( $website ); ?></a>
-				</p>
-			<?php endif; ?>
-
-			<div class="flex items-start justify-center gap-1.5 text-xs text-slate-500 font-medium max-w-xs mx-auto mb-3.5">
-				<span class="text-brand-primary shrink-0 mt-0.5">📍</span>
-				<span class="text-left leading-relaxed">
-					Địa chỉ: <?php echo esc_html( $address ?: 'Chưa cập nhật' ); ?>
-					<?php if ( $map_url ) : ?>
-						<a href="<?php echo esc_url( $map_url ); ?>" target="_blank" rel="noopener noreferrer" class="text-brand-primary font-bold hover:underline ml-0.5 inline-block">(Xem bản đồ)</a>
-					<?php endif; ?>
-				</span>
-			</div>
-
-			<div class="border-t border-slate-100 pt-3">
-				<a href="#gioi-thieu" class="text-brand-primary font-bold text-xs sm:text-sm hover:underline flex items-center justify-center gap-1">
-					<span>Xem chi tiết trường</span> <span>→</span>
-				</a>
-			</div>
-		</div>
-	</div>
 
 
 	<!-- Consultation Form -->
