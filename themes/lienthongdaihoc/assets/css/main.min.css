@@ -5152,6 +5152,9 @@
     .sm\:py-4 {
       padding-block: calc(var(--spacing) * 4);
     }
+    .sm\:py-10 {
+      padding-block: calc(var(--spacing) * 10);
+    }
     .sm\:py-12 {
       padding-block: calc(var(--spacing) * 12);
     }
@@ -5166,6 +5169,9 @@
     }
     .sm\:pb-5 {
       padding-bottom: calc(var(--spacing) * 5);
+    }
+    .sm\:pb-6 {
+      padding-bottom: calc(var(--spacing) * 6);
     }
     .sm\:pl-8 {
       padding-left: calc(var(--spacing) * 8);
@@ -5599,6 +5605,9 @@
     }
     .lg\:col-span-8 {
       grid-column: span 8 / span 8;
+    }
+    .lg\:mb-10 {
+      margin-bottom: calc(var(--spacing) * 10);
     }
     .lg\:block {
       display: block;
