@@ -1147,13 +1147,7 @@ $zalo    = ltdh_get_zalo_url();
 				<?php endforeach; ?>
 			</div>
 
-			<!-- Mobile swipe indicator -->
-			<div class="md:hidden flex items-center justify-center gap-2 mt-4 text-xs font-semibold text-slate-500">
-				<span>Vuốt xem 6 học viên tiêu biểu</span>
-				<svg class="w-4 h-4 text-brand-primary animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-				</svg>
-			</div>
+			
 		</div>
 	</section>
 
