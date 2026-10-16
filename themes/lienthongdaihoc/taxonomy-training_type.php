@@ -646,24 +646,27 @@ $has_active_filters  = $active_filter_count > 0;
 							<div class="h-28 sm:h-48 md:h-64 w-full bg-slate-100 bg-cover bg-center relative overflow-hidden" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');">
 								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent"></div>
 								
-								<!-- Status Badge (Left) -->
-								<?php if ( 'tam-ngung' === $admission_status ) : ?>
-									<span class="absolute top-2 left-2 md:top-3 md:left-3 bg-rose-600/90 text-white text-[9px] sm:text-[10px] md:text-[11px] font-extrabold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider shadow-md z-10 flex items-center gap-1 backdrop-blur-md">
-										<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-										<span class="hidden xs:inline">Đã hết</span> chỉ tiêu
-									</span>
-								<?php elseif ( 'sap-mo' === $admission_status ) : ?>
-									<span class="absolute top-2 left-2 md:top-3 md:left-3 bg-amber-500/90 text-white text-[9px] sm:text-[10px] md:text-[11px] font-extrabold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider shadow-md z-10 backdrop-blur-md">
-										Sắp mở
-									</span>
-								<?php endif; ?>
+								<!-- Top Badges Flex Container (Anti-collision & responsive wrapping) -->
+								<div class="absolute top-2 inset-x-2 md:top-3 md:inset-x-3 flex flex-wrap items-start justify-between gap-1 z-10 pointer-events-none">
+									<!-- Status Badge -->
+									<?php if ( 'tam-ngung' === $admission_status ) : ?>
+										<span class="bg-rose-600/95 text-white text-[9px] sm:text-[10px] md:text-[11px] font-bold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-tight sm:tracking-wider shadow-md flex items-center gap-1 backdrop-blur-md shrink-0 pointer-events-auto">
+											<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+											Tạm dừng
+										</span>
+									<?php elseif ( 'sap-mo' === $admission_status ) : ?>
+										<span class="bg-amber-500/95 text-white text-[9px] sm:text-[10px] md:text-[11px] font-bold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-tight sm:tracking-wider shadow-md backdrop-blur-md shrink-0 pointer-events-auto">
+											Sắp mở
+										</span>
+									<?php endif; ?>
 
-								<!-- Training Type Badge (Right) -->
-								<?php if ( $show_type_badge ) : ?>
-									<span class="absolute top-2 right-2 md:top-3 md:right-3 <?php echo esc_attr( $badge_class ); ?> text-[9px] sm:text-xs font-black px-2 py-0.5 sm:px-3.5 sm:py-1 rounded-full uppercase tracking-tight sm:tracking-wide shadow-md z-10 backdrop-blur-md truncate max-w-[110px] sm:max-w-none">
-										<?php echo esc_html( $clean_type_name ); ?>
-									</span>
-								<?php endif; ?>
+									<!-- Training Type Badge -->
+									<?php if ( $show_type_badge ) : ?>
+										<span class="<?php echo esc_attr( $badge_class ); ?> text-[9px] sm:text-xs font-bold px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-tight sm:tracking-wide shadow-md backdrop-blur-md truncate max-w-[105px] sm:max-w-none shrink-0 pointer-events-auto ml-auto">
+											<?php echo esc_html( $clean_type_name ); ?>
+										</span>
+									<?php endif; ?>
+								</div>
 							</div>
 
 							<!-- Card Body -->
@@ -727,12 +730,12 @@ $has_active_filters  = $active_filter_count > 0;
 
 						<!-- Card Footer Action Buttons -->
 						<div class="p-3 sm:p-5 pt-0">
-							<div class="pt-2 sm:pt-3 border-t border-slate-100 flex items-center gap-1.5 sm:gap-2">
-								<a href="<?php the_permalink(); ?>" class="text-[11px] sm:text-xs md:text-sm py-2 sm:py-2.5 px-2 sm:px-4 rounded-lg sm:rounded-xl font-bold ltdh-btn-details min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center">
+							<div class="pt-2 sm:pt-3 border-t border-slate-100 flex items-stretch gap-1.5 sm:gap-2">
+								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-2 sm:py-2.5 px-1 sm:px-4 rounded-lg sm:rounded-xl font-bold ltdh-btn-details min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
 									Tìm hiểu
 								</a>
 								<button type="button"
-										class="ltdh-compare-toggle text-[11px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-1.5 sm:px-3 transition-all min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center"
+										class="ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-1 sm:px-3 transition-all min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap"
 										data-compare-type="program"
 										data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 										data-compare-title="<?php echo esc_attr( $card_headline ); ?>"

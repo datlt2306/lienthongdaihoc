@@ -688,84 +688,77 @@ if ( ! empty( $faqs ) ) {
 
 				<!-- SECTION 6: TUITION & SECTION 7: DURATION -->
 				<section id="hoc-phi-thoi-gian" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
-					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Học phí & Thời gian học</h2>
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-						<!-- Column 1: Tuition Details -->
-						<div class="bg-white border border-slate-100 p-5 rounded-2xl flex flex-col justify-between shadow-xs transition-all duration-300">
-							<div class="space-y-3.5">
-								<div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-1">
-									<svg class="w-5.5 h-5.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-									<h3 class="font-extrabold text-base md:text-lg text-slate-900">Thông tin học phí</h3>
+					<h2 class="text-base sm:text-xl md:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">Học phí & Thời gian học</h2>
+					
+					<!-- 1 Hàng trên cả Mobile và Desktop: 2 Cột song song -->
+					<div class="grid grid-cols-2 gap-2.5 sm:gap-4 md:gap-6">
+						<!-- Card 1: Học phí -->
+						<div class="bg-blue-50/50 rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col justify-between">
+							<div>
+								<div class="flex items-center gap-1.5 text-blue-700 mb-1 sm:mb-2">
+									<svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+									<span class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-600">Đơn giá học phí</span>
 								</div>
 								
-								<!-- Học phí per credit -->
-								<div class="bg-slate-50 rounded-xl p-3.5">
-									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Đơn giá học phí</span>
-									<div class="flex items-baseline flex-wrap gap-1">
-										<span class="text-base md:text-lg font-bold text-slate-900">
-											<?php echo esc_html( $tuition ?: 'Liên hệ ban tuyển sinh' ); ?>
-										</span>
-										<?php if ( isset($tuition_year) && $tuition_year ) : ?>
-											<span class="text-xs font-semibold text-slate-600">(Năm học <?php echo esc_html( $tuition_year ); ?>)</span>
-										<?php endif; ?>
-									</div>
+								<div class="text-sm sm:text-lg md:text-2xl font-black text-slate-900 leading-snug">
+									<?php echo esc_html( $tuition ?: 'Liên hệ ban tuyển sinh' ); ?>
 								</div>
-
-								<!-- Admission fee (Lệ phí xét tuyển trên 1 hồ sơ) -->
-								<?php 
-								if ( ! empty( $admission_fee ) || ( is_numeric( $admission_fee ) && (int) $admission_fee === 0 ) ) : 
-									$fee_info = function_exists( 'ltdh_format_admission_fee' ) ? ltdh_format_admission_fee( $admission_fee ) : [ 'display' => esc_html( $admission_fee ) . ' / hồ sơ', 'is_free' => false ];
-								?>
-									<div class="bg-slate-50 rounded-xl p-3.5">
-										<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Lệ phí xét tuyển</span>
-										<div class="flex items-baseline flex-wrap gap-1">
-											<?php if ( ! empty( $fee_info['is_free'] ) ) : ?>
-												<span class="text-base md:text-lg font-bold text-emerald-600">
-													<?php echo esc_html( $fee_info['display'] ); ?>
-												</span>
-											<?php else : ?>
-												<span class="text-base md:text-lg font-bold text-slate-900">
-													<?php echo esc_html( $fee_info['display'] ); ?>
-												</span>
-											<?php endif; ?>
-										</div>
-									</div>
+								
+								<?php if ( isset($tuition_year) && $tuition_year ) : ?>
+									<span class="text-[10px] sm:text-xs text-slate-500 font-medium block mt-0.5">(Năm học <?php echo esc_html( $tuition_year ); ?>)</span>
 								<?php endif; ?>
 							</div>
 
 							<?php 
-							$increase_roadmap = get_field( 'tuition_increase_roadmap', $program_id );
-							if ( $increase_roadmap ) : 
+							if ( ! empty( $admission_fee ) || ( is_numeric( $admission_fee ) && (int) $admission_fee === 0 ) ) : 
+								$fee_info = function_exists( 'ltdh_format_admission_fee' ) ? ltdh_format_admission_fee( $admission_fee ) : [ 'display' => esc_html( $admission_fee ) . ' / hồ sơ', 'is_free' => false ];
 							?>
-								<div class="mt-4 pt-3.5 border-t border-slate-100 text-xs md:text-sm text-slate-600 leading-relaxed">
-									<span class="font-bold text-slate-700 block mb-1">Lộ trình học phí / Ghi chú:</span>
-									<p class="text-slate-600"><?php echo esc_html( $increase_roadmap ); ?></p>
+								<div class="mt-2.5 pt-2 border-t border-blue-100/60 flex flex-wrap items-center justify-between text-[10px] sm:text-xs gap-1">
+									<span class="text-slate-500">Lệ phí xét:</span>
+									<span class="font-bold <?php echo ! empty( $fee_info['is_free'] ) ? 'text-emerald-600' : 'text-slate-800'; ?>">
+										<?php echo esc_html( $fee_info['display'] ); ?>
+									</span>
 								</div>
 							<?php endif; ?>
 						</div>
 
-						<!-- Column 2: Study Duration -->
-						<div class="bg-white border border-slate-100 p-5 rounded-2xl flex flex-col justify-between shadow-xs transition-all duration-300">
-							<div class="space-y-3.5">
-								<div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-1">
-									<svg class="w-5.5 h-5.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-									<h3 class="font-extrabold text-base md:text-lg text-slate-900">Thời gian học tập</h3>
+						<!-- Card 2: Thời gian học tập -->
+						<div class="bg-amber-50/50 rounded-xl sm:rounded-2xl p-3 sm:p-5 flex flex-col justify-between">
+							<div>
+								<div class="flex items-center gap-1.5 text-amber-700 mb-1 sm:mb-2">
+									<svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+									<span class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-600">Thời gian học</span>
 								</div>
 								
-								<!-- Card 1: Standard Duration -->
-								<div class="bg-slate-50 rounded-xl p-3.5">
-									<span class="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Lộ trình chuẩn</span>
-									<div class="flex items-baseline flex-wrap gap-1">
-										<span class="text-base font-bold text-slate-900"><?php echo esc_html( $duration ?: '2.0 - 3.0 năm' ); ?></span>
-									</div>
+								<div class="text-sm sm:text-xl md:text-2xl font-black text-slate-900 leading-snug">
+									<?php echo esc_html( $duration ?: '2.0 - 3.0 năm' ); ?>
 								</div>
+								
+								<span class="text-[10px] sm:text-xs text-slate-500 font-medium block mt-0.5">Lộ trình chuẩn</span>
 							</div>
-							
-							<div class="mt-4 pt-3.5 border-t border-slate-100 text-xs md:text-sm text-slate-600 leading-relaxed">
-								<span class="font-bold text-slate-700 block mb-1">Lưu ý quan trọng:</span>
-								<p class="text-slate-600">Quy định miễn trừ học phần, chuyển đổi tín chỉ và số tín chỉ thực tế cần hoàn thành sẽ được Nhà trường thẩm định cụ thể dựa trên bảng điểm tốt nghiệp của từng học viên.</p>
+
+							<div class="mt-2.5 pt-2 border-t border-amber-100/60 flex flex-wrap items-center justify-between text-[10px] sm:text-xs gap-1 text-slate-500">
+								<span>Hình thức:</span>
+								<span class="font-bold text-slate-800">Trực tuyến / Từ xa</span>
 							</div>
 						</div>
+					</div>
+
+					<!-- Ghi chú & Lộ trình học phí (Gọn gàng, loại bỏ các khối border lồng nhau) -->
+					<?php 
+					$increase_roadmap = get_field( 'tuition_increase_roadmap', $program_id );
+					?>
+					<div class="mt-3 bg-slate-50/70 rounded-xl p-3 sm:p-3.5 space-y-1.5 text-xs text-slate-600 leading-relaxed">
+						<?php if ( $increase_roadmap ) : ?>
+							<p class="flex items-start gap-1.5">
+								<span class="text-blue-600 shrink-0">💡</span>
+								<span><strong class="text-slate-800">Lộ trình học phí:</strong> <?php echo esc_html( $increase_roadmap ); ?></span>
+							</p>
+						<?php endif; ?>
+						<p class="flex items-start gap-1.5">
+							<span class="text-amber-500 shrink-0">📌</span>
+							<span><strong class="text-slate-800">Lưu ý xét tuyển:</strong> Quy định miễn trừ học phần, chuyển đổi tín chỉ và số tín chỉ thực tế cần hoàn thành sẽ được Nhà trường thẩm định cụ thể dựa trên bảng điểm tốt nghiệp của từng học viên.</span>
+						</p>
 					</div>
 					<?php 
 					if ( ! empty( $exemption_items ) && is_array( $exemption_items ) ) :

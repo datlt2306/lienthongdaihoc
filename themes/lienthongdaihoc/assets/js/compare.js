@@ -124,6 +124,24 @@
 		return items[type] && items[type].indexOf(id) !== -1;
 	}
 
+	function updateCompareButtonUI(btn, isCompared) {
+		if (isCompared) {
+			btn.classList.add('is-compared');
+			if (btn.classList.contains('ltdh-compare-single-btn')) {
+				btn.innerHTML = '<span class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap"><svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg><span>Đã thêm vào so sánh</span></span>';
+			} else {
+				btn.innerHTML = '<span class="inline-flex items-center justify-center gap-1 whitespace-nowrap"><svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg><span>Đã thêm</span></span>';
+			}
+		} else {
+			btn.classList.remove('is-compared');
+			if (btn.classList.contains('ltdh-compare-single-btn')) {
+				btn.innerHTML = '📊 Thêm vào so sánh';
+			} else {
+				btn.innerHTML = 'So sánh';
+			}
+		}
+	}
+
 	function clearAll() {
 		sessionStorage.removeItem(STORAGE_KEY);
 		sessionStorage.removeItem('ltdh_compare_metadata');
@@ -132,8 +150,7 @@
 		// Reset all buttons on the page
 		var buttons = document.querySelectorAll('.ltdh-compare-toggle, .ltdh-compare-single-btn');
 		buttons.forEach(function (btn) {
-			btn.classList.remove('is-compared');
-			btn.textContent = btn.classList.contains('ltdh-compare-single-btn') ? '📊 Thêm vào so sánh' : 'So sánh';
+			updateCompareButtonUI(btn, false);
 		});
 
 		updateTray();
@@ -150,13 +167,7 @@
 			var id   = parseInt(btn.getAttribute('data-compare-id'), 10);
 			if (!type || !id) return;
 
-			if (hasItem(type, id)) {
-				btn.classList.add('is-compared');
-				btn.textContent = '✓ Đã thêm';
-			} else {
-				btn.classList.remove('is-compared');
-				btn.textContent = btn.classList.contains('ltdh-compare-single-btn') ? '📊 Thêm vào so sánh' : 'So sánh';
-			}
+			updateCompareButtonUI(btn, hasItem(type, id));
 		});
 	}
 
@@ -174,8 +185,7 @@
 
 			if (hasItem(type, id)) {
 				removeItem(type, id);
-				btn.classList.remove('is-compared');
-				btn.textContent = btn.classList.contains('ltdh-compare-single-btn') ? '📊 Thêm vào so sánh' : 'So sánh';
+				updateCompareButtonUI(btn, false);
 			} else {
 				var items = getItems();
 				var total = Object.values(items).reduce(function (s, a) { return s + a.length; }, 0);
@@ -217,8 +227,7 @@
 				}
 
 				addItem(type, id, btnHe, btnNganh, btnTitle, btnThumb, btnMajorName, btnSchoolName);
-				btn.classList.add('is-compared');
-				btn.textContent = '✓ Đã thêm';
+				updateCompareButtonUI(btn, true);
 				showToast('Đã thêm vào danh sách so sánh (' + (total + 1) + '/' + MAX_ITEMS + ')', 'success');
 			}
 			updateTray();

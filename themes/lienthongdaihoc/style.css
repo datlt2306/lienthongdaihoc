@@ -685,12 +685,16 @@ body.admin-bar #ltdh-program-sticky-nav {
 }
 
 /* Compare button active state - high contrast vibrant emerald green */
+.ltdh-compare-toggle,
+.ltdh-compare-single-btn {
+    white-space: nowrap !important;
+}
 .ltdh-compare-toggle.is-compared,
 .ltdh-compare-single-btn.is-compared {
     background-color: #059669 !important;
     color: #ffffff !important;
     border-color: #059669 !important;
-    font-weight: 800 !important;
+    font-weight: 700 !important;
     box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
 }
 .ltdh-compare-toggle.is-compared:hover,
