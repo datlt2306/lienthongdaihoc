@@ -24,15 +24,10 @@ $messenger = ltdh_get_messenger_url();
 						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="inline-block">
 							<span class="font-display font-black text-2xl text-white tracking-tight">lienthongdaihoc<span class="text-orange-500">.com</span></span>
 						</a>
-						<!-- Micro Trust Badge (Mobile only, top right) -->
-						<span class="md:hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-bold text-emerald-400">
-							<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-							<span>Đào tạo chuẩn Bộ</span>
-						</span>
 					</div>
 					
 					<p class="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
-						Hệ thống tư vấn tuyển sinh Liên thông Đại học, Vừa học vừa làm & Từ xa hàng đầu. Đồng hành cùng bạn chinh phục tấm bằng cử nhân và mở rộng cơ hội thăng tiến.
+    Kênh thông tin tuyển sinh Liên thông Đại học, Vừa học vừa làm và Đào tạo từ xa. Hỗ trợ bạn tìm hiểu ngành học, điều kiện tuyển sinh và lựa chọn chương trình phù hợp với công việc, thời gian của mình.
 					</p>
 
 					<!-- Social Links Circles (Thumb-friendly 40x40px touch targets) -->
@@ -45,12 +40,7 @@ $messenger = ltdh_get_messenger_url();
 							<a href="<?php echo esc_url( $zalo ); ?>" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 hover:bg-[#0068ff] hover:border-[#0068ff] hover:text-white active:scale-95 transition-all flex items-center justify-center text-slate-300 shadow-xs" aria-label="Zalo">
 								<span class="text-xs font-black">Za</span>
 							</a>
-							<a href="<?php echo esc_url( $messenger ); ?>" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 hover:bg-[#0084ff] hover:border-[#0084ff] hover:text-white active:scale-95 transition-all flex items-center justify-center text-slate-300 shadow-xs" aria-label="Messenger">
-								<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.914 1.448 5.518 3.7 7.205V22l3.39-1.859c.91.253 1.87.392 2.87.392 5.523 0 10-4.146 10-9.258C22 6.145 17.523 2 12 2zm1.26 12.18l-2.45-2.61-4.78 2.61 5.26-5.59 2.5 2.61 4.73-2.61-5.26 5.59z"/></svg>
-							</a>
-							<a href="#" class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 hover:bg-red-600 hover:border-red-600 hover:text-white active:scale-95 transition-all flex items-center justify-center text-slate-300 shadow-xs" aria-label="Youtube">
-								<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 00-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 00-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 002.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.002 3.002 0 002.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-							</a>
+							
 						</div>
 					</div>
 				</div>
@@ -148,7 +138,6 @@ $messenger = ltdh_get_messenger_url();
 							</div>
 							<div class="min-w-0">
 								<p class="font-extrabold text-white text-xs sm:text-sm truncate">Group Hỏi - Đáp Tuyển Sinh</p>
-								<span class="text-[11px] text-slate-400 font-semibold block mt-0.5 truncate">50.000+ sinh viên thảo luận</span>
 							</div>
 						</div>
 						<a href="https://www.facebook.com/groups/lienthongdh" target="_blank" rel="noopener noreferrer" 
