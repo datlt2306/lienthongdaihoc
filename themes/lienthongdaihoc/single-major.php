@@ -208,6 +208,8 @@ $major_tabs[] = [
 	'title'    => 'Quy trình',
 	'subtitle' => '4 bước xét tuyển',
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+];
+
 $major_curriculum = function_exists( 'ltdh_get_major_curriculum_info' ) ? ltdh_get_major_curriculum_info( (int) $major_id, $context_school ?: $school_param ) : null;
 
 if ( ! empty( $major_curriculum['url'] ) ) {
@@ -673,6 +675,8 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 						'cta_link'   => '/kiem-tra-dieu-kien',
 						'card_bg'    => 'bg-white',
 					]
+				);
+				?>
 				<!-- SECTION: MAJOR CURRICULUM ROADMAP (UI/UX Pro Max) -->
 				<?php if ( ! empty( $major_curriculum['url'] ) ) : ?>
 					<section id="khung-chuong-trinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
