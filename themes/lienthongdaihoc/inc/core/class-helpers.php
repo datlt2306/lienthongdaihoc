@@ -344,8 +344,8 @@ function ltdh_get_program_school_id( int $program_id ): int {
  * @return string Tiêu đề thẻ card đã được định dạng chuẩn.
  */
 function ltdh_format_program_card_headline( ?string $raw_prog_title = '', ?string $school_code = '', ?string $school_name = '', ?string $major_title = '' ): string {
-	$school_code   = trim( (string) $school_code );
-	$school_name   = trim( (string) $school_name );
+	$school_code   = trim( html_entity_decode( (string) $school_code, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
+	$school_name   = trim( html_entity_decode( (string) $school_name, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
 	$school_suffix = '';
 
 	if ( ! empty( $school_code ) ) {
@@ -356,30 +356,28 @@ function ltdh_format_program_card_headline( ?string $raw_prog_title = '', ?strin
 	}
 
 	$clean_prog = trim( (string) $raw_prog_title );
+	$clean_prog = html_entity_decode( $clean_prog, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 	$clean_prog = preg_replace( '/^(?:tuyển sinh\s+)?(?:liên thông\s+)?(?:ngành\s+)?/iu', '', $clean_prog );
 	$clean_prog = preg_replace( '/^(?:cử nhân|kỹ sư|đại học)\s+/iu', '', $clean_prog );
 
-	// Lược bỏ hậu tố mã trường/tên trường nếu người dùng nhập sẵn trong tiêu đề
-	if ( ! empty( $school_code ) ) {
-		$clean_prog = preg_replace( '/\s*[-–—]\s*(?:(?:đh|trường|học viện|đại học)\s+)?' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
+	// Lặp lược bỏ các hậu tố tên trường, mã trường, ngoặc hệ đào tạo cho đến khi chuỗi ổn định
+	$prev = '';
+	while ( $prev !== $clean_prog ) {
+		$prev = $clean_prog;
+		if ( ! empty( $school_code ) ) {
+			$clean_prog = preg_replace( '/\s*[-–—]\s*(?:(?:đh|trường|học viện|đại học)\s+)?' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
+		}
+		if ( ! empty( $school_name ) ) {
+			$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_prog );
+		}
+		// Lược bỏ hậu tố tên trường dạng - ĐH ..., - Trường ..., - Học viện ...
+		$clean_prog = preg_replace( '/\s*[-–—]\s*(?:đh|trường|học viện|đại học)\s+[^\-–—()]+$/iu', '', $clean_prog );
+		// Lược bỏ phần ngoặc hệ đào tạo ở đuôi (ví dụ: (Chính quy), (Từ xa)...)
+		$clean_prog = preg_replace( '/\s*\([^)]*\)$/u', '', $clean_prog );
+		// Lược bỏ hệ đào tạo sau dấu gạch ngang nếu có (ví dụ: - Từ xa, - Đào tạo từ xa...)
+		$clean_prog = preg_replace( '/\s*[-–—]\s*(?:hệ\s+|đào tạo\s+)?(?:từ xa|chính quy|vừa học vừa làm|vhvl|vừa làm vừa học|online|văn bằng 2|vb2)$/iu', '', $clean_prog );
+		$clean_prog = trim( $clean_prog, " -–—\t\n\r\0\x0B" );
 	}
-	if ( ! empty( $school_name ) ) {
-		$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_prog );
-	}
-	// Lược bỏ hậu tố tên trường dạng - ĐH ..., - Trường ..., - Học viện ...
-	$clean_prog = preg_replace( '/\s*[-–—]\s*(?:đh|trường|học viện|đại học)\s+[^\-–—()]+$/iu', '', $clean_prog );
-	// Lược bỏ phần ngoặc hệ đào tạo ở đuôi (ví dụ: (Chính quy), (Từ xa)...)
-	$clean_prog = preg_replace( '/\s*\([^)]*\)$/u', '', $clean_prog );
-	// Lược bỏ hệ đào tạo sau dấu gạch ngang nếu có (ví dụ: - Từ xa, - Đào tạo từ xa...)
-	$clean_prog = preg_replace( '/\s*[-–—]\s*(?:hệ\s+|đào tạo\s+)?(?:từ xa|chính quy|vừa học vừa làm|vhvl|vừa làm vừa học|online|văn bằng 2|vb2)$/iu', '', $clean_prog );
-
-	// Lặp lại nếu người dùng gõ cả hai theo thứ tự khác nhau
-	if ( ! empty( $school_code ) ) {
-		$clean_prog = preg_replace( '/\s*[-–—]\s*(?:(?:đh|trường|học viện|đại học)\s+)?' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
-	}
-	$clean_prog = preg_replace( '/\s*[-–—]\s*(?:đh|trường|học viện|đại học)\s+[^\-–—()]+$/iu', '', $clean_prog );
-
-	$clean_prog = trim( $clean_prog, " -–—\t\n\r\0\x0B" );
 
 	if ( empty( $clean_prog ) && ! empty( $major_title ) ) {
 		$clean_prog = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major_title ) );
