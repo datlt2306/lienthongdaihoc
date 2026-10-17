@@ -250,6 +250,217 @@ function ltdh_register_school_admission_forms_acf_fields() {
 }
 
 /**
+ * Ensure School Default Admissions Tab and Fields are registered to group_school_details (DRY Principle).
+ * Allows school-wide defaults for programs: admission requirements, required documents, admission fee, batches, exemptions.
+ */
+add_action( 'acf/init', 'ltdh_register_school_default_admissions_acf_fields', 20 );
+function ltdh_register_school_default_admissions_acf_fields() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	// 1. Tab: Quy chế tuyển sinh mặc định
+	acf_add_local_field( [
+		'key'       => 'field_tab_school_default_admissions',
+		'label'     => 'Quy chế tuyển sinh mặc định',
+		'name'      => '',
+		'type'      => 'tab',
+		'parent'    => 'group_school_details',
+		'placement' => 'top',
+		'endpoint'  => 0,
+	] );
+
+	// 2. Default Admission Requirements (Điều kiện xét tuyển mặc định)
+	acf_add_local_field( [
+		'key'          => 'field_school_default_admission_requirements',
+		'label'        => 'Điều kiện xét tuyển mặc định của trường',
+		'name'         => 'default_admission_requirements',
+		'type'         => 'wysiwyg',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Quy định tiêu chuẩn xét tuyển chung của trường. Các chương trình thuộc trường này nếu để trống điều kiện xét tuyển sẽ tự động nhận nội dung này.',
+		'toolbar'      => 'full',
+		'media_upload' => 1,
+	] );
+
+	// 3. Default Required Documents (Hồ sơ xét tuyển cần nộp mặc định)
+	acf_add_local_field( [
+		'key'          => 'field_school_default_required_documents',
+		'label'        => 'Hồ sơ xét tuyển cần nộp mặc định',
+		'name'         => 'default_required_documents',
+		'type'         => 'wysiwyg',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Danh mục giấy tờ hồ sơ nộp chung của trường (VD: 02 bằng CĐ công chứng, bảng điểm, CCCD, ảnh 3x4...). Các chương trình thuộc trường nếu để trống hồ sơ sẽ tự động nhận danh mục này.',
+		'toolbar'      => 'full',
+		'media_upload' => 1,
+	] );
+
+	// 4. Default Admission Fee (Lệ phí xét tuyển mặc định)
+	acf_add_local_field( [
+		'key'          => 'field_school_default_admission_fee',
+		'label'        => 'Lệ phí xét tuyển mặc định (trên 1 hồ sơ)',
+		'name'         => 'default_admission_fee',
+		'type'         => 'text',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Mức lệ phí xét tuyển chung của trường (VD: 300.000 đ/hồ sơ, hoặc Miễn phí). Chương trình nào để trống lệ phí sẽ dùng giá trị này.',
+		'placeholder'  => 'Ví dụ: 300.000 đ/hồ sơ',
+	] );
+
+	// 5. Default Admission Batches (Các đợt tuyển sinh mặc định của trường)
+	acf_add_local_field( [
+		'key'          => 'field_school_default_admission_batches',
+		'label'        => 'Các đợt tuyển sinh mặc định của trường',
+		'name'         => 'default_admission_batches',
+		'type'         => 'repeater',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Áp dụng khi trường có kế hoạch tuyển sinh chung cho tất cả các ngành trong năm. Chương trình nào không thiết lập đợt tuyển riêng sẽ tự động dùng lịch này.',
+		'layout'       => 'row',
+		'button_label' => 'Thêm đợt tuyển sinh mặc định',
+		'sub_fields'   => [
+			[
+				'key'         => 'field_school_def_batch_name',
+				'label'       => 'Tên đợt',
+				'name'        => 'batch_name',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: Tuyển sinh Đợt 1',
+				'required'    => 1,
+			],
+			[
+				'key'         => 'field_school_def_batch_release',
+				'label'       => 'Phát hành hồ sơ',
+				'name'        => 'release_period',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: 15/01/2026',
+			],
+			[
+				'key'         => 'field_school_def_batch_app',
+				'label'       => 'Nhận hồ sơ',
+				'name'        => 'application_period',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: 20/01 - 30/04/2026',
+				'required'    => 1,
+			],
+			[
+				'key'         => 'field_school_def_batch_review',
+				'label'       => 'Thời gian ôn tập',
+				'name'        => 'review_time',
+				'type'        => 'text',
+			],
+			[
+				'key'         => 'field_school_def_batch_eval',
+				'label'       => 'Thời gian xét tuyển / Thi tuyển',
+				'name'        => 'evaluation_time',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: Xét tuyển liên tục hàng tháng',
+			],
+			[
+				'key'         => 'field_school_def_batch_enroll',
+				'label'       => 'Thời gian nhập học / Khai giảng',
+				'name'        => 'enrollment_time',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: Dự kiến 15/05/2026',
+			],
+			[
+				'key'           => 'field_school_def_batch_status',
+				'label'         => 'Trạng thái đợt',
+				'name'          => 'batch_status',
+				'type'          => 'select',
+				'choices'       => [
+					'dang-nhan' => 'Đang nhận hồ sơ (Nổi bật)',
+					'sap-mo'    => 'Sắp mở đợt',
+					'da-dong'   => 'Đã kết thúc',
+				],
+				'default_value' => 'dang-nhan',
+				'allow_null'    => 0,
+			],
+		],
+	] );
+
+	// 6. Default Exemption Settings (Quy định miễn môn & Chuyển đổi tín chỉ của trường)
+	acf_add_local_field( [
+		'key'         => 'field_school_default_exemption_title',
+		'label'       => 'Tiêu đề khối quy định miễn môn mặc định',
+		'name'        => 'default_exemption_title',
+		'type'        => 'text',
+		'parent'      => 'group_school_details',
+		'placeholder' => 'Quy định miễn môn & Chuyển đổi tín chỉ',
+	] );
+
+	acf_add_local_field( [
+		'key'    => 'field_school_default_exemption_intro',
+		'label'  => 'Mô tả quy định miễn môn mặc định',
+		'name'   => 'default_exemption_intro',
+		'type'   => 'textarea',
+		'parent' => 'group_school_details',
+		'rows'   => 3,
+	] );
+
+	acf_add_local_field( [
+		'key'          => 'field_school_default_exemption_items',
+		'label'        => 'Danh sách môn được xét miễn giảm mặc định của trường',
+		'name'         => 'default_exemption_items',
+		'type'         => 'repeater',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Cấu hình các môn xét miễn giảm chung của trường (Tiếng Anh, Tin học, Triết học...). Các chương trình nếu không có quy định riêng sẽ tự động dùng bảng này.',
+		'layout'       => 'row',
+		'button_label' => 'Thêm môn xét miễn giảm',
+		'sub_fields'   => [
+			[
+				'key'         => 'field_school_def_ex_subject',
+				'label'       => '1. Tên môn học',
+				'name'        => 'subject_name',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: Tiếng Anh cơ bản 1 & 2',
+				'required'    => 1,
+			],
+			[
+				'key'   => 'field_school_def_ex_condition',
+				'label' => '2. Điều kiện & Yêu cầu xét miễn môn',
+				'name'  => 'condition_note',
+				'type'  => 'textarea',
+				'rows'  => 3,
+			],
+			[
+				'key'          => 'field_school_def_ex_cert_scores',
+				'label'        => '3. Danh sách chứng chỉ quy đổi (Tùy chọn)',
+				'name'         => 'cert_scores',
+				'type'         => 'repeater',
+				'layout'       => 'table',
+				'button_label' => 'Thêm chứng chỉ',
+				'sub_fields'   => [
+					[
+						'key'         => 'field_school_def_ex_cert_name',
+						'label'       => 'Chứng chỉ',
+						'name'        => 'cert_name',
+						'type'        => 'text',
+						'placeholder' => 'IELTS, TOEIC...',
+					],
+					[
+						'key'         => 'field_school_def_ex_cert_min',
+						'label'       => 'Điểm tối thiểu',
+						'name'        => 'min_score',
+						'type'        => 'text',
+						'placeholder' => '450+, B1...',
+					],
+				],
+			],
+			[
+				'key'   => 'field_school_def_ex_cert_note',
+				'label' => '4. Ghi chú điều kiện chứng chỉ (Tùy chọn)',
+				'name'  => 'cert_note',
+				'type'  => 'text',
+			],
+			[
+				'key'   => 'field_school_def_ex_process',
+				'label' => '5. Quy trình thẩm định / Box lưu ý màu vàng (Tùy chọn)',
+				'name'  => 'assessment_process',
+				'type'  => 'textarea',
+				'rows'  => 2,
+			],
+		],
+	] );
+}
+
+/**
  * Register Major-level Curriculum Fields (General & School-specific) to group_major_details.
  */
 add_action( 'acf/init', 'ltdh_register_major_curriculum_acf_fields', 20 );
@@ -1095,6 +1306,10 @@ function ltdh_is_repeater_or_complex_field( $key_or_name ) {
 		'training_variants',
 		'field_program_training_variants',
 		'field_variant_admission_batches',
+		'field_school_default_admission_batches',
+		'default_admission_batches',
+		'field_school_default_exemption_items',
+		'default_exemption_items',
 	];
 	if ( in_array( $key_or_name, $repeaters, true ) ) {
 		return true;
@@ -1498,15 +1713,26 @@ function ltdh_admin_verification_quick_actions() {
 			}
 
 			// -------------------------------------------------------------------
-			// 2-Way Sync & Ràng buộc tự động giữa Tab 1 (Trạng thái tuyển sinh) & Tab 2 (Các đợt tuyển sinh)
+			// Tự động hiển thị Trạng thái tuyển sinh dựa trên Tab "Các đợt tuyển sinh"
 			// -------------------------------------------------------------------
-			function ltdhEvaluateAdmissionBatches(triggerSource) {
+			function ltdhEvaluateAdmissionBatches() {
 				var $batchWrapper = $('[data-name="admission_batches"], [data-key="field_program_admission_batches"]');
 				if (!$batchWrapper.length) return;
 
 				var $rows = $batchWrapper.find('tbody tr.acf-row:not(.acf-clone)');
 				var total = $rows.length;
-				if (total === 0) return;
+
+				var $notice = $('#ltdh-batch-computed-status-notice');
+				if (!$notice.length) {
+					$notice = $('<div id="ltdh-batch-computed-status-notice" style="margin-bottom:12px;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.5;"></div>');
+					$batchWrapper.find('.acf-input').first().prepend($notice);
+				}
+
+				if (total === 0) {
+					$notice.html('ℹ️ <strong>Trạng thái hiển thị tự động ngoài Website:</strong> Chưa cấu hình đợt tuyển sinh nào (Mặc định: <span style="font-weight:700;color:#065f46;background:#d1fae5;padding:2px 8px;border-radius:4px;">Đang tuyển sinh</span>).')
+						   .css({'background': '#f8fafc', 'color': '#475569', 'border': '1px solid #e2e8f0', 'display': 'block'});
+					return;
+				}
 
 				var countOpen = 0;
 				var countUpcoming = 0;
@@ -1523,112 +1749,36 @@ function ltdh_admin_verification_quick_actions() {
 					}
 				});
 
-				var $statusField = $('[data-name="admission_status"], [data-key="field_program_admission_status"]');
-				var $statusSelect = $statusField.find('select');
-				if (!$statusSelect.length) return;
-				var curStatus = $statusSelect.val();
-
-				var $notice = $('#ltdh-batch-constraint-notice');
-				if (!$notice.length) {
-					$notice = $('<div id="ltdh-batch-constraint-notice" style="margin-top:8px;padding:8px 12px;border-radius:6px;font-size:12px;line-height:1.5;display:none;"></div>');
-					$statusField.find('.acf-input').append($notice);
-				}
-
 				if (countClosed === total) {
-					// TẤT CẢ CÁC ĐỢT ĐÃ ĐÓNG
-					if (curStatus !== 'tam-ngung') {
-						$statusSelect.val('tam-ngung').trigger('change');
-						$notice.html('⚡ <strong>Ràng buộc tự động:</strong> Tất cả ' + total + ' đợt tuyển sinh ở Tab "Các đợt tuyển sinh" đều đã đóng. Hệ thống đã tự động chuyển sang <strong>"Tạm ngưng tuyển sinh (Đã hết chỉ tiêu)"</strong>.')
-							   .css({'background': '#fef2f2', 'color': '#991b1b', 'border': '1px solid #fecaca', 'display': 'block'});
-					} else {
-						$notice.html('ℹ️ Tất cả ' + total + ' đợt tuyển sinh đều đã đóng. Trạng thái chương trình đang là <strong>Tạm ngưng tuyển sinh</strong>.')
-							   .css({'background': '#f8fafc', 'color': '#475569', 'border': '1px solid #e2e8f0', 'display': 'block'});
-					}
+					$notice.html('🔴 <strong>Trạng thái hiển thị tự động ngoài Website:</strong> Tất cả ' + total + ' đợt tuyển sinh đều đã đóng. Website sẽ tự động hiển thị: <span style="font-weight:700;color:#991b1b;background:#fee2e2;padding:2px 8px;border-radius:4px;">Đã hết chỉ tiêu</span>.')
+						   .css({'background': '#fef2f2', 'color': '#991b1b', 'border': '1px solid #fecaca', 'display': 'block'});
 				} else if (countOpen > 0) {
-					// CÓ ĐỢT ĐANG NHẬN HỒ SƠ
-					if (curStatus === 'tam-ngung') {
-						$statusSelect.val('tuyen-sinh').trigger('change');
-						$notice.html('⚡ <strong>Ràng buộc tự động:</strong> Có ' + countOpen + ' đợt đang mở nhận hồ sơ. Hệ thống đã tự động chuyển sang <strong>"Đang tuyển sinh (Còn chỉ tiêu)"</strong>.')
-							   .css({'background': '#ecfdf5', 'color': '#065f46', 'border': '1px solid #a7f3d0', 'display': 'block'});
-					} else {
-						$notice.hide();
-					}
-				} else if (countUpcoming > 0 && countOpen === 0) {
-					// CÓ ĐỢT SẮP MỞ
-					if (curStatus === 'tam-ngung') {
-						$statusSelect.val('sap-mo').trigger('change');
-						$notice.html('⚡ <strong>Ràng buộc tự động:</strong> Có đợt sắp mở nhận hồ sơ. Hệ thống đã tự động chuyển sang <strong>"Sắp mở tuyển sinh"</strong>.')
-							   .css({'background': '#eff6ff', 'color': '#1e40af', 'border': '1px solid #bfdbfe', 'display': 'block'});
-					} else {
-						$notice.hide();
-					}
+					$notice.html('🟢 <strong>Trạng thái hiển thị tự động ngoài Website:</strong> Có ' + countOpen + ' đợt đang mở nhận hồ sơ. Website sẽ tự động hiển thị: <span style="font-weight:700;color:#065f46;background:#d1fae5;padding:2px 8px;border-radius:4px;">Đang tuyển sinh (Còn chỉ tiêu)</span>.')
+						   .css({'background': '#ecfdf5', 'color': '#065f46', 'border': '1px solid #a7f3d0', 'display': 'block'});
+				} else if (countUpcoming > 0) {
+					$notice.html('🔵 <strong>Trạng thái hiển thị tự động ngoài Website:</strong> Có ' + countUpcoming + ' đợt sắp mở nhận hồ sơ. Website sẽ tự động hiển thị: <span style="font-weight:700;color:#1e40af;background:#dbeafe;padding:2px 8px;border-radius:4px;">Sắp mở tuyển sinh</span>.')
+						   .css({'background': '#eff6ff', 'color': '#1e40af', 'border': '1px solid #bfdbfe', 'display': 'block'});
 				}
 			}
 
 			// Lắng nghe khi thay đổi trạng thái đợt
 			$(document).on('change', '[data-name="admission_batches"] [data-name="batch_status"] select, [data-key="field_program_admission_batches"] select[name*="batch_status"]', function() {
-				ltdhEvaluateAdmissionBatches('batch_status_changed');
+				ltdhEvaluateAdmissionBatches();
 			});
 
 			// Lắng nghe khi thêm/xóa hàng trong bảng đợt
 			if (window.acf) {
 				window.acf.addAction('remove', function($el) {
-					setTimeout(function() { ltdhEvaluateAdmissionBatches('batch_row_removed'); }, 150);
+					setTimeout(function() { ltdhEvaluateAdmissionBatches(); }, 150);
 				});
 				window.acf.addAction('append', function($el) {
-					setTimeout(function() { ltdhEvaluateAdmissionBatches('batch_row_added'); }, 150);
+					setTimeout(function() { ltdhEvaluateAdmissionBatches(); }, 150);
 				});
 			}
 
-			// Lắng nghe khi người dùng thủ công đổi Trạng thái tuyển sinh ở Tab 1
-			$(document).on('change', '[data-name="admission_status"] select, [data-key="field_program_admission_status"] select', function() {
-				var val = $(this).val();
-				var $batchWrapper = $('[data-name="admission_batches"], [data-key="field_program_admission_batches"]');
-				if (!$batchWrapper.length) return;
-
-				var $rows = $batchWrapper.find('tbody tr.acf-row:not(.acf-clone)');
-				if (!$rows.length) return;
-
-				var countOpen = 0;
-				var countClosed = 0;
-				$rows.each(function() {
-					var st = $(this).find('[data-name="batch_status"] select, select[name*="batch_status"]').val();
-					if (st === 'dang-nhan') countOpen++;
-					if (st === 'da-dong') countClosed++;
-				});
-
-				var $notice = $('#ltdh-batch-constraint-notice');
-				if (!$notice.length) {
-					$notice = $('<div id="ltdh-batch-constraint-notice" style="margin-top:8px;padding:8px 12px;border-radius:6px;font-size:12px;line-height:1.5;display:none;"></div>');
-					$(this).closest('.acf-input').append($notice);
-				}
-
-				if (val === 'tam-ngung' && countOpen > 0) {
-					$notice.html('⚠️ <strong>Chú ý:</strong> Bạn đang chọn "Tạm ngưng tuyển sinh" nhưng ở Tab "Các đợt tuyển sinh" vẫn còn ' + countOpen + ' đợt đang mở. <button type="button" id="ltdh-btn-close-all-batches" class="button button-small" style="margin-left:6px;color:#b91c1c;border-color:#fca5a5;">Đóng tất cả các đợt ngay</button>')
-						   .css({'background': '#fffbeb', 'color': '#92400e', 'border': '1px solid #fde68a', 'display': 'block'});
-				} else if (val === 'tuyen-sinh' && countClosed === $rows.length) {
-					$notice.html('⚠️ <strong>Chú ý:</strong> Bạn đang chọn "Đang tuyển sinh" nhưng toàn bộ ' + countClosed + ' đợt tuyển sinh ở Tab 2 đều đang "Đã đóng". Vui lòng mở lại ít nhất 1 đợt hoặc tạo đợt mới.')
-						   .css({'background': '#fffbeb', 'color': '#92400e', 'border': '1px solid #fde68a', 'display': 'block'});
-				} else {
-					$notice.hide();
-				}
-			});
-
-			// Xử lý nút bấm đóng tất cả các đợt ngay
-			$(document).on('click', '#ltdh-btn-close-all-batches', function(e) {
-				e.preventDefault();
-				var $batchWrapper = $('[data-name="admission_batches"], [data-key="field_program_admission_batches"]');
-				$batchWrapper.find('tbody tr.acf-row:not(.acf-clone)').each(function() {
-					$(this).find('[data-name="batch_status"] select, select[name*="batch_status"]').val('da-dong').trigger('change');
-				});
-				$('#ltdh-batch-constraint-notice')
-					.html('✓ Đã đồng bộ đóng tất cả các đợt tuyển sinh.')
-					.css({'background': '#ecfdf5', 'color': '#065f46', 'border': '1px solid #a7f3d0'});
-			});
-
 			// Kiểm tra ban đầu khi load trang
 			setTimeout(function() {
-				ltdhEvaluateAdmissionBatches('initial_load');
+				ltdhEvaluateAdmissionBatches();
 			}, 600);
 		}, 300);
 	});
@@ -1637,48 +1787,57 @@ function ltdh_admin_verification_quick_actions() {
 }
 
 /**
- * Tự động đồng bộ ràng buộc giữa Trạng thái tuyển sinh (Tab 1) và Các đợt tuyển sinh (Tab 2) khi lưu bài.
+ * Tự động đồng bộ trạng thái tuyển sinh (admission_status) khi lưu bài viết Program.
+ * Trạng thái được tự động suy luận hoàn toàn từ các đợt tuyển sinh (admission_batches):
+ * - Nếu tất cả các đợt đã đóng -> 'tam-ngung' (Đã hết chỉ tiêu)
+ * - Nếu có ít nhất 1 đợt đang nhận hồ sơ -> 'tuyen-sinh' (Đang tuyển sinh / Còn chỉ tiêu)
+ * - Nếu có đợt sắp mở -> 'sap-mo' (Sắp mở tuyển sinh)
+ * - Nếu chưa cấu hình đợt -> 'tuyen-sinh'
  */
 add_action( 'acf/save_post', 'ltdh_sync_program_admission_status_batches', 20 );
+add_action( 'save_post_program', 'ltdh_sync_program_admission_status_batches', 25 );
 function ltdh_sync_program_admission_status_batches( $post_id ) {
 	if ( 'program' !== get_post_type( $post_id ) ) {
 		return;
 	}
 
 	$batches = get_field( 'admission_batches', $post_id );
-	if ( ! is_array( $batches ) || empty( $batches ) ) {
-		return;
-	}
+	if ( is_array( $batches ) && ! empty( $batches ) ) {
+		$has_open     = false;
+		$has_upcoming = false;
+		$all_closed   = true;
 
-	$has_open     = false;
-	$has_upcoming = false;
-	$all_closed   = true;
-
-	foreach ( $batches as $b ) {
-		$b_status = $b['batch_status'] ?? 'dang-nhan';
-		if ( 'dang-nhan' === $b_status ) {
-			$has_open   = true;
-			$all_closed = false;
-		} elseif ( 'sap-mo' === $b_status ) {
-			$has_upcoming = true;
-			$all_closed   = false;
+		foreach ( $batches as $b ) {
+			$b_status = $b['batch_status'] ?? 'dang-nhan';
+			if ( 'dang-nhan' === $b_status ) {
+				$has_open   = true;
+				$all_closed = false;
+			} elseif ( 'sap-mo' === $b_status ) {
+				$has_upcoming = true;
+				$all_closed   = false;
+			}
 		}
-	}
 
-	$current_status = get_post_meta( $post_id, 'admission_status', true ) ?: 'tuyen-sinh';
-
-	if ( $all_closed ) {
-		if ( 'tam-ngung' !== $current_status ) {
+		if ( $all_closed ) {
 			update_post_meta( $post_id, 'admission_status', 'tam-ngung' );
+			$cur_period = get_post_meta( $post_id, 'enrollment_period', true );
+			if ( empty( $cur_period ) || in_array( trim( $cur_period ), [ 'Đang nhận hồ sơ', 'Tuyển sinh theo đợt' ], true ) ) {
+				update_post_meta( $post_id, 'enrollment_period', 'Đã hết chỉ tiêu tuyển sinh' );
+			}
+		} elseif ( $has_open ) {
+			update_post_meta( $post_id, 'admission_status', 'tuyen-sinh' );
+			$cur_period = get_post_meta( $post_id, 'enrollment_period', true );
+			if ( 'Đã hết chỉ tiêu tuyển sinh' === trim( (string) $cur_period ) ) {
+				update_post_meta( $post_id, 'enrollment_period', 'Đang nhận hồ sơ' );
+			}
+		} elseif ( $has_upcoming ) {
+			update_post_meta( $post_id, 'admission_status', 'sap-mo' );
 		}
-		$cur_period = get_post_meta( $post_id, 'enrollment_period', true );
-		if ( empty( $cur_period ) || in_array( trim( $cur_period ), [ 'Đang nhận hồ sơ', 'Tuyển sinh theo đợt' ], true ) ) {
-			update_post_meta( $post_id, 'enrollment_period', 'Đã hết chỉ tiêu tuyển sinh' );
+	} else {
+		$status = get_post_meta( $post_id, 'admission_status', true );
+		if ( empty( $status ) ) {
+			update_post_meta( $post_id, 'admission_status', 'tuyen-sinh' );
 		}
-	} elseif ( $has_open && 'tam-ngung' === $current_status ) {
-		update_post_meta( $post_id, 'admission_status', 'tuyen-sinh' );
-	} elseif ( ! $has_open && $has_upcoming && 'tam-ngung' === $current_status ) {
-		update_post_meta( $post_id, 'admission_status', 'sap-mo' );
 	}
 }
 
@@ -1990,15 +2149,10 @@ function ltdh_get_program_data_completeness( $post_id ) {
 		$p0_missing[] = 'Trường "Đơn vị tính học phí" (Tab Học phí & Thời gian học): Vui lòng chọn đơn vị tính (ví dụ: /tín chỉ, /học kỳ...).';
 	}
 
-	// 4. Kiểm tra: Thời gian học & Trạng thái tuyển sinh
+	// 4. Kiểm tra: Thời gian học
 	$duration = get_post_meta( $post_id, 'duration', true );
 	if ( empty( $duration ) ) {
 		$p0_missing[] = 'Trường "Thời gian học" (Tab Học phí & Thời gian học): Đang để trống (ví dụ: "1.5 - 2 năm").';
-	}
-
-	$status = get_post_meta( $post_id, 'admission_status', true );
-	if ( empty( $status ) ) {
-		$p0_missing[] = 'Trường "Trạng thái tuyển sinh" (Tab Tổng quan chương trình): Vui lòng chọn trạng thái (ví dụ: Đang nhận hồ sơ, Sắp khai giảng...).';
 	}
 
 	// 5. Kiểm tra: Yêu cầu & Hồ sơ
@@ -2054,7 +2208,7 @@ function ltdh_get_program_data_completeness( $post_id ) {
 		}
 	}
 
-	$total_checks = 11;
+	$total_checks = 10;
 	$passed       = $total_checks - count( $p0_missing );
 	$score        = max( 0, min( 100, intval( round( ( $passed / $total_checks ) * 100 ) ) ) );
 
@@ -2109,16 +2263,97 @@ function ltdh_program_admin_edit_completeness_notice() {
 }
 
 /**
- * Kiểm thực chặn xuất bản bài viết nếu thiếu các trường bắt buộc trên giao diện ACF Admin.
+ * Kiểm tra xem tên chương trình đào tạo đã tồn tại trong hệ thống hay chưa.
+ *
+ * @param string $title Tên chương trình cần kiểm tra.
+ * @param int    $exclude_post_id ID bài viết cần loại trừ (khi chỉnh sửa bài viết hiện có).
+ * @return int|false ID của bài viết bị trùng nếu tìm thấy, ngược lại trả về false.
+ */
+function ltdh_is_program_title_duplicate( $title, $exclude_post_id = 0 ) {
+	global $wpdb;
+
+	$clean_title = trim( (string) $title );
+	if ( '' === $clean_title ) {
+		return false;
+	}
+
+	$clean_title = preg_replace( '/\s+/', ' ', $clean_title );
+	$exclude_post_id = absint( $exclude_post_id );
+	$post_type = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
+
+	if ( $exclude_post_id > 0 ) {
+		$duplicate_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT ID FROM {$wpdb->posts}
+				WHERE post_type = %s
+				  AND post_status NOT IN ('trash', 'auto-draft')
+				  AND LOWER(TRIM(post_title)) = LOWER(%s)
+				  AND ID != %d
+				LIMIT 1",
+				$post_type,
+				$clean_title,
+				$exclude_post_id
+			)
+		);
+	} else {
+		$duplicate_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT ID FROM {$wpdb->posts}
+				WHERE post_type = %s
+				  AND post_status NOT IN ('trash', 'auto-draft')
+				  AND LOWER(TRIM(post_title)) = LOWER(%s)
+				LIMIT 1",
+				$post_type,
+				$clean_title
+			)
+		);
+	}
+
+	return $duplicate_id ? (int) $duplicate_id : false;
+}
+
+/**
+ * Kiểm thực chặn lưu/xuất bản bài viết nếu tên chương trình bị trùng hoặc thiếu các trường bắt buộc trên ACF Admin.
  */
 add_action( 'acf/validate_save_post', 'ltdh_validate_program_acf_publish_fields', 10 );
 function ltdh_validate_program_acf_publish_fields() {
 	$post_type = isset( $_POST['post_type'] ) ? sanitize_text_field( $_POST['post_type'] ) : '';
+	$post_id   = isset( $_POST['post_ID'] ) ? absint( $_POST['post_ID'] ) : 0;
+
+	if ( empty( $post_type ) && $post_id > 0 ) {
+		$post_type = get_post_type( $post_id );
+	}
+
 	if ( 'program' !== $post_type ) {
 		return;
 	}
 
-	// Chỉ bắt buộc kiểm tra chặt chẽ khi có hành động Xuất bản (Publish)
+	// 1. Kiểm tra trùng lặp tên chương trình (Bắt buộc kiểm tra cho cả Lưu nháp & Xuất bản)
+	$post_title = isset( $_POST['post_title'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['post_title'] ) ) ) : '';
+
+	if ( '' !== $post_title ) {
+		$duplicate_id = ltdh_is_program_title_duplicate( $post_title, $post_id );
+		if ( $duplicate_id ) {
+			$dup_post   = get_post( $duplicate_id );
+			$dup_status = $dup_post ? ( 'publish' === $dup_post->post_status ? 'Đã xuất bản' : 'Bản nháp' ) : '';
+			$error_msg  = sprintf(
+				'Tên chương trình "%s" đã tồn tại trên hệ thống (bài viết #%d%s). Vui lòng đặt tên khác để tránh tạo trùng lặp.',
+				esc_html( $post_title ),
+				$duplicate_id,
+				$dup_status ? ' - ' . $dup_status : ''
+			);
+			acf_add_validation_error( 'post_title', $error_msg );
+			acf_add_validation_error( '', $error_msg );
+		}
+	} else {
+		// Tiêu đề rỗng khi cố gắng xuất bản
+		if ( ( isset( $_POST['post_status'] ) && 'publish' === $_POST['post_status'] ) || isset( $_POST['publish'] ) ) {
+			acf_add_validation_error( 'post_title', 'Vui lòng nhập tên (tiêu đề) chương trình đào tạo trước khi Xuất bản.' );
+			acf_add_validation_error( '', 'Vui lòng nhập tên (tiêu đề) chương trình đào tạo trước khi Xuất bản.' );
+		}
+	}
+
+	// 2. Chỉ bắt buộc kiểm tra chặt chẽ các trường ACF khi có hành động Xuất bản (Publish)
 	$is_publishing = false;
 	if ( isset( $_POST['post_status'] ) && 'publish' === $_POST['post_status'] ) {
 		$is_publishing = true;
@@ -2164,12 +2399,7 @@ function ltdh_validate_program_acf_publish_fields() {
 		acf_add_validation_error( 'acf[field_program_duration]', 'Thời gian học bị dính lỗi định dạng ngày tháng Excel. Vui lòng nhập khoảng thời gian dạng "1.5 - 2 năm".' );
 	}
 
-	// 7. Admission status
-	if ( empty( $acf['field_program_admission_status'] ) ) {
-		acf_add_validation_error( 'acf[field_program_admission_status]', 'Vui lòng chọn trường "Trạng thái tuyển sinh" ở Tab "Tổng quan chương trình" trước khi Xuất bản.' );
-	}
-
-	// 8. Requirements
+	// 7. Requirements
 	$req_text = isset( $acf['field_program_requirements'] ) ? trim( strip_tags( (string) $acf['field_program_requirements'] ) ) : '';
 	if ( empty( $req_text ) ) {
 		acf_add_validation_error( 'acf[field_program_requirements]', 'Vui lòng nhập nội dung trường "Điều kiện xét tuyển" ở Tab "Điều kiện & Hồ sơ xét tuyển" trước khi Xuất bản.' );
@@ -2181,6 +2411,186 @@ function ltdh_validate_program_acf_publish_fields() {
 		acf_add_validation_error( 'acf[field_program_documents]', 'Vui lòng nhập danh mục trường "Hồ sơ xét tuyển cần thiết" ở Tab "Điều kiện & Hồ sơ xét tuyển" trước khi Xuất bản.' );
 	}
 }
+
+/**
+ * Chặn lưu bài viết chương trình nếu tên bị trùng lặp (áp dụng cho Quick Edit & server-side save).
+ */
+add_filter( 'wp_insert_post_data', 'ltdh_prevent_duplicate_program_title_on_save', 10, 4 );
+function ltdh_prevent_duplicate_program_title_on_save( $data, $postarr, $unsanitized_postarr, $update ) {
+	$post_type = $data['post_type'] ?? ( $postarr['post_type'] ?? '' );
+	if ( 'program' !== $post_type ) {
+		return $data;
+	}
+
+	$post_status = $data['post_status'] ?? ( $postarr['post_status'] ?? '' );
+	// Bỏ qua các trạng thái không phải bài viết lưu chính thức
+	if ( in_array( $post_status, [ 'auto-draft', 'trash', 'inherit' ], true ) ) {
+		return $data;
+	}
+
+	// Nếu đang thực hiện thao tác xóa vào thùng rác hoặc phục hồi
+	if ( isset( $_GET['action'] ) && in_array( $_GET['action'], [ 'trash', 'untrash' ], true ) ) {
+		return $data;
+	}
+
+	$title   = trim( wp_unslash( $data['post_title'] ?? '' ) );
+	$post_id = ! empty( $postarr['ID'] ) ? absint( $postarr['ID'] ) : 0;
+
+	if ( '' === $title ) {
+		return $data;
+	}
+
+	$duplicate_id = ltdh_is_program_title_duplicate( $title, $post_id );
+	if ( $duplicate_id ) {
+		// Quick edit qua AJAX inline-save
+		if ( wp_doing_ajax() && isset( $_POST['action'] ) && 'inline-save' === $_POST['action'] ) {
+			wp_die( sprintf( 'Lỗi: Tên chương trình "%s" đã tồn tại trên hệ thống (ID: #%d). Vui lòng chọn tên khác.', esc_html( $title ), $duplicate_id ) );
+		}
+
+		// Submit trực tiếp từ wp-admin
+		if ( is_admin() && ! wp_doing_cron() ) {
+			$dup_link  = get_edit_post_link( $duplicate_id );
+			$link_html = $dup_link ? ' (bài viết <a href="' . esc_url( $dup_link ) . '" target="_blank">#' . $duplicate_id . '</a>)' : ' (ID: #' . $duplicate_id . ')';
+			wp_die(
+				sprintf(
+					'<h1>Không thể lưu chương trình</h1><p>Tên chương trình <strong>%s</strong> đã tồn tại trên hệ thống%s.</p><p>Hệ thống không cho phép tạo 2 chương trình có tên giống nhau. Vui lòng quay lại và thay đổi tên chương trình.</p>',
+					esc_html( $title ),
+					$link_html
+				),
+				'Lỗi trùng tên chương trình',
+				[ 'back_link' => true ]
+			);
+		}
+	}
+
+	return $data;
+}
+
+/**
+ * Chặn tạo/cập nhật chương trình trùng tên qua REST API (Gutenberg Block Editor).
+ */
+add_filter( 'rest_pre_insert_program', 'ltdh_validate_duplicate_program_title_rest', 10, 2 );
+function ltdh_validate_duplicate_program_title_rest( $prepared_post, $request ) {
+	$title   = isset( $prepared_post->post_title ) ? trim( $prepared_post->post_title ) : '';
+	$post_id = isset( $prepared_post->ID ) ? absint( $prepared_post->ID ) : 0;
+
+	if ( '' !== $title ) {
+		$duplicate_id = ltdh_is_program_title_duplicate( $title, $post_id );
+		if ( $duplicate_id ) {
+			return new WP_Error(
+				'duplicate_program_title',
+				sprintf( 'Tên chương trình "%s" đã tồn tại trên hệ thống (ID: #%d). Vui lòng chọn một tên khác để tránh trùng lặp.', esc_html( $title ), $duplicate_id ),
+				[ 'status' => 400 ]
+			);
+		}
+	}
+
+	return $prepared_post;
+}
+
+/**
+ * AJAX endpoint kiểm tra trùng lặp tên chương trình theo thời gian thực.
+ */
+add_action( 'wp_ajax_ltdh_check_program_title_duplicate', 'ltdh_ajax_check_program_title_duplicate' );
+function ltdh_ajax_check_program_title_duplicate() {
+	$title   = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
+	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+
+	if ( '' === $title ) {
+		wp_send_json_success( [ 'is_duplicate' => false ] );
+	}
+
+	$duplicate_id = ltdh_is_program_title_duplicate( $title, $post_id );
+	if ( $duplicate_id ) {
+		$dup_post   = get_post( $duplicate_id );
+		$dup_status = $dup_post ? ( 'publish' === $dup_post->post_status ? 'Đã xuất bản' : 'Bản nháp' ) : '';
+		$edit_link  = get_edit_post_link( $duplicate_id );
+		wp_send_json_success( [
+			'is_duplicate' => true,
+			'duplicate_id' => $duplicate_id,
+			'message'      => sprintf(
+				'⚠️ Tên chương trình "%s" đã tồn tại trên hệ thống (%s#%d%s). Vui lòng đổi tên khác để tránh tạo trùng lặp!',
+				esc_html( $title ),
+				$edit_link ? '<a href="' . esc_url( $edit_link ) . '" target="_blank" style="color: #991b1b; text-decoration: underline;">bài viết ' : 'ID: ',
+				$duplicate_id,
+				$edit_link ? ( $dup_status ? ' - ' . $dup_status : '' ) . '</a>' : ( $dup_status ? ' - ' . $dup_status : '' )
+			),
+		] );
+	} else {
+		wp_send_json_success( [ 'is_duplicate' => false ] );
+	}
+}
+
+/**
+ * Script kiểm tra trùng lặp tên chương trình ngay khi nhập liệu trong Admin.
+ */
+add_action( 'admin_footer-post.php', 'ltdh_admin_program_duplicate_title_checker' );
+add_action( 'admin_footer-post-new.php', 'ltdh_admin_program_duplicate_title_checker' );
+function ltdh_admin_program_duplicate_title_checker() {
+	$screen = get_current_screen();
+	if ( ! $screen || 'program' !== $screen->post_type ) {
+		return;
+	}
+	?>
+	<script>
+	jQuery(document).ready(function($) {
+		var $titleInput = $('#title');
+		if (!$titleInput.length) return;
+
+		var $postID = $('#post_ID');
+		var checkTimer = null;
+
+		function checkDuplicateTitle() {
+			var title = $.trim($titleInput.val());
+			var postId = $postID.length ? parseInt($postID.val(), 10) : 0;
+
+			if (!title) {
+				$('#ltdh-title-dup-alert').remove();
+				$titleInput.css({'border-color': '', 'background-color': ''});
+				return;
+			}
+
+			$.post(ajaxurl, {
+				action: 'ltdh_check_program_title_duplicate',
+				title: title,
+				post_id: postId
+			}, function(res) {
+				if (res && res.success && res.data && res.data.is_duplicate) {
+					var alertHtml = '<div id="ltdh-title-dup-alert" style="margin-top: 8px; padding: 10px 14px; background: #fef2f2; border: 1px solid #f87171; border-left: 4px solid #dc2626; border-radius: 4px; color: #991b1b; font-size: 13px; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">'
+						+ res.data.message
+						+ '</div>';
+					if ($('#ltdh-title-dup-alert').length) {
+						$('#ltdh-title-dup-alert').replaceWith(alertHtml);
+					} else {
+						$('#titlediv').after(alertHtml);
+					}
+					$titleInput.css({'border-color': '#dc2626', 'background-color': '#fff5f5'});
+				} else {
+					$('#ltdh-title-dup-alert').remove();
+					$titleInput.css({'border-color': '', 'background-color': ''});
+				}
+			});
+		}
+
+		$titleInput.on('input paste change', function() {
+			clearTimeout(checkTimer);
+			checkTimer = setTimeout(checkDuplicateTitle, 400);
+		});
+
+		$titleInput.on('blur', function() {
+			clearTimeout(checkTimer);
+			checkDuplicateTitle();
+		});
+
+		// Chạy kiểm tra ngay khi load nếu ô title đã có giá trị
+		if ($titleInput.val()) {
+			checkDuplicateTitle();
+		}
+	});
+	</script>
+	<?php
+}
+
 
 
 

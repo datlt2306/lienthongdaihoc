@@ -576,17 +576,7 @@ if ( ! empty( $school_faqs ) ) {
 							$major_slug = $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '';
 
 							// Determine badge classes based on training type name
-							$badge_class = 'bg-orange-50 text-orange-700';
-							if ( $clean_type_name ) {
-								$type_name_lower = mb_strtolower( trim( $clean_type_name ), 'UTF-8' );
-								if ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
-									$badge_class = 'bg-blue-50 text-[#00308b]';
-								} elseif ( false !== strpos( $type_name_lower, 'chính quy' ) ) {
-									$badge_class = 'bg-indigo-50 text-indigo-700';
-								} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
-									$badge_class = 'bg-amber-50 text-amber-800';
-								}
-							}
+							$badge_class = 'bg-blue-50 text-[#00308b]';
 
 							$academic_year = get_field( 'tuition_academic_year', $prog_id ) ?: '2025 - 2026';
 

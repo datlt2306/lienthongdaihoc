@@ -114,8 +114,8 @@ foreach ( $outer_classes as $cls ) {
 
 // 2.2 Cover image and badge overlay tokens
 $cover_tokens = [
-	'h-28 sm:h-48 md:h-60 w-full bg-slate-100 relative overflow-hidden group/cover',
-	'bg-gradient-to-t from-slate-900/60 via-slate-900/15 to-transparent',
+	'h-32 sm:h-44 md:h-48 w-full bg-slate-100 relative overflow-hidden group/cover',
+	'bg-gradient-to-t from-slate-900/70 via-slate-900/10 to-slate-900/40 pointer-events-none',
 	'tam-ngung',
 	'Tạm dừng',
 	'sap-mo',
@@ -135,9 +135,9 @@ foreach ( $cover_tokens as $token ) {
 
 // 2.3 Institution header & typography
 $header_tokens = [
-	'w-8 h-8 sm:w-10 sm:h-10 bg-white border border-slate-200/90 rounded-lg sm:rounded-xl flex items-center justify-center p-1 shrink-0 shadow-2xs group-hover/school:border-brand-primary/40 group-hover/school:shadow-xs transition-all -mt-4 sm:-mt-6',
+	'w-8 h-8 sm:w-10 sm:h-10 bg-white border border-slate-200/90 rounded-lg sm:rounded-xl flex items-center justify-center p-1 shrink-0 shadow-2xs group-hover/school:border-brand-primary/40 group-hover/school:shadow-xs transition-all -mt-4 sm:-mt-5',
 	'text-[10px] sm:text-xs font-bold text-slate-500 group-hover/school:text-brand-primary uppercase tracking-tight sm:tracking-wide block truncate transition-colors',
-	'font-black text-slate-900 text-xs sm:text-base md:text-lg hover:text-brand-primary leading-tight sm:leading-snug line-clamp-2 min-h-[32px] sm:min-h-[44px] transition-colors',
+	'font-black text-slate-900 text-xs sm:text-base md:text-lg hover:text-brand-primary leading-tight sm:leading-snug line-clamp-2 min-h-[28px] sm:min-h-[40px] transition-colors',
 ];
 
 foreach ( $header_tokens as $token ) {
@@ -172,8 +172,8 @@ foreach ( $metric_labels as $label ) {
 
 // 2.5 Action buttons (Details CTA & Compare Toggle)
 $action_tokens = [
-	'ltdh-btn-details min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1',
-	'ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-1 sm:px-3 transition-all min-h-[38px] sm:min-h-[44px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap',
+	'ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1',
+	'ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap',
 	'Tìm hiểu',
 	'So sánh',
 ];
@@ -261,13 +261,46 @@ CardParityTestSuite::assert(
 );
 
 CardParityTestSuite::assert(
-	false !== strpos( $ajax_code, "preg_replace( '/^hệ\\s+/iu', '', trim( \$type_name ) )" ),
+	false !== strpos( $ajax_code, "preg_replace( '/^hệ\\s+/iu', '', trim( \$t_name ) )" )
+	|| false !== strpos( $ajax_code, "preg_replace( '/^hệ\\s+/iu', '', trim( \$type_name ) )" ),
 	"AJAX executes regex stripping of 'Hệ ' prefix before badge output"
 );
 
 CardParityTestSuite::assert(
 	false !== strpos( $compare_code, "preg_replace( '/^hệ\\s+/iu', '', trim( \$item['training_type'] ?? '' ) )" ),
 	"Compare cards executes regex stripping of 'Hệ ' prefix before badge output"
+);
+
+// Zero hardcoded 'Hệ ' prefix inside badge span across all 3 card templates
+CardParityTestSuite::assert(
+	false === strpos( $ssr_tax_code, 'Hệ <?php echo esc_html( $clean_type_name ); ?>' ),
+	"SSR taxonomy does not have literal 'Hệ ' inside badge span"
+);
+
+CardParityTestSuite::assert(
+	false === strpos( $ssr_arch_code, 'Hệ <?php echo esc_html( $clean_type_name ); ?>' ),
+	"SSR archive does not have literal 'Hệ ' inside badge span"
+);
+
+CardParityTestSuite::assert(
+	false === strpos( $ajax_code, 'Hệ <?php echo esc_html( $clean_type_name ); ?>' ),
+	"AJAX card does not have literal 'Hệ ' inside badge span"
+);
+
+// All 3 templates invoke ltdh_format_program_card_headline
+CardParityTestSuite::assert(
+	false !== strpos( $ssr_tax_code, 'ltdh_format_program_card_headline' ),
+	"SSR taxonomy calls ltdh_format_program_card_headline"
+);
+
+CardParityTestSuite::assert(
+	false !== strpos( $ssr_arch_code, 'ltdh_format_program_card_headline' ),
+	"SSR archive calls ltdh_format_program_card_headline"
+);
+
+CardParityTestSuite::assert(
+	false !== strpos( $ajax_code, 'ltdh_format_program_card_headline' ),
+	"AJAX calls ltdh_format_program_card_headline"
 );
 
 // -----------------------------------------------------------------
@@ -278,19 +311,62 @@ echo "-------------------------------------------------------------------\n";
 
 /**
  * Exact replica of the template logic used in:
- * - taxonomy-training_type.php (lines 340-353)
- * - archive-program.php (lines 340-353)
- * - inc/core/class-query-filters.php (lines 191-208)
+ * - taxonomy-training_type.php
+ * - archive-program.php
+ * - inc/core/class-query-filters.php
+ * via ltdh_format_program_card_headline()
  */
-function simulate_card_headline( ?string $major_cpt_title, string $raw_prog_title, string $type_name ): array {
+function simulate_card_headline( ?string $major_cpt_title, string $raw_prog_title, string $type_name, string $school_code = 'TMU', string $school_name = 'Trường Đại học Thương mại' ): array {
 	$major_name = $major_cpt_title ?: '';
 	if ( empty( $major_name ) ) {
 		$major_name = preg_replace( '/^(Cử nhân|Kỹ sư|Đại học)\s+/iu', '', $raw_prog_title );
+		$major_name = preg_replace( '/\s*[-–—].*$/u', '', $major_name );
 		$major_name = preg_replace( '/\s*\([^)]*\)$/u', '', $major_name );
 	}
 	$clean_major_name = preg_replace( '/^ngành\s+/iu', '', trim( $major_name ) );
 	$clean_type_name  = preg_replace( '/^hệ\s+/iu', '', trim( $type_name ) );
-	$card_headline    = 'Liên thông ngành ' . $clean_major_name . ( $clean_type_name ? ' - ' . $clean_type_name : '' );
+
+	$school_code   = trim( $school_code );
+	$school_name   = trim( $school_name );
+	$school_suffix = '';
+
+	if ( ! empty( $school_code ) ) {
+		$school_suffix = ' - ' . $school_code;
+	} elseif ( ! empty( $school_name ) ) {
+		$clean_school_fallback = preg_replace( '/^trường\s+đại\s+học\s+/iu', 'ĐH ', $school_name );
+		$school_suffix = $clean_school_fallback ? ' - ' . $clean_school_fallback : '';
+	}
+
+	$clean_prog = trim( $raw_prog_title );
+	$clean_prog = preg_replace( '/^(?:tuyển sinh\s+)?(?:liên thông\s+)?(?:ngành\s+)?/iu', '', $clean_prog );
+	$clean_prog = preg_replace( '/^(?:cử nhân|kỹ sư|đại học)\s+/iu', '', $clean_prog );
+
+	if ( ! empty( $school_code ) ) {
+		$clean_prog = preg_replace( '/\s*[-–—]\s*(?:(?:đh|trường|học viện|đại học)\s+)?' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
+	}
+	if ( ! empty( $school_name ) ) {
+		$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_prog );
+	}
+	$clean_prog = preg_replace( '/\s*[-–—]\s*(?:đh|trường|học viện|đại học)\s+[^\-–—()]+$/iu', '', $clean_prog );
+	$clean_prog = preg_replace( '/\s*\([^)]*\)$/u', '', $clean_prog );
+	$clean_prog = preg_replace( '/\s*[-–—]\s*(?:hệ\s+|đào tạo\s+)?(?:từ xa|chính quy|vừa học vừa làm|vhvl|vừa làm vừa học|online|văn bằng 2|vb2)$/iu', '', $clean_prog );
+
+	if ( ! empty( $school_code ) ) {
+		$clean_prog = preg_replace( '/\s*[-–—]\s*(?:(?:đh|trường|học viện|đại học)\s+)?' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
+	}
+	$clean_prog = preg_replace( '/\s*[-–—]\s*(?:đh|trường|học viện|đại học)\s+[^\-–—()]+$/iu', '', $clean_prog );
+
+	$clean_prog = trim( $clean_prog, " -–—\t\n\r\0\x0B" );
+
+	if ( empty( $clean_prog ) && ! empty( $clean_major_name ) ) {
+		$clean_prog = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $clean_major_name ) );
+	}
+
+	if ( empty( $clean_prog ) ) {
+		$clean_prog = trim( $raw_prog_title );
+	}
+
+	$card_headline = 'Liên thông ngành ' . $clean_prog . $school_suffix;
 
 	return [
 		'clean_major'   => $clean_major_name,
@@ -300,15 +376,17 @@ function simulate_card_headline( ?string $major_cpt_title, string $raw_prog_titl
 }
 
 $adversarial_cases = [
-	// Edge Case 1: Standard clean inputs
+	// Edge Case 1: Standard clean names with TMU school code
 	[
-		'desc'           => 'Standard clean names',
+		'desc'           => 'Standard clean names with TMU school code',
 		'major_cpt'      => 'Công nghệ thông tin',
 		'prog_title'     => 'Cử nhân Công nghệ thông tin',
 		'type_name'      => 'Từ xa',
+		'school_code'    => 'TMU',
+		'school_name'    => 'Trường Đại học Thương mại',
 		'expected_major' => 'Công nghệ thông tin',
 		'expected_type'  => 'Từ xa',
-		'expected_hl'    => 'Liên thông ngành Công nghệ thông tin - Từ xa',
+		'expected_hl'    => 'Liên thông ngành Công nghệ thông tin - TMU',
 	],
 	// Edge Case 2: Major starting with "Ngành"
 	[
@@ -316,9 +394,11 @@ $adversarial_cases = [
 		'major_cpt'      => 'Ngành Quản trị kinh doanh',
 		'prog_title'     => 'Cử nhân Quản trị kinh doanh',
 		'type_name'      => 'Từ xa',
+		'school_code'    => 'TMU',
+		'school_name'    => 'Trường Đại học Thương mại',
 		'expected_major' => 'Quản trị kinh doanh',
 		'expected_type'  => 'Từ xa',
-		'expected_hl'    => 'Liên thông ngành Quản trị kinh doanh - Từ xa',
+		'expected_hl'    => 'Liên thông ngành Quản trị kinh doanh - TMU',
 	],
 	// Edge Case 3: Major starting with "ngành " (lowercase)
 	[
@@ -326,19 +406,23 @@ $adversarial_cases = [
 		'major_cpt'      => 'ngành Kế toán',
 		'prog_title'     => 'Cử nhân Kế toán',
 		'type_name'      => 'Từ xa',
+		'school_code'    => 'UTC',
+		'school_name'    => 'Trường Đại học Giao thông Vận tải',
 		'expected_major' => 'Kế toán',
 		'expected_type'  => 'Từ xa',
-		'expected_hl'    => 'Liên thông ngành Kế toán - Từ xa',
+		'expected_hl'    => 'Liên thông ngành Kế toán - UTC',
 	],
 	// Edge Case 4: Major starting with "NGÀNH " (uppercase)
 	[
 		'desc'           => 'Major CPT starting with uppercase "NGÀNH "',
 		'major_cpt'      => 'NGÀNH LUẬT',
-		'prog_title'     => 'Cử nhân Luật',
+		'prog_title'     => 'Cử nhân LUẬT',
 		'type_name'      => 'Từ xa',
+		'school_code'    => 'TMU',
+		'school_name'    => 'Trường Đại học Thương mại',
 		'expected_major' => 'LUẬT',
 		'expected_type'  => 'Từ xa',
-		'expected_hl'    => 'Liên thông ngành LUẬT - Từ xa',
+		'expected_hl'    => 'Liên thông ngành LUẬT - TMU',
 	],
 	// Edge Case 5: Training type starting with "Hệ "
 	[
@@ -346,9 +430,11 @@ $adversarial_cases = [
 		'major_cpt'      => 'Thương mại điện tử',
 		'prog_title'     => 'Cử nhân Thương mại điện tử',
 		'type_name'      => 'Hệ Từ xa',
+		'school_code'    => 'TMU',
+		'school_name'    => 'Trường Đại học Thương mại',
 		'expected_major' => 'Thương mại điện tử',
 		'expected_type'  => 'Từ xa',
-		'expected_hl'    => 'Liên thông ngành Thương mại điện tử - Từ xa',
+		'expected_hl'    => 'Liên thông ngành Thương mại điện tử - TMU',
 	],
 	// Edge Case 6: Training type starting with lowercase "hệ "
 	[
@@ -356,9 +442,11 @@ $adversarial_cases = [
 		'major_cpt'      => 'Logistics',
 		'prog_title'     => 'Cử nhân Logistics',
 		'type_name'      => 'hệ vừa học vừa làm',
+		'school_code'    => 'PTIT',
+		'school_name'    => 'Học viện Công nghệ Bưu chính Viễn thông',
 		'expected_major' => 'Logistics',
 		'expected_type'  => 'vừa học vừa làm',
-		'expected_hl'    => 'Liên thông ngành Logistics - vừa học vừa làm',
+		'expected_hl'    => 'Liên thông ngành Logistics - PTIT',
 	],
 	// Edge Case 7: Training type starting with uppercase "HỆ "
 	[
@@ -366,9 +454,11 @@ $adversarial_cases = [
 		'major_cpt'      => 'Tài chính Ngân hàng',
 		'prog_title'     => 'Cử nhân Tài chính Ngân hàng',
 		'type_name'      => 'HỆ TỪ XA',
+		'school_code'    => 'TMU',
+		'school_name'    => 'Trường Đại học Thương mại',
 		'expected_major' => 'Tài chính Ngân hàng',
 		'expected_type'  => 'TỪ XA',
-		'expected_hl'    => 'Liên thông ngành Tài chính Ngân hàng - TỪ XA',
+		'expected_hl'    => 'Liên thông ngành Tài chính Ngân hàng - TMU',
 	],
 	// Edge Case 8: Missing major relationship (major_cpt = null), fallback to "Cử nhân [Major]"
 	[
@@ -376,9 +466,11 @@ $adversarial_cases = [
 		'major_cpt'      => null,
 		'prog_title'     => 'Cử nhân Ngôn ngữ Anh',
 		'type_name'      => 'Từ xa',
+		'school_code'    => 'ETU',
+		'school_name'    => 'Trường Đại học Hòa Bình',
 		'expected_major' => 'Ngôn ngữ Anh',
 		'expected_type'  => 'Từ xa',
-		'expected_hl'    => 'Liên thông ngành Ngôn ngữ Anh - Từ xa',
+		'expected_hl'    => 'Liên thông ngành Ngôn ngữ Anh - ETU',
 	],
 	// Edge Case 9: Missing major rel, fallback extracts from "Kỹ sư [Major]"
 	[
@@ -386,9 +478,11 @@ $adversarial_cases = [
 		'major_cpt'      => null,
 		'prog_title'     => 'Kỹ sư Xây dựng',
 		'type_name'      => 'Vừa học vừa làm',
+		'school_code'    => 'UTC',
+		'school_name'    => 'Trường Đại học Giao thông Vận tải',
 		'expected_major' => 'Xây dựng',
 		'expected_type'  => 'Vừa học vừa làm',
-		'expected_hl'    => 'Liên thông ngành Xây dựng - Vừa học vừa làm',
+		'expected_hl'    => 'Liên thông ngành Xây dựng - UTC',
 	],
 	// Edge Case 10: Missing major rel, fallback extracts from "Đại học [Major]"
 	[
@@ -396,19 +490,23 @@ $adversarial_cases = [
 		'major_cpt'      => null,
 		'prog_title'     => 'Đại học Sư phạm Toán',
 		'type_name'      => 'Từ xa',
+		'school_code'    => 'TNU',
+		'school_name'    => 'Trường Đại học Thái Nguyên',
 		'expected_major' => 'Sư phạm Toán',
 		'expected_type'  => 'Từ xa',
-		'expected_hl'    => 'Liên thông ngành Sư phạm Toán - Từ xa',
+		'expected_hl'    => 'Liên thông ngành Sư phạm Toán - TNU',
 	],
-	// Edge Case 11: Program title with parenthetical suffix "(Vừa học vừa làm)"
+	// Edge Case 11: Program title with parenthetical suffix "(Vừa học vừa làm)" and school in title
 	[
-		'desc'           => 'Missing major rel, program title with parenthetical suffix',
+		'desc'           => 'Missing major rel, program title with parenthetical suffix and school',
 		'major_cpt'      => null,
-		'prog_title'     => 'Cử nhân Công nghệ thông tin (Vừa học vừa làm)',
-		'type_name'      => 'Vừa học vừa làm',
+		'prog_title'     => 'Công nghệ thông tin (Chính quy) - ĐH GTVT',
+		'type_name'      => 'Chính quy',
+		'school_code'    => 'UTC',
+		'school_name'    => 'Trường Đại học Giao thông Vận tải',
 		'expected_major' => 'Công nghệ thông tin',
-		'expected_type'  => 'Vừa học vừa làm',
-		'expected_hl'    => 'Liên thông ngành Công nghệ thông tin - Vừa học vừa làm',
+		'expected_type'  => 'Chính quy',
+		'expected_hl'    => 'Liên thông ngành Công nghệ thông tin - UTC',
 	],
 	// Edge Case 12: Empty training type
 	[
@@ -416,24 +514,34 @@ $adversarial_cases = [
 		'major_cpt'      => 'Công nghệ sinh học',
 		'prog_title'     => 'Cử nhân Công nghệ sinh học',
 		'type_name'      => '',
+		'school_code'    => 'TMU',
+		'school_name'    => 'Trường Đại học Thương mại',
 		'expected_major' => 'Công nghệ sinh học',
 		'expected_type'  => '',
-		'expected_hl'    => 'Liên thông ngành Công nghệ sinh học',
+		'expected_hl'    => 'Liên thông ngành Công nghệ sinh học - TMU',
 	],
-	// Edge Case 13: Combined double adversity: "Ngành Kế toán" + "Hệ Từ xa"
+	// Edge Case 13: Combined: Admin title "Thương mại điện tử" + TMU (User specific test case)
 	[
-		'desc'           => 'Combined: "Ngành Kế toán" + "Hệ Từ xa"',
-		'major_cpt'      => 'Ngành Kế toán',
-		'prog_title'     => 'Cử nhân Kế toán',
-		'type_name'      => 'Hệ Từ xa',
-		'expected_major' => 'Kế toán',
-		'expected_type'  => 'Từ xa',
-		'expected_hl'    => 'Liên thông ngành Kế toán - Từ xa',
+		'desc'           => 'User exact case: Title "Thương mại điện tử", School TMU, Type Đào tạo từ xa',
+		'major_cpt'      => 'Thương mại điện tử',
+		'prog_title'     => 'Thương mại điện tử',
+		'type_name'      => 'Đào tạo từ xa',
+		'school_code'    => 'TMU',
+		'school_name'    => 'Trường Đại học Thương mại',
+		'expected_major' => 'Thương mại điện tử',
+		'expected_type'  => 'Đào tạo từ xa',
+		'expected_hl'    => 'Liên thông ngành Thương mại điện tử - TMU',
 	],
 ];
 
 foreach ( $adversarial_cases as $idx => $test ) {
-	$res = simulate_card_headline( $test['major_cpt'], $test['prog_title'], $test['type_name'] );
+	$res = simulate_card_headline(
+		$test['major_cpt'],
+		$test['prog_title'],
+		$test['type_name'],
+		$test['school_code'] ?? 'TMU',
+		$test['school_name'] ?? 'Trường Đại học Thương mại'
+	);
 
 	CardParityTestSuite::assert(
 		$res['clean_major'] === $test['expected_major'],

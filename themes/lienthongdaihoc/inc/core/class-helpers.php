@@ -334,6 +334,65 @@ function ltdh_get_program_school_id( int $program_id ): int {
 }
 
 /**
+ * Chuẩn hóa tiêu đề thẻ card chương trình đào tạo theo quy tắc:
+ * "Liên thông ngành [Tiêu đề trong quản trị / Tên ngành] - [Mã trường]"
+ *
+ * @param string $raw_prog_title Tiêu đề bài viết chương trình trong quản trị.
+ * @param string $school_code Mã trường (ví dụ: TMU, UTC, PTIT).
+ * @param string $school_name Tên trường đào tạo (dùng khi không có mã trường).
+ * @param string $major_title Tên ngành liên kết (fallback nếu tiêu đề quản trị rỗng).
+ * @return string Tiêu đề thẻ card đã được định dạng chuẩn.
+ */
+function ltdh_format_program_card_headline( ?string $raw_prog_title = '', ?string $school_code = '', ?string $school_name = '', ?string $major_title = '' ): string {
+	$school_code   = trim( (string) $school_code );
+	$school_name   = trim( (string) $school_name );
+	$school_suffix = '';
+
+	if ( ! empty( $school_code ) ) {
+		$school_suffix = ' - ' . $school_code;
+	} elseif ( ! empty( $school_name ) ) {
+		$clean_school_fallback = preg_replace( '/^trường\s+đại\s+học\s+/iu', 'ĐH ', $school_name );
+		$school_suffix = $clean_school_fallback ? ' - ' . $clean_school_fallback : '';
+	}
+
+	$clean_prog = trim( (string) $raw_prog_title );
+	$clean_prog = preg_replace( '/^(?:tuyển sinh\s+)?(?:liên thông\s+)?(?:ngành\s+)?/iu', '', $clean_prog );
+	$clean_prog = preg_replace( '/^(?:cử nhân|kỹ sư|đại học)\s+/iu', '', $clean_prog );
+
+	// Lược bỏ hậu tố mã trường/tên trường nếu người dùng nhập sẵn trong tiêu đề
+	if ( ! empty( $school_code ) ) {
+		$clean_prog = preg_replace( '/\s*[-–—]\s*(?:(?:đh|trường|học viện|đại học)\s+)?' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
+	}
+	if ( ! empty( $school_name ) ) {
+		$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_prog );
+	}
+	// Lược bỏ hậu tố tên trường dạng - ĐH ..., - Trường ..., - Học viện ...
+	$clean_prog = preg_replace( '/\s*[-–—]\s*(?:đh|trường|học viện|đại học)\s+[^\-–—()]+$/iu', '', $clean_prog );
+	// Lược bỏ phần ngoặc hệ đào tạo ở đuôi (ví dụ: (Chính quy), (Từ xa)...)
+	$clean_prog = preg_replace( '/\s*\([^)]*\)$/u', '', $clean_prog );
+	// Lược bỏ hệ đào tạo sau dấu gạch ngang nếu có (ví dụ: - Từ xa, - Đào tạo từ xa...)
+	$clean_prog = preg_replace( '/\s*[-–—]\s*(?:hệ\s+|đào tạo\s+)?(?:từ xa|chính quy|vừa học vừa làm|vhvl|vừa làm vừa học|online|văn bằng 2|vb2)$/iu', '', $clean_prog );
+
+	// Lặp lại nếu người dùng gõ cả hai theo thứ tự khác nhau
+	if ( ! empty( $school_code ) ) {
+		$clean_prog = preg_replace( '/\s*[-–—]\s*(?:(?:đh|trường|học viện|đại học)\s+)?' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
+	}
+	$clean_prog = preg_replace( '/\s*[-–—]\s*(?:đh|trường|học viện|đại học)\s+[^\-–—()]+$/iu', '', $clean_prog );
+
+	$clean_prog = trim( $clean_prog, " -–—\t\n\r\0\x0B" );
+
+	if ( empty( $clean_prog ) && ! empty( $major_title ) ) {
+		$clean_prog = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major_title ) );
+	}
+
+	if ( empty( $clean_prog ) ) {
+		$clean_prog = trim( $raw_prog_title );
+	}
+
+	return 'Liên thông ngành ' . $clean_prog . $school_suffix;
+}
+
+/**
  * Lấy giá trị custom field (ưu tiên get_field của ACF, nếu rỗng thì fallback sang get_post_meta)
  *
  * @param string $key
@@ -2813,15 +2872,7 @@ function ltdh_get_training_type_badge_html( string $type_name ): string {
 	if ( ! $type_name ) {
 		return '';
 	}
-	$badge_class = 'bg-orange-50 text-orange-600 border border-orange-100';
-	$type_name_lower = mb_strtolower( trim( $type_name ), 'UTF-8' );
-	if ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
-		$badge_class = 'bg-blue-50 text-[#00308b] border border-blue-200';
-	} elseif ( false !== strpos( $type_name_lower, 'chính quy' ) ) {
-		$badge_class = 'bg-indigo-50 text-indigo-700 border border-indigo-200';
-	} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
-		$badge_class = 'bg-amber-50 text-amber-600 border border-amber-100';
-	}
+	$badge_class = 'bg-blue-50 text-[#00308b] border border-blue-200';
 	return sprintf(
 		'<span class="%s text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide border shadow-xs inline-block leading-normal">%s</span>',
 		esc_attr( $badge_class ),
@@ -2858,16 +2909,19 @@ function ltdh_get_program_tuition_display(int $program_id, bool $include_year = 
 
 /**
  * Lấy trạng thái tuyển sinh thực tế của chương trình đào tạo.
- * Thiết lập ràng buộc và tự động đồng bộ giữa:
- * - Tab 1: Trạng thái tuyển sinh tổng thể (admission_status)
- * - Tab 2: Trạng thái các đợt tuyển sinh con (admission_batches)
+ * Tự động tính toán (derived) trực tiếp từ các đợt tuyển sinh (admission_batches):
+ * - Nếu tất cả các đợt đã đóng -> 'tam-ngung' (Đã hết chỉ tiêu)
+ * - Nếu có ít nhất 1 đợt đang nhận hồ sơ -> 'tuyen-sinh' (Đang tuyển sinh / Còn chỉ tiêu)
+ * - Nếu có đợt sắp mở (và không có đợt mở) -> 'sap-mo' (Sắp mở tuyển sinh)
+ * - Nếu chưa cấu hình đợt tuyển sinh -> fallback về postmeta 'admission_status' hoặc mặc định 'tuyen-sinh'
  *
  * @param int $program_id ID của bài viết program.
  * @return string 'tuyen-sinh' | 'tam-ngung' | 'sap-mo'
  */
 function ltdh_get_program_admission_status( int $program_id ): string {
-	$raw_status = get_post_meta( $program_id, 'admission_status', true ) ?: 'tuyen-sinh';
-	$batches    = get_field( 'admission_batches', $program_id );
+	$batches = function_exists( 'ltdh_get_program_admission_batches' )
+		? ltdh_get_program_admission_batches( $program_id )
+		: ( get_field( 'admission_batches', $program_id ) ?: [] );
 
 	if ( is_array( $batches ) && ! empty( $batches ) ) {
 		$has_open     = false;
@@ -2885,30 +2939,32 @@ function ltdh_get_program_admission_status( int $program_id ): string {
 			}
 		}
 
-		// Ràng buộc 1: Nếu TẤT CẢ các đợt đã đóng -> Bắt buộc coi là tạm ngưng tuyển sinh (đã hết chỉ tiêu)
+		// Nếu TẤT CẢ các đợt đã đóng -> Bắt buộc là 'tam-ngung' (Đã hết chỉ tiêu)
 		if ( $all_closed ) {
 			return 'tam-ngung';
 		}
 
-		// Ràng buộc 2: Nếu có ít nhất 1 đợt đang nhận hồ sơ -> Bắt buộc coi là đang tuyển sinh
-		if ( $has_open && 'tam-ngung' === $raw_status ) {
+		// Nếu có ít nhất 1 đợt đang nhận hồ sơ -> 'tuyen-sinh' (Đang tuyển sinh)
+		if ( $has_open ) {
 			return 'tuyen-sinh';
 		}
 
-		// Ràng buộc 3: Nếu không có đợt nhận nhưng có đợt sắp mở -> Sắp mở
-		if ( ! $has_open && $has_upcoming && 'tam-ngung' === $raw_status ) {
+		// Nếu có đợt sắp mở -> 'sap-mo' (Sắp mở tuyển sinh)
+		if ( $has_upcoming ) {
 			return 'sap-mo';
 		}
 	}
 
-	return $raw_status;
+	return get_post_meta( $program_id, 'admission_status', true ) ?: 'tuyen-sinh';
 }
 
 /**
  * Get dynamic admission deadline display based on batches or enrollment_period.
  */
 function ltdh_get_program_admission_deadline_display(int $program_id): string {
-	$batches = get_field('admission_batches', $program_id);
+	$batches = function_exists( 'ltdh_get_program_admission_batches' )
+		? ltdh_get_program_admission_batches( $program_id )
+		: ( get_field( 'admission_batches', $program_id ) ?: [] );
 	if (is_array($batches) && ! empty($batches)) {
 		$sap_mo_batches = [];
 		$all_closed     = true;
@@ -3293,6 +3349,392 @@ function ltdh_get_major_target_admissions( int $major_id ): array {
 
 	return $results;
 }
+
+/**
+ * Lấy quy định đối tượng tuyển sinh (ngành đúng & ngành gần) cho một chương trình đào tạo.
+ * Kế thừa trực tiếp từ cấu hình của ngành (CPT major) tương ứng với trường đào tạo của chương trình.
+ *
+ * @param int $program_id ID của chương trình đào tạo.
+ * @return array|null Mảng thông tin quy định nếu có, null nếu không có.
+ */
+function ltdh_get_program_target_admission( int $program_id ): ?array {
+	if ( ! $program_id ) {
+		return null;
+	}
+
+	$school_raw = function_exists( 'get_field' ) ? get_field( LTDH_META_SCHOOL_REL, $program_id ) : get_post_meta( $program_id, LTDH_META_SCHOOL_REL, true );
+	$major_raw  = function_exists( 'get_field' ) ? get_field( LTDH_META_MAJOR_REL, $program_id ) : get_post_meta( $program_id, LTDH_META_MAJOR_REL, true );
+
+	$school_id = is_object( $school_raw ) ? (int) $school_raw->ID : ( (int) $school_raw ?: (int) get_post_meta( $program_id, LTDH_META_SCHOOL_REL, true ) );
+	$major_id  = is_object( $major_raw ) ? (int) $major_raw->ID : ( (int) $major_raw ?: (int) get_post_meta( $program_id, LTDH_META_MAJOR_REL, true ) );
+
+	if ( ! $major_id ) {
+		return null;
+	}
+
+	$target_list = function_exists( 'ltdh_get_major_target_admissions' ) ? ltdh_get_major_target_admissions( $major_id ) : [];
+	if ( empty( $target_list ) ) {
+		return null;
+	}
+
+	$target_school_matcher = function( array $target_item, int $target_sch_id, int $p_id ): bool {
+		if ( empty( $target_item ) ) {
+			return false;
+		}
+
+		$row_school_id    = (int) ( $target_item['school_id'] ?? 0 );
+		$row_school_slug  = sanitize_title( (string) ( $target_item['school_slug'] ?? '' ) );
+		$row_school_badge = strtoupper( trim( (string) ( $target_item['school_badge'] ?? '' ) ) );
+
+		// 1. Khớp trực tiếp School ID
+		if ( $target_sch_id > 0 && $row_school_id > 0 && $row_school_id === $target_sch_id ) {
+			return true;
+		}
+
+		// 2. Khớp School Code / Badge
+		if ( $target_sch_id > 0 ) {
+			$school_code = strtoupper( trim( (string) ( function_exists( 'ltdh_get_school_code' ) ? ltdh_get_school_code( $target_sch_id ) : get_post_meta( $target_sch_id, 'school_code', true ) ) ) );
+			if ( ! empty( $school_code ) && ! empty( $row_school_badge ) && $school_code === $row_school_badge ) {
+				return true;
+			}
+
+			// 3. Khớp School Slug
+			$school_slug = sanitize_title( (string) get_post_field( 'post_name', $target_sch_id ) );
+			if ( ! empty( $school_slug ) && ! empty( $row_school_slug ) && ( $school_slug === $row_school_slug || str_contains( $school_slug, $row_school_slug ) || str_contains( $row_school_slug, $school_slug ) ) ) {
+				return true;
+			}
+		}
+
+		// 4. Khớp theo tên chương trình có chứa badge trường (VD: "UTC")
+		if ( ! empty( $row_school_badge ) ) {
+			$prog_title = strtoupper( get_the_title( $p_id ) );
+			if ( str_contains( $prog_title, $row_school_badge ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	};
+
+	foreach ( $target_list as $t_candidate ) {
+		if ( $target_school_matcher( $t_candidate, $school_id, $program_id ) ) {
+			return $t_candidate;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Lấy ID ngành học (CPT major) liên kết với chương trình.
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return int ID của ngành học hoặc 0 nếu không tìm thấy.
+ */
+function ltdh_get_program_major_id( int $program_id ): int {
+	if ( ! $program_id ) {
+		return 0;
+	}
+
+	$key      = defined( 'LTDH_META_MAJOR_REL' ) ? LTDH_META_MAJOR_REL : 'major_relationship';
+	$major_id = function_exists( 'get_field' ) ? get_field( $key, $program_id ) : 0;
+	if ( empty( $major_id ) ) {
+		$major_id = get_post_meta( $program_id, $key, true );
+	}
+	if ( is_array( $major_id ) ) {
+		$first    = reset( $major_id );
+		$major_id = is_object( $first ) ? $first->ID : intval( $first );
+	} elseif ( is_object( $major_id ) ) {
+		$major_id = $major_id->ID;
+	}
+
+	return intval( $major_id );
+}
+
+/**
+ * Lấy điều kiện xét tuyển của chương trình với cơ chế DRY fallback về trường.
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return string HTML/text điều kiện xét tuyển.
+ */
+function ltdh_get_program_admission_requirements( int $program_id ): string {
+	if ( ! $program_id ) {
+		return '';
+	}
+
+	$prog_req = function_exists( 'get_field' ) ? get_field( 'admission_requirements', $program_id ) : '';
+	if ( empty( $prog_req ) ) {
+		$prog_req = get_post_meta( $program_id, 'admission_requirements', true );
+	}
+
+	if ( ! empty( $prog_req ) && ! empty( trim( strip_tags( (string) $prog_req ) ) ) ) {
+		return (string) $prog_req;
+	}
+
+	// Fallback to school default
+	$school_id = ltdh_get_program_school_id( $program_id );
+	if ( $school_id > 0 ) {
+		$school_req = function_exists( 'get_field' ) ? get_field( 'default_admission_requirements', $school_id ) : '';
+		if ( empty( $school_req ) ) {
+			$school_req = get_post_meta( $school_id, 'default_admission_requirements', true );
+		}
+		if ( ! empty( $school_req ) && ! empty( trim( strip_tags( (string) $school_req ) ) ) ) {
+			return (string) $school_req;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Lấy danh mục hồ sơ cần nộp của chương trình với cơ chế DRY fallback về trường.
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return string HTML/text danh mục hồ sơ.
+ */
+function ltdh_get_program_required_documents( int $program_id ): string {
+	if ( ! $program_id ) {
+		return '';
+	}
+
+	$prog_docs = function_exists( 'get_field' ) ? get_field( 'required_documents', $program_id ) : '';
+	if ( empty( $prog_docs ) ) {
+		$prog_docs = get_post_meta( $program_id, 'required_documents', true );
+	}
+
+	if ( ! empty( $prog_docs ) && ! empty( trim( strip_tags( (string) $prog_docs ) ) ) ) {
+		return (string) $prog_docs;
+	}
+
+	// Fallback to school default
+	$school_id = ltdh_get_program_school_id( $program_id );
+	if ( $school_id > 0 ) {
+		$school_docs = function_exists( 'get_field' ) ? get_field( 'default_required_documents', $school_id ) : '';
+		if ( empty( $school_docs ) ) {
+			$school_docs = get_post_meta( $school_id, 'default_required_documents', true );
+		}
+		if ( ! empty( $school_docs ) && ! empty( trim( strip_tags( (string) $school_docs ) ) ) ) {
+			return (string) $school_docs;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Lấy lệ phí xét tuyển của chương trình với cơ chế DRY fallback về trường.
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return mixed Chuỗi lệ phí hoặc giá trị số, rỗng nếu không có.
+ */
+function ltdh_get_program_admission_fee( int $program_id ) {
+	if ( ! $program_id ) {
+		return '';
+	}
+
+	$fee = function_exists( 'get_field' ) ? get_field( 'admission_fee', $program_id ) : '';
+	if ( '' === $fee || null === $fee || false === $fee ) {
+		$fee = get_post_meta( $program_id, 'admission_fee', true );
+	}
+
+	if ( ! empty( $fee ) || ( is_numeric( $fee ) && (int) $fee === 0 ) ) {
+		return $fee;
+	}
+
+	// Fallback to school default
+	$school_id = ltdh_get_program_school_id( $program_id );
+	if ( $school_id > 0 ) {
+		$default_fee = function_exists( 'get_field' ) ? get_field( 'default_admission_fee', $school_id ) : '';
+		if ( '' === $default_fee || null === $default_fee || false === $default_fee ) {
+			$default_fee = get_post_meta( $school_id, 'default_admission_fee', true );
+		}
+		if ( ! empty( $default_fee ) || ( is_numeric( $default_fee ) && (int) $default_fee === 0 ) ) {
+			return $default_fee;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Lấy danh sách các đợt tuyển sinh của chương trình với cơ chế DRY fallback về trường.
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return array Danh sách các đợt tuyển sinh.
+ */
+function ltdh_get_program_admission_batches( int $program_id ): array {
+	if ( ! $program_id ) {
+		return [];
+	}
+
+	$batches = function_exists( 'get_field' ) ? get_field( 'admission_batches', $program_id ) : [];
+	if ( ! empty( $batches ) && is_array( $batches ) ) {
+		return $batches;
+	}
+
+	// Fallback to school default admission batches
+	$school_id = ltdh_get_program_school_id( $program_id );
+	if ( $school_id > 0 ) {
+		$school_batches = function_exists( 'get_field' ) ? get_field( 'default_admission_batches', $school_id ) : [];
+		if ( ! empty( $school_batches ) && is_array( $school_batches ) ) {
+			return $school_batches;
+		}
+	}
+
+	return [];
+}
+
+/**
+ * Lấy thông tin quy định miễn môn & chuyển đổi tín chỉ với cơ chế DRY fallback về trường.
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return array Mảng gồm ['title', 'intro', 'items', 'inherited']
+ */
+function ltdh_get_program_exemptions( int $program_id ): array {
+	$result = [
+		'title'     => '',
+		'intro'     => '',
+		'items'     => [],
+		'inherited' => false,
+	];
+
+	if ( ! $program_id ) {
+		return $result;
+	}
+
+	$items = function_exists( 'ltdh_get_field_or_meta' ) 
+		? ltdh_get_field_or_meta( 'exemption_items', $program_id ) 
+		: ( function_exists( 'get_field' ) ? get_field( 'exemption_items', $program_id ) : get_post_meta( $program_id, 'exemption_items', true ) );
+
+	if ( ! empty( $items ) && is_array( $items ) ) {
+		$title = function_exists( 'ltdh_get_field_or_meta' ) 
+			? ltdh_get_field_or_meta( 'exemption_title', $program_id ) 
+			: ( function_exists( 'get_field' ) ? get_field( 'exemption_title', $program_id ) : get_post_meta( $program_id, 'exemption_title', true ) );
+		$intro = function_exists( 'ltdh_get_field_or_meta' ) 
+			? ltdh_get_field_or_meta( 'exemption_intro', $program_id ) 
+			: ( function_exists( 'get_field' ) ? get_field( 'exemption_intro', $program_id ) : get_post_meta( $program_id, 'exemption_intro', true ) );
+
+		$result['title']     = ! empty( $title ) ? (string) $title : 'Quy định miễn môn & Chuyển đổi tín chỉ';
+		$result['intro']     = ! empty( $intro ) ? (string) $intro : '';
+		$result['items']     = $items;
+		$result['inherited'] = false;
+		return $result;
+	}
+
+	// Fallback to school default exemptions
+	$school_id = ltdh_get_program_school_id( $program_id );
+	if ( $school_id > 0 ) {
+		$default_items = function_exists( 'ltdh_get_field_or_meta' ) 
+			? ltdh_get_field_or_meta( 'default_exemption_items', $school_id ) 
+			: ( function_exists( 'get_field' ) ? get_field( 'default_exemption_items', $school_id ) : get_post_meta( $school_id, 'default_exemption_items', true ) );
+
+		if ( ! empty( $default_items ) && is_array( $default_items ) ) {
+			$def_title = function_exists( 'ltdh_get_field_or_meta' ) 
+				? ltdh_get_field_or_meta( 'default_exemption_title', $school_id ) 
+				: ( function_exists( 'get_field' ) ? get_field( 'default_exemption_title', $school_id ) : get_post_meta( $school_id, 'default_exemption_title', true ) );
+			$def_intro = function_exists( 'ltdh_get_field_or_meta' ) 
+				? ltdh_get_field_or_meta( 'default_exemption_intro', $school_id ) 
+				: ( function_exists( 'get_field' ) ? get_field( 'default_exemption_intro', $school_id ) : get_post_meta( $school_id, 'default_exemption_intro', true ) );
+
+			$result['title']     = ! empty( $def_title ) ? (string) $def_title : 'Quy định miễn môn & Chuyển đổi tín chỉ';
+			$result['intro']     = ! empty( $def_intro ) ? (string) $def_intro : '';
+			$result['items']     = $default_items;
+			$result['inherited'] = true;
+			return $result;
+		}
+	}
+
+	return $result;
+}
+
+/**
+ * Lấy danh sách câu hỏi thường gặp (FAQ) của chương trình với cơ chế DRY thông minh:
+ * 1. Nếu chương trình có FAQ riêng -> Ưu tiên dùng FAQ riêng.
+ * 2. Nếu chương trình để trống -> Tự động kết hợp FAQ của ngành (major_faq) và FAQ của trường (school_faq / synthesized).
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return array Mảng các câu hỏi [ ['question' => ..., 'answer' => ...] ]
+ */
+function ltdh_get_program_faqs( int $program_id ): array {
+	if ( ! $program_id ) {
+		return [];
+	}
+
+	// 1. Program-specific FAQs
+	$prog_faqs = function_exists( 'get_field' ) ? get_field( 'faq', $program_id ) : [];
+	if ( empty( $prog_faqs ) ) {
+		$prog_faqs = get_post_meta( $program_id, 'faq', true );
+	}
+
+	if ( ! empty( $prog_faqs ) && is_array( $prog_faqs ) ) {
+		$valid = [];
+		foreach ( $prog_faqs as $item ) {
+			$q = trim( $item['question'] ?? '' );
+			$a = trim( $item['answer'] ?? '' );
+			if ( ! empty( $q ) && ! empty( $a ) ) {
+				$valid[] = [
+					'question' => $q,
+					'answer'   => $a,
+				];
+			}
+		}
+		if ( ! empty( $valid ) ) {
+			return $valid;
+		}
+	}
+
+	// 2. Intelligent DRY Merge: Major FAQs + School FAQs
+	$combined       = [];
+	$seen_questions = [];
+
+	$major_id  = ltdh_get_program_major_id( $program_id );
+	$school_id = ltdh_get_program_school_id( $program_id );
+
+	// 2.1 Lấy FAQ ngành (đặc thù chuyên môn, việc làm, cơ hội nghề nghiệp)
+	if ( $major_id > 0 ) {
+		$major_raw_faqs = function_exists( 'get_field' ) ? get_field( 'major_faq', $major_id ) : get_post_meta( $major_id, 'major_faq', true );
+		if ( ! empty( $major_raw_faqs ) && is_array( $major_raw_faqs ) ) {
+			foreach ( $major_raw_faqs as $item ) {
+				$q = trim( $item['question'] ?? '' );
+				$a = trim( $item['answer'] ?? '' );
+				if ( ! empty( $q ) && ! empty( $a ) ) {
+					$key = mb_strtolower( preg_replace( '/[^\p{L}\p{N}]/u', '', $q ), 'UTF-8' );
+					if ( ! isset( $seen_questions[ $key ] ) ) {
+						$seen_questions[ $key ] = true;
+						$combined[] = [
+							'question' => $q,
+							'answer'   => $a,
+						];
+					}
+				}
+			}
+		}
+	}
+
+	// 2.2 Lấy FAQ trường (đặc thù bằng cấp, học phí, địa điểm thi, điều kiện tốt nghiệp)
+	if ( $school_id > 0 ) {
+		$school_faqs = ltdh_get_school_faqs( $school_id );
+		if ( ! empty( $school_faqs ) && is_array( $school_faqs ) ) {
+			foreach ( $school_faqs as $item ) {
+				$q = trim( $item['question'] ?? '' );
+				$a = trim( $item['answer'] ?? '' );
+				if ( ! empty( $q ) && ! empty( $a ) ) {
+					$key = mb_strtolower( preg_replace( '/[^\p{L}\p{N}]/u', '', $q ), 'UTF-8' );
+					if ( ! isset( $seen_questions[ $key ] ) ) {
+						$seen_questions[ $key ] = true;
+						$combined[] = [
+							'question' => $q,
+							'answer'   => $a,
+						];
+					}
+				}
+			}
+		}
+	}
+
+	return $combined;
+}
+
 
 /**
  * Lấy danh sách các hình thức đào tạo thực tế có chương trình đang tuyển sinh của một ngành.

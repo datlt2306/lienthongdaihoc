@@ -25,14 +25,16 @@ $initials            = $school_title ? ( function_exists( 'ltdh_get_initials' ) 
 
 $tuition         = ltdh_get_program_tuition_display( $program_id );
 $duration        = get_field( LTDH_META_DURATION, $program_id );
-$requirements    = get_field( 'admission_requirements', $program_id ) ?: get_post_meta( $program_id, 'admission_requirements', true );
-$documents       = get_field( 'required_documents', $program_id ) ?: get_post_meta( $program_id, 'required_documents', true );
+$requirements    = function_exists( 'ltdh_get_program_admission_requirements' ) ? ltdh_get_program_admission_requirements( $program_id ) : ( get_field( 'admission_requirements', $program_id ) ?: get_post_meta( $program_id, 'admission_requirements', true ) );
+$documents       = function_exists( 'ltdh_get_program_required_documents' ) ? ltdh_get_program_required_documents( $program_id ) : ( get_field( 'required_documents', $program_id ) ?: get_post_meta( $program_id, 'required_documents', true ) );
 $enrollment      = ltdh_get_program_admission_deadline_display( $program_id );
 $quota           = get_field( 'quota', $program_id );
-$admission_fee   = get_field( 'admission_fee', $program_id ) ?: get_post_meta( $program_id, 'admission_fee', true );
-$exemption_title = function_exists( 'ltdh_get_field_or_meta' ) ? ltdh_get_field_or_meta( 'exemption_title', $program_id ) : ( get_field( 'exemption_title', $program_id ) ?: get_post_meta( $program_id, 'exemption_title', true ) );
-$exemption_intro = function_exists( 'ltdh_get_field_or_meta' ) ? ltdh_get_field_or_meta( 'exemption_intro', $program_id ) : ( get_field( 'exemption_intro', $program_id ) ?: get_post_meta( $program_id, 'exemption_intro', true ) );
-$exemption_items = function_exists( 'ltdh_get_field_or_meta' ) ? ltdh_get_field_or_meta( 'exemption_items', $program_id ) : ( get_field( 'exemption_items', $program_id ) ?: get_post_meta( $program_id, 'exemption_items', true ) );
+$admission_fee   = function_exists( 'ltdh_get_program_admission_fee' ) ? ltdh_get_program_admission_fee( $program_id ) : ( get_field( 'admission_fee', $program_id ) ?: get_post_meta( $program_id, 'admission_fee', true ) );
+
+$exemptions_data = function_exists( 'ltdh_get_program_exemptions' ) ? ltdh_get_program_exemptions( $program_id ) : [ 'title' => '', 'intro' => '', 'items' => [], 'inherited' => false ];
+$exemption_title = ! empty( $exemptions_data['title'] ) ? $exemptions_data['title'] : 'Quy định miễn môn & Chuyển đổi tín chỉ';
+$exemption_intro = ! empty( $exemptions_data['intro'] ) ? $exemptions_data['intro'] : '';
+$exemption_items = ! empty( $exemptions_data['items'] ) ? $exemptions_data['items'] : [];
 
 
 $program_hotline = ltdh_get_program_hotline( $program_id );
@@ -46,7 +48,7 @@ if ( ! empty( $benefits ) ) {
 }
 $opportunities   = get_field( 'career_opportunities', $program_id );
 $why_choose      = get_field( 'why_choose_us', $program_id );
-$faqs            = get_field( 'faq', $program_id );
+$faqs            = function_exists( 'ltdh_get_program_faqs' ) ? ltdh_get_program_faqs( $program_id ) : get_field( 'faq', $program_id );
 
 $prog_contact_custom = get_field( 'contact_info', $program_id );
 $school_contact_raw  = $school_id ? get_field( 'contact_info', $school_id ) : '';
@@ -61,9 +63,10 @@ $curriculum_title = $curriculum_info['title'] ?? ( 'Khung chương trình: ' . g
 $global_zalo = ltdh_get_zalo_url();
 
 // Dynamically construct sticky navigation tabs for Program (UI/UX Pro Max)
-$admission_batches_list = get_field( 'admission_batches', $program_id );
-$admission_form_data    = function_exists( 'ltdh_get_program_admission_form_data' ) ? ltdh_get_program_admission_form_data( $program_id ) : null;
-$admission_form_file    = $admission_form_data['url'] ?? '';
+$admission_batches_list   = function_exists( 'ltdh_get_program_admission_batches' ) ? ltdh_get_program_admission_batches( $program_id ) : get_field( 'admission_batches', $program_id );
+$admission_form_data      = function_exists( 'ltdh_get_program_admission_form_data' ) ? ltdh_get_program_admission_form_data( $program_id ) : null;
+$admission_form_file      = $admission_form_data['url'] ?? '';
+$program_target_admission = function_exists( 'ltdh_get_program_target_admission' ) ? ltdh_get_program_target_admission( $program_id ) : null;
 
 $program_tabs = [];
 $program_tabs[] = [
@@ -88,6 +91,15 @@ if ( ! empty( $requirements ) || ! empty( $documents ) || ! empty( $admission_fo
 		'title'    => 'Điều kiện & Hồ sơ',
 		'subtitle' => 'Tiêu chuẩn & Tiếp nhận',
 		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>',
+	];
+}
+
+if ( ! empty( $program_target_admission ) ) {
+	$program_tabs[] = [
+		'id'       => 'doi-tuong-tuyen-sinh',
+		'title'    => 'Đối tượng tuyển sinh',
+		'subtitle' => 'Ngành đúng & ngành gần',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>',
 	];
 }
 
@@ -330,7 +342,7 @@ if ( ! empty( $faqs ) ) {
 
 				<!-- SECTION: ADMISSION BATCHES -->
 				<?php 
-				$batches_data = get_field( 'admission_batches', $program_id );
+				$batches_data = function_exists( 'ltdh_get_program_admission_batches' ) ? ltdh_get_program_admission_batches( $program_id ) : get_field( 'admission_batches', $program_id );
 				if ( ! empty( $batches_data ) && is_array( $batches_data ) ) : 
 					// Determine training type: 'chinh-quy' -> 'Thi tuyển', others ('tu-xa', 'vua-hoc-vua-lam') -> 'Xét tuyển'
 					$training_terms = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
@@ -732,6 +744,98 @@ if ( ! empty( $faqs ) ) {
 					</section>
 				<?php endif; ?>
 
+				<!-- SECTION: ĐỐI TƯỢNG TUYỂN SINH (NGÀNH ĐÚNG & NGÀNH GẦN) -->
+				<?php if ( ! empty( $program_target_admission ) ) : 
+					$t_item = $program_target_admission;
+				?>
+					<section id="doi-tuong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+						<div class="border-b border-slate-100 pb-3 mb-5">
+							<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
+								Đối tượng tuyển sinh: Ngành đúng & Ngành gần
+							</h2>
+							<p class="text-xs md:text-sm text-slate-500 mt-1">
+								Quy định phân loại văn bằng tốt nghiệp Cao đẳng và điều kiện học phần bổ sung của <?php echo esc_html( $t_item['school_title'] ); ?>
+							</p>
+						</div>
+
+						<div class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+							<!-- Header thẻ quy định của trường -->
+							<div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+								<div class="flex items-center gap-2">
+									<span class="w-6 h-6 rounded-lg bg-[#00308b] text-white flex items-center justify-center font-bold text-xs shrink-0">
+										🏛️
+									</span>
+									<h3 class="font-bold text-slate-900 text-sm md:text-base">
+										<?php echo esc_html( $t_item['school_title'] ); ?>
+									</h3>
+								</div>
+								<span class="text-xs font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+									<?php echo esc_html( $t_item['regulation_title'] ); ?>
+								</span>
+							</div>
+
+							<!-- BẢNG 2 CỘT CHUẨN: CHỈ CÓ NGÀNH ĐÚNG VS NGÀNH GẦN (KHÔNG STT, KHÔNG CỘT NGÀNH DỰ TUYỂN) -->
+							<div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+								
+								<!-- CỘT 1: NHÓM NGÀNH ĐÚNG -->
+								<div class="p-4 sm:p-5 bg-emerald-50/15 flex flex-col justify-between">
+									<div>
+										<div class="flex items-center justify-between gap-2 border-b border-emerald-100 pb-3 mb-3.5">
+											<div class="flex items-center gap-2">
+												<span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">✓</span>
+												<h4 class="font-bold text-slate-900 text-sm md:text-base">Nhóm Ngành Đúng</h4>
+											</div>
+											<span class="px-2.5 py-1 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-200">
+												Không học bổ sung
+											</span>
+										</div>
+
+										<p class="text-xs text-slate-600 mb-2.5 font-medium">Thí sinh tốt nghiệp Cao đẳng các chuyên ngành:</p>
+										<?php if ( ! empty( $t_item['proper_majors'] ) ) : ?>
+											<ul class="space-y-2 pl-4 list-disc text-slate-800 text-xs sm:text-sm mb-4">
+												<?php foreach ( $t_item['proper_majors'] as $p_major ) : ?>
+													<li><span class="font-semibold text-slate-900"><?php echo esc_html( $p_major ); ?></span></li>
+												<?php endforeach; ?>
+											</ul>
+										<?php endif; ?>
+									</div>
+
+									<div class="mt-4 pt-3 border-t border-emerald-200/60 text-xs text-emerald-800 font-semibold bg-emerald-50/70 p-2.5 rounded-lg leading-relaxed">
+										🎉 Vào học thẳng môn chuyên ngành. Thời gian đào tạo tiêu chuẩn (1.5 - 2 năm), không phải học bổ sung môn chuyển đổi.
+									</div>
+								</div>
+
+								<!-- CỘT 2: NHÓM NGÀNH GẦN -->
+								<div class="p-4 sm:p-5 bg-amber-50/15 flex flex-col justify-between">
+									<div>
+										<div class="flex items-center justify-between gap-2 border-b border-amber-100 pb-3 mb-3.5">
+											<div class="flex items-center gap-2">
+												<span class="w-6 h-6 rounded-md bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-xs shrink-0">⚡</span>
+												<h4 class="font-bold text-slate-900 text-sm md:text-base">Nhóm Ngành Gần</h4>
+											</div>
+											<span class="px-2.5 py-1 bg-amber-50 text-amber-900 text-xs font-bold rounded-lg border border-amber-200">
+												+ <?php echo sprintf( '%02d', (int) ( $t_item['bridge_count'] ?: 3 ) ); ?> Học phần bổ sung
+											</span>
+										</div>
+
+										<p class="text-xs text-slate-600 mb-2.5 font-medium">Thí sinh tốt nghiệp Cao đẳng các ngành:</p>
+										<?php if ( ! empty( $t_item['near_majors'] ) ) : ?>
+											<p class="text-xs sm:text-sm text-slate-800 leading-relaxed mb-4">
+												<?php echo esc_html( implode( '; ', $t_item['near_majors'] ) ); ?>.
+											</p>
+										<?php endif; ?>
+									</div>
+
+									<div class="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed font-medium">
+										⚠️ <strong>Quy định bắt buộc:</strong> <?php echo esc_html( $t_item['bridge_note'] ); ?>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</section>
+				<?php endif; ?>
+
 				<!-- SECTION 6: TUITION & SECTION 7: DURATION -->
 				<section id="hoc-phi-thoi-gian" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 					<h2 class="text-base sm:text-xl md:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">Học phí & Thời gian học</h2>
@@ -966,7 +1070,9 @@ if ( ! empty( $faqs ) ) {
 										<span class="bg-teal-100 text-teal-800 text-sm px-1.5 py-0.5 rounded-lg font-black">Q</span>
 										<span><?php echo esc_html( $item['question'] ); ?></span>
 									</h3>
-									<p class="text-slate-600 text-sm pl-7 leading-relaxed"><?php echo esc_html( $item['answer'] ); ?></p>
+									<div class="text-slate-600 text-sm pl-7 leading-relaxed space-y-2">
+										<?php echo strpos( $item['answer'], '<p' ) !== false ? wp_kses_post( $item['answer'] ) : wp_kses_post( wpautop( $item['answer'] ) ); ?>
+									</div>
 								</div>
 							<?php endforeach; ?>
 						</div>

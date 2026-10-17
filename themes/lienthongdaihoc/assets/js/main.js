@@ -197,101 +197,415 @@ function ltdhInitTheme() {
     }
 
     // ----------------------------------------------------
-    // 3. Program Search & AJAX Filtering
+    // Reusable AJAX Loading Indicator Overlay
     // ----------------------------------------------------
-    // Clean empty GET form controls on submit to prevent dirty URLs like ?s=&truong=abc&nganh=&sort=
-    document.querySelectorAll('form[method="GET"], form[method="get"]').forEach(form => {
-        form.addEventListener('submit', () => {
-            form.querySelectorAll('input, select').forEach(input => {
-                if (!input.value || input.value.trim() === '') {
-                    input.disabled = true;
+    function showLoadingOverlay(container, message) {
+        if (!container) return;
+        message = message || 'Đang tải dữ liệu...';
+        const wrapper = container.closest('#program-results-wrapper, #major-results-wrapper, #ltdh-major-programs-wrapper') || container;
+        let overlay = wrapper.querySelector(':scope > .ltdh-loading-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'ltdh-loading-overlay absolute inset-0 bg-white/80 backdrop-blur-[2px] z-30 flex flex-col items-center justify-center min-h-[220px] rounded-2xl transition-opacity duration-200';
+            overlay.innerHTML = `
+                <div class="flex flex-col items-center gap-3 p-5 sm:p-6 bg-white/95 rounded-2xl shadow-xl border border-slate-100 max-w-[260px] text-center pointer-events-none">
+                    <svg class="w-9 h-9 text-[#00308b] animate-spin shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <div class="flex flex-col items-center">
+                        <span class="text-xs sm:text-sm font-bold text-slate-800 tracking-wide">${message}</span>
+                        <span class="text-[11px] text-slate-400 mt-0.5">Vui lòng chờ trong giây lát</span>
+                    </div>
+                </div>
+            `;
+            if (getComputedStyle(wrapper).position === 'static') {
+                wrapper.style.position = 'relative';
+            }
+            wrapper.appendChild(overlay);
+        }
+        overlay.style.display = 'flex';
+        overlay.style.opacity = '1';
+        container.style.opacity = '0.35';
+        container.style.pointerEvents = 'none';
+    }
+
+    function hideLoadingOverlay(container) {
+        if (!container) return;
+        const wrapper = container.closest('#program-results-wrapper, #major-results-wrapper, #ltdh-major-programs-wrapper') || container;
+        const overlay = wrapper.querySelector(':scope > .ltdh-loading-overlay');
+        if (overlay) {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                if (overlay && overlay.parentNode === wrapper) {
+                    overlay.remove();
+                }
+            }, 180);
+        }
+        container.style.opacity = '1';
+        container.style.pointerEvents = 'auto';
+    }
+
+    // ----------------------------------------------------
+    // 3. Program Search & AJAX Filtering with SEO URL Sync
+    // ----------------------------------------------------
+    function initProgramArchiveFilter() {
+        const filterForm = document.getElementById('catalog-filter-form') || document.querySelector('form[action*="/chuong-trinh/"], form[action*="/he-dao-tao/"], form[action*="/hinh-thuc-dao-tao/"]');
+        const container = document.getElementById('program-results-container');
+        if (!filterForm || !container) return;
+
+        const headingTitle = document.getElementById('catalog-heading-title');
+        const countDisplay = document.getElementById('catalog-count-display');
+        const desktopResetWrapper = document.getElementById('catalog-desktop-reset');
+        const mobileResetWrapper = document.getElementById('catalog-mobile-reset');
+        const mobileFilterBadge = document.getElementById('catalog-mobile-filter-badge');
+        const mobileChipsWrapper = document.getElementById('catalog-mobile-chips');
+        const pillsContainer = document.getElementById('catalog-pills-container');
+        const paginationContainer = document.getElementById('catalog-pagination-container');
+        const mobileFilterBtn = document.getElementById('ltdh-mobile-filter-btn');
+        const mobileFilterBody = document.getElementById('catalog-filter-body');
+        const mobileFilterChevron = document.getElementById('ltdh-mobile-filter-chevron');
+        const mobileFilterBtnText = document.getElementById('ltdh-mobile-filter-btn-text');
+        const mobileCloseBtn = document.getElementById('ltdh-mobile-filter-close');
+
+        const searchInput = filterForm.querySelector('input[name="s"]');
+        const regionSelect = filterForm.querySelector('select[name="khu_vuc"]');
+        const schoolSelect = filterForm.querySelector('select[name="truong"]');
+        const majorSelect = filterForm.querySelector('select[name="nganh"]');
+        const sortSelect = filterForm.querySelector('select[name="sort"]');
+        let heInput = filterForm.querySelector('input[name="he"]');
+        if (!heInput) {
+            heInput = document.createElement('input');
+            heInput.type = 'hidden';
+            heInput.name = 'he';
+            heInput.value = '';
+            filterForm.appendChild(heInput);
+        }
+
+        let searchTimeout = null;
+        let activeAbortController = null;
+        
+        // Base archive root
+        let rootArchiveUrl = '/hinh-thuc-dao-tao/';
+        if (window.location.pathname.startsWith('/chuong-trinh')) {
+            rootArchiveUrl = '/chuong-trinh/';
+        }
+
+        // Initialize active training type
+        const pathMatch = window.location.pathname.match(/^\/(?:hinh-thuc-dao-tao|he-dao-tao)\/([^\/]+)(?:\/page\/\d+)?\/?$/i);
+        if (pathMatch && pathMatch[1] && pathMatch[1] !== 'page') {
+            heInput.value = decodeURIComponent(pathMatch[1]);
+        } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('he')) {
+                heInput.value = urlParams.get('he');
+            }
+        }
+
+        function updatePillStyles(activeTypeSlug) {
+            if (!pillsContainer) return;
+            const pills = pillsContainer.querySelectorAll('.js-ltdh-type-pill');
+            pills.forEach(pill => {
+                const pillType = pill.getAttribute('data-type') || '';
+                const badge = pill.querySelector('.pill-badge');
+                const isMatch = (pillType === (activeTypeSlug || '')) ||
+                    ((activeTypeSlug === 'tu-xa' || activeTypeSlug === 'dao-tao-tu-xa') && (pillType === 'tu-xa' || pillType === 'dao-tao-tu-xa'));
+                if (isMatch) {
+                    pill.classList.add('bg-brand-primary', 'text-white', 'shadow-xs');
+                    pill.classList.remove('bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
+                    if (badge) {
+                        badge.classList.add('bg-white/20', 'text-white');
+                        badge.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200/60');
+                    }
+                } else {
+                    pill.classList.remove('bg-brand-primary', 'text-white', 'shadow-xs');
+                    pill.classList.add('bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
+                    if (badge) {
+                        badge.classList.remove('bg-white/20', 'text-white');
+                        badge.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200/60');
+                    }
                 }
             });
-        });
-    });
+        }
 
-    const filterForm = document.querySelector('form[action*="/chuong-trinh/"], form[action*="/he-dao-tao/"], form[action*="/hinh-thuc-dao-tao/"]');
-    const container = document.getElementById('program-results-container');
+        function buildCurrentUrl(paged = 1) {
+            const params = new URLSearchParams();
+            const sVal = (searchInput ? searchInput.value : '').trim();
+            const regionVal = regionSelect ? regionSelect.value : '';
+            const schoolVal = schoolSelect ? schoolSelect.value : '';
+            const majorVal = majorSelect ? majorSelect.value : '';
+            const sortVal = sortSelect ? sortSelect.value : '';
+            const heVal = (heInput ? heInput.value : '').trim();
 
-    if (filterForm && container) {
-        // Prevent form reload on submit
+            let targetPath = rootArchiveUrl;
+            if (heVal && rootArchiveUrl === '/hinh-thuc-dao-tao/') {
+                targetPath = `${rootArchiveUrl}${encodeURIComponent(heVal)}/`;
+            } else if (heVal) {
+                params.set('he', heVal);
+            }
+
+            if (regionVal) params.set('khu_vuc', regionVal);
+            if (schoolVal) params.set('truong', schoolVal);
+            if (majorVal) params.set('nganh', majorVal);
+            if (sVal) params.set('s', sVal);
+            if (sortVal) params.set('sort', sortVal);
+            if (paged > 1) params.set('paged', paged);
+
+            const queryString = params.toString();
+            return queryString ? `${targetPath}?${queryString}` : targetPath;
+        }
+
+        function triggerFilter(options = {}) {
+            const paged = options.paged || 1;
+            const pushUrl = options.pushUrl !== false;
+            const isTyping = options.isTyping || false;
+            const scrollToTop = options.scrollToTop || false;
+
+            const targetUrl = buildCurrentUrl(paged);
+
+            if (pushUrl) {
+                if (isTyping) {
+                    window.history.replaceState({ ltdhProgramFilter: true, paged: paged }, '', targetUrl);
+                } else {
+                    window.history.pushState({ ltdhProgramFilter: true, paged: paged }, '', targetUrl);
+                }
+            }
+
+            const currentHe = (heInput ? heInput.value : '').trim();
+            updatePillStyles(currentHe);
+
+            if (activeAbortController) {
+                activeAbortController.abort();
+            }
+            activeAbortController = new AbortController();
+
+            // Display loading overlay with spinner
+            showLoadingOverlay(container, 'Đang tìm chương trình...');
+
+            const formData = new FormData();
+            formData.append('action', 'ltdh_filter_programs');
+            formData.append('paged', paged);
+            if (currentHe) formData.append('he', currentHe);
+            if (searchInput && searchInput.value.trim()) formData.append('s', searchInput.value.trim());
+            if (regionSelect && regionSelect.value) formData.append('khu_vuc', regionSelect.value);
+            if (schoolSelect && schoolSelect.value) formData.append('truong', schoolSelect.value);
+            if (majorSelect && majorSelect.value) formData.append('nganh', majorSelect.value);
+            if (sortSelect && sortSelect.value) formData.append('sort', sortSelect.value);
+
+            const ajaxUrl = (typeof ltdh_ajax !== 'undefined' && ltdh_ajax.ajax_url)
+                ? ltdh_ajax.ajax_url
+                : '/wp-admin/admin-ajax.php';
+
+            fetch(ajaxUrl, {
+                method: 'POST',
+                body: formData,
+                signal: activeAbortController.signal
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success && res.data) {
+                    const data = res.data;
+
+                    container.innerHTML = data.html;
+
+                    if (headingTitle && data.heading_title) {
+                        headingTitle.textContent = data.heading_title;
+                    }
+                    if (countDisplay && typeof data.found_posts !== 'undefined') {
+                        countDisplay.textContent = data.found_posts;
+                    }
+
+                    if (paginationContainer) {
+                        paginationContainer.innerHTML = data.pagination_html || '';
+                    }
+
+                    if (mobileChipsWrapper) {
+                        mobileChipsWrapper.innerHTML = data.chips_html || '';
+                    }
+
+                    const resetBtnHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 border border-rose-100 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]"><span>✕</span> <span>Xóa tất cả bộ lọc</span></a>`;
+                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 min-h-[44px] transition-colors shrink-0" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
+
+                    if (desktopResetWrapper) {
+                        desktopResetWrapper.innerHTML = data.has_active_filters ? resetBtnHtml : '';
+                    }
+                    if (mobileResetWrapper) {
+                        mobileResetWrapper.innerHTML = data.has_active_filters ? mobileResetHtml : '';
+                    }
+
+                    if (mobileFilterBadge) {
+                        mobileFilterBadge.innerHTML = (data.active_filter_count > 0)
+                            ? `<span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[11px] font-black rounded-full bg-[#EA580C] text-white shrink-0 min-w-[20px] shadow-2xs">${data.active_filter_count}</span>`
+                            : '';
+                    }
+                    if (mobileFilterBtn) {
+                        if (data.has_active_filters) {
+                            mobileFilterBtn.className = 'flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs bg-blue-50/90 border-blue-200/90 text-[#00308b]';
+                        } else {
+                            mobileFilterBtn.className = 'flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs bg-slate-50 hover:bg-slate-100 border-slate-200/80 text-slate-700';
+                        }
+                    }
+
+                    if (window.ltdhCompare && typeof window.ltdhCompare.syncButtonStates === 'function') {
+                        window.ltdhCompare.syncButtonStates();
+                    }
+
+                    if (scrollToTop) {
+                        const targetEl = document.getElementById('catalog-filter-body') || container;
+                        const topOffset = targetEl.getBoundingClientRect().top + window.pageYOffset - 100;
+                        window.scrollTo({ top: topOffset, behavior: 'smooth' });
+                    }
+                }
+            })
+            .catch(err => {
+                if (err.name !== 'AbortError') {
+                    console.error('Error filtering programs:', err);
+                }
+            })
+            .finally(() => {
+                hideLoadingOverlay(container);
+            });
+        }
+
+        // 1. Form submit event
         filterForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            triggerFilter();
+            triggerFilter({ paged: 1, pushUrl: true });
+            if (mobileFilterBody && !mobileFilterBody.classList.contains('hidden') && window.innerWidth < 768) {
+                mobileFilterBody.classList.add('hidden');
+                if (mobileFilterBtn) mobileFilterBtn.setAttribute('aria-expanded', 'false');
+                if (mobileFilterChevron) mobileFilterChevron.classList.remove('rotate-180');
+                if (mobileFilterBtnText) mobileFilterBtnText.textContent = 'Bộ lọc & Tìm kiếm';
+            }
         });
 
-        // Trigger filter instantly on dropdown changes
-        filterForm.querySelectorAll('select').forEach(select => {
+        // 2. Dropdown changes
+        [regionSelect, schoolSelect, majorSelect, sortSelect].forEach(select => {
+            if (!select) return;
             select.removeAttribute('onchange');
-            select.addEventListener('change', triggerFilter, { passive: true });
+            select.addEventListener('change', () => {
+                triggerFilter({ paged: 1, pushUrl: true });
+            });
         });
 
-        // Debounce input typing in search field
-        let searchTimeout;
-        const searchInput = filterForm.querySelector('input[name="s"]');
+        // 3. Search input (debounced)
         if (searchInput) {
             searchInput.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(triggerFilter, 300);
-            }, { passive: true });
+                searchTimeout = setTimeout(() => {
+                    triggerFilter({ paged: 1, pushUrl: true, isTyping: true });
+                }, 350);
+            });
         }
 
-        // Intercept Reset button clicks
-        const resetBtn = document.querySelector('.js-ltdh-reset-filter');
-        if (resetBtn) {
-            resetBtn.addEventListener('click', (e) => {
+        // 4. Training Type Pills Click
+        if (pillsContainer) {
+            pillsContainer.addEventListener('click', (e) => {
+                const pill = e.target.closest('.js-ltdh-type-pill');
+                if (!pill) return;
                 e.preventDefault();
-                filterForm.reset();
-                filterForm.querySelectorAll('input').forEach(el => el.value = '');
-                filterForm.querySelectorAll('select').forEach(el => el.value = '');
-                window.location.href = resetBtn.href;
-            });
-        }
 
-        function triggerFilter() {
-            // Apply loading state
-            container.style.opacity = '0.4';
-            container.style.pointerEvents = 'none';
-
-            // Gather values
-            const formData = new FormData(filterForm);
-            formData.append('action', 'ltdh_filter_programs');
-
-            // Construct new URL parameters
-            const queryParams = [];
-            filterForm.querySelectorAll('input, select').forEach(el => {
-                if (el.value) {
-                    queryParams.push(`${encodeURIComponent(el.name)}=${encodeURIComponent(el.value)}`);
+                const typeSlug = pill.getAttribute('data-type') || '';
+                if (heInput) {
+                    heInput.value = typeSlug;
                 }
+                triggerFilter({ paged: 1, pushUrl: true });
             });
-            const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}` + (queryParams.length ? `?${queryParams.join('&')}` : '');
-            
-            // Push State to update browser URL bar dynamically
-            window.history.pushState({ path: newUrl }, '', newUrl);
-
-            // Fetch AJAX
-            if (typeof ltdh_ajax !== 'undefined' && ltdh_ajax.ajax_url) {
-                fetch(ltdh_ajax.ajax_url, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(res => {
-                    if (res.success) {
-                        container.innerHTML = res.data.html;
-                        if (window.ltdhCompare && typeof window.ltdhCompare.syncButtonStates === 'function') {
-                            window.ltdhCompare.syncButtonStates();
-                        }
-                    }
-                })
-                .catch(err => console.error('Filter error:', err))
-                .finally(() => {
-                    container.style.opacity = '1';
-                    container.style.pointerEvents = 'auto';
-                });
-            }
         }
+
+        // 5. Pagination Click (Delegated for catalog)
+        document.addEventListener('click', (e) => {
+            if (!container || !document.body.contains(container)) return;
+            const pageLink = e.target.closest('#catalog-pagination-container a.page-numbers');
+            if (!pageLink) return;
+            e.preventDefault();
+
+            const href = pageLink.getAttribute('href') || '';
+            let targetPage = 1;
+
+            const pagedMatch = href.match(/[?&]paged=(\d+)/);
+            if (pagedMatch) {
+                targetPage = parseInt(pagedMatch[1], 10);
+            } else {
+                const slashMatch = href.match(/\/page\/(\d+)\/?/);
+                if (slashMatch) {
+                    targetPage = parseInt(slashMatch[1], 10);
+                } else {
+                    const textNum = parseInt(pageLink.textContent.trim(), 10);
+                    if (!isNaN(textNum)) {
+                        targetPage = textNum;
+                    }
+                }
+            }
+
+            triggerFilter({ paged: targetPage, pushUrl: true, scrollToTop: true });
+        });
+
+        // 6. Reset Filters (Delegated for catalog)
+        document.addEventListener('click', (e) => {
+            if (!container || !document.body.contains(container)) return;
+            const resetBtn = e.target.closest('#catalog-desktop-reset .js-ltdh-reset-filter, #catalog-mobile-reset .js-ltdh-reset-filter');
+            if (!resetBtn) return;
+            e.preventDefault();
+
+            if (searchInput) searchInput.value = '';
+            if (regionSelect) regionSelect.value = '';
+            if (schoolSelect) schoolSelect.value = '';
+            if (majorSelect) majorSelect.value = '';
+            if (sortSelect) sortSelect.value = '';
+            if (heInput) heInput.value = '';
+
+            triggerFilter({ paged: 1, pushUrl: true });
+        });
+
+        // 7. Chip Remove Click (Delegated for catalog)
+        document.addEventListener('click', (e) => {
+            if (!container || !document.body.contains(container)) return;
+            const chip = e.target.closest('#catalog-mobile-chips .js-ltdh-chip-remove');
+            if (!chip) return;
+            e.preventDefault();
+
+            const key = chip.getAttribute('data-filter-key');
+            if (key === 's' && searchInput) searchInput.value = '';
+            if (key === 'khu_vuc' && regionSelect) regionSelect.value = '';
+            if (key === 'truong' && schoolSelect) schoolSelect.value = '';
+            if (key === 'nganh' && majorSelect) majorSelect.value = '';
+            if (key === 'sort' && sortSelect) sortSelect.value = '';
+            if (key === 'he' && heInput) heInput.value = '';
+
+            triggerFilter({ paged: 1, pushUrl: true });
+        });
+
+        // 8. Popstate (Browser Back / Forward)
+        window.addEventListener('popstate', () => {
+            if (!container || !document.body.contains(container)) return;
+            const params = new URLSearchParams(window.location.search);
+            const sVal = params.get('s') || '';
+            const regionVal = params.get('khu_vuc') || params.get('khu-vuc') || '';
+            const schoolVal = params.get('truong') || '';
+            const majorVal = params.get('nganh') || params.get('nhom_nganh') || '';
+            const sortVal = params.get('sort') || '';
+            const pagedVal = parseInt(params.get('paged') || '1', 10);
+
+            let heVal = params.get('he') || params.get('training_type') || '';
+            const currentPathMatch = window.location.pathname.match(/^\/(?:hinh-thuc-dao-tao|he-dao-tao)\/([^\/]+)(?:\/page\/\d+)?\/?$/i);
+            if (currentPathMatch && currentPathMatch[1] && currentPathMatch[1] !== 'page') {
+                heVal = decodeURIComponent(currentPathMatch[1]);
+            }
+
+            if (searchInput) searchInput.value = sVal;
+            if (regionSelect) regionSelect.value = regionVal;
+            if (schoolSelect) schoolSelect.value = schoolVal;
+            if (majorSelect) majorSelect.value = majorVal;
+            if (sortSelect) sortSelect.value = sortVal;
+            if (heInput) heInput.value = heVal;
+
+            updatePillStyles(heVal);
+            triggerFilter({ paged: pagedVal, pushUrl: false });
+        });
     }
+
+    initProgramArchiveFilter();
 
     // Single Major Page Filter (Training Type Pills & School Select Dropdown)
     function initMajorPageFilter() {
@@ -305,8 +619,7 @@ function ltdhInitTheme() {
         if (!listContainer || !majorId) return;
 
         function doFilter(pushUrl = true) {
-            listContainer.style.opacity = '0.4';
-            listContainer.style.pointerEvents = 'none';
+            showLoadingOverlay(listContainer, 'Đang tải danh sách...');
 
             const activePill = document.querySelector('.ltdh-major-he-pill.is-active');
             const selectedHe = activePill ? (activePill.dataset.he || '') : '';
@@ -363,8 +676,7 @@ function ltdhInitTheme() {
             })
             .catch(err => console.error('Error filtering major programs:', err))
             .finally(() => {
-                listContainer.style.opacity = '1';
-                listContainer.style.pointerEvents = 'auto';
+                hideLoadingOverlay(listContainer);
             });
         }
 
@@ -522,8 +834,8 @@ function ltdhInitTheme() {
             }
             activeAbortController = new AbortController();
 
-            container.style.opacity = '0.35';
-            container.style.pointerEvents = 'none';
+            // Display loading overlay with spinner
+            showLoadingOverlay(container, 'Đang tìm ngành học...');
 
             const formData = new FormData();
             formData.append('action', 'ltdh_filter_majors');
@@ -603,8 +915,7 @@ function ltdhInitTheme() {
                 }
             })
             .finally(() => {
-                container.style.opacity = '1';
-                container.style.pointerEvents = 'auto';
+                hideLoadingOverlay(container);
             });
         }
 

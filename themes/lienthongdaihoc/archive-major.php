@@ -272,7 +272,8 @@ $has_active_filters  = $active_filter_count > 0;
 	</div>
 
 		<!-- ============ MAJORS RESULTS GRID (2 COLUMNS ON MOBILE, 3 ON DESKTOP) ============ -->
-		<div id="major-results-container" class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+		<div id="major-results-wrapper" class="relative">
+			<div id="major-results-container" class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
 			<?php
 			if ( have_posts() ) :
 				while ( have_posts() ) : the_post();
@@ -296,7 +297,8 @@ $has_active_filters  = $active_filter_count > 0;
 			<?php
 			endif;
 			?>
-		</div>
+			</div><!-- #major-results-container -->
+		</div><!-- #major-results-wrapper -->
 
 		<!-- ============ PAGINATION ============ -->
 		<div id="major-pagination-container" class="mt-12 flex justify-center theme-pagination">
