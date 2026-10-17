@@ -359,7 +359,7 @@ $has_active_filters  = $active_filter_count > 0;
 							<!-- Action Footer -->
 							<div class="pt-2.5 sm:pt-3 md:pt-4 border-t border-slate-100 mt-auto">
 								<a href="<?php the_permalink(); ?>" class="w-full inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-slate-100 hover:bg-brand-primary text-slate-700 hover:text-white py-2 sm:py-2.5 md:py-3 px-2 sm:px-3 md:px-4 rounded-lg md:rounded-xl font-bold transition-all text-xs sm:text-sm group/btn min-h-[38px] md:min-h-[44px]">
-									<span>Khám phá</span><span class="hidden sm:inline">&nbsp;ngành học</span>
+									<span>Khám phá</span><span class="hidden sm:inline">ngành học</span>
 									<svg class="w-3.5 h-3.5 md:w-4 md:h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
 								</a>
 							</div>
