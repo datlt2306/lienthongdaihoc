@@ -1848,9 +1848,57 @@ class LTDH_CLI_Commands {
 		WP_CLI::log( sprintf( 'TỔNG QUAN: %d chương trình | Đạt chuẩn P0: %d (%s%%) | Chưa đạt: %d', $total, $passed_count, round( ( $passed_count / $total ) * 100, 1 ), $failed_count ) );
 		WP_CLI::log( "------------------------------------------------------------\n" );
 	}
+
+	/**
+	 * Test sending student confirmation and admin alert emails.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--to=<email>]
+	 * : Destination email address to test. Defaults to WordPress admin email.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp ltdh test-email --to=student@example.com
+	 */
+	public function test_email( $args, $assoc_args ) {
+		$to = $assoc_args['to'] ?? get_option( 'admin_email' );
+		WP_CLI::log( "Kiểm tra gửi email thử nghiệm tới: {$to}..." );
+
+		$dummy_data = [
+			'name'            => 'Nguyễn Văn Test',
+			'phone'           => '0988991496',
+			'email'           => $to,
+			'program_id'      => 0,
+			'school_id'       => 0,
+			'major_id'        => 0,
+			'training_type'   => 'Đào tạo Từ xa',
+			'campus'          => 'Hà Nội & TP.HCM',
+			'referral_source' => 'WP-CLI Test Command',
+			'message'         => 'Đây là nội dung thử nghiệm dịch vụ gửi mail tự động.',
+			'is_group_reg'    => false,
+		];
+
+		if ( ! function_exists( 'ltdh_trigger_email_notifications' ) ) {
+			WP_CLI::error( 'Hàm ltdh_trigger_email_notifications chưa được khai báo.' );
+			return;
+		}
+
+		$result = ltdh_trigger_email_notifications( $dummy_data, 99999 );
+		WP_CLI::log( 'Kết quả kiểm tra:' );
+		WP_CLI::log( sprintf( '- Email học viên: %s %s', $result['student_sent'] ? '✓ Thành công' : '✗ Thất bại', $result['student_error'] ? "({$result['student_error']})" : '' ) );
+		WP_CLI::log( sprintf( '- Email admin: %s %s', $result['admin_sent'] ? '✓ Thành công' : '✗ Thất bại', $result['admin_error'] ? "({$result['admin_error']})" : '' ) );
+
+		if ( $result['student_sent'] || $result['admin_sent'] ) {
+			WP_CLI::success( 'Đã hoàn thành kiểm tra gửi mail!' );
+		} else {
+			WP_CLI::warning( 'Cả 2 email đều chưa gửi được. Vui lòng kiểm tra lại cấu hình SMTP hoặc mail server.' );
+		}
+	}
 }
 
 WP_CLI::add_command( 'ltdh', 'LTDH_CLI_Commands' );
+WP_CLI::add_command( 'ltdh test-email', [ new LTDH_CLI_Commands(), 'test_email' ] );
 WP_CLI::add_command( 'ltdh audit-data', [ new LTDH_CLI_Commands(), 'audit_data' ] );
 WP_CLI::add_command( 'ltdh backfill-tuition', [ new LTDH_CLI_Commands(), 'backfill_tuition' ] );
 WP_CLI::add_command( 'ltdh validate-programs', [ new LTDH_CLI_Commands(), 'validate_programs' ] );

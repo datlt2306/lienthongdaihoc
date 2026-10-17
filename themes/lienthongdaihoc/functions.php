@@ -46,6 +46,7 @@ require_once __DIR__ . '/inc/relationship-hooks.php';
 require_once __DIR__ . '/inc/recaptcha.php';
 require_once __DIR__ . '/inc/lead-capture.php';
 require_once __DIR__ . '/inc/crm-adapters.php';
+require_once __DIR__ . '/inc/email-notifications.php';
 require_once __DIR__ . '/inc/search-engine.php';
 require_once __DIR__ . '/inc/comparison.php';
 require_once __DIR__ . '/inc/eligibility.php';

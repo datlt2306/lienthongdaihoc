@@ -150,11 +150,18 @@ function ltdh_elig_enqueue_assets() {
 			true
 		);
 
+		$shared_check = null;
+		$param = sanitize_text_field( $_GET['kq'] ?? ( $_GET['check_id'] ?? ( $_GET['res'] ?? ( $_GET['token'] ?? '' ) ) ) );
+		if ( ! empty( $param ) && function_exists( 'ltdh_elig_get_check_results' ) ) {
+			$shared_check = ltdh_elig_get_check_results( $param );
+		}
+
 		wp_localize_script( 'ltdh-eligibility-js', 'ltdh_elig', [
-			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'nonce'    => wp_create_nonce( 'ltdh_elig_nonce' ),
-			'rest_url' => esc_url_raw( rest_url( 'ltdh/v1/eligibility/' ) ),
-			'i18n'     => [
+			'ajax_url'        => admin_url( 'admin-ajax.php' ),
+			'nonce'           => wp_create_nonce( 'ltdh_elig_nonce' ),
+			'rest_url'        => esc_url_raw( rest_url( 'ltdh/v1/eligibility/' ) ),
+			'initial_results' => $shared_check,
+			'i18n'            => [
 				'checking'   => 'Đang kiểm tra...',
 				'results'    => 'Kết quả',
 				'step'       => 'Bước',
@@ -183,8 +190,23 @@ add_action( 'wp_enqueue_scripts', 'ltdh_elig_enqueue_assets' );
 add_action( 'wp_ajax_ltdh_elig_check', 'ltdh_elig_ajax_check' );
 add_action( 'wp_ajax_nopriv_ltdh_elig_check', 'ltdh_elig_ajax_check' );
 
+add_action( 'wp_ajax_ltdh_elig_get_check', 'ltdh_elig_ajax_get_check' );
+add_action( 'wp_ajax_nopriv_ltdh_elig_get_check', 'ltdh_elig_ajax_get_check' );
+
 add_action( 'wp_ajax_ltdh_elig_lead', 'ltdh_elig_ajax_lead' );
 add_action( 'wp_ajax_nopriv_ltdh_elig_lead', 'ltdh_elig_ajax_lead' );
+
+function ltdh_elig_ajax_get_check() {
+	$check_param = sanitize_text_field( $_GET['check_id'] ?? ( $_POST['check_id'] ?? ( $_GET['kq'] ?? ( $_POST['kq'] ?? '' ) ) ) );
+	if ( empty( $check_param ) ) {
+		wp_send_json_error( [ 'message' => 'Check ID required' ], 400 );
+	}
+	$result = ltdh_elig_get_check_results( $check_param );
+	if ( ! $result ) {
+		wp_send_json_error( [ 'message' => 'Không tìm thấy kết quả đối chiếu' ], 404 );
+	}
+	wp_send_json_success( $result );
+}
 
 function ltdh_elig_ajax_check() {
 	check_ajax_referer( 'ltdh_elig_nonce', 'nonce' );
@@ -881,6 +903,71 @@ function ltdh_elig_store_check( $input, $results ) {
 	return $wpdb->insert_id;
 }
 
+/**
+ * Retrieve saved check data and evaluate results for permalink sharing.
+ *
+ * @param int|string $check_identifier Check ID or session token.
+ * @return array|null Check result object or null if not found.
+ */
+function ltdh_elig_get_check_results( $check_identifier ) {
+	global $wpdb;
+	$table = $wpdb->prefix . 'ltdh_eligibility_checks';
+
+	if ( is_numeric( $check_identifier ) ) {
+		$check_id = intval( $check_identifier );
+		if ( $check_id <= 0 ) {
+			return null;
+		}
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $check_id ), ARRAY_A );
+	} else {
+		$token = sanitize_text_field( $check_identifier );
+		if ( empty( $token ) ) {
+			return null;
+		}
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE session_token = %s", $token ), ARRAY_A );
+	}
+
+	if ( ! $row ) {
+		return null;
+	}
+
+	$input = [
+		'name'             => '',
+		'education'        => sanitize_text_field( $row['input_education'] ?? '' ),
+		'major_id'         => intval( $row['input_major_id'] ?? 0 ),
+		'previous_school'  => sanitize_text_field( $row['input_previous_school'] ?? '' ),
+		'graduation'       => ! empty( $row['input_graduation'] ) ? intval( $row['input_graduation'] ) : 0,
+		'desired_major'    => intval( $row['input_desired_major'] ?? 0 ),
+		'training_type'    => sanitize_text_field( $row['input_training_type'] ?? '' ),
+		'campus'           => sanitize_text_field( $row['input_campus'] ?? '' ),
+		'budget'           => sanitize_text_field( $row['input_budget'] ?? '' ),
+		'phone'            => sanitize_text_field( $row['phone'] ?? '' ),
+		'email'            => sanitize_email( $row['email'] ?? '' ),
+		'degree_link'      => '',
+		'degree_file_path' => '',
+	];
+
+	if ( ! empty( $input['desired_major'] ) ) {
+		$input['desired_major_title'] = html_entity_decode( get_the_title( intval( $input['desired_major'] ) ), ENT_QUOTES, 'UTF-8' );
+	} else {
+		$input['desired_major_title'] = '';
+	}
+
+	$results = ltdh_elig_run_check( $input );
+
+	return [
+		'check_id'       => intval( $row['id'] ),
+		'input'          => $input,
+		'eligible'       => $results['eligible'],
+		'programs'       => $results['programs'],
+		'total'          => $results['total_candidates'],
+		'eligible_count' => $results['eligible_count'],
+		'top_score'      => $results['top_score'],
+		'alternatives'   => $results['alternatives'],
+		'is_shared'      => true,
+	];
+}
+
 // ----------------------------------------------------
 // 9. Lead Capture Integration
 // ----------------------------------------------------
@@ -1281,6 +1368,18 @@ function ltdh_elig_ajax_advanced_verify() {
 		];
 		if ( function_exists( 'ltdh_trigger_telegram_notification' ) ) {
 			ltdh_trigger_telegram_notification( $telegram_data );
+		}
+
+		if ( function_exists( 'ltdh_trigger_admin_supplement_email' ) ) {
+			try {
+				ltdh_trigger_admin_supplement_email( (array) $lead, [
+					'previous_school' => $previous_school,
+					'graduation'      => $graduation,
+					'degree_link'     => $degree_link,
+				] );
+			} catch ( \Throwable $e ) {
+				error_log( '[LTDH Email Error] ' . $e->getMessage() );
+			}
 		}
 
 		wp_send_json_success( [ 'message' => 'Hồ sơ đã được bổ sung thành công.' ] );

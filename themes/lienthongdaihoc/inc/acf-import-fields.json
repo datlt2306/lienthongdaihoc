@@ -1242,6 +1242,263 @@
             }
           ]
         ]
+      },
+      {
+        "key": "field_tab_email",
+        "label": "Tích hợp Gửi Email",
+        "type": "tab",
+        "placement": "top",
+        "endpoint": 0
+      },
+      {
+        "key": "field_email_notifications_enabled",
+        "label": "Kích hoạt Dịch vụ Gửi Email",
+        "name": "email_notifications_enabled",
+        "type": "true_false",
+        "instructions": "Bật/tắt toàn bộ tính năng gửi email thông báo tự động (cho cả sinh viên và admin) khi có lead mới.",
+        "default_value": 1,
+        "ui": 1
+      },
+      {
+        "key": "field_email_student_enabled",
+        "label": "Gửi Email Xác nhận cho Học viên",
+        "name": "email_student_enabled",
+        "type": "true_false",
+        "instructions": "Tự động gửi email xác nhận và lộ trình tư vấn về địa chỉ email của học viên khi họ điền form đăng ký.",
+        "default_value": 1,
+        "ui": 1,
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_admin_enabled",
+        "label": "Gửi Email Thông báo cho Ban Tuyển Sinh / Admin",
+        "name": "email_admin_enabled",
+        "type": "true_false",
+        "instructions": "Tự động gửi email thông báo có lead mới đến danh sách email của quản trị viên và ban tuyển sinh.",
+        "default_value": 1,
+        "ui": 1,
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_admin_recipients",
+        "label": "Danh sách Email Nhận Thông báo Admin",
+        "name": "email_admin_recipients",
+        "type": "text",
+        "instructions": "Nhập danh sách email nhận thông báo khi có lead mới (phân cách bằng dấu phẩy hoặc chấm phẩy). Nếu để trống, hệ thống sẽ gửi về email quản trị WordPress mặc định.",
+        "placeholder": "tuyensinh@lienthongdaihoc.edu.vn, admin@lienthongdaihoc.edu.vn",
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            },
+            {
+              "field": "field_email_admin_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_from_name",
+        "label": "Tên Người Gửi (From Name)",
+        "name": "email_from_name",
+        "type": "text",
+        "instructions": "Tên hiển thị người gửi email. Mặc định: Cổng Tuyển Sinh Liên Thông Đại Học.",
+        "placeholder": "Cổng Tuyển Sinh Liên Thông Đại Học",
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_from_address",
+        "label": "Địa chỉ Email Gửi (From Address)",
+        "name": "email_from_address",
+        "type": "email",
+        "instructions": "Địa chỉ email gửi đi. Nên dùng email cùng domain website để tối ưu tỷ lệ vào Inbox (tránh Spam).",
+        "placeholder": "tuyensinh@lienthongdaihoc.edu.vn",
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_reply_to",
+        "label": "Địa chỉ Phản Hồi (Reply-To)",
+        "name": "email_reply_to",
+        "type": "email",
+        "instructions": "Địa chỉ email nhận thư trả lời khi học viên nhấn Reply trên ứng dụng email.",
+        "placeholder": "hotro@lienthongdaihoc.edu.vn",
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_smtp_custom_enabled",
+        "label": "Kích hoạt Cấu hình Máy chủ SMTP Trực tiếp",
+        "name": "email_smtp_custom_enabled",
+        "type": "true_false",
+        "instructions": "Bật nếu muốn nhập trực tiếp thông số máy chủ SMTP (Gmail, Zoho, SendGrid, Amazon SES...). Nếu bạn đang dùng plugin WP Mail SMTP, bạn có thể để tắt mục này.",
+        "default_value": 0,
+        "ui": 1,
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_smtp_host",
+        "label": "SMTP Host",
+        "name": "email_smtp_host",
+        "type": "text",
+        "instructions": "Địa chỉ máy chủ SMTP (Ví dụ: smtp.gmail.com hoặc smtp.sendgrid.net).",
+        "placeholder": "smtp.gmail.com",
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            },
+            {
+              "field": "field_email_smtp_custom_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_smtp_port",
+        "label": "SMTP Port",
+        "name": "email_smtp_port",
+        "type": "number",
+        "instructions": "Cổng kết nối máy chủ SMTP. Thường là 465 (SSL) hoặc 587 (TLS).",
+        "default_value": 465,
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            },
+            {
+              "field": "field_email_smtp_custom_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_smtp_encryption",
+        "label": "Giao thức Mã hóa (Encryption)",
+        "name": "email_smtp_encryption",
+        "type": "select",
+        "choices": {
+          "ssl": "SSL (Khuyến nghị cho cổng 465)",
+          "tls": "TLS (Khuyến nghị cho cổng 587)",
+          "none": "Không mã hóa (Cổng 25)"
+        },
+        "default_value": "ssl",
+        "allow_null": 0,
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            },
+            {
+              "field": "field_email_smtp_custom_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_smtp_username",
+        "label": "SMTP Username / Tài khoản",
+        "name": "email_smtp_username",
+        "type": "text",
+        "instructions": "Tên đăng nhập SMTP hoặc địa chỉ Gmail / Email của bạn.",
+        "placeholder": "tuyensinh@gmail.com",
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            },
+            {
+              "field": "field_email_smtp_custom_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
+      },
+      {
+        "key": "field_email_smtp_password",
+        "label": "SMTP Password / Mật khẩu ứng dụng",
+        "name": "email_smtp_password",
+        "type": "password",
+        "instructions": "Mật khẩu SMTP hoặc Mật khẩu ứng dụng (App Password) cấp từ Google / máy chủ mail.",
+        "conditional_logic": [
+          [
+            {
+              "field": "field_email_notifications_enabled",
+              "operator": "==",
+              "value": 1
+            },
+            {
+              "field": "field_email_smtp_custom_enabled",
+              "operator": "==",
+              "value": 1
+            }
+          ]
+        ]
       }
     ],
     "location": [

@@ -22,6 +22,8 @@
 		initNavigation();
 		initResultsActions();
 		initFileUpload();
+		initShareAndCopy();
+		initUrlAndInitialResults();
 	}
 
 	if (document.readyState === 'loading') {
@@ -531,6 +533,10 @@
 		.then(function (json) {
 			if (json.success) {
 				results = json.data;
+				if (results && results.check_id && window.history && window.history.pushState) {
+					var newUrl = window.location.pathname + '?kq=' + encodeURIComponent(results.check_id);
+					window.history.pushState({ check_id: results.check_id }, '', newUrl);
+				}
 				renderResults(results);
 				showResults();
 			} else {
@@ -570,19 +576,34 @@
 	// Render Results
 	// ----------------------------------------------------
 	function renderResults(data) {
-		// Header
+		if (!data) return;
+
+		// Synchronize browser address bar with check_id permalink
+		if (data.check_id && window.history && window.history.pushState) {
+			var currentParams = new URLSearchParams(window.location.search);
+			if (currentParams.get('kq') !== String(data.check_id)) {
+				var newUrl = window.location.pathname + '?kq=' + encodeURIComponent(data.check_id);
+				window.history.pushState({ check_id: data.check_id }, '', newUrl);
+			}
+		}
+
+		// Header Banner
 		var header = document.getElementById('elig-results-header');
-		var icon = document.getElementById('elig-results-icon');
 		var title = document.getElementById('elig-results-title');
 		var subtitle = document.getElementById('elig-results-subtitle');
 
-		if (data.eligible_count > 0) {
-			if (header) header.classList.remove('hidden');
-			if (icon) icon.textContent = '✅';
-			if (title) title.textContent = 'Tìm thấy ' + data.eligible_count + ' chương trình phù hợp!';
-			if (subtitle) subtitle.textContent = 'Dưới đây là các chương trình được xếp hạng phù hợp nhất với nhu cầu của bạn.';
-		} else {
-			if (header) header.classList.add('hidden');
+		if (header) {
+			header.classList.remove('hidden');
+			if (data.eligible_count > 0) {
+				if (title) title.textContent = 'Tìm thấy ' + data.eligible_count + ' chương trình phù hợp với hồ sơ của bạn!';
+				if (subtitle) subtitle.textContent = 'Dưới đây là các chương trình được xếp hạng tương thích cao nhất với trình độ văn bằng và nguyện vọng của bạn.';
+			} else if (data.alternatives && data.alternatives.length > 0) {
+				if (title) title.textContent = 'Đề xuất ' + data.alternatives.length + ' phương án đào tạo tối ưu cho bạn';
+				if (subtitle) subtitle.textContent = 'Chưa có chương trình mở lớp đúng 100% tiêu chí lọc ban đầu, dưới đây là phương án Đào tạo từ xa / ngành tương đương linh hoạt bạn có thể nộp hồ sơ ngay.';
+			} else {
+				if (title) title.textContent = 'Kết quả đối chiếu điều kiện nhập học';
+				if (subtitle) subtitle.textContent = 'Hệ thống đã ghi nhận hồ sơ của bạn. Hãy gửi thông tin bên dưới để chuyên viên đối chiếu điều kiện đặc cách của từng trường.';
+			}
 		}
 
 		// Input Summary
@@ -590,17 +611,23 @@
 
 		// Programs
 		var programList = document.getElementById('elig-program-list');
+		var noRes = document.getElementById('elig-no-results');
 		if (programList) {
 			programList.innerHTML = '';
 			if (data.programs && data.programs.length > 0) {
 				data.programs.forEach(function (prog, idx) {
 					programList.appendChild(renderProgramCard(prog, idx));
 				});
-				var noRes = document.getElementById('elig-no-results');
 				if (noRes) noRes.classList.add('hidden');
 			} else {
-				var noRes2 = document.getElementById('elig-no-results');
-				if (noRes2) noRes2.classList.remove('hidden');
+				if (noRes) {
+					// If alternatives exist, hide scary error so the alternatives section takes center stage cleanly
+					if (data.alternatives && data.alternatives.length > 0) {
+						noRes.classList.add('hidden');
+					} else {
+						noRes.classList.remove('hidden');
+					}
+				}
 			}
 		}
 
@@ -621,14 +648,15 @@
 
 		// Pre-fill fields in Consultation lead capture form at the bottom
 		var checkIdField = document.getElementById('elig-check-id');
-		if (checkIdField) checkIdField.value = data.check_id;
+		if (checkIdField) checkIdField.value = data.check_id || '';
 
-		if (data.programs && data.programs.length > 0) {
+		var topProg = (data.programs && data.programs[0]) || (data.alternatives && data.alternatives[0]);
+		if (topProg) {
 			var progIdField = document.getElementById('elig-program-id');
-			if (progIdField && data.programs[0]) progIdField.value = data.programs[0].program_id;
+			if (progIdField) progIdField.value = topProg.program_id;
 		}
 
-		// Lead form submission
+		// Lead form submission & Card verification triggers
 		initLeadForm();
 		initFileUpload();
 		initCardVerifyListeners();
@@ -644,8 +672,8 @@
 
 		var labels = {
 			education: { 'trung-cap': 'Trung cấp', 'cao-dang': 'Cao đẳng' },
-			training_type: { 'chinh-quy': 'Hệ chính quy', 'vua-hoc-vua-lam': 'Hệ vừa học vừa làm', 'tu-xa': 'Hệ đào tạo từ xa', 'dao-tao-tu-xa': 'Hệ đào tạo từ xa' },
-			campus: { 'ha-noi': 'Hà Nội', 'ho-chi-minh': 'TP.HCM', 'da-nang': 'Đà Nẵng', 'thai-nguyen': 'Thái Nguyên', 'online': 'Online' }
+			training_type: { 'chinh-quy': 'Hệ chính quy', 'vua-hoc-vua-lam': 'Vừa học vừa làm', 'tu-xa': 'Đào tạo từ xa', 'dao-tao-tu-xa': 'Đào tạo từ xa' },
+			campus: { 'ha-noi': 'Hà Nội', 'ho-chi-minh': 'TP.HCM', 'da-nang': 'Đà Nẵng', 'thai-nguyen': 'Thái Nguyên', 'online': 'Online / Toàn quốc' }
 		};
 
 		var majorTitle = (input && input.desired_major_title) ? input.desired_major_title : '';
@@ -664,8 +692,8 @@
 
 		if (majorTitle) {
 			var majorTag = document.createElement('span');
-			majorTag.className = 'elig-tag elig-tag-major';
-			majorTag.textContent = 'Ngành: ' + majorTitle;
+			majorTag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-400/25 backdrop-blur-md text-white text-xs font-bold border border-sky-300/40 shadow-2xs';
+			majorTag.innerHTML = '<span>🎯 Ngành:</span> <span class="font-extrabold text-sky-100">' + escHtml(majorTitle) + '</span>';
 			tags.appendChild(majorTag);
 		}
 
@@ -673,101 +701,168 @@
 		keys.forEach(function (key) {
 			if (input && input[key]) {
 				var label = labels[key] && labels[key][input[key]] ? labels[key][input[key]] : input[key];
+				var icon = key === 'education' ? '🎓' : (key === 'training_type' ? '⏰' : '📍');
 				var tag = document.createElement('span');
-				tag.className = 'elig-tag';
-				tag.textContent = label;
+				tag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/15 backdrop-blur-md text-white text-xs font-semibold border border-white/20 shadow-2xs';
+				tag.innerHTML = '<span>' + icon + '</span> <span>' + escHtml(label) + '</span>';
 				tags.appendChild(tag);
 			}
 		});
 	}
 
 	function renderProgramCard(prog, idx) {
-		var isTopPick = (idx === 0);
-		var statusClass = prog.preliminary_status === 'compatible' ? 'elig-status-compatible' : (prog.preliminary_status === 'needs_verification' ? 'elig-status-verification' : 'elig-status-incompatible');
-		var statusLabel = prog.preliminary_status === 'compatible' ? 'Độ tương thích tốt' : (prog.preliminary_status === 'needs_verification' ? 'Cần xác minh hồ sơ' : 'Chưa tương thích');
-		var matchPriorityLabel = prog.score >= 80 ? 'Ưu tiên cao' : (prog.score >= 50 ? 'Phù hợp tốt' : 'Tham khảo');
-
+		var isTopPick = (idx === 0 && (prog.score >= 70 || !prog.score));
 		var schoolCode = (prog.school && prog.school.code) ? prog.school.code.toUpperCase() : '';
 		var schoolTitle = (prog.school && prog.school.title) ? prog.school.title : 'Trường Đại học';
 		var schoolLogo = (prog.school && prog.school.logo) ? prog.school.logo : '';
+		var permalink = prog.permalink || '#';
 
-		var topPickAccentHtml = isTopPick
-			? '<div class="h-1 bg-gradient-to-r from-[#00308b] via-blue-500 to-indigo-600"></div>'
+		var statusClass = prog.preliminary_status === 'compatible'
+			? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+			: (prog.preliminary_status === 'needs_verification'
+				? 'bg-amber-50 text-amber-800 border-amber-200'
+				: 'bg-rose-50 text-rose-800 border-rose-200');
+
+		var statusLabel = prog.preliminary_status === 'compatible'
+			? 'Tương thích tốt'
+			: (prog.preliminary_status === 'needs_verification' ? 'Cần đối chiếu môn' : 'Chưa tương thích');
+
+		var scoreHtml = (prog.score && prog.score > 0)
+			? '<span class="ml-1 text-[11px] font-black opacity-80">(' + prog.score + '%)</span>'
 			: '';
 
+		var topPickBadgeHtml = isTopPick
+			? '<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[11px] font-black shadow-xs shrink-0">' +
+				'<span class="w-1.5 h-1.5 rounded-full bg-sky-300 animate-ping"></span>' +
+				'<span>★ Lựa chọn #1 tối ưu</span>' +
+			  '</div>'
+			: '<div class="text-xs font-black text-slate-400 shrink-0">#' + (idx + 1) + '</div>';
+
+		var topPickAccentLine = isTopPick
+			? '<div class="h-1.5 bg-gradient-to-r from-[#00308b] via-blue-500 to-indigo-600"></div>'
+			: '<div class="h-1 bg-slate-100"></div>';
+
 		var schoolHeaderHtml =
-			'<div class="p-4 sm:p-5 pb-3 border-b border-slate-100 flex items-center justify-between gap-3">' +
+			'<div class="p-4 sm:p-5 pb-3 border-b border-slate-100 flex items-center justify-between gap-3 bg-slate-50/40">' +
 				'<div class="flex items-center gap-3 min-w-0">' +
 					(schoolLogo
-						? '<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white border border-slate-200/80 p-1 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">' +
+						? '<div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white border border-slate-200/80 p-1 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">' +
 								'<img src="' + escAttr(schoolLogo) + '" alt="' + escAttr(schoolTitle) + '" class="max-w-full max-h-full object-contain">' +
 						  '</div>'
-						: '<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#00308b] text-white font-black text-xs flex items-center justify-center shrink-0">' +
+						: '<div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#00308b] text-white font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-2xs">' +
 								escHtml(schoolCode || 'ĐH') +
 						  '</div>'
 					) +
 					'<div class="min-w-0">' +
-						'<div class="font-extrabold text-xs sm:text-sm text-slate-800 truncate">' + escHtml(schoolTitle) + '</div>' +
-						(schoolCode ? '<span class="inline-block text-[11px] font-bold text-slate-500">' + escHtml(schoolCode) + '</span>' : '') +
+						'<div class="font-extrabold text-xs sm:text-sm text-slate-800 truncate" title="' + escAttr(schoolTitle) + '">' + escHtml(schoolTitle) + '</div>' +
+						(schoolCode ? '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200/80 text-slate-600 mt-0.5">' + escHtml(schoolCode) + '</span>' : '') +
 					'</div>' +
 				'</div>' +
-				(isTopPick
-					? '<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-[#00308b] text-[11px] font-extrabold border border-blue-200/80 shrink-0">★ #1 Top Pick</div>'
-					: '<div class="text-xs font-bold text-slate-400 shrink-0">#' + (idx + 1) + '</div>'
-				) +
+				'<div class="flex items-center gap-2">' +
+					'<div class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-extrabold border ' + statusClass + '">' +
+						statusLabel + scoreHtml +
+					'</div>' +
+					topPickBadgeHtml +
+				'</div>' +
 			'</div>';
 
+		// 4-Metric Bento Chips
+		var bentoGridHtml =
+			'<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-3.5">' +
+				'<div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-100/90 flex flex-col justify-between transition-colors hover:bg-emerald-50">' +
+					'<div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-1">' +
+						'<svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>' +
+						'<span>Học phí</span>' +
+					'</div>' +
+					'<span class="font-black text-slate-900 text-xs sm:text-sm leading-tight">' + escHtml(prog.tuition_fee || 'Liên hệ') + '</span>' +
+				'</div>' +
+				'<div class="p-3 rounded-xl bg-blue-50/60 border border-blue-100/90 flex flex-col justify-between transition-colors hover:bg-blue-50">' +
+					'<div class="flex items-center gap-1.5 text-[11px] font-bold text-blue-800 uppercase tracking-wider mb-1">' +
+						'<svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
+						'<span>Thời gian</span>' +
+					'</div>' +
+					'<span class="font-black text-slate-900 text-xs sm:text-sm leading-tight">' + escHtml(prog.duration || '1.5 – 2 năm') + '</span>' +
+				'</div>' +
+				'<div class="p-3 rounded-xl bg-purple-50/60 border border-purple-100/90 flex flex-col justify-between transition-colors hover:bg-purple-50">' +
+					'<div class="flex items-center gap-1.5 text-[11px] font-bold text-purple-800 uppercase tracking-wider mb-1">' +
+						'<svg class="w-3.5 h-3.5 text-purple-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>' +
+						'<span>Lịch học</span>' +
+					'</div>' +
+					'<span class="font-black text-slate-900 text-xs sm:text-sm leading-tight">' + escHtml(prog.schedule || 'Linh hoạt') + '</span>' +
+				'</div>' +
+				'<div class="p-3 rounded-xl bg-amber-50/60 border border-amber-100/90 flex flex-col justify-between transition-colors hover:bg-amber-50">' +
+					'<div class="flex items-center gap-1.5 text-[11px] font-bold text-amber-800 uppercase tracking-wider mb-1">' +
+						'<svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>' +
+						'<span>Cơ sở</span>' +
+					'</div>' +
+					'<span class="font-black text-slate-900 text-xs sm:text-sm leading-tight truncate" title="' + escAttr(prog.campus_info || 'Toàn quốc') + '">' + escHtml(prog.campus_info || 'Toàn quốc') + '</span>' +
+				'</div>' +
+			'</div>';
+
+		// Match reasons & Verification badges
 		var reasonsHtml = '';
 		if ((prog.match_reasons && prog.match_reasons.length > 0) || (prog.verification_items && prog.verification_items.length > 0) || (prog.mismatch_reasons && prog.mismatch_reasons.length > 0)) {
-			reasonsHtml = '<div class="space-y-1.5 mt-3 pt-3 border-t border-slate-100 text-xs">';
+			reasonsHtml = '<div class="space-y-2 my-3 pt-1 text-xs">';
 			if (prog.match_reasons && prog.match_reasons.length > 0) {
+				reasonsHtml += '<div class="flex flex-wrap items-center gap-1.5">';
 				prog.match_reasons.forEach(function (reason) {
-					reasonsHtml += '<div class="flex items-start gap-1.5 text-emerald-700 font-medium"><svg class="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><span>' + escHtml(reason) + '</span></div>';
+					reasonsHtml += '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-100">' +
+						'<svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>' +
+						'<span>' + escHtml(reason) + '</span>' +
+					'</span>';
 				});
+				reasonsHtml += '</div>';
 			}
 			if (prog.verification_items && prog.verification_items.length > 0) {
+				reasonsHtml += '<div class="p-3 rounded-xl bg-amber-50/90 border border-amber-200/90 text-amber-900 leading-relaxed space-y-1">' +
+					'<div class="flex items-center gap-1.5 font-black text-amber-950">' +
+						'<svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>' +
+						'<span>Lưu ý thẩm định hồ sơ:</span>' +
+					'</div>';
 				prog.verification_items.forEach(function (item) {
-					reasonsHtml += '<div class="flex items-start gap-1.5 text-amber-700 font-medium"><svg class="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg><span>' + escHtml(item) + '</span></div>';
+					reasonsHtml += '<div class="pl-5 text-[11px] sm:text-xs text-amber-800 font-medium">• ' + escHtml(item) + '</div>';
 				});
+				reasonsHtml += '</div>';
 			}
 			if (prog.mismatch_reasons && prog.mismatch_reasons.length > 0) {
+				reasonsHtml += '<div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 leading-relaxed space-y-1">' +
+					'<div class="flex items-center gap-1.5 font-black text-rose-950">' +
+						'<svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>' +
+						'<span>Điểm chưa phù hợp:</span>' +
+					'</div>';
 				prog.mismatch_reasons.forEach(function (reason) {
-					reasonsHtml += '<div class="flex items-start gap-1.5 text-rose-700 font-medium"><svg class="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg><span>' + escHtml(reason) + '</span></div>';
+					reasonsHtml += '<div class="pl-5 text-[11px] sm:text-xs text-rose-800 font-medium">• ' + escHtml(reason) + '</div>';
 				});
+				reasonsHtml += '</div>';
 			}
 			reasonsHtml += '</div>';
 		}
 
 		var card = document.createElement('div');
-		card.className = 'elig-card bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md transition-all overflow-hidden' + (isTopPick ? ' ring-1 ring-blue-500/20' : '');
+		card.className = 'elig-card bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-lg transition-all duration-200 overflow-hidden' + (isTopPick ? ' ring-2 ring-blue-500/30' : '');
 
 		card.innerHTML =
-			topPickAccentHtml +
+			topPickAccentLine +
 			schoolHeaderHtml +
 			'<div class="p-4 sm:p-5 pt-3">' +
-				'<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-3">' +
-					'<h3 class="font-extrabold text-base sm:text-lg text-slate-900 leading-snug min-w-0 flex-1">' +
-						'<a href="' + escAttr(prog.permalink) + '" target="_blank" rel="noopener" class="elig-card-title hover:text-[#00308b] transition-colors no-underline text-slate-900">' + escHtml(prog.title) + '</a>' +
+				'<div class="mb-2">' +
+					'<h3 class="font-black text-base sm:text-lg text-slate-900 leading-snug">' +
+						'<a href="' + escAttr(permalink) + '" target="_blank" rel="noopener" class="elig-card-title hover:text-[#00308b] transition-colors no-underline text-slate-900 inline-flex items-center gap-1.5 group">' +
+							'<span>' + escHtml(prog.title) + '</span>' +
+							'<svg class="w-4 h-4 text-slate-400 group-hover:text-[#00308b] transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>' +
+						'</a>' +
 					'</h3>' +
-					'<div class="' + statusClass + ' shrink-0">' +
-						'<span class="elig-score-label text-xs font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1">' + statusLabel + ' (' + matchPriorityLabel + ')</span>' +
-					'</div>' +
 				'</div>' +
-				'<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 py-3 border-y border-slate-100 text-xs text-slate-600">' +
-					'<div><span class="text-slate-400 block mb-0.5">Học phí:</span><span class="font-bold text-slate-900">' + escHtml(prog.tuition_fee || 'Liên hệ') + '</span></div>' +
-					'<div><span class="text-slate-400 block mb-0.5">Thời gian:</span><span class="font-bold text-slate-900">' + escHtml(prog.duration || '—') + '</span></div>' +
-					'<div><span class="text-slate-400 block mb-0.5">Lịch học:</span><span class="font-bold text-slate-900">' + escHtml(prog.schedule || 'Linh hoạt') + '</span></div>' +
-					'<div><span class="text-slate-400 block mb-0.5">Cơ sở:</span><span class="font-bold text-slate-900">' + escHtml(prog.campus_info || '—') + '</span></div>' +
-				'</div>' +
+				bentoGridHtml +
 				reasonsHtml +
-				'<div class="mt-4 pt-1 flex flex-col sm:flex-row items-center gap-2.5">' +
-					'<a href="' + escAttr(prog.permalink) + '" target="_blank" rel="noopener" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-bold transition-all no-underline shadow-2xs inline-flex items-center justify-center gap-1.5 cursor-pointer">' +
-						'<span>Xem chi tiết</span>' +
+				'<div class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-2.5">' +
+					'<a href="' + escAttr(permalink) + '" target="_blank" rel="noopener" class="w-full sm:w-auto px-4 py-2.5 text-center rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-bold transition-all no-underline shadow-2xs inline-flex items-center justify-center gap-1.5 cursor-pointer">' +
+						'<span>Xem chi tiết trường</span>' +
 						'<svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>' +
 					'</a>' +
 					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-blue-900 text-white text-xs font-extrabold transition-all no-underline shadow-2xs elig-verify-card-btn inline-flex items-center justify-center gap-1.5 cursor-pointer" data-program-id="' + prog.program_id + '">' +
-						'<span>Xác minh hồ sơ 1:1</span>' +
-						'<svg class="w-3.5 h-3.5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>' +
+						'<span>Thẩm định hồ sơ miễn giảm tín chỉ</span>' +
+						'<svg class="w-3.5 h-3.5 text-sky-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>' +
 					'</a>' +
 				'</div>' +
 			'</div>';
@@ -784,75 +879,96 @@
 		var suggestionReason = prog.suggestion_reason || prog.reason || 'Chương trình đào tạo tương thích với hồ sơ văn bằng của bạn.';
 
 		var schoolHeaderHtml =
-			'<div class="p-4 sm:p-5 pb-3 border-b border-slate-100 flex items-center justify-between gap-3">' +
+			'<div class="p-4 sm:p-5 pb-3 border-b border-slate-100 flex items-center justify-between gap-3 bg-amber-50/30">' +
 				'<div class="flex items-center gap-3 min-w-0">' +
 					(schoolLogo
-						? '<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white border border-slate-200/90 p-1 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">' +
+						? '<div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white border border-slate-200/90 p-1 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">' +
 								'<img src="' + escAttr(schoolLogo) + '" alt="' + escAttr(schoolTitle) + '" class="max-w-full max-h-full object-contain">' +
 						  '</div>'
-						: '<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-800 text-white font-black text-xs flex items-center justify-center shrink-0">' +
+						: '<div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-800 text-white font-black text-xs sm:text-sm flex items-center justify-center shrink-0">' +
 								escHtml(schoolCode || 'ĐH') +
 						  '</div>'
 					) +
 					'<div class="min-w-0">' +
-						'<div class="font-extrabold text-xs sm:text-sm text-slate-800 truncate">' + escHtml(schoolTitle) + '</div>' +
-						(schoolCode ? '<span class="inline-block text-[11px] font-bold text-slate-500">' + escHtml(schoolCode) + '</span>' : '') +
+						'<div class="font-extrabold text-xs sm:text-sm text-slate-800 truncate" title="' + escAttr(schoolTitle) + '">' + escHtml(schoolTitle) + '</div>' +
+						(schoolCode ? '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200/80 text-slate-600 mt-0.5">' + escHtml(schoolCode) + '</span>' : '') +
 					'</div>' +
 				'</div>' +
-				'<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#00308b] text-[11px] font-extrabold border border-blue-200/80 shrink-0 shadow-2xs">' +
-					'<svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>' +
-					'<span>' + escHtml(altBadge) + '</span>' +
+				'<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/80 text-amber-900 text-xs font-black border border-amber-200 shrink-0 shadow-2xs">' +
+					'<svg class="w-3.5 h-3.5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>' +
+					'<span>Phương án dự phòng</span>' +
 				'</div>' +
 			'</div>';
 
-		var tagsHtml = '<div class="flex flex-wrap items-center gap-2 mt-2">';
-		if (prog.training_type) {
-			tagsHtml += '<span class="px-2.5 py-0.5 rounded-md bg-blue-50 text-[#00308b] text-xs font-bold border border-blue-100">' + escHtml(prog.training_type) + '</span>';
-		}
-		if (prog.major) {
-			tagsHtml += '<span class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-xs font-medium">Ngành: ' + escHtml(prog.major) + '</span>';
-		}
-		tagsHtml += '</div>';
-
 		var reasonCalloutHtml =
-			'<div class="my-3.5 p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-blue-50/80 via-indigo-50/40 to-slate-50 border border-blue-100/90 text-xs text-slate-700 flex items-start gap-2.5">' +
-				'<div class="w-6 h-6 rounded-lg bg-blue-100/80 text-[#00308b] flex items-center justify-center shrink-0 mt-0.5">' +
+			'<div class="my-3 p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 flex items-start gap-2.5 leading-relaxed">' +
+				'<div class="w-6 h-6 rounded-lg bg-amber-200/90 text-amber-900 flex items-center justify-center shrink-0 mt-0.5">' +
 					'<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.516 0c.85.493 1.508 1.333 1.508 2.316V18"/></svg>' +
 				'</div>' +
-				'<div class="leading-relaxed">' +
-					'<strong class="text-slate-900 font-extrabold mr-1">Lý do gợi ý:</strong>' +
+				'<div>' +
+					'<strong class="font-black text-amber-950 block mb-0.5">' + escHtml(altBadge) + ':</strong>' +
 					'<span>' + escHtml(suggestionReason) + '</span>' +
 				'</div>' +
 			'</div>';
 
+		// 4-Metric Bento Chips
+		var bentoGridHtml =
+			'<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-3.5">' +
+				'<div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-100/90 flex flex-col justify-between">' +
+					'<div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-1">' +
+						'<svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>' +
+						'<span>Học phí</span>' +
+					'</div>' +
+					'<span class="font-black text-slate-900 text-xs sm:text-sm leading-tight">' + escHtml(prog.tuition_fee || 'Theo quy định') + '</span>' +
+				'</div>' +
+				'<div class="p-3 rounded-xl bg-blue-50/60 border border-blue-100/90 flex flex-col justify-between">' +
+					'<div class="flex items-center gap-1.5 text-[11px] font-bold text-blue-800 uppercase tracking-wider mb-1">' +
+						'<svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
+						'<span>Thời gian</span>' +
+					'</div>' +
+					'<span class="font-black text-slate-900 text-xs sm:text-sm leading-tight">' + escHtml(prog.duration || '1.5 – 2 năm') + '</span>' +
+				'</div>' +
+				'<div class="p-3 rounded-xl bg-purple-50/60 border border-purple-100/90 flex flex-col justify-between">' +
+					'<div class="flex items-center gap-1.5 text-[11px] font-bold text-purple-800 uppercase tracking-wider mb-1">' +
+						'<svg class="w-3.5 h-3.5 text-purple-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>' +
+						'<span>Lịch học</span>' +
+					'</div>' +
+					'<span class="font-black text-slate-900 text-xs sm:text-sm leading-tight">' + escHtml(prog.schedule || 'Linh hoạt') + '</span>' +
+				'</div>' +
+				'<div class="p-3 rounded-xl bg-amber-50/60 border border-amber-100/90 flex flex-col justify-between">' +
+					'<div class="flex items-center gap-1.5 text-[11px] font-bold text-amber-800 uppercase tracking-wider mb-1">' +
+						'<svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>' +
+						'<span>Cơ sở</span>' +
+					'</div>' +
+					'<span class="font-black text-slate-900 text-xs sm:text-sm leading-tight truncate" title="' + escAttr(prog.campus_info || 'Toàn quốc') + '">' + escHtml(prog.campus_info || 'Toàn quốc') + '</span>' +
+				'</div>' +
+			'</div>';
+
 		var card = document.createElement('div');
-		card.className = 'elig-card elig-alternative-card bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md transition-all overflow-hidden';
+		card.className = 'elig-card elig-alternative-card bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-lg transition-all duration-200 overflow-hidden';
 
 		card.innerHTML =
-			'<div class="h-1 bg-gradient-to-r from-sky-400 via-indigo-500 to-blue-600"></div>' +
+			'<div class="h-1.5 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500"></div>' +
 			schoolHeaderHtml +
 			'<div class="p-4 sm:p-5 pt-3">' +
-				'<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">' +
-					'<h3 class="font-extrabold text-base sm:text-lg text-slate-900 leading-snug min-w-0 flex-1">' +
-						'<a href="' + escAttr(permalink) + '" target="_blank" rel="noopener" class="elig-card-title hover:text-[#00308b] transition-colors no-underline text-slate-900">' + escHtml(prog.title) + '</a>' +
+				'<div class="mb-2">' +
+					'<h3 class="font-black text-base sm:text-lg text-slate-900 leading-snug">' +
+						'<a href="' + escAttr(permalink) + '" target="_blank" rel="noopener" class="elig-card-title hover:text-[#00308b] transition-colors no-underline text-slate-900 inline-flex items-center gap-1.5 group">' +
+							'<span>' + escHtml(prog.title) + '</span>' +
+							'<svg class="w-4 h-4 text-slate-400 group-hover:text-[#00308b] transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>' +
+						'</a>' +
 					'</h3>' +
 				'</div>' +
-				tagsHtml +
 				reasonCalloutHtml +
-				'<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 py-3 border-y border-slate-100 text-xs text-slate-600">' +
-					'<div><span class="text-slate-400 block mb-0.5">Học phí:</span><span class="font-bold text-slate-900">' + escHtml(prog.tuition_fee || 'Theo quy định') + '</span></div>' +
-					'<div><span class="text-slate-400 block mb-0.5">Thời gian:</span><span class="font-bold text-slate-900">' + escHtml(prog.duration || '1.5 – 2 năm') + '</span></div>' +
-					'<div><span class="text-slate-400 block mb-0.5">Lịch học:</span><span class="font-bold text-slate-900">' + escHtml(prog.schedule || 'Linh hoạt') + '</span></div>' +
-					'<div><span class="text-slate-400 block mb-0.5">Cơ sở:</span><span class="font-bold text-slate-900">' + escHtml(prog.campus_info || 'Toàn quốc') + '</span></div>' +
-				'</div>' +
-				'<div class="mt-4 pt-1 flex flex-col sm:flex-row items-center gap-2.5">' +
-					'<a href="' + escAttr(permalink) + '" target="_blank" rel="noopener" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-bold transition-all no-underline shadow-2xs inline-flex items-center justify-center gap-1.5 cursor-pointer">' +
-						'<span>Xem chi tiết</span>' +
+				bentoGridHtml +
+				'<div class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-2.5">' +
+					'<a href="' + escAttr(permalink) + '" target="_blank" rel="noopener" class="w-full sm:w-auto px-4 py-2.5 text-center rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-bold transition-all no-underline shadow-2xs inline-flex items-center justify-center gap-1.5 cursor-pointer">' +
+						'<span>Xem chi tiết trường</span>' +
 						'<svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>' +
 					'</a>' +
 					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-blue-900 text-white text-xs font-extrabold transition-all no-underline shadow-2xs elig-verify-card-btn inline-flex items-center justify-center gap-1.5 cursor-pointer" data-program-id="' + prog.program_id + '">' +
-						'<span>Nhận tư vấn phương án này</span>' +
-						'<svg class="w-3.5 h-3.5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>' +
+						'<span>Tư vấn phương án dự phòng này</span>' +
+						'<svg class="w-3.5 h-3.5 text-sky-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>' +
 					'</a>' +
 				'</div>' +
 			'</div>';
@@ -1006,31 +1122,35 @@
 	function initCardVerifyListeners() {
 		// Event delegation to capture card clicks
 		var container = document.getElementById('elig-results');
-		if (container) {
-			container.addEventListener('click', function(e) {
-				var verifyBtn = e.target.closest('.elig-verify-card-btn');
-				if (verifyBtn) {
-					var programId = verifyBtn.getAttribute('data-program-id');
-					var progIdField = document.getElementById('elig-program-id');
-					if (progIdField) {
-						progIdField.value = programId;
-					}
-					
-					var cardTitleEl = verifyBtn.closest('.elig-card').querySelector('.elig-card-title');
+		if (!container || container.dataset.verifyBound === 'true') return;
+		container.dataset.verifyBound = 'true';
+
+		container.addEventListener('click', function(e) {
+			var verifyBtn = e.target.closest('.elig-verify-card-btn');
+			if (verifyBtn) {
+				var programId = verifyBtn.getAttribute('data-program-id');
+				var progIdField = document.getElementById('elig-program-id');
+				if (progIdField) {
+					progIdField.value = programId;
+				}
+				
+				var card = verifyBtn.closest('.elig-card');
+				if (card) {
+					var cardTitleEl = card.querySelector('.elig-card-title');
 					if (cardTitleEl) {
-						var titleText = cardTitleEl.textContent;
+						var titleText = cardTitleEl.textContent.trim();
 						var contextH3 = document.querySelector('#elig-lead-section h3');
 						if (contextH3) {
 							contextH3.textContent = "Yêu cầu đối chiếu điều kiện nhập học cho: " + titleText;
 						}
 					}
 				}
-			});
-		}
+			}
+		});
 	}
 
 	// ----------------------------------------------------
-	// Results Actions
+	// Results Actions & Retry
 	// ----------------------------------------------------
 	function initResultsActions() {
 		var retry = document.getElementById('elig-retry');
@@ -1042,10 +1162,174 @@
 
 			if (wizard) wizard.classList.remove('hidden');
 			if (resultsEl) resultsEl.classList.add('hidden');
+
+			// Clean up URL ?kq=
+			if (window.history && window.history.pushState) {
+				window.history.pushState({}, '', window.location.pathname);
+			}
+
+			var container = document.getElementById('eligibility-app');
+			if (container) {
+				container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}
 		}
 
-		if (retry) retry.addEventListener('click', backToForm);
-		if (retry2) retry2.addEventListener('click', backToForm);
+		if (retry && retry.dataset.bound !== 'true') {
+			retry.dataset.bound = 'true';
+			retry.addEventListener('click', backToForm);
+		}
+		if (retry2 && retry2.dataset.bound !== 'true') {
+			retry2.dataset.bound = 'true';
+			retry2.addEventListener('click', backToForm);
+		}
+	}
+
+	// ----------------------------------------------------
+	// Share & Copy URL Permalink
+	// ----------------------------------------------------
+	function initShareAndCopy() {
+		var copyBtn = document.getElementById('elig-copy-share-btn');
+		if (!copyBtn || copyBtn.dataset.bound === 'true') return;
+		copyBtn.dataset.bound = 'true';
+
+		copyBtn.addEventListener('click', function () {
+			var shareUrl = window.location.href;
+			if (results && results.check_id && !shareUrl.includes('kq=')) {
+				var urlObj = new URL(shareUrl);
+				urlObj.searchParams.set('kq', results.check_id);
+				shareUrl = urlObj.toString();
+			}
+
+			copyToClipboard(shareUrl, function () {
+				showCopyFeedback();
+			});
+		});
+	}
+
+	function copyToClipboard(text, onSuccess) {
+		if (navigator.clipboard && window.isSecureContext) {
+			navigator.clipboard.writeText(text).then(function () {
+				if (onSuccess) onSuccess();
+			}).catch(function () {
+				fallbackCopyText(text, onSuccess);
+			});
+		} else {
+			fallbackCopyText(text, onSuccess);
+		}
+	}
+
+	function fallbackCopyText(text, onSuccess) {
+		var textArea = document.createElement('textarea');
+		textArea.value = text;
+		textArea.style.position = 'fixed';
+		textArea.style.top = '-9999px';
+		textArea.style.left = '-9999px';
+		textArea.setAttribute('readonly', '');
+		document.body.appendChild(textArea);
+		textArea.focus();
+		textArea.select();
+		try {
+			var successful = document.execCommand('copy');
+			if (successful && onSuccess) {
+				onSuccess();
+			}
+		} catch (err) {
+			console.error('Fallback copy failed', err);
+			prompt('Sao chép link kết quả tại đây:', text);
+		}
+		document.body.removeChild(textArea);
+	}
+
+	function showCopyFeedback() {
+		var toast = document.getElementById('elig-share-toast');
+		var btnText = document.getElementById('elig-copy-btn-text');
+
+		if (btnText) {
+			var originalText = btnText.textContent;
+			btnText.textContent = '✓ Đã sao chép!';
+			setTimeout(function () {
+				btnText.textContent = originalText;
+			}, 2500);
+		}
+
+		if (toast) {
+			toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+			toast.classList.add('opacity-100', 'translate-y-0');
+			setTimeout(function () {
+				toast.classList.remove('opacity-100', 'translate-y-0');
+				toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+			}, 3000);
+		}
+	}
+
+	// ----------------------------------------------------
+	// URL Permalinks & Direct Load
+	// ----------------------------------------------------
+	function initUrlAndInitialResults() {
+		// 1. If SSR injected initial results (via window or localized script)
+		var initial = window.ltdh_initial_results || (window.ltdh_elig && window.ltdh_elig.initial_results);
+		if (initial) {
+			results = initial;
+			renderResults(results);
+			showResults();
+			return;
+		}
+
+		// 2. If client visited with query param ?kq= or ?check_id=
+		var urlParams = new URLSearchParams(window.location.search);
+		var checkParam = urlParams.get('kq') || urlParams.get('check_id') || urlParams.get('res') || urlParams.get('token');
+		if (checkParam) {
+			loadCheckById(checkParam);
+		}
+
+		// 3. Browser Back/Forward navigation
+		window.addEventListener('popstate', function (e) {
+			if (e.state && e.state.check_id) {
+				loadCheckById(e.state.check_id);
+			} else {
+				var params = new URLSearchParams(window.location.search);
+				var id = params.get('kq') || params.get('check_id');
+				if (id) {
+					loadCheckById(id);
+				} else {
+					var wizard = document.getElementById('elig-wizard');
+					var resultsEl = document.getElementById('elig-results');
+					if (wizard) wizard.classList.remove('hidden');
+					if (resultsEl) resultsEl.classList.add('hidden');
+				}
+			}
+		});
+	}
+
+	function loadCheckById(checkId) {
+		if (!checkId) return;
+
+		var wizard = document.getElementById('elig-wizard');
+		var resultsEl = document.getElementById('elig-results');
+		if (wizard) wizard.classList.add('hidden');
+		if (resultsEl) resultsEl.classList.remove('hidden');
+
+		var ajaxUrl = (window.ltdh_elig && window.ltdh_elig.ajax_url) ? window.ltdh_elig.ajax_url : '/wp-admin/admin-ajax.php';
+
+		fetch(ajaxUrl + '?action=ltdh_elig_get_check&check_id=' + encodeURIComponent(checkId), {
+			credentials: 'same-origin'
+		})
+		.then(function (r) { return r.json(); })
+		.then(function (json) {
+			if (json.success && json.data) {
+				results = json.data;
+				renderResults(results);
+				showResults();
+			} else {
+				if (wizard) wizard.classList.remove('hidden');
+				if (resultsEl) resultsEl.classList.add('hidden');
+			}
+		})
+		.catch(function (err) {
+			console.error('Failed to load check by id:', err);
+			if (wizard) wizard.classList.remove('hidden');
+			if (resultsEl) resultsEl.classList.add('hidden');
+		});
 	}
 
 	// ----------------------------------------------------

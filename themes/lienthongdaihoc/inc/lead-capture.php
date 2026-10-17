@@ -264,6 +264,15 @@ function ltdh_insert_lead( array $data ): int {
 			}
 		}
 
+		// Automated Email Dispatch: Confirmation to Student and Alert to Admin
+		if ( function_exists( 'ltdh_trigger_email_notifications' ) ) {
+			try {
+				ltdh_trigger_email_notifications( $notification_data, $lead_id );
+			} catch ( \Throwable $e ) {
+				error_log( '[LTDH Email Error] ' . $e->getMessage() );
+			}
+		}
+
 		return $lead_id;
 	}
 

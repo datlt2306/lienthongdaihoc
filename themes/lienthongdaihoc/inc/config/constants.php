@@ -131,3 +131,26 @@ if ( ! defined( 'LTDH_RECAPTCHA_SECRET_KEY' ) ) {
 if ( ! defined( 'LTDH_RECAPTCHA_MIN_SCORE' ) ) {
 	define( 'LTDH_RECAPTCHA_MIN_SCORE', 0.5 );
 }
+
+// ====================================================
+// Email Notification Settings
+// Can be overridden in wp-config.php for production security
+// ====================================================
+if ( ! defined( 'LTDH_EMAIL_NOTIFICATIONS_ENABLED' ) ) {
+	define( 'LTDH_EMAIL_NOTIFICATIONS_ENABLED', true );
+}
+if ( ! defined( 'LTDH_EMAIL_STUDENT_CONFIRMATION' ) ) {
+	define( 'LTDH_EMAIL_STUDENT_CONFIRMATION', true );
+}
+if ( ! defined( 'LTDH_EMAIL_ADMIN_NOTIFICATION' ) ) {
+	define( 'LTDH_EMAIL_ADMIN_NOTIFICATION', true );
+}
+if ( ! defined( 'LTDH_EMAIL_ADMIN_RECIPIENT' ) ) {
+	define( 'LTDH_EMAIL_ADMIN_RECIPIENT', '' );
+}
+if ( ! defined( 'LTDH_EMAIL_FROM_NAME' ) ) {
+	define( 'LTDH_EMAIL_FROM_NAME', 'Cổng Tuyển Sinh Liên Thông Đại Học' );
+}
+if ( ! defined( 'LTDH_EMAIL_FROM_ADDRESS' ) ) {
+	define( 'LTDH_EMAIL_FROM_ADDRESS', '' );
+}

@@ -9,34 +9,62 @@ $current_year = (int) date( 'Y' );
 $years = range( $current_year, $current_year - 25 );
 ?>
 
-<!-- Summary Header -->
-<div id="elig-results-header" class="elig-results-header hidden text-center mb-6">
-	<div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 mb-2.5 border border-emerald-200/80 shadow-2xs">
-		<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-		</svg>
+<!-- Unified Admissions Assessment Hero Banner -->
+<div id="elig-results-header" class="elig-results-hero hidden rounded-3xl bg-gradient-to-br from-[#001c54] via-[#00308b] to-[#1d4ed8] text-white p-6 sm:p-8 shadow-xl mb-8 relative overflow-hidden">
+	<!-- Decorative background ambient glow -->
+	<div class="absolute -top-24 -right-24 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
+	<div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+	<!-- Top Bar: Badge & Action Group -->
+	<div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/15">
+		<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-sky-200 text-xs font-bold border border-white/15 w-fit">
+			<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+			<span class="uppercase tracking-wider">Kết quả đối chiếu hồ sơ</span>
+		</div>
+
+		<!-- Action Group: Share Link & Re-check -->
+		<div class="flex items-center gap-2">
+			<!-- Share / Copy URL button -->
+			<button type="button" id="elig-copy-share-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-white/15 hover:bg-white/25 active:scale-95 backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-2xs" title="Sao chép link kết quả này để chia sẻ">
+				<svg class="w-4 h-4 text-sky-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+				</svg>
+				<span id="elig-copy-btn-text">Sao chép link kết quả</span>
+			</button>
+
+			<!-- Re-check / Edit button -->
+			<button type="button" id="elig-retry" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-sky-100 hover:text-white bg-white/10 hover:bg-white/20 transition-all cursor-pointer border border-white/10 shadow-2xs">
+				<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+				</svg>
+				<span>Đối chiếu lại</span>
+			</button>
+		</div>
 	</div>
-	<h2 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight" id="elig-results-title">Kết quả đối chiếu sơ bộ</h2>
-	<p class="text-slate-500 text-xs sm:text-sm mt-1 max-w-xl mx-auto" id="elig-results-subtitle"></p>
+
+	<!-- Main Assessment Title & Subtitle -->
+	<div class="relative z-10 my-4 sm:my-5">
+		<h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight" id="elig-results-title">
+			Tìm thấy chương trình phù hợp với hồ sơ của bạn!
+		</h2>
+		<p class="text-sky-100/90 text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed" id="elig-results-subtitle">
+			Dưới đây là các chương trình đào tạo tương thích nhất với trình độ văn bằng và nguyện vọng của bạn.
+		</p>
+	</div>
+
+	<!-- Candidate Profile Tags Integrated -->
+	<div id="elig-input-summary" class="relative z-10 pt-4 border-t border-white/15">
+		<div class="text-[11px] font-bold uppercase tracking-wider text-sky-200/80 mb-2">Hồ sơ đã đối chiếu:</div>
+		<div id="elig-summary-tags" class="flex flex-wrap items-center gap-2"></div>
+	</div>
 </div>
 
-<!-- Input Summary (Mobile-First Responsive Layout) -->
-<div id="elig-input-summary" class="elig-input-summary hidden bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 mb-6 shadow-2xs">
-	<div class="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-100">
-		<div class="flex items-center gap-2">
-			<svg class="w-4 h-4 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
-			</svg>
-			<span class="text-xs font-black uppercase tracking-wider text-slate-700">Hồ sơ đã nhập:</span>
-		</div>
-		<button type="button" id="elig-retry" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-[#00308b] bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer border border-blue-100/80 shrink-0">
-			<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-			</svg>
-			<span>Chỉnh sửa</span>
-		</button>
-	</div>
-	<div id="elig-summary-tags" class="elig-summary-tags flex flex-wrap gap-2 w-full"></div>
+<!-- Floating Toast Notification for Link Copied -->
+<div id="elig-share-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-slate-900/95 text-white text-xs font-bold rounded-2xl shadow-2xl border border-slate-700/80 backdrop-blur-md transition-all duration-300 opacity-0 translate-y-4 pointer-events-none flex items-center gap-2">
+	<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+		<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+	</svg>
+	<span>Đã sao chép link kết quả vào bộ nhớ tạm! Bạn có thể gửi cho người khác.</span>
 </div>
 
 <!-- Eligible Programs -->
