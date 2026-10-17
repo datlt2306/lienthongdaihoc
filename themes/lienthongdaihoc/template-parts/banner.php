@@ -26,6 +26,9 @@ $request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
 if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $request_path ) ) {
 	$banner_title    = 'Hình thức đào tạo';
 	$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
+	$banner_eyebrow  = [
+		'text' => 'Hình thức đào tạo liên thông ' . date( 'Y' ),
+	];
 } elseif ( $type === 'program' ) {
 	$banner_title    = 'So sánh chương trình đào tạo';
 	$banner_subtitle = 'So sánh chi tiết học phí, thời gian học, điều kiện tuyển sinh của các chương trình học.';
@@ -52,6 +55,9 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	$banner_title    = get_the_title();
 	$banner_subtitle = 'Thông tin chi tiết về trường đào tạo đối tác';
 	$banner_image    = get_field( 'school_banner' ) ?: get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
+	$banner_eyebrow  = [
+		'text' => 'Trường đại học đối tác ' . date( 'Y' ),
+	];
 } elseif ( is_singular( 'major' ) ) {
 	$major_id    = get_the_ID();
 	$raw_title   = get_the_title( $major_id );
@@ -274,9 +280,22 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 } elseif ( is_post_type_archive( 'school' ) ) {
 	$banner_title    = 'Trường Đại học Đối tác';
 	$banner_subtitle = 'Hệ thống các trường đại học uy tín hàng đầu Việt Nam';
+	$banner_eyebrow  = [
+		'text' => 'Mạng lưới đại học đối tác ' . date( 'Y' ),
+	];
 } elseif ( is_post_type_archive( 'major' ) ) {
 	$banner_title    = 'Chuyên Ngành';
 	$banner_subtitle = 'Khám phá các ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
+	$banner_eyebrow  = [
+		'text' => 'Danh mục ngành đào tạo ' . date( 'Y' ),
+	];
+} elseif ( is_tax( 'major_cat' ) ) {
+	$term            = get_queried_object();
+	$banner_title    = ( $term && ! empty( $term->name ) ) ? 'Nhóm ngành: ' . $term->name : 'Chuyên Ngành';
+	$banner_subtitle = ( $term && ! empty( $term->description ) ) ? $term->description : 'Khám phá các ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
+	$banner_eyebrow  = [
+		'text' => 'Danh mục ngành đào tạo ' . date( 'Y' ),
+	];
 } elseif ( is_post_type_archive( 'program' ) ) {
 	$selected_he = '';
 	$request_path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
@@ -297,15 +316,24 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 			$banner_title    = 'Chương Trình Tuyển Sinh Liên Thông Đại Học';
 			$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
 		}
+		$banner_eyebrow  = [
+			'text' => 'Hình thức đào tạo liên thông ' . date( 'Y' ),
+		];
 	} else {
 		$banner_title    = 'Chương Trình Tuyển Sinh Liên Thông Đại Học';
 		$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
+		$banner_eyebrow  = [
+			'text' => 'Chương trình tuyển sinh liên thông ' . date( 'Y' ),
+		];
 	}
 } elseif ( is_tax( 'training_type' ) ) {
 	$term            = get_queried_object();
 	$clean_term_name = ( $term && ! empty( $term->name ) ) ? preg_replace( '/^hệ\s+/iu', '', $term->name ) : '';
 	$banner_title    = 'Hình thức đào tạo: ' . $clean_term_name;
 	$banner_subtitle = ( $term && ! empty( $term->description ) ) ? $term->description : ( 'Danh sách chương trình thuộc hình thức đào tạo ' . $clean_term_name );
+	$banner_eyebrow  = [
+		'text' => 'Hình thức đào tạo liên thông ' . date( 'Y' ),
+	];
 } elseif ( is_tax( 'campus' ) ) {
 	$term = get_queried_object();
 	$banner_title    = 'Cơ sở: ' . $term->name;
@@ -372,13 +400,19 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 } else {
 	if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $request_path ) ) {
 		$banner_title    = 'Hình thức đào tạo';
-		$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
+		$banner_subtitle = 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
+		$banner_eyebrow  = [
+			'text' => 'Hình thức đào tạo liên thông ' . date( 'Y' ),
+		];
 	} elseif ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m ) && 'page' !== $m[1] ) {
 		$slug_lookup     = ( 'tu-xa' === $m[1] ) ? 'dao-tao-tu-xa' : $m[1];
 		$he_term         = get_term_by( 'slug', $slug_lookup, 'training_type' ) ?: get_term_by( 'slug', $m[1], 'training_type' );
 		$clean_he_name   = $he_term ? preg_replace( '/^hệ\s+/iu', '', $he_term->name ) : '';
 		$banner_title    = $he_term ? 'Hình thức đào tạo: ' . $clean_he_name : 'Chương Trình Tuyển Sinh Liên Thông Đại Học';
-		$banner_subtitle = $he_term ? ( $he_term->description ?: 'Danh sách chương trình thuộc hình thức đào tạo ' . $clean_he_name ) : 'Tổng hợp các chương trình tuyển sinh liên thông đại học hình thức từ xa và vừa học vừa làm';
+		$banner_subtitle = $he_term ? ( $he_term->description ?: 'Danh sách chương trình thuộc hình thức đào tạo ' . $clean_he_name ) : 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
+		$banner_eyebrow  = [
+			'text' => 'Hình thức đào tạo liên thông ' . date( 'Y' ),
+		];
 	} else {
 		$banner_title    = get_the_title() ?: wp_title( '', false );
 		$banner_subtitle = '';
