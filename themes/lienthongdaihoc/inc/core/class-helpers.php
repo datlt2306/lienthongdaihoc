@@ -1505,26 +1505,39 @@ function ltdh_get_fallback_image(string $context = 'program'): string {
 		return $theme_uri . '/assets/images/banner-school.jpg';
 	}
 
-	if ( $context === 'news' || $context === 'post' ) {
-		if ( function_exists( 'get_field' ) ) {
-			$custom_share_image = get_field( 'global_share_image', 'options' );
-			if ( ! empty( $custom_share_image ) ) {
-				return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $custom_share_image ) : $custom_share_image;
+	$custom_share_image = null;
+	if ( function_exists( 'get_field' ) ) {
+		$custom_share_image = get_field( 'global_share_image', 'options' ) ?: get_field( 'global_share_image', 'option' );
+	}
+	if ( empty( $custom_share_image ) ) {
+		$raw_opt = get_option( 'options_global_share_image' ) ?: get_option( 'global_share_image' );
+		if ( ! empty( $raw_opt ) ) {
+			if ( is_numeric( $raw_opt ) ) {
+				$custom_share_image = wp_get_attachment_image_url( (int) $raw_opt, 'full' );
+			} elseif ( is_string( $raw_opt ) && filter_var( $raw_opt, FILTER_VALIDATE_URL ) ) {
+				$custom_share_image = $raw_opt;
 			}
 		}
-		if ( file_exists( $theme_dir . '/assets/images/banner-fallback.webp' ) ) {
-			return $theme_uri . '/assets/images/banner-fallback.webp';
-		}
-		if ( file_exists( $theme_dir . '/assets/images/banner-default.jpg' ) ) {
-			return $theme_uri . '/assets/images/banner-default.jpg';
-		}
 	}
-
-	if ( function_exists( 'get_field' ) ) {
-		$custom_share_image = get_field( 'global_share_image', 'options' );
+	if ( ! empty( $custom_share_image ) ) {
+		if ( is_array( $custom_share_image ) && ! empty( $custom_share_image['url'] ) ) {
+			$custom_share_image = $custom_share_image['url'];
+		} elseif ( is_numeric( $custom_share_image ) ) {
+			$custom_share_image = wp_get_attachment_image_url( (int) $custom_share_image, 'full' );
+		}
 		if ( ! empty( $custom_share_image ) ) {
 			return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $custom_share_image ) : $custom_share_image;
 		}
+	}
+
+	if ( file_exists( $theme_dir . '/assets/images/banner-fallback.png' ) ) {
+		return $theme_uri . '/assets/images/banner-fallback.png';
+	}
+	if ( file_exists( $theme_dir . '/assets/images/banner-fallback.webp' ) ) {
+		return $theme_uri . '/assets/images/banner-fallback.webp';
+	}
+	if ( file_exists( $theme_dir . '/assets/images/banner-default.jpg' ) ) {
+		return $theme_uri . '/assets/images/banner-default.jpg';
 	}
 	return $theme_uri . '/assets/images/banner-program.jpg';
 }

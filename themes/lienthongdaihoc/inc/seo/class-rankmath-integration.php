@@ -828,20 +828,79 @@ add_filter( 'rank_math/json_ld', 'ltdh_seo_compare_schema', 99, 2 );
 /**
  * Filter Rank Math OpenGraph Image.
  */
-add_filter( 'rank_math/opengraph/facebook/image', 'ltdh_seo_fallback_og_image' );
-add_filter( 'rank_math/opengraph/twitter/image', 'ltdh_seo_fallback_og_image' );
+add_filter( 'rank_math/opengraph/facebook/image', 'ltdh_seo_fallback_og_image', 20 );
+add_filter( 'rank_math/opengraph/twitter/image', 'ltdh_seo_fallback_og_image', 20 );
+
+function ltdh_seo_resolve_global_share_image() {
+	$custom_share_image = null;
+	if ( function_exists( 'get_field' ) ) {
+		$custom_share_image = get_field( 'global_share_image', 'options' ) ?: get_field( 'global_share_image', 'option' );
+	}
+	if ( empty( $custom_share_image ) ) {
+		$raw_opt = get_option( 'options_global_share_image' ) ?: get_option( 'global_share_image' );
+		if ( ! empty( $raw_opt ) ) {
+			if ( is_numeric( $raw_opt ) ) {
+				$custom_share_image = wp_get_attachment_image_url( (int) $raw_opt, 'full' );
+			} elseif ( is_string( $raw_opt ) && filter_var( $raw_opt, FILTER_VALIDATE_URL ) ) {
+				$custom_share_image = $raw_opt;
+			}
+		}
+	}
+	if ( ! empty( $custom_share_image ) ) {
+		if ( is_array( $custom_share_image ) && ! empty( $custom_share_image['url'] ) ) {
+			return $custom_share_image['url'];
+		} elseif ( is_numeric( $custom_share_image ) ) {
+			$url = wp_get_attachment_image_url( (int) $custom_share_image, 'full' );
+			if ( ! empty( $url ) ) {
+				return $url;
+			}
+		} elseif ( is_string( $custom_share_image ) ) {
+			return $custom_share_image;
+		}
+	}
+
+	$theme_dir = get_template_directory();
+	$theme_uri = get_template_directory_uri();
+	if ( file_exists( $theme_dir . '/assets/images/banner-fallback.png' ) ) {
+		return $theme_uri . '/assets/images/banner-fallback.png';
+	}
+	if ( file_exists( $theme_dir . '/assets/images/banner-fallback.webp' ) ) {
+		return $theme_uri . '/assets/images/banner-fallback.webp';
+	}
+	return $theme_uri . '/assets/images/banner-default.jpg';
+}
 
 function ltdh_seo_fallback_og_image( $image_url ) {
 	if ( ! empty( $image_url ) ) {
 		return $image_url;
 	}
-	if ( function_exists( 'get_field' ) ) {
-		$custom_share_image = get_field( 'global_share_image', 'options' );
-		if ( ! empty( $custom_share_image ) ) {
-			return $custom_share_image;
+	return ltdh_seo_resolve_global_share_image();
+}
+
+/**
+ * Ensure og:image width, height, and mime type are set for optimal social card rendering (Zalo, Facebook).
+ */
+add_filter( 'rank_math/opengraph/facebook/image_array', 'ltdh_seo_enrich_og_image_meta', 20 );
+function ltdh_seo_enrich_og_image_meta( $attachment ) {
+	if ( ! is_array( $attachment ) || empty( $attachment['url'] ) ) {
+		return $attachment;
+	}
+	if ( empty( $attachment['width'] ) || empty( $attachment['height'] ) ) {
+		$attachment['width']  = 1200;
+		$attachment['height'] = 630;
+	}
+	if ( empty( $attachment['type'] ) ) {
+		$path = parse_url( $attachment['url'], PHP_URL_PATH );
+		$ext  = strtolower( pathinfo( (string) $path, PATHINFO_EXTENSION ) );
+		if ( $ext === 'webp' ) {
+			$attachment['type'] = 'image/webp';
+		} elseif ( $ext === 'png' ) {
+			$attachment['type'] = 'image/png';
+		} elseif ( $ext === 'jpg' || $ext === 'jpeg' ) {
+			$attachment['type'] = 'image/jpeg';
 		}
 	}
-	return get_template_directory_uri() . '/assets/images/banner-program.jpg';
+	return $attachment;
 }
 
 /**
@@ -858,12 +917,8 @@ add_action( 'wp_head', function() {
 		$thumbnail_url = get_the_post_thumbnail_url( null, 'large' );
 	}
 	
-	if ( empty( $thumbnail_url ) && function_exists( 'get_field' ) ) {
-		$thumbnail_url = get_field( 'global_share_image', 'options' );
-	}
-	
 	if ( empty( $thumbnail_url ) ) {
-		$thumbnail_url = get_template_directory_uri() . '/assets/images/banner-program.jpg';
+		$thumbnail_url = ltdh_seo_resolve_global_share_image();
 	}
 	
 	echo "\n" . '<!-- Social Share Meta Tags -->' . "\n";
