@@ -15,6 +15,7 @@ if ( function_exists( 'ltdh_elig_get_check_results' ) ) {
 			define( 'DONOTCACHEPAGE', true );
 		}
 		nocache_headers();
+		do_action( 'litespeed_control_set_nocache', 'shared_check_result' );
 		$shared_check = ltdh_elig_get_check_results( $param );
 	}
 }

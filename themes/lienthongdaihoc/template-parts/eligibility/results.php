@@ -9,32 +9,28 @@ $current_year = (int) date( 'Y' );
 $years = range( $current_year, $current_year - 25 );
 ?>
 
-<!-- Unified Admissions Assessment Hero Banner -->
-<div id="elig-results-header" class="elig-results-hero hidden rounded-3xl bg-gradient-to-br from-[#001c54] via-[#00308b] to-[#1d4ed8] text-white p-6 sm:p-8 shadow-xl mb-8 relative overflow-hidden">
-	<!-- Decorative background ambient glow -->
-	<div class="absolute -top-24 -right-24 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
-	<div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
-
+<!-- Admissions Assessment Header Card (Clean Website Concept) -->
+<div id="elig-results-header" class="elig-results-hero hidden bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-7 shadow-xs mb-6">
 	<!-- Top Bar: Badge & Action Group -->
-	<div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/15">
-		<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-sky-200 text-xs font-bold border border-white/15 w-fit">
-			<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+		<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[#00308b] text-xs font-bold border border-blue-100 w-fit">
+			<span class="w-2 h-2 rounded-full bg-[#00308b]"></span>
 			<span class="uppercase tracking-wider">Kết quả đối chiếu hồ sơ</span>
 		</div>
 
 		<!-- Action Group: Share Link & Re-check -->
 		<div class="flex items-center gap-2">
 			<!-- Share / Copy URL button -->
-			<button type="button" id="elig-copy-share-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-white/15 hover:bg-white/25 active:scale-95 backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-2xs" title="Sao chép link kết quả này để chia sẻ">
-				<svg class="w-4 h-4 text-sky-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+			<button type="button" id="elig-copy-share-btn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 active:scale-95 border border-slate-200 transition-all cursor-pointer shadow-2xs" title="Sao chép link kết quả này để chia sẻ">
+				<svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
 				</svg>
 				<span id="elig-copy-btn-text">Sao chép link kết quả</span>
 			</button>
 
 			<!-- Re-check / Edit button -->
-			<button type="button" id="elig-retry" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-sky-100 hover:text-white bg-white/10 hover:bg-white/20 transition-all cursor-pointer border border-white/10 shadow-2xs">
-				<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+			<button type="button" id="elig-retry" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#00308b] hover:text-[#002266] bg-blue-50 hover:bg-blue-100 transition-all cursor-pointer border border-blue-100 shadow-2xs">
+				<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
 				</svg>
 				<span>Đối chiếu lại</span>
@@ -43,18 +39,18 @@ $years = range( $current_year, $current_year - 25 );
 	</div>
 
 	<!-- Main Assessment Title & Subtitle -->
-	<div class="relative z-10 my-4 sm:my-5">
-		<h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight" id="elig-results-title">
+	<div class="my-4">
+		<h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug" id="elig-results-title">
 			Tìm thấy chương trình phù hợp với hồ sơ của bạn!
 		</h2>
-		<p class="text-sky-100/90 text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed" id="elig-results-subtitle">
+		<p class="text-slate-600 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed" id="elig-results-subtitle">
 			Dưới đây là các chương trình đào tạo tương thích nhất với trình độ văn bằng và nguyện vọng của bạn.
 		</p>
 	</div>
 
 	<!-- Candidate Profile Tags Integrated -->
-	<div id="elig-input-summary" class="relative z-10 pt-4 border-t border-white/15">
-		<div class="text-[11px] font-bold uppercase tracking-wider text-sky-200/80 mb-2">Hồ sơ đã đối chiếu:</div>
+	<div id="elig-input-summary" class="pt-3 border-t border-slate-100">
+		<div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Hồ sơ đã đối chiếu:</div>
 		<div id="elig-summary-tags" class="flex flex-wrap items-center gap-2"></div>
 	</div>
 </div>
@@ -65,6 +61,17 @@ $years = range( $current_year, $current_year - 25 );
 		<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
 	</svg>
 	<span>Đã sao chép link kết quả vào bộ nhớ tạm! Bạn có thể gửi cho người khác.</span>
+</div>
+
+<!-- Section 1 Header: Program Results -->
+<div id="elig-programs-heading" class="flex items-center justify-between gap-3 mb-3 px-1">
+	<div class="flex items-center gap-2">
+		<span class="w-6 h-6 rounded-lg bg-[#00308b] text-white text-xs font-black inline-flex items-center justify-center shrink-0 shadow-2xs">1</span>
+		<h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-700 m-0">
+			Danh sách chương trình đối chiếu phù hợp
+		</h3>
+	</div>
+	<span id="elig-programs-count-badge" class="text-xs text-slate-500 font-semibold"></span>
 </div>
 
 <!-- Eligible Programs -->
@@ -80,12 +87,9 @@ $years = range( $current_year, $current_year - 25 );
 </div>
 
 <!-- Alternatives (Smart Recommendations) -->
-<div id="elig-alternatives-section" class="elig-alternatives hidden mt-8 bg-slate-50/70 border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-2xs">
+<div id="elig-alternatives-section" class="elig-alternatives hidden mt-8 bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-6 shadow-xs">
 	<div class="mb-4">
 		<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#00308b] text-[11px] font-extrabold uppercase tracking-wider mb-1.5 border border-blue-100">
-			<svg class="w-3.5 h-3.5 text-[#00308b]" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-			</svg>
 			<span>Phương án đề xuất bổ sung</span>
 		</div>
 		<h3 class="font-black text-slate-900 text-base sm:text-lg flex items-center gap-2 m-0">
@@ -98,22 +102,69 @@ $years = range( $current_year, $current_year - 25 );
 	<div id="elig-alternatives-list" class="elig-program-list space-y-4"></div>
 </div>
 
-<!-- Contextual Comprehensive Lead Form Section -->
-<div id="elig-lead-section" class="elig-lead-form mt-8 border border-slate-200/90 bg-white p-5 sm:p-7 md:p-8 rounded-2xl shadow-xs relative overflow-hidden">
-	<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00308b] via-blue-500 to-[#EA580C]"></div>
+<!-- Clear Visual Divider: Transition from Results to Application Form -->
+<div class="my-8 sm:my-10 relative">
+	<div class="absolute inset-0 flex items-center" aria-hidden="true">
+		<div class="w-full border-t-2 border-dashed border-slate-200"></div>
+	</div>
+	<div class="relative flex justify-center">
+		<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-xs font-black uppercase tracking-wider border border-slate-200 shadow-2xs">
+			<span class="w-5 h-5 rounded-full bg-[#00308b] text-white text-[11px] font-bold flex items-center justify-center shrink-0">2</span>
+			<span>Bước tiếp theo: Đăng ký thẩm định chi tiết & miễn giảm môn</span>
+			<svg class="w-4 h-4 text-[#00308b]" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+			</svg>
+		</div>
+	</div>
+</div>
 
-	<div class="elig-lead-context mb-6 space-y-1.5 pt-1">
-		<span class="inline-block bg-blue-50 text-[#00308b] text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-blue-100 uppercase tracking-wider">
-			Thẩm định hồ sơ 1:1
-		</span>
-		<h3 class="text-lg sm:text-xl font-black text-slate-900 leading-tight">Yêu cầu đối chiếu điều kiện nhập học thực tế</h3>
-		<p class="text-slate-500 text-xs sm:text-sm leading-relaxed">
-			Cung cấp thông tin và tài liệu (bằng tốt nghiệp, bảng điểm nếu có) để chuyên viên đối chiếu số tín chỉ miễn giảm và thẩm định điều kiện trúng tuyển chính xác nhất.
-		</p>
+<!-- Dedicated Consultation / Verification Form Section -->
+<div id="elig-lead-section" class="elig-lead-form rounded-2xl shadow-sm border-2 border-blue-200/80 overflow-hidden bg-white scroll-mt-6">
+
+	<!-- Distinct Form Header: Solid Navy Blue matching site brand -->
+	<div class="bg-[#00308b] text-white p-5 sm:p-6 md:p-7 relative">
+		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+			<div>
+				<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-xs text-white text-[11px] font-extrabold uppercase tracking-wider mb-2 border border-white/20">
+					<span>✍️ Form đăng ký xét tuyển 1:1</span>
+				</div>
+				<h3 class="text-xl sm:text-2xl font-black text-white leading-tight m-0">
+					Đăng ký thẩm định hồ sơ & xét miễn giảm tín chỉ
+				</h3>
+				<p class="text-blue-100 text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed m-0">
+					Điền thông tin và đính kèm bằng/bảng điểm (nếu có). Ban tuyển sinh sẽ thẩm định điều kiện trúng tuyển thực tế và gửi bảng đối chiếu tín chỉ miễn giảm hoàn toàn miễn phí.
+				</p>
+			</div>
+			<div class="hidden md:flex w-14 h-14 rounded-2xl bg-white/10 border border-white/15 items-center justify-center text-3xl shrink-0 text-white shadow-inner">
+				📋
+			</div>
+		</div>
 	</div>
 
-	<!-- Unified Lead Capture & Profile Verification Form -->
-	<form id="elig-consultation-form" class="space-y-5" autocomplete="off" enctype="multipart/form-data">
+	<!-- Form Body -->
+	<div class="p-5 sm:p-7 md:p-8 bg-slate-50/40">
+
+		<!-- Target Program Context Bar -->
+		<div id="elig-selected-program-banner" class="mb-6 p-4 rounded-xl bg-white border border-blue-200 shadow-2xs flex items-center justify-between gap-3 transition-all duration-300">
+			<div class="flex items-center gap-3 min-w-0">
+				<div class="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-lg shrink-0 text-[#00308b]">
+					🎓
+				</div>
+				<div class="min-w-0">
+					<span class="text-[11px] font-bold uppercase tracking-wider text-blue-700 block">Bạn đang nộp thẩm định cho chương trình:</span>
+					<strong id="elig-selected-program-title" class="text-sm sm:text-base font-extrabold text-slate-900 block truncate">
+						Đang chọn chương trình...
+					</strong>
+				</div>
+			</div>
+			<span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full shrink-0 hidden sm:inline-flex items-center gap-1">
+				<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+				Thẩm định miễn phí
+			</span>
+		</div>
+
+		<!-- Unified Lead Capture & Profile Verification Form -->
+		<form id="elig-consultation-form" class="space-y-5" autocomplete="off" enctype="multipart/form-data">
 		<input type="hidden" name="elig_check_id" id="elig-check-id" value="">
 		<input type="hidden" name="elig_program_id" id="elig-program-id" value="">
 		
@@ -223,6 +274,7 @@ $years = range( $current_year, $current_year - 25 );
 			<span class="elig-btn-loading hidden">Đang gửi hồ sơ...</span>
 		</button>
 	</form>
+	</div>
 </div>
 
 <!-- Disclaimer Box -->

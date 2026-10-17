@@ -127,15 +127,9 @@ function ltdh_sync_lead_to_crm( $lead ) {
 	$school_crm = function_exists( 'get_field' ) ? get_field( 'crm_provider', $school_id ) : '';
 
 	// Determine CRM provider: school override or global default
-	if ( ! empty( $school_crm ) && $school_crm !== 'default' ) {
-		$crm_type = $school_crm;
-		$endpoint = get_field( 'crm_endpoint', $school_id );
-		$token    = get_field( 'crm_token', $school_id );
-	} else {
-		$crm_type = $default_crm_type;
-		$endpoint = '';
-		$token    = '';
-	}
+	$crm_type = ( ! empty( $school_crm ) && $school_crm !== 'default' ) ? $school_crm : $default_crm_type;
+	$endpoint = '';
+	$token    = '';
 
 	if ( ! $crm_type || $crm_type === 'internal' ) {
 		return true; // No third-party CRM sync needed

@@ -26,7 +26,7 @@ if ( ! empty( $offered_program_ids ) && is_array( $offered_program_ids ) ) {
 }
 
 $global_zalo = ltdh_get_zalo_url();
-$zalo_group  = get_field( 'zalo_group_url', $school_id ) ?: get_field( 'school_zalo_group', $school_id ) ?: $global_zalo;
+$zalo_group  = get_field( 'zalo_group_url', $school_id ) ?: $global_zalo;
 
 $school_logo_url  = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'medium' ) : '';
 $school_cover_url = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium_large' ) : ( get_field( 'school_banner', $school_id ) ?: get_template_directory_uri() . '/assets/images/banner-school.jpg' );

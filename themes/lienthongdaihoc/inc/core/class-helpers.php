@@ -130,9 +130,9 @@ function ltdh_get_school_zalo_group_url( int $school_id = 0 ): string {
 		$school_id = ltdh_get_current_context_school_id();
 	}
 	if ( $school_id ) {
-		$url = function_exists( 'get_field' ) ? ( get_field( 'zalo_group_url', $school_id ) ?: get_field( 'school_zalo_group', $school_id ) ) : '';
+		$url = function_exists( 'get_field' ) ? get_field( 'zalo_group_url', $school_id ) : '';
 		if ( empty( $url ) ) {
-			$url = get_post_meta( $school_id, 'zalo_group_url', true ) ?: get_post_meta( $school_id, 'school_zalo_group', true );
+			$url = get_post_meta( $school_id, 'zalo_group_url', true );
 		}
 		if ( ! empty( $url ) && is_string( $url ) ) {
 			return trim( $url );

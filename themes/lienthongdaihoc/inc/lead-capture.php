@@ -450,36 +450,6 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		] );
 	}
 
-	// Dispatch to School's private Telegram group if configured
-	if ( ! empty( $data['school_id'] ) && function_exists( 'get_field' ) ) {
-		$school_id        = intval( $data['school_id'] );
-		$school_chat_id   = get_field( 'school_telegram_chat_id', $school_id );
-		$school_bot_token = get_field( 'school_telegram_bot_token', $school_id );
-		$dispatch_token   = ! empty( $school_bot_token ) ? trim( $school_bot_token ) : $clean_token;
-
-		if ( ! empty( $school_chat_id ) && ! empty( $dispatch_token ) ) {
-			$school_chat_ids = preg_split( '/[\s,;]+/', $school_chat_id );
-			$school_chat_ids = array_filter( array_map( 'trim', $school_chat_ids ) );
-			$school_api_url  = "https://api.telegram.org/bot{$dispatch_token}/sendMessage";
-
-			foreach ( $school_chat_ids as $s_chat_id ) {
-				// Avoid duplicate dispatch if already sent in master list with same token
-				if ( in_array( $s_chat_id, $chat_ids, true ) && $dispatch_token === $clean_token ) {
-					continue;
-				}
-				wp_remote_post( $school_api_url, [
-					'body' => [
-						'chat_id'    => $s_chat_id,
-						'text'       => $msg_text,
-						'parse_mode' => 'HTML',
-					],
-					'timeout'  => 10,
-					'blocking' => false,
-				] );
-			}
-		}
-	}
-
 	// [CBR-10]: Ephemeral Degree File forwarding & cleanup (Decree 13/2023/ND-CP)
 	if ( ! empty( $data['degree_file_path'] ) && file_exists( $data['degree_file_path'] ) ) {
 		$caption = '📎 Hồ sơ văn bằng đính kèm: ' . esc_html( $name ) . ' (' . esc_html( $phone ) . ')';

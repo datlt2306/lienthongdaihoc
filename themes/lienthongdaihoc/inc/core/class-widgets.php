@@ -1257,7 +1257,7 @@ function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
 
 	<!-- ZALO GROUP COMMUNITY WIDGET -->
 	<?php
-	$program_school_zalo = ( $school_id ? ( get_field( 'zalo_group_url', $school_id ) ?: get_field( 'school_zalo_group', $school_id ) ) : '' ) ?: $global_zalo;
+	$program_school_zalo = ( $school_id ? get_field( 'zalo_group_url', $school_id ) : '' ) ?: $global_zalo;
 	?>
 	<div class="hidden lg:block bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white rounded-2xl p-5 shadow-md relative overflow-hidden">
 		<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
@@ -1418,7 +1418,7 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 	$website     = get_field( 'website', $school_id );
 	$address     = get_post_meta( $school_id, 'address', true ) ?: get_field( 'address', $school_id );
 	$map_url     = get_field( 'google_maps_url', $school_id );
-	$zalo_group  = get_field( 'zalo_group_url', $school_id ) ?: get_field( 'school_zalo_group', $school_id ) ?: $global_zalo;
+	$zalo_group  = get_field( 'zalo_group_url', $school_id ) ?: $global_zalo;
 	?>
 	<!-- School Mini Card -->
 	<?php
