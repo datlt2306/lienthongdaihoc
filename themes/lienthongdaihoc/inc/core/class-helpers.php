@@ -2866,6 +2866,110 @@ function ltdh_get_major_valid_programs_count( int $major_id ): int {
 	return $count;
 }
 
+/**
+ * Get count of distinct schools actively offering/admitting this major.
+ * Only counts published schools with active (non tam-ngung) programs.
+ *
+ * @param int $major_id
+ * @return int
+ */
+function ltdh_get_major_unique_schools_count( int $major_id ): int {
+	if ( ! $major_id ) {
+		return 0;
+	}
+
+	$cache_key = 'ltdh_major_schools_count_' . $major_id;
+	$cached    = wp_cache_get( $cache_key, 'ltdh' );
+	if ( false !== $cached ) {
+		return (int) $cached;
+	}
+
+	$offered_program_ids = get_post_meta( $major_id, defined( 'LTDH_META_OFFERED_PROGRAMS' ) ? LTDH_META_OFFERED_PROGRAMS : '_offered_programs', true );
+	$major_rel_key       = defined( 'LTDH_META_MAJOR_REL' ) ? LTDH_META_MAJOR_REL : 'major_relationship';
+	$program_cpt         = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
+	$school_rel_key      = defined( 'LTDH_META_SCHOOL_REL' ) ? LTDH_META_SCHOOL_REL : 'school_relationship';
+	$status_key          = defined( 'LTDH_META_ADMISSION_STATUS' ) ? LTDH_META_ADMISSION_STATUS : 'admission_status';
+
+	$direct_prog_ids = get_posts( [
+		'post_type'     => $program_cpt,
+		'post_status'   => 'publish',
+		'numberposts'   => -1,
+		'fields'        => 'ids',
+		'no_found_rows' => true,
+		'meta_query'    => [
+			'relation' => 'OR',
+			[
+				'key'     => $major_rel_key,
+				'value'   => $major_id,
+				'compare' => '=',
+			],
+			[
+				'key'     => $major_rel_key,
+				'value'   => '"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => $major_rel_key,
+				'value'   => 's:' . strlen( (string) $major_id ) . ':"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => $major_rel_key,
+				'value'   => 'i:' . $major_id . ';',
+				'compare' => 'LIKE',
+			],
+		],
+	] );
+
+	$all_candidate_ids = array_unique( array_filter( array_merge(
+		is_array( $offered_program_ids ) ? $offered_program_ids : [],
+		is_array( $direct_prog_ids ) ? $direct_prog_ids : []
+	) ) );
+
+	if ( empty( $all_candidate_ids ) ) {
+		wp_cache_set( $cache_key, 0, 'ltdh', HOUR_IN_SECONDS );
+		return 0;
+	}
+
+	$meta_query = [
+		'relation' => 'AND',
+		[
+			'relation' => 'OR',
+			[
+				'key'     => $status_key,
+				'value'   => 'tam-ngung',
+				'compare' => '!=',
+			],
+			[
+				'key'     => $status_key,
+				'compare' => 'NOT EXISTS',
+			],
+		],
+	];
+
+	$programs = get_posts( [
+		'post_type'      => $program_cpt,
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'post__in'       => $all_candidate_ids,
+		'fields'         => 'ids',
+		'no_found_rows'  => true,
+		'meta_query'     => $meta_query,
+	] );
+
+	$school_ids = [];
+	foreach ( $programs as $p_id ) {
+		$school_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $p_id ) : intval( get_post_meta( $p_id, $school_rel_key, true ) );
+		if ( $school_id > 0 && 'publish' === get_post_status( $school_id ) && ! in_array( $school_id, $school_ids, true ) ) {
+			$school_ids[] = $school_id;
+		}
+	}
+
+	$count = count( $school_ids );
+	wp_cache_set( $cache_key, $count, 'ltdh', HOUR_IN_SECONDS );
+	return $count;
+}
+
 function ltdh_get_training_type_badge_html( string $type_name ): string {
 	if ( ! $type_name ) {
 		return '';
@@ -4443,174 +4547,3 @@ add_filter( 'the_content', function( $content ) {
 
 	return $content;
 }, 99 );
-
-/**
- * Retrieve comprehensive, structured metadata for Major Cards (Archive & Directory).
- *
- * @param int $major_id CPT Major ID.
- * @return array Structured card details including training types, roadmaps, schools, and excerpt.
- */
-function ltdh_get_major_card_metadata( int $major_id ): array {
-	if ( ! $major_id ) {
-		return [];
-	}
-
-	$cache_key = 'ltdh_major_card_meta_' . $major_id;
-	$cached    = wp_cache_get( $cache_key, 'ltdh' );
-	if ( false !== $cached && is_array( $cached ) ) {
-		return $cached;
-	}
-
-	$major_post = get_post( $major_id );
-	if ( ! $major_post ) {
-		return [];
-	}
-
-	$raw_title   = $major_post->post_title;
-	$clean_title = preg_replace( '/^ngành\s+/iu', '', trim( $raw_title ) );
-	$code        = trim( (string) ( get_field( 'major_code', $major_id ) ?: get_post_meta( $major_id, 'major_code', true ) ) );
-
-	// Category Taxonomy
-	$terms    = get_the_terms( $major_id, 'major_cat' );
-	$cat_name = ( ! empty( $terms ) && ! is_wp_error( $terms ) ) ? $terms[0]->name : 'Ngành đào tạo';
-
-	// Thumbnail with deterministic fallback
-	$thumb = get_the_post_thumbnail_url( $major_id, 'medium_large' );
-	if ( empty( $thumb ) ) {
-		$major_fallbacks = [
-			get_stylesheet_directory_uri() . '/assets/images/banner-program.jpg',
-			get_stylesheet_directory_uri() . '/assets/images/banner-hero-02.webp',
-			get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg',
-		];
-		$thumb = $major_fallbacks[ $major_id % count( $major_fallbacks ) ];
-	}
-
-	// Roadmaps (Duration, Degree, Entry level)
-	$roadmaps    = get_field( 'major_entry_roadmaps', $major_id );
-	$study_time  = '1.5 - 2 năm';
-	$entry_level = 'Từ Cao đẳng, Trung cấp';
-	$degree      = 'Bằng Cử nhân / Kỹ sư';
-
-	if ( ! empty( $roadmaps ) && is_array( $roadmaps ) ) {
-		$first_r = $roadmaps[0];
-		if ( ! empty( $first_r['study_time'] ) ) {
-			$study_time = $first_r['study_time'];
-		}
-		if ( ! empty( $first_r['entry_level'] ) ) {
-			$entry_level = $first_r['entry_level'];
-		}
-		if ( ! empty( $first_r['degree_output'] ) ) {
-			$degree = $first_r['degree_output'];
-		}
-	}
-
-	// Excerpt / Summary
-	$excerpt = wp_strip_all_tags( get_the_excerpt( $major_id ) );
-	if ( empty( $excerpt ) ) {
-		$overview = get_field( 'major_overview', $major_id );
-		if ( ! empty( $overview ) ) {
-			$excerpt = wp_trim_words( wp_strip_all_tags( $overview ), 24, '...' );
-		} else {
-			$excerpt = 'Chương trình tuyển sinh liên thông đại học ngành ' . $clean_title . ' cấp bằng chính quy, tối ưu thời gian học cho người đi làm.';
-		}
-	}
-
-	// Query Linked Programs & Participating Schools
-	$progs = get_posts( [
-		'post_type'      => 'program',
-		'post_status'    => 'publish',
-		'posts_per_page' => -1,
-		'fields'         => 'ids',
-		'no_found_rows'  => true,
-		'meta_query'     => [
-			'relation' => 'OR',
-			[ 'key' => 'major_relationship', 'value' => $major_id, 'compare' => '=' ],
-			[ 'key' => 'major_relationship', 'value' => '"' . $major_id . '"', 'compare' => 'LIKE' ],
-			[ 'key' => 'major_relationship', 'value' => 's:' . strlen( (string) $major_id ) . ':"' . $major_id . '"', 'compare' => 'LIKE' ],
-			[ 'key' => 'major_relationship', 'value' => 'i:' . $major_id . ';', 'compare' => 'LIKE' ],
-		],
-	] );
-
-	$schools        = [];
-	$training_types = [];
-
-	if ( ! empty( $progs ) ) {
-		foreach ( $progs as $p_id ) {
-			$sch_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $p_id ) : intval( get_post_meta( $p_id, 'school_relationship', true ) );
-			if ( $sch_id && ! isset( $schools[ $sch_id ] ) && 'publish' === get_post_status( $sch_id ) ) {
-				$sch_code = get_post_meta( $sch_id, 'school_code', true ) ?: get_field( 'school_code', $sch_id );
-				$schools[ $sch_id ] = [
-					'id'    => $sch_id,
-					'name'  => get_the_title( $sch_id ),
-					'code'  => $sch_code ?: get_the_title( $sch_id ),
-					'logo'  => function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $sch_id, 'thumbnail' ) : '',
-				];
-			}
-
-			$t_terms = wp_get_post_terms( $p_id, 'training_type' );
-			if ( ! empty( $t_terms ) && ! is_wp_error( $t_terms ) ) {
-				foreach ( $t_terms as $t ) {
-					$slug = $t->slug;
-					$name = preg_replace( '/^hệ\s+/iu', '', $t->name );
-					$badge_class = 'bg-slate-100 text-slate-700 border-slate-200';
-					$dot_class   = 'bg-slate-400';
-
-					if ( in_array( $slug, [ 'tu-xa', 'dao-tao-tu-xa' ], true ) ) {
-						$badge_class = 'bg-blue-50 text-[#00308b] border-blue-200/80';
-						$dot_class   = 'bg-blue-600';
-					} elseif ( in_array( $slug, [ 'vua-hoc-vua-lam', 'vhvl', 'vua-lam-vua-hoc' ], true ) ) {
-						$badge_class = 'bg-amber-50 text-amber-800 border-amber-200/80';
-						$dot_class   = 'bg-amber-500';
-					} elseif ( in_array( $slug, [ 'chinh-quy', 'chinh-quy-tap-trung' ], true ) ) {
-						$badge_class = 'bg-indigo-50 text-indigo-800 border-indigo-200/80';
-						$dot_class   = 'bg-indigo-600';
-					}
-
-					$training_types[ $slug ] = [
-						'name'        => $name,
-						'badge_class' => $badge_class,
-						'dot_class'   => $dot_class,
-					];
-				}
-			}
-		}
-	}
-
-	// Fallback training types if none explicitly linked yet
-	if ( empty( $training_types ) ) {
-		$training_types['tu-xa'] = [
-			'name'        => 'Đào tạo từ xa',
-			'badge_class' => 'bg-blue-50 text-[#00308b] border-blue-200/80',
-			'dot_class'   => 'bg-blue-600',
-		];
-		$training_types['vua-hoc-vua-lam'] = [
-			'name'        => 'Vừa học vừa làm',
-			'badge_class' => 'bg-amber-50 text-amber-800 border-amber-200/80',
-			'dot_class'   => 'bg-amber-500',
-		];
-	}
-
-	$prog_count = function_exists( 'ltdh_get_major_valid_programs_count' )
-		? ltdh_get_major_valid_programs_count( $major_id )
-		: count( $progs );
-
-	$data = [
-		'major_id'       => $major_id,
-		'title'          => $clean_title,
-		'code'           => $code,
-		'cat_name'       => $cat_name,
-		'thumb'          => $thumb,
-		'excerpt'        => $excerpt,
-		'study_time'     => $study_time,
-		'entry_level'    => $entry_level,
-		'degree'         => $degree,
-		'prog_count'     => $prog_count,
-		'schools'        => array_values( $schools ),
-		'school_count'   => count( $schools ),
-		'training_types' => array_values( $training_types ),
-	];
-
-	wp_cache_set( $cache_key, $data, 'ltdh', HOUR_IN_SECONDS );
-	return $data;
-}
-
