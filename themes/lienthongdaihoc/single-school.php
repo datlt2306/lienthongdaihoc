@@ -90,7 +90,7 @@ if ( ! empty( $school_faqs ) ) {
 		<div class="relative bg-slate-100 border border-slate-200/90 rounded-2xl sm:rounded-3xl overflow-hidden mb-6 shadow-lg min-h-[320px] sm:min-h-[380px] md:min-h-[440px] lg:min-h-[480px] flex flex-col justify-end">
 			<?php if ( $banner_image ) : ?>
 				<!-- Background School Banner Image (Bright, natural display) -->
-				<img src="<?php echo esc_url( $banner_image ); ?>" class="absolute inset-0 w-full h-full object-cover object-center" alt="<?php echo esc_attr( $school_title ); ?>">
+				<img src="<?php echo esc_url( $banner_image ); ?>" class="hero-banner skip-lazy no-lazy absolute inset-0 w-full h-full object-cover object-center" alt="<?php echo esc_attr( $school_title ); ?>" loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
 				
 				<!-- Ultra-Soft Scrim Gradient: Upper 65% is 100% clear & bright; bottom has gentle fade only for text contrast -->
 				<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 via-35% to-transparent pointer-events-none"></div>

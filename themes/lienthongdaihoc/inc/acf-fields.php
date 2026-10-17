@@ -113,6 +113,81 @@ function ltdh_register_school_faq_acf_fields() {
 }
 
 /**
+ * Ensure School Admission Forms Tab and Fields are registered directly to group_school_details.
+ */
+add_action( 'acf/init', 'ltdh_register_school_admission_forms_acf_fields', 20 );
+function ltdh_register_school_admission_forms_acf_fields() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	// Register Tab
+	acf_add_local_field( [
+		'key'       => 'field_tab_school_admission_forms',
+		'label'     => 'Phiếu tuyển sinh',
+		'name'      => '',
+		'type'      => 'tab',
+		'parent'    => 'group_school_details',
+		'placement' => 'top',
+		'endpoint'  => 0,
+	] );
+
+	// Register Default Admission Form Field
+	acf_add_local_field( [
+		'key'           => 'field_school_default_admission_form',
+		'label'         => 'Mẫu phiếu tuyển sinh mặc định của trường',
+		'name'          => 'default_admission_form',
+		'type'          => 'file',
+		'parent'        => 'group_school_details',
+		'instructions'  => 'Mẫu phiếu đăng ký xét tuyển dùng chung cho tất cả các hệ đào tạo và ngành học của trường nếu không có mẫu riêng. Nếu trường chỉ dùng đúng 1 biểu mẫu duy nhất cho mọi hệ, hãy tải lên tại đây.',
+		'return_format' => 'array',
+		'library'       => 'all',
+	] );
+
+	// Register Forms by Training Type Repeater
+	acf_add_local_field( [
+		'key'          => 'field_school_admission_forms_by_type',
+		'label'        => 'Mẫu phiếu tuyển sinh theo từng Hệ đào tạo',
+		'name'         => 'admission_forms_by_type',
+		'type'         => 'repeater',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Dành cho trường hợp mỗi Hệ đào tạo (Đại học từ xa, Liên thông chính quy, Văn bằng 2...) có mẫu phiếu riêng. Các chương trình thuộc hệ tương ứng sẽ tự động dùng mẫu này.',
+		'layout'       => 'table',
+		'button_label' => 'Thêm phiếu theo hệ',
+		'sub_fields'   => [
+			[
+				'key'           => 'field_school_form_training_type',
+				'label'         => 'Hệ đào tạo',
+				'name'          => 'training_type',
+				'type'          => 'taxonomy',
+				'taxonomy'      => 'training_type',
+				'field_type'    => 'select',
+				'allow_null'    => 0,
+				'add_term'      => 0,
+				'save_terms'    => 0,
+				'load_terms'    => 0,
+				'return_format' => 'id',
+			],
+			[
+				'key'           => 'field_school_form_file',
+				'label'         => 'File mẫu phiếu (PDF/DOCX)',
+				'name'          => 'file',
+				'type'          => 'file',
+				'return_format' => 'array',
+				'library'       => 'all',
+			],
+			[
+				'key'         => 'field_school_form_notes',
+				'label'       => 'Ghi chú / Tên hiển thị (Tùy chọn)',
+				'name'        => 'notes',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: Mẫu phiếu ĐH Từ xa 2026',
+			],
+		],
+	] );
+}
+
+/**
  * Ensure Major FAQ Tab and Repeater are registered directly to group_major_details.
  */
 add_action( 'acf/init', 'ltdh_register_major_faq_acf_fields', 20 );
@@ -1758,7 +1833,7 @@ function ltdh_get_program_data_completeness( $post_id ) {
 		$warnings[] = 'Học phí bị dính định dạng số thực lẻ (.0): ' . esc_html( $tuition_fee );
 	}
 
-	$form_file = get_post_meta( $post_id, 'admission_form_file', true );
+	$form_file = function_exists( 'ltdh_get_program_admission_form_url' ) ? ltdh_get_program_admission_form_url( $post_id ) : get_post_meta( $post_id, 'admission_form_file', true );
 	if ( ! empty( $form_file ) && is_string( $form_file ) && str_contains( $form_file, 'utc' ) ) {
 		$school_slug = $school_id ? get_post_field( 'post_name', $school_id ) : '';
 		if ( ! str_contains( (string) $school_slug, 'giao-thong-van-tai' ) ) {

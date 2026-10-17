@@ -56,7 +56,8 @@ $zalo    = ltdh_get_zalo_url();
 					$slide_img_desktop = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'] ) : $slide['image'];
 					$slide_img_mobile  = ! empty( $slide['image_mobile'] ) ? ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image_mobile'], true ) : $slide['image_mobile'] ) : ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'], true ) : '' );
 					$is_lcp            = ( 0 === $slide_idx );
-					$loading_attr      = $is_lcp ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" fetchpriority="low"';
+					$loading_attr      = $is_lcp ? 'loading="eager" fetchpriority="high" data-no-lazy="1"' : 'loading="lazy" fetchpriority="low"';
+					$hero_cls          = $is_lcp ? 'hero-banner hero-img skip-lazy no-lazy ' : '';
 					?>
 
 					<div class="swiper-slide w-full">
@@ -70,7 +71,7 @@ $zalo    = ltdh_get_zalo_url();
 								<?php if ( ! empty( $slide_img_mobile ) && $slide_img_mobile !== $slide_img_desktop ) : ?>
 									<source media="(max-width: 768px)" srcset="<?php echo esc_url( $slide_img_mobile ); ?>">
 								<?php endif; ?>
-								<img src="<?php echo esc_url( $slide_img_desktop ); ?>" width="1942" height="809" alt="Banner Hero" class="w-full h-auto max-h-[800px] object-cover object-center pointer-events-none" <?php echo $loading_attr; ?> decoding="async">
+								<img src="<?php echo esc_url( $slide_img_desktop ); ?>" width="1942" height="809" alt="Banner Hero" class="<?php echo $hero_cls; ?>w-full h-auto max-h-[800px] object-cover object-center pointer-events-none" <?php echo $loading_attr; ?> decoding="async">
 							</picture>
 						</div>
 

@@ -93,7 +93,8 @@ $global_zalo = ltdh_get_zalo_url();
 
 // Dynamically construct sticky navigation tabs for Program (UI/UX Pro Max)
 $admission_batches_list = get_field( 'admission_batches', $program_id );
-$admission_form_file    = get_field( 'admission_form_file', $program_id );
+$admission_form_data    = function_exists( 'ltdh_get_program_admission_form_data' ) ? ltdh_get_program_admission_form_data( $program_id ) : null;
+$admission_form_file    = $admission_form_data['url'] ?? '';
 
 $program_tabs = [];
 $program_tabs[] = [
@@ -513,27 +514,10 @@ if ( ! empty( $faqs ) ) {
 
 				<!-- SECTION 3: ADMISSION REQUIREMENTS & DOCUMENTS -->
 				<?php 
-				$admission_form = get_field( 'admission_form_file', $program_id );
-				$form_url = '';
-				if ( is_array( $admission_form ) && ! empty( $admission_form['url'] ) ) {
-					$form_url = $admission_form['url'];
-				} elseif ( is_string( $admission_form ) && ! empty( $admission_form ) ) {
-					$form_url = $admission_form;
-				}
-
-				// Nếu file URL trỏ nhầm về UTC nhưng trường không phải UTC, ánh xạ lại chính xác
-				if ( ! empty( $form_url ) && str_contains( $form_url, 'utc-2026.pdf' ) ) {
-					$s_code_val = get_post_meta( $school_id, 'school_code', true );
-					$school_code_clean = strtolower( preg_replace( '/[^a-zA-Z0-9]/', '', (string) $s_code_val ) );
-					if ( $school_code_clean !== 'utc' ) {
-						$custom_form_path = WP_CONTENT_DIR . "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf";
-						if ( file_exists( $custom_form_path ) ) {
-							$form_url = content_url( "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf" );
-						} else {
-							$form_url = home_url( "/lien-he/?school={$school_code_clean}&program_id={$program_id}" );
-						}
-					}
-				}
+				$admission_form_data = function_exists( 'ltdh_get_program_admission_form_data' ) ? ltdh_get_program_admission_form_data( $program_id ) : null;
+				$form_url            = $admission_form_data['url'] ?? '';
+				$form_title          = $admission_form_data['title'] ?? ( 'Phiếu tuyển sinh: ' . get_the_title( $program_id ) );
+				$form_badge          = $admission_form_data['source_label'] ?? '';
 				?>
 				<?php if ( $requirements || $documents || $form_url || ! empty( $contact_formatted ) ) : ?>
 					<section id="dieu-kien-ho-so" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
@@ -638,11 +622,18 @@ if ( ! empty( $faqs ) ) {
 														📄
 													</div>
 													<div>
-														<p class="font-bold text-slate-900 text-sm mb-0.5">Tải mẫu phiếu đăng ký tuyển sinh</p>
-														<p class="text-xs text-slate-500">Mẫu phiếu đăng ký tuyển sinh chính thức để in và làm hồ sơ</p>
+														<div class="flex flex-wrap items-center gap-2 mb-0.5">
+															<p class="font-bold text-slate-900 text-sm">Tải mẫu phiếu đăng ký tuyển sinh</p>
+															<?php if ( ! empty( $form_badge ) ) : ?>
+																<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-800">
+																	<?php echo esc_html( $form_badge ); ?>
+																</span>
+															<?php endif; ?>
+														</div>
+														<p class="text-xs text-slate-500"><?php echo esc_html( $form_title ); ?></p>
 													</div>
 												</div>
-												<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="Phiếu tuyển sinh: <?php echo esc_attr( get_the_title() ); ?>">
+												<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="<?php echo esc_attr( $form_title ); ?>">
 													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 													<span>Tải Phiếu Tuyển Sinh</span>
 												</a>

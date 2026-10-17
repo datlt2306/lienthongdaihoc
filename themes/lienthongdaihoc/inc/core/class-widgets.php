@@ -1456,6 +1456,28 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 		?>
 	</section>
 
+	<!-- ADMISSION FORMS DOWNLOAD (Sidebar) -->
+	<?php
+	$school_admission_forms = function_exists( 'ltdh_get_school_admission_forms' ) ? ltdh_get_school_admission_forms( $school_id ) : [];
+	if ( ! empty( $school_admission_forms ) ) :
+	?>
+		<section class="bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-5">
+			<div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-3">
+				<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center text-sm font-bold shrink-0">📄</span>
+				<h3 class="text-base font-extrabold text-slate-900 leading-snug">Mẫu phiếu tuyển sinh</h3>
+			</div>
+			<p class="text-xs text-slate-500 mb-3.5 leading-relaxed">Tải mẫu phiếu đăng ký chính thức để hoàn thiện hồ sơ xét tuyển vào trường.</p>
+			<div class="space-y-2">
+				<?php foreach ( $school_admission_forms as $form_item ) : ?>
+					<a href="<?php echo esc_url( $form_item['url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="flex items-center justify-between gap-2 p-2.5 bg-blue-50/50 hover:bg-blue-50 rounded-lg border border-blue-100/70 text-xs font-semibold text-[#00308b] transition-all cursor-pointer group">
+						<span class="truncate"><?php echo esc_html( $form_item['label'] ); ?></span>
+						<svg class="w-4 h-4 text-[#00308b] shrink-0 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+					</a>
+				<?php endforeach; ?>
+			</div>
+		</section>
+	<?php endif; ?>
+
 	<!-- RELATED NEWS & ANNOUNCEMENTS (Sidebar) -->
 	<?php
 	$related_news_query = new WP_Query( [

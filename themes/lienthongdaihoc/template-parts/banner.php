@@ -436,7 +436,7 @@ if ( empty( $banner_image ) ) {
 	<?php if ( ! empty( $banner_image ) ) : ?>
 		<!-- Banner Background Image with Gradient Overlay -->
 		<div class="absolute inset-0 z-0">
-			<img src="<?php echo esc_url( $banner_image ); ?>" class="w-full h-full object-cover object-center scale-105 <?php echo is_singular( 'post' ) ? 'opacity-20 blur-[2px]' : 'opacity-25 blur-[1px]'; ?>" alt="<?php echo esc_attr( $banner_title ); ?>" width="1920" height="400" loading="eager" fetchpriority="high" decoding="async">
+			<img src="<?php echo esc_url( $banner_image ); ?>" class="hero-banner skip-lazy no-lazy w-full h-full object-cover object-center scale-105 <?php echo is_singular( 'post' ) ? 'opacity-20 blur-[2px]' : 'opacity-25 blur-[1px]'; ?>" alt="<?php echo esc_attr( $banner_title ); ?>" width="1920" height="400" loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
 			<div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/80 to-brand-primary/80"></div>
 		</div>
 	<?php endif; ?>
