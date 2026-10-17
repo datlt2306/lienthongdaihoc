@@ -51,14 +51,22 @@ $years = range( $current_year, $current_year - 25 );
 	</div>
 </div>
 
-<!-- Alternatives -->
-<div id="elig-alternatives-section" class="elig-alternatives hidden mt-8">
-	<h3 class="font-black text-slate-800 text-base sm:text-lg mb-4 flex items-center gap-2">
-		<svg class="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.516 0c.85.493 1.508 1.333 1.508 2.316V18" />
-		</svg>
-		<span>Gợi ý chương trình liên quan</span>
-	</h3>
+<!-- Alternatives (Smart Recommendations) -->
+<div id="elig-alternatives-section" class="elig-alternatives hidden mt-8 bg-slate-50/70 border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-2xs">
+	<div class="mb-4">
+		<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#00308b] text-[11px] font-extrabold uppercase tracking-wider mb-1.5 border border-blue-100">
+			<svg class="w-3.5 h-3.5 text-[#00308b]" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+			</svg>
+			<span>Phương án đề xuất bổ sung</span>
+		</div>
+		<h3 class="font-black text-slate-900 text-base sm:text-lg flex items-center gap-2 m-0">
+			Gợi ý chương trình liên quan & phương án dự phòng
+		</h3>
+		<p class="text-xs sm:text-sm text-slate-500 mt-1">
+			Các chương trình cùng ngành hoặc hệ đào tạo từ xa linh hoạt, tối ưu thời gian và chi phí bạn có thể cân nhắc thêm.
+		</p>
+	</div>
 	<div id="elig-alternatives-list" class="elig-program-list space-y-4"></div>
 </div>
 

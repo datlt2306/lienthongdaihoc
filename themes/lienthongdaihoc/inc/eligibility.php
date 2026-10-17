@@ -265,7 +265,7 @@ function ltdh_elig_ajax_check() {
 
 	// Attach desired major title for frontend summary
 	if ( ! empty( $input['desired_major'] ) ) {
-		$input['desired_major_title'] = get_the_title( intval( $input['desired_major'] ) );
+		$input['desired_major_title'] = html_entity_decode( get_the_title( intval( $input['desired_major'] ) ), ENT_QUOTES, 'UTF-8' );
 	} else {
 		$input['desired_major_title'] = '';
 	}
@@ -581,7 +581,7 @@ function ltdh_elig_run_check( $input ) {
 
 		$program_data = [
 			'program_id'         => $program_id,
-			'title'              => get_the_title( $program_id ),
+			'title'              => html_entity_decode( get_the_title( $program_id ), ENT_QUOTES, 'UTF-8' ),
 			'permalink'          => get_permalink( $program_id ),
 			'thumbnail'          => get_the_post_thumbnail_url( $program_id, 'medium' ) ?: get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg',
 			'score'              => $match_score,
@@ -591,11 +591,11 @@ function ltdh_elig_run_check( $input ) {
 			'mismatch_reasons'   => $mismatch_reasons,
 			'school'             => $school_id ? [
 				'id'     => $school_id,
-				'title'  => get_the_title( $school_id ),
+				'title'  => html_entity_decode( get_the_title( $school_id ), ENT_QUOTES, 'UTF-8' ),
 				'code'   => get_post_meta( $school_id, 'school_code', true ) ?: '',
 				'logo'   => $school_logo_id ? wp_get_attachment_image_url( $school_logo_id, 'thumbnail' ) : '',
 			] : null,
-			'major'              => $prog_major_id ? get_the_title( $prog_major_id ) : '',
+			'major'              => $prog_major_id ? html_entity_decode( get_the_title( $prog_major_id ), ENT_QUOTES, 'UTF-8' ) : '',
 			'training_type'      => wp_get_post_terms( $program_id, 'training_type', [ 'fields' => 'names' ] )[0] ?? '',
 			'tuition_fee'        => get_post_meta( $program_id, 'tuition_fee', true ) ?: '',
 			'duration'           => get_post_meta( $program_id, 'duration', true ) ?: '',
@@ -617,18 +617,8 @@ function ltdh_elig_run_check( $input ) {
 
 	$eligible_slice = array_slice( $eligible, 0, 10 );
 
-	// Build alternatives (programs that are not fully compatible but might interest the user)
-	$alternatives = [];
-	foreach ( $rejected as $r ) {
-		if ( count( $alternatives ) >= 5 ) {
-			break;
-		}
-		$alternatives[] = [
-			'program_id' => $r['program_id'],
-			'title'      => $r['title'],
-			'reason'     => ! empty( $r['mismatch_reasons'] ) ? $r['mismatch_reasons'][0] : 'Chưa phù hợp điều kiện',
-		];
-	}
+	// Build curated, intelligent alternatives
+	$alternatives = ltdh_elig_build_smart_alternatives( $input, $eligible_slice, $hierarchy );
 
 	return [
 		'eligible'         => ! empty( $eligible_slice ),
@@ -638,6 +628,162 @@ function ltdh_elig_run_check( $input ) {
 		'top_score'        => $eligible_slice[0]['score'] ?? 0,
 		'alternatives'     => $alternatives,
 	];
+}
+
+/**
+ * Build smart, relevant alternatives when primary search needs backup options.
+ *
+ * @param array $input User input data.
+ * @param array $eligible_slice Currently matched eligible programs.
+ * @param array $hierarchy Education hierarchy map.
+ * @return array List of curated alternative programs.
+ */
+function ltdh_elig_build_smart_alternatives( $input, $eligible_slice, $hierarchy ) {
+	$eligible_ids = ! empty( $eligible_slice ) ? wp_list_pluck( $eligible_slice, 'program_id' ) : [];
+	$target_major = ! empty( $input['desired_major'] ) ? intval( $input['desired_major'] ) : intval( $input['major_id'] ?? 0 );
+	$user_level   = $hierarchy[ $input['education'] ?? '' ] ?? 0;
+
+	$args = [
+		'post_type'      => LTDH_CPT_PROGRAM,
+		'post_status'    => 'publish',
+		'posts_per_page' => 20,
+		'fields'         => 'ids',
+		'post__not_in'   => ! empty( $eligible_ids ) ? $eligible_ids : [ 0 ],
+		'meta_query'     => [
+			[
+				'key'     => LTDH_META_ADMISSION_STATUS,
+				'value'   => LTDH_STATUS_OPEN,
+				'compare' => '=',
+			],
+		],
+	];
+
+	$candidate_ids = get_posts( $args );
+	if ( empty( $candidate_ids ) ) {
+		return [];
+	}
+
+	$prohibited_slugs = function_exists( 'ltdh_elig_get_prohibited_distance_learning_categories' ) 
+		? ltdh_elig_get_prohibited_distance_learning_categories() 
+		: [ 'y-khoa', 'y-da-khoa', 'duoc-hoc', 'dieu-duong', 'su-pham-toan', 'su-pham-van', 'su-pham-tieng-anh', 'giao-duc-mam-non', 'giao-duc-tieu-hoc' ];
+
+	$alternatives = [];
+
+	foreach ( $candidate_ids as $prog_id ) {
+		if ( count( $alternatives ) >= 3 ) {
+			break;
+		}
+
+		$school_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $prog_id ) : 0;
+		if ( ! $school_id ) {
+			$raw_school = get_field( 'school_relationship', $prog_id );
+			if ( is_array( $raw_school ) ) {
+				$raw_school = ! empty( $raw_school ) ? $raw_school[0] : 0;
+			}
+			if ( is_object( $raw_school ) ) {
+				$raw_school = $raw_school->ID;
+			}
+			$school_id = intval( $raw_school );
+		}
+		if ( ! $school_id || 'publish' !== get_post_status( $school_id ) ) {
+			continue;
+		}
+
+		$prog_major_id = get_field( 'major_relationship', $prog_id );
+		if ( is_array( $prog_major_id ) ) {
+			$prog_major_id = ! empty( $prog_major_id ) ? $prog_major_id[0] : 0;
+		}
+		if ( is_object( $prog_major_id ) ) {
+			$prog_major_id = $prog_major_id->ID;
+		}
+		$prog_major_id = intval( $prog_major_id );
+
+		$min_edu = get_field( 'elig_min_education', $prog_id ) ?: '';
+		if ( $min_edu && $user_level ) {
+			$min_level = $hierarchy[ $min_edu ] ?? 0;
+			if ( $user_level < $min_level ) {
+				continue;
+			}
+		}
+
+		$prog_tt_slugs = wp_get_post_terms( $prog_id, 'training_type', [ 'fields' => 'slugs' ] );
+		$is_distance   = in_array( 'tu-xa', $prog_tt_slugs, true ) || in_array( 'dao-tao-tu-xa', $prog_tt_slugs, true );
+
+		if ( $is_distance ) {
+			$prog_major_slug = $prog_major_id ? get_post_field( 'post_name', $prog_major_id ) : '';
+			if ( in_array( $prog_major_slug, $prohibited_slugs, true ) ) {
+				continue;
+			}
+		}
+
+		$is_same_major    = false;
+		$is_related_major = false;
+
+		if ( $target_major > 0 ) {
+			if ( $prog_major_id === $target_major ) {
+				$is_same_major = true;
+			} elseif ( $prog_major_id && function_exists( 'ltdh_elig_are_majors_related' ) && ltdh_elig_are_majors_related( $target_major, $prog_major_id ) ) {
+				$is_related_major = true;
+			} else {
+				// Strictly skip any program with unrelated major
+				continue;
+			}
+		}
+
+		$major_title = $prog_major_id ? html_entity_decode( get_the_title( $prog_major_id ), ENT_QUOTES, 'UTF-8' ) : '';
+		$school_name = html_entity_decode( get_the_title( $school_id ), ENT_QUOTES, 'UTF-8' );
+
+		if ( $is_same_major ) {
+			if ( $is_distance ) {
+				$reason = 'Chương trình cùng ngành với hình thức Đào tạo từ xa linh hoạt (học online 100%, chủ động thời gian, văn bằng giá trị tương đương chính quy).';
+				$badge  = 'Cùng ngành • Đào tạo từ xa';
+			} elseif ( in_array( 'vua-hoc-vua-lam', $prog_tt_slugs, true ) ) {
+				$reason = 'Chương trình cùng ngành hệ Vừa học vừa làm (học buổi tối & cuối tuần, thuận tiện cho người đi làm).';
+				$badge  = 'Cùng ngành • Vừa học vừa làm';
+			} else {
+				$reason = 'Phương án tuyển sinh mở rộng cùng ngành ' . ( $major_title ? ' (' . $major_title . ')' : '' ) . ' tại ' . $school_name . '.';
+				$badge  = 'Cùng ngành đào tạo';
+			}
+		} elseif ( $is_related_major ) {
+			$reason = 'Ngành gần với định hướng của bạn' . ( $major_title ? ' (' . $major_title . ')' : '' ) . ' — cơ hội việc làm và chương trình đào tạo tương đương.';
+			$badge  = 'Ngành liên quan gần';
+		} else {
+			$reason = 'Chương trình đào tạo uy tín đang mở đợt tuyển sinh phù hợp với hồ sơ văn bằng của bạn.';
+			$badge  = 'Chương trình nổi bật';
+		}
+
+		$school_logo_id = ltdh_get_school_image_id( $school_id );
+
+		$alternatives[] = [
+			'program_id'         => $prog_id,
+			'title'              => html_entity_decode( get_the_title( $prog_id ), ENT_QUOTES, 'UTF-8' ),
+			'permalink'          => get_permalink( $prog_id ),
+			'thumbnail'          => get_the_post_thumbnail_url( $prog_id, 'medium' ) ?: get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg',
+			'score'              => 75,
+			'preliminary_status' => 'alternative',
+			'alt_badge'          => $badge,
+			'reason'             => $reason,
+			'suggestion_reason'  => $reason,
+			'match_reasons'      => [ $reason ],
+			'verification_items' => [],
+			'mismatch_reasons'   => [],
+			'school'             => [
+				'id'    => $school_id,
+				'title' => $school_name,
+				'code'  => get_post_meta( $school_id, 'school_code', true ) ?: '',
+				'logo'  => $school_logo_id ? wp_get_attachment_image_url( $school_logo_id, 'thumbnail' ) : '',
+			],
+			'major'              => $major_title,
+			'training_type'      => wp_get_post_terms( $prog_id, 'training_type', [ 'fields' => 'names' ] )[0] ?? 'Linh hoạt',
+			'tuition_fee'        => get_post_meta( $prog_id, 'tuition_fee', true ) ?: 'Theo quy định nhà trường',
+			'duration'           => get_post_meta( $prog_id, 'duration', true ) ?: '1.5 – 2 năm',
+			'schedule'           => get_post_meta( $prog_id, 'schedule', true ) ?: 'Linh hoạt (Online/Tối/Cuối tuần)',
+			'campus_info'        => implode( ', ', wp_get_post_terms( $prog_id, 'campus', [ 'fields' => 'names' ] ) ) ?: 'Toàn quốc (Online)',
+			'is_alternative'     => true,
+		];
+	}
+
+	return $alternatives;
 }
 
 // ----------------------------------------------------

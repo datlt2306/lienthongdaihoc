@@ -604,7 +604,7 @@
 			}
 		}
 
-		// Alternatives
+		// Alternatives (Smart Curated Recommendations)
 		var altSection = document.getElementById('elig-alternatives-section');
 		var altList = document.getElementById('elig-alternatives-list');
 		if (altList) {
@@ -612,7 +612,7 @@
 			if (data.alternatives && data.alternatives.length > 0) {
 				if (altSection) altSection.classList.remove('hidden');
 				data.alternatives.forEach(function (prog, idx) {
-					altList.appendChild(renderProgramCard(prog, idx));
+					altList.appendChild(renderAlternativeCard(prog, idx));
 				});
 			} else {
 				if (altSection) altSection.classList.add('hidden');
@@ -747,7 +747,7 @@
 			'<div class="p-4 sm:p-5 pt-3">' +
 				'<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-3">' +
 					'<h3 class="font-extrabold text-base sm:text-lg text-slate-900 leading-snug min-w-0 flex-1">' +
-						'<a href="' + escAttr(prog.permalink) + '" class="hover:text-[#00308b] transition-colors no-underline text-slate-900">' + escHtml(prog.title) + '</a>' +
+						'<a href="' + escAttr(prog.permalink) + '" target="_blank" rel="noopener" class="elig-card-title hover:text-[#00308b] transition-colors no-underline text-slate-900">' + escHtml(prog.title) + '</a>' +
 					'</h3>' +
 					'<div class="' + statusClass + ' shrink-0">' +
 						'<span class="elig-score-label text-xs font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1">' + statusLabel + ' (' + matchPriorityLabel + ')</span>' +
@@ -761,8 +761,99 @@
 				'</div>' +
 				reasonsHtml +
 				'<div class="mt-4 pt-1 flex flex-col sm:flex-row items-center gap-2.5">' +
-					'<a href="' + escAttr(prog.permalink) + '" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all no-underline shadow-2xs">Xem chi tiết</a>' +
-					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-blue-900 text-white text-xs font-extrabold transition-all no-underline shadow-2xs elig-verify-card-btn" data-program-id="' + prog.program_id + '">Xác minh hồ sơ 1:1</a>' +
+					'<a href="' + escAttr(prog.permalink) + '" target="_blank" rel="noopener" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-bold transition-all no-underline shadow-2xs inline-flex items-center justify-center gap-1.5 cursor-pointer">' +
+						'<span>Xem chi tiết</span>' +
+						'<svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>' +
+					'</a>' +
+					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-blue-900 text-white text-xs font-extrabold transition-all no-underline shadow-2xs elig-verify-card-btn inline-flex items-center justify-center gap-1.5 cursor-pointer" data-program-id="' + prog.program_id + '">' +
+						'<span>Xác minh hồ sơ 1:1</span>' +
+						'<svg class="w-3.5 h-3.5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>' +
+					'</a>' +
+				'</div>' +
+			'</div>';
+
+		return card;
+	}
+
+	function renderAlternativeCard(prog, idx) {
+		var schoolCode = (prog.school && prog.school.code) ? prog.school.code.toUpperCase() : '';
+		var schoolTitle = (prog.school && prog.school.title) ? prog.school.title : 'Trường Đại học';
+		var schoolLogo = (prog.school && prog.school.logo) ? prog.school.logo : '';
+		var permalink = prog.permalink || '#';
+		var altBadge = prog.alt_badge || 'Phương án đề xuất bổ sung';
+		var suggestionReason = prog.suggestion_reason || prog.reason || 'Chương trình đào tạo tương thích với hồ sơ văn bằng của bạn.';
+
+		var schoolHeaderHtml =
+			'<div class="p-4 sm:p-5 pb-3 border-b border-slate-100 flex items-center justify-between gap-3">' +
+				'<div class="flex items-center gap-3 min-w-0">' +
+					(schoolLogo
+						? '<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white border border-slate-200/90 p-1 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">' +
+								'<img src="' + escAttr(schoolLogo) + '" alt="' + escAttr(schoolTitle) + '" class="max-w-full max-h-full object-contain">' +
+						  '</div>'
+						: '<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-800 text-white font-black text-xs flex items-center justify-center shrink-0">' +
+								escHtml(schoolCode || 'ĐH') +
+						  '</div>'
+					) +
+					'<div class="min-w-0">' +
+						'<div class="font-extrabold text-xs sm:text-sm text-slate-800 truncate">' + escHtml(schoolTitle) + '</div>' +
+						(schoolCode ? '<span class="inline-block text-[11px] font-bold text-slate-500">' + escHtml(schoolCode) + '</span>' : '') +
+					'</div>' +
+				'</div>' +
+				'<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#00308b] text-[11px] font-extrabold border border-blue-200/80 shrink-0 shadow-2xs">' +
+					'<svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>' +
+					'<span>' + escHtml(altBadge) + '</span>' +
+				'</div>' +
+			'</div>';
+
+		var tagsHtml = '<div class="flex flex-wrap items-center gap-2 mt-2">';
+		if (prog.training_type) {
+			tagsHtml += '<span class="px-2.5 py-0.5 rounded-md bg-blue-50 text-[#00308b] text-xs font-bold border border-blue-100">' + escHtml(prog.training_type) + '</span>';
+		}
+		if (prog.major) {
+			tagsHtml += '<span class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-xs font-medium">Ngành: ' + escHtml(prog.major) + '</span>';
+		}
+		tagsHtml += '</div>';
+
+		var reasonCalloutHtml =
+			'<div class="my-3.5 p-3 sm:p-3.5 rounded-xl bg-gradient-to-r from-blue-50/80 via-indigo-50/40 to-slate-50 border border-blue-100/90 text-xs text-slate-700 flex items-start gap-2.5">' +
+				'<div class="w-6 h-6 rounded-lg bg-blue-100/80 text-[#00308b] flex items-center justify-center shrink-0 mt-0.5">' +
+					'<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.516 0c.85.493 1.508 1.333 1.508 2.316V18"/></svg>' +
+				'</div>' +
+				'<div class="leading-relaxed">' +
+					'<strong class="text-slate-900 font-extrabold mr-1">Lý do gợi ý:</strong>' +
+					'<span>' + escHtml(suggestionReason) + '</span>' +
+				'</div>' +
+			'</div>';
+
+		var card = document.createElement('div');
+		card.className = 'elig-card elig-alternative-card bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md transition-all overflow-hidden';
+
+		card.innerHTML =
+			'<div class="h-1 bg-gradient-to-r from-sky-400 via-indigo-500 to-blue-600"></div>' +
+			schoolHeaderHtml +
+			'<div class="p-4 sm:p-5 pt-3">' +
+				'<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">' +
+					'<h3 class="font-extrabold text-base sm:text-lg text-slate-900 leading-snug min-w-0 flex-1">' +
+						'<a href="' + escAttr(permalink) + '" target="_blank" rel="noopener" class="elig-card-title hover:text-[#00308b] transition-colors no-underline text-slate-900">' + escHtml(prog.title) + '</a>' +
+					'</h3>' +
+				'</div>' +
+				tagsHtml +
+				reasonCalloutHtml +
+				'<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 py-3 border-y border-slate-100 text-xs text-slate-600">' +
+					'<div><span class="text-slate-400 block mb-0.5">Học phí:</span><span class="font-bold text-slate-900">' + escHtml(prog.tuition_fee || 'Theo quy định') + '</span></div>' +
+					'<div><span class="text-slate-400 block mb-0.5">Thời gian:</span><span class="font-bold text-slate-900">' + escHtml(prog.duration || '1.5 – 2 năm') + '</span></div>' +
+					'<div><span class="text-slate-400 block mb-0.5">Lịch học:</span><span class="font-bold text-slate-900">' + escHtml(prog.schedule || 'Linh hoạt') + '</span></div>' +
+					'<div><span class="text-slate-400 block mb-0.5">Cơ sở:</span><span class="font-bold text-slate-900">' + escHtml(prog.campus_info || 'Toàn quốc') + '</span></div>' +
+				'</div>' +
+				'<div class="mt-4 pt-1 flex flex-col sm:flex-row items-center gap-2.5">' +
+					'<a href="' + escAttr(permalink) + '" target="_blank" rel="noopener" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-xs font-bold transition-all no-underline shadow-2xs inline-flex items-center justify-center gap-1.5 cursor-pointer">' +
+						'<span>Xem chi tiết</span>' +
+						'<svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>' +
+					'</a>' +
+					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-blue-900 text-white text-xs font-extrabold transition-all no-underline shadow-2xs elig-verify-card-btn inline-flex items-center justify-center gap-1.5 cursor-pointer" data-program-id="' + prog.program_id + '">' +
+						'<span>Nhận tư vấn phương án này</span>' +
+						'<svg class="w-3.5 h-3.5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>' +
+					'</a>' +
 				'</div>' +
 			'</div>';
 
@@ -960,10 +1051,18 @@
 	// ----------------------------------------------------
 	// Helpers
 	// ----------------------------------------------------
+	function decodeHtml(html) {
+		if (!html) return '';
+		var txt = document.createElement('textarea');
+		txt.innerHTML = html;
+		return txt.value;
+	}
+
 	function escHtml(str) {
 		if (!str) return '';
+		var decoded = decodeHtml(str);
 		var div = document.createElement('div');
-		div.appendChild(document.createTextNode(str));
+		div.appendChild(document.createTextNode(decoded));
 		return div.innerHTML;
 	}
 
