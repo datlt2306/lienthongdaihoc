@@ -111,6 +111,45 @@ function ltdh_customize_archive_queries( $query ) {
 		return;
 	}
 
+	// Blog and Category Archives: align Main Query posts_per_page with index.php (8 per page)
+	if ( $query->is_home() || $query->is_category() ) {
+		$query->set( 'posts_per_page', 8 );
+
+		$school_filter   = isset( $_GET['truong'] ) ? intval( $_GET['truong'] ) : 0;
+		$major_filter    = isset( $_GET['nganh'] ) ? intval( $_GET['nganh'] ) : 0;
+		$program_filter  = isset( $_GET['chuong-trinh'] ) ? intval( $_GET['chuong-trinh'] ) : 0;
+
+		if ( $school_filter || $major_filter || $program_filter ) {
+			$meta_query = $query->get( 'meta_query' );
+			if ( ! is_array( $meta_query ) ) {
+				$meta_query = [];
+			}
+			$meta_query['relation'] = 'AND';
+			if ( $school_filter ) {
+				$meta_query[] = [
+					'key'     => 'related_schools',
+					'value'   => '"' . $school_filter . '"',
+					'compare' => 'LIKE',
+				];
+			}
+			if ( $major_filter ) {
+				$meta_query[] = [
+					'key'     => 'related_majors',
+					'value'   => '"' . $major_filter . '"',
+					'compare' => 'LIKE',
+				];
+			}
+			if ( $program_filter ) {
+				$meta_query[] = [
+					'key'     => 'related_programs',
+					'value'   => '"' . $program_filter . '"',
+					'compare' => 'LIKE',
+				];
+			}
+			$query->set( 'meta_query', $meta_query );
+		}
+	}
+
 	if ( $query->is_tax( LTDH_TAX_TRAINING_TYPE ) ) {
 		$query->set( 'post_type', LTDH_CPT_PROGRAM );
 	}
@@ -987,6 +1026,187 @@ function ltdh_ajax_filter_major_programs() {
 	wp_send_json_success( [
 		'html'  => $html,
 		'count' => $count,
+	] );
+}
+
+/**
+ * AJAX Handler for filtering majors on /nganh-hoc/ without page reload.
+ */
+add_action( 'wp_ajax_ltdh_filter_majors', 'ltdh_ajax_filter_majors' );
+add_action( 'wp_ajax_nopriv_ltdh_filter_majors', 'ltdh_ajax_filter_majors' );
+
+function ltdh_ajax_filter_majors() {
+	$paged = isset( $_REQUEST['paged'] ) ? max( 1, intval( $_REQUEST['paged'] ) ) : 1;
+	$limit = isset( $_REQUEST['limit'] ) ? intval( $_REQUEST['limit'] ) : 12;
+	if ( ! in_array( $limit, [ 10, 12, 20, 24, 30, 36, 48, 50, 100, -1 ], true ) ) {
+		$limit = 12;
+	}
+
+	$nhom_nganh = isset( $_REQUEST['nhom_nganh'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nhom_nganh'] ) ) : '';
+	$search     = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : '';
+	$sort       = isset( $_REQUEST['sort'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['sort'] ) ) : '';
+
+	$args = [
+		'post_type'      => LTDH_CPT_MAJOR,
+		'post_status'    => 'publish',
+		'posts_per_page' => $limit,
+		'paged'          => $paged,
+	];
+
+	if ( ! empty( $nhom_nganh ) ) {
+		$args['tax_query'] = [
+			[
+				'taxonomy' => LTDH_TAX_MAJOR_CAT,
+				'field'    => 'slug',
+				'terms'    => $nhom_nganh,
+			],
+		];
+	}
+
+	if ( ! empty( $search ) ) {
+		$args['s'] = $search;
+	}
+
+	if ( 'title_asc' === $sort ) {
+		$args['orderby'] = 'title';
+		$args['order']   = 'ASC';
+	} elseif ( 'title_desc' === $sort ) {
+		$args['orderby'] = 'title';
+		$args['order']   = 'DESC';
+	} elseif ( 'date_desc' === $sort ) {
+		$args['orderby'] = 'date';
+		$args['order']   = 'DESC';
+	} else {
+		$args['orderby'] = 'menu_order title';
+		$args['order']   = 'ASC';
+	}
+
+	$query = new WP_Query( $args );
+
+	$active_cat_term = $nhom_nganh ? get_term_by( 'slug', $nhom_nganh, LTDH_TAX_MAJOR_CAT ) : null;
+	$heading_title   = $active_cat_term ? 'Nhóm ngành: ' . $active_cat_term->name : 'Danh sách Ngành đào tạo Liên thông Đại học';
+
+	// Compute active filter items
+	$active_filter_items = [];
+	if ( ! empty( $search ) ) {
+		$active_filter_items[] = [
+			'label' => 'Từ khóa: "' . $search . '"',
+			'key'   => 's',
+		];
+	}
+	if ( ! empty( $nhom_nganh ) ) {
+		$cat_label = $active_cat_term ? $active_cat_term->name : $nhom_nganh;
+		$active_filter_items[] = [
+			'label' => 'Nhóm: ' . $cat_label,
+			'key'   => 'nhom_nganh',
+		];
+	}
+	if ( ! empty( $sort ) ) {
+		$sort_labels = [
+			'title_asc'  => 'A-Z',
+			'title_desc' => 'Z-A',
+			'date_desc'  => 'Mới nhất',
+		];
+		$active_filter_items[] = [
+			'label' => 'Xếp: ' . ( $sort_labels[ $sort ] ?? $sort ),
+			'key'   => 'sort',
+		];
+	}
+	if ( 12 !== $limit ) {
+		$active_filter_items[] = [
+			'label' => $limit . ' ngành/trang',
+			'key'   => 'limit',
+		];
+	}
+	$active_filter_count = count( $active_filter_items );
+	$has_active_filters  = $active_filter_count > 0;
+	$archive_link        = get_post_type_archive_link( LTDH_CPT_MAJOR ) ?: home_url( '/nganh-hoc/' );
+
+	// Preserved query parameters for URLs
+	$preserved_args = [];
+	if ( ! empty( $nhom_nganh ) ) $preserved_args['nhom_nganh'] = $nhom_nganh;
+	if ( ! empty( $search ) )     $preserved_args['s'] = $search;
+	if ( ! empty( $sort ) )       $preserved_args['sort'] = $sort;
+	if ( 12 !== $limit )          $preserved_args['limit'] = $limit;
+
+	// Render Cards HTML
+	ob_start();
+	if ( $query->have_posts() ) :
+		while ( $query->have_posts() ) : $query->the_post();
+			get_template_part( 'template-parts/cards/card-major' );
+		endwhile;
+		wp_reset_postdata();
+	else :
+		?>
+		<div class="col-span-full text-center py-16 bg-white border border-slate-200 rounded-2xl p-8 shadow-xs">
+			<div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+				<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z" />
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+				</svg>
+			</div>
+			<h3 class="text-lg font-bold text-slate-800 mb-1">Không tìm thấy ngành học phù hợp</h3>
+			<p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Vui lòng thử thay đổi từ khóa tìm kiếm hoặc chọn lại nhóm ngành khác.</p>
+			<a href="<?php echo esc_url( $archive_link ); ?>" class="js-ltdh-reset-filter inline-flex items-center gap-2 bg-brand-primary text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-brand-primary-dark transition-colors cursor-pointer">
+				Xóa tất cả bộ lọc
+			</a>
+		</div>
+		<?php
+	endif;
+	$cards_html = ob_get_clean();
+
+	// Render Pagination HTML
+	$pagination_html = '';
+	if ( $query->max_num_pages > 1 ) {
+		$pagination_base = add_query_arg( array_merge( $preserved_args, [ 'paged' => '%#%' ] ), $archive_link );
+
+		$page_links = paginate_links( [
+			'base'      => $pagination_base,
+			'format'    => '',
+			'total'     => $query->max_num_pages,
+			'current'   => $paged,
+			'mid_size'  => 2,
+			'prev_text' => '← Trước',
+			'next_text' => 'Sau →',
+			'type'      => 'plain',
+		] );
+
+		if ( $page_links ) {
+			$pagination_html = '<nav class="navigation pagination" aria-label="Bài viết"><h2 class="screen-reader-text">Điều hướng bài viết</h2><div class="nav-links">' . $page_links . '</div></nav>';
+		}
+	}
+
+	// Render Chips HTML
+	ob_start();
+	if ( ! empty( $active_filter_items ) ) :
+		?>
+		<div class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pt-2.5 pb-0.5">
+			<?php foreach ( $active_filter_items as $item ) : 
+				$remove_args = $preserved_args;
+				unset( $remove_args[ $item['key'] ] );
+				$remove_url = ! empty( $remove_args ) ? add_query_arg( $remove_args, $archive_link ) : $archive_link;
+			?>
+				<a href="<?php echo esc_url( $remove_url ); ?>" data-filter-key="<?php echo esc_attr( $item['key'] ); ?>" class="js-ltdh-chip-remove inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200/60 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-colors shrink-0 select-none">
+					<span class="truncate max-w-[140px]"><?php echo esc_html( $item['label'] ); ?></span>
+					<span class="text-blue-400 hover:text-rose-600 font-bold ml-0.5">✕</span>
+				</a>
+			<?php endforeach; ?>
+		</div>
+		<?php
+	endif;
+	$chips_html = ob_get_clean();
+
+	wp_send_json_success( [
+		'cards_html'          => $cards_html,
+		'pagination_html'     => $pagination_html,
+		'chips_html'          => $chips_html,
+		'found_posts'         => $query->found_posts,
+		'heading_title'       => $heading_title,
+		'has_active_filters'  => $has_active_filters,
+		'active_filter_count' => $active_filter_count,
+		'active_cat'          => $nhom_nganh,
+		'paged'               => $paged,
+		'max_pages'           => $query->max_num_pages,
 	] );
 }
 

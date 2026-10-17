@@ -49,16 +49,29 @@ function ltdh_register_program_rewrite() {
 	add_rewrite_rule( '^nganh-hoc/page/([0-9]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major' ) . '&paged=$matches[1]', 'top' );
 	add_rewrite_rule( '^(?:truong-doi-tac|truong-da-hoc)/page/([0-9]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) . '&paged=$matches[1]', 'top' );
 
+	// Paginated Blog / News Archive (tin-tuc) — must precede category rewrite rules
+	add_rewrite_rule( '^tin-tuc/page/([0-9]+)/?$', 'index.php?pagename=tin-tuc&paged=$matches[1]', 'top' );
+	add_rewrite_rule( '^tin-tuc/?$', 'index.php?pagename=tin-tuc', 'top' );
+
 	add_rewrite_rule( '^nganh-([^/]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major' ) . '&name=$matches[1]', 'top' );
 	add_rewrite_rule( '([^/]+)/?$', 'index.php?program=$matches[1]', 'top' );
 }
 add_action( 'init', 'ltdh_register_program_rewrite' );
 
 /**
- * Filter request to fix CPT archive pagination when parsed as single post with slug 'page'.
+ * Filter request to fix CPT archive pagination when parsed as single post with slug 'page',
+ * and fix /tin-tuc/page/{n}/ when intercepted by category base rewrite rules.
  */
 add_filter( 'request', 'ltdh_fix_cpt_archive_pagination_request', 1 );
 function ltdh_fix_cpt_archive_pagination_request( $query_vars ) {
+	// Fix /tin-tuc/page/{n}/ when intercepted by category base rule tin-tuc/(.+?)/?$
+	if ( isset( $query_vars['category_name'] ) && preg_match( '#^page/([0-9]+)$#', $query_vars['category_name'], $matches ) ) {
+		unset( $query_vars['category_name'] );
+		$query_vars['pagename'] = 'tin-tuc';
+		$query_vars['paged']    = intval( $matches[1] );
+		return $query_vars;
+	}
+
 	if ( isset( $query_vars['post_type'] ) && in_array( $query_vars['post_type'], [ 'major', 'school' ], true ) ) {
 		if ( isset( $query_vars['name'] ) && 'page' === $query_vars['name'] ) {
 			$page_num = ! empty( $query_vars['page'] ) ? intval( $query_vars['page'] ) : ( ! empty( $query_vars['paged'] ) ? intval( $query_vars['paged'] ) : 1 );
@@ -85,6 +98,14 @@ function ltdh_program_request_guard( $query_vars ) {
 	}
 
 	$raw_slug = sanitize_title( $query_vars['program'] );
+
+	if ( 'tin-tuc' === $raw_slug ) {
+		unset( $query_vars['program'] );
+		unset( $query_vars['name'] );
+		unset( $query_vars['post_type'] );
+		$query_vars['pagename'] = 'tin-tuc';
+		return $query_vars;
+	}
 
 	// Check if raw_slug is a CPT archive base slug
 	if ( 'nganh-hoc' === $raw_slug ) {
@@ -501,3 +522,14 @@ function ltdh_template_include_he_dao_tao( $template ) {
 	return $template;
 }
 add_filter( 'template_include', 'ltdh_template_include_he_dao_tao' );
+
+/**
+ * Auto-flush rewrite rules once if tin-tuc rewrite version is not applied.
+ */
+function ltdh_maybe_flush_tin_tuc_rewrites() {
+	if ( '2' !== get_option( 'ltdh_rewrite_version_tin_tuc' ) ) {
+		flush_rewrite_rules( false );
+		update_option( 'ltdh_rewrite_version_tin_tuc', '2' );
+	}
+}
+add_action( 'init', 'ltdh_maybe_flush_tin_tuc_rewrites', 99 );

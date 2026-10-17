@@ -51,7 +51,7 @@ if ( ! $is_filtered ) {
 }
 
 // Main query args
-$paged = max( 1, get_query_var( 'paged' ) );
+$paged = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
 $cat_args = [];
 if ( $active_cat ) {
 	$cat_args['cat'] = $active_cat->term_id;
@@ -257,14 +257,26 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 					<!-- Pagination -->
 					<?php if ( $blog_query->max_num_pages > 1 ) : ?>
 					<div class="pt-8 flex justify-center theme-pagination">
-						<?php echo paginate_links( [
-							'base'      => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
-							'format'    => '?paged=%#%',
+						<?php
+						$pagenum_link = html_entity_decode( get_pagenum_link() );
+						$query_args   = [];
+						$url_parts    = explode( '?', $pagenum_link );
+						if ( isset( $url_parts[1] ) ) {
+							wp_parse_str( $url_parts[1], $query_args );
+						}
+						$clean_link = remove_query_arg( array_keys( $query_args ), $pagenum_link );
+						$clean_link = trailingslashit( preg_replace( '%/page/[0-9]+/?%', '/', $clean_link ) );
+
+						echo paginate_links( [
+							'base'      => $clean_link . '%_%',
+							'format'    => 'page/%#%/',
 							'current'   => $paged,
 							'total'     => $blog_query->max_num_pages,
 							'prev_text' => '← Trước',
 							'next_text' => 'Sau →',
-						] ); ?>
+							'add_args'  => $query_args,
+						] );
+						?>
 					</div>
 					<?php endif; ?>
 				</div>
