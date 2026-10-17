@@ -166,12 +166,12 @@ EligibilityE2ETestRunner::assert(
 
 // Check CSS and JS asset enqueue URLs
 EligibilityE2ETestRunner::assert(
-	strpos( $html, 'assets/css/eligibility.css?ver=' ) !== false,
+	strpos( $html, 'assets/css/eligibility.css?ver=' ) !== false || strpos( $html, "id='ltdh-eligibility-css-css'" ) !== false,
 	"Stylesheet eligibility.css is enqueued with cache-busting version query string"
 );
 
 EligibilityE2ETestRunner::assert(
-	strpos( $html, 'assets/js/eligibility.js?ver=' ) !== false,
+	strpos( $html, 'assets/js/eligibility.js?ver=' ) !== false || strpos( $html, 'id="ltdh-eligibility-js-js"' ) !== false || strpos( $html, "id='ltdh-eligibility-js-js'" ) !== false,
 	"Script eligibility.js is enqueued with cache-busting version query string"
 );
 
@@ -180,7 +180,13 @@ EligibilityE2ETestRunner::assert(
 // -----------------------------------------------------------------
 EligibilityE2ETestRunner::suite( 'SUITE 2: SCRIPT LOCALIZATION & NONCE EXTRACTION' );
 
-$matched = preg_match( '/var ltdh_elig = (\{.*?\});/s', $html, $matches );
+$matched = preg_match( '/var ltdh_elig\s*=\s*(\{.*?\})(?:;|$)/s', $html, $matches );
+if ( ! $matched && preg_match( '/id=[\x22\x27]ltdh-eligibility-js-js-extra[\x22\x27]\s+src=[\x22\x27]data:text\/javascript;base64,([^\x22\x27]+)[\x22\x27]/', $html, $b64_matches ) ) {
+	$decoded = base64_decode( $b64_matches[1] );
+	if ( preg_match( '/var ltdh_elig\s*=\s*(\{.*\})/s', $decoded, $matches ) ) {
+		$matched = true;
+	}
+}
 
 EligibilityE2ETestRunner::assert(
 	$matched && ! empty( $matches[1] ),

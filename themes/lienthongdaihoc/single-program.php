@@ -30,6 +30,10 @@ $documents       = get_field( 'required_documents', $program_id ) ?: get_post_me
 $enrollment      = ltdh_get_program_admission_deadline_display( $program_id );
 $quota           = get_field( 'quota', $program_id );
 $admission_fee   = get_field( 'admission_fee', $program_id ) ?: get_post_meta( $program_id, 'admission_fee', true );
+$exemption_title = function_exists( 'ltdh_get_field_or_meta' ) ? ltdh_get_field_or_meta( 'exemption_title', $program_id ) : ( get_field( 'exemption_title', $program_id ) ?: get_post_meta( $program_id, 'exemption_title', true ) );
+$exemption_intro = function_exists( 'ltdh_get_field_or_meta' ) ? ltdh_get_field_or_meta( 'exemption_intro', $program_id ) : ( get_field( 'exemption_intro', $program_id ) ?: get_post_meta( $program_id, 'exemption_intro', true ) );
+$exemption_items = function_exists( 'ltdh_get_field_or_meta' ) ? ltdh_get_field_or_meta( 'exemption_items', $program_id ) : ( get_field( 'exemption_items', $program_id ) ?: get_post_meta( $program_id, 'exemption_items', true ) );
+
 
 $program_hotline = ltdh_get_program_hotline( $program_id );
 $benefits        = get_field( 'program_benefits', $program_id );
@@ -514,12 +518,14 @@ if ( ! empty( $faqs ) ) {
 
 				<!-- SECTION 3: ADMISSION REQUIREMENTS & DOCUMENTS -->
 				<?php 
+				$admission_package   = function_exists( 'ltdh_get_program_admission_package' ) ? ltdh_get_program_admission_package( $program_id ) : null;
 				$admission_form_data = function_exists( 'ltdh_get_program_admission_form_data' ) ? ltdh_get_program_admission_form_data( $program_id ) : null;
-				$form_url            = $admission_form_data['url'] ?? '';
-				$form_title          = $admission_form_data['title'] ?? ( 'Phiếu tuyển sinh: ' . get_the_title( $program_id ) );
-				$form_badge          = $admission_form_data['source_label'] ?? '';
+				$form_url            = $admission_form_data['url'] ?? ( $admission_package['primary_url'] ?? '' );
+				$form_title          = $admission_form_data['title'] ?? ( $admission_package['primary_title'] ?? ( 'Phiếu tuyển sinh: ' . get_the_title( $program_id ) ) );
+				$form_badge          = $admission_form_data['source_label'] ?? ( $admission_package['source_label'] ?? '' );
+				$has_package         = ! empty( $admission_package['has_package'] ) || ! empty( $form_url );
 				?>
-				<?php if ( $requirements || $documents || $form_url || ! empty( $contact_formatted ) ) : ?>
+				<?php if ( $requirements || $documents || $has_package || ! empty( $contact_formatted ) ) : ?>
 					<section id="dieu-kien-ho-so" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 						<!-- Hidden anchor targets for backward compatibility with existing links -->
 						<span id="dieu-kien-xet-tuyen" class="relative -top-36 block invisible pointer-events-none"></span>
@@ -585,7 +591,7 @@ if ( ! empty( $faqs ) ) {
 								</details>
 							<?php endif; ?>
 
-							<?php if ( $documents || $form_url ) : 
+							<?php if ( $documents || $has_package ) : 
 								$req_step++;
 							?>
 								<!-- BLOCK 2: REQUIRED DOCUMENTS & ADMISSION FORM DOWNLOAD (Collapsible Details) -->
@@ -615,29 +621,113 @@ if ( ! empty( $faqs ) ) {
 											</div>
 										<?php endif; ?>
 
-										<?php if ( $form_url ) : ?>
-											<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-50/60 p-4 rounded-xl border border-blue-100/60">
-												<div class="flex items-center gap-3">
-													<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
-														📄
-													</div>
-													<div>
-														<div class="flex flex-wrap items-center gap-2 mb-0.5">
-															<p class="font-bold text-slate-900 text-sm">Tải mẫu phiếu đăng ký tuyển sinh</p>
-															<?php if ( ! empty( $form_badge ) ) : ?>
-																<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-800">
-																	<?php echo esc_html( $form_badge ); ?>
-																</span>
-															<?php endif; ?>
+										<?php if ( ! empty( $admission_package['has_package'] ) ) : ?>
+											<?php if ( $admission_package['is_single'] ) : 
+												$single_doc = $admission_package['documents'][0] ?? null;
+												$doc_url    = $single_doc['url'] ?? $form_url;
+												$doc_title  = $single_doc['label'] ?? $form_title;
+												$doc_badge  = $admission_package['source_label'] ?? '';
+											?>
+												<!-- TRƯỜNG HỢP 1: BIỂU MẪU ĐƠN LẺ -->
+												<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-50/60 p-4 rounded-xl border border-blue-100/60 mt-3.5">
+													<div class="flex items-center gap-3">
+														<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+															📄
 														</div>
-														<p class="text-xs text-slate-500"><?php echo esc_html( $form_title ); ?></p>
+														<div>
+															<div class="flex flex-wrap items-center gap-2 mb-0.5">
+																<p class="font-bold text-slate-900 text-sm">Tải mẫu phiếu đăng ký tuyển sinh</p>
+																<?php if ( ! empty( $doc_badge ) ) : ?>
+																	<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-800">
+																		<?php echo esc_html( $doc_badge ); ?>
+																	</span>
+																<?php endif; ?>
+															</div>
+															<p class="text-xs text-slate-500"><?php echo esc_html( $doc_title ); ?></p>
+														</div>
 													</div>
+													<a href="<?php echo esc_url( $doc_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $doc_url ); ?>" data-file-title="<?php echo esc_attr( $doc_title ); ?>">
+														<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+														<span>Tải Phiếu Tuyển Sinh</span>
+													</a>
 												</div>
-												<a href="<?php echo esc_url( $form_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $form_url ); ?>" data-file-title="<?php echo esc_attr( $form_title ); ?>">
-													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-													<span>Tải Phiếu Tuyển Sinh</span>
-												</a>
-											</div>
+
+											<?php else : ?>
+												<!-- TRƯỜNG HỢP 2: BỘ BIỂU MẪU ĐA NĂNG (TẢI TOÀN BỘ + TẢI LẺ TỪNG ROW) -->
+												<div class="bg-gradient-to-br from-blue-50/70 via-white to-slate-50/80 rounded-2xl border border-blue-100/80 p-4 sm:p-5 mt-4 shadow-2xs">
+													<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-blue-100/70">
+														<div class="flex items-start sm:items-center gap-3">
+															<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+																📁
+															</div>
+															<div>
+																<div class="flex flex-wrap items-center gap-2">
+																	<h4 class="font-extrabold text-slate-900 text-sm sm:text-base leading-snug">
+																		Bộ biểu mẫu & Hồ sơ tuyển sinh
+																	</h4>
+																	<?php if ( ! empty( $admission_package['source_label'] ) ) : ?>
+																		<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-800">
+																			<?php echo esc_html( $admission_package['source_label'] ); ?>
+																		</span>
+																	<?php endif; ?>
+																</div>
+																<p class="text-xs text-slate-500 mt-0.5">
+																	Bao gồm phiếu đăng ký chính thức và các đơn xin xét miễn giảm môn
+																</p>
+															</div>
+														</div>
+
+														<?php if ( ! empty( $admission_package['bundle_url'] ) ) : ?>
+															<a href="<?php echo esc_url( $admission_package['bundle_url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer self-start sm:self-auto" data-file-url="<?php echo esc_url( $admission_package['bundle_url'] ); ?>" data-file-title="<?php echo esc_attr( $admission_package['bundle_title'] ); ?>">
+																<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+																<span>📦 <?php echo esc_html( $admission_package['bundle_title'] ); ?></span>
+															</a>
+														<?php endif; ?>
+													</div>
+
+													<!-- DANH SÁCH BIỂU MẪU TẢI RIÊNG TỪNG DÒNG -->
+													<?php if ( ! empty( $admission_package['documents'] ) ) : ?>
+														<div class="mt-3.5">
+															<p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+																Hoặc tải riêng từng biểu mẫu theo nhu cầu:
+															</p>
+															<div class="space-y-2">
+																<?php foreach ( $admission_package['documents'] as $doc_idx => $doc ) : 
+																	$badge_color = 'bg-slate-100 text-slate-700';
+																	if ( $doc['badge'] === 'required' ) {
+																		$badge_color = 'bg-rose-50 text-rose-700 border border-rose-100/80';
+																	} elseif ( $doc['badge'] === 'exemption' ) {
+																		$badge_color = 'bg-amber-50 text-amber-800 border border-amber-100/80';
+																	} elseif ( $doc['badge'] === 'optional' ) {
+																		$badge_color = 'bg-emerald-50 text-emerald-800 border border-emerald-100/80';
+																	}
+																	$is_word = in_array( strtolower( $doc['ext'] ), [ 'doc', 'docx' ], true );
+																?>
+																	<div class="flex items-center justify-between gap-3 p-3 bg-white hover:bg-blue-50/30 rounded-xl border border-slate-100 transition-all group">
+																		<div class="flex items-center gap-2.5 min-w-0">
+																			<span class="w-7 h-7 rounded-lg <?php echo $is_word ? 'bg-blue-50 text-blue-700' : 'bg-rose-50 text-rose-700'; ?> flex items-center justify-center text-[10px] font-black shrink-0">
+																				<?php echo $is_word ? 'DOC' : 'PDF'; ?>
+																			</span>
+																			<div class="min-w-0">
+																				<p class="font-bold text-slate-800 text-xs sm:text-sm truncate group-hover:text-[#00308b] transition-colors">
+																					<?php echo esc_html( $doc['label'] ); ?>
+																				</p>
+																			</div>
+																			<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold <?php echo esc_attr( $badge_color ); ?> shrink-0">
+																				<?php echo esc_html( $doc['badge_label'] ); ?>
+																			</span>
+																		</div>
+																		<a href="<?php echo esc_url( $doc['url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-[#00308b] text-slate-700 hover:text-white text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $doc['url'] ); ?>" data-file-title="<?php echo esc_attr( $doc['label'] ); ?>">
+																			<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+																			<span class="hidden sm:inline">Tải về</span>
+																		</a>
+																	</div>
+																<?php endforeach; ?>
+															</div>
+														</div>
+													<?php endif; ?>
+												</div>
+											<?php endif; ?>
 										<?php endif; ?>
 									</div>
 								</details>
@@ -805,6 +895,29 @@ if ( ! empty( $faqs ) ) {
 												<div class="mt-3 bg-amber-50/80 rounded-xl p-3.5 text-xs md:text-sm text-amber-900 leading-relaxed flex items-start gap-2.5">
 													<svg class="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
 													<p><?php echo esc_html( $item['assessment_process'] ); ?></p>
+												</div>
+											<?php endif; ?>
+
+											<?php 
+											$matched_exemption_doc = function_exists( 'ltdh_find_matching_exemption_doc' ) 
+												? ltdh_find_matching_exemption_doc( $item['subject_name'] ?? '', $admission_package['documents'] ?? [] ) 
+												: null;
+											if ( $matched_exemption_doc ) :
+												$m_is_word = in_array( strtolower( $matched_exemption_doc['ext'] ), [ 'doc', 'docx' ], true );
+											?>
+												<div class="mt-3 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+													<div class="flex items-center gap-2 min-w-0">
+														<span class="w-6 h-6 rounded-md <?php echo $m_is_word ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'; ?> flex items-center justify-center text-[10px] font-black shrink-0">
+															<?php echo $m_is_word ? 'DOC' : 'PDF'; ?>
+														</span>
+														<span class="text-xs text-slate-600 truncate">
+															Mẫu đơn: <strong class="text-slate-800"><?php echo esc_html( $matched_exemption_doc['label'] ); ?></strong>
+														</span>
+													</div>
+													<a href="<?php echo esc_url( $matched_exemption_doc['url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white border border-amber-200/80 hover:border-amber-600 text-xs font-bold rounded-lg transition-all shrink-0 cursor-pointer shadow-2xs self-start sm:self-auto" data-file-url="<?php echo esc_url( $matched_exemption_doc['url'] ); ?>" data-file-title="<?php echo esc_attr( $matched_exemption_doc['label'] ); ?>">
+														<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+														<span>Tải đơn miễn môn</span>
+													</a>
 												</div>
 											<?php endif; ?>
 										</div>
@@ -978,14 +1091,100 @@ if ( ! empty( $faqs ) ) {
 	</div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
+<script data-no-defer="1">
+window.ltdhCloseLeadMagnetModal = function() {
+	const modal = document.getElementById('ltdh-lead-magnet-modal');
+	if (modal) {
+		modal.classList.add('hidden');
+		modal.classList.remove('flex');
+		document.body.style.overflow = '';
+	}
+};
+
+window.ltdhSubmitLeadMagnet = async function(e) {
+	if (e && e.preventDefault) e.preventDefault();
+	const form = document.getElementById('ltdh-lead-magnet-form');
+	if (!form) return;
+
+	const fileUrlInput = document.getElementById('ltdh-lm-file-url');
+	const submitBtn    = document.getElementById('ltdh-lm-submit-btn');
+	const errorEl      = document.getElementById('ltdh-lm-error');
+	const targetUrl    = fileUrlInput ? fileUrlInput.value : '';
+
+	if (submitBtn) {
+		submitBtn.disabled = true;
+		submitBtn.innerHTML = '<span>Đang gửi thông tin...</span>';
+	}
+	if (errorEl) errorEl.classList.add('hidden');
+
+	const formData  = new FormData(form);
+
+	if (window.ltdhGetRecaptchaToken) {
+		try {
+			const recaptchaToken = await window.ltdhGetRecaptchaToken('lead_magnet', form);
+			if (recaptchaToken) {
+				formData.set('g-recaptcha-response', recaptchaToken);
+			}
+		} catch (recaptchaErr) {
+			if (submitBtn) {
+				submitBtn.disabled = false;
+				submitBtn.innerHTML = '<span>Tải Tài Liệu Miễn Phí</span>';
+			}
+			if (errorEl) {
+				errorEl.textContent = recaptchaErr.message || 'Vui lòng xác thực ô "Tôi không phải là người máy".';
+				errorEl.classList.remove('hidden');
+			}
+			return;
+		}
+	}
+
+	fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', {
+		method: 'POST',
+		body: formData
+	})
+	.then(res => res.json())
+	.then(data => {
+		if (submitBtn) {
+			submitBtn.disabled = false;
+			submitBtn.innerHTML = '<span>Tải Tài Liệu Miễn Phí</span>';
+		}
+
+		if (data.success) {
+			sessionStorage.setItem('ltdh_lead_magnet_unlocked', '1');
+			window.ltdhCloseLeadMagnetModal();
+
+			// Automatically trigger download or open file in new window
+			if (targetUrl) {
+				const win = window.open(targetUrl, '_blank');
+				if (!win || win.closed || typeof win.closed === 'undefined') {
+					window.location.href = targetUrl;
+				}
+			}
+		} else {
+			if (errorEl) {
+				errorEl.textContent = data.data && data.data.message ? data.data.message : 'Có lỗi xảy ra, vui lòng thử lại.';
+				errorEl.classList.remove('hidden');
+			}
+		}
+	})
+	.catch(err => {
+		if (submitBtn) {
+			submitBtn.disabled = false;
+			submitBtn.innerHTML = '<span>Tải Tài Liệu Miễn Phí</span>';
+		}
+		if (errorEl) {
+			errorEl.textContent = 'Lỗi kết nối mạng. Vui lòng thử lại sau.';
+			errorEl.classList.remove('hidden');
+		}
+	});
+};
+
+function ltdhInitLeadMagnet() {
 	const modal          = document.getElementById('ltdh-lead-magnet-modal');
 	const fileUrlInput   = document.getElementById('ltdh-lm-file-url');
 	const fileTitleInput = document.getElementById('ltdh-lm-file-title');
 	const docLabel       = document.getElementById('ltdh-lm-doc-name-label');
 	const errorEl        = document.getElementById('ltdh-lm-error');
-	const submitBtn      = document.getElementById('ltdh-lm-submit-btn');
 
 	// Attach click handlers to all .ltdh-lead-magnet-btn elements
 	document.querySelectorAll('.ltdh-lead-magnet-btn').forEach(btn => {
@@ -1016,94 +1215,27 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	});
 
-	window.ltdhCloseLeadMagnetModal = function() {
-		if (modal) {
-			modal.classList.add('hidden');
-			modal.classList.remove('flex');
-			document.body.style.overflow = '';
-		}
-	};
-
-	window.ltdhSubmitLeadMagnet = async function(e) {
-		e.preventDefault();
-		const form = document.getElementById('ltdh-lead-magnet-form');
-		if (!form) return;
-
-		const formData  = new FormData(form);
-		const targetUrl = fileUrlInput ? fileUrlInput.value : '';
-
-		if (submitBtn) {
-			submitBtn.disabled = true;
-			submitBtn.innerHTML = '<span>Đang gửi thông tin...</span>';
-		}
-		if (errorEl) errorEl.classList.add('hidden');
-
-		if (window.ltdhGetRecaptchaToken) {
-			try {
-				const recaptchaToken = await window.ltdhGetRecaptchaToken('lead_magnet', form);
-				if (recaptchaToken) {
-					formData.set('g-recaptcha-response', recaptchaToken);
-				}
-			} catch (recaptchaErr) {
-				if (submitBtn) {
-					submitBtn.disabled = false;
-					submitBtn.innerHTML = '<span>Tải Tài Liệu Miễn Phí</span>';
-				}
-				if (errorEl) {
-					errorEl.textContent = recaptchaErr.message || 'Vui lòng xác thực ô "Tôi không phải là người máy".';
-					errorEl.classList.remove('hidden');
-				}
-				return;
-			}
-		}
-
-		fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', {
-			method: 'POST',
-			body: formData
-		})
-		.then(res => res.json())
-		.then(data => {
-			if (submitBtn) {
-				submitBtn.disabled = false;
-				submitBtn.innerHTML = '<span>Tải Tài Liệu Miễn Phí</span>';
-			}
-
-			if (data.success) {
-				sessionStorage.setItem('ltdh_lead_magnet_unlocked', '1');
-				ltdhCloseLeadMagnetModal();
-
-				// Automatically trigger download or open file in new window
-				if (targetUrl) {
-					const win = window.open(targetUrl, '_blank');
-					if (!win || win.closed || typeof win.closed === 'undefined') {
-						window.location.href = targetUrl;
-					}
-				}
-			} else {
-				if (errorEl) {
-					errorEl.textContent = data.data && data.data.message ? data.data.message : 'Có lỗi xảy ra, vui lòng thử lại.';
-					errorEl.classList.remove('hidden');
-				}
-			}
-		})
-		.catch(err => {
-			if (submitBtn) {
-				submitBtn.disabled = false;
-				submitBtn.innerHTML = '<span>Tải Tài Liệu Miễn Phí</span>';
-			}
-			if (errorEl) {
-				errorEl.textContent = 'Lỗi kết nối mạng. Vui lòng thử lại sau.';
-				errorEl.classList.remove('hidden');
+	// Close on modal backdrop click
+	if (modal) {
+		modal.addEventListener('click', function(e) {
+			if (e.target === modal) {
+				window.ltdhCloseLeadMagnetModal();
 			}
 		});
-	};
-});
+	}
+}
+
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', ltdhInitLeadMagnet);
+} else {
+	ltdhInitLeadMagnet();
+}
 </script>
 
 <!-- SCROLLSPY & SMOOTH SCROLL SCRIPT (UI/UX Pro Max) -->
 <script>
 (function() {
-	document.addEventListener('DOMContentLoaded', function() {
+	function initProgramStickyNav() {
 		var stickyNav = document.getElementById('ltdh-program-sticky-nav');
 		if (!stickyNav) return;
 
@@ -1340,7 +1472,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		} else {
 			setTimeout(onScroll, 100);
 		}
-	});
+	}
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initProgramStickyNav);
+	} else {
+		initProgramStickyNav();
+	}
 })();
 </script>
 

@@ -97,7 +97,7 @@
 			</div>
 		</div>
 
-		<script>
+		<script data-no-defer="1">
 		function ltdhToggleSubmenu(btn, e) {
 			if (e) {
 				e.preventDefault();

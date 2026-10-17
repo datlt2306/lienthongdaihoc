@@ -801,7 +801,7 @@ $zalo    = ltdh_get_zalo_url();
 	</div>
 
 	<script>
-		document.addEventListener('DOMContentLoaded', function() {
+		function initFrontPageInteractive() {
 			const modal = document.getElementById('youtube-video-modal');
 			const iframe = document.getElementById('modal-video-iframe');
 			const closeBtn = document.getElementById('close-video-modal');
@@ -851,9 +851,16 @@ $zalo    = ltdh_get_zalo_url();
 				});
 			}
 
-			// Certificate Swiper Slider Logic (Lazy Hydration)
+			// Certificate Swiper Slider Logic (Lazy Hydration with Deferred Swiper support)
+			let certAttempts = 0;
 			const initCertSwiper = () => {
-				if (typeof Swiper !== 'undefined' && document.querySelector('.cert-swiper')) {
+				if (typeof Swiper === 'undefined') {
+					if (++certAttempts < 100) {
+						setTimeout(initCertSwiper, certAttempts > 20 ? 250 : 100);
+					}
+					return;
+				}
+				if (document.querySelector('.cert-swiper')) {
 					new Swiper('.cert-swiper', {
 						loop: true,
 						autoplay: {
@@ -874,7 +881,12 @@ $zalo    = ltdh_get_zalo_url();
 			} else {
 				setTimeout(initCertSwiper, 1000);
 			}
-		});
+		}
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initFrontPageInteractive);
+		} else {
+			initFrontPageInteractive();
+		}
 	</script>
 
 	<!-- 6. EXPERIENCE & ACCURATE STATISTICS -->

@@ -113,7 +113,7 @@ function ltdh_register_school_faq_acf_fields() {
 }
 
 /**
- * Ensure School Admission Forms Tab and Fields are registered directly to group_school_details.
+ * Ensure School Admission Forms Tab and Multi-document Kit Fields are registered directly to group_school_details.
  */
 add_action( 'acf/init', 'ltdh_register_school_admission_forms_acf_fields', 20 );
 function ltdh_register_school_admission_forms_acf_fields() {
@@ -121,10 +121,10 @@ function ltdh_register_school_admission_forms_acf_fields() {
 		return;
 	}
 
-	// Register Tab
+	// 1. Register Tab
 	acf_add_local_field( [
 		'key'       => 'field_tab_school_admission_forms',
-		'label'     => 'Phiếu tuyển sinh',
+		'label'     => 'Hồ sơ & Phiếu tuyển sinh',
 		'name'      => '',
 		'type'      => 'tab',
 		'parent'    => 'group_school_details',
@@ -132,28 +132,86 @@ function ltdh_register_school_admission_forms_acf_fields() {
 		'endpoint'  => 0,
 	] );
 
-	// Register Default Admission Form Field
+	// 2. Default Bundle File (Tải trọn bộ mặc định của trường - ZIP / PDF gộp)
 	acf_add_local_field( [
-		'key'           => 'field_school_default_admission_form',
-		'label'         => 'Mẫu phiếu tuyển sinh mặc định của trường',
-		'name'          => 'default_admission_form',
+		'key'           => 'field_school_default_bundle_file',
+		'label'         => 'File trọn bộ hồ sơ mặc định của trường (ZIP/PDF gộp)',
+		'name'          => 'default_bundle_file',
 		'type'          => 'file',
 		'parent'        => 'group_school_details',
-		'instructions'  => 'Mẫu phiếu đăng ký xét tuyển dùng chung cho tất cả các hệ đào tạo và ngành học của trường nếu không có mẫu riêng. Nếu trường chỉ dùng đúng 1 biểu mẫu duy nhất cho mọi hệ, hãy tải lên tại đây.',
+		'instructions'  => 'Tải lên file nén (.zip) hoặc PDF gộp TOÀN BỘ các biểu mẫu tuyển sinh của trường để thí sinh có thể tải trọn bộ 1-click. (Tùy chọn)',
 		'return_format' => 'array',
 		'library'       => 'all',
 	] );
 
-	// Register Forms by Training Type Repeater
+	// 3. Default Admission Documents Repeater (Danh sách biểu mẫu tải riêng mặc định của trường)
+	acf_add_local_field( [
+		'key'          => 'field_school_default_admission_documents',
+		'label'        => 'Danh sách biểu mẫu tuyển sinh mặc định (Tải lẻ từng phiếu)',
+		'name'         => 'default_admission_documents',
+		'type'         => 'repeater',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Khai báo các biểu mẫu của trường (Phiếu đăng ký, Đơn miễn môn, Đơn miễn QP-AN, Đơn tiếng Anh...). Thí sinh có thể chọn tải riêng từng loại phiếu.',
+		'layout'       => 'table',
+		'button_label' => 'Thêm biểu mẫu',
+		'sub_fields'   => [
+			[
+				'key'         => 'field_school_def_doc_label',
+				'label'       => 'Tên biểu mẫu',
+				'name'        => 'label',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: Phiếu đăng ký dự tuyển 2026',
+				'required'    => 1,
+			],
+			[
+				'key'           => 'field_school_def_doc_file',
+				'label'         => 'File đính kèm (PDF/DOCX)',
+				'name'          => 'file',
+				'type'          => 'file',
+				'return_format' => 'array',
+				'library'       => 'all',
+				'required'      => 1,
+			],
+			[
+				'key'           => 'field_school_def_doc_badge',
+				'label'         => 'Phân loại',
+				'name'          => 'badge',
+				'type'          => 'select',
+				'choices'       => [
+					'required'  => 'Bắt buộc',
+					'optional'  => 'Tùy chọn',
+					'exemption' => 'Miễn môn',
+					'other'     => 'Tham khảo',
+				],
+				'default_value' => 'required',
+				'allow_null'    => 0,
+				'return_format' => 'value',
+			],
+		],
+	] );
+
+	// 4. Register Default Admission Form Field (Legacy single file fallback)
+	acf_add_local_field( [
+		'key'           => 'field_school_default_admission_form',
+		'label'         => 'Mẫu phiếu tuyển sinh mặc định (Đơn lẻ - Legacy)',
+		'name'          => 'default_admission_form',
+		'type'          => 'file',
+		'parent'        => 'group_school_details',
+		'instructions'  => 'Dùng khi trường chỉ có đúng 1 file biểu mẫu duy nhất và không dùng danh sách chi tiết ở trên.',
+		'return_format' => 'array',
+		'library'       => 'all',
+	] );
+
+	// 5. Register Forms by Training Type Repeater (Bộ biểu mẫu theo từng hệ đào tạo)
 	acf_add_local_field( [
 		'key'          => 'field_school_admission_forms_by_type',
-		'label'        => 'Mẫu phiếu tuyển sinh theo từng Hệ đào tạo',
+		'label'        => 'Bộ hồ sơ & Biểu mẫu theo từng Hệ đào tạo',
 		'name'         => 'admission_forms_by_type',
 		'type'         => 'repeater',
 		'parent'       => 'group_school_details',
-		'instructions' => 'Dành cho trường hợp mỗi Hệ đào tạo (Đại học từ xa, Liên thông chính quy, Văn bằng 2...) có mẫu phiếu riêng. Các chương trình thuộc hệ tương ứng sẽ tự động dùng mẫu này.',
-		'layout'       => 'table',
-		'button_label' => 'Thêm phiếu theo hệ',
+		'instructions' => 'Dành cho trường hợp mỗi Hệ đào tạo (Đại học từ xa, Liên thông chính quy, Văn bằng 2...) có bộ biểu mẫu riêng. Các chương trình thuộc hệ tương ứng sẽ tự động dùng bộ này.',
+		'layout'       => 'row',
+		'button_label' => 'Thêm bộ hồ sơ theo hệ',
 		'sub_fields'   => [
 			[
 				'key'           => 'field_school_form_training_type',
@@ -169,8 +227,60 @@ function ltdh_register_school_admission_forms_acf_fields() {
 				'return_format' => 'id',
 			],
 			[
+				'key'           => 'field_school_form_bundle_file',
+				'label'         => 'File trọn bộ hồ sơ của hệ này (ZIP/PDF gộp)',
+				'name'          => 'bundle_file',
+				'type'          => 'file',
+				'instructions'  => 'File nén (.zip) hoặc PDF gộp TOÀN BỘ biểu mẫu của hệ này để thí sinh tải 1-click.',
+				'return_format' => 'array',
+				'library'       => 'all',
+			],
+			[
+				'key'          => 'field_school_form_documents',
+				'label'        => 'Danh sách biểu mẫu tải riêng của hệ này',
+				'name'         => 'documents',
+				'type'         => 'repeater',
+				'instructions' => 'Thêm từng phiếu (Phiếu đăng ký, Đơn miễn môn, Đơn miễn QP-AN...) để học viên tải lẻ.',
+				'layout'       => 'table',
+				'button_label' => 'Thêm phiếu',
+				'sub_fields'   => [
+					[
+						'key'         => 'field_school_row_doc_label',
+						'label'       => 'Tên biểu mẫu',
+						'name'        => 'label',
+						'type'        => 'text',
+						'placeholder' => 'Ví dụ: Đơn đề nghị miễn GDQP-AN 2026',
+						'required'    => 1,
+					],
+					[
+						'key'           => 'field_school_row_doc_file',
+						'label'         => 'File đính kèm (PDF/DOCX)',
+						'name'          => 'file',
+						'type'          => 'file',
+						'return_format' => 'array',
+						'library'       => 'all',
+						'required'      => 1,
+					],
+					[
+						'key'           => 'field_school_row_doc_badge',
+						'label'         => 'Phân loại',
+						'name'          => 'badge',
+						'type'          => 'select',
+						'choices'       => [
+							'required'  => 'Bắt buộc',
+							'optional'  => 'Tùy chọn',
+							'exemption' => 'Miễn môn',
+							'other'     => 'Tham khảo',
+						],
+						'default_value' => 'required',
+						'allow_null'    => 0,
+						'return_format' => 'value',
+					],
+				],
+			],
+			[
 				'key'           => 'field_school_form_file',
-				'label'         => 'File mẫu phiếu (PDF/DOCX)',
+				'label'         => 'File mẫu phiếu đơn lẻ (Legacy)',
 				'name'          => 'file',
 				'type'          => 'file',
 				'return_format' => 'array',
@@ -181,7 +291,75 @@ function ltdh_register_school_admission_forms_acf_fields() {
 				'label'       => 'Ghi chú / Tên hiển thị (Tùy chọn)',
 				'name'        => 'notes',
 				'type'        => 'text',
-				'placeholder' => 'Ví dụ: Mẫu phiếu ĐH Từ xa 2026',
+				'placeholder' => 'Ví dụ: Bộ hồ sơ ĐH Từ xa TMU 2026',
+			],
+		],
+	] );
+}
+
+/**
+ * Register Program-level Admission Document Kit Overrides to group_program_details.
+ */
+add_action( 'acf/init', 'ltdh_register_program_admission_package_acf_fields', 20 );
+function ltdh_register_program_admission_package_acf_fields() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	// Program Bundle File (Override)
+	acf_add_local_field( [
+		'key'           => 'field_program_bundle_file',
+		'label'         => 'File trọn bộ hồ sơ riêng của ngành (ZIP/PDF Override)',
+		'name'          => 'program_bundle_file',
+		'type'          => 'file',
+		'parent'        => 'group_program_details',
+		'instructions'  => 'Tải lên file ZIP hoặc PDF gộp riêng của ngành này nếu có mẫu đặc thù. Để trống để tự động kế thừa từ Trường / Hệ.',
+		'return_format' => 'array',
+		'library'       => 'all',
+	] );
+
+	// Program Admission Documents (Override)
+	acf_add_local_field( [
+		'key'          => 'field_program_admission_documents',
+		'label'        => 'Danh sách biểu mẫu riêng của ngành (Override)',
+		'name'         => 'program_admission_documents',
+		'type'         => 'repeater',
+		'parent'       => 'group_program_details',
+		'instructions' => 'Danh sách biểu mẫu tải riêng của ngành này (nếu có biểu mẫu riêng biệt). Để trống để tự động kế thừa từ Trường / Hệ.',
+		'layout'       => 'table',
+		'button_label' => 'Thêm biểu mẫu riêng',
+		'sub_fields'   => [
+			[
+				'key'         => 'field_prog_doc_label',
+				'label'       => 'Tên biểu mẫu',
+				'name'        => 'label',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: Phiếu đăng ký chuyên ngành đặc thù',
+				'required'    => 1,
+			],
+			[
+				'key'           => 'field_prog_doc_file',
+				'label'         => 'File đính kèm (PDF/DOCX)',
+				'name'          => 'file',
+				'type'          => 'file',
+				'return_format' => 'array',
+				'library'       => 'all',
+				'required'      => 1,
+			],
+			[
+				'key'           => 'field_prog_doc_badge',
+				'label'         => 'Phân loại',
+				'name'          => 'badge',
+				'type'          => 'select',
+				'choices'       => [
+					'required'  => 'Bắt buộc',
+					'optional'  => 'Tùy chọn',
+					'exemption' => 'Miễn môn',
+					'other'     => 'Tham khảo',
+				],
+				'default_value' => 'required',
+				'allow_null'    => 0,
+				'return_format' => 'value',
 			],
 		],
 	] );

@@ -101,8 +101,14 @@ function ltdhInitTheme() {
     // ----------------------------------------------------
     // 2. Swiper Sliders Initialization (Hero & School Partners)
     // ----------------------------------------------------
+    let swiperAttempts = 0;
     const initSwipers = () => {
-        if (typeof Swiper === 'undefined') return;
+        if (typeof Swiper === 'undefined') {
+            if (++swiperAttempts < 100) {
+                setTimeout(initSwipers, swiperAttempts > 20 ? 250 : 100);
+            }
+            return;
+        }
 
         const heroSwiperEl = document.querySelector('.hero-swiper');
         if (heroSwiperEl) {
@@ -216,6 +222,7 @@ function ltdhInitTheme() {
 
         // Trigger filter instantly on dropdown changes
         filterForm.querySelectorAll('select').forEach(select => {
+            select.removeAttribute('onchange');
             select.addEventListener('change', triggerFilter, { passive: true });
         });
 

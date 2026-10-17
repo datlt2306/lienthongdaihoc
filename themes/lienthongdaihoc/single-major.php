@@ -831,7 +831,7 @@ body.admin-bar #ltdh-major-sticky-nav {
 
 <script>
 (function() {
-	document.addEventListener('DOMContentLoaded', function() {
+	function initMajorStickyNav() {
 		var stickyNav = document.getElementById('ltdh-major-sticky-nav');
 		if (!stickyNav) return;
 
@@ -1018,7 +1018,12 @@ body.admin-bar #ltdh-major-sticky-nav {
 		} else {
 			setTimeout(onScroll, 100);
 		}
-	});
+	}
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initMajorStickyNav);
+	} else {
+		initMajorStickyNav();
+	}
 })();
 </script>
 

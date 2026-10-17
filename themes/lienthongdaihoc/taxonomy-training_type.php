@@ -535,31 +535,40 @@ $has_active_filters  = $active_filter_count > 0;
 
 		<script>
 		(function() {
-			var btn = document.getElementById('ltdh-mobile-filter-btn');
-			var body = document.getElementById('catalog-filter-body');
-			var chevron = document.getElementById('ltdh-mobile-filter-chevron');
-			var btnText = document.getElementById('ltdh-mobile-filter-btn-text');
-			var closeBtn = document.getElementById('ltdh-mobile-filter-close');
-			if (!btn || !body) return;
+			function initMobileFilter() {
+				var btn = document.getElementById('ltdh-mobile-filter-btn');
+				var body = document.getElementById('catalog-filter-body');
+				var chevron = document.getElementById('ltdh-mobile-filter-chevron');
+				var btnText = document.getElementById('ltdh-mobile-filter-btn-text');
+				var closeBtn = document.getElementById('ltdh-mobile-filter-close');
+				if (!btn || !body || btn._bound) return;
+				btn._bound = true;
 
-			function toggleFilter() {
-				var isHidden = body.classList.contains('hidden');
-				if (isHidden) {
-					body.classList.remove('hidden');
-					btn.setAttribute('aria-expanded', 'true');
-					if (chevron) chevron.classList.add('rotate-180');
-					if (btnText) btnText.textContent = 'Thu gọn bộ lọc';
-				} else {
-					body.classList.add('hidden');
-					btn.setAttribute('aria-expanded', 'false');
-					if (chevron) chevron.classList.remove('rotate-180');
-					if (btnText) btnText.textContent = 'Bộ lọc & Tìm kiếm';
+				function toggleFilter() {
+					var isHidden = body.classList.contains('hidden');
+					if (isHidden) {
+						body.classList.remove('hidden');
+						btn.setAttribute('aria-expanded', 'true');
+						if (chevron) chevron.classList.add('rotate-180');
+						if (btnText) btnText.textContent = 'Thu gọn bộ lọc';
+					} else {
+						body.classList.add('hidden');
+						btn.setAttribute('aria-expanded', 'false');
+						if (chevron) chevron.classList.remove('rotate-180');
+						if (btnText) btnText.textContent = 'Bộ lọc & Tìm kiếm';
+					}
+				}
+
+				btn.addEventListener('click', toggleFilter);
+				if (closeBtn) {
+					closeBtn.addEventListener('click', toggleFilter);
 				}
 			}
 
-			btn.addEventListener('click', toggleFilter);
-			if (closeBtn) {
-				closeBtn.addEventListener('click', toggleFilter);
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', initMobileFilter);
+			} else {
+				initMobileFilter();
 			}
 		})();
 		</script>

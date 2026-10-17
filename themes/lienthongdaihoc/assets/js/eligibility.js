@@ -70,56 +70,265 @@
 		initSearchSelects();
 	}
 
+	function removeVietnameseAccents(str) {
+		if (!str) return '';
+		return str
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/đ/g, 'd')
+			.replace(/Đ/g, 'D');
+	}
+
 	function initSearchSelects() {
 		var containers = document.querySelectorAll('[data-search-select]');
 		containers.forEach(function (container) {
 			var input = container.querySelector('.elig-search-input');
 			var hidden = container.querySelector('.elig-search-value');
 			var dropdown = container.querySelector('.elig-search-dropdown');
-			var items = container.querySelectorAll('.elig-search-option-item');
+			var items = Array.prototype.slice.call(container.querySelectorAll('.elig-search-option-item'));
 
 			if (!input || !dropdown) return;
 
-			// Focus input -> show dropdown
-			input.addEventListener('focus', function () {
+			var activeIndex = -1;
+			var justSelected = false;
+
+			function getVisibleItems() {
+				return items.filter(function (item) {
+					return item.style.display !== 'none';
+				});
+			}
+
+			function setActiveItem(index) {
+				var visibleItems = getVisibleItems();
+				items.forEach(function (it) {
+					it.classList.remove('is-active', 'active', 'bg-blue-50', 'text-[#00308b]', 'font-bold');
+				});
+
+				if (index >= 0 && index < visibleItems.length) {
+					activeIndex = index;
+					var activeEl = visibleItems[index];
+					activeEl.classList.add('is-active', 'active', 'bg-blue-50', 'text-[#00308b]', 'font-bold');
+
+					// Scroll safely within dropdown without jumping window
+					var itemTop = activeEl.offsetTop;
+					var itemBottom = itemTop + activeEl.offsetHeight;
+					var dropTop = dropdown.scrollTop;
+					var dropHeight = dropdown.clientHeight;
+
+					if (itemTop < dropTop) {
+						dropdown.scrollTop = itemTop;
+					} else if (itemBottom > dropTop + dropHeight) {
+						dropdown.scrollTop = itemBottom - dropHeight;
+					}
+				} else {
+					activeIndex = -1;
+				}
+			}
+
+			function openDropdown() {
 				document.querySelectorAll('.elig-search-dropdown').forEach(function (d) {
-					d.classList.add('hidden');
+					if (d !== dropdown) {
+						d.classList.add('hidden');
+					}
 				});
 				dropdown.classList.remove('hidden');
+
+				var visibleItems = getVisibleItems();
+				var currentIndex = -1;
+				if (hidden.value) {
+					currentIndex = visibleItems.findIndex(function (it) {
+						return it.getAttribute('data-value') === hidden.value;
+					});
+				}
+				if (currentIndex >= 0) {
+					setActiveItem(currentIndex);
+				} else {
+					setActiveItem(-1);
+				}
+			}
+
+			function closeDropdown() {
+				dropdown.classList.add('hidden');
+				setActiveItem(-1);
+			}
+
+			function selectItem(item) {
+				if (!item) return;
+				var val = item.getAttribute('data-value') || '';
+				var text = item.textContent.trim();
+
+				justSelected = true;
+				setTimeout(function () {
+					justSelected = false;
+				}, 350);
+
+				if (val === '') {
+					input.value = '';
+					hidden.value = '';
+				} else {
+					input.value = text;
+					hidden.value = val;
+				}
+
+				// Update global form state
+				var name = hidden.getAttribute('name');
+				if (name) {
+					form[name] = hidden.value;
+				}
+
+				// Clear validation error if matched successfully
+				if (hidden.value) {
+					input.classList.remove('elig-input-error');
+					var errorEl = container.querySelector('.elig-error-message');
+					if (errorEl) errorEl.remove();
+				}
+
+				closeDropdown();
+				hidden.dispatchEvent(new Event('change', { bubbles: true }));
+			}
+
+			// Focus input -> show dropdown
+			input.addEventListener('focus', function () {
+				openDropdown();
 			});
 
 			// Click outside -> hide dropdown
 			document.addEventListener('click', function (e) {
 				if (!container.contains(e.target)) {
-					dropdown.classList.add('hidden');
+					closeDropdown();
 				}
 			});
 
-			// Filter items as user types
+			// Keyboard navigation on input
+			input.addEventListener('keydown', function (e) {
+				var isDropdownOpen = !dropdown.classList.contains('hidden');
+				var visibleItems = getVisibleItems();
+
+				if (e.key === 'ArrowDown') {
+					e.preventDefault();
+					if (!isDropdownOpen) {
+						openDropdown();
+						visibleItems = getVisibleItems();
+						if (visibleItems.length > 0) {
+							var defaultIndex = visibleItems.findIndex(function (it) {
+								return it.getAttribute('data-value') !== '';
+							});
+							setActiveItem(defaultIndex >= 0 ? defaultIndex : 0);
+						}
+					} else if (visibleItems.length > 0) {
+						var nextIdx = activeIndex + 1;
+						if (nextIdx >= visibleItems.length) {
+							nextIdx = 0; // wrap to top
+						}
+						setActiveItem(nextIdx);
+					}
+				} else if (e.key === 'ArrowUp') {
+					e.preventDefault();
+					if (!isDropdownOpen) {
+						openDropdown();
+						visibleItems = getVisibleItems();
+						if (visibleItems.length > 0) {
+							setActiveItem(visibleItems.length - 1);
+						}
+					} else if (visibleItems.length > 0) {
+						var prevIdx = activeIndex - 1;
+						if (prevIdx < 0) {
+							prevIdx = visibleItems.length - 1; // wrap to bottom
+						}
+						setActiveItem(prevIdx);
+					}
+				} else if (e.key === 'Enter') {
+					if (isDropdownOpen) {
+						e.preventDefault();
+						if (activeIndex >= 0 && activeIndex < visibleItems.length) {
+							selectItem(visibleItems[activeIndex]);
+						} else if (visibleItems.length > 0) {
+							var candidate = visibleItems.find(function (it) {
+								return it.getAttribute('data-value') !== '';
+							}) || visibleItems[0];
+							selectItem(candidate);
+						}
+					}
+				} else if (e.key === 'Escape') {
+					if (isDropdownOpen) {
+						e.preventDefault();
+						closeDropdown();
+					}
+				} else if (e.key === 'Tab') {
+					if (isDropdownOpen) {
+						if (activeIndex >= 0 && activeIndex < visibleItems.length) {
+							selectItem(visibleItems[activeIndex]);
+						} else {
+							closeDropdown();
+						}
+					}
+				}
+			});
+
+			// Filter items as user types (with Vietnamese accent folding)
 			input.addEventListener('input', function () {
 				var query = this.value.toLowerCase().trim();
+				var queryFolded = removeVietnameseAccents(query);
+
 				items.forEach(function (item) {
+					var val = item.getAttribute('data-value') || '';
 					var text = item.textContent.toLowerCase();
-					if (text.indexOf(query) > -1 || item.getAttribute('data-value') === '') {
+					var textFolded = removeVietnameseAccents(text);
+
+					if (val === '' || text.indexOf(query) > -1 || textFolded.indexOf(queryFolded) > -1) {
 						item.style.display = 'block';
 					} else {
 						item.style.display = 'none';
 					}
+				});
+
+				if (dropdown.classList.contains('hidden')) {
+					openDropdown();
+				}
+
+				var visibleItems = getVisibleItems();
+				if (query !== '' && visibleItems.length > 0) {
+					var firstRealIdx = visibleItems.findIndex(function (it) {
+						return it.getAttribute('data-value') !== '';
+					});
+					setActiveItem(firstRealIdx >= 0 ? firstRealIdx : 0);
+				} else {
+					setActiveItem(-1);
+				}
+			});
+
+			// Mouse hover synchronizes activeIndex
+			items.forEach(function (item) {
+				item.addEventListener('mouseenter', function () {
+					var visibleItems = getVisibleItems();
+					var idx = visibleItems.indexOf(item);
+					if (idx >= 0) {
+						setActiveItem(idx);
+					}
+				});
+
+				// Click item -> select value
+				item.addEventListener('click', function () {
+					selectItem(this);
 				});
 			});
 
 			// Auto-match values when blurring or losing focus
 			input.addEventListener('blur', function () {
 				setTimeout(function () {
+					if (justSelected) return;
+
 					var val = input.value.trim().toLowerCase();
+					var valFolded = removeVietnameseAccents(val);
 					var name = hidden.getAttribute('name');
 					var matched = false;
 
 					items.forEach(function (item) {
 						var text = item.textContent.trim().toLowerCase();
+						var textFolded = removeVietnameseAccents(text);
 						var itemVal = item.getAttribute('data-value');
 
-						if (itemVal !== '' && text === val) {
+						if (itemVal !== '' && (text === val || textFolded === valFolded)) {
 							hidden.value = itemVal;
 							input.value = item.textContent.trim(); // Normalize capitalization
 							form[name] = itemVal;
@@ -132,9 +341,10 @@
 						for (var i = 0; i < items.length; i++) {
 							var item = items[i];
 							var text = item.textContent.trim().toLowerCase();
+							var textFolded = removeVietnameseAccents(text);
 							var itemVal = item.getAttribute('data-value');
 
-							if (itemVal !== '' && text.indexOf(val) > -1) {
+							if (itemVal !== '' && (text.indexOf(val) > -1 || textFolded.indexOf(valFolded) > -1)) {
 								hidden.value = itemVal;
 								input.value = item.textContent.trim();
 								form[name] = itemVal;
@@ -157,27 +367,6 @@
 						if (errorEl) errorEl.remove();
 					}
 				}, 250);
-			});
-
-			// Click item -> select value
-			items.forEach(function (item) {
-				item.addEventListener('click', function () {
-					var val = this.getAttribute('data-value');
-					var text = this.textContent;
-					if (val === '') {
-						input.value = '';
-						hidden.value = '';
-					} else {
-						input.value = text;
-						hidden.value = val;
-					}
-					// Update global form state
-					var name = hidden.getAttribute('name');
-					if (name) {
-						form[name] = hidden.value;
-					}
-					dropdown.classList.add('hidden');
-				});
 			});
 		});
 	}

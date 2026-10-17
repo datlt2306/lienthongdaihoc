@@ -179,9 +179,12 @@
 .elig-search-option-item {
 	transition: background 0.15s ease, color 0.15s ease;
 }
-.elig-search-option-item:hover {
-	background: #EFF6FF;
+.elig-search-option-item:hover,
+.elig-search-option-item.is-active,
+.elig-search-option-item.active {
+	background: #EFF6FF !important;
 	color: #00308b !important;
+	font-weight: 700 !important;
 }
 
 /* ----------------------------------------------------

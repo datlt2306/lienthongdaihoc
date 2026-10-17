@@ -1087,7 +1087,7 @@ if ( ! empty( $school_faqs ) ) {
 <!-- SCROLLSPY & SMOOTH SCROLL SCRIPT -->
 <script>
 (function() {
-	document.addEventListener('DOMContentLoaded', function() {
+	function initSchoolStickyNav() {
 		var stickyNav = document.getElementById('ltdh-school-sticky-nav');
 		if (!stickyNav) return;
 
@@ -1297,7 +1297,12 @@ if ( ! empty( $school_faqs ) ) {
 		} else {
 			setTimeout(onScroll, 100);
 		}
-	});
+	}
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initSchoolStickyNav);
+	} else {
+		initSchoolStickyNav();
+	}
 })();
 </script>
 

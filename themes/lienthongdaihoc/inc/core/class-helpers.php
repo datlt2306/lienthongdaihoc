@@ -334,164 +334,320 @@ function ltdh_get_program_school_id( int $program_id ): int {
 }
 
 /**
- * Lấy dữ liệu phiếu tuyển sinh của chương trình theo cơ chế kế thừa phân tầng (Cascading Fallback):
- * 1. Phiếu riêng của Chương trình (Ghi đè/Override tại bài viết Program)
- * 2. Phiếu theo Hệ đào tạo của Trường (School x Training Type Repeater)
- * 3. Phiếu mặc định dùng chung của Trường (Default School Form)
- * 4. File PDF vật lý theo mã trường (WP_CONTENT_DIR/uploads/forms/phieu-dang-ky-{code}-2026.pdf)
+ * Lấy giá trị custom field (ưu tiên get_field của ACF, nếu rỗng thì fallback sang get_post_meta)
+ *
+ * @param string $key
+ * @param int $post_id
+ * @return mixed
+ */
+function ltdh_get_field_or_meta( string $key, int $post_id ) {
+	$val = function_exists( 'get_field' ) ? get_field( $key, $post_id ) : null;
+	if ( empty( $val ) ) {
+		$val = get_post_meta( $post_id, $key, true );
+	}
+	return $val;
+}
+
+/**
+ * Chuẩn hóa giá trị trường file của ACF (Attachment ID, Array, hoặc URL string)
+ *
+ * @param mixed $raw
+ * @return array [ 'url' => string, 'title' => string, 'filename' => string, 'ext' => string ]
+ */
+function ltdh_normalize_admission_file_info( $raw ): array {
+	$url   = '';
+	$title = '';
+
+	if ( is_array( $raw ) && ! empty( $raw['url'] ) ) {
+		$url   = (string) $raw['url'];
+		$title = ! empty( $raw['title'] ) ? (string) $raw['title'] : ( ! empty( $raw['filename'] ) ? (string) $raw['filename'] : '' );
+	} elseif ( is_numeric( $raw ) && (int) $raw > 0 ) {
+		$url   = wp_get_attachment_url( (int) $raw ) ?: '';
+		$title = get_the_title( (int) $raw );
+	} elseif ( is_string( $raw ) && ! empty( $raw ) ) {
+		$url = $raw;
+	}
+
+	$filename = ! empty( $url ) ? basename( parse_url( $url, PHP_URL_PATH ) ?: '' ) : '';
+	$ext      = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
+
+	return [
+		'url'      => $url,
+		'title'    => $title ?: $filename,
+		'filename' => $filename,
+		'ext'      => $ext,
+	];
+}
+
+/**
+ * Lấy toàn bộ gói hồ sơ & bộ biểu mẫu tuyển sinh của chương trình theo cơ chế kế thừa phân tầng (Cách 3):
+ * 1. Chương trình (Override riêng tại bài viết Program: bundle_file, admission_documents, admission_form_file)
+ * 2. Hệ đào tạo của Trường (admission_forms_by_type: bundle_file, documents, file)
+ * 3. Mặc định của Trường (default_bundle_file, default_admission_documents, default_admission_form)
+ * 4. File tĩnh quy ước (/uploads/forms/phieu-dang-ky-{code}-2026.pdf)
  *
  * @param int $program_id
- * @return array|null [ 'url' => string, 'title' => string, 'source' => string, 'source_label' => string, 'filename' => string ]
+ * @return array
  */
-function ltdh_get_program_admission_form_data( int $program_id ): ?array {
+function ltdh_get_program_admission_package( int $program_id ): array {
+	$empty_package = [
+		'has_package'   => false,
+		'source'        => '',
+		'source_label'  => '',
+		'bundle_url'    => '',
+		'bundle_title'  => '',
+		'bundle_ext'    => '',
+		'documents'     => [],
+		'is_single'     => true,
+		'primary_url'   => '',
+		'primary_title' => '',
+	];
+
 	if ( ! $program_id ) {
-		return null;
+		return $empty_package;
 	}
 
 	$school_id         = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
 	$s_code_val        = $school_id ? get_post_meta( $school_id, 'school_code', true ) : '';
 	$school_code_clean = strtolower( preg_replace( '/[^a-zA-Z0-9]/', '', (string) $s_code_val ) );
 
-	// 1. Cấp 1: Kiểm tra override ở chính Program
-	$prog_form  = function_exists( 'get_field' ) ? get_field( 'admission_form_file', $program_id ) : get_post_meta( $program_id, 'admission_form_file', true );
-	$prog_url   = '';
-	$prog_title = '';
-	if ( is_array( $prog_form ) && ! empty( $prog_form['url'] ) ) {
-		$prog_url   = (string) $prog_form['url'];
-		$prog_title = ! empty( $prog_form['title'] ) ? (string) $prog_form['title'] : ( ! empty( $prog_form['filename'] ) ? (string) $prog_form['filename'] : '' );
-	} elseif ( is_numeric( $prog_form ) && (int) $prog_form > 0 ) {
-		$prog_url   = wp_get_attachment_url( (int) $prog_form ) ?: '';
-		$prog_title = get_the_title( (int) $prog_form );
-	} elseif ( is_string( $prog_form ) && ! empty( $prog_form ) ) {
-		$prog_url = $prog_form;
+	$badge_labels = [
+		'required'  => 'Bắt buộc',
+		'optional'  => 'Tùy chọn',
+		'exemption' => 'Miễn môn',
+		'other'     => 'Tham khảo',
+	];
+
+	$raw_bundle    = null;
+	$raw_documents = [];
+	$source        = '';
+	$source_label  = '';
+
+	// ----------------------------------------------------
+	// CẤP 1: KIỂM TRA OVERRIDE TẠI BÀI VIẾT CHƯƠNG TRÌNH
+	// ----------------------------------------------------
+	$prog_bundle = ltdh_get_field_or_meta( 'program_bundle_file', $program_id );
+	$prog_docs   = ltdh_get_field_or_meta( 'program_admission_documents', $program_id );
+
+	if ( ! empty( $prog_bundle ) || ( ! empty( $prog_docs ) && is_array( $prog_docs ) ) ) {
+		$raw_bundle    = $prog_bundle;
+		$raw_documents = is_array( $prog_docs ) ? $prog_docs : [];
+		$source        = 'program';
+		$source_label  = 'Mẫu riêng theo ngành';
+	} else {
+		// Legacy single file override
+		$prog_single = ltdh_get_field_or_meta( 'admission_form_file', $program_id );
+		$single_info = ltdh_normalize_admission_file_info( $prog_single );
+
+		// Lọc bỏ URL giả định UTC nếu trường không phải UTC
+		if ( ! empty( $single_info['url'] ) && str_contains( $single_info['url'], 'utc-2026.pdf' ) && $school_code_clean !== 'utc' ) {
+			$single_info['url'] = '';
+		}
+
+		if ( ! empty( $single_info['url'] ) ) {
+			$raw_documents = [
+				[
+					'label' => $single_info['title'] ?: ( 'Phiếu tuyển sinh: ' . get_the_title( $program_id ) ),
+					'file'  => $single_info['url'],
+					'badge' => 'required',
+				],
+			];
+			$source       = 'program';
+			$source_label = 'Mẫu riêng theo ngành';
+		}
 	}
 
-	// Lọc bỏ URL giả định UTC nếu trường này không phải UTC
-	if ( ! empty( $prog_url ) && str_contains( $prog_url, 'utc-2026.pdf' ) && $school_code_clean !== 'utc' ) {
-		$prog_url = '';
-	}
+	// ----------------------------------------------------
+	// CẤP 2: KIỂM TRA THEO HỆ ĐÀO TẠO CỦA TRƯỜNG (SCHOOL X TRAINING TYPE)
+	// ----------------------------------------------------
+	if ( empty( $source ) && $school_id > 0 ) {
+		$training_terms = wp_get_post_terms( $program_id, 'training_type' );
+		if ( ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ) {
+			$by_type_rows = ltdh_get_field_or_meta( 'admission_forms_by_type', $school_id );
+			if ( ! empty( $by_type_rows ) && is_array( $by_type_rows ) ) {
+				$prog_term_ids   = wp_list_pluck( $training_terms, 'term_id' );
+				$prog_term_slugs = wp_list_pluck( $training_terms, 'slug' );
 
-	if ( ! empty( $prog_url ) ) {
-		return [
-			'url'          => $prog_url,
-			'title'        => $prog_title ?: ( 'Phiếu tuyển sinh: ' . get_the_title( $program_id ) ),
-			'source'       => 'program',
-			'source_label' => 'Mẫu riêng theo ngành',
-			'filename'     => basename( parse_url( $prog_url, PHP_URL_PATH ) ?: '' ),
-		];
-	}
-
-	if ( ! $school_id ) {
-		return null;
-	}
-
-	// 2. Cấp 2: Kiểm tra phiếu theo Hệ đào tạo (School x Training Type)
-	$training_terms = wp_get_post_terms( $program_id, 'training_type' );
-	if ( ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ) {
-		$by_type_rows = function_exists( 'get_field' ) ? get_field( 'admission_forms_by_type', $school_id ) : get_post_meta( $school_id, 'admission_forms_by_type', true );
-		if ( ! empty( $by_type_rows ) && is_array( $by_type_rows ) ) {
-			$prog_term_ids   = wp_list_pluck( $training_terms, 'term_id' );
-			$prog_term_slugs = wp_list_pluck( $training_terms, 'slug' );
-
-			foreach ( $by_type_rows as $row ) {
-				$row_type = $row['training_type'] ?? null;
-				$row_file = $row['file'] ?? null;
-
-				$row_type_id   = 0;
-				$row_type_slug = '';
-				if ( is_numeric( $row_type ) ) {
-					$row_type_id = (int) $row_type;
-				} elseif ( is_array( $row_type ) ) {
-					$row_type_id   = (int) ( $row_type['term_id'] ?? $row_type['ID'] ?? 0 );
-					$row_type_slug = (string) ( $row_type['slug'] ?? '' );
-				} elseif ( is_object( $row_type ) ) {
-					$row_type_id   = (int) ( $row_type->term_id ?? $row_type->ID ?? 0 );
-					$row_type_slug = (string) ( $row_type->slug ?? '' );
-				} elseif ( is_string( $row_type ) ) {
-					$row_type_slug = $row_type;
-				}
-
-				$is_matched = false;
-				if ( $row_type_id > 0 && in_array( $row_type_id, $prog_term_ids, true ) ) {
-					$is_matched = true;
-				} elseif ( ! empty( $row_type_slug ) && in_array( $row_type_slug, $prog_term_slugs, true ) ) {
-					$is_matched = true;
-				}
-
-				if ( $is_matched && ! empty( $row_file ) ) {
-					$type_url   = '';
-					$type_title = ! empty( $row['notes'] ) ? (string) $row['notes'] : '';
-					if ( is_array( $row_file ) && ! empty( $row_file['url'] ) ) {
-						$type_url = (string) $row_file['url'];
-						if ( empty( $type_title ) ) {
-							$type_title = ! empty( $row_file['title'] ) ? (string) $row_file['title'] : ( ! empty( $row_file['filename'] ) ? (string) $row_file['filename'] : '' );
-						}
-					} elseif ( is_numeric( $row_file ) && (int) $row_file > 0 ) {
-						$type_url = wp_get_attachment_url( (int) $row_file ) ?: '';
-						if ( empty( $type_title ) ) {
-							$type_title = get_the_title( (int) $row_file );
-						}
-					} elseif ( is_string( $row_file ) ) {
-						$type_url = $row_file;
+				foreach ( $by_type_rows as $row ) {
+					$row_type = $row['training_type'] ?? null;
+					$row_type_id   = 0;
+					$row_type_slug = '';
+					if ( is_numeric( $row_type ) ) {
+						$row_type_id = (int) $row_type;
+					} elseif ( is_array( $row_type ) ) {
+						$row_type_id   = (int) ( $row_type['term_id'] ?? $row_type['ID'] ?? 0 );
+						$row_type_slug = (string) ( $row_type['slug'] ?? '' );
+					} elseif ( is_object( $row_type ) ) {
+						$row_type_id   = (int) ( $row_type->term_id ?? $row_type->ID ?? 0 );
+						$row_type_slug = (string) ( $row_type->slug ?? '' );
+					} elseif ( is_string( $row_type ) ) {
+						$row_type_slug = $row_type;
 					}
 
-					if ( ! empty( $type_url ) ) {
-						$term_name = $training_terms[0]->name ?? '';
-						return [
-							'url'          => $type_url,
-							'title'        => $type_title ?: ( 'Phiếu tuyển sinh ' . $term_name . ' - ' . get_the_title( $school_id ) ),
-							'source'       => 'school_type',
-							'source_label' => 'Mẫu theo hệ: ' . $term_name,
-							'filename'     => basename( parse_url( $type_url, PHP_URL_PATH ) ?: '' ),
-						];
+					$is_matched = false;
+					if ( $row_type_id > 0 && in_array( $row_type_id, $prog_term_ids, true ) ) {
+						$is_matched = true;
+					} elseif ( ! empty( $row_type_slug ) && in_array( $row_type_slug, $prog_term_slugs, true ) ) {
+						$is_matched = true;
+					}
+
+					if ( $is_matched ) {
+						$has_type_data = false;
+						if ( ! empty( $row['bundle_file'] ) ) {
+							$raw_bundle    = $row['bundle_file'];
+							$has_type_data = true;
+						}
+						if ( ! empty( $row['documents'] ) && is_array( $row['documents'] ) ) {
+							$raw_documents = $row['documents'];
+							$has_type_data = true;
+						} elseif ( ! empty( $row['file'] ) ) {
+							// Single file legacy
+							$single_info = ltdh_normalize_admission_file_info( $row['file'] );
+							if ( ! empty( $single_info['url'] ) ) {
+								$raw_documents = [
+									[
+										'label' => ! empty( $row['notes'] ) ? $row['notes'] : ( 'Phiếu tuyển sinh ' . ( $training_terms[0]->name ?? '' ) . ' - ' . get_the_title( $school_id ) ),
+										'file'  => $single_info['url'],
+										'badge' => 'required',
+									],
+								];
+								$has_type_data = true;
+							}
+						}
+
+						if ( $has_type_data ) {
+							$term_name    = $training_terms[0]->name ?? 'Hệ đào tạo';
+							$source       = 'school_type';
+							$source_label = 'Mẫu theo hệ: ' . $term_name;
+							break;
+						}
 					}
 				}
 			}
 		}
 	}
 
-	// 3. Cấp 3: Fallback về Phiếu mặc định chung của Trường
-	$default_form = function_exists( 'get_field' ) ? get_field( 'default_admission_form', $school_id ) : get_post_meta( $school_id, 'default_admission_form', true );
-	if ( ! empty( $default_form ) ) {
-		$default_url   = '';
-		$default_title = '';
-		if ( is_array( $default_form ) && ! empty( $default_form['url'] ) ) {
-			$default_url   = (string) $default_form['url'];
-			$default_title = ! empty( $default_form['title'] ) ? (string) $default_form['title'] : ( ! empty( $default_form['filename'] ) ? (string) $default_form['filename'] : '' );
-		} elseif ( is_numeric( $default_form ) && (int) $default_form > 0 ) {
-			$default_url   = wp_get_attachment_url( (int) $default_form ) ?: '';
-			$default_title = get_the_title( (int) $default_form );
-		} elseif ( is_string( $default_form ) ) {
-			$default_url = $default_form;
-		}
+	// ----------------------------------------------------
+	// CẤP 3: KIỂM TRA MẶC ĐỊNH CHUNG CỦA TRƯỜNG (SCHOOL DEFAULT)
+	// ----------------------------------------------------
+	if ( empty( $source ) && $school_id > 0 ) {
+		$def_bundle = ltdh_get_field_or_meta( 'default_bundle_file', $school_id );
+		$def_docs   = ltdh_get_field_or_meta( 'default_admission_documents', $school_id );
 
-		if ( ! empty( $default_url ) ) {
-			return [
-				'url'          => $default_url,
-				'title'        => $default_title ?: ( 'Phiếu tuyển sinh: ' . get_the_title( $school_id ) ),
-				'source'       => 'school_default',
-				'source_label' => 'Mẫu chuẩn của trường',
-				'filename'     => basename( parse_url( $default_url, PHP_URL_PATH ) ?: '' ),
-			];
+		if ( ! empty( $def_bundle ) || ( ! empty( $def_docs ) && is_array( $def_docs ) ) ) {
+			$raw_bundle    = $def_bundle;
+			$raw_documents = is_array( $def_docs ) ? $def_docs : [];
+			$source        = 'school_default';
+			$source_label  = 'Mẫu chuẩn của trường';
+		} else {
+			// Single file legacy default
+			$def_single  = ltdh_get_field_or_meta( 'default_admission_form', $school_id );
+			$single_info = ltdh_normalize_admission_file_info( $def_single );
+			if ( ! empty( $single_info['url'] ) ) {
+				$raw_documents = [
+					[
+						'label' => $single_info['title'] ?: ( 'Phiếu tuyển sinh: ' . get_the_title( $school_id ) ),
+						'file'  => $single_info['url'],
+						'badge' => 'required',
+					],
+				];
+				$source       = 'school_default';
+				$source_label = 'Mẫu chuẩn của trường';
+			}
 		}
 	}
 
-	// 4. Cấp 4: Fallback về file tĩnh theo quy ước thư mục (nếu có tồn tại)
-	if ( ! empty( $school_code_clean ) ) {
+	// ----------------------------------------------------
+	// CẤP 4: FILE TĨNH THEO QUY ƯỚC (/uploads/forms/phieu-dang-ky-{code}-2026.pdf)
+	// ----------------------------------------------------
+	if ( empty( $source ) && ! empty( $school_code_clean ) ) {
 		$custom_form_path = WP_CONTENT_DIR . "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf";
 		if ( file_exists( $custom_form_path ) ) {
-			$file_url = content_url( "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf" );
-			return [
-				'url'          => $file_url,
-				'title'        => 'Phiếu tuyển sinh: ' . get_the_title( $school_id ),
-				'source'       => 'school_file',
-				'source_label' => 'Mẫu chuẩn của trường',
-				'filename'     => basename( $custom_form_path ),
+			$file_url      = content_url( "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf" );
+			$raw_documents = [
+				[
+					'label' => 'Phiếu tuyển sinh: ' . ( $school_id ? get_the_title( $school_id ) : '' ),
+					'file'  => $file_url,
+					'badge' => 'required',
+				],
 			];
+			$source       = 'school_file';
+			$source_label = 'Mẫu chuẩn của trường';
 		}
 	}
 
-	return null;
+	if ( empty( $source ) ) {
+		return $empty_package;
+	}
+
+	// ----------------------------------------------------
+	// CHUẨN HÓA DỮ LIỆU ĐẦU RA
+	// ----------------------------------------------------
+	$bundle_info  = ltdh_normalize_admission_file_info( $raw_bundle );
+	$bundle_url   = $bundle_info['url'];
+	$bundle_ext   = $bundle_info['ext'] ?: 'zip';
+	$bundle_title = ! empty( $bundle_url ) ? 'Tải trọn bộ hồ sơ (' . strtoupper( $bundle_ext ) . ')' : '';
+
+	$parsed_documents = [];
+	foreach ( $raw_documents as $doc_row ) {
+		$f_info = ltdh_normalize_admission_file_info( $doc_row['file'] ?? null );
+		if ( empty( $f_info['url'] ) ) {
+			continue;
+		}
+
+		$raw_badge   = $doc_row['badge'] ?? 'required';
+		$badge_text  = $badge_labels[ $raw_badge ] ?? 'Bắt buộc';
+		$label_text  = ! empty( $doc_row['label'] ) ? (string) $doc_row['label'] : ( $f_info['title'] ?: 'Biểu mẫu tuyển sinh' );
+
+		$parsed_documents[] = [
+			'label'       => $label_text,
+			'url'         => $f_info['url'],
+			'filename'    => $f_info['filename'],
+			'ext'         => $f_info['ext'] ?: 'pdf',
+			'badge'       => $raw_badge,
+			'badge_label' => $badge_text,
+		];
+	}
+
+	$has_package = ( ! empty( $bundle_url ) || ! empty( $parsed_documents ) );
+	$is_single   = ( empty( $bundle_url ) && count( $parsed_documents ) <= 1 );
+
+	$primary_url   = ! empty( $bundle_url ) ? $bundle_url : ( $parsed_documents[0]['url'] ?? '' );
+	$primary_title = ! empty( $bundle_title ) ? $bundle_title : ( $parsed_documents[0]['label'] ?? '' );
+
+	return [
+		'has_package'   => $has_package,
+		'source'        => $source,
+		'source_label'  => $source_label,
+		'bundle_url'    => $bundle_url,
+		'bundle_title'  => $bundle_title,
+		'bundle_ext'    => $bundle_ext,
+		'documents'     => $parsed_documents,
+		'is_single'     => $is_single,
+		'primary_url'   => $primary_url,
+		'primary_title' => $primary_title,
+	];
+}
+
+/**
+ * Lấy dữ liệu phiếu tuyển sinh chính (Backward compatibility wrapper)
+ *
+ * @param int $program_id
+ * @return array|null
+ */
+function ltdh_get_program_admission_form_data( int $program_id ): ?array {
+	$pkg = ltdh_get_program_admission_package( $program_id );
+	if ( empty( $pkg['has_package'] ) || empty( $pkg['primary_url'] ) ) {
+		return null;
+	}
+
+	return [
+		'url'          => $pkg['primary_url'],
+		'title'        => $pkg['primary_title'] ?: ( 'Phiếu tuyển sinh: ' . get_the_title( $program_id ) ),
+		'source'       => $pkg['source'],
+		'source_label' => $pkg['source_label'],
+		'filename'     => basename( parse_url( $pkg['primary_url'], PHP_URL_PATH ) ?: '' ),
+	];
 }
 
 /**
@@ -506,8 +662,75 @@ function ltdh_get_program_admission_form_url( int $program_id ): string {
 }
 
 /**
+ * Tìm kiếm biểu mẫu miễn giảm môn học phù hợp với tên môn học
+ *
+ * @param string $subject
+ * @param array $documents
+ * @return array|null
+ */
+function ltdh_find_matching_exemption_doc( string $subject, array $documents ): ?array {
+	if ( empty( $documents ) || empty( $subject ) ) {
+		return null;
+	}
+
+	$sub_clean = mb_strtolower( remove_accents( $subject ) );
+
+	$topic_keywords = [
+		'quoc phong' => [ 'quoc phong', 'an ninh', 'gdqp', 'quan su' ],
+		'an ninh'    => [ 'quoc phong', 'an ninh', 'gdqp', 'quan su' ],
+		'gdqp'       => [ 'quoc phong', 'an ninh', 'gdqp', 'quan su' ],
+		'tieng anh'  => [ 'tieng anh', 'anh van', 'english', 'ngoai ngu' ],
+		'ngoai ngu'  => [ 'tieng anh', 'anh van', 'english', 'ngoai ngu' ],
+		'tin hoc'    => [ 'tin hoc', 'cntt', 'ic3', 'mos' ],
+		'triet'      => [ 'triet hoc', 'mac lenin', 'ly luan' ],
+	];
+
+	$active_keywords = [];
+	foreach ( $topic_keywords as $key => $kws ) {
+		foreach ( $kws as $kw ) {
+			if ( str_contains( $sub_clean, $kw ) ) {
+				$active_keywords = array_merge( $active_keywords, $kws );
+				break;
+			}
+		}
+	}
+
+	// 1. Kiểm tra đối chiếu theo chủ đề nhận diện được
+	if ( ! empty( $active_keywords ) ) {
+		foreach ( $documents as $doc ) {
+			$doc_clean = mb_strtolower( remove_accents( $doc['label'] ?? '' ) );
+			foreach ( $active_keywords as $kw ) {
+				if ( str_contains( $doc_clean, $kw ) ) {
+					return $doc;
+				}
+			}
+		}
+	}
+
+	// 2. Đối chiếu từ khóa ngữ nghĩa nếu tài liệu có gắn badge 'exemption'
+	$words = preg_split( '/[\s,\.-]+/', $sub_clean );
+	$meaningful = array_filter( $words, fn( $w ) => mb_strlen( $w ) >= 4 && ! in_array( $w, [ 'mon', 'hoc', 'phan', 'khoa', 'tin', 'chi' ], true ) );
+	if ( ! empty( $meaningful ) ) {
+		foreach ( $documents as $doc ) {
+			if ( ( $doc['badge'] ?? '' ) !== 'exemption' ) {
+				continue;
+			}
+			$doc_clean = mb_strtolower( remove_accents( $doc['label'] ?? '' ) );
+			foreach ( $meaningful as $w ) {
+				if ( str_contains( $doc_clean, $w ) ) {
+					return $doc;
+				}
+			}
+		}
+	}
+
+	return null;
+}
+
+
+/**
  * Lấy danh sách toàn bộ các phiếu tuyển sinh đang có của một trường
- * (gồm phiếu mặc định chung và các phiếu theo hệ đào tạo)
+ * (gồm phiếu mặc định chung, bundle file và các phiếu theo hệ đào tạo)
  *
  * @param int $school_id
  * @return array
@@ -519,35 +742,57 @@ function ltdh_get_school_admission_forms( int $school_id ): array {
 
 	$forms = [];
 
-	// 1. Phiếu mặc định chung
-	$default_form = function_exists( 'get_field' ) ? get_field( 'default_admission_form', $school_id ) : get_post_meta( $school_id, 'default_admission_form', true );
-	if ( ! empty( $default_form ) ) {
-		$url   = is_array( $default_form ) ? ( $default_form['url'] ?? '' ) : ( is_numeric( $default_form ) ? ( wp_get_attachment_url( (int) $default_form ) ?: '' ) : (string) $default_form );
-		$title = is_array( $default_form ) ? ( $default_form['title'] ?? $default_form['filename'] ?? '' ) : ( is_numeric( $default_form ) ? get_the_title( (int) $default_form ) : '' );
-		if ( ! empty( $url ) ) {
+	// 1. Bundle mặc định chung
+	$def_bundle = ltdh_get_field_or_meta( 'default_bundle_file', $school_id );
+	$b_info     = ltdh_normalize_admission_file_info( $def_bundle );
+	if ( ! empty( $b_info['url'] ) ) {
+		$forms[] = [
+			'type'     => 'bundle',
+			'label'    => 'Trọn bộ hồ sơ tuyển sinh (ZIP/PDF)',
+			'url'      => $b_info['url'],
+			'title'    => 'Trọn bộ hồ sơ tuyển sinh: ' . get_the_title( $school_id ),
+			'filename' => $b_info['filename'],
+		];
+	}
+
+	// 2. Danh sách biểu mẫu mặc định chung
+	$def_docs = ltdh_get_field_or_meta( 'default_admission_documents', $school_id );
+	if ( ! empty( $def_docs ) && is_array( $def_docs ) ) {
+		foreach ( $def_docs as $d ) {
+			$f_info = ltdh_normalize_admission_file_info( $d['file'] ?? null );
+			if ( ! empty( $f_info['url'] ) ) {
+				$label = ! empty( $d['label'] ) ? (string) $d['label'] : $f_info['title'];
+				$forms[] = [
+					'type'     => 'default_doc',
+					'label'    => $label,
+					'url'      => $f_info['url'],
+					'title'    => $label . ' - ' . get_the_title( $school_id ),
+					'filename' => $f_info['filename'],
+				];
+			}
+		}
+	}
+
+	// 3. Phiếu đơn lẻ mặc định (Legacy)
+	if ( empty( $def_docs ) && empty( $b_info['url'] ) ) {
+		$default_form = ltdh_get_field_or_meta( 'default_admission_form', $school_id );
+		$f_info       = ltdh_normalize_admission_file_info( $default_form );
+		if ( ! empty( $f_info['url'] ) ) {
 			$forms[] = [
 				'type'     => 'default',
 				'label'    => 'Phiếu tuyển sinh chung toàn trường',
-				'url'      => $url,
-				'title'    => $title ?: ( 'Phiếu tuyển sinh: ' . get_the_title( $school_id ) ),
-				'filename' => basename( parse_url( $url, PHP_URL_PATH ) ?: '' ),
+				'url'      => $f_info['url'],
+				'title'    => 'Phiếu tuyển sinh: ' . get_the_title( $school_id ),
+				'filename' => $f_info['filename'],
 			];
 		}
 	}
 
-	// 2. Phiếu theo hệ
-	$by_type_rows = function_exists( 'get_field' ) ? get_field( 'admission_forms_by_type', $school_id ) : get_post_meta( $school_id, 'admission_forms_by_type', true );
+	// 4. Biểu mẫu theo từng hệ
+	$by_type_rows = ltdh_get_field_or_meta( 'admission_forms_by_type', $school_id );
 	if ( ! empty( $by_type_rows ) && is_array( $by_type_rows ) ) {
 		foreach ( $by_type_rows as $row ) {
-			$row_file = $row['file'] ?? null;
 			$row_type = $row['training_type'] ?? null;
-			if ( empty( $row_file ) ) {
-				continue;
-			}
-
-			$url   = is_array( $row_file ) ? ( $row_file['url'] ?? '' ) : ( is_numeric( $row_file ) ? ( wp_get_attachment_url( (int) $row_file ) ?: '' ) : (string) $row_file );
-			$title = ! empty( $row['notes'] ) ? (string) $row['notes'] : ( is_array( $row_file ) ? ( $row_file['title'] ?? $row_file['filename'] ?? '' ) : ( is_numeric( $row_file ) ? get_the_title( (int) $row_file ) : '' ) );
-
 			$term_name = 'Hệ đào tạo';
 			if ( is_numeric( $row_type ) ) {
 				$term = get_term( (int) $row_type, 'training_type' );
@@ -560,14 +805,47 @@ function ltdh_get_school_admission_forms( int $school_id ): array {
 				$term_name = $row_type->name;
 			}
 
-			if ( ! empty( $url ) ) {
-				$forms[] = [
-					'type'     => 'by_training_type',
-					'label'    => 'Phiếu tuyển sinh hệ ' . $term_name,
-					'url'      => $url,
-					'title'    => $title ?: ( 'Phiếu tuyển sinh ' . $term_name . ' - ' . get_the_title( $school_id ) ),
-					'filename' => basename( parse_url( $url, PHP_URL_PATH ) ?: '' ),
-				];
+			// Bundle của hệ
+			if ( ! empty( $row['bundle_file'] ) ) {
+				$b_info = ltdh_normalize_admission_file_info( $row['bundle_file'] );
+				if ( ! empty( $b_info['url'] ) ) {
+					$forms[] = [
+						'type'     => 'type_bundle',
+						'label'    => 'Trọn bộ hồ sơ hệ ' . $term_name . ' (ZIP/PDF)',
+						'url'      => $b_info['url'],
+						'title'    => 'Trọn bộ hồ sơ hệ ' . $term_name . ' - ' . get_the_title( $school_id ),
+						'filename' => $b_info['filename'],
+					];
+				}
+			}
+
+			// Từng document của hệ
+			if ( ! empty( $row['documents'] ) && is_array( $row['documents'] ) ) {
+				foreach ( $row['documents'] as $d ) {
+					$f_info = ltdh_normalize_admission_file_info( $d['file'] ?? null );
+					if ( ! empty( $f_info['url'] ) ) {
+						$label = ! empty( $d['label'] ) ? (string) $d['label'] : $f_info['title'];
+						$forms[] = [
+							'type'     => 'type_doc',
+							'label'    => $label . ' (' . $term_name . ')',
+							'url'      => $f_info['url'],
+							'title'    => $label . ' - ' . get_the_title( $school_id ),
+							'filename' => $f_info['filename'],
+						];
+					}
+				}
+			} elseif ( ! empty( $row['file'] ) ) {
+				// Single file legacy
+				$f_info = ltdh_normalize_admission_file_info( $row['file'] );
+				if ( ! empty( $f_info['url'] ) ) {
+					$forms[] = [
+						'type'     => 'by_training_type',
+						'label'    => 'Phiếu tuyển sinh hệ ' . $term_name,
+						'url'      => $f_info['url'],
+						'title'    => 'Phiếu tuyển sinh ' . $term_name . ' - ' . get_the_title( $school_id ),
+						'filename' => $f_info['filename'],
+					];
+				}
 			}
 		}
 	}
