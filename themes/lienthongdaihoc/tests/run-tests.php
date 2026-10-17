@@ -24,11 +24,43 @@ echo "STARTING AUTOMATED TEST RUNNER: PROGRAM SEARCH\n";
 echo "==================================================\n\n";
 
 // 2. Setup fixtures
-$school_id = 0;
-$major_id  = 0;
-$program_id = 0;
-$type_term = null;
-$campus_term = null;
+$school_id       = 0;
+$major_id        = 0;
+$program_id      = 0;
+$qtkd_major_id   = 0;
+$qtkd_program_id = 0;
+$type_term       = null;
+$campus_term     = null;
+
+$cleanup_fixtures = function() use ( &$school_id, &$major_id, &$program_id, &$qtkd_major_id, &$qtkd_program_id ) {
+	static $cleaned = false;
+	if ( $cleaned ) {
+		return;
+	}
+	$cleaned = true;
+	if ( $program_id ) {
+		wp_delete_post( $program_id, true );
+		$program_id = 0;
+	}
+	if ( $school_id ) {
+		wp_delete_post( $school_id, true );
+		$school_id = 0;
+	}
+	if ( $major_id ) {
+		wp_delete_post( $major_id, true );
+		$major_id = 0;
+	}
+	if ( $qtkd_program_id ) {
+		wp_delete_post( $qtkd_program_id, true );
+		$qtkd_program_id = 0;
+	}
+	if ( $qtkd_major_id ) {
+		wp_delete_post( $qtkd_major_id, true );
+		$qtkd_major_id = 0;
+	}
+	echo "Fixtures cleaned up successfully.\n";
+};
+register_shutdown_function( $cleanup_fixtures );
 
 try {
 	// Create Test School
@@ -201,6 +233,8 @@ try {
 	if ( ! assertContainsProgram( $res, $qtkd_program_id, "TC-07: Synonym search (qtkd)" ) ) $failures++;
 	wp_delete_post( $qtkd_program_id, true );
 	wp_delete_post( $qtkd_major_id, true );
+	$qtkd_program_id = 0;
+	$qtkd_major_id   = 0;
 
 	// TC-08: school filter
 	echo "Running TC-08...\n";
@@ -258,14 +292,15 @@ try {
 		echo "TEST RESULT: ALL TESTS PASSED SUCCESSFULLY! 🎉\n";
 	} else {
 		echo "TEST RESULT: FAILED with $failures failure(s).\n";
-		exit(1);
 	}
 	echo "==================================================\n";
 
 } finally {
-	// Cleanup fixtures
-	if ( $program_id ) wp_delete_post( $program_id, true );
-	if ( $school_id ) wp_delete_post( $school_id, true );
-	if ( $major_id ) wp_delete_post( $major_id, true );
-	echo "Fixtures cleaned up successfully.\n";
+	$cleanup_fixtures();
 }
+
+if ( $failures > 0 ) {
+	exit( 1 );
+}
+exit( 0 );
+
