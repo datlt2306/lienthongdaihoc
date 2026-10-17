@@ -13,7 +13,7 @@ $program_id = get_the_ID();
 $school_id  = (int) get_field( 'school_relationship', $program_id );
 ?>
 
-<aside id="program-sidebar" class="widget-area space-y-4 lg:space-y-6 sticky top-36 md:top-40" role="complementary" aria-label="<?php esc_attr_e( 'Thanh bên chương trình đào tạo', 'ltdh' ); ?>">
+<aside id="program-sidebar" class="widget-area space-y-4 lg:space-y-6" role="complementary" aria-label="<?php esc_attr_e( 'Thanh bên chương trình đào tạo', 'ltdh' ); ?>">
 	<?php
 	if ( is_active_sidebar( 'sidebar-program' ) ) :
 		dynamic_sidebar( 'sidebar-program' );

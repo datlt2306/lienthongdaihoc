@@ -278,7 +278,7 @@ $company_name = function_exists( 'ltdh_get_company_name' ) ? ltdh_get_company_na
 			</div>
 
 			<!-- SIDEBAR NAVIGATION & QUICK ACTIONS (4/12) -->
-			<aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+			<aside class="lg:col-span-4 space-y-6">
 
 				<!-- Quick TOC Card -->
 				<div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-5 sm:p-6 space-y-4">

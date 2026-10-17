@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<aside id="guide-sidebar" class="widget-area space-y-6 sticky top-24" role="complementary" aria-label="<?php esc_attr_e( 'Thanh bên cẩm nang', 'ltdh' ); ?>">
+<aside id="guide-sidebar" class="widget-area space-y-6" role="complementary" aria-label="<?php esc_attr_e( 'Thanh bên cẩm nang', 'ltdh' ); ?>">
 	<?php
 	if ( is_active_sidebar( 'sidebar-guide' ) ) :
 		dynamic_sidebar( 'sidebar-guide' );
