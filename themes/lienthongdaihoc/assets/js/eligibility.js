@@ -859,9 +859,9 @@
 						'<span>Xem chi tiết trường</span>' +
 						'<svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>' +
 					'</a>' +
-					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold transition-all no-underline shadow-2xs elig-verify-card-btn inline-flex items-center justify-center gap-1.5 cursor-pointer" data-program-id="' + prog.program_id + '">' +
-						'<span>Thẩm định hồ sơ miễn giảm tín chỉ</span>' +
-						'<svg class="w-3.5 h-3.5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>' +
+					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold transition-all no-underline shadow-2xs elig-verify-card-btn inline-flex items-center justify-center gap-1.5 cursor-pointer" data-program-id="' + prog.program_id + '" data-program-title="' + escAttr((prog.school && prog.school.title ? (prog.school.title + ' — ') : '') + prog.title) + '">' +
+						'<span>Nộp hồ sơ thẩm định trường này</span>' +
+						'<svg class="w-3.5 h-3.5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"/></svg>' +
 					'</a>' +
 				'</div>' +
 			'</div>';
@@ -946,9 +946,9 @@
 						'<span>Xem chi tiết trường</span>' +
 						'<svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>' +
 					'</a>' +
-					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold transition-all no-underline shadow-2xs elig-verify-card-btn inline-flex items-center justify-center gap-1.5 cursor-pointer" data-program-id="' + prog.program_id + '">' +
-						'<span>Tư vấn phương án dự phòng này</span>' +
-						'<svg class="w-3.5 h-3.5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>' +
+					'<a href="#elig-lead-section" class="w-full sm:flex-1 py-2.5 px-4 text-center rounded-xl bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold transition-all no-underline shadow-2xs elig-verify-card-btn inline-flex items-center justify-center gap-1.5 cursor-pointer" data-program-id="' + prog.program_id + '" data-program-title="' + escAttr((prog.school && prog.school.title ? (prog.school.title + ' — ') : '') + prog.title) + '">' +
+						'<span>Nộp hồ sơ thẩm định phương án này</span>' +
+						'<svg class="w-3.5 h-3.5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"/></svg>' +
 					'</a>' +
 				'</div>' +
 			'</div>';
@@ -1109,20 +1109,46 @@
 			var verifyBtn = e.target.closest('.elig-verify-card-btn');
 			if (verifyBtn) {
 				var programId = verifyBtn.getAttribute('data-program-id');
+				var progTitle = verifyBtn.getAttribute('data-program-title');
+				
 				var progIdField = document.getElementById('elig-program-id');
-				if (progIdField) {
+				if (progIdField && programId) {
 					progIdField.value = programId;
 				}
 				
-				var card = verifyBtn.closest('.elig-card');
-				if (card) {
-					var cardTitleEl = card.querySelector('.elig-card-title');
-					if (cardTitleEl) {
-						var titleText = cardTitleEl.textContent.trim();
-						var contextH3 = document.querySelector('#elig-lead-section h3');
-						if (contextH3) {
-							contextH3.textContent = "Yêu cầu đối chiếu điều kiện nhập học cho: " + titleText;
+				if (!progTitle) {
+					var card = verifyBtn.closest('.elig-card');
+					if (card) {
+						var cardTitleEl = card.querySelector('.elig-card-title');
+						if (cardTitleEl) {
+							progTitle = cardTitleEl.textContent.trim();
 						}
+					}
+				}
+
+				if (progTitle) {
+					var selectedTitleEl = document.getElementById('elig-selected-program-title');
+					if (selectedTitleEl) {
+						selectedTitleEl.textContent = progTitle;
+					}
+				}
+
+				var banner = document.getElementById('elig-selected-program-banner');
+				if (banner) {
+					banner.classList.add('ring-2', 'ring-[#00308b]', 'bg-blue-50');
+					setTimeout(function() {
+						banner.classList.remove('ring-2', 'ring-[#00308b]', 'bg-blue-50');
+					}, 1500);
+				}
+
+				var leadSection = document.getElementById('elig-lead-section');
+				if (leadSection) {
+					leadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					var nameInput = document.getElementById('elig-lead-name');
+					if (nameInput) {
+						setTimeout(function() {
+							nameInput.focus();
+						}, 400);
 					}
 				}
 			}
