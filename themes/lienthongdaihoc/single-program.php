@@ -53,45 +53,10 @@ $school_contact_raw  = $school_id ? get_field( 'contact_info', $school_id ) : ''
 $contact_html        = ! empty( $prog_contact_custom ) ? $prog_contact_custom : $school_contact_raw;
 $contact_formatted   = function_exists( 'ltdh_format_contact_info' ) ? ltdh_format_contact_info( (string) $contact_html, (int) $school_id ) : (string) $contact_html;
 
-$curriculum_raw  = get_field( 'curriculum_file', $program_id );
-$curriculum_url  = '';
-$curriculum_type = 'file';
-
-if ( is_numeric( $curriculum_raw ) ) {
-	$attachment_id = intval( $curriculum_raw );
-	$curriculum_url = wp_get_attachment_url( $attachment_id );
-	$mime = get_post_mime_type( $attachment_id );
-	if ( strpos( $mime, 'image' ) !== false ) {
-		$curriculum_type = 'image';
-	} elseif ( strpos( $mime, 'pdf' ) !== false ) {
-		$curriculum_type = 'pdf';
-	} else {
-		$ext = strtolower( pathinfo( $curriculum_url, PATHINFO_EXTENSION ) );
-		if ( in_array( $ext, array( 'png', 'jpg', 'jpeg', 'webp', 'gif' ), true ) ) {
-			$curriculum_type = 'image';
-		} elseif ( $ext === 'pdf' ) {
-			$curriculum_type = 'pdf';
-		}
-	}
-} elseif ( is_array( $curriculum_raw ) && ! empty( $curriculum_raw['url'] ) ) {
-	$curriculum_url = $curriculum_raw['url'];
-	$mime    = strtolower( $curriculum_raw['mime_type'] ?? '' );
-	$type    = strtolower( $curriculum_raw['type'] ?? '' );
-	$subtype = strtolower( $curriculum_raw['subtype'] ?? '' );
-	if ( strpos( $mime, 'image' ) !== false || in_array( $type, array( 'image', 'png', 'jpg', 'jpeg', 'webp' ), true ) || in_array( $subtype, array( 'png', 'jpg', 'jpeg', 'webp' ), true ) ) {
-		$curriculum_type = 'image';
-	} elseif ( strpos( $mime, 'pdf' ) !== false || $subtype === 'pdf' || strtolower( pathinfo( $curriculum_url, PATHINFO_EXTENSION ) ) === 'pdf' ) {
-		$curriculum_type = 'pdf';
-	}
-} elseif ( is_string( $curriculum_raw ) && ! empty( $curriculum_raw ) ) {
-	$curriculum_url = $curriculum_raw;
-	$ext = strtolower( pathinfo( $curriculum_url, PATHINFO_EXTENSION ) );
-	if ( in_array( $ext, array( 'png', 'jpg', 'jpeg', 'webp', 'gif' ), true ) ) {
-		$curriculum_type = 'image';
-	} elseif ( $ext === 'pdf' ) {
-		$curriculum_type = 'pdf';
-	}
-}
+$curriculum_info  = function_exists( 'ltdh_get_program_curriculum_info' ) ? ltdh_get_program_curriculum_info( $program_id ) : null;
+$curriculum_url   = $curriculum_info['url'] ?? '';
+$curriculum_type  = $curriculum_info['type'] ?? 'file';
+$curriculum_title = $curriculum_info['title'] ?? ( 'Khung chương trình: ' . get_the_title( $program_id ) );
 
 $global_zalo = ltdh_get_zalo_url();
 

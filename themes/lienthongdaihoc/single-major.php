@@ -208,7 +208,16 @@ $major_tabs[] = [
 	'title'    => 'Quy trình',
 	'subtitle' => '4 bước xét tuyển',
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
-];
+$major_curriculum = function_exists( 'ltdh_get_major_curriculum_info' ) ? ltdh_get_major_curriculum_info( (int) $major_id, $context_school ?: $school_param ) : null;
+
+if ( ! empty( $major_curriculum['url'] ) ) {
+	$major_tabs[] = [
+		'id'       => 'khung-chuong-trinh',
+		'title'    => 'Khung đào tạo',
+		'subtitle' => 'Môn học & Lộ trình',
+		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>',
+	];
+}
 
 $major_faqs = function_exists( 'ltdh_get_major_faqs' ) ? ltdh_get_major_faqs( (int) $major_id, $context_school ? $context_school->ID : null ) : [];
 
@@ -664,8 +673,67 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 						'cta_link'   => '/kiem-tra-dieu-kien',
 						'card_bg'    => 'bg-white',
 					]
-				);
-				?>
+				<!-- SECTION: MAJOR CURRICULUM ROADMAP (UI/UX Pro Max) -->
+				<?php if ( ! empty( $major_curriculum['url'] ) ) : ?>
+					<section id="khung-chuong-trinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
+						<div class="border-b border-slate-100 pb-3 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+							<div>
+								<h2 class="text-lg md:text-2xl font-bold text-slate-900">Khung chương trình đào tạo</h2>
+								<p class="text-xs md:text-sm text-slate-500 mt-0.5">
+									<?php if ( $context_school && ! empty( $context_school->post_title ) ) : ?>
+										Lộ trình môn học & khung kiến thức chính thức áp dụng tại <?php echo esc_html( $context_school->post_title ); ?>
+									<?php else : ?>
+										Khung kiến thức chuẩn và lộ trình đào tạo các học kỳ của ngành <?php echo esc_html( get_the_title( $major_id ) ); ?>
+									<?php endif; ?>
+								</p>
+							</div>
+							<?php if ( ! empty( $major_curriculum['source'] ) && 'major_school' === $major_curriculum['source'] && $context_school ) : ?>
+								<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#00308b] text-xs font-bold rounded-full self-start sm:self-auto border border-blue-100">
+									Mẫu chuẩn <?php echo esc_html( get_post_meta( $context_school->ID, 'school_code', true ) ?: $context_school->post_title ); ?>
+								</span>
+							<?php endif; ?>
+						</div>
+
+						<?php if ( 'image' === $major_curriculum['type'] ) : ?>
+							<a href="<?php echo esc_url( $major_curriculum['url'] ); ?>" target="_blank" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 bg-slate-50/90 hover:bg-blue-50/60 rounded-xl sm:rounded-2xl border border-slate-100 hover:border-blue-200/80 transition-all duration-200 group shadow-2xs hover:shadow-md block">
+								<div class="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0">
+									<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-100/90 text-[#00308b] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5 sm:mt-0">
+										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+									</div>
+									<div class="min-w-0 flex-1">
+										<h3 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base group-hover:text-[#00308b] transition-colors leading-snug">
+											<?php echo esc_html( $major_curriculum['title'] ); ?>
+										</h3>
+										<p class="text-[11px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-relaxed">Click để mở xem ảnh lộ trình các học kỳ & danh sách môn học chi tiết</p>
+									</div>
+								</div>
+								<span class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-[#00308b] sm:bg-white sm:text-[#00308b] sm:border sm:border-blue-200/60 group-hover:bg-[#00308b] group-hover:text-white px-4 py-2 sm:py-2.5 rounded-lg shadow-2xs transition-all shrink-0 min-h-[38px] whitespace-nowrap">
+									<span>Xem chi tiết</span>
+									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+								</span>
+							</a>
+						<?php else : ?>
+							<div class="bg-slate-50/80 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+								<div class="flex items-center gap-3.5 min-w-0">
+									<div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-black text-xl shrink-0 shadow-2xs">
+										PDF
+									</div>
+									<div class="min-w-0">
+										<h3 class="font-bold text-slate-900 text-sm sm:text-base mb-1 truncate">
+											<?php echo esc_html( $major_curriculum['title'] ); ?>
+										</h3>
+										<p class="text-xs text-slate-500">Tệp PDF chính thức liệt kê lộ trình các học kỳ, khối lượng tín chỉ và môn học</p>
+									</div>
+								</div>
+								<a href="<?php echo esc_url( $major_curriculum['url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $major_curriculum['url'] ); ?>" data-file-title="<?php echo esc_attr( $major_curriculum['title'] ); ?>">
+									<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+									<span>Tải Khung Chương Trình (PDF)</span>
+								</a>
+							</div>
+						<?php endif; ?>
+					</section>
+				<?php endif; ?>
+
 				<!-- SECTION: MAJOR FAQ (UI/UX Pro Max - Borderless Accordion & Structured Bullets) -->
 				<?php if ( ! empty( $major_faqs ) ) : 
 					$clean_m_name = function_exists( 'ltdh_normalize_major_name' ) ? ltdh_normalize_major_name( get_the_title( $major_id ) ) : get_the_title( $major_id );
