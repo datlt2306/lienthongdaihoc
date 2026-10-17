@@ -403,6 +403,335 @@ function ltdhInitTheme() {
     initMajorPageFilter();
 
     // ----------------------------------------------------
+    // 4b. Major Archive AJAX Filter & SEO URL Synchronization
+    // ----------------------------------------------------
+    function initMajorArchiveFilter() {
+        const filterForm = document.getElementById('major-filter-form');
+        const container = document.getElementById('major-results-container');
+        if (!filterForm || !container) return;
+
+        const headingTitle = document.getElementById('major-heading-title');
+        const countDisplay = document.getElementById('major-count-display');
+        const desktopResetWrapper = document.getElementById('major-desktop-reset');
+        const mobileResetWrapper = document.getElementById('major-mobile-reset');
+        const mobileFilterBadge = document.getElementById('major-mobile-filter-badge');
+        const mobileChipsWrapper = document.getElementById('major-mobile-chips');
+        const mobileApplyBtnCount = document.getElementById('major-apply-btn-count');
+        const pillsContainer = document.getElementById('major-pills-container');
+        const paginationContainer = document.getElementById('major-pagination-container');
+        const mobileFilterBtn = document.getElementById('ltdh-mobile-filter-btn');
+        const mobileFilterBody = document.getElementById('major-filter-body');
+        const mobileFilterChevron = document.getElementById('ltdh-mobile-filter-chevron');
+        const mobileFilterBtnText = document.getElementById('ltdh-mobile-filter-btn-text');
+        const mobileCloseBtn = document.getElementById('ltdh-mobile-filter-close');
+
+        const searchInput = filterForm.querySelector('input[name="s"]');
+        const catSelect = filterForm.querySelector('select[name="nhom_nganh"]');
+        const sortSelect = filterForm.querySelector('select[name="sort"]');
+        const limitSelect = filterForm.querySelector('select[name="limit"]');
+
+        let searchTimeout = null;
+        let activeAbortController = null;
+        const basePath = window.location.pathname.replace(/\/page\/\d+\/?$/, '/');
+
+        // Mobile Filter Accordion Toggle
+        if (mobileFilterBtn && mobileFilterBody && !mobileFilterBtn._bound) {
+            mobileFilterBtn._bound = true;
+            function toggleMobileFilter() {
+                const isHidden = mobileFilterBody.classList.contains('hidden');
+                if (isHidden) {
+                    mobileFilterBody.classList.remove('hidden');
+                    mobileFilterBtn.setAttribute('aria-expanded', 'true');
+                    if (mobileFilterChevron) mobileFilterChevron.classList.add('rotate-180');
+                    if (mobileFilterBtnText) mobileFilterBtnText.textContent = 'Thu gọn bộ lọc';
+                } else {
+                    mobileFilterBody.classList.add('hidden');
+                    mobileFilterBtn.setAttribute('aria-expanded', 'false');
+                    if (mobileFilterChevron) mobileFilterChevron.classList.remove('rotate-180');
+                    if (mobileFilterBtnText) mobileFilterBtnText.textContent = 'Bộ lọc & Tìm kiếm';
+                }
+            }
+            mobileFilterBtn.addEventListener('click', toggleMobileFilter);
+            if (mobileCloseBtn) {
+                mobileCloseBtn.addEventListener('click', toggleMobileFilter);
+            }
+        }
+
+        function updatePillStyles(activeCatSlug) {
+            if (!pillsContainer) return;
+            const pills = pillsContainer.querySelectorAll('.js-ltdh-major-pill');
+            pills.forEach(pill => {
+                const cat = pill.getAttribute('data-cat') || '';
+                const badge = pill.querySelector('.pill-badge');
+                if (cat === (activeCatSlug || '')) {
+                    pill.classList.add('is-active', 'bg-brand-primary', 'text-white', 'shadow-xs');
+                    pill.classList.remove('bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
+                    if (badge) {
+                        badge.classList.add('bg-white/20', 'text-white');
+                        badge.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200/60');
+                    }
+                } else {
+                    pill.classList.remove('is-active', 'bg-brand-primary', 'text-white', 'shadow-xs');
+                    pill.classList.add('bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
+                    if (badge) {
+                        badge.classList.remove('bg-white/20', 'text-white');
+                        badge.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200/60');
+                    }
+                }
+            });
+        }
+
+        function buildCurrentUrl(paged = 1) {
+            const params = new URLSearchParams();
+            const sVal = (searchInput ? searchInput.value : '').trim();
+            const catVal = catSelect ? catSelect.value : '';
+            const sortVal = sortSelect ? sortSelect.value : '';
+            const limitVal = limitSelect ? limitSelect.value : '';
+
+            if (catVal) params.set('nhom_nganh', catVal);
+            if (sVal) params.set('s', sVal);
+            if (sortVal) params.set('sort', sortVal);
+            if (limitVal && limitVal !== '12') params.set('limit', limitVal);
+            if (paged > 1) params.set('paged', paged);
+
+            const queryString = params.toString();
+            return queryString ? `${basePath}?${queryString}` : basePath;
+        }
+
+        function triggerFilter(options = {}) {
+            const paged = options.paged || 1;
+            const pushUrl = options.pushUrl !== false;
+            const isTyping = options.isTyping || false;
+            const scrollToTop = options.scrollToTop || false;
+
+            const targetUrl = buildCurrentUrl(paged);
+
+            if (pushUrl) {
+                if (isTyping) {
+                    window.history.replaceState({ ltdhMajorFilter: true, paged: paged }, '', targetUrl);
+                } else {
+                    window.history.pushState({ ltdhMajorFilter: true, paged: paged }, '', targetUrl);
+                }
+            }
+
+            const currentCat = catSelect ? catSelect.value : '';
+            updatePillStyles(currentCat);
+
+            if (activeAbortController) {
+                activeAbortController.abort();
+            }
+            activeAbortController = new AbortController();
+
+            container.style.opacity = '0.35';
+            container.style.pointerEvents = 'none';
+
+            const formData = new FormData();
+            formData.append('action', 'ltdh_filter_majors');
+            formData.append('paged', paged);
+            if (catSelect && catSelect.value) formData.append('nhom_nganh', catSelect.value);
+            if (searchInput && searchInput.value.trim()) formData.append('s', searchInput.value.trim());
+            if (sortSelect && sortSelect.value) formData.append('sort', sortSelect.value);
+            if (limitSelect && limitSelect.value) formData.append('limit', limitSelect.value);
+
+            const ajaxUrl = (typeof ltdh_ajax !== 'undefined' && ltdh_ajax.ajax_url)
+                ? ltdh_ajax.ajax_url
+                : '/wp-admin/admin-ajax.php';
+
+            fetch(ajaxUrl, {
+                method: 'POST',
+                body: formData,
+                signal: activeAbortController.signal
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success && res.data) {
+                    const data = res.data;
+
+                    container.innerHTML = data.cards_html;
+
+                    if (headingTitle && data.heading_title) {
+                        headingTitle.textContent = data.heading_title;
+                    }
+                    if (countDisplay && typeof data.found_posts !== 'undefined') {
+                        countDisplay.textContent = data.found_posts;
+                    }
+                    if (mobileApplyBtnCount && typeof data.found_posts !== 'undefined') {
+                        mobileApplyBtnCount.textContent = data.found_posts;
+                    }
+
+                    if (paginationContainer) {
+                        paginationContainer.innerHTML = data.pagination_html || '';
+                    }
+
+                    if (mobileChipsWrapper) {
+                        mobileChipsWrapper.innerHTML = data.chips_html || '';
+                    }
+
+                    const resetBtnHtml = `<a href="${basePath}" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]"><span>✕</span> <span>Xóa tất cả bộ lọc</span></a>`;
+                    const mobileResetHtml = `<a href="${basePath}" class="js-ltdh-reset-filter flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 min-h-[44px] transition-colors shrink-0" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
+
+                    if (desktopResetWrapper) {
+                        desktopResetWrapper.innerHTML = data.has_active_filters ? resetBtnHtml : '';
+                    }
+                    if (mobileResetWrapper) {
+                        mobileResetWrapper.innerHTML = data.has_active_filters ? mobileResetHtml : '';
+                    }
+
+                    if (mobileFilterBadge) {
+                        mobileFilterBadge.innerHTML = (data.active_filter_count > 0)
+                            ? `<span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[11px] font-black rounded-full bg-[#EA580C] text-white shrink-0 min-w-[20px] shadow-2xs">${data.active_filter_count}</span>`
+                            : '';
+                    }
+                    if (mobileFilterBtn) {
+                        if (data.has_active_filters) {
+                            mobileFilterBtn.className = 'flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs bg-blue-50/90 border-blue-200/90 text-[#00308b]';
+                        } else {
+                            mobileFilterBtn.className = 'flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs bg-slate-50 hover:bg-slate-100 border-slate-200/80 text-slate-700';
+                        }
+                    }
+
+                    if (scrollToTop) {
+                        const targetEl = document.getElementById('major-filter-body') || container;
+                        const topOffset = targetEl.getBoundingClientRect().top + window.pageYOffset - 100;
+                        window.scrollTo({ top: topOffset, behavior: 'smooth' });
+                    }
+                }
+            })
+            .catch(err => {
+                if (err.name !== 'AbortError') {
+                    console.error('Error filtering majors:', err);
+                }
+            })
+            .finally(() => {
+                container.style.opacity = '1';
+                container.style.pointerEvents = 'auto';
+            });
+        }
+
+        // 1. Form submit event
+        filterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            triggerFilter({ paged: 1, pushUrl: true });
+            if (mobileFilterBody && !mobileFilterBody.classList.contains('hidden') && window.innerWidth < 768) {
+                mobileFilterBody.classList.add('hidden');
+                if (mobileFilterBtn) mobileFilterBtn.setAttribute('aria-expanded', 'false');
+                if (mobileFilterChevron) mobileFilterChevron.classList.remove('rotate-180');
+                if (mobileFilterBtnText) mobileFilterBtnText.textContent = 'Bộ lọc & Tìm kiếm';
+            }
+        });
+
+        // 2. Dropdown changes
+        [catSelect, sortSelect, limitSelect].forEach(select => {
+            if (!select) return;
+            select.removeAttribute('onchange');
+            select.addEventListener('change', () => {
+                triggerFilter({ paged: 1, pushUrl: true });
+            });
+        });
+
+        // 3. Search input (debounced)
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    triggerFilter({ paged: 1, pushUrl: true, isTyping: true });
+                }, 350);
+            });
+        }
+
+        // 4. Category Pills Click
+        if (pillsContainer) {
+            pillsContainer.addEventListener('click', (e) => {
+                const pill = e.target.closest('.js-ltdh-major-pill');
+                if (!pill) return;
+                e.preventDefault();
+
+                const catSlug = pill.getAttribute('data-cat') || '';
+                if (catSelect) {
+                    catSelect.value = catSlug;
+                }
+                triggerFilter({ paged: 1, pushUrl: true });
+            });
+        }
+
+        // 5. Pagination Click (Delegated)
+        document.addEventListener('click', (e) => {
+            const pageLink = e.target.closest('.theme-pagination a.page-numbers');
+            if (!pageLink || (!container.contains(pageLink) && !paginationContainer.contains(pageLink))) return;
+            e.preventDefault();
+
+            const href = pageLink.getAttribute('href') || '';
+            let targetPage = 1;
+
+            const pagedMatch = href.match(/[?&]paged=(\d+)/);
+            if (pagedMatch) {
+                targetPage = parseInt(pagedMatch[1], 10);
+            } else {
+                const slashMatch = href.match(/\/page\/(\d+)\/?/);
+                if (slashMatch) {
+                    targetPage = parseInt(slashMatch[1], 10);
+                } else {
+                    const textNum = parseInt(pageLink.textContent.trim(), 10);
+                    if (!isNaN(textNum)) {
+                        targetPage = textNum;
+                    }
+                }
+            }
+
+            triggerFilter({ paged: targetPage, pushUrl: true, scrollToTop: true });
+        });
+
+        // 6. Reset Filters (Delegated)
+        document.addEventListener('click', (e) => {
+            const resetBtn = e.target.closest('.js-ltdh-reset-filter');
+            if (!resetBtn) return;
+            e.preventDefault();
+
+            if (searchInput) searchInput.value = '';
+            if (catSelect) catSelect.value = '';
+            if (sortSelect) sortSelect.value = '';
+            if (limitSelect) limitSelect.value = '12';
+
+            triggerFilter({ paged: 1, pushUrl: true });
+        });
+
+        // 7. Chip Remove Click (Delegated)
+        document.addEventListener('click', (e) => {
+            const chip = e.target.closest('.js-ltdh-chip-remove');
+            if (!chip) return;
+            e.preventDefault();
+
+            const key = chip.getAttribute('data-filter-key');
+            if (key === 's' && searchInput) searchInput.value = '';
+            if (key === 'nhom_nganh' && catSelect) catSelect.value = '';
+            if (key === 'sort' && sortSelect) sortSelect.value = '';
+            if (key === 'limit' && limitSelect) limitSelect.value = '12';
+
+            triggerFilter({ paged: 1, pushUrl: true });
+        });
+
+        // 8. Popstate (Browser Back / Forward)
+        window.addEventListener('popstate', () => {
+            const params = new URLSearchParams(window.location.search);
+            const catVal = params.get('nhom_nganh') || '';
+            const sVal = params.get('s') || '';
+            const sortVal = params.get('sort') || '';
+            const limitVal = params.get('limit') || '12';
+            const pagedVal = parseInt(params.get('paged') || '1', 10);
+
+            if (catSelect) catSelect.value = catVal;
+            if (searchInput) searchInput.value = sVal;
+            if (sortSelect) sortSelect.value = sortVal;
+            if (limitSelect) limitSelect.value = limitVal;
+
+            updatePillStyles(catVal);
+            triggerFilter({ paged: pagedVal, pushUrl: false });
+        });
+    }
+
+    initMajorArchiveFilter();
+
+    // ----------------------------------------------------
     // 5. Scroll-triggered KPI Number Counter Animation
     // ----------------------------------------------------
     function initStatsCounter() {
