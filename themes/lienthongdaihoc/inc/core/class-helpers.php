@@ -1009,10 +1009,10 @@ function ltdh_get_major_curriculum_info( int $major_id, $school_param = null ): 
 
 /**
  * Lấy thông tin Khung chương trình đào tạo của Chương trình tuyển sinh
- * Kế thừa phân tầng thông minh:
+ * Kế thừa tập trung từ Ngành học (Major):
  * 1. Khung chương trình của Ngành dành riêng cho Trường đó (và Hệ đào tạo đó nếu có)
  * 2. Khung chương trình chuẩn mặc định của Ngành chung
- * 3. Fallback bài viết Chương trình (dữ liệu cũ đã upload tại program)
+ * Nếu Ngành chưa cấu hình khung chương trình nào, hàm trả về null (không hiển thị ra ngoài frontend).
  *
  * @param int $program_id
  * @return array|null
@@ -1092,17 +1092,6 @@ function ltdh_get_program_curriculum_info( int $program_id ): ?array {
 				$raw_file = $def_file;
 				$source   = 'major_default';
 			}
-		}
-	}
-
-	// ----------------------------------------------------
-	// CẤP 3: FALLBACK DỮ LIỆU CŨ TẠI BÀI VIẾT CHƯƠNG TRÌNH
-	// ----------------------------------------------------
-	if ( empty( $raw_file ) ) {
-		$prog_file = ltdh_get_field_or_meta( 'curriculum_file', $program_id );
-		if ( ! empty( $prog_file ) ) {
-			$raw_file = $prog_file;
-			$source   = 'program_legacy';
 		}
 	}
 
@@ -1987,7 +1976,7 @@ function ltdh_get_school_region_label( int $school_id ): string {
 }
 
 function ltdh_get_cached_featured_schools() {
-	$cache_key = 'ltdh_featured_schools_data_v17';
+	$cache_key = 'ltdh_featured_schools_data_v18';
 	$data      = get_transient( $cache_key );
 	if ( false !== $data && is_array( $data ) ) {
 		return $data;
@@ -2067,6 +2056,7 @@ function ltdh_get_cached_featured_schools() {
 				'region'        => $region,
 				'hotline'       => $hotline,
 				'thumb_url'     => $thumb_url,
+				'cover_id'      => ltdh_get_school_cover_id( $school_id ),
 				'logo_id'       => $logo_id,
 				'en_name'       => $en_name,
 				'systems_label' => $systems_label,
@@ -2312,14 +2302,77 @@ function ltdh_get_school_logo_url( $school_id, string $size = 'thumbnail' ): str
 }
 
 /**
- * Get school cover / banner photo URL (e.g. for card top backgrounds or school page banners).
- * Never uses the school logo attachment as a banner background.
+ * Lấy Attachment ID ảnh bìa trường học (bảo đảm không nhầm lẫn với Logo).
  *
  * @param int|array|object $school_id School post ID, array, or post object.
- * @param string           $size      Image size name (default 'medium_large').
+ * @return int Attachment ID hoặc 0.
+ */
+function ltdh_get_school_cover_id( $school_id ): int {
+	if ( is_array( $school_id ) ) {
+		$school_id = ! empty( $school_id ) ? ( is_object( $school_id[0] ) ? $school_id[0]->ID : $school_id[0] ) : 0;
+	} elseif ( is_object( $school_id ) ) {
+		$school_id = $school_id->ID;
+	}
+	$school_id = intval( $school_id );
+	if ( $school_id <= 0 ) {
+		return 0;
+	}
+
+	$logo_id = function_exists( 'ltdh_get_school_image_id' ) ? ltdh_get_school_image_id( $school_id ) : 0;
+
+	// 1. Kiểm tra ACF trường school_banner (không format để lấy Attachment ID)
+	if ( function_exists( 'get_field' ) ) {
+		$banner = get_field( 'school_banner', $school_id, false )
+			?: get_field( 'cover_image', $school_id, false )
+			?: get_field( 'page_banner', $school_id, false )
+			?: get_field( 'banner', $school_id, false );
+
+		if ( ! empty( $banner ) ) {
+			if ( is_numeric( $banner ) && (int) $banner !== (int) $logo_id ) {
+				return (int) $banner;
+			}
+			if ( is_array( $banner ) && ! empty( $banner['ID'] ) && (int) $banner['ID'] !== (int) $logo_id ) {
+				return (int) $banner['ID'];
+			}
+		}
+	}
+
+	// 2. Kiểm tra postmeta trực tiếp
+	$meta_banner = get_post_meta( $school_id, 'school_banner', true );
+	if ( ! empty( $meta_banner ) && is_numeric( $meta_banner ) && (int) $meta_banner !== (int) $logo_id ) {
+		return (int) $meta_banner;
+	}
+
+	// 3. Featured Image (ảnh đại diện post)
+	$thumb_id = get_post_thumbnail_id( $school_id );
+	if ( $thumb_id && (int) $thumb_id !== (int) $logo_id ) {
+		return (int) $thumb_id;
+	}
+
+	// 4. Nếu lưu chuỗi URL, tra cứu ngược ID qua attachment_url_to_postid
+	if ( function_exists( 'get_field' ) ) {
+		$banner_url = get_field( 'school_banner', $school_id, true );
+		if ( is_string( $banner_url ) && ! empty( $banner_url ) ) {
+			$att_id = attachment_url_to_postid( $banner_url );
+			if ( $att_id && (int) $att_id !== (int) $logo_id ) {
+				return (int) $att_id;
+			}
+		}
+	}
+
+	return 0;
+}
+
+/**
+ * Get school cover / banner photo URL (e.g. for card top backgrounds or school page banners).
+ * Never uses the school logo attachment as a banner background.
+ * Trả về ảnh kích thước 'medium' (300x180 WebP) thay vì ảnh gốc 1920px.
+ *
+ * @param int|array|object $school_id School post ID, array, or post object.
+ * @param string           $size      Image size name (default 'medium').
  * @return string
  */
-function ltdh_get_school_cover_url( $school_id, string $size = 'medium_large' ): string {
+function ltdh_get_school_cover_url( $school_id, string $size = 'medium' ): string {
 	if ( is_array( $school_id ) ) {
 		$school_id = ! empty( $school_id ) ? ( is_object( $school_id[0] ) ? $school_id[0]->ID : $school_id[0] ) : 0;
 	} elseif ( is_object( $school_id ) ) {
@@ -2327,41 +2380,37 @@ function ltdh_get_school_cover_url( $school_id, string $size = 'medium_large' ):
 	}
 	$school_id = intval( $school_id );
 
+	$theme_dir = get_template_directory();
 	$theme_uri = get_template_directory_uri();
 
 	if ( $school_id > 0 ) {
-		$logo_id  = function_exists( 'ltdh_get_school_image_id' ) ? ltdh_get_school_image_id( $school_id ) : 0;
-		$logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'full' ) : '';
+		$cover_id = ltdh_get_school_cover_id( $school_id );
+		if ( $cover_id > 0 ) {
+			$url = wp_get_attachment_image_url( $cover_id, $size );
+			if ( ! empty( $url ) ) {
+				return $url;
+			}
+		}
 
+		// Fallback kiểm tra chuỗi URL hợp lệ không phải logo
 		if ( function_exists( 'get_field' ) ) {
-			// 1. Try ACF school_banner, cover_image, page_banner, or banner
 			$banner = get_field( 'school_banner', $school_id ) ?: get_field( 'cover_image', $school_id ) ?: get_field( 'page_banner', $school_id ) ?: get_field( 'banner', $school_id );
 			if ( ! empty( $banner ) ) {
-				$url = '';
-				if ( is_numeric( $banner ) ) {
-					$url = wp_get_attachment_image_url( (int) $banner, $size );
-				} elseif ( is_array( $banner ) ) {
-					$url = $banner['sizes'][ $size ] ?? ( $banner['url'] ?? '' );
-				} elseif ( is_string( $banner ) && 0 === strpos( $banner, 'http' ) ) {
-					$url = $banner;
-				}
-				if ( ! empty( $url ) && $url !== $logo_url && false === strpos( $url, 'cropped-logo' ) && false === strpos( strtolower( $url ), 'logo' ) ) {
-					return $url;
-				}
-			}
-
-			// 2. Check featured image ONLY IF it's NOT the logo attachment
-			$thumb_id = get_post_thumbnail_id( $school_id );
-			if ( $thumb_id && (int) $thumb_id !== (int) $logo_id ) {
-				$url = wp_get_attachment_image_url( $thumb_id, $size );
-				if ( ! empty( $url ) && $url !== $logo_url && false === strpos( $url, 'cropped-logo' ) && false === strpos( strtolower( $url ), 'logo' ) ) {
-					return $url;
+				$logo_id  = function_exists( 'ltdh_get_school_image_id' ) ? ltdh_get_school_image_id( $school_id ) : 0;
+				$logo_url = $logo_id ? wp_get_attachment_image_url( $logo_id, 'full' ) : '';
+				$raw_url  = is_array( $banner ) ? ( $banner['sizes'][ $size ] ?? ( $banner['url'] ?? '' ) ) : ( is_string( $banner ) ? $banner : '' );
+				if ( ! empty( $raw_url ) && $raw_url !== $logo_url && false === strpos( $raw_url, 'cropped-logo' ) && false === strpos( strtolower( $raw_url ), 'logo' ) ) {
+					return $raw_url;
 				}
 			}
 		}
 	}
 
-	// 3. Fallback campus cover photos (never returning logo image)
+	// Fallback campus cover photos: ưu tiên WebP nhẹ (< 100 KiB)
+	if ( file_exists( $theme_dir . '/assets/images/banner-fallback.webp' ) ) {
+		return $theme_uri . '/assets/images/banner-fallback.webp';
+	}
+
 	return $theme_uri . '/assets/images/banner-school.jpg';
 }
 
