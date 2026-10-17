@@ -463,16 +463,11 @@
    ---------------------------------------------------- */
 .elig-lead-form {
 	margin-top: 2rem;
-	padding: 1.5rem;
 	background: #FFFFFF;
-	border: 1px solid #E2E8F0;
-	border-radius: 1rem;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 .elig-lead-form h3 {
 	font-size: 1.25rem;
 	font-weight: 800;
-	color: #0F172A;
 	margin-bottom: 0.5rem;
 }
 .elig-lead-form > p {

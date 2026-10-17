@@ -105,10 +105,10 @@ $years = range( $current_year, $current_year - 25 );
 <!-- Clear Visual Divider: Transition from Results to Application Form -->
 <div class="my-8 sm:my-10 relative">
 	<div class="absolute inset-0 flex items-center" aria-hidden="true">
-		<div class="w-full border-t-2 border-dashed border-slate-200"></div>
+		<div class="w-full border-t border-slate-200"></div>
 	</div>
 	<div class="relative flex justify-center">
-		<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-xs font-black uppercase tracking-wider border border-slate-200 shadow-2xs">
+		<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider border border-slate-200/80 shadow-2xs">
 			<span class="w-5 h-5 rounded-full bg-[#00308b] text-white text-[11px] font-bold flex items-center justify-center shrink-0">2</span>
 			<span>Bước tiếp theo: Đăng ký thẩm định chi tiết & miễn giảm môn</span>
 			<svg class="w-4 h-4 text-[#00308b]" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
@@ -119,19 +119,19 @@ $years = range( $current_year, $current_year - 25 );
 </div>
 
 <!-- Dedicated Consultation / Verification Form Section -->
-<div id="elig-lead-section" class="elig-lead-form rounded-2xl shadow-sm border-2 border-blue-200/80 overflow-hidden bg-white scroll-mt-6">
+<div id="elig-lead-section" class="elig-lead-form mt-8 rounded-2xl border border-slate-200/80 overflow-hidden bg-white shadow-xs scroll-mt-6">
 
-	<!-- Distinct Form Header: Solid Navy Blue matching site brand -->
+	<!-- Distinct Form Header: Solid Navy Blue with pure white text -->
 	<div class="bg-[#00308b] text-white p-5 sm:p-6 md:p-7 relative">
 		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 			<div>
 				<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-xs text-white text-[11px] font-extrabold uppercase tracking-wider mb-2 border border-white/20">
 					<span>✍️ Form đăng ký xét tuyển 1:1</span>
 				</div>
-				<h3 class="text-xl sm:text-2xl font-black text-white leading-tight m-0">
+				<h3 class="text-xl sm:text-2xl font-black leading-tight m-0" style="color: #ffffff !important;">
 					Đăng ký thẩm định hồ sơ & xét miễn giảm tín chỉ
 				</h3>
-				<p class="text-blue-100 text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed m-0">
+				<p class="text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed m-0" style="color: #dbeafe !important;">
 					Điền thông tin và đính kèm bằng/bảng điểm (nếu có). Ban tuyển sinh sẽ thẩm định điều kiện trúng tuyển thực tế và gửi bảng đối chiếu tín chỉ miễn giảm hoàn toàn miễn phí.
 				</p>
 			</div>
@@ -142,12 +142,12 @@ $years = range( $current_year, $current_year - 25 );
 	</div>
 
 	<!-- Form Body -->
-	<div class="p-5 sm:p-7 md:p-8 bg-slate-50/40">
+	<div class="p-5 sm:p-7 md:p-8 bg-white">
 
-		<!-- Target Program Context Bar -->
-		<div id="elig-selected-program-banner" class="mb-6 p-4 rounded-xl bg-white border border-blue-200 shadow-2xs flex items-center justify-between gap-3 transition-all duration-300">
+		<!-- Target Program Context Bar: Sleek Left-accent without full box border -->
+		<div id="elig-selected-program-banner" class="mb-6 p-3.5 sm:p-4 rounded-xl bg-blue-50/70 border-l-4 border-l-[#00308b] flex items-center justify-between gap-3 transition-all duration-300">
 			<div class="flex items-center gap-3 min-w-0">
-				<div class="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-lg shrink-0 text-[#00308b]">
+				<div class="w-9 h-9 rounded-lg bg-blue-100/80 flex items-center justify-center text-base shrink-0 text-[#00308b]">
 					🎓
 				</div>
 				<div class="min-w-0">
@@ -157,7 +157,7 @@ $years = range( $current_year, $current_year - 25 );
 					</strong>
 				</div>
 			</div>
-			<span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full shrink-0 hidden sm:inline-flex items-center gap-1">
+			<span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full shrink-0 hidden sm:inline-flex items-center gap-1">
 				<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
 				Thẩm định miễn phí
 			</span>
@@ -201,22 +201,22 @@ $years = range( $current_year, $current_year - 25 );
 			</div>
 		</div>
 
-		<!-- Block 3: Degree & Transcript Upload / Links -->
-		<div class="border-t border-slate-200/80 pt-4 space-y-3">
+		<!-- Block 3: Degree & Transcript Upload / Links (Clean, No Nested Outer Borders) -->
+		<div class="border-t border-slate-100 pt-5 space-y-3">
 			<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
 				<label class="block text-sm font-bold text-slate-800">Tài liệu đính kèm đối chiếu (Bằng tốt nghiệp & Bảng điểm)</label>
-				<span class="text-xs text-slate-500 font-medium">Không bắt buộc • Ảnh chụp hoặc PDF dưới 5MB</span>
+				<span class="text-xs text-slate-400 font-medium">Không bắt buộc • Ảnh chụp hoặc PDF dưới 5MB</span>
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<!-- Degree upload -->
-				<div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+				<div class="space-y-1.5">
 					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
 						<span>🎓</span> 1. Bằng tốt nghiệp (TC / CĐ)
 					</label>
-					<div class="relative border-2 border-dashed border-slate-300 hover:border-brand-primary rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all bg-white hover:bg-blue-50/30 group" onclick="document.getElementById('degree-file-input').click()">
+					<div class="border border-dashed border-slate-300 hover:border-[#00308b] rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-blue-50/30 group" onclick="document.getElementById('degree-file-input').click()">
 						<input type="file" id="degree-file-input" name="degree_file" accept="image/*,application/pdf" class="hidden">
-						<svg class="w-6 h-6 text-slate-400 group-hover:text-brand-primary transition-colors mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<svg class="w-6 h-6 text-slate-400 group-hover:text-[#00308b] transition-colors mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
 						</svg>
 						<span id="degree-file-label" class="text-xs text-slate-600 font-bold text-center break-all">Tải ảnh hoặc PDF bằng cấp lên</span>
@@ -225,13 +225,13 @@ $years = range( $current_year, $current_year - 25 );
 				</div>
 
 				<!-- Transcript upload -->
-				<div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+				<div class="space-y-1.5">
 					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
 						<span>📊</span> 2. Bảng điểm tốt nghiệp
 					</label>
-					<div class="relative border-2 border-dashed border-slate-300 hover:border-brand-primary rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all bg-white hover:bg-blue-50/30 group" onclick="document.getElementById('transcript-file-input').click()">
+					<div class="border border-dashed border-slate-300 hover:border-[#00308b] rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-blue-50/30 group" onclick="document.getElementById('transcript-file-input').click()">
 						<input type="file" id="transcript-file-input" name="transcript_file" accept="image/*,application/pdf" class="hidden">
-						<svg class="w-6 h-6 text-slate-400 group-hover:text-brand-primary transition-colors mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<svg class="w-6 h-6 text-slate-400 group-hover:text-[#00308b] transition-colors mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 						</svg>
 						<span id="transcript-file-label" class="text-xs text-slate-600 font-bold text-center break-all">Tải ảnh hoặc PDF bảng điểm lên</span>
@@ -247,8 +247,8 @@ $years = range( $current_year, $current_year - 25 );
 			<textarea name="cf_message" id="elig-lead-message" rows="2" class="elig-input" placeholder="Ví dụ: Mong muốn học lớp tối thứ 7 & CN, thắc mắc về miễn giảm môn học..."></textarea>
 		</div>
 
-		<!-- Group Registration Option -->
-		<div class="p-3 bg-amber-50/80 border border-amber-200/90 rounded-xl">
+		<!-- Group Registration Option: Left-accent bar instead of full bounding box -->
+		<div class="p-3 bg-amber-50/60 border-l-4 border-l-amber-400 rounded-r-xl">
 			<label class="flex items-start gap-2.5 cursor-pointer select-none">
 				<input type="checkbox" name="is_group_reg" id="elig-group-reg" value="1" class="mt-0.5 rounded border-amber-300 text-brand-primary focus:ring-brand-primary">
 				<span class="text-xs text-slate-700 font-medium leading-snug">
