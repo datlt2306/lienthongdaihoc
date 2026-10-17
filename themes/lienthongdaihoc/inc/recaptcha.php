@@ -301,3 +301,43 @@ function ltdh_recaptcha_enqueue_scripts(): void {
 		'version' => $version,
 	] );
 }
+
+/**
+ * Filter script_loader_tag to guarantee defer & async attributes for reCAPTCHA scripts.
+ *
+ * @param string $tag    The script tag HTML.
+ * @param string $handle The registered script handle.
+ * @return string
+ */
+add_filter( 'script_loader_tag', 'ltdh_recaptcha_script_loader_tag', 15, 2 );
+function ltdh_recaptcha_script_loader_tag( string $tag, string $handle ): string {
+	if ( is_admin() ) {
+		return $tag;
+	}
+
+	// Only modify external scripts with a src attribute
+	if ( false === strpos( $tag, 'src=' ) && false === strpos( $tag, 'src =' ) ) {
+		return $tag;
+	}
+
+	if ( 'google-recaptcha-api' === $handle ) {
+		$tag = preg_replace_callback( '/<script\b(?=[^>]*\ssrc=)([^>]*)>/i', function( $matches ) {
+			if ( preg_match( '/\s+defer(?=[\s>"\']|$)/i', $matches[1] ) && preg_match( '/\s+async(?=[\s>"\']|$)/i', $matches[1] ) ) {
+				return $matches[0];
+			}
+			$attrs = preg_replace( '/\s+(defer|async|fetchpriority="[^"]*")(?=[\s>"\']|$)/i', '', $matches[1] );
+			return '<script async defer fetchpriority="low"' . $attrs . '>';
+		}, $tag );
+	} elseif ( 'ltdh-recaptcha-js' === $handle ) {
+		$tag = preg_replace_callback( '/<script\b(?=[^>]*\ssrc=)([^>]*)>/i', function( $matches ) {
+			if ( ! preg_match( '/\s+defer(?=[\s>"\']|$)/i', $matches[1] ) ) {
+				return '<script defer fetchpriority="low"' . $matches[1] . '>';
+			}
+			return $matches[0];
+		}, $tag );
+	}
+
+	return $tag;
+}
+
+

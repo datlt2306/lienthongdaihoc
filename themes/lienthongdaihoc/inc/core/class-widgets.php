@@ -1190,8 +1190,15 @@ if ( ! function_exists( 'ltdh_render_school_info_card' ) ) {
 		$school_address   = get_post_meta( $school_id, 'address', true ) ?: ( function_exists( 'get_field' ) ? get_field( 'address', $school_id ) : '' ) ?: 'Việt Nam';
 		?>
 		<div class="<?php echo esc_attr( $wrapper_class ); ?>">
-			<div class="h-28 bg-cover bg-center relative" style="background-image: url('<?php echo esc_url( $school_cover_url ); ?>');">
-				<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+			<div class="h-28 bg-slate-200 relative overflow-hidden">
+				<img src="<?php echo esc_url( $school_cover_url ); ?>"
+					 alt="<?php echo esc_attr( $school_title ); ?>"
+					 loading="lazy"
+					 decoding="async"
+					 width="300"
+					 height="180"
+					 class="absolute inset-0 w-full h-full object-cover object-center">
+				<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
 			</div>
 			<div class="p-4 sm:p-5 text-center relative -mt-12">
 				<div class="w-20 h-20 rounded-2xl bg-white p-2 shadow-md mx-auto mb-3 border border-slate-100 flex items-center justify-center overflow-hidden">

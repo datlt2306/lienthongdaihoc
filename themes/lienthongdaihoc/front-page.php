@@ -309,8 +309,15 @@ $zalo    = ltdh_get_zalo_url();
 								<div class="swiper-slide h-auto flex">
 									<div class="w-full bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
 										<!-- Ảnh trường & Vị trí -->
-										<div class="relative h-36 sm:h-40 bg-slate-200 bg-cover bg-center overflow-hidden" style="background-image: url('<?php echo esc_url($thumb_url); ?>');">
-											<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent"></div>
+										<div class="relative h-36 sm:h-40 bg-slate-200 overflow-hidden">
+											<img src="<?php echo esc_url( $thumb_url ); ?>"
+												 alt="<?php echo esc_attr( $school['title'] ?? 'Ảnh trường' ); ?>"
+												 loading="lazy"
+												 decoding="async"
+												 width="300"
+												 height="180"
+												 class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+											<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent pointer-events-none"></div>
 											<?php if ( ! empty( $school_region ) ) : ?>
 												<span class="absolute top-3 right-3 bg-slate-900/60 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
 													<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

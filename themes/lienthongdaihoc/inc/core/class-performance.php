@@ -67,19 +67,13 @@ class LTDH_Performance {
 	 * @return array
 	 */
 	public static function resource_hints( $urls, $relation_type ) {
+		// Preconnect tags are directly declared in header.php for early connection.
+		// Avoid duplicate preconnect injection here to ensure total preconnect <= 3.
 		if ( 'preconnect' === $relation_type ) {
-			$urls[] = [
-				'href'        => 'https://fonts.googleapis.com',
-				'crossorigin' => false,
-			];
-			$urls[] = [
-				'href'        => 'https://fonts.gstatic.com',
-				'crossorigin' => true,
-			];
-			$urls[] = [
-				'href'        => 'https://www.google.com',
-				'crossorigin' => false,
-			];
+			$urls = array_filter( $urls, function( $entry ) {
+				$href = is_array( $entry ) ? ( $entry['href'] ?? '' ) : $entry;
+				return ! in_array( $href, [ 'https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://www.google.com' ], true );
+			} );
 		}
 
 		if ( 'dns-prefetch' === $relation_type ) {
@@ -160,17 +154,40 @@ class LTDH_Performance {
 			return $tag;
 		}
 
+		// Only modify external scripts with a src attribute
+		if ( false === strpos( $tag, 'src=' ) && false === strpos( $tag, 'src =' ) ) {
+			return $tag;
+		}
+
 		$defer_handles = [
 			'swiper-js',
 			'ltdh-theme-js',
 			'ltdh-fallback-js',
 			'ltdh-compare-js',
 			'ltdh-eligibility-js',
+			'google-recaptcha-api',
+			'ltdh-recaptcha-js',
+			'contact-form-7',
+			'swv',
 		];
 
 		if ( in_array( $handle, $defer_handles, true ) ) {
-			if ( false === strpos( $tag, 'defer' ) && false === strpos( $tag, 'async' ) ) {
-				$tag = str_replace( ' src', ' defer fetchpriority="low" src', $tag );
+			if ( 'google-recaptcha-api' === $handle ) {
+				// Google reCAPTCHA v3 requires both defer & async for non-blocking execution
+				$tag = preg_replace_callback( '/<script\b(?=[^>]*\ssrc=)([^>]*)>/i', function( $matches ) {
+					if ( preg_match( '/\s+defer(?=[\s>"\']|$)/i', $matches[1] ) && preg_match( '/\s+async(?=[\s>"\']|$)/i', $matches[1] ) ) {
+						return $matches[0];
+					}
+					$attrs = preg_replace( '/\s+(defer|async|fetchpriority="[^"]*")(?=[\s>"\']|$)/i', '', $matches[1] );
+					return '<script async defer fetchpriority="low"' . $attrs . '>';
+				}, $tag );
+			} else {
+				$tag = preg_replace_callback( '/<script\b(?=[^>]*\ssrc=)([^>]*)>/i', function( $matches ) {
+					if ( ! preg_match( '/\s+defer(?=[\s>"\']|$)/i', $matches[1] ) ) {
+						return '<script defer fetchpriority="low"' . $matches[1] . '>';
+					}
+					return $matches[0];
+				}, $tag );
 			}
 		}
 
@@ -247,6 +264,14 @@ class LTDH_Performance {
 
 		// Remove classic theme styles and global styles inline SVG filters if not using FSE
 		wp_dequeue_style( 'classic-theme-styles' );
+
+		// Dequeue Contact Form 7 CSS and scripts on front page (modal uses custom AJAX lead capture)
+		if ( is_front_page() ) {
+			wp_dequeue_style( 'contact-form-7' );
+			wp_dequeue_style( 'contact-form-7-rtl' );
+			wp_dequeue_script( 'contact-form-7' );
+			wp_dequeue_script( 'swv' );
+		}
 	}
 
 	/**

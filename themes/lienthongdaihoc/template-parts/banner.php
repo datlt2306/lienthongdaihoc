@@ -430,6 +430,10 @@ if ( empty( $banner_image ) ) {
 		$banner_image = $theme_uri . '/assets/images/banner-default.jpg';
 	}
 }
+
+if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url' ) ) {
+	$banner_image = ltdh_get_optimized_image_url( $banner_image );
+}
 ?>
 
 	<section class="relative w-full bg-gradient-to-tr from-[#0F172A] via-[#1E293B] to-brand-primary text-white py-12 md:py-16 overflow-hidden">

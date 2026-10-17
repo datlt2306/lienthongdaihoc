@@ -2406,9 +2406,17 @@ function ltdh_get_school_cover_url( $school_id, string $size = 'medium' ): strin
 		}
 	}
 
-	// Fallback campus cover photos: ưu tiên WebP nhẹ (< 100 KiB)
+	// Fallback campus cover photos: ưu tiên WebP chuẩn kích thước thẻ card (< 30 KiB)
+	if ( ( $size === 'medium' || $size === 'thumbnail' ) && file_exists( $theme_dir . '/assets/images/banner-fallback-300x180.webp' ) ) {
+		return $theme_uri . '/assets/images/banner-fallback-300x180.webp';
+	}
+
 	if ( file_exists( $theme_dir . '/assets/images/banner-fallback.webp' ) ) {
 		return $theme_uri . '/assets/images/banner-fallback.webp';
+	}
+
+	if ( file_exists( $theme_dir . '/assets/images/banner-school.webp' ) ) {
+		return $theme_uri . '/assets/images/banner-school.webp';
 	}
 
 	return $theme_uri . '/assets/images/banner-school.jpg';
@@ -2529,11 +2537,17 @@ add_filter('wpcf7_form_tag', 'ltdh_cf7_dynamic_programs', 10, 2);
 // 13. Fallback Image Helper
 // ----------------------------------------------------
 
-function ltdh_get_fallback_image(string $context = 'program'): string {
+function ltdh_get_fallback_image( string $context = 'program', string $size = 'medium' ): string {
 	$theme_uri = get_template_directory_uri();
 	$theme_dir = get_template_directory();
 
 	if ( $context === 'school' ) {
+		if ( ( $size === 'medium' || $size === 'thumbnail' ) && file_exists( $theme_dir . '/assets/images/banner-fallback-300x180.webp' ) ) {
+			return $theme_uri . '/assets/images/banner-fallback-300x180.webp';
+		}
+		if ( file_exists( $theme_dir . '/assets/images/banner-school.webp' ) ) {
+			return $theme_uri . '/assets/images/banner-school.webp';
+		}
 		return $theme_uri . '/assets/images/banner-school.jpg';
 	}
 
@@ -2562,14 +2576,17 @@ function ltdh_get_fallback_image(string $context = 'program'): string {
 		}
 	}
 
-	if ( file_exists( $theme_dir . '/assets/images/banner-fallback.png' ) ) {
-		return $theme_uri . '/assets/images/banner-fallback.png';
+	if ( ( $size === 'medium' || $size === 'thumbnail' ) && file_exists( $theme_dir . '/assets/images/banner-fallback-300x180.webp' ) ) {
+		return $theme_uri . '/assets/images/banner-fallback-300x180.webp';
 	}
 	if ( file_exists( $theme_dir . '/assets/images/banner-fallback.webp' ) ) {
 		return $theme_uri . '/assets/images/banner-fallback.webp';
 	}
 	if ( file_exists( $theme_dir . '/assets/images/banner-default.jpg' ) ) {
 		return $theme_uri . '/assets/images/banner-default.jpg';
+	}
+	if ( file_exists( $theme_dir . '/assets/images/banner-fallback.png' ) ) {
+		return $theme_uri . '/assets/images/banner-fallback.png';
 	}
 	return $theme_uri . '/assets/images/banner-program.jpg';
 }

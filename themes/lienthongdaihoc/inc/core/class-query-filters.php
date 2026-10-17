@@ -490,7 +490,7 @@ function ltdh_ajax_filter_programs() {
 				}
 			}
 
-			$school_thumb    = $school_rel_id && function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_rel_id, 'medium_large' ) : get_stylesheet_directory_uri() . '/assets/images/banner-school.jpg';
+			$school_thumb    = $school_rel_id && function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_rel_id, 'medium' ) : get_stylesheet_directory_uri() . '/assets/images/banner-school.jpg';
 			$learning_details = function_exists( 'ltdh_get_program_learning_details' ) ? ltdh_get_program_learning_details( $prog_id ) : [ 'mode' => 'Học online 100%' ];
 			$school_logo_id   = $school_rel_id && function_exists( 'ltdh_get_school_image_id' ) ? ltdh_get_school_image_id( $school_rel_id ) : 0;
 			$school_logo_url  = $school_rel_id && function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_rel_id, 'thumbnail' ) : get_stylesheet_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp';
@@ -510,7 +510,13 @@ function ltdh_ajax_filter_programs() {
 				<div>
 					<!-- School Cover Image with Status Badge (Links to Program) -->
 					<a href="<?php the_permalink(); ?>" class="block h-28 sm:h-48 md:h-60 w-full bg-slate-100 relative overflow-hidden group/cover">
-						<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover/cover:scale-105" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');"></div>
+						<img src="<?php echo esc_url( $school_thumb ); ?>"
+							 alt="<?php echo esc_attr( $card_headline ?? get_the_title() ); ?>"
+							 loading="lazy"
+							 decoding="async"
+							 width="300"
+							 height="180"
+							 class="absolute inset-0 w-full h-full object-cover object-center group-hover/cover:scale-105 transition-transform duration-500">
 						<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/15 to-transparent pointer-events-none"></div>
 						
 						<!-- Status Badge Floating on Cover Image -->

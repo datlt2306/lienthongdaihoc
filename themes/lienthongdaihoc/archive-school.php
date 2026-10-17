@@ -96,8 +96,20 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 					?>
 						<div class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group<?php echo $grid_span_class ? ' ' . esc_attr( $grid_span_class ) : ''; ?>">
 							<!-- Card Cover & Badges -->
-							<div class="relative h-36 sm:h-40 bg-slate-200 bg-cover bg-center overflow-hidden" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'large' ) : ( get_the_post_thumbnail_url( $school_id, 'large' ) ?: ltdh_get_fallback_image( 'school' ) ) ); ?>');">
-								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent"></div>
+							<div class="relative h-36 sm:h-40 bg-slate-200 overflow-hidden">
+								<?php
+								$cover_url = function_exists( 'ltdh_get_school_cover_url' )
+									? ltdh_get_school_cover_url( $school_id, 'medium' )
+									: ( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school', 'medium' ) );
+								?>
+								<img src="<?php echo esc_url( $cover_url ); ?>"
+									 alt="<?php echo esc_attr( get_the_title( $school_id ) ); ?>"
+									 loading="lazy"
+									 decoding="async"
+									 width="300"
+									 height="180"
+									 class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent pointer-events-none"></div>
 								
 								<!-- Featured Pill -->
 								<span class="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider shadow-sm z-10 flex items-center gap-1.5">
@@ -278,8 +290,20 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 				?>
 					<div class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group<?php echo $grid_span_class ? ' ' . esc_attr( $grid_span_class ) : ''; ?>">
 						<!-- Card Cover & Location -->
-						<div class="relative h-32 sm:h-36 bg-slate-200 bg-cover bg-center overflow-hidden" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ) ); ?>');">
-							<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent"></div>
+						<div class="relative h-32 sm:h-36 bg-slate-200 overflow-hidden">
+							<?php
+							$cover_url = function_exists( 'ltdh_get_school_cover_url' )
+								? ltdh_get_school_cover_url( $school_id, 'medium' )
+								: ( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school', 'medium' ) );
+							?>
+							<img src="<?php echo esc_url( $cover_url ); ?>"
+								 alt="<?php echo esc_attr( get_the_title( $school_id ) ); ?>"
+								 loading="lazy"
+								 decoding="async"
+								 width="300"
+								 height="180"
+								 class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+							<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent pointer-events-none"></div>
 							<?php if ( ! empty( $school_region ) ) : ?>
 								<span class="absolute top-2.5 right-2.5 bg-slate-900/60 backdrop-blur-md text-white text-[10px] font-semibold px-2 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
 									<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -392,7 +416,20 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 				?>
 				<div class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all">
 					<div class="flex flex-col sm:flex-row items-stretch">
-						<div class="sm:w-44 h-32 sm:h-auto bg-cover bg-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-100" style="background-image: url('<?php echo esc_url( function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : ( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school' ) ) ); ?>');"></div>
+						<div class="relative sm:w-44 h-32 sm:h-auto shrink-0 overflow-hidden border-b sm:border-b-0 sm:border-r border-slate-100 bg-slate-100">
+							<?php
+							$cover_url = function_exists( 'ltdh_get_school_cover_url' )
+								? ltdh_get_school_cover_url( $school_id, 'medium' )
+								: ( get_the_post_thumbnail_url( $school_id, 'medium' ) ?: ltdh_get_fallback_image( 'school', 'medium' ) );
+							?>
+							<img src="<?php echo esc_url( $cover_url ); ?>"
+								 alt="<?php echo esc_attr( get_the_title( $school_id ) ); ?>"
+								 loading="lazy"
+								 decoding="async"
+								 width="300"
+								 height="180"
+								 class="w-full h-full object-cover object-center">
+						</div>
 						<div class="flex-1 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 							<div class="flex-1 min-w-0">
 								<div class="flex items-center gap-2 mb-1.5">
