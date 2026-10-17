@@ -641,10 +641,29 @@ $has_active_filters  = $active_filter_count > 0;
 						 data-compare-school-name="<?php echo esc_attr( $school_name ); ?>">
 
 						<div>
-							<!-- School Cover Image (Clean, No Overlay Badges) -->
+							<!-- School Cover Image with Status Badge (Links to Program) -->
 							<a href="<?php the_permalink(); ?>" class="block h-28 sm:h-48 md:h-60 w-full bg-slate-100 relative overflow-hidden group/cover">
 								<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover/cover:scale-105" style="background-image: url('<?php echo esc_url( $school_thumb ); ?>');"></div>
-								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/15 to-transparent opacity-0 group-hover/cover:opacity-20 transition-opacity pointer-events-none"></div>
+								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/15 to-transparent pointer-events-none"></div>
+								
+								<!-- Status Badge Floating on Cover Image -->
+								<div class="absolute top-2 left-2 md:top-3 md:left-3 z-10 pointer-events-none">
+									<?php if ( 'tam-ngung' === $admission_status ) : ?>
+										<span class="bg-rose-600/95 text-white text-[9px] sm:text-[10px] md:text-[11px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1 backdrop-blur-md shrink-0">
+											<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+											Tạm dừng
+										</span>
+									<?php elseif ( 'sap-mo' === $admission_status ) : ?>
+										<span class="bg-amber-500/95 text-white text-[9px] sm:text-[10px] md:text-[11px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md backdrop-blur-md shrink-0">
+											Sắp mở
+										</span>
+									<?php else : ?>
+										<span class="bg-emerald-600/95 text-white text-[9px] sm:text-[10px] md:text-[11px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1 backdrop-blur-md shrink-0">
+											<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+											Tuyển sinh
+										</span>
+									<?php endif; ?>
+								</div>
 							</a>
 
 							<!-- Card Body -->
@@ -672,38 +691,12 @@ $has_active_filters  = $active_filter_count > 0;
 									<h2 class="font-black text-slate-900 text-xs sm:text-base md:text-lg hover:text-brand-primary leading-tight sm:leading-snug line-clamp-2 min-h-[32px] sm:min-h-[44px] transition-colors">
 										<a href="<?php the_permalink(); ?>"><?php echo esc_html( $card_headline ); ?></a>
 									</h2>
-									<!-- Program Badges (Admission Status, Training Type, Verification) -->
-									<div class="mt-2 sm:mt-2.5 flex flex-col items-start gap-1.5 sm:flex-row sm:items-center sm:gap-1.5 min-h-[52px] sm:min-h-[24px]">
-										<!-- Status Badge -->
-										<?php if ( 'tam-ngung' === $admission_status ) : ?>
-											<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80 shrink-0">
-												<span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
-												Tạm dừng
-											</span>
-										<?php elseif ( 'sap-mo' === $admission_status ) : ?>
-											<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80 shrink-0">
-												Sắp mở
-											</span>
-										<?php else : ?>
-											<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shrink-0">
-												<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-												Tuyển sinh
-											</span>
-										<?php endif; ?>
-
-										<!-- Training Type Badge -->
+									<!-- Training Type Badge -->
+									<div class="mt-2 sm:mt-2.5 flex items-center min-h-[24px]">
 										<?php if ( ! empty( $clean_type_name ) ) : ?>
 											<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold <?php echo esc_attr( $badge_class ); ?> shrink-0">
 												Hệ <?php echo esc_html( $clean_type_name ); ?>
 											</span>
-										<?php endif; ?>
-
-										<!-- Verification Badge -->
-										<?php
-										$verification_badge_html = function_exists( 'ltdh_get_program_verification_badge_html' ) ? ltdh_get_program_verification_badge_html( $prog_id, 'card' ) : '';
-										if ( ! empty( $verification_badge_html ) ) :
-										?>
-											<?php echo $verification_badge_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 										<?php endif; ?>
 									</div>
 								</div>
