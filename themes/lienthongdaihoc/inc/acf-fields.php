@@ -65,6 +65,26 @@ function ltdh_load_acf_field_groups_from_json() {
 }
 
 /**
+ * Ensure School Overview Tab is registered directly to group_school_details.
+ */
+add_action( 'acf/init', 'ltdh_register_school_overview_acf_fields', 15 );
+function ltdh_register_school_overview_acf_fields() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	acf_add_local_field( [
+		'key'       => 'field_tab_school_overview',
+		'label'     => 'Tổng quan',
+		'name'      => '',
+		'type'      => 'tab',
+		'parent'    => 'group_school_details',
+		'placement' => 'top',
+		'endpoint'  => 0,
+	] );
+}
+
+/**
  * Ensure School FAQ Tab and Repeater are registered directly to group_school_details.
  */
 add_action( 'acf/init', 'ltdh_register_school_faq_acf_fields', 20 );
@@ -132,62 +152,28 @@ function ltdh_register_school_admission_forms_acf_fields() {
 		'endpoint'  => 0,
 	] );
 
-	// 2. Default Admission Documents Repeater (Chỉ dùng 1 Repeater biểu mẫu duy nhất)
+	// 2. Google Drive Folder for Admission Forms (Trọn bộ hồ sơ)
 	acf_add_local_field( [
-		'key'          => 'field_school_default_admission_documents',
-		'label'        => 'Danh sách biểu mẫu tuyển sinh mặc định',
-		'name'         => 'default_admission_documents',
-		'type'         => 'repeater',
+		'key'          => 'field_school_admission_drive_folder',
+		'label'        => 'Đường link Google Drive hồ sơ tuyển sinh (Thư mục hoặc File)',
+		'name'         => 'admission_drive_folder_url',
+		'type'         => 'url',
 		'parent'       => 'group_school_details',
-		'instructions' => 'Thêm các biểu mẫu tuyển sinh của trường (Phiếu đăng ký, Đơn miễn môn, Đơn miễn QP-AN, Đơn tiếng Anh...). Nếu trường chỉ có 1 file, chỉ cần thêm 1 dòng. Khi có từ 2 file trở lên, hệ thống sẽ TỰ ĐỘNG nén thành file ZIP trọn bộ cho thí sinh tải 1-click.',
-		'layout'       => 'table',
-		'button_label' => 'Thêm biểu mẫu',
-		'sub_fields'   => [
-			[
-				'key'         => 'field_school_def_doc_label',
-				'label'       => 'Tên biểu mẫu',
-				'name'        => 'label',
-				'type'        => 'text',
-				'placeholder' => 'Ví dụ: Phiếu đăng ký dự tuyển 2026',
-				'required'    => 1,
-			],
-			[
-				'key'           => 'field_school_def_doc_file',
-				'label'         => 'File đính kèm (PDF/DOCX)',
-				'name'          => 'file',
-				'type'          => 'file',
-				'return_format' => 'array',
-				'library'       => 'all',
-				'required'      => 1,
-			],
-			[
-				'key'           => 'field_school_def_doc_badge',
-				'label'         => 'Phân loại',
-				'name'          => 'badge',
-				'type'          => 'select',
-				'choices'       => [
-					'required'  => 'Bắt buộc',
-					'optional'  => 'Tùy chọn',
-					'exemption' => 'Miễn môn',
-					'other'     => 'Tham khảo',
-				],
-				'default_value' => 'required',
-				'allow_null'    => 0,
-				'return_format' => 'value',
-			],
-		],
+		'instructions' => 'Dán đường dẫn thư mục Google Drive (hoặc file Drive) chứa toàn bộ hồ sơ, biểu mẫu tuyển sinh của trường (Phiếu đăng ký, hướng dẫn, đơn miễn môn...). Đảm bảo link đã được bật quyền "Bất kỳ ai có đường liên kết đều có thể xem".',
+		'placeholder'  => 'https://drive.google.com/drive/folders/...',
+		'required'     => 0,
 	] );
 
-	// 3. Register Forms by Training Type Repeater (Bộ biểu mẫu theo từng hệ đào tạo)
+	// 3. Register Forms by Training Type Repeater (Bộ biểu mẫu theo từng hệ đào tạo - Tùy chọn)
 	acf_add_local_field( [
 		'key'          => 'field_school_admission_forms_by_type',
-		'label'        => 'Bộ biểu mẫu theo từng Hệ đào tạo',
+		'label'        => 'Link Google Drive hồ sơ theo từng Hệ đào tạo (Nếu có riêng)',
 		'name'         => 'admission_forms_by_type',
 		'type'         => 'repeater',
 		'parent'       => 'group_school_details',
-		'instructions' => 'Dành cho trường hợp mỗi Hệ đào tạo (Đại học từ xa, Liên thông chính quy, Văn bằng 2...) có bộ biểu mẫu riêng. Khi có từ 2 file trở lên, hệ thống sẽ tự động gộp file ZIP.',
-		'layout'       => 'row',
-		'button_label' => 'Thêm bộ hồ sơ theo hệ',
+		'instructions' => 'Chỉ điền nếu trường có link Google Drive hồ sơ riêng biệt cho từng hệ đào tạo (VD: Hệ từ xa dùng link riêng, Vừa làm vừa học dùng link riêng).',
+		'layout'       => 'table',
+		'button_label' => 'Thêm link Drive theo hệ',
 		'sub_fields'   => [
 			[
 				'key'           => 'field_school_form_training_type',
@@ -203,49 +189,35 @@ function ltdh_register_school_admission_forms_acf_fields() {
 				'return_format' => 'id',
 			],
 			[
-				'key'          => 'field_school_form_documents',
-				'label'        => 'Danh sách biểu mẫu của hệ này',
-				'name'         => 'documents',
-				'type'         => 'repeater',
-				'instructions' => 'Thêm các phiếu của hệ này (Phiếu đăng ký, Đơn miễn môn...). Nếu có từ 2 file trở lên, hệ thống sẽ tự động tạo file ZIP.',
-				'layout'       => 'table',
-				'button_label' => 'Thêm phiếu',
-				'sub_fields'   => [
-					[
-						'key'         => 'field_school_row_doc_label',
-						'label'       => 'Tên biểu mẫu',
-						'name'        => 'label',
-						'type'        => 'text',
-						'placeholder' => 'Ví dụ: Phiếu đăng ký Đại học từ xa 2026',
-						'required'    => 1,
-					],
-					[
-						'key'           => 'field_school_row_doc_file',
-						'label'         => 'File đính kèm (PDF/DOCX)',
-						'name'          => 'file',
-						'type'          => 'file',
-						'return_format' => 'array',
-						'library'       => 'all',
-						'required'      => 1,
-					],
-					[
-						'key'           => 'field_school_row_doc_badge',
-						'label'         => 'Phân loại',
-						'name'          => 'badge',
-						'type'          => 'select',
-						'choices'       => [
-							'required'  => 'Bắt buộc',
-							'optional'  => 'Tùy chọn',
-							'exemption' => 'Miễn môn',
-							'other'     => 'Tham khảo',
-						],
-						'default_value' => 'required',
-						'allow_null'    => 0,
-						'return_format' => 'value',
-					],
-				],
+				'key'          => 'field_school_form_drive_folder',
+				'label'        => 'Đường link Google Drive của hệ này',
+				'name'         => 'drive_folder_url',
+				'type'         => 'url',
+				'placeholder'  => 'https://drive.google.com/drive/folders/...',
+				'instructions' => 'Dán đường link thư mục hoặc file Google Drive hồ sơ của hệ này.',
+				'required'     => 1,
+			],
+			[
+				'key'         => 'field_school_form_notes',
+				'label'       => 'Ghi chú / Nhãn hiển thị',
+				'name'        => 'notes',
+				'type'        => 'text',
+				'placeholder' => 'Ví dụ: Hồ sơ Đại học từ xa 2026',
+				'required'    => 0,
 			],
 		],
+	] );
+
+	// 4. Optional Override on Program
+	acf_add_local_field( [
+		'key'          => 'field_program_admission_drive_url',
+		'label'        => 'Link Google Drive hồ sơ riêng của ngành này (Tùy chọn)',
+		'name'         => 'program_admission_drive_url',
+		'type'         => 'url',
+		'parent'       => 'group_program_details',
+		'instructions' => 'Dán link thư mục hoặc file Google Drive hồ sơ riêng của ngành này nếu có. Nếu để trống, hệ thống sẽ tự động dùng link hồ sơ chung của Trường.',
+		'placeholder'  => 'https://drive.google.com/drive/folders/...',
+		'required'     => 0,
 	] );
 }
 
@@ -259,10 +231,10 @@ function ltdh_register_school_default_admissions_acf_fields() {
 		return;
 	}
 
-	// 1. Tab: Quy chế tuyển sinh mặc định
+	// 1. Tab: Các đợt tuyển sinh
 	acf_add_local_field( [
-		'key'       => 'field_tab_school_default_admissions',
-		'label'     => 'Quy chế tuyển sinh mặc định',
+		'key'       => 'field_tab_school_batches',
+		'label'     => 'Các đợt tuyển sinh',
 		'name'      => '',
 		'type'      => 'tab',
 		'parent'    => 'group_school_details',
@@ -270,42 +242,7 @@ function ltdh_register_school_default_admissions_acf_fields() {
 		'endpoint'  => 0,
 	] );
 
-	// 2. Default Admission Requirements (Điều kiện xét tuyển mặc định)
-	acf_add_local_field( [
-		'key'          => 'field_school_default_admission_requirements',
-		'label'        => 'Điều kiện xét tuyển mặc định của trường',
-		'name'         => 'default_admission_requirements',
-		'type'         => 'wysiwyg',
-		'parent'       => 'group_school_details',
-		'instructions' => 'Quy định tiêu chuẩn xét tuyển chung của trường. Các chương trình thuộc trường này nếu để trống điều kiện xét tuyển sẽ tự động nhận nội dung này.',
-		'toolbar'      => 'full',
-		'media_upload' => 1,
-	] );
-
-	// 3. Default Required Documents (Hồ sơ xét tuyển cần nộp mặc định)
-	acf_add_local_field( [
-		'key'          => 'field_school_default_required_documents',
-		'label'        => 'Hồ sơ xét tuyển cần nộp mặc định',
-		'name'         => 'default_required_documents',
-		'type'         => 'wysiwyg',
-		'parent'       => 'group_school_details',
-		'instructions' => 'Danh mục giấy tờ hồ sơ nộp chung của trường (VD: 02 bằng CĐ công chứng, bảng điểm, CCCD, ảnh 3x4...). Các chương trình thuộc trường nếu để trống hồ sơ sẽ tự động nhận danh mục này.',
-		'toolbar'      => 'full',
-		'media_upload' => 1,
-	] );
-
-	// 4. Default Admission Fee (Lệ phí xét tuyển mặc định)
-	acf_add_local_field( [
-		'key'          => 'field_school_default_admission_fee',
-		'label'        => 'Lệ phí xét tuyển mặc định (trên 1 hồ sơ)',
-		'name'         => 'default_admission_fee',
-		'type'         => 'text',
-		'parent'       => 'group_school_details',
-		'instructions' => 'Mức lệ phí xét tuyển chung của trường (VD: 300.000 đ/hồ sơ, hoặc Miễn phí). Chương trình nào để trống lệ phí sẽ dùng giá trị này.',
-		'placeholder'  => 'Ví dụ: 300.000 đ/hồ sơ',
-	] );
-
-	// 5. Default Admission Batches (Các đợt tuyển sinh mặc định của trường)
+	// 1.1 Default Admission Batches (Các đợt tuyển sinh mặc định của trường)
 	acf_add_local_field( [
 		'key'          => 'field_school_default_admission_batches',
 		'label'        => 'Các đợt tuyển sinh mặc định của trường',
@@ -375,7 +312,76 @@ function ltdh_register_school_default_admissions_acf_fields() {
 		],
 	] );
 
-	// 6. Default Exemption Settings (Quy định miễn môn & Chuyển đổi tín chỉ của trường)
+	// 1.2 Default Admission Fee (Lệ phí xét tuyển mặc định)
+	acf_add_local_field( [
+		'key'          => 'field_school_default_admission_fee',
+		'label'        => 'Lệ phí xét tuyển mặc định (trên 1 hồ sơ)',
+		'name'         => 'default_admission_fee',
+		'type'         => 'text',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Mức lệ phí xét tuyển chung của trường (VD: 300.000 đ/hồ sơ, hoặc Miễn phí). Chương trình nào để trống lệ phí sẽ dùng giá trị này.',
+		'placeholder'  => 'Ví dụ: 300.000 đ/hồ sơ',
+	] );
+
+	// 2. Tab: Điều kiện & Hồ sơ xét tuyển
+	acf_add_local_field( [
+		'key'       => 'field_tab_school_requirements',
+		'label'     => 'Điều kiện & Hồ sơ xét tuyển',
+		'name'      => '',
+		'type'      => 'tab',
+		'parent'    => 'group_school_details',
+		'placement' => 'top',
+		'endpoint'  => 0,
+	] );
+
+	// 2.1 Default Admission Requirements (Điều kiện xét tuyển mặc định)
+	acf_add_local_field( [
+		'key'          => 'field_school_default_admission_requirements',
+		'label'        => 'Điều kiện xét tuyển mặc định của trường',
+		'name'         => 'default_admission_requirements',
+		'type'         => 'wysiwyg',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Quy định tiêu chuẩn xét tuyển chung của trường. Các chương trình thuộc trường này nếu để trống điều kiện xét tuyển sẽ tự động nhận nội dung này.',
+		'toolbar'      => 'full',
+		'media_upload' => 1,
+	] );
+
+	// 2.2 Default Required Documents (Hồ sơ xét tuyển cần nộp mặc định)
+	acf_add_local_field( [
+		'key'          => 'field_school_default_required_documents',
+		'label'        => 'Hồ sơ xét tuyển cần nộp mặc định',
+		'name'         => 'default_required_documents',
+		'type'         => 'wysiwyg',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Danh mục giấy tờ hồ sơ nộp chung của trường (VD: 02 bằng CĐ công chứng, bảng điểm, CCCD, ảnh 3x4...). Các chương trình thuộc trường nếu để trống hồ sơ sẽ tự động nhận danh mục này.',
+		'toolbar'      => 'full',
+		'media_upload' => 1,
+	] );
+
+	// 2.3 Contact Info & Document Submission (Thông tin liên hệ & Tiếp nhận hồ sơ)
+	acf_add_local_field( [
+		'key'          => 'field_school_contact_info',
+		'label'        => 'Thông tin liên hệ & Tiếp nhận hồ sơ',
+		'name'         => 'contact_info',
+		'type'         => 'wysiwyg',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Địa chỉ văn phòng tuyển sinh, địa điểm tiếp nhận hồ sơ, hotline và thông tin nộp lệ phí xét tuyển của trường. Thông tin này sẽ tự động hiển thị trong mục "Điều kiện & Hồ sơ" của tất cả các chương trình thuộc trường nếu chương trình không cấu hình riêng.',
+		'toolbar'      => 'full',
+		'media_upload' => 1,
+	] );
+
+	// 3. Tab: Quy định miễn môn
+	acf_add_local_field( [
+		'key'       => 'field_tab_school_exemptions',
+		'label'     => 'Quy định miễn môn',
+		'name'      => '',
+		'type'      => 'tab',
+		'parent'    => 'group_school_details',
+		'placement' => 'top',
+		'endpoint'  => 0,
+	] );
+
+	// 3.1 Default Exemption Settings (Quy định miễn môn & Chuyển đổi tín chỉ của trường)
 	acf_add_local_field( [
 		'key'         => 'field_school_default_exemption_title',
 		'label'       => 'Tiêu đề khối quy định miễn môn mặc định',
@@ -740,6 +746,13 @@ function ltdh_override_field_program_requirements_tab_label( $field ) {
 // Ensure Program contact info field is properly labeled
 add_filter( 'acf/load_field/key=field_program_contact_info', 'ltdh_override_field_program_contact_info_label' );
 function ltdh_override_field_program_contact_info_label( $field ) {
+	$field['label'] = 'Thông tin liên hệ & Tiếp nhận hồ sơ';
+	return $field;
+}
+
+// Ensure School contact info field is properly labeled
+add_filter( 'acf/load_field/key=field_school_contact_info', 'ltdh_override_field_school_contact_info_label' );
+function ltdh_override_field_school_contact_info_label( $field ) {
 	$field['label'] = 'Thông tin liên hệ & Tiếp nhận hồ sơ';
 	return $field;
 }
@@ -1310,6 +1323,12 @@ function ltdh_is_repeater_or_complex_field( $key_or_name ) {
 		'default_admission_batches',
 		'field_school_default_exemption_items',
 		'default_exemption_items',
+		'field_school_default_admission_documents',
+		'default_admission_documents',
+		'field_school_admission_forms_by_type',
+		'admission_forms_by_type',
+		'field_school_form_documents',
+		'documents',
 	];
 	if ( in_array( $key_or_name, $repeaters, true ) ) {
 		return true;

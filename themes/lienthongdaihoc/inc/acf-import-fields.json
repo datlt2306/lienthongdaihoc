@@ -1,8 +1,29 @@
 [
   {
     "key": "group_school_details",
-    "title": "Thông tin Trường học",
+    "title": "Thông tin Tuyển sinh",
     "fields": [
+      {
+        "key": "field_tab_school_overview",
+        "label": "Tổng quan",
+        "name": "",
+        "type": "tab",
+        "placement": "top",
+        "endpoint": 0
+      },
+      {
+        "key": "field_school_code",
+        "label": "Mã trường / Viết tắt",
+        "name": "school_code",
+        "type": "text",
+        "placeholder": "Ví dụ: NEU, TMU, PTIT..."
+      },
+      {
+        "key": "field_school_english_name",
+        "label": "Tên tiếng Anh",
+        "name": "english_name",
+        "type": "text"
+      },
       {
         "key": "field_school_logo",
         "label": "Logo Trường",
@@ -11,6 +32,41 @@
         "return_format": "id",
         "preview_size": "thumbnail",
         "library": "all"
+      },
+      {
+        "key": "field_school_banner",
+        "label": "Banner Trường",
+        "name": "school_banner",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all"
+      },
+      {
+        "key": "field_school_hotline",
+        "label": "Hotline tuyển sinh",
+        "name": "hotline",
+        "type": "text"
+      },
+      {
+        "key": "field_school_website",
+        "label": "Website chính thức",
+        "name": "website",
+        "type": "url"
+      },
+      {
+        "key": "field_school_address",
+        "label": "Địa chỉ trụ sở",
+        "name": "address",
+        "type": "text"
+      },
+      {
+        "key": "field_school_zalo_group_url",
+        "label": "Link Nhóm Zalo Trao Đổi (Cộng đồng)",
+        "name": "zalo_group_url",
+        "type": "url",
+        "instructions": "Nhập đường dẫn tham gia nhóm Zalo dành riêng cho sinh viên / tuyển sinh của trường này (Ví dụ: https://zalo.me/g/...)",
+        "placeholder": "https://zalo.me/g/..."
       },
       {
         "key": "field_school_is_featured",
@@ -51,52 +107,87 @@
         "placeholder": "Ví dụ: 1"
       },
       {
-        "key": "field_school_banner",
-        "label": "Banner Trường",
-        "name": "school_banner",
-        "type": "image",
-        "return_format": "url",
-        "preview_size": "medium",
-        "library": "all"
-      },
-      {
-        "key": "field_school_code",
-        "label": "Mã trường / Viết tắt",
-        "name": "school_code",
+        "key": "field_school_duration",
+        "label": "Thời gian học",
+        "name": "duration",
         "type": "text",
-        "placeholder": "Ví dụ: NEU, TMU, PTIT..."
+        "instructions": "Thời gian đào tạo tiêu chuẩn chung của trường (ví dụ: 1.5 - 2 năm). Các chương trình thuộc trường này sẽ tự động kế thừa và hiển thị thời gian này.",
+        "placeholder": "Ví dụ: 1.5 - 2 năm"
       },
       {
-        "key": "field_school_english_name",
-        "label": "Tên tiếng Anh",
-        "name": "english_name",
-        "type": "text"
+        "key": "field_tab_school_batches",
+        "label": "Các đợt tuyển sinh",
+        "name": "",
+        "type": "tab",
+        "placement": "top",
+        "endpoint": 0
       },
       {
-        "key": "field_school_website",
-        "label": "Website chính thức",
-        "name": "website",
-        "type": "url"
-      },
-      {
-        "key": "field_school_address",
-        "label": "Địa chỉ trụ sở",
-        "name": "address",
-        "type": "text"
-      },
-      {
-        "key": "field_school_hotline",
-        "label": "Hotline tuyển sinh",
-        "name": "hotline",
-        "type": "text"
-      },
-      {
-        "key": "field_school_zalo_group_url",
-        "label": "Link Nhóm Zalo Trao Đổi (Cộng đồng)",
-        "name": "zalo_group_url",
-        "type": "url",
-        "instructions": "Nhập đường dẫn tham gia nhóm Zalo dành riêng cho sinh viên / tuyển sinh của trường này (Ví dụ: https://zalo.me/g/...)",
-        "placeholder": "https://zalo.me/g/..."
+        "key": "field_school_default_admission_batches",
+        "label": "Các đợt tuyển sinh mặc định của trường",
+        "name": "default_admission_batches",
+        "type": "repeater",
+        "instructions": "Áp dụng khi trường có kế hoạch tuyển sinh chung cho tất cả các ngành trong năm. Chương trình nào không thiết lập đợt tuyển riêng sẽ tự động dùng lịch này.",
+        "layout": "row",
+        "button_label": "Thêm đợt tuyển sinh mặc định",
+        "sub_fields": [
+          {
+            "key": "field_school_def_batch_name",
+            "label": "Tên đợt",
+            "name": "batch_name",
+            "type": "text",
+            "placeholder": "Ví dụ: Tuyển sinh Đợt 1",
+            "required": 1
+          },
+          {
+            "key": "field_school_def_batch_release",
+            "label": "Phát hành hồ sơ",
+            "name": "release_period",
+            "type": "text",
+            "placeholder": "Ví dụ: 15/01/2026"
+          },
+          {
+            "key": "field_school_def_batch_app",
+            "label": "Nhận hồ sơ",
+            "name": "application_period",
+            "type": "text",
+            "placeholder": "Ví dụ: 20/01 - 30/04/2026",
+            "required": 1
+          },
+          {
+            "key": "field_school_def_batch_review",
+            "label": "Thời gian ôn tập",
+            "name": "review_time",
+            "type": "text"
+          },
+          {
+            "key": "field_school_def_batch_eval",
+            "label": "Thời gian xét tuyển / Thi tuyển",
+            "name": "evaluation_time",
+            "type": "text",
+            "placeholder": "Ví dụ: Xét tuyển liên tục hàng tháng"
+          },
+          {
+            "key": "field_school_def_batch_enroll",
+            "label": "Thời gian nhập học / Khai giảng",
+            "name": "enrollment_time",
+            "type": "text",
+            "placeholder": "Ví dụ: Dự kiến 15/05/2026"
+          },
+          {
+            "key": "field_school_def_batch_status",
+            "label": "Trạng thái đợt",
+            "name": "batch_status",
+            "type": "select",
+            "choices": {
+              "dang-nhan": "Đang nhận hồ sơ (Nổi bật)",
+              "sap-mo": "Sắp mở đợt",
+              "da-dong": "Đã kết thúc"
+            },
+            "default_value": "dang-nhan",
+            "allow_null": 0
+          }
+        ]
       },
       {
         "key": "field_school_admission_info",
@@ -105,6 +196,201 @@
         "type": "wysiwyg",
         "toolbar": "full",
         "media_upload": 1
+      },
+      {
+        "key": "field_school_default_admission_fee",
+        "label": "Lệ phí xét tuyển mặc định (trên 1 hồ sơ)",
+        "name": "default_admission_fee",
+        "type": "text",
+        "instructions": "Mức lệ phí xét tuyển chung của trường (VD: 300.000 đ/hồ sơ, hoặc Miễn phí). Chương trình nào để trống lệ phí sẽ dùng giá trị này.",
+        "placeholder": "Ví dụ: 300.000 đ/hồ sơ"
+      },
+      {
+        "key": "field_school_tuition_increase_roadmap",
+        "label": "Lộ trình tăng học phí / Ghi chú học phí",
+        "name": "tuition_increase_roadmap",
+        "type": "textarea",
+        "instructions": "Quy định điều chỉnh học phí hàng năm, mức tăng tối đa hoặc ghi chú học phí chung của trường. Các chương trình thuộc trường sẽ tự động kế thừa nội dung này.",
+        "rows": 3,
+        "placeholder": "Ví dụ: Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước (tăng không quá 10%/năm)..."
+      },
+      {
+        "key": "field_tab_school_requirements",
+        "label": "Điều kiện & Hồ sơ xét tuyển",
+        "name": "",
+        "type": "tab",
+        "placement": "top",
+        "endpoint": 0
+      },
+      {
+        "key": "field_school_default_admission_requirements",
+        "label": "Điều kiện xét tuyển mặc định của trường",
+        "name": "default_admission_requirements",
+        "type": "wysiwyg",
+        "instructions": "Quy định tiêu chuẩn xét tuyển chung của trường. Các chương trình thuộc trường này nếu để trống điều kiện xét tuyển sẽ tự động nhận nội dung này.",
+        "toolbar": "full",
+        "media_upload": 1
+      },
+      {
+        "key": "field_school_default_required_documents",
+        "label": "Hồ sơ xét tuyển cần thiết",
+        "name": "default_required_documents",
+        "type": "wysiwyg",
+        "instructions": "Danh mục giấy tờ hồ sơ nộp chung của trường (VD: 02 bằng CĐ công chứng, bảng điểm, CCCD, ảnh 3x4...). Các chương trình thuộc trường nếu để trống hồ sơ sẽ tự động nhận danh mục này.",
+        "toolbar": "full",
+        "media_upload": 1
+      },
+      {
+        "key": "field_school_contact_info",
+        "label": "Thông tin liên hệ & Tiếp nhận hồ sơ",
+        "name": "contact_info",
+        "type": "wysiwyg",
+        "instructions": "Địa chỉ văn phòng tuyển sinh, địa điểm tiếp nhận hồ sơ, hotline và thông tin nộp lệ phí xét tuyển của trường. Thông tin này sẽ tự động hiển thị trong mục 'Điều kiện & Hồ sơ' của tất cả các chương trình thuộc trường nếu chương trình không cấu hình riêng.",
+        "toolbar": "full",
+        "media_upload": 1
+      },
+      {
+        "key": "field_tab_school_admission_forms",
+        "label": "Hồ sơ & Biểu mẫu tuyển sinh",
+        "name": "",
+        "type": "tab",
+        "placement": "top",
+        "endpoint": 0
+      },
+      {
+        "key": "field_school_admission_drive_folder",
+        "label": "Đường link Google Drive hồ sơ tuyển sinh (Thư mục hoặc File)",
+        "name": "admission_drive_folder_url",
+        "type": "url",
+        "instructions": "Dán đường dẫn thư mục Google Drive (hoặc file Drive) chứa toàn bộ hồ sơ, biểu mẫu tuyển sinh của trường (Phiếu đăng ký, hướng dẫn, đơn miễn môn...). Đảm bảo link đã được bật quyền 'Bất kỳ ai có đường liên kết đều có thể xem'.",
+        "placeholder": "https://drive.google.com/drive/folders/...",
+        "required": 0
+      },
+      {
+        "key": "field_school_admission_forms_by_type",
+        "label": "Link Google Drive hồ sơ theo từng Hệ đào tạo (Nếu có riêng)",
+        "name": "admission_forms_by_type",
+        "type": "repeater",
+        "instructions": "Chỉ điền nếu trường có link Google Drive hồ sơ riêng biệt cho từng hệ đào tạo (VD: Hệ từ xa dùng link riêng, Vừa làm vừa học dùng link riêng).",
+        "layout": "table",
+        "button_label": "Thêm link Drive theo hệ",
+        "sub_fields": [
+          {
+            "key": "field_school_form_training_type",
+            "label": "Hệ đào tạo",
+            "name": "training_type",
+            "type": "taxonomy",
+            "taxonomy": "training_type",
+            "field_type": "select",
+            "allow_null": 0,
+            "add_term": 0,
+            "save_terms": 0,
+            "load_terms": 0,
+            "return_format": "id"
+          },
+          {
+            "key": "field_school_form_drive_folder",
+            "label": "Đường link Google Drive của hệ này",
+            "name": "drive_folder_url",
+            "type": "url",
+            "placeholder": "https://drive.google.com/drive/folders/...",
+            "instructions": "Dán đường link thư mục hoặc file Google Drive hồ sơ của hệ này.",
+            "required": 1
+          },
+          {
+            "key": "field_school_form_notes",
+            "label": "Ghi chú / Nhãn hiển thị",
+            "name": "notes",
+            "type": "text",
+            "placeholder": "Ví dụ: Hồ sơ Đại học từ xa 2026",
+            "required": 0
+          }
+        ]
+      },
+      {
+        "key": "field_tab_school_exemptions",
+        "label": "Quy định miễn môn",
+        "name": "",
+        "type": "tab",
+        "placement": "top",
+        "endpoint": 0
+      },
+      {
+        "key": "field_school_default_exemption_title",
+        "label": "Tiêu đề khối quy định miễn môn",
+        "name": "exemption_title",
+        "type": "text",
+        "placeholder": "Quy định miễn môn & Chuyển đổi tín chỉ"
+      },
+      {
+        "key": "field_school_default_exemption_intro",
+        "label": "Mô tả / Lời mở đầu quy định miễn môn",
+        "name": "exemption_intro",
+        "type": "textarea",
+        "rows": 3
+      },
+      {
+        "key": "field_school_default_exemption_items",
+        "label": "Danh sách các môn được xét miễn giảm",
+        "name": "exemption_items",
+        "type": "repeater",
+        "instructions": "Cấu hình các môn xét miễn giảm chung của trường (Tiếng Anh, Tin học, Triết học...). Các chương trình nếu không có quy định riêng sẽ tự động dùng bảng này.",
+        "layout": "row",
+        "button_label": "Thêm môn xét miễn giảm",
+        "sub_fields": [
+          {
+            "key": "field_school_def_ex_subject",
+            "label": "1. Tên môn học",
+            "name": "subject_name",
+            "type": "text",
+            "placeholder": "Ví dụ: Tiếng Anh cơ bản 1 & 2",
+            "required": 1
+          },
+          {
+            "key": "field_school_def_ex_condition",
+            "label": "2. Điều kiện & Yêu cầu xét miễn môn",
+            "name": "condition_note",
+            "type": "textarea",
+            "rows": 3
+          },
+          {
+            "key": "field_school_def_ex_cert_scores",
+            "label": "3. Danh sách chứng chỉ quy đổi (Tùy chọn)",
+            "name": "cert_scores",
+            "type": "repeater",
+            "layout": "table",
+            "button_label": "Thêm chứng chỉ",
+            "sub_fields": [
+              {
+                "key": "field_school_def_ex_cert_name",
+                "label": "Chứng chỉ",
+                "name": "cert_name",
+                "type": "text",
+                "placeholder": "IELTS, TOEIC..."
+              },
+              {
+                "key": "field_school_def_ex_cert_min",
+                "label": "Điểm tối thiểu",
+                "name": "min_score",
+                "type": "text",
+                "placeholder": "450+, B1..."
+              }
+            ]
+          },
+          {
+            "key": "field_school_def_ex_cert_note",
+            "label": "4. Ghi chú điều kiện chứng chỉ (Tùy chọn)",
+            "name": "cert_note",
+            "type": "text"
+          },
+          {
+            "key": "field_school_def_ex_process",
+            "label": "5. Quy trình thẩm định / Box lưu ý màu vàng (Tùy chọn)",
+            "name": "assessment_process",
+            "type": "textarea",
+            "rows": 2
+          }
+        ]
       },
       {
         "key": "field_tab_school_faq",
@@ -135,124 +421,6 @@
             "name": "answer",
             "type": "textarea",
             "rows": 3
-          }
-        ]
-      },
-      {
-        "key": "field_tab_school_admission_forms",
-        "label": "Hồ sơ & Biểu mẫu tuyển sinh",
-        "name": "",
-        "type": "tab",
-        "placement": "top",
-        "endpoint": 0
-      },
-      {
-        "key": "field_school_default_admission_documents",
-        "label": "Danh sách biểu mẫu tuyển sinh mặc định",
-        "name": "default_admission_documents",
-        "type": "repeater",
-        "instructions": "Thêm các biểu mẫu tuyển sinh của trường (Phiếu đăng ký, Đơn miễn môn, Đơn miễn QP-AN, Đơn tiếng Anh...). Nếu trường chỉ có 1 file, chỉ cần thêm 1 dòng. Khi có từ 2 file trở lên, hệ thống sẽ TỰ ĐỘNG nén thành file ZIP trọn bộ cho thí sinh tải 1-click.",
-        "layout": "table",
-        "button_label": "Thêm biểu mẫu",
-        "sub_fields": [
-          {
-            "key": "field_school_def_doc_label",
-            "label": "Tên biểu mẫu",
-            "name": "label",
-            "type": "text",
-            "placeholder": "Ví dụ: Phiếu đăng ký dự tuyển 2026",
-            "required": 1
-          },
-          {
-            "key": "field_school_def_doc_file",
-            "label": "File đính kèm (PDF/DOCX)",
-            "name": "file",
-            "type": "file",
-            "return_format": "array",
-            "library": "all",
-            "required": 1
-          },
-          {
-            "key": "field_school_def_doc_badge",
-            "label": "Phân loại",
-            "name": "badge",
-            "type": "select",
-            "choices": {
-              "required": "Bắt buộc",
-              "optional": "Tùy chọn",
-              "exemption": "Miễn môn",
-              "other": "Tham khảo"
-            },
-            "default_value": "required",
-            "allow_null": 0,
-            "return_format": "value"
-          }
-        ]
-      },
-      {
-        "key": "field_school_admission_forms_by_type",
-        "label": "Bộ biểu mẫu theo từng Hệ đào tạo",
-        "name": "admission_forms_by_type",
-        "type": "repeater",
-        "instructions": "Dành cho trường hợp mỗi Hệ đào tạo (Đại học từ xa, Liên thông chính quy, Văn bằng 2...) có bộ biểu mẫu riêng. Khi có từ 2 file trở lên, hệ thống sẽ tự động gộp file ZIP.",
-        "layout": "row",
-        "button_label": "Thêm bộ hồ sơ theo hệ",
-        "sub_fields": [
-          {
-            "key": "field_school_form_training_type",
-            "label": "Hệ đào tạo",
-            "name": "training_type",
-            "type": "taxonomy",
-            "taxonomy": "training_type",
-            "field_type": "select",
-            "allow_null": 0,
-            "add_term": 0,
-            "save_terms": 0,
-            "load_terms": 0,
-            "return_format": "id"
-          },
-          {
-            "key": "field_school_form_documents",
-            "label": "Danh sách biểu mẫu của hệ này",
-            "name": "documents",
-            "type": "repeater",
-            "instructions": "Thêm các phiếu của hệ này (Phiếu đăng ký, Đơn miễn môn...). Nếu có từ 2 file trở lên, hệ thống sẽ tự động tạo file ZIP.",
-            "layout": "table",
-            "button_label": "Thêm phiếu",
-            "sub_fields": [
-              {
-                "key": "field_school_row_doc_label",
-                "label": "Tên biểu mẫu",
-                "name": "label",
-                "type": "text",
-                "placeholder": "Ví dụ: Phiếu đăng ký Đại học từ xa 2026",
-                "required": 1
-              },
-              {
-                "key": "field_school_row_doc_file",
-                "label": "File đính kèm (PDF/DOCX)",
-                "name": "file",
-                "type": "file",
-                "return_format": "array",
-                "library": "all",
-                "required": 1
-              },
-              {
-                "key": "field_school_row_doc_badge",
-                "label": "Phân loại",
-                "name": "badge",
-                "type": "select",
-                "choices": {
-                  "required": "Bắt buộc",
-                  "optional": "Tùy chọn",
-                  "exemption": "Miễn môn",
-                  "other": "Tham khảo"
-                },
-                "default_value": "required",
-                "allow_null": 0,
-                "return_format": "value"
-              }
-            ]
           }
         ]
       }
@@ -744,21 +912,6 @@
         "type": "wysiwyg"
       },
       {
-        "key": "field_program_documents",
-        "label": "Hồ sơ xét tuyển cần thiết",
-        "name": "required_documents",
-        "type": "wysiwyg"
-      },
-      {
-        "key": "field_program_contact_info",
-        "label": "Thông tin liên hệ & Tiếp nhận hồ sơ",
-        "name": "contact_info",
-        "type": "wysiwyg",
-        "instructions": "Địa chỉ văn phòng tuyển sinh, địa điểm tiếp nhận hồ sơ, hotline riêng cho chương trình này. Nếu để trống, hệ thống sẽ tự động kế thừa từ Thông tin liên hệ của Trường đào tạo.",
-        "toolbar": "full",
-        "media_upload": 1
-      },
-      {
         "key": "field_tab_prog_tuition",
         "label": "Học phí & Thời gian học",
         "name": "",
@@ -815,100 +968,6 @@
         "type": "text",
         "instructions": "Nhập mức lệ phí tính trên 1 bộ hồ sơ xét tuyển (Ví dụ: 200.000 đ hoặc Miễn phí). Để trống nếu trường không thu lệ phí.",
         "placeholder": "Ví dụ: 200.000 đ / hồ sơ hoặc Miễn phí (Để trống nếu không thu)"
-      },
-      {
-        "key": "field_program_tuition_increase_roadmap",
-        "label": "Lộ trình tăng học phí / Ghi chú học phí",
-        "name": "tuition_increase_roadmap",
-        "type": "textarea",
-        "rows": 3,
-        "placeholder": "Ví dụ: Học phí có thể tăng hàng năm theo quy định..."
-      },
-      {
-        "key": "field_program_duration",
-        "label": "Thời gian học",
-        "name": "duration",
-        "type": "text",
-        "placeholder": "Ví dụ: 1.5 - 2 năm"
-      },
-      {
-        "key": "field_program_exemption_title",
-        "label": "Tiêu đề khối quy định miễn môn",
-        "name": "exemption_title",
-        "type": "text",
-        "placeholder": "Ví dụ: Quy định miễn môn đối với Đại học GTVT (UTC)"
-      },
-      {
-        "key": "field_program_exemption_intro",
-        "label": "Mô tả / Lời mở đầu quy định miễn môn",
-        "name": "exemption_intro",
-        "type": "textarea",
-        "rows": 2,
-        "placeholder": "Ví dụ: Chương trình đào tạo hệ liên thông chỉ xem xét miễn trừ tối đa đối với các môn học dưới đây nếu học viên đáp ứng đủ điều kiện:"
-      },
-      {
-        "key": "field_program_exemption_items",
-        "label": "Danh sách các môn được xét miễn giảm",
-        "name": "exemption_items",
-        "type": "repeater",
-        "layout": "block",
-        "button_label": "+ Thêm môn được miễn",
-        "sub_fields": [
-          {
-            "key": "field_exemption_subject_name",
-            "label": "1. Tên môn học",
-            "name": "subject_name",
-            "type": "text",
-            "placeholder": "Ví dụ: Giáo dục quốc phòng an ninh"
-          },
-          {
-            "key": "field_exemption_condition_note",
-            "label": "2. Điều kiện & Yêu cầu xét miễn môn",
-            "name": "condition_note",
-            "type": "textarea",
-            "rows": 3,
-            "placeholder": "Ví dụ: Chỉ được xét miễn giảm khi học viên nộp chứng chỉ do Bộ Giáo dục và Đào tạo cấp..."
-          },
-          {
-            "key": "field_exemption_cert_scores",
-            "label": "3. Danh sách chứng chỉ quy đổi (Tùy chọn)",
-            "name": "cert_scores",
-            "type": "repeater",
-            "layout": "table",
-            "button_label": "+ Thêm chứng chỉ",
-            "sub_fields": [
-              {
-                "key": "field_cert_name",
-                "label": "Tên chứng chỉ",
-                "name": "cert_name",
-                "type": "text",
-                "placeholder": "IELTS"
-              },
-              {
-                "key": "field_cert_score",
-                "label": "Mức điểm tối thiểu",
-                "name": "min_score",
-                "type": "text",
-                "placeholder": "≥ 4.5"
-              }
-            ]
-          },
-          {
-            "key": "field_exemption_cert_note",
-            "label": "4. Ghi chú điều kiện chứng chỉ (Tùy chọn)",
-            "name": "cert_note",
-            "type": "text",
-            "placeholder": "Ví dụ: * Riêng VSTEP: Chỉ nhận chứng chỉ do 1 trong 3 cơ sở đào tạo cấp..."
-          },
-          {
-            "key": "field_exemption_assessment_process",
-            "label": "5. Quy trình thẩm định / Box lưu ý màu vàng (Tùy chọn)",
-            "name": "assessment_process",
-            "type": "textarea",
-            "rows": 2,
-            "placeholder": "Ví dụ: Quy trình thẩm định & Quy đổi điểm: Sinh viên bắt buộc phải tham gia bài kiểm tra..."
-          }
-        ]
       },
       {
         "key": "field_tab_prog_faq",

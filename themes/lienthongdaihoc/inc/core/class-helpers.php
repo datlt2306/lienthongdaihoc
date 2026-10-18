@@ -406,10 +406,23 @@ function ltdh_get_field_or_meta( string $key, int $post_id ) {
 }
 
 /**
+ * Kiểm tra xem một URL có phải là liên kết Google Drive / Google Docs hay không.
+ *
+ * @param string $url
+ * @return bool
+ */
+function ltdh_is_google_drive_url( string $url ): bool {
+	if ( empty( $url ) ) {
+		return false;
+	}
+	return (bool) preg_match( '#^https?://(drive|docs)\.google\.com/#i', trim( $url ) );
+}
+
+/**
  * Chuẩn hóa giá trị trường file của ACF (Attachment ID, Array, hoặc URL string)
  *
  * @param mixed $raw
- * @return array [ 'url' => string, 'title' => string, 'filename' => string, 'ext' => string ]
+ * @return array [ 'url' => string, 'title' => string, 'filename' => string, 'ext' => string, 'is_drive' => bool ]
  */
 function ltdh_normalize_admission_file_info( $raw ): array {
 	$url           = '';
@@ -428,17 +441,22 @@ function ltdh_normalize_admission_file_info( $raw ): array {
 		$url           = wp_get_attachment_url( $attachment_id ) ?: '';
 		$title         = get_the_title( $attachment_id );
 	} elseif ( is_string( $raw ) && ! empty( $raw ) ) {
-		$url = $raw;
+		$url = trim( $raw );
 	}
 
 	if ( $attachment_id > 0 && function_exists( 'get_attached_file' ) ) {
 		$local_path = (string) get_attached_file( $attachment_id );
 	}
 
+	$is_drive = ltdh_is_google_drive_url( $url );
 	$filename = ! empty( $url ) ? basename( parse_url( $url, PHP_URL_PATH ) ?: '' ) : '';
 	$ext      = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
 
-	if ( empty( $local_path ) && ! empty( $url ) && function_exists( 'wp_upload_dir' ) ) {
+	if ( $is_drive && empty( $ext ) ) {
+		$ext = str_contains( $url, '/folders/' ) ? 'drive_folder' : 'drive';
+	}
+
+	if ( empty( $local_path ) && ! empty( $url ) && ! $is_drive && function_exists( 'wp_upload_dir' ) ) {
 		$upload_dir = wp_upload_dir();
 		if ( ! empty( $upload_dir['baseurl'] ) && str_starts_with( $url, $upload_dir['baseurl'] ) ) {
 			$rel        = substr( $url, strlen( $upload_dir['baseurl'] ) );
@@ -462,6 +480,7 @@ function ltdh_normalize_admission_file_info( $raw ): array {
 		'ext'           => $ext,
 		'attachment_id' => $attachment_id,
 		'local_path'    => $local_path,
+		'is_drive'      => $is_drive,
 	];
 }
 
@@ -624,60 +643,28 @@ function ltdh_get_program_admission_package( int $program_id ): array {
 		return $empty_package;
 	}
 
-	$school_id         = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
-	$s_code_val        = $school_id ? get_post_meta( $school_id, 'school_code', true ) : '';
-	$school_code_clean = strtolower( preg_replace( '/[^a-zA-Z0-9]/', '', (string) $s_code_val ) );
-
-	$badge_labels = [
-		'required'  => 'Bắt buộc',
-		'optional'  => 'Tùy chọn',
-		'exemption' => 'Miễn môn',
-		'other'     => 'Tham khảo',
-	];
-
-	$raw_bundle    = null;
-	$raw_documents = [];
-	$source        = '';
-	$source_label  = '';
+	$school_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
+	$drive_url = '';
+	$source    = '';
+	$source_label = '';
 
 	// ----------------------------------------------------
-	// CẤP 1: KIỂM TRA OVERRIDE TẠI BÀI VIẾT CHƯƠNG TRÌNH
+	// CẤP 1: KIỂM TRA LINK DRIVE RIÊNG CỦA CHƯƠNG TRÌNH (PROGRAM OVERRIDE)
 	// ----------------------------------------------------
-	$prog_bundle = ltdh_get_field_or_meta( 'program_bundle_file', $program_id );
-	$prog_docs   = ltdh_get_field_or_meta( 'program_admission_documents', $program_id );
-
-	if ( ! empty( $prog_bundle ) || ( ! empty( $prog_docs ) && is_array( $prog_docs ) ) ) {
-		$raw_bundle    = $prog_bundle;
-		$raw_documents = is_array( $prog_docs ) ? $prog_docs : [];
+	$prog_drive = ltdh_get_field_or_meta( 'program_admission_drive_url', $program_id );
+	if ( empty( $prog_drive ) ) {
+		$prog_drive = ltdh_get_field_or_meta( 'admission_drive_folder_url', $program_id );
+	}
+	if ( ! empty( $prog_drive ) ) {
+		$drive_url     = trim( (string) $prog_drive );
 		$source        = 'program';
 		$source_label  = 'Mẫu riêng theo ngành';
-	} else {
-		// Legacy single file override
-		$prog_single = ltdh_get_field_or_meta( 'admission_form_file', $program_id );
-		$single_info = ltdh_normalize_admission_file_info( $prog_single );
-
-		// Lọc bỏ URL giả định UTC nếu trường không phải UTC
-		if ( ! empty( $single_info['url'] ) && str_contains( $single_info['url'], 'utc-2026.pdf' ) && $school_code_clean !== 'utc' ) {
-			$single_info['url'] = '';
-		}
-
-		if ( ! empty( $single_info['url'] ) ) {
-			$raw_documents = [
-				[
-					'label' => $single_info['title'] ?: ( 'Phiếu tuyển sinh: ' . get_the_title( $program_id ) ),
-					'file'  => $single_info['url'],
-					'badge' => 'required',
-				],
-			];
-			$source       = 'program';
-			$source_label = 'Mẫu riêng theo ngành';
-		}
 	}
 
 	// ----------------------------------------------------
-	// CẤP 2: KIỂM TRA THEO HỆ ĐÀO TẠO CỦA TRƯỜNG (SCHOOL X TRAINING TYPE)
+	// CẤP 2: KIỂM TRA LINK DRIVE THEO HỆ ĐÀO TẠO CỦA TRƯỜNG (TRAINING TYPE)
 	// ----------------------------------------------------
-	if ( empty( $source ) && $school_id > 0 ) {
+	if ( empty( $drive_url ) && $school_id > 0 ) {
 		$training_terms = wp_get_post_terms( $program_id, 'training_type' );
 		if ( ! is_wp_error( $training_terms ) && ! empty( $training_terms ) ) {
 			$by_type_rows = ltdh_get_field_or_meta( 'admission_forms_by_type', $school_id );
@@ -708,36 +695,12 @@ function ltdh_get_program_admission_package( int $program_id ): array {
 						$is_matched = true;
 					}
 
-					if ( $is_matched ) {
-						$has_type_data = false;
-						if ( ! empty( $row['bundle_file'] ) ) {
-							$raw_bundle    = $row['bundle_file'];
-							$has_type_data = true;
-						}
-						if ( ! empty( $row['documents'] ) && is_array( $row['documents'] ) ) {
-							$raw_documents = $row['documents'];
-							$has_type_data = true;
-						} elseif ( ! empty( $row['file'] ) ) {
-							// Single file legacy
-							$single_info = ltdh_normalize_admission_file_info( $row['file'] );
-							if ( ! empty( $single_info['url'] ) ) {
-								$raw_documents = [
-									[
-										'label' => ! empty( $row['notes'] ) ? $row['notes'] : ( 'Phiếu tuyển sinh ' . ( $training_terms[0]->name ?? '' ) . ' - ' . get_the_title( $school_id ) ),
-										'file'  => $single_info['url'],
-										'badge' => 'required',
-									],
-								];
-								$has_type_data = true;
-							}
-						}
-
-						if ( $has_type_data ) {
-							$term_name    = $training_terms[0]->name ?? 'Hệ đào tạo';
-							$source       = 'school_type';
-							$source_label = 'Mẫu theo hệ: ' . $term_name;
-							break;
-						}
+					if ( $is_matched && ! empty( $row['drive_folder_url'] ) ) {
+						$drive_url     = trim( (string) $row['drive_folder_url'] );
+						$term_name     = $training_terms[0]->name ?? 'Hệ đào tạo';
+						$source        = 'school_type';
+						$source_label  = 'Mẫu theo hệ: ' . $term_name;
+						break;
 					}
 				}
 			}
@@ -745,120 +708,79 @@ function ltdh_get_program_admission_package( int $program_id ): array {
 	}
 
 	// ----------------------------------------------------
-	// CẤP 3: KIỂM TRA MẶC ĐỊNH CHUNG CỦA TRƯỜNG (SCHOOL DEFAULT)
+	// CẤP 3: KIỂM TRA LINK DRIVE CHUNG CỦA TRƯỜNG (SCHOOL DEFAULT)
 	// ----------------------------------------------------
-	if ( empty( $source ) && $school_id > 0 ) {
-		$def_bundle = ltdh_get_field_or_meta( 'default_bundle_file', $school_id );
-		$def_docs   = ltdh_get_field_or_meta( 'default_admission_documents', $school_id );
-
-		if ( ! empty( $def_bundle ) || ( ! empty( $def_docs ) && is_array( $def_docs ) ) ) {
-			$raw_bundle    = $def_bundle;
-			$raw_documents = is_array( $def_docs ) ? $def_docs : [];
+	if ( empty( $drive_url ) && $school_id > 0 ) {
+		$school_drive = ltdh_get_field_or_meta( 'admission_drive_folder_url', $school_id );
+		if ( ! empty( $school_drive ) ) {
+			$drive_url     = trim( (string) $school_drive );
 			$source        = 'school_default';
 			$source_label  = 'Mẫu chuẩn của trường';
-		} else {
-			// Single file legacy default
-			$def_single  = ltdh_get_field_or_meta( 'default_admission_form', $school_id );
-			$single_info = ltdh_normalize_admission_file_info( $def_single );
-			if ( ! empty( $single_info['url'] ) ) {
-				$raw_documents = [
-					[
-						'label' => $single_info['title'] ?: ( 'Phiếu tuyển sinh: ' . get_the_title( $school_id ) ),
-						'file'  => $single_info['url'],
-						'badge' => 'required',
-					],
-				];
+		}
+	}
+
+	// ----------------------------------------------------
+	// CẤP 4: FALLBACK CHO DỮ LIỆU FILE CŨ (NẾU CHƯA NHẬP DRIVE LINK)
+	// ----------------------------------------------------
+	$fallback_url = '';
+	if ( empty( $drive_url ) ) {
+		// Program legacy single file
+		$prog_single = ltdh_get_field_or_meta( 'admission_form_file', $program_id );
+		$s_info      = ltdh_normalize_admission_file_info( $prog_single );
+		if ( ! empty( $s_info['url'] ) ) {
+			$fallback_url = $s_info['url'];
+			$source       = 'program';
+			$source_label = 'Mẫu riêng theo ngành';
+		} elseif ( $school_id > 0 ) {
+			// School bundle or single default
+			$def_bundle = ltdh_get_field_or_meta( 'default_bundle_file', $school_id );
+			$b_info     = ltdh_normalize_admission_file_info( $def_bundle );
+			if ( ! empty( $b_info['url'] ) ) {
+				$fallback_url = $b_info['url'];
 				$source       = 'school_default';
 				$source_label = 'Mẫu chuẩn của trường';
+			} else {
+				$def_single = ltdh_get_field_or_meta( 'default_admission_form', $school_id );
+				$df_info    = ltdh_normalize_admission_file_info( $def_single );
+				if ( ! empty( $df_info['url'] ) ) {
+					$fallback_url = $df_info['url'];
+					$source       = 'school_default';
+					$source_label = 'Mẫu chuẩn của trường';
+				}
 			}
 		}
 	}
 
-	// ----------------------------------------------------
-	// CẤP 4: FILE TĨNH THEO QUY ƯỚC (/uploads/forms/phieu-dang-ky-{code}-2026.pdf)
-	// ----------------------------------------------------
-	if ( empty( $source ) && ! empty( $school_code_clean ) ) {
-		$custom_form_path = WP_CONTENT_DIR . "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf";
-		if ( file_exists( $custom_form_path ) ) {
-			$file_url      = content_url( "/uploads/forms/phieu-dang-ky-{$school_code_clean}-2026.pdf" );
-			$raw_documents = [
-				[
-					'label' => 'Phiếu tuyển sinh: ' . ( $school_id ? get_the_title( $school_id ) : '' ),
-					'file'  => $file_url,
-					'badge' => 'required',
-				],
-			];
-			$source       = 'school_file';
-			$source_label = 'Mẫu chuẩn của trường';
-		}
-	}
-
-	if ( empty( $source ) ) {
+	$target_url = ! empty( $drive_url ) ? $drive_url : $fallback_url;
+	if ( empty( $target_url ) ) {
 		return $empty_package;
 	}
 
-	// ----------------------------------------------------
-	// CHUẨN HÓA DỮ LIỆU ĐẦU RA
-	// ----------------------------------------------------
-	$bundle_info  = ltdh_normalize_admission_file_info( $raw_bundle );
-	$bundle_url   = $bundle_info['url'];
-	$bundle_ext   = $bundle_info['ext'] ?: 'zip';
-	$bundle_title = ! empty( $bundle_url ) ? 'Tải trọn bộ hồ sơ (' . strtoupper( $bundle_ext ) . ')' : '';
-
-	$parsed_documents = [];
-	foreach ( $raw_documents as $doc_row ) {
-		$f_info = ltdh_normalize_admission_file_info( $doc_row['file'] ?? null );
-		if ( empty( $f_info['url'] ) ) {
-			continue;
-		}
-
-		$raw_badge   = $doc_row['badge'] ?? 'required';
-		$badge_text  = $badge_labels[ $raw_badge ] ?? 'Bắt buộc';
-		$label_text  = ! empty( $doc_row['label'] ) ? (string) $doc_row['label'] : ( $f_info['title'] ?: 'Biểu mẫu tuyển sinh' );
-
-		$parsed_documents[] = [
-			'label'         => $label_text,
-			'url'           => $f_info['url'],
-			'filename'      => $f_info['filename'],
-			'ext'           => $f_info['ext'] ?: 'pdf',
-			'badge'         => $raw_badge,
-			'badge_label'   => $badge_text,
-			'local_path'    => $f_info['local_path'] ?? '',
-			'attachment_id' => $f_info['attachment_id'] ?? 0,
-		];
-	}
-
-	// TỰ ĐỘNG NÉN FILE ZIP GỘP NẾU CÓ TỪ 2 BIỂU MẪU TRỞ LÊN VÀ CHƯA CÓ BUNDLE FILE THỦ CÔNG
-	if ( empty( $bundle_url ) && count( $parsed_documents ) > 1 ) {
-		$prog_slug = get_post_field( 'post_name', $program_id );
-		if ( empty( $prog_slug ) ) {
-			$prog_slug = 'chuong-trinh-' . $program_id;
-		}
-		$auto_zip = ltdh_get_or_create_admission_zip( $parsed_documents, 'ho-so-' . $prog_slug );
-		if ( ! empty( $auto_zip ) ) {
-			$bundle_url   = $auto_zip;
-			$bundle_ext   = 'zip';
-			$bundle_title = 'Tải trọn bộ hồ sơ (ZIP)';
-		}
-	}
-
-	$has_package = ( ! empty( $bundle_url ) || ! empty( $parsed_documents ) );
-	$is_single   = ( empty( $bundle_url ) && count( $parsed_documents ) <= 1 );
-
-	$primary_url   = ! empty( $bundle_url ) ? $bundle_url : ( $parsed_documents[0]['url'] ?? '' );
-	$primary_title = ! empty( $bundle_title ) ? $bundle_title : ( $parsed_documents[0]['label'] ?? '' );
+	$is_drive = ! empty( $drive_url ) || ( function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $target_url ) );
+	$title    = $is_drive ? 'Mở trọn bộ hồ sơ trên Google Drive' : ( 'Phiếu tuyển sinh: ' . get_the_title( $program_id ) );
 
 	return [
-		'has_package'   => $has_package,
-		'source'        => $source,
-		'source_label'  => $source_label,
-		'bundle_url'    => $bundle_url,
-		'bundle_title'  => $bundle_title,
-		'bundle_ext'    => $bundle_ext,
-		'documents'     => $parsed_documents,
-		'is_single'     => $is_single,
-		'primary_url'   => $primary_url,
-		'primary_title' => $primary_title,
+		'has_package'      => true,
+		'source'           => $source,
+		'source_label'     => $source_label,
+		'drive_url'        => $is_drive ? $target_url : '',
+		'bundle_url'       => $target_url,
+		'bundle_title'     => $title,
+		'bundle_ext'       => $is_drive ? 'drive' : 'pdf',
+		'drive_folder_url' => $is_drive ? $target_url : '',
+		'documents'        => [
+			[
+				'label'       => $title,
+				'url'         => $target_url,
+				'is_drive'    => $is_drive,
+				'ext'         => $is_drive ? 'drive' : 'pdf',
+				'badge'       => 'required',
+				'badge_label' => 'Bắt buộc',
+			],
+		],
+		'is_single'        => true,
+		'primary_url'      => $target_url,
+		'primary_title'    => $title,
 	];
 }
 
@@ -1189,170 +1111,76 @@ function ltdh_get_school_admission_forms( int $school_id ): array {
 
 	$forms = [];
 
-	// 1. Bundle mặc định chung
-	$def_bundle = ltdh_get_field_or_meta( 'default_bundle_file', $school_id );
-	$b_info     = ltdh_normalize_admission_file_info( $def_bundle );
-
-	// 2. Danh sách biểu mẫu mặc định chung
-	$def_docs          = ltdh_get_field_or_meta( 'default_admission_documents', $school_id );
-	$parsed_def_docs   = [];
-	$default_doc_forms = [];
-
-	if ( ! empty( $def_docs ) && is_array( $def_docs ) ) {
-		foreach ( $def_docs as $d ) {
-			$f_info = ltdh_normalize_admission_file_info( $d['file'] ?? null );
-			if ( ! empty( $f_info['url'] ) ) {
-				$label = ! empty( $d['label'] ) ? (string) $d['label'] : $f_info['title'];
-				$parsed_def_docs[] = [
-					'label'         => $label,
-					'url'           => $f_info['url'],
-					'filename'      => $f_info['filename'],
-					'ext'           => $f_info['ext'] ?: 'pdf',
-					'local_path'    => $f_info['local_path'] ?? '',
-					'attachment_id' => $f_info['attachment_id'] ?? 0,
-				];
-				$default_doc_forms[] = [
-					'type'     => 'default_doc',
-					'label'    => $label,
-					'url'      => $f_info['url'],
-					'title'    => $label . ' - ' . get_the_title( $school_id ),
-					'filename' => $f_info['filename'],
-				];
-			}
-		}
-	}
-
-	// Tự động tạo file ZIP cho biểu mẫu mặc định nếu >= 2 files và chưa có file ZIP thủ công
-	if ( empty( $b_info['url'] ) && count( $parsed_def_docs ) > 1 ) {
-		$school_slug = get_post_field( 'post_name', $school_id ) ?: ( 'truong-' . $school_id );
-		$auto_zip    = ltdh_get_or_create_admission_zip( $parsed_def_docs, 'ho-so-' . $school_slug );
-		if ( ! empty( $auto_zip ) ) {
-			$b_info = [
-				'url'      => $auto_zip,
-				'title'    => 'Trọn bộ hồ sơ tuyển sinh: ' . get_the_title( $school_id ),
-				'filename' => basename( $auto_zip ),
-				'ext'      => 'zip',
-			];
-		}
-	}
-
-	if ( ! empty( $b_info['url'] ) ) {
+	// 1. Link Google Drive chung của trường
+	$school_drive = ltdh_get_field_or_meta( 'admission_drive_folder_url', $school_id );
+	if ( ! empty( $school_drive ) ) {
 		$forms[] = [
-			'type'     => 'bundle',
-			'label'    => 'Trọn bộ hồ sơ tuyển sinh (ZIP)',
-			'url'      => $b_info['url'],
-			'title'    => 'Trọn bộ hồ sơ tuyển sinh: ' . get_the_title( $school_id ),
-			'filename' => $b_info['filename'],
+			'type'     => 'drive_folder',
+			'label'    => 'Thư mục Google Drive hồ sơ trường',
+			'url'      => trim( (string) $school_drive ),
+			'title'    => 'Thư mục Google Drive: ' . get_the_title( $school_id ),
+			'filename' => 'Google Drive',
+			'is_drive' => true,
 		];
 	}
 
-	if ( ! empty( $default_doc_forms ) ) {
-		$forms = array_merge( $forms, $default_doc_forms );
-	}
-
-	// 3. Phiếu đơn lẻ mặc định (Legacy)
-	if ( empty( $def_docs ) && empty( $b_info['url'] ) ) {
-		$default_form = ltdh_get_field_or_meta( 'default_admission_form', $school_id );
-		$f_info       = ltdh_normalize_admission_file_info( $default_form );
-		if ( ! empty( $f_info['url'] ) ) {
-			$forms[] = [
-				'type'     => 'default',
-				'label'    => 'Phiếu tuyển sinh chung toàn trường',
-				'url'      => $f_info['url'],
-				'title'    => 'Phiếu tuyển sinh: ' . get_the_title( $school_id ),
-				'filename' => $f_info['filename'],
-			];
-		}
-	}
-
-	// 4. Biểu mẫu theo từng hệ
+	// 2. Link Google Drive theo từng hệ đào tạo (nếu có riêng)
 	$by_type_rows = ltdh_get_field_or_meta( 'admission_forms_by_type', $school_id );
 	if ( ! empty( $by_type_rows ) && is_array( $by_type_rows ) ) {
 		foreach ( $by_type_rows as $row ) {
-			$row_type = $row['training_type'] ?? null;
+			if ( empty( $row['drive_folder_url'] ) ) {
+				continue;
+			}
+			$row_type  = $row['training_type'] ?? null;
 			$term_name = 'Hệ đào tạo';
-			$term_slug = '';
 			if ( is_numeric( $row_type ) ) {
 				$term = get_term( (int) $row_type, 'training_type' );
 				if ( $term && ! is_wp_error( $term ) ) {
 					$term_name = $term->name;
-					$term_slug = $term->slug;
 				}
 			} elseif ( is_array( $row_type ) && ! empty( $row_type['name'] ) ) {
 				$term_name = $row_type['name'];
-				$term_slug = $row_type['slug'] ?? '';
 			} elseif ( is_object( $row_type ) && ! empty( $row_type->name ) ) {
 				$term_name = $row_type->name;
-				$term_slug = $row_type->slug ?? '';
 			}
 
-			// Từng document của hệ
-			$parsed_type_docs = [];
-			$type_doc_forms   = [];
-			if ( ! empty( $row['documents'] ) && is_array( $row['documents'] ) ) {
-				foreach ( $row['documents'] as $d ) {
-					$f_info = ltdh_normalize_admission_file_info( $d['file'] ?? null );
-					if ( ! empty( $f_info['url'] ) ) {
-						$label = ! empty( $d['label'] ) ? (string) $d['label'] : $f_info['title'];
-						$parsed_type_docs[] = [
-							'label'         => $label,
-							'url'           => $f_info['url'],
-							'filename'      => $f_info['filename'],
-							'ext'           => $f_info['ext'] ?: 'pdf',
-							'local_path'    => $f_info['local_path'] ?? '',
-							'attachment_id' => $f_info['attachment_id'] ?? 0,
-						];
-						$type_doc_forms[] = [
-							'type'     => 'type_doc',
-							'label'    => $label . ' (' . $term_name . ')',
-							'url'      => $f_info['url'],
-							'title'    => $label . ' - ' . get_the_title( $school_id ),
-							'filename' => $f_info['filename'],
-						];
-					}
-				}
-			}
+			$label = ! empty( $row['notes'] ) ? (string) $row['notes'] : ( 'Hồ sơ Google Drive hệ ' . $term_name );
+			$forms[] = [
+				'type'     => 'type_drive_folder',
+				'label'    => $label,
+				'url'      => trim( (string) $row['drive_folder_url'] ),
+				'title'    => $label . ' - ' . get_the_title( $school_id ),
+				'filename' => 'Google Drive',
+				'is_drive' => true,
+			];
+		}
+	}
 
-			// Bundle của hệ (thủ công hoặc tự động nén ZIP)
-			$type_bundle_info = ! empty( $row['bundle_file'] ) ? ltdh_normalize_admission_file_info( $row['bundle_file'] ) : [ 'url' => '', 'filename' => '', 'title' => '' ];
-			if ( empty( $type_bundle_info['url'] ) && count( $parsed_type_docs ) > 1 ) {
-				$school_slug = get_post_field( 'post_name', $school_id ) ?: ( 'truong-' . $school_id );
-				$prefix      = 'ho-so-' . $school_slug . ( $term_slug ? ( '-' . $term_slug ) : '' );
-				$auto_zip    = ltdh_get_or_create_admission_zip( $parsed_type_docs, $prefix );
-				if ( ! empty( $auto_zip ) ) {
-					$type_bundle_info = [
-						'url'      => $auto_zip,
-						'title'    => 'Trọn bộ hồ sơ hệ ' . $term_name . ' - ' . get_the_title( $school_id ),
-						'filename' => basename( $auto_zip ),
-						'ext'      => 'zip',
-					];
-				}
-			}
-
-			if ( ! empty( $type_bundle_info['url'] ) ) {
+	// 3. Fallback cho dữ liệu file cũ nếu trường chưa kịp nhập link Drive
+	if ( empty( $forms ) ) {
+		$def_bundle = ltdh_get_field_or_meta( 'default_bundle_file', $school_id );
+		$b_info     = ltdh_normalize_admission_file_info( $def_bundle );
+		if ( ! empty( $b_info['url'] ) ) {
+			$forms[] = [
+				'type'     => 'bundle',
+				'label'    => 'Trọn bộ hồ sơ tuyển sinh (ZIP)',
+				'url'      => $b_info['url'],
+				'title'    => 'Trọn bộ hồ sơ: ' . get_the_title( $school_id ),
+				'filename' => $b_info['filename'],
+				'is_drive' => false,
+			];
+		} else {
+			$def_single = ltdh_get_field_or_meta( 'default_admission_form', $school_id );
+			$s_info     = ltdh_normalize_admission_file_info( $def_single );
+			if ( ! empty( $s_info['url'] ) ) {
 				$forms[] = [
-					'type'     => 'type_bundle',
-					'label'    => 'Trọn bộ hồ sơ hệ ' . $term_name . ' (ZIP)',
-					'url'      => $type_bundle_info['url'],
-					'title'    => 'Trọn bộ hồ sơ hệ ' . $term_name . ' - ' . get_the_title( $school_id ),
-					'filename' => $type_bundle_info['filename'],
+					'type'     => 'default',
+					'label'    => 'Phiếu tuyển sinh chung toàn trường',
+					'url'      => $s_info['url'],
+					'title'    => 'Phiếu tuyển sinh: ' . get_the_title( $school_id ),
+					'filename' => $s_info['filename'],
+					'is_drive' => false,
 				];
-			}
-
-			if ( ! empty( $type_doc_forms ) ) {
-				$forms = array_merge( $forms, $type_doc_forms );
-			} elseif ( ! empty( $row['file'] ) ) {
-				// Single file legacy
-				$f_info = ltdh_normalize_admission_file_info( $row['file'] );
-				if ( ! empty( $f_info['url'] ) ) {
-					$forms[] = [
-						'type'     => 'by_training_type',
-						'label'    => 'Phiếu tuyển sinh hệ ' . $term_name,
-						'url'      => $f_info['url'],
-						'title'    => 'Phiếu tuyển sinh ' . $term_name . ' - ' . get_the_title( $school_id ),
-						'filename' => $f_info['filename'],
-					];
-				}
 			}
 		}
 	}

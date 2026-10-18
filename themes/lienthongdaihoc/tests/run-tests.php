@@ -58,11 +58,16 @@ $cleanup_fixtures = function() use ( &$school_id, &$major_id, &$program_id, &$qt
 		wp_delete_post( $qtkd_major_id, true );
 		$qtkd_major_id = 0;
 	}
+	global $wpdb;
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_ltdh_search_%' OR option_name LIKE '_transient_timeout_ltdh_search_%'" );
 	echo "Fixtures cleaned up successfully.\n";
 };
 register_shutdown_function( $cleanup_fixtures );
 
 try {
+	global $wpdb;
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_ltdh_search_%' OR option_name LIKE '_transient_timeout_ltdh_search_%'" );
+
 	// Create Test School
 	$school_id = wp_insert_post( [
 		'post_title'  => 'Học viện Công nghệ Bưu chính Viễn thông',
