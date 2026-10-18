@@ -191,8 +191,38 @@ FAQTestSuite::assert(
 );
 
 // -----------------------------------------------------------------
-// SUMMARY
+// SUITE 6: single-program.php FAQ Presentation & Accordion
 // -----------------------------------------------------------------
+echo "\nSUITE 6: single-program.php FAQ Presentation & Accordion\n";
+echo "-------------------------------------------------------------------\n";
+
+$program_content = file_get_contents( ABSPATH . 'single-program.php' );
+
+FAQTestSuite::assert(
+	false !== strpos( $program_content, 'id="hoi-dap"' ),
+	"single-program.php: FAQ section id='hoi-dap' is rendered"
+);
+
+FAQTestSuite::assert(
+	false !== strpos( $program_content, 'id="ltdh-toggle-program-faq-btn"' ),
+	"single-program.php: Bulk toggle button #ltdh-toggle-program-faq-btn is present"
+);
+
+FAQTestSuite::assert(
+	false !== strpos( $program_content, '<details class="group py-3.5 sm:py-4 transition-colors">' ),
+	"single-program.php: FAQ items rendered as collapsible <details class='group...'>"
+);
+
+FAQTestSuite::assert(
+	false !== strpos( $program_content, '<summary class="flex items-center justify-between' ),
+	"single-program.php: FAQ items use native <summary> element with flex layout"
+);
+
+FAQTestSuite::assert(
+	false !== strpos( $program_content, "toggleFaqBtn.addEventListener('click'" ),
+	"single-program.php: Bulk toggle listener attached to toggle all FAQ accordions"
+);
+
 echo "\n===================================================================\n";
 echo sprintf( "FAQ TEST SUITE SUMMARY: %d PASSED, %d FAILED\n", FAQTestSuite::$passed, FAQTestSuite::$failed );
 echo "===================================================================\n";
