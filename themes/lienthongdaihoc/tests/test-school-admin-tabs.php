@@ -93,11 +93,11 @@ foreach ($expected_tabs as $tab_key => $tab_label) {
 
 // Verify fields under each tab
 $expected_fields_by_tab = [
-    'field_tab_school_overview' => ['school_code', 'english_name', 'logo', 'school_banner', 'hotline', 'website', 'address', 'zalo_group_url', 'is_featured', 'order'],
-    'field_tab_school_batches' => ['default_admission_batches', 'admission_info', 'default_admission_fee'],
+    'field_tab_school_overview' => ['school_code', 'english_name', 'logo', 'school_banner', 'hotline', 'website', 'address', 'zalo_group_url', 'is_featured', 'order', 'duration'],
+    'field_tab_school_batches' => ['default_admission_batches', 'admission_info', 'default_admission_fee', 'tuition_increase_roadmap'],
     'field_tab_school_requirements' => ['default_admission_requirements', 'default_required_documents', 'contact_info'],
-    'field_tab_school_admission_forms' => ['admission_drive_folder_url', 'default_admission_documents', 'admission_forms_by_type'],
-    'field_tab_school_exemptions' => ['default_exemption_title', 'default_exemption_intro', 'default_exemption_items'],
+    'field_tab_school_admission_forms' => ['admission_drive_folder_url', 'admission_forms_by_type'],
+    'field_tab_school_exemptions' => ['exemption_title', 'exemption_intro', 'exemption_items'],
     'field_tab_school_faq' => ['school_faq'],
 ];
 

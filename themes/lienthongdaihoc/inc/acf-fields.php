@@ -82,6 +82,16 @@ function ltdh_register_school_overview_acf_fields() {
 		'placement' => 'top',
 		'endpoint'  => 0,
 	] );
+
+	acf_add_local_field( [
+		'key'          => 'field_school_duration',
+		'label'        => 'Thời gian học',
+		'name'         => 'duration',
+		'type'         => 'text',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Thời gian đào tạo tiêu chuẩn chung của trường (ví dụ: 1.5 - 2 năm). Toàn bộ các chương trình thuộc trường sẽ tự động kế thừa và hiển thị thời gian này.',
+		'placeholder'  => 'Ví dụ: 1.5 - 2 năm',
+	] );
 }
 
 /**
@@ -323,6 +333,18 @@ function ltdh_register_school_default_admissions_acf_fields() {
 		'placeholder'  => 'Ví dụ: 300.000 đ/hồ sơ',
 	] );
 
+	// 1.3 Tuition Increase Roadmap (Lộ trình tăng học phí / Ghi chú học phí)
+	acf_add_local_field( [
+		'key'          => 'field_school_tuition_increase_roadmap',
+		'label'        => 'Lộ trình tăng học phí / Ghi chú học phí',
+		'name'         => 'tuition_increase_roadmap',
+		'type'         => 'textarea',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Quy định điều chỉnh học phí hàng năm, mức tăng tối đa hoặc ghi chú học phí chung của trường. Các chương trình thuộc trường sẽ tự động kế thừa nội dung này.',
+		'rows'         => 3,
+		'placeholder'  => 'Ví dụ: Học phí có thể được điều chỉnh hàng năm theo quy định của nhà nước (tăng không quá 10%/năm)...',
+	] );
+
 	// 2. Tab: Điều kiện & Hồ sơ xét tuyển
 	acf_add_local_field( [
 		'key'       => 'field_tab_school_requirements',
@@ -346,10 +368,10 @@ function ltdh_register_school_default_admissions_acf_fields() {
 		'media_upload' => 1,
 	] );
 
-	// 2.2 Default Required Documents (Hồ sơ xét tuyển cần nộp mặc định)
+	// 2.2 Default Required Documents (Hồ sơ xét tuyển cần thiết)
 	acf_add_local_field( [
 		'key'          => 'field_school_default_required_documents',
-		'label'        => 'Hồ sơ xét tuyển cần nộp mặc định',
+		'label'        => 'Hồ sơ xét tuyển cần thiết',
 		'name'         => 'default_required_documents',
 		'type'         => 'wysiwyg',
 		'parent'       => 'group_school_details',
@@ -384,7 +406,7 @@ function ltdh_register_school_default_admissions_acf_fields() {
 	// 3.1 Default Exemption Settings (Quy định miễn môn & Chuyển đổi tín chỉ của trường)
 	acf_add_local_field( [
 		'key'         => 'field_school_default_exemption_title',
-		'label'       => 'Tiêu đề khối quy định miễn môn mặc định',
+		'label'       => 'Tiêu đề khối quy định miễn môn',
 		'name'        => 'default_exemption_title',
 		'type'        => 'text',
 		'parent'      => 'group_school_details',
@@ -393,7 +415,7 @@ function ltdh_register_school_default_admissions_acf_fields() {
 
 	acf_add_local_field( [
 		'key'    => 'field_school_default_exemption_intro',
-		'label'  => 'Mô tả quy định miễn môn mặc định',
+		'label'  => 'Mô tả / Lời mở đầu quy định miễn môn',
 		'name'   => 'default_exemption_intro',
 		'type'   => 'textarea',
 		'parent' => 'group_school_details',
@@ -402,7 +424,7 @@ function ltdh_register_school_default_admissions_acf_fields() {
 
 	acf_add_local_field( [
 		'key'          => 'field_school_default_exemption_items',
-		'label'        => 'Danh sách môn được xét miễn giảm mặc định của trường',
+		'label'        => 'Danh sách các môn được xét miễn giảm',
 		'name'         => 'default_exemption_items',
 		'type'         => 'repeater',
 		'parent'       => 'group_school_details',
@@ -809,6 +831,16 @@ add_filter( 'acf/prepare_field/key=field_program_schedule', '__return_false' );
 // add_filter( 'acf/prepare_field/key=field_program_degree_type', '__return_false' );
 // add_filter( 'acf/prepare_field/key=field_program_diploma_value', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_disadvantages', '__return_false' );
+
+// Remove fields from Program that now inherit from School (DRY Principle)
+add_filter( 'acf/prepare_field/key=field_program_contact_info', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_documents', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_tuition_increase_roadmap', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_duration', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_exemption_title', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_exemption_intro', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_program_exemption_items', '__return_false' );
+
 
 // Remove/hide 'Các mảng đào tạo chuyên sâu' and 'Cơ hội nghề nghiệp & Định hướng' from Major CPT in admin
 add_filter( 'acf/prepare_field/key=field_tab_major_specializations', '__return_false' );
@@ -2411,23 +2443,10 @@ function ltdh_validate_program_acf_publish_fields() {
 		acf_add_validation_error( 'acf[field_program_tuition_unit]', 'Vui lòng chọn trường "Đơn vị tính học phí" ở Tab "Học phí & Thời gian học" trước khi Xuất bản.' );
 	}
 
-	// 6. Duration
-	if ( empty( $acf['field_program_duration'] ) ) {
-		acf_add_validation_error( 'acf[field_program_duration]', 'Vui lòng nhập trường "Thời gian học" ở Tab "Học phí & Thời gian học" trước khi Xuất bản.' );
-	} elseif ( preg_match( '/\d{4}-\d{2}-\d{2}/', (string) $acf['field_program_duration'] ) ) {
-		acf_add_validation_error( 'acf[field_program_duration]', 'Thời gian học bị dính lỗi định dạng ngày tháng Excel. Vui lòng nhập khoảng thời gian dạng "1.5 - 2 năm".' );
-	}
-
-	// 7. Requirements
+	// 6. Requirements
 	$req_text = isset( $acf['field_program_requirements'] ) ? trim( strip_tags( (string) $acf['field_program_requirements'] ) ) : '';
 	if ( empty( $req_text ) ) {
 		acf_add_validation_error( 'acf[field_program_requirements]', 'Vui lòng nhập nội dung trường "Điều kiện xét tuyển" ở Tab "Điều kiện & Hồ sơ xét tuyển" trước khi Xuất bản.' );
-	}
-
-	// 9. Required documents
-	$doc_text = isset( $acf['field_program_documents'] ) ? trim( strip_tags( (string) $acf['field_program_documents'] ) ) : '';
-	if ( empty( $doc_text ) ) {
-		acf_add_validation_error( 'acf[field_program_documents]', 'Vui lòng nhập danh mục trường "Hồ sơ xét tuyển cần thiết" ở Tab "Điều kiện & Hồ sơ xét tuyển" trước khi Xuất bản.' );
 	}
 }
 

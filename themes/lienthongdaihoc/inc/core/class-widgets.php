@@ -1470,10 +1470,10 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 	?>
 		<section class="bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-5">
 			<div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-3">
-				<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center text-sm font-bold shrink-0">📄</span>
-				<h3 class="text-base font-extrabold text-slate-900 leading-snug">Mẫu phiếu tuyển sinh</h3>
+				<span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-sm font-bold shrink-0">📂</span>
+				<h3 class="text-base font-extrabold text-slate-900 leading-snug">Hồ sơ tuyển sinh</h3>
 			</div>
-			<p class="text-xs text-slate-500 mb-3.5 leading-relaxed">Tải mẫu phiếu đăng ký chính thức để hoàn thiện hồ sơ xét tuyển vào trường.</p>
+			<p class="text-xs text-slate-500 mb-3.5 leading-relaxed">Mở thư mục Google Drive chính thức để xem và tải biểu mẫu hồ sơ xét tuyển.</p>
 			<div class="space-y-2">
 				<?php foreach ( $school_admission_forms as $form_item ) : 
 					$is_item_drive = ! empty( $form_item['is_drive'] ) || ( function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $form_item['url'] ) );

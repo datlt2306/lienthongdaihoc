@@ -197,7 +197,7 @@ function ltdh_seo_dynamic_description( $desc ) {
 		$school     = $school_id ? get_the_title( $school_id ) : '';
 		$major      = $major_id ? get_the_title( $major_id ) : '';
 		$tuition    = ltdh_get_program_tuition_display( $program_id );
-		$duration   = get_field( LTDH_META_DURATION, $program_id ) ?: '1.5 - 2 năm';
+		$duration   = function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $program_id ) : ( get_field( LTDH_META_DURATION, $program_id ) ?: '1.5 - 2 năm' );
 
 		$training_type = '';
 		$terms = wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE );
@@ -452,7 +452,7 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			'educationalProgramMode'       => $training_type ?: 'Liên thông Đại học',
 			'programPrerequisites'         => 'Tốt nghiệp trình độ Trung cấp hoặc Cao đẳng theo quy chế tuyển sinh hiện hành của Bộ GD&ĐT',
 			'educationalCredentialAwarded' => 'Bằng Cử nhân / Bằng Kỹ sư',
-			'timeToComplete'               => get_field( LTDH_META_DURATION, $program_id ) ?: 'P1Y6M',
+			'timeToComplete'               => function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $program_id ) : ( get_field( LTDH_META_DURATION, $program_id ) ?: 'P1Y6M' ),
 			'url'                          => get_permalink( $program_id ),
 		];
 
@@ -962,7 +962,7 @@ function ltdh_output_native_schema_fallback() {
 		$program_id  = get_the_ID();
 		$school_id   = intval( function_exists( 'get_field' ) && defined( 'LTDH_META_SCHOOL_REL' ) ? get_field( LTDH_META_SCHOOL_REL, $program_id ) : 0 );
 		$tuition_raw = function_exists( 'get_field' ) && defined( 'LTDH_META_TUITION' ) ? get_field( LTDH_META_TUITION, $program_id ) : '';
-		$duration    = ( function_exists( 'get_field' ) && defined( 'LTDH_META_DURATION' ) ? get_field( LTDH_META_DURATION, $program_id ) : '' ) ?: '1.5 - 2.5 năm';
+		$duration    = ( function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $program_id ) : ( function_exists( 'get_field' ) && defined( 'LTDH_META_DURATION' ) ? get_field( LTDH_META_DURATION, $program_id ) : '' ) ) ?: '1.5 - 2.5 năm';
 		$mode_terms  = defined( 'LTDH_TAX_TRAINING_TYPE' ) ? wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE ) : [];
 		$mode_name   = ( ! empty( $mode_terms ) && ! is_wp_error( $mode_terms ) ) ? $mode_terms[0]->name : 'Đại học từ xa';
 

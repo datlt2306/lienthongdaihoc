@@ -570,7 +570,7 @@ if ( ! empty( $school_faqs ) ) {
 							$clean_major_name = preg_replace( '/^ngành\s+/iu', '', trim( $major_name ) );
 							$opportunity_title = 'Liên thông ngành ' . $clean_major_name . ( $clean_type_name ? ' - ' . $clean_type_name : '' );
 							$tuition_fee = ltdh_get_program_tuition_display( $prog_id );
-							$duration = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
+							$duration = function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $prog_id ) : ( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' );
 							$permalink = get_permalink( $prog_id );
 							$prog_slug = get_post_field( 'post_name', $prog_id );
 							$major_slug = $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '';
@@ -580,7 +580,7 @@ if ( ! empty( $school_faqs ) ) {
 
 							$academic_year = get_field( 'tuition_academic_year', $prog_id ) ?: '2025 - 2026';
 
-							$majors_data[ $major_key ]['programs'][] = [
+							$prog_data = [
 								'id'                => $prog_id,
 								'title'             => $clean_title,
 								'opportunity_title' => $opportunity_title,
@@ -598,8 +598,22 @@ if ( ! empty( $school_faqs ) ) {
 								'school_name'       => $school_title,
 								'thumb'             => $school_thumb_url,
 							];
+
+							$prog_he_key = $type_slug ?: ( $clean_type_name ? sanitize_title( $clean_type_name ) : 'default' );
+							if ( isset( $majors_data[ $major_key ]['programs'][ $prog_he_key ] ) ) {
+								$existing = $majors_data[ $major_key ]['programs'][ $prog_he_key ];
+								if ( $major_slug && false !== strpos( $prog_slug, $major_slug ) && false === strpos( $existing['slug'], $major_slug ) ) {
+									$majors_data[ $major_key ]['programs'][ $prog_he_key ] = $prog_data;
+								}
+							} else {
+								$majors_data[ $major_key ]['programs'][ $prog_he_key ] = $prog_data;
+							}
 						}
 						wp_reset_postdata();
+
+						foreach ( $majors_data as $m_k => $m_v ) {
+							$majors_data[ $m_k ]['programs'] = array_values( $m_v['programs'] );
+						}
 					}
 
 					$available_he = [];
@@ -861,6 +875,7 @@ if ( ! empty( $school_faqs ) ) {
 															<svg class="w-3.5 h-3.5 opacity-60 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 																<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
 															</svg>
+														</a>
 													<?php endforeach; ?>
 												</div>
 											<?php endif; ?>

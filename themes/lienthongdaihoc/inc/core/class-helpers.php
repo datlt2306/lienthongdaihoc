@@ -3436,15 +3436,85 @@ function ltdh_get_program_required_documents( int $program_id ): string {
 		return (string) $prog_docs;
 	}
 
-	// Fallback to school default
+	// Fallback to school required documents (DRY)
 	$school_id = ltdh_get_program_school_id( $program_id );
 	if ( $school_id > 0 ) {
-		$school_docs = function_exists( 'get_field' ) ? get_field( 'default_required_documents', $school_id ) : '';
+		$school_docs = function_exists( 'get_field' ) ? ( get_field( 'required_documents', $school_id ) ?: get_field( 'default_required_documents', $school_id ) ) : '';
 		if ( empty( $school_docs ) ) {
-			$school_docs = get_post_meta( $school_id, 'default_required_documents', true );
+			$school_docs = get_post_meta( $school_id, 'required_documents', true ) ?: get_post_meta( $school_id, 'default_required_documents', true );
 		}
 		if ( ! empty( $school_docs ) && ! empty( trim( strip_tags( (string) $school_docs ) ) ) ) {
 			return (string) $school_docs;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Lấy thời gian học của chương trình với cơ chế DRY fallback về trường.
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return string Khoảng thời gian đào tạo (ví dụ: '1.5 - 2 năm').
+ */
+function ltdh_get_program_duration( int $program_id ): string {
+	if ( ! $program_id ) {
+		return '1.5 - 2 năm';
+	}
+
+	$dur = function_exists( 'get_field' ) ? get_field( 'duration', $program_id ) : '';
+	if ( empty( $dur ) ) {
+		$dur = get_post_meta( $program_id, 'duration', true );
+	}
+
+	if ( ! empty( $dur ) && ! empty( trim( (string) $dur ) ) ) {
+		return trim( (string) $dur );
+	}
+
+	// Fallback to school duration (DRY)
+	$school_id = ltdh_get_program_school_id( $program_id );
+	if ( $school_id > 0 ) {
+		$school_dur = function_exists( 'get_field' ) ? get_field( 'duration', $school_id ) : '';
+		if ( empty( $school_dur ) ) {
+			$school_dur = get_post_meta( $school_id, 'duration', true );
+		}
+		if ( ! empty( $school_dur ) && ! empty( trim( (string) $school_dur ) ) ) {
+			return trim( (string) $school_dur );
+		}
+	}
+
+	return '1.5 - 2 năm';
+}
+
+/**
+ * Lấy lộ trình tăng học phí / ghi chú học phí của chương trình với cơ chế DRY fallback về trường.
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return string Lộ trình hoặc ghi chú học phí.
+ */
+function ltdh_get_program_tuition_roadmap( int $program_id ): string {
+	if ( ! $program_id ) {
+		return '';
+	}
+
+	$roadmap = function_exists( 'get_field' ) ? get_field( 'tuition_increase_roadmap', $program_id ) : '';
+	if ( empty( $roadmap ) ) {
+		$roadmap = get_post_meta( $program_id, 'tuition_increase_roadmap', true );
+	}
+
+	if ( ! empty( $roadmap ) && ! empty( trim( (string) $roadmap ) ) ) {
+		return trim( (string) $roadmap );
+	}
+
+	// Fallback to school tuition increase roadmap (DRY)
+	$school_id = ltdh_get_program_school_id( $program_id );
+	if ( $school_id > 0 ) {
+		$school_roadmap = function_exists( 'get_field' ) ? get_field( 'tuition_increase_roadmap', $school_id ) : '';
+		if ( empty( $school_roadmap ) ) {
+			$school_roadmap = get_post_meta( $school_id, 'tuition_increase_roadmap', true );
+		}
+		if ( ! empty( $school_roadmap ) && ! empty( trim( (string) $school_roadmap ) ) ) {
+			return trim( (string) $school_roadmap );
 		}
 	}
 
@@ -3555,16 +3625,16 @@ function ltdh_get_program_exemptions( int $program_id ): array {
 	$school_id = ltdh_get_program_school_id( $program_id );
 	if ( $school_id > 0 ) {
 		$default_items = function_exists( 'ltdh_get_field_or_meta' ) 
-			? ltdh_get_field_or_meta( 'default_exemption_items', $school_id ) 
-			: ( function_exists( 'get_field' ) ? get_field( 'default_exemption_items', $school_id ) : get_post_meta( $school_id, 'default_exemption_items', true ) );
+			? ( ltdh_get_field_or_meta( 'exemption_items', $school_id ) ?: ltdh_get_field_or_meta( 'default_exemption_items', $school_id ) )
+			: ( ( function_exists( 'get_field' ) ? ( get_field( 'exemption_items', $school_id ) ?: get_field( 'default_exemption_items', $school_id ) ) : null ) ?: ( get_post_meta( $school_id, 'exemption_items', true ) ?: get_post_meta( $school_id, 'default_exemption_items', true ) ) );
 
 		if ( ! empty( $default_items ) && is_array( $default_items ) ) {
 			$def_title = function_exists( 'ltdh_get_field_or_meta' ) 
-				? ltdh_get_field_or_meta( 'default_exemption_title', $school_id ) 
-				: ( function_exists( 'get_field' ) ? get_field( 'default_exemption_title', $school_id ) : get_post_meta( $school_id, 'default_exemption_title', true ) );
+				? ( ltdh_get_field_or_meta( 'exemption_title', $school_id ) ?: ltdh_get_field_or_meta( 'default_exemption_title', $school_id ) )
+				: ( ( function_exists( 'get_field' ) ? ( get_field( 'exemption_title', $school_id ) ?: get_field( 'default_exemption_title', $school_id ) ) : null ) ?: ( get_post_meta( $school_id, 'exemption_title', true ) ?: get_post_meta( $school_id, 'default_exemption_title', true ) ) );
 			$def_intro = function_exists( 'ltdh_get_field_or_meta' ) 
-				? ltdh_get_field_or_meta( 'default_exemption_intro', $school_id ) 
-				: ( function_exists( 'get_field' ) ? get_field( 'default_exemption_intro', $school_id ) : get_post_meta( $school_id, 'default_exemption_intro', true ) );
+				? ( ltdh_get_field_or_meta( 'exemption_intro', $school_id ) ?: ltdh_get_field_or_meta( 'default_exemption_intro', $school_id ) )
+				: ( ( function_exists( 'get_field' ) ? ( get_field( 'exemption_intro', $school_id ) ?: get_field( 'default_exemption_intro', $school_id ) ) : null ) ?: ( get_post_meta( $school_id, 'exemption_intro', true ) ?: get_post_meta( $school_id, 'default_exemption_intro', true ) ) );
 
 			$result['title']     = ! empty( $def_title ) ? (string) $def_title : 'Quy định miễn môn & Chuyển đổi tín chỉ';
 			$result['intro']     = ! empty( $def_intro ) ? (string) $def_intro : '';

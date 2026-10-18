@@ -82,7 +82,7 @@ ContactInfoAdminTestSuite::assert(
 	"group_school_details: Key is 'field_school_contact_info'"
 );
 
-// Check Program Contact Info field
+// Check Program Contact Info field (removed per DRY request - now inherits from School)
 $program_contact = null;
 foreach ( $program_group['fields'] ?? [] as $f ) {
 	if ( ( $f['name'] ?? '' ) === 'contact_info' ) {
@@ -92,26 +92,16 @@ foreach ( $program_group['fields'] ?? [] as $f ) {
 }
 
 ContactInfoAdminTestSuite::assert(
-	$program_contact !== null,
-	"group_program_details: Has 'contact_info' field"
+	$program_contact === null,
+	"group_program_details: 'contact_info' field removed (inherits from school)"
 );
 
-ContactInfoAdminTestSuite::assert(
-	( $program_contact['label'] ?? '' ) === 'Thông tin liên hệ & Tiếp nhận hồ sơ',
-	"group_program_details: Field label is 'Thông tin liên hệ & Tiếp nhận hồ sơ'"
-);
-
-ContactInfoAdminTestSuite::assert(
-	( $program_contact['key'] ?? '' ) === 'field_program_contact_info',
-	"group_program_details: Key is 'field_program_contact_info'"
-);
-
-// 2. Check inc/acf-fields.php label overrides
+// 2. Check inc/acf-fields.php label overrides and prepare_field filters
 $acf_fields_php = file_get_contents( ABSPATH . 'inc/acf-fields.php' );
 
 ContactInfoAdminTestSuite::assert(
-	false !== strpos( $acf_fields_php, 'field_program_contact_info' ),
-	"inc/acf-fields.php: Hooks field_program_contact_info"
+	false !== strpos( $acf_fields_php, "add_filter( 'acf/prepare_field/key=field_program_contact_info', '__return_false' );" ),
+	"inc/acf-fields.php: Hides field_program_contact_info in admin"
 );
 
 ContactInfoAdminTestSuite::assert(
