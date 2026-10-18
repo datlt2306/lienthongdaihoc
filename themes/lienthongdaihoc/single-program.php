@@ -122,7 +122,7 @@ if ( ! empty( $curriculum_url ) ) {
 $program_tabs[] = [
 	'id'       => 'quy-trinh-tuyen-sinh',
 	'title'    => 'Quy trình',
-	'subtitle' => '4 bước xét tuyển',
+	'subtitle' => 'Lộ trình 4 bước',
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
 ];
 
@@ -604,16 +604,24 @@ if ( ! empty( $faqs ) ) {
 												$doc_url    = $single_doc['url'] ?? $form_url;
 												$doc_title  = $single_doc['label'] ?? $form_title;
 												$doc_badge  = $admission_package['source_label'] ?? '';
+												$is_drive   = ! empty( $single_doc['is_drive'] ) || ( function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $doc_url ) );
 											?>
 												<!-- TRƯỜNG HỢP 1: BIỂU MẪU ĐƠN LẺ -->
 												<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-blue-50/60 p-4 rounded-xl border border-blue-100/60 mt-3.5">
 													<div class="flex items-center gap-3">
-														<div class="w-10 h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
-															📄
+														<div class="w-10 h-10 rounded-xl <?php echo $is_drive ? 'bg-emerald-600' : 'bg-[#00308b]'; ?> text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+															<?php echo $is_drive ? '📁' : '📄'; ?>
 														</div>
 														<div>
 															<div class="flex flex-wrap items-center gap-2 mb-0.5">
-																<p class="font-bold text-slate-900 text-sm">Tải mẫu phiếu đăng ký tuyển sinh</p>
+																<p class="font-bold text-slate-900 text-sm">
+																	<?php echo $is_drive ? 'Hồ sơ tuyển sinh trên Google Drive' : 'Tải mẫu phiếu đăng ký tuyển sinh'; ?>
+																</p>
+																<?php if ( $is_drive ) : ?>
+																	<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+																		Google Drive
+																	</span>
+																<?php endif; ?>
 																<?php if ( ! empty( $doc_badge ) ) : ?>
 																	<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-800">
 																		<?php echo esc_html( $doc_badge ); ?>
@@ -623,9 +631,14 @@ if ( ! empty( $faqs ) ) {
 															<p class="text-xs text-slate-500"><?php echo esc_html( $doc_title ); ?></p>
 														</div>
 													</div>
-													<a href="<?php echo esc_url( $doc_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-2 px-4.5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $doc_url ); ?>" data-file-title="<?php echo esc_attr( $doc_title ); ?>">
-														<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-														<span>Tải Phiếu Tuyển Sinh</span>
+													<a href="<?php echo esc_url( $doc_url ); ?>" <?php echo $is_drive ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-2 px-4.5 py-2.5 <?php echo $is_drive ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[#00308b] hover:bg-[#002266]'; ?> text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $doc_url ); ?>" data-file-title="<?php echo esc_attr( $doc_title ); ?>">
+														<?php if ( $is_drive ) : ?>
+															<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+															<span>Mở Google Drive</span>
+														<?php else : ?>
+															<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+															<span>Tải Phiếu Tuyển Sinh</span>
+														<?php endif; ?>
 													</a>
 												</div>
 
@@ -654,12 +667,24 @@ if ( ! empty( $faqs ) ) {
 															</div>
 														</div>
 
-														<?php if ( ! empty( $admission_package['bundle_url'] ) ) : ?>
-															<a href="<?php echo esc_url( $admission_package['bundle_url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer self-start sm:self-auto" data-file-url="<?php echo esc_url( $admission_package['bundle_url'] ); ?>" data-file-title="<?php echo esc_attr( $admission_package['bundle_title'] ); ?>">
-																<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-																<span>📦 <?php echo esc_html( $admission_package['bundle_title'] ); ?></span>
-															</a>
-														<?php endif; ?>
+														<div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+															<?php 
+															$has_zip_bundle = ! empty( $admission_package['bundle_url'] ) && ( $admission_package['bundle_ext'] ?? '' ) !== 'drive';
+															$drive_folder   = $admission_package['drive_folder_url'] ?? ( ( $admission_package['bundle_ext'] ?? '' ) === 'drive' ? $admission_package['bundle_url'] : '' );
+															?>
+															<?php if ( $has_zip_bundle ) : ?>
+																<a href="<?php echo esc_url( $admission_package['bundle_url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $admission_package['bundle_url'] ); ?>" data-file-title="<?php echo esc_attr( $admission_package['bundle_title'] ); ?>">
+																	<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+																	<span>📦 <?php echo esc_html( $admission_package['bundle_title'] ); ?></span>
+																</a>
+															<?php endif; ?>
+															<?php if ( ! empty( $drive_folder ) ) : ?>
+																<a href="<?php echo esc_url( $drive_folder ); ?>" target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $drive_folder ); ?>" data-file-title="Mở thư mục Google Drive">
+																	<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+																	<span>📂 Mở Google Drive</span>
+																</a>
+															<?php endif; ?>
+														</div>
 													</div>
 
 													<!-- DANH SÁCH BIỂU MẪU TẢI RIÊNG TỪNG DÒNG -->
@@ -678,13 +703,20 @@ if ( ! empty( $faqs ) ) {
 																	} elseif ( $doc['badge'] === 'optional' ) {
 																		$badge_color = 'bg-emerald-50 text-emerald-800 border border-emerald-100/80';
 																	}
-																	$is_word = in_array( strtolower( $doc['ext'] ), [ 'doc', 'docx' ], true );
+																	$is_drive = ! empty( $doc['is_drive'] ) || ( function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $doc['url'] ) );
+																	$is_word  = ! $is_drive && in_array( strtolower( $doc['ext'] ), [ 'doc', 'docx' ], true );
 																?>
 																	<div class="flex items-center justify-between gap-3 p-3 bg-white hover:bg-blue-50/30 rounded-xl border border-slate-100 transition-all group">
 																		<div class="flex items-center gap-2.5 min-w-0">
-																			<span class="w-7 h-7 rounded-lg <?php echo $is_word ? 'bg-blue-50 text-blue-700' : 'bg-rose-50 text-rose-700'; ?> flex items-center justify-center text-[10px] font-black shrink-0">
-																				<?php echo $is_word ? 'DOC' : 'PDF'; ?>
-																			</span>
+																			<?php if ( $is_drive ) : ?>
+																				<span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-[10px] font-black shrink-0" title="Google Drive">
+																					DRIVE
+																				</span>
+																			<?php else : ?>
+																				<span class="w-7 h-7 rounded-lg <?php echo $is_word ? 'bg-blue-50 text-blue-700' : 'bg-rose-50 text-rose-700'; ?> flex items-center justify-center text-[10px] font-black shrink-0">
+																					<?php echo $is_word ? 'DOC' : 'PDF'; ?>
+																				</span>
+																			<?php endif; ?>
 																			<div class="min-w-0">
 																				<p class="font-bold text-slate-800 text-xs sm:text-sm truncate group-hover:text-[#00308b] transition-colors">
 																					<?php echo esc_html( $doc['label'] ); ?>
@@ -694,9 +726,14 @@ if ( ! empty( $faqs ) ) {
 																				<?php echo esc_html( $doc['badge_label'] ); ?>
 																			</span>
 																		</div>
-																		<a href="<?php echo esc_url( $doc['url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-[#00308b] text-slate-700 hover:text-white text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $doc['url'] ); ?>" data-file-title="<?php echo esc_attr( $doc['label'] ); ?>">
-																			<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-																			<span class="hidden sm:inline">Tải về</span>
+																		<a href="<?php echo esc_url( $doc['url'] ); ?>" <?php echo $is_drive ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-1.5 px-3 py-1.5 <?php echo $is_drive ? 'bg-emerald-50 hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-200/80' : 'bg-slate-100 hover:bg-[#00308b] text-slate-700 hover:text-white'; ?> text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $doc['url'] ); ?>" data-file-title="<?php echo esc_attr( $doc['label'] ); ?>">
+																			<?php if ( $is_drive ) : ?>
+																				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+																				<span class="hidden sm:inline">Mở Drive</span>
+																			<?php else : ?>
+																				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+																				<span class="hidden sm:inline">Tải về</span>
+																			<?php endif; ?>
 																		</a>
 																	</div>
 																<?php endforeach; ?>
@@ -972,20 +1009,32 @@ if ( ! empty( $faqs ) ) {
 												? ltdh_find_matching_exemption_doc( $item['subject_name'] ?? '', $admission_package['documents'] ?? [] ) 
 												: null;
 											if ( $matched_exemption_doc ) :
-												$m_is_word = in_array( strtolower( $matched_exemption_doc['ext'] ), [ 'doc', 'docx' ], true );
+												$m_is_drive = ! empty( $matched_exemption_doc['is_drive'] ) || ( function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $matched_exemption_doc['url'] ) );
+												$m_is_word  = ! $m_is_drive && in_array( strtolower( $matched_exemption_doc['ext'] ), [ 'doc', 'docx' ], true );
 											?>
 												<div class="mt-3 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
 													<div class="flex items-center gap-2 min-w-0">
-														<span class="w-6 h-6 rounded-md <?php echo $m_is_word ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'; ?> flex items-center justify-center text-[10px] font-black shrink-0">
-															<?php echo $m_is_word ? 'DOC' : 'PDF'; ?>
-														</span>
+														<?php if ( $m_is_drive ) : ?>
+															<span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-black shrink-0">
+																DRIVE
+															</span>
+														<?php else : ?>
+															<span class="w-6 h-6 rounded-md <?php echo $m_is_word ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'; ?> flex items-center justify-center text-[10px] font-black shrink-0">
+																<?php echo $m_is_word ? 'DOC' : 'PDF'; ?>
+															</span>
+														<?php endif; ?>
 														<span class="text-xs text-slate-600 truncate">
 															Mẫu đơn: <strong class="text-slate-800"><?php echo esc_html( $matched_exemption_doc['label'] ); ?></strong>
 														</span>
 													</div>
-													<a href="<?php echo esc_url( $matched_exemption_doc['url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white border border-amber-200/80 hover:border-amber-600 text-xs font-bold rounded-lg transition-all shrink-0 cursor-pointer shadow-2xs self-start sm:self-auto" data-file-url="<?php echo esc_url( $matched_exemption_doc['url'] ); ?>" data-file-title="<?php echo esc_attr( $matched_exemption_doc['label'] ); ?>">
-														<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-														<span>Tải đơn miễn môn</span>
+													<a href="<?php echo esc_url( $matched_exemption_doc['url'] ); ?>" <?php echo $m_is_drive ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-1.5 px-3 py-1.5 <?php echo $m_is_drive ? 'bg-emerald-50 hover:bg-emerald-600 text-emerald-900 hover:text-white border border-emerald-200/80 hover:border-emerald-600' : 'bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white border border-amber-200/80 hover:border-amber-600'; ?> text-xs font-bold rounded-lg transition-all shrink-0 cursor-pointer shadow-2xs self-start sm:self-auto" data-file-url="<?php echo esc_url( $matched_exemption_doc['url'] ); ?>" data-file-title="<?php echo esc_attr( $matched_exemption_doc['label'] ); ?>">
+														<?php if ( $m_is_drive ) : ?>
+															<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+															<span>Mở đơn trên Drive</span>
+														<?php else : ?>
+															<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+															<span>Tải đơn miễn môn</span>
+														<?php endif; ?>
 													</a>
 												</div>
 											<?php endif; ?>
@@ -1051,7 +1100,7 @@ if ( ! empty( $faqs ) ) {
 					null,
 					[
 						'title'      => 'Quy trình tuyển sinh & Nhập học',
-						'subtitle'   => 'Lộ trình 4 bước xét tuyển từ đăng ký đến khi chính thức nhập học tại ' . ( $program_school_name ?: 'nhà trường' ),
+						'subtitle'   => 'Lộ trình 4 bước từ đăng ký hồ sơ đến khi chính thức nhập học tại ' . ( $program_school_name ?: 'nhà trường' ),
 						'section_id' => 'quy-trinh-tuyen-sinh',
 						'cta_text'   => 'Đăng ký tư vấn lộ trình ngay',
 						'cta_link'   => '#register',

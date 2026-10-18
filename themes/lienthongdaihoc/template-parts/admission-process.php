@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $defaults = [
 	'title'      => 'Quy trình tuyển sinh & Nhập học',
-	'subtitle'   => 'Lộ trình 4 bước xét tuyển từ đăng ký đến khi chính thức nhập học tại nhà trường',
+	'subtitle'   => 'Lộ trình 4 bước từ đăng ký hồ sơ đến khi chính thức nhập học tại nhà trường',
 	'section_id' => 'quy-trinh-tuyen-sinh',
 	'cta_text'   => 'Đăng ký tư vấn lộ trình ngay',
 	'cta_link'   => '#register',
@@ -31,7 +31,7 @@ $steps = [
 	[
 		'step'        => '01',
 		'title'       => 'Đăng ký & Kiểm tra điều kiện',
-		'desc'        => 'Điền thông tin bằng cấp hiện tại (Trung cấp / Cao đẳng) để Ban tuyển sinh thẩm định điều kiện xét tuyển và dự kiến số tín chỉ được miễn giảm.',
+		'desc'        => 'Điền thông tin bằng cấp hiện tại (Trung cấp / Cao đẳng) để thẩm định điều kiện dự tuyển, xác định phương thức xét tuyển hoặc thi tuyển và dự kiến số tín chỉ được miễn giảm.',
 		'tag'         => '1 phút online',
 		'detail_meta' => 'Miễn phí 100%',
 		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
@@ -39,15 +39,15 @@ $steps = [
 	[
 		'step'        => '02',
 		'title'       => 'Tư vấn 1:1 & Chọn lộ trình',
-		'desc'        => 'Chuyên viên tuyển sinh gọi điện/Zalo hỗ trợ chọn ngành phù hợp, giải đáp học phí, thời gian học và gửi danh mục hồ sơ mẫu.',
+		'desc'        => 'Chuyên viên tuyển sinh hỗ trợ chọn ngành phù hợp, giải đáp học phí, thời gian học; hướng dẫn chuẩn bị hồ sơ hoặc kế hoạch ôn tập đối với ngành có thi tuyển.',
 		'tag'         => 'Tư vấn miễn phí',
 		'detail_meta' => 'Phản hồi trong 15p',
 		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>',
 	],
 	[
 		'step'        => '03',
-		'title'       => 'Nộp hồ sơ xét tuyển',
-		'desc'        => 'Hoàn thiện bộ hồ sơ (bản photo công chứng bằng & bảng điểm). Nộp linh hoạt qua Bưu điện, nộp trực tiếp hoặc gửi bản scan trước.',
+		'title'       => 'Nộp hồ sơ & Xét tuyển / Dự thi',
+		'desc'        => 'Hoàn thiện bộ hồ sơ công chứng theo hướng dẫn. Nhà trường tiến hành xét duyệt văn bằng hoặc tổ chức ôn tập & thi tuyển đối với ngành có kỳ thi riêng.',
 		'tag'         => 'Thủ tục đơn giản',
 		'detail_meta' => 'Linh hoạt hình thức',
 		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>',
@@ -55,9 +55,9 @@ $steps = [
 	[
 		'step'        => '04',
 		'title'       => 'Nhận thông báo & Nhập học',
-		'desc'        => 'Nhận Giấy báo trúng tuyển chính thức từ nhà trường, cấp tài khoản hệ thống E-Learning (LMS) và bắt đầu học tập ngay.',
+		'desc'        => 'Nhận Giấy báo trúng tuyển chính thức từ nhà trường, hoàn tất thủ tục nhập học và bắt đầu học tập (trực tuyến qua LMS hoặc học tập trung theo quy định).',
 		'tag'         => 'Bằng chuẩn Bộ GD&ĐT',
-		'detail_meta' => 'Học online linh hoạt',
+		'detail_meta' => 'Học tập linh hoạt',
 		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>',
 	],
 ];
@@ -101,10 +101,6 @@ $steps = [
 							</h3>
 						</div>
 
-						<!-- Clean Neutral Tag Pill -->
-						<span class="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-slate-600 bg-white border border-slate-200/70 px-2 py-0.5 rounded-md shadow-2xs shrink-0 whitespace-nowrap">
-							<?php echo esc_html( $step_item['tag'] ); ?>
-						</span>
 					</div>
 
 					<!-- Step Description -->
