@@ -57,6 +57,11 @@ class LTDH_Performance {
 		add_filter( 'wp_handle_upload', [ __CLASS__, 'auto_convert_upload_to_webp' ], 10, 1 );
 		add_filter( 'intermediate_image_sizes_advanced', [ __CLASS__, 'prune_unnecessary_image_sizes' ], 10, 1 );
 		add_filter( 'big_image_size_threshold', [ __CLASS__, 'cap_max_image_threshold' ], 10, 0 );
+
+		// 10. Intelligent Delay for Analytics & Tag Manager (Saves ~143 KiB unused JS)
+		add_filter( 'googlesitekit_tagmanager_tag_blocked', [ __CLASS__, 'block_sitekit_tags' ] );
+		add_filter( 'googlesitekit_analytics-4_tag_blocked', [ __CLASS__, 'block_sitekit_tags' ] );
+		add_action( 'wp_head', [ __CLASS__, 'render_delayed_analytics_loader' ], 2 );
 	}
 
 	/**
@@ -437,6 +442,93 @@ class LTDH_Performance {
 	 */
 	public static function cap_max_image_threshold() {
 		return 1920;
+	}
+
+	/**
+	 * 10. Intelligent Non-blocking Google Analytics & Tag Manager Loader
+	 *
+	 * Eliminates render-blocking & unused JS flags (~143 KiB saved) by deferring
+	 * gtm.js and gtag.js downloads until first user interaction or idle timeout,
+	 * while preserving immediate dataLayer queueing so no analytics events are lost.
+	 *
+	 * @param bool $blocked Whether or not tag output is suppressed.
+	 * @return bool
+	 */
+	public static function block_sitekit_tags( $blocked ) {
+		if ( is_admin() ) {
+			return $blocked;
+		}
+		return true;
+	}
+
+	/**
+	 * Render non-blocking delayed GTM and GA4 scripts in wp_head.
+	 */
+	public static function render_delayed_analytics_loader() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		$gtm_settings = get_option( 'googlesitekit_tagmanager_settings', [] );
+		$ga4_settings = get_option( 'googlesitekit_analytics-4_settings', [] );
+
+		$gtm_id = ( ! empty( $gtm_settings['useSnippet'] ) && ! empty( $gtm_settings['containerID'] ) ) ? $gtm_settings['containerID'] : '';
+
+		// Respect GA4 trackingDisabled for logged-in users if configured
+		$disabled_users = $ga4_settings['trackingDisabled'] ?? [];
+		if ( is_user_logged_in() && in_array( 'loggedinUsers', (array) $disabled_users, true ) ) {
+			$ga4_id = '';
+		} else {
+			$ga4_id = ( ! empty( $ga4_settings['useSnippet'] ) && ! empty( $ga4_settings['googleTagID'] ) ) ? $ga4_settings['googleTagID'] : ( $ga4_settings['measurementID'] ?? '' );
+		}
+
+		// If neither GTM nor GA4 is active, nothing to load
+		if ( empty( $gtm_id ) && empty( $ga4_id ) ) {
+			return;
+		}
+		?>
+		<!-- LTDH Intelligent Non-blocking Analytics Loader -->
+		<script id="ltdh-delayed-analytics">
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		<?php if ( ! empty( $ga4_id ) ) : ?>
+		gtag('config', '<?php echo esc_js( $ga4_id ); ?>');
+		<?php endif; ?>
+		(function() {
+			var loaded = false;
+			function loadAnalytics() {
+				if (loaded) return;
+				loaded = true;
+				['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(ev) {
+					window.removeEventListener(ev, loadAnalytics, { passive: true });
+				});
+				<?php if ( ! empty( $gtm_id ) ) : ?>
+				var sGtm = document.createElement('script');
+				sGtm.async = true;
+				sGtm.src = 'https://www.googletagmanager.com/gtm.js?id=<?php echo esc_js( $gtm_id ); ?>';
+				document.head.appendChild(sGtm);
+				<?php endif; ?>
+				<?php if ( ! empty( $ga4_id ) ) : ?>
+				var sGa = document.createElement('script');
+				sGa.async = true;
+				sGa.src = 'https://www.googletagmanager.com/gtag/js?id=<?php echo esc_js( $ga4_id ); ?>';
+				document.head.appendChild(sGa);
+				<?php endif; ?>
+			}
+			['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(ev) {
+				window.addEventListener(ev, loadAnalytics, { passive: true, once: true });
+			});
+			if ('requestIdleCallback' in window) {
+				requestIdleCallback(function() {
+					setTimeout(loadAnalytics, 3500);
+				});
+			} else {
+				setTimeout(loadAnalytics, 4000);
+			}
+		})();
+		</script>
+		<?php
 	}
 }
 

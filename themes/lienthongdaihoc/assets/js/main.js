@@ -101,12 +101,49 @@ function ltdhInitTheme() {
     // ----------------------------------------------------
     // 2. Swiper Sliders Initialization (Hero & School Partners)
     // ----------------------------------------------------
-    let swiperAttempts = 0;
+    let swiperLoaded = false;
+    let swiperLoading = false;
+    const swiperCallbacks = [];
+
+    const loadSwiperScript = (cb) => {
+        if (typeof Swiper !== 'undefined') {
+            swiperLoaded = true;
+            if (cb) cb();
+            return;
+        }
+        if (cb) swiperCallbacks.push(cb);
+        if (swiperLoading) return;
+        swiperLoading = true;
+
+        const swiperUrl = (window.ltdh_ajax && window.ltdh_ajax.swiper_url)
+            ? window.ltdh_ajax.swiper_url
+            : (window.location.origin + '/wp-content/themes/lienthongdaihoc/assets/js/swiper-bundle.min.js');
+
+        const s = document.createElement('script');
+        s.src = swiperUrl;
+        s.async = true;
+        s.onload = () => {
+            swiperLoaded = true;
+            swiperLoading = false;
+            window.dispatchEvent(new CustomEvent('ltdh:swiper:loaded'));
+            while (swiperCallbacks.length) {
+                try {
+                    swiperCallbacks.shift()();
+                } catch (e) {
+                    console.error('Swiper callback error:', e);
+                }
+            }
+        };
+        s.onerror = () => {
+            swiperLoading = false;
+            console.error('Failed to load Swiper bundle');
+        };
+        document.head.appendChild(s);
+    };
+
     const initSwipers = () => {
         if (typeof Swiper === 'undefined') {
-            if (++swiperAttempts < 100) {
-                setTimeout(initSwipers, swiperAttempts > 20 ? 250 : 100);
-            }
+            loadSwiperScript(initSwipers);
             return;
         }
 
@@ -212,10 +249,37 @@ function ltdhInitTheme() {
         }
     };
 
-    if ('requestIdleCallback' in window) {
-        requestIdleCallback(initSwipers, { timeout: 1500 });
-    } else {
-        setTimeout(initSwipers, 200);
+    // Smart on-demand loading of Swiper bundle
+    const swiperElements = document.querySelectorAll('.swiper, .hero-swiper, .school-partner-swiper, .hot-majors-swiper, .cert-swiper');
+    if (swiperElements.length > 0) {
+        let swiperTriggered = false;
+        const triggerSwiper = () => {
+            if (swiperTriggered) return;
+            swiperTriggered = true;
+            ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(ev => {
+                window.removeEventListener(ev, triggerSwiper, { passive: true });
+            });
+            initSwipers();
+        };
+
+        ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(ev => {
+            window.addEventListener(ev, triggerSwiper, { passive: true, once: true });
+        });
+
+        // Fast path: if user hovers or touches swiper directly or clicks arrow
+        swiperElements.forEach(el => {
+            el.addEventListener('mouseenter', triggerSwiper, { passive: true, once: true });
+            el.addEventListener('touchstart', triggerSwiper, { passive: true, once: true });
+        });
+
+        // Fallback timer: load after 3500ms for idle visitors
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                setTimeout(triggerSwiper, 3500);
+            });
+        } else {
+            setTimeout(triggerSwiper, 3500);
+        }
     }
 
     // ----------------------------------------------------

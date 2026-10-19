@@ -52,9 +52,6 @@ function ltdh_enqueue_assets() {
 		if ( file_exists( get_template_directory() . '/assets/css/swiper-bundle.min.css' ) ) {
 			wp_enqueue_style( 'swiper-css', get_template_directory_uri() . '/assets/css/swiper-bundle.min.css', [], '11.0.0' );
 		}
-		if ( file_exists( get_template_directory() . '/assets/js/swiper-bundle.min.js' ) ) {
-			wp_enqueue_script( 'swiper-js', get_template_directory_uri() . '/assets/js/swiper-bundle.min.js', [], '11.0.0', true );
-		}
 	}
 
 	$theme_css_path = get_template_directory() . '/assets/css/main.min.css';
@@ -75,10 +72,15 @@ function ltdh_enqueue_assets() {
 		wp_enqueue_script( 'ltdh-fallback-js', get_template_directory_uri() . '/assets/js/main.js', [], $main_js_ver, true );
 	}
 
+	$swiper_url = file_exists( get_template_directory() . '/assets/js/swiper-bundle.min.js' )
+		? get_template_directory_uri() . '/assets/js/swiper-bundle.min.js'
+		: '';
+
 	wp_localize_script( $script_handle, 'ltdh_ajax', [
 		'ajax_url'      => admin_url( 'admin-ajax.php' ),
 		'compare_nonce' => wp_create_nonce( LTDH_NONCE_COMPARE ),
 		'home_url'      => esc_url( home_url( '/' ) ),
+		'swiper_url'    => esc_url( $swiper_url ),
 	] );
 
 	if ( ltdh_compare_should_load() ) {

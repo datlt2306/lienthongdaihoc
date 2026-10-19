@@ -314,10 +314,11 @@ add_action( 'wp_ajax_ltdh_filter_programs', 'ltdh_ajax_filter_programs' );
 add_action( 'wp_ajax_nopriv_ltdh_filter_programs', 'ltdh_ajax_filter_programs' );
 
 function ltdh_ajax_filter_programs() {
-	$paged = isset( $_POST['paged'] ) ? max( 1, intval( $_POST['paged'] ) ) : 1;
-	$limit = isset( $_POST['limit'] ) ? intval( $_POST['limit'] ) : 12;
+	$paged     = isset( $_POST['paged'] ) ? max( 1, intval( $_POST['paged'] ) ) : 1;
+	$type_slug = ! empty( $_POST['he'] ) ? sanitize_text_field( wp_unslash( $_POST['he'] ) ) : ( ! empty( $_POST['training_type'] ) ? sanitize_text_field( wp_unslash( $_POST['training_type'] ) ) : '' );
+	$limit     = isset( $_POST['limit'] ) ? intval( $_POST['limit'] ) : ( empty( $type_slug ) ? -1 : 12 );
 	if ( ! in_array( $limit, [ 10, 12, 20, 24, 30, 36, 48, 50, 100, -1 ], true ) ) {
-		$limit = 12;
+		$limit = empty( $type_slug ) ? -1 : 12;
 	}
 
 	$args = [

@@ -893,6 +893,8 @@ $zalo    = ltdh_get_zalo_url();
 				}
 			};
 
+			window.addEventListener('ltdh:swiper:loaded', initCertSwiper, { once: true });
+
 			if ('requestIdleCallback' in window) {
 				requestIdleCallback(initCertSwiper, { timeout: 3000 });
 			} else {
