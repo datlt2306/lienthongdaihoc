@@ -54,6 +54,7 @@ $zalo    = ltdh_get_zalo_url();
 				foreach ($hero_slides as $slide) : 
 					if (empty($slide['image'])) continue;
 					$slide_img_desktop = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'] ) : $slide['image'];
+					$slide_img_1400    = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'], '1400w' ) : '';
 					$slide_img_mobile  = ! empty( $slide['image_mobile'] ) ? ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image_mobile'], true ) : $slide['image_mobile'] ) : ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'], true ) : '' );
 					$is_lcp            = ( 0 === $slide_idx );
 					$loading_attr      = $is_lcp ? 'loading="eager" fetchpriority="high" data-no-lazy="1"' : 'loading="lazy" fetchpriority="low"';
@@ -69,7 +70,10 @@ $zalo    = ltdh_get_zalo_url();
 							<!-- Main Banner Image -->
 							<picture class="relative z-10 block w-full h-auto max-h-[800px]">
 								<?php if ( ! empty( $slide_img_mobile ) && $slide_img_mobile !== $slide_img_desktop ) : ?>
-									<source media="(max-width: 768px)" srcset="<?php echo esc_url( $slide_img_mobile ); ?>">
+									<source media="(max-width: 768px)" srcset="<?php echo esc_url( $slide_img_mobile ); ?>" width="768" height="320">
+								<?php endif; ?>
+								<?php if ( ! empty( $slide_img_1400 ) && $slide_img_1400 !== $slide_img_desktop ) : ?>
+									<source media="(max-width: 1440px)" srcset="<?php echo esc_url( $slide_img_1400 ); ?>" width="1400" height="584">
 								<?php endif; ?>
 								<img src="<?php echo esc_url( $slide_img_desktop ); ?>" width="1942" height="809" alt="Banner Hero" class="<?php echo $hero_cls; ?>w-full h-auto max-h-[800px] object-cover object-center pointer-events-none" <?php echo $loading_attr; ?> decoding="async">
 							</picture>
@@ -334,7 +338,13 @@ $zalo    = ltdh_get_zalo_url();
 											<?php if ($logo_id) : 
 												$logo_alt = get_post_meta( $logo_id, '_wp_attachment_image_alt', true ) ?: ( 'Logo ' . ( $school['title'] ?? '' ) );
 											?>
-												<?php echo wp_get_attachment_image($logo_id, 'thumbnail', false, ['class' => 'h-full w-full object-contain', 'alt' => $logo_alt]); ?>
+												<?php echo wp_get_attachment_image($logo_id, 'thumbnail', false, [
+													'class'    => 'h-full w-full object-contain',
+													'alt'      => $logo_alt,
+													'sizes'    => '56px',
+													'loading'  => 'lazy',
+													'decoding' => 'async',
+												]); ?>
 											<?php else : ?>
 												<span class="font-display font-extrabold text-[#00308b] text-sm">UNI</span>
 											<?php endif; ?>
@@ -672,7 +682,7 @@ $zalo    = ltdh_get_zalo_url();
 									$opt_slide_url = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide_url ) : $slide_url;
 								?>
 									<div class="swiper-slide w-full h-full">
-										<img src="<?php echo esc_url($opt_slide_url); ?>" alt="Students Graduation Slide" loading="lazy" decoding="async" class="w-full h-full object-cover">
+										<img src="<?php echo esc_url($opt_slide_url); ?>" alt="Students Graduation Slide" width="640" height="468" loading="lazy" decoding="async" class="w-full h-full object-cover">
 									</div>
 								<?php endforeach; ?>
 							</div>
@@ -1034,7 +1044,7 @@ $zalo    = ltdh_get_zalo_url();
 						[
 							'name'         => 'Hoàng Thị Độ',
 							'workplace'    => 'Product Owner',
-							'role'         => 'Liên thông ngành CNTT',
+							'role' => 'Liên thông Công nghệ thông tin',
 							'graduation'   => 'Khóa 29.1 - ĐH Giao thông Vận tải',
 							'status'       => 'graduated',
 							'status_label' => 'Đã tốt nghiệp',

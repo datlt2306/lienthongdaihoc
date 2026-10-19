@@ -248,52 +248,17 @@ function ltdh_recaptcha_enqueue_scripts(): void {
 	$script_path = get_template_directory() . '/assets/js/recaptcha.js';
 	$script_ver  = file_exists( $script_path ) ? filemtime( $script_path ) : LTDH_VERSION;
 
-	if ( $enabled && ! empty( $site_key ) ) {
-		if ( 'v2' === $version ) {
-			// In v2, load handler first so ltdhOnRecaptchaLoad callback exists when Google API loads
-			wp_enqueue_script(
-				'ltdh-recaptcha-js',
-				get_template_directory_uri() . '/assets/js/recaptcha.js',
-				[],
-				$script_ver,
-				true
-			);
-
-			wp_enqueue_script(
-				'google-recaptcha-api',
-				'https://www.google.com/recaptcha/api.js?onload=ltdhOnRecaptchaLoad&render=explicit',
-				[ 'ltdh-recaptcha-js' ],
-				null,
-				true
-			);
-		} else {
-			// v3: Google API script loaded with render={site_key}
-			wp_enqueue_script(
-				'google-recaptcha-api',
-				'https://www.google.com/recaptcha/api.js?render=' . rawurlencode( $site_key ),
-				[],
-				null,
-				true
-			);
-
-			wp_enqueue_script(
-				'ltdh-recaptcha-js',
-				get_template_directory_uri() . '/assets/js/recaptcha.js',
-				[ 'google-recaptcha-api' ],
-				$script_ver,
-				true
-			);
-		}
-	} else {
-		// If disabled or unconfigured, enqueue recaptcha.js stub so frontend calls resolve safely
-		wp_enqueue_script(
-			'ltdh-recaptcha-js',
-			get_template_directory_uri() . '/assets/js/recaptcha.js',
-			[],
-			$script_ver,
-			true
-		);
-	}
+	// Always enqueue the lightweight theme bridge script.
+	// Google's external API script is lazily injected upon first user interaction
+	// (touch, scroll, click, form focus) or on demand by ltdhGetRecaptchaToken().
+	// This prevents ~1,000ms CPU blocking during initial page load, boosting CWV.
+	wp_enqueue_script(
+		'ltdh-recaptcha-js',
+		get_template_directory_uri() . '/assets/js/recaptcha.js',
+		[],
+		$script_ver,
+		true
+	);
 
 	wp_localize_script( 'ltdh-recaptcha-js', 'ltdhRecaptchaConfig', [
 		'enabled' => $enabled,

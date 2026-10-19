@@ -11,6 +11,96 @@
 
 	window.ltdhRecaptchaWidgets = window.ltdhRecaptchaWidgets || {};
 
+	var scriptLoaded = false;
+	var scriptLoading = false;
+	var readyCallbacks = [];
+
+	/**
+	 * Dynamically load Google's api.js script on demand or user interaction.
+	 */
+	function loadGoogleScript(callback) {
+		if (typeof callback === 'function') {
+			readyCallbacks.push(callback);
+		}
+
+		if (scriptLoaded && typeof grecaptcha !== 'undefined') {
+			flushReadyCallbacks();
+			return;
+		}
+
+		if (scriptLoading) {
+			return;
+		}
+
+		var config = window.ltdhRecaptchaConfig;
+		if (!config || !config.enabled || !config.siteKey) {
+			flushReadyCallbacks();
+			return;
+		}
+
+		scriptLoading = true;
+		var version = config.version || 'v3';
+		var src = (version === 'v2')
+			? 'https://www.google.com/recaptcha/api.js?onload=ltdhOnRecaptchaLoad&render=explicit'
+			: 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(config.siteKey);
+
+		var script = document.createElement('script');
+		script.src = src;
+		script.async = true;
+		script.defer = true;
+		script.setAttribute('fetchpriority', 'low');
+
+		script.onload = function () {
+			scriptLoaded = true;
+			scriptLoading = false;
+			if (typeof grecaptcha !== 'undefined' && grecaptcha.ready) {
+				grecaptcha.ready(function () {
+					flushReadyCallbacks();
+				});
+			} else {
+				flushReadyCallbacks();
+			}
+		};
+
+		script.onerror = function () {
+			scriptLoading = false;
+			console.warn('reCAPTCHA script failed to load.');
+			flushReadyCallbacks();
+		};
+
+		document.head.appendChild(script);
+	}
+
+	function flushReadyCallbacks() {
+		while (readyCallbacks.length > 0) {
+			var cb = readyCallbacks.shift();
+			try { cb(); } catch (err) { console.error('reCAPTCHA callback error:', err); }
+		}
+	}
+
+	// Trigger lazy script loading on first user interaction or input focus
+	var interactionEvents = ['touchstart', 'pointerdown', 'keydown', 'scroll'];
+	function onUserInteraction() {
+		interactionEvents.forEach(function (ev) {
+			window.removeEventListener(ev, onUserInteraction, { passive: true });
+		});
+		document.removeEventListener('focusin', onFormFocus);
+		loadGoogleScript();
+	}
+
+	function onFormFocus(e) {
+		if (e.target && e.target.matches && e.target.matches('input, textarea, select')) {
+			onUserInteraction();
+		}
+	}
+
+	if (window.ltdhRecaptchaConfig && window.ltdhRecaptchaConfig.enabled && window.ltdhRecaptchaConfig.siteKey) {
+		interactionEvents.forEach(function (ev) {
+			window.addEventListener(ev, onUserInteraction, { passive: true, once: true });
+		});
+		document.addEventListener('focusin', onFormFocus, { passive: true, once: true });
+	}
+
 	/**
 	 * Callback triggered when Google reCAPTCHA v2 script finishes loading with render=explicit.
 	 */
@@ -54,45 +144,62 @@
 
 			var version = window.ltdhRecaptchaConfig.version || 'v3';
 
-			// --- v2 Checkbox Handling ---
-			if (version === 'v2') {
-				if (typeof grecaptcha === 'undefined') {
+			function executeVerification() {
+				// --- v2 Checkbox Handling ---
+				if (version === 'v2') {
+					if (typeof grecaptcha === 'undefined') {
+						resolve('');
+						return;
+					}
+
+					var widgetEl = formEl ? formEl.querySelector('.ltdh-recaptcha-v2') : document.querySelector('.ltdh-recaptcha-v2');
+					var widgetId = widgetEl ? widgetEl.dataset.widgetId : undefined;
+					var response = (typeof widgetId !== 'undefined') ? grecaptcha.getResponse(widgetId) : grecaptcha.getResponse();
+
+					if (!response) {
+						reject(new Error('Vui lòng xác nhận ô "Tôi không phải là người máy".'));
+						return;
+					}
+
+					resolve(response);
+					return;
+				}
+
+				// --- v3 Invisible Handling ---
+				if (typeof grecaptcha === 'undefined' || !grecaptcha.execute) {
+					console.warn('Google reCAPTCHA v3 script not loaded or blocked.');
 					resolve('');
 					return;
 				}
 
-				var widgetEl = formEl ? formEl.querySelector('.ltdh-recaptcha-v2') : document.querySelector('.ltdh-recaptcha-v2');
-				var widgetId = widgetEl ? widgetEl.dataset.widgetId : undefined;
-				var response = (typeof widgetId !== 'undefined') ? grecaptcha.getResponse(widgetId) : grecaptcha.getResponse();
-
-				if (!response) {
-					reject(new Error('Vui lòng xác nhận ô "Tôi không phải là người máy".'));
-					return;
-				}
-
-				resolve(response);
-				return;
-			}
-
-			// --- v3 Invisible Handling ---
-			if (typeof grecaptcha === 'undefined') {
-				console.warn('Google reCAPTCHA v3 script not loaded or blocked.');
-				resolve('');
-				return;
-			}
-
-			grecaptcha.ready(function () {
-				grecaptcha.execute(window.ltdhRecaptchaConfig.siteKey, {
-					action: action || 'submit'
-				})
-				.then(function (token) {
-					resolve(token || '');
-				})
-				.catch(function (err) {
-					console.warn('reCAPTCHA v3 execution failed:', err);
-					resolve('');
+				grecaptcha.ready(function () {
+					grecaptcha.execute(window.ltdhRecaptchaConfig.siteKey, {
+						action: action || 'submit'
+					})
+					.then(function (token) {
+						resolve(token || '');
+					})
+					.catch(function (err) {
+						console.warn('reCAPTCHA v3 execution failed:', err);
+						resolve('');
+					});
 				});
-			});
+			}
+
+			// Ensure script is loaded before execution
+			if (typeof grecaptcha === 'undefined') {
+				var loadTimeout = setTimeout(function () {
+					console.warn('reCAPTCHA timed out waiting for script, continuing without blocking.');
+					resolve('');
+				}, 3500);
+
+				loadGoogleScript(function () {
+					clearTimeout(loadTimeout);
+					executeVerification();
+				});
+			} else {
+				executeVerification();
+			}
 		});
 	};
 

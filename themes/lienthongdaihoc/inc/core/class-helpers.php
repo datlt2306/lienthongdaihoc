@@ -1337,10 +1337,10 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
  * Automatically resolve optimized image URL (e.g. serving optimized WebP replacements from assets/images/).
  *
  * @param string $url       Original image URL.
- * @param bool   $is_mobile Whether mobile variant is requested.
+ * @param string|bool $variant Variant name ('mobile', '1400w') or bool for mobile.
  * @return string
  */
-function ltdh_get_optimized_image_url( string $url, bool $is_mobile = false ): string {
+function ltdh_get_optimized_image_url( string $url, $variant = false ): string {
 	if ( empty( $url ) ) {
 		return '';
 	}
@@ -1352,19 +1352,39 @@ function ltdh_get_optimized_image_url( string $url, bool $is_mobile = false ): s
 
 	$filename         = basename( $parsed_path );
 	$name_without_ext = pathinfo( $filename, PATHINFO_FILENAME );
+	$ext              = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
 
-	// Check if theme has an optimized WebP replacement in assets/images/
-	$suffix     = $is_mobile ? '-mobile.webp' : '.webp';
-	$theme_file = get_template_directory() . '/assets/images/' . $name_without_ext . $suffix;
-	if ( file_exists( $theme_file ) ) {
-		return get_template_directory_uri() . '/assets/images/' . $name_without_ext . $suffix;
+	$is_mobile = ( true === $variant || 'mobile' === $variant );
+	$is_1400w  = ( '1400w' === $variant );
+
+	$theme_dir = get_template_directory();
+	$theme_uri = get_template_directory_uri();
+
+	// 1. Check for specific variant in theme assets/images/
+	if ( $is_1400w && file_exists( $theme_dir . '/assets/images/' . $name_without_ext . '-1400w.webp' ) ) {
+		return $theme_uri . '/assets/images/' . $name_without_ext . '-1400w.webp';
 	}
 
-	// Also check standard webp as fallback for mobile if -mobile.webp doesn't exist
-	if ( $is_mobile ) {
-		$theme_desktop_file = get_template_directory() . '/assets/images/' . $name_without_ext . '.webp';
-		if ( file_exists( $theme_desktop_file ) ) {
-			return get_template_directory_uri() . '/assets/images/' . $name_without_ext . '.webp';
+	if ( $is_mobile && file_exists( $theme_dir . '/assets/images/' . $name_without_ext . '-mobile.webp' ) ) {
+		return $theme_uri . '/assets/images/' . $name_without_ext . '-mobile.webp';
+	}
+
+	// 2. Check for standard .webp in theme assets/images/
+	if ( file_exists( $theme_dir . '/assets/images/' . $name_without_ext . '.webp' ) ) {
+		return $theme_uri . '/assets/images/' . $name_without_ext . '.webp';
+	}
+
+	// 3. If image is in wp-content/uploads/, check for sibling .webp
+	if ( in_array( $ext, [ 'jpg', 'jpeg', 'png' ], true ) && strpos( $parsed_path, '/wp-content/uploads/' ) !== false ) {
+		$upload_dir = wp_upload_dir();
+		$rel_path   = ltrim( strstr( $parsed_path, '/wp-content/uploads/' ), '/' );
+		$rel_path   = preg_replace( '#^wp-content/uploads/#', '', $rel_path );
+		$dir_part   = dirname( $rel_path );
+		$webp_rel   = ( '.' === $dir_part ? '' : $dir_part . '/' ) . $name_without_ext . '.webp';
+		$webp_file  = $upload_dir['basedir'] . '/' . $webp_rel;
+
+		if ( file_exists( $webp_file ) ) {
+			return $upload_dir['baseurl'] . '/' . $webp_rel;
 		}
 	}
 

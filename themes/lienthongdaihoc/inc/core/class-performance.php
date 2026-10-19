@@ -100,10 +100,30 @@ class LTDH_Performance {
 		if ( is_front_page() ) {
 			$hero_slides = function_exists( 'get_field' ) ? get_field( 'hero_slides', 'options' ) : [];
 			if ( ! empty( $hero_slides[0]['image'] ) ) {
-				$lcp_image_url = $hero_slides[0]['image'];
+				$lcp_raw = $hero_slides[0]['image'];
 			} else {
-				$lcp_image_url = ltdh_get_fallback_image( 'hero' );
+				$lcp_raw = ltdh_get_fallback_image( 'hero' );
 			}
+
+			$lcp_desktop = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $lcp_raw ) : $lcp_raw;
+			$lcp_1400    = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $lcp_raw, '1400w' ) : '';
+			$lcp_mobile  = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $lcp_raw, 'mobile' ) : '';
+
+			if ( ! empty( $lcp_desktop ) ) {
+				$srcset_entries = [];
+				if ( ! empty( $lcp_mobile ) && $lcp_mobile !== $lcp_desktop ) {
+					$srcset_entries[] = esc_url( $lcp_mobile ) . ' 768w';
+				}
+				if ( ! empty( $lcp_1400 ) && $lcp_1400 !== $lcp_desktop ) {
+					$srcset_entries[] = esc_url( $lcp_1400 ) . ' 1400w';
+				}
+				$srcset_entries[] = esc_url( $lcp_desktop ) . ' 1942w';
+				$srcset_str = implode( ', ', $srcset_entries );
+
+				$fallback_href = ! empty( $lcp_1400 ) ? $lcp_1400 : $lcp_desktop;
+				echo '<link rel="preload" as="image" href="' . esc_url( $fallback_href ) . '" imagesrcset="' . $srcset_str . '" imagesizes="(max-width: 768px) 100vw, (max-width: 1440px) 1335px, 1942px" type="image/webp" fetchpriority="high">' . "\n";
+			}
+			return;
 		} elseif ( is_singular( 'program' ) ) {
 			$school_id = get_field( 'school_relationship' );
 			if ( is_array( $school_id ) && ! empty( $school_id ) ) {
@@ -171,7 +191,9 @@ class LTDH_Performance {
 			'swv',
 		];
 
-		if ( in_array( $handle, $defer_handles, true ) ) {
+		$is_defer = in_array( $handle, $defer_handles, true ) || ( false !== strpos( $handle, 'googlesitekit' ) );
+
+		if ( $is_defer ) {
 			if ( 'google-recaptcha-api' === $handle ) {
 				// Google reCAPTCHA v3 requires both defer & async for non-blocking execution
 				$tag = preg_replace_callback( '/<script\b(?=[^>]*\ssrc=)([^>]*)>/i', function( $matches ) {
@@ -271,6 +293,7 @@ class LTDH_Performance {
 			wp_dequeue_style( 'contact-form-7-rtl' );
 			wp_dequeue_script( 'contact-form-7' );
 			wp_dequeue_script( 'swv' );
+			wp_dequeue_script( 'googlesitekit-events-provider-contact-form-7' );
 		}
 	}
 

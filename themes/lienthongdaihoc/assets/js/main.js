@@ -111,7 +111,7 @@ function ltdhInitTheme() {
         }
 
         const heroSwiperEl = document.querySelector('.hero-swiper');
-        if (heroSwiperEl) {
+        if (heroSwiperEl && !heroSwiperEl.classList.contains('swiper-initialized')) {
             new Swiper('.hero-swiper', {
                 loop: true,
                 autoplay: {
@@ -131,69 +131,91 @@ function ltdhInitTheme() {
             });
         }
 
-        const schoolSwiperEl = document.querySelector('.school-partner-swiper');
-        if (schoolSwiperEl) {
-            new Swiper('.school-partner-swiper', {
-                slidesPerView: 1.25,
-                spaceBetween: 16,
-                rewind: true,
-                speed: 600,
-                watchSlidesProgress: true,
-                navigation: {
-                    nextEl: '.school-slider-next',
-                    prevEl: '.school-slider-prev',
-                },
-                breakpoints: {
-                    640: {
-                        slidesPerView: 2.2,
-                        spaceBetween: 20,
+        const initBelowFoldSwipers = () => {
+            const schoolSwiperEl = document.querySelector('.school-partner-swiper');
+            if (schoolSwiperEl && !schoolSwiperEl.classList.contains('swiper-initialized')) {
+                new Swiper('.school-partner-swiper', {
+                    slidesPerView: 1.25,
+                    spaceBetween: 16,
+                    rewind: true,
+                    speed: 600,
+                    watchSlidesProgress: true,
+                    navigation: {
+                        nextEl: '.school-slider-next',
+                        prevEl: '.school-slider-prev',
                     },
-                    1024: {
-                        slidesPerView: 3.2,
-                        spaceBetween: 24,
+                    breakpoints: {
+                        640: {
+                            slidesPerView: 2.2,
+                            spaceBetween: 20,
+                        },
+                        1024: {
+                            slidesPerView: 3.2,
+                            spaceBetween: 24,
+                        },
+                        1280: {
+                            slidesPerView: 4,
+                            spaceBetween: 24,
+                        },
                     },
-                    1280: {
-                        slidesPerView: 4,
-                        spaceBetween: 24,
-                    },
-                },
-            });
-        }
+                });
+            }
 
-        const hotMajorsSwiperEl = document.querySelector('.hot-majors-swiper');
-        if (hotMajorsSwiperEl) {
-            new Swiper('.hot-majors-swiper', {
-                slidesPerView: 2.2,
-                spaceBetween: 12,
-                watchSlidesProgress: true,
-                grabCursor: true,
-                pagination: {
-                    el: '.hot-majors-pagination',
-                    clickable: true,
-                },
-                breakpoints: {
-                    480: {
-                        slidesPerView: 2.5,
-                        spaceBetween: 14,
+            const hotMajorsSwiperEl = document.querySelector('.hot-majors-swiper');
+            if (hotMajorsSwiperEl && !hotMajorsSwiperEl.classList.contains('swiper-initialized')) {
+                new Swiper('.hot-majors-swiper', {
+                    slidesPerView: 2.2,
+                    spaceBetween: 12,
+                    watchSlidesProgress: true,
+                    grabCursor: true,
+                    pagination: {
+                        el: '.hot-majors-pagination',
+                        clickable: true,
                     },
-                    640: {
-                        slidesPerView: 3.5,
-                        spaceBetween: 16,
+                    breakpoints: {
+                        480: {
+                            slidesPerView: 2.5,
+                            spaceBetween: 14,
+                        },
+                        640: {
+                            slidesPerView: 3.5,
+                            spaceBetween: 16,
+                        },
+                        1024: {
+                            slidesPerView: 5,
+                            spaceBetween: 16,
+                            allowTouchMove: false,
+                        },
                     },
-                    1024: {
-                        slidesPerView: 5,
-                        spaceBetween: 16,
-                        allowTouchMove: false,
-                    },
-                },
-            });
+                });
+            }
+        };
+
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        obs.disconnect();
+                        initBelowFoldSwipers();
+                    }
+                });
+            }, { rootMargin: '300px 0px' });
+
+            const target = document.querySelector('.school-partner-swiper') || document.querySelector('.hot-majors-swiper');
+            if (target) {
+                observer.observe(target);
+            } else {
+                initBelowFoldSwipers();
+            }
+        } else {
+            setTimeout(initBelowFoldSwipers, 800);
         }
     };
 
     if ('requestIdleCallback' in window) {
-        requestIdleCallback(initSwipers, { timeout: 2000 });
+        requestIdleCallback(initSwipers, { timeout: 1500 });
     } else {
-        setTimeout(initSwipers, 300);
+        setTimeout(initSwipers, 200);
     }
 
     // ----------------------------------------------------
