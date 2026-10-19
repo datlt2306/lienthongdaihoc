@@ -323,6 +323,52 @@ ltdh_render_fallback_menu( 'mobile', 'nav-mobile-menu' );
 $fallback_mobile = ob_get_clean();
 test_assert( strpos( $fallback_mobile, 'mobile-submenu-toggle' ) !== false, 'Fallback mobile renders accordion toggle buttons' );
 
+// Test 6: Admin-managed Mode (When user saves children in wp-admin)
+echo "\nTEST 6: Admin-managed Mode in Dynamic Injection\n";
+$admin_saved_items = [
+	(object) [
+		'ID'               => 10,
+		'title'            => 'Chuyên ngành',
+		'url'              => home_url( '/nganh-hoc/' ),
+		'menu_item_parent' => 0,
+		'classes'          => [],
+	],
+	(object) [
+		'ID'               => 11,
+		'title'            => 'Khối ngành Kinh tế Đặc biệt',
+		'url'              => home_url( '/nhom-nganh/kinh-te/' ),
+		'menu_item_parent' => 10,
+		'classes'          => [],
+		'object'           => 'custom',
+		'object_id'        => 0,
+	],
+	(object) [
+		'ID'               => 12,
+		'title'            => 'Ngành Quản lý Doanh nghiệp',
+		'url'              => home_url( '/nganh-quan-ly/' ),
+		'menu_item_parent' => 11,
+		'classes'          => [],
+		'object'           => 'custom',
+		'object_id'        => 0,
+	],
+	(object) [
+		'ID'               => 13,
+		'title'            => 'Khám phá tất cả các ngành →',
+		'url'              => home_url( '/nganh-hoc/' ),
+		'menu_item_parent' => 10,
+		'classes'          => [],
+		'object'           => 'custom',
+		'object_id'        => 0,
+	],
+];
+
+$admin_res = ltdh_dynamic_menu_submenu_injection( $admin_saved_items, (object) [ 'theme_location' => 'primary-menu' ] );
+test_assert( count( $admin_res ) === 4, 'Admin-saved items are NOT wiped (exactly 4 items preserved)' );
+test_assert( in_array( 'menu-item-mega-menu', $admin_res[0]->classes, true ), 'Parent item 10 gets menu-item-mega-menu' );
+test_assert( in_array( 'menu-item-category', $admin_res[1]->classes, true ), 'Custom category 11 gets menu-item-category' );
+test_assert( in_array( 'menu-item-object-major', $admin_res[2]->classes, true ), 'Custom sub-major 12 gets menu-item-object-major' );
+test_assert( in_array( 'ltdh-view-all-link', $admin_res[3]->classes, true ), 'Custom CTA 13 gets ltdh-view-all-link' );
+
 echo "\n===================================================================\n";
 if ( $all_passed ) {
 	echo "ALL MEGA MENU TESTS PASSED!\n";

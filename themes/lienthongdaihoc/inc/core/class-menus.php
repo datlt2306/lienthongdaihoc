@@ -317,11 +317,98 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 			}
 		}
 
-		$is_major_menu = in_array( $title, [ 'chuyên ngành', 'ngành học', 'chuyên ngành học' ], true )
+		$is_top_level  = ( (int) ( $item->menu_item_parent ?? 0 ) === 0 );
+		$is_major_menu = $is_top_level && (
+			in_array( $title, [ 'chuyên ngành', 'ngành học', 'chuyên ngành học' ], true )
 			|| ( ! empty( $item->url ) && rtrim( (string) parse_url( $item->url, PHP_URL_PATH ), '/' ) === '/nganh-hoc' )
-			|| in_array( 'menu-item-mega-menu', (array) $item->classes, true );
+			|| in_array( 'menu-item-mega-menu', (array) $item->classes, true )
+			|| ( function_exists( 'get_post_meta' ) && get_post_meta( $item->ID, '_menu_item_is_mega_menu', true ) === '1' )
+		);
 
 		if ( $is_major_menu ) {
+			if ( ! in_array( 'menu-item-has-children', $item->classes, true ) ) {
+				$item->classes[] = 'menu-item-has-children';
+			}
+			if ( ! in_array( 'menu-item-mega-menu', $item->classes, true ) ) {
+				$item->classes[] = 'menu-item-mega-menu';
+			}
+
+			// Check if this menu item already has saved children directly in WordPress Menu
+			$has_saved_children = false;
+			foreach ( $sorted_menu_items as $chk ) {
+				if ( (int) $chk->menu_item_parent === (int) $item->ID ) {
+					$has_saved_children = true;
+					break;
+				}
+			}
+
+			if ( $has_saved_children ) {
+				// Admin-managed Mode: The user has arranged child items in Appearance -> Menus.
+				// Respect all saved items, enrich their classes, and DO NOT wipe them.
+				$saved_cat_ids = [];
+				foreach ( $sorted_menu_items as $chk_cat ) {
+					if ( (int) $chk_cat->menu_item_parent === (int) $item->ID ) {
+						$saved_cat_ids[] = (int) $chk_cat->ID;
+
+						$is_footer = ( function_exists( 'get_post_meta' ) && get_post_meta( $chk_cat->ID, '_menu_item_is_footer_bar', true ) === '1' )
+							|| stripos( $chk_cat->title, 'tất cả' ) !== false;
+
+						if ( $is_footer ) {
+							if ( ! in_array( 'ltdh-view-all-link', $chk_cat->classes, true ) ) {
+								$chk_cat->classes[] = 'ltdh-view-all-link';
+							}
+						} else {
+							if ( ! in_array( 'menu-item-category', $chk_cat->classes, true ) ) {
+								$chk_cat->classes[] = 'menu-item-category';
+							}
+							if ( ! in_array( 'menu-item-has-children', $chk_cat->classes, true ) ) {
+								$chk_cat->classes[] = 'menu-item-has-children';
+							}
+
+							$cat_slug = '';
+							if ( function_exists( 'get_post_meta' ) ) {
+								$cat_slug = get_post_meta( $chk_cat->ID, '_menu_item_mega_icon', true );
+							}
+							if ( empty( $cat_slug ) && $chk_cat->object === LTDH_TAX_MAJOR_CAT && ! empty( $chk_cat->object_id ) ) {
+								$term = function_exists( 'get_term' ) ? get_term( (int) $chk_cat->object_id, LTDH_TAX_MAJOR_CAT ) : null;
+								if ( $term && ! is_wp_error( $term ) ) {
+									$cat_slug = $term->slug;
+								}
+							}
+							if ( empty( $cat_slug ) ) {
+								$cat_slug = function_exists( 'sanitize_title' ) ? sanitize_title( $chk_cat->title ) : preg_replace( '/[^a-z0-9_-]/', '', strtolower( (string) $chk_cat->title ) );
+							}
+							if ( ! empty( $cat_slug ) ) {
+								$cat_class = 'menu-cat-' . sanitize_html_class( $cat_slug );
+								if ( ! in_array( $cat_class, $chk_cat->classes, true ) ) {
+									$chk_cat->classes[] = $cat_class;
+								}
+							}
+						}
+					}
+				}
+
+				// Grandchildren: Sub-majors inside each category column
+				foreach ( $sorted_menu_items as $chk_maj ) {
+					if ( in_array( (int) $chk_maj->menu_item_parent, $saved_cat_ids, true ) ) {
+						if ( ! in_array( 'menu-item-object-major', $chk_maj->classes, true ) ) {
+							$chk_maj->classes[] = 'menu-item-object-major';
+						}
+
+						$is_hot = ( function_exists( 'get_post_meta' ) && get_post_meta( $chk_maj->ID, '_menu_item_is_hot', true ) === '1' );
+						if ( ! $is_hot && $chk_maj->object === LTDH_CPT_MAJOR && ! empty( $chk_maj->object_id ) && function_exists( 'get_post_meta' ) ) {
+							$is_hot = ( get_post_meta( (int) $chk_maj->object_id, '_is_hot', true ) === '1' );
+						}
+						if ( $is_hot && ! in_array( 'is-hot-major', $chk_maj->classes, true ) ) {
+							$chk_maj->classes[] = 'is-hot-major';
+						}
+					}
+				}
+
+				continue;
+			}
+
+			// Dynamic Fallback Mode: When no children exist in WP Menu, generate dynamically from DB
 			$filtered_items = [];
 			foreach ($new_items as $ni) {
 				if ((int) $ni->menu_item_parent === (int) $item->ID) {
@@ -330,9 +417,6 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 				$filtered_items[] = $ni;
 			}
 			$new_items = $filtered_items;
-
-			$item->classes[] = 'menu-item-has-children';
-			$item->classes[] = 'menu-item-mega-menu';
 
 			$mega_data = ltdh_get_mega_menu_data();
 
@@ -754,13 +838,21 @@ function ltdh_mega_menu_nav_menu_start_el( $item_output, $item, $depth, $args ) 
 
 	if ( $is_desktop && in_array( 'menu-item-category', $classes, true ) ) {
 		$cat_slug = '';
-		foreach ( $classes as $c ) {
-			if ( strpos( $c, 'menu-cat-' ) === 0 ) {
-				$cat_slug = substr( $c, 9 );
-				break;
+		if ( function_exists( 'get_post_meta' ) ) {
+			$meta_icon = get_post_meta( $item->ID, '_menu_item_mega_icon', true );
+			if ( ! empty( $meta_icon ) ) {
+				$cat_slug = $meta_icon;
 			}
 		}
-		$icon  = ltdh_get_major_cat_icon( $cat_slug );
+		if ( empty( $cat_slug ) ) {
+			foreach ( $classes as $c ) {
+				if ( strpos( $c, 'menu-cat-' ) === 0 ) {
+					$cat_slug = substr( $c, 9 );
+					break;
+				}
+			}
+		}
+		$icon  = ( $cat_slug === 'none' ) ? '' : ltdh_get_major_cat_icon( $cat_slug );
 		$count = ltdh_get_major_count_by_cat( $cat_slug );
 
 		return '<a href="' . esc_url( $item->url ) . '" class="mega-cat-header-link">'
@@ -785,13 +877,14 @@ function ltdh_mega_menu_nav_menu_start_el( $item_output, $item, $depth, $args ) 
 	}
 
 	if ( $is_desktop && in_array( 'ltdh-view-all-link', $classes, true ) && $depth === 1 ) {
+		$cta_title = ! empty( $item->title ) ? $item->title : 'Xem tất cả ngành học';
 		return '<div class="mega-footer-bar">'
 			. '<div class="mega-footer-info">'
 			. '<span class="mega-footer-tag">Tuyển sinh liên thông</span>'
 			. '<span class="mega-footer-desc">Đầy đủ hệ: Chính quy, Từ xa &amp; Vừa học vừa làm</span>'
 			. '</div>'
 			. '<a href="' . esc_url( $item->url ) . '" class="mega-footer-btn">'
-			. '<span>Xem tất cả ngành học</span>'
+			. '<span>' . esc_html( $cta_title ) . '</span>'
 			. '<svg class="w-3.5 h-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>'
 			. '</a>'
 			. '</div>';
@@ -800,4 +893,373 @@ function ltdh_mega_menu_nav_menu_start_el( $item_output, $item, $depth, $args ) 
 	return $item_output;
 }
 add_filter( 'walker_nav_menu_start_el', 'ltdh_mega_menu_nav_menu_start_el', 9, 4 );
+
+// ----------------------------------------------------
+// 9. WordPress Admin Mega Menu Custom Fields & Tools
+// ----------------------------------------------------
+
+/**
+ * Ensure Major CPT and Major Cat taxonomy metaboxes are visible by default in Appearance -> Menus.
+ */
+if ( function_exists( 'add_filter' ) ) {
+	add_filter( 'default_hidden_meta_boxes', function( $hidden, $screen ) {
+		if ( $screen && $screen->id === 'nav-menus' ) {
+			$hidden = array_diff( (array) $hidden, [ 'add-post-type-major', 'add-major_cat' ] );
+		}
+		return $hidden;
+	}, 10, 2 );
+
+	add_filter( 'get_user_option_metaboxhidden_nav-menus', function( $result ) {
+		if ( is_array( $result ) ) {
+			$result = array_diff( $result, [ 'add-post-type-major', 'add-major_cat' ] );
+		}
+		return $result;
+	}, 10 );
+}
+
+/**
+ * Render custom fields inside each nav menu item card in Appearance -> Menus.
+ */
+function ltdh_menu_item_custom_fields( $item_id, $item, $depth, $args ) {
+	$is_mega_menu  = function_exists( 'get_post_meta' ) ? get_post_meta( $item_id, '_menu_item_is_mega_menu', true ) : '';
+	$is_hot        = function_exists( 'get_post_meta' ) ? get_post_meta( $item_id, '_menu_item_is_hot', true ) : '';
+	$is_cat_header = function_exists( 'get_post_meta' ) ? get_post_meta( $item_id, '_menu_item_is_cat_header', true ) : '';
+	$mega_icon     = function_exists( 'get_post_meta' ) ? get_post_meta( $item_id, '_menu_item_mega_icon', true ) : '';
+	$is_footer_bar = function_exists( 'get_post_meta' ) ? get_post_meta( $item_id, '_menu_item_is_footer_bar', true ) : '';
+
+	// Auto detect mega menu for /nganh-hoc/ or 'chuyên ngành' if unset
+	if ( '' === $is_mega_menu && 0 === (int) $depth ) {
+		$title = mb_strtolower( trim( $item->title ?? '' ), 'UTF-8' );
+		if ( in_array( $title, [ 'chuyên ngành', 'ngành học' ], true ) || false !== strpos( (string) ( $item->url ?? '' ), '/nganh-hoc' ) ) {
+			$is_mega_menu = '1';
+		}
+	}
+	?>
+	<div class="ltdh-mega-menu-fields" style="margin: 14px 0 6px; padding: 12px 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+		<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; font-weight: 700; color: #0f172a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
+			<span style="display:inline-block; width: 6px; height: 14px; background: #0284c7; border-radius: 2px;"></span>
+			Cấu hình Mega Menu Liên Thông
+		</div>
+
+		<p class="description description-wide" style="margin: 4px 0 8px;">
+			<label for="edit-menu-item-is-mega-menu-<?php echo esc_attr( $item_id ); ?>">
+				<input type="checkbox" id="edit-menu-item-is-mega-menu-<?php echo esc_attr( $item_id ); ?>" 
+				       name="menu_item_is_mega_menu[<?php echo esc_attr( $item_id ); ?>]" 
+				       value="1" <?php checked( $is_mega_menu, '1' ); ?> />
+				<strong style="color: #0369a1;">Kích hoạt Mega Menu đa cột</strong> 
+				<span class="description" style="display: block; color: #64748b; font-size: 11px; margin-left: 20px;">
+					(Bật cho menu cha như "Chuyên ngành", "Ngành học". Các menu con cấp 1 sẽ thành cột Nhóm ngành, cấp 2 thành Ngành con).
+				</span>
+			</label>
+		</p>
+
+		<p class="description description-wide" style="margin: 4px 0 8px;">
+			<label for="edit-menu-item-is-cat-header-<?php echo esc_attr( $item_id ); ?>">
+				<input type="checkbox" id="edit-menu-item-is-cat-header-<?php echo esc_attr( $item_id ); ?>" 
+				       name="menu_item_is_cat_header[<?php echo esc_attr( $item_id ); ?>]" 
+				       value="1" <?php checked( $is_cat_header, '1' ); ?> />
+				<strong>Tiêu đề cột nhóm ngành</strong>
+				<span class="description" style="display: block; color: #64748b; font-size: 11px; margin-left: 20px;">
+					(Đánh dấu menu này làm tiêu đề của một cột nhóm ngành bên trong Mega Menu).
+				</span>
+			</label>
+		</p>
+
+		<p class="description description-wide" style="margin: 4px 0 8px;">
+			<label for="edit-menu-item-mega-icon-<?php echo esc_attr( $item_id ); ?>" style="font-weight: 600; font-size: 12px; color: #334155;">
+				Biểu tượng Icon nhóm ngành:
+				<select id="edit-menu-item-mega-icon-<?php echo esc_attr( $item_id ); ?>" 
+				        name="menu_item_mega_icon[<?php echo esc_attr( $item_id ); ?>]" 
+				        style="display: block; width: 100%; margin-top: 4px; font-weight: normal;">
+					<option value="" <?php selected( $mega_icon, '' ); ?>>— Tự động theo danh mục (Mặc định) —</option>
+					<option value="kinh-te-quan-ly" <?php selected( $mega_icon, 'kinh-te-quan-ly' ); ?>>📊 Kinh tế & Quản lý</option>
+					<option value="ky-thuat-cong-nghe" <?php selected( $mega_icon, 'ky-thuat-cong-nghe' ); ?>>💻 Kỹ thuật & Công nghệ</option>
+					<option value="xa-hoi-dich-vu" <?php selected( $mega_icon, 'xa-hoi-dich-vu' ); ?>>📦 Xã hội & Dịch vụ</option>
+					<option value="ngon-ngu-nhan-van" <?php selected( $mega_icon, 'ngon-ngu-nhan-van' ); ?>>🌍 Ngôn ngữ & Nhân văn</option>
+					<option value="nong-lam-moi-truong" <?php selected( $mega_icon, 'nong-lam-moi-truong' ); ?>>🌿 Nông lâm & Môi trường</option>
+					<option value="none" <?php selected( $mega_icon, 'none' ); ?>>🚫 Không hiển thị icon</option>
+				</select>
+			</label>
+		</p>
+
+		<p class="description description-wide" style="margin: 4px 0 8px;">
+			<label for="edit-menu-item-is-hot-<?php echo esc_attr( $item_id ); ?>">
+				<input type="checkbox" id="edit-menu-item-is-hot-<?php echo esc_attr( $item_id ); ?>" 
+				       name="menu_item_is_hot[<?php echo esc_attr( $item_id ); ?>]" 
+				       value="1" <?php checked( $is_hot, '1' ); ?> />
+				<span style="display: inline-block; padding: 1px 6px; background: #ea580c; color: #fff; font-size: 10px; font-weight: 800; border-radius: 4px; vertical-align: middle;">HOT</span>
+				<strong>Đánh dấu ngành nổi bật</strong>
+			</label>
+		</p>
+
+		<p class="description description-wide" style="margin: 4px 0 0;">
+			<label for="edit-menu-item-is-footer-bar-<?php echo esc_attr( $item_id ); ?>">
+				<input type="checkbox" id="edit-menu-item-is-footer-bar-<?php echo esc_attr( $item_id ); ?>" 
+				       name="menu_item_is_footer_bar[<?php echo esc_attr( $item_id ); ?>]" 
+				       value="1" <?php checked( $is_footer_bar, '1' ); ?> />
+				<strong>Thanh Footer Bar chân Mega Menu (Full-width CTA)</strong>
+				<span class="description" style="display: block; color: #64748b; font-size: 11px; margin-left: 20px;">
+					(Ví dụ link "Xem tất cả ngành học →" sẽ trải dài toàn bộ đáy bảng Mega Menu).
+				</span>
+			</label>
+		</p>
+	</div>
+	<?php
+}
+if ( function_exists( 'add_action' ) ) {
+	add_action( 'wp_nav_menu_item_custom_fields', 'ltdh_menu_item_custom_fields', 10, 4 );
+}
+
+/**
+ * Save custom fields when nav menu item is updated.
+ */
+function ltdh_save_menu_item_custom_fields( $menu_id, $menu_item_db_id, $args ) {
+	if ( ! function_exists( 'update_post_meta' ) ) {
+		return;
+	}
+
+	if ( isset( $_POST['menu_item_is_mega_menu'][ $menu_item_db_id ] ) ) {
+		update_post_meta( $menu_item_db_id, '_menu_item_is_mega_menu', '1' );
+	} else {
+		delete_post_meta( $menu_item_db_id, '_menu_item_is_mega_menu' );
+	}
+
+	if ( isset( $_POST['menu_item_is_cat_header'][ $menu_item_db_id ] ) ) {
+		update_post_meta( $menu_item_db_id, '_menu_item_is_cat_header', '1' );
+	} else {
+		delete_post_meta( $menu_item_db_id, '_menu_item_is_cat_header' );
+	}
+
+	if ( isset( $_POST['menu_item_mega_icon'][ $menu_item_db_id ] ) ) {
+		$icon_val = sanitize_text_field( $_POST['menu_item_mega_icon'][ $menu_item_db_id ] );
+		update_post_meta( $menu_item_db_id, '_menu_item_mega_icon', $icon_val );
+	}
+
+	if ( isset( $_POST['menu_item_is_hot'][ $menu_item_db_id ] ) ) {
+		update_post_meta( $menu_item_db_id, '_menu_item_is_hot', '1' );
+	} else {
+		delete_post_meta( $menu_item_db_id, '_menu_item_is_hot' );
+	}
+
+	if ( isset( $_POST['menu_item_is_footer_bar'][ $menu_item_db_id ] ) ) {
+		update_post_meta( $menu_item_db_id, '_menu_item_is_footer_bar', '1' );
+	} else {
+		delete_post_meta( $menu_item_db_id, '_menu_item_is_footer_bar' );
+	}
+
+	if ( function_exists( 'ltdh_clear_mega_menu_cache' ) ) {
+		ltdh_clear_mega_menu_cache();
+	}
+}
+if ( function_exists( 'add_action' ) ) {
+	add_action( 'wp_update_nav_menu_item', 'ltdh_save_menu_item_custom_fields', 10, 3 );
+}
+
+/**
+ * Register a helper metabox in Appearance -> Menus for one-click Mega Menu sync.
+ */
+function ltdh_register_mega_menu_nav_metabox() {
+	if ( function_exists( 'add_meta_box' ) ) {
+		add_meta_box(
+			'ltdh_mega_menu_sync_box',
+			'⚡ Đồng bộ Mega Menu Chuyên Ngành',
+			'ltdh_render_mega_menu_nav_metabox',
+			'nav-menus',
+			'side',
+			'high'
+		);
+	}
+}
+if ( function_exists( 'add_action' ) ) {
+	add_action( 'admin_init', 'ltdh_register_mega_menu_nav_metabox' );
+}
+
+function ltdh_render_mega_menu_nav_metabox() {
+	?>
+	<div style="padding: 6px 0;">
+		<p style="font-size: 13px; color: #475569; margin: 0 0 10px; line-height: 1.5;">
+			Bạn có thể trực tiếp kéo thả, sắp xếp hoặc đổi tên các <strong>Nhóm ngành</strong> và <strong>Ngành học con</strong> ngay trong menu.
+		</p>
+		<p style="font-size: 12px; color: #64748b; margin: 0 0 12px; line-height: 1.4;">
+			Nhấn nút bên dưới để <strong>tự động nạp toàn bộ cấu trúc Nhóm ngành &amp; Ngành nhỏ</strong> hiện có trong cơ sở dữ liệu vào menu:
+		</p>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<?php wp_nonce_field( 'ltdh_sync_mega_menu', 'ltdh_sync_nonce' ); ?>
+			<input type="hidden" name="action" value="ltdh_sync_mega_menu_action">
+			<input type="hidden" name="nav_menu_id" value="<?php echo esc_attr( isset( $_GET['menu'] ) ? (int) $_GET['menu'] : 0 ); ?>">
+			<button type="submit" class="button button-primary" style="width: 100%; height: auto; padding: 9px 12px; font-weight: 700; text-align: center; font-size: 13px;">
+				🔄 Nạp tự động vào Menu
+			</button>
+		</form>
+	</div>
+	<?php
+}
+
+/**
+ * Handle admin-post action for one-click Mega Menu sync.
+ */
+function ltdh_handle_sync_mega_menu_action() {
+	if ( ! current_user_can( 'edit_theme_options' ) || ! check_admin_referer( 'ltdh_sync_mega_menu', 'ltdh_sync_nonce' ) ) {
+		wp_die( 'Unauthorized' );
+	}
+
+	$menu_id = isset( $_POST['nav_menu_id'] ) ? (int) $_POST['nav_menu_id'] : 0;
+	if ( ! $menu_id ) {
+		$locations = get_nav_menu_locations();
+		$menu_id   = $locations['primary-menu'] ?? 0;
+	}
+
+	if ( $menu_id ) {
+		ltdh_sync_mega_menu_items_to_nav_menu( $menu_id );
+	}
+
+	wp_safe_redirect( add_query_arg( [ 'menu' => $menu_id, 'ltdh_synced' => '1' ], admin_url( 'nav-menus.php' ) ) );
+	exit;
+}
+if ( function_exists( 'add_action' ) ) {
+	add_action( 'admin_post_ltdh_sync_mega_menu_action', 'ltdh_handle_sync_mega_menu_action' );
+}
+
+/**
+ * Admin notice after sync.
+ */
+function ltdh_mega_menu_admin_notice() {
+	if ( isset( $_GET['ltdh_synced'] ) && '1' === $_GET['ltdh_synced'] ) {
+		?>
+		<div class="notice notice-success is-dismissible">
+			<p><strong>Thành công!</strong> Toàn bộ cấu trúc Nhóm ngành và Chuyên ngành đã được nạp vào menu. Bạn có thể kéo thả để sắp xếp lại theo ý muốn và nhấn <strong>Lưu menu</strong>.</p>
+		</div>
+		<?php
+	}
+}
+if ( function_exists( 'add_action' ) ) {
+	add_action( 'admin_notices', 'ltdh_mega_menu_admin_notice' );
+}
+
+/**
+ * Populate or synchronize categories & majors into a specified WP nav menu under the Mega Menu parent.
+ */
+function ltdh_sync_mega_menu_items_to_nav_menu( int $menu_id ): bool {
+	if ( ! function_exists( 'wp_get_nav_menu_items' ) || ! function_exists( 'wp_update_nav_menu_item' ) ) {
+		return false;
+	}
+
+	$items = wp_get_nav_menu_items( $menu_id );
+	if ( ! $items ) {
+		return false;
+	}
+
+	$parent_item = null;
+	foreach ( $items as $it ) {
+		if ( (int) $it->menu_item_parent === 0 ) {
+			$title = mb_strtolower( trim( $it->title ), 'UTF-8' );
+			if ( in_array( $title, [ 'chuyên ngành', 'ngành học', 'chuyên ngành học' ], true )
+				|| ( ! empty( $it->url ) && false !== strpos( $it->url, '/nganh-hoc' ) )
+				|| ( function_exists( 'get_post_meta' ) && get_post_meta( $it->ID, '_menu_item_is_mega_menu', true ) === '1' )
+			) {
+				$parent_item = $it;
+				break;
+			}
+		}
+	}
+
+	if ( ! $parent_item ) {
+		return false;
+	}
+
+	// Remove existing children of this parent item to prevent duplication on re-sync
+	foreach ( $items as $it ) {
+		if ( (int) $it->menu_item_parent === (int) $parent_item->ID ) {
+			foreach ( $items as $sub_it ) {
+				if ( (int) $sub_it->menu_item_parent === (int) $it->ID ) {
+					wp_delete_post( $sub_it->ID, true );
+				}
+			}
+			wp_delete_post( $it->ID, true );
+		}
+	}
+
+	// Set parent item meta
+	update_post_meta( $parent_item->ID, '_menu_item_is_mega_menu', '1' );
+
+	$mega_data = ltdh_get_mega_menu_data();
+	if ( empty( $mega_data ) ) {
+		return false;
+	}
+
+	$order = (int) $parent_item->menu_order;
+
+	foreach ( $mega_data as $cat_slug => $cat ) {
+		$order++;
+		$cat_args = [
+			'menu-item-title'     => $cat['name'],
+			'menu-item-parent-id' => $parent_item->ID,
+			'menu-item-position'  => $order,
+			'menu-item-status'    => 'publish',
+		];
+
+		if ( ! empty( $cat['term_id'] ) ) {
+			$cat_args['menu-item-type']      = 'taxonomy';
+			$cat_args['menu-item-object']    = LTDH_TAX_MAJOR_CAT;
+			$cat_args['menu-item-object-id'] = (int) $cat['term_id'];
+		} else {
+			$cat_args['menu-item-type'] = 'custom';
+			$cat_args['menu-item-url']  = $cat['url'];
+		}
+
+		$cat_item_id = wp_update_nav_menu_item( $menu_id, 0, $cat_args );
+		if ( ! is_wp_error( $cat_item_id ) && $cat_item_id ) {
+			update_post_meta( $cat_item_id, '_menu_item_is_cat_header', '1' );
+			update_post_meta( $cat_item_id, '_menu_item_mega_icon', $cat_slug );
+
+			if ( ! empty( $cat['majors'] ) ) {
+				foreach ( $cat['majors'] as $maj ) {
+					$order++;
+					$maj_args = [
+						'menu-item-title'     => $maj['title'],
+						'menu-item-parent-id' => $cat_item_id,
+						'menu-item-position'  => $order,
+						'menu-item-type'      => 'post_type',
+						'menu-item-object'    => LTDH_CPT_MAJOR,
+						'menu-item-object-id' => (int) $maj['ID'],
+						'menu-item-status'    => 'publish',
+					];
+					$maj_item_id = wp_update_nav_menu_item( $menu_id, 0, $maj_args );
+					if ( ! is_wp_error( $maj_item_id ) && $maj_item_id ) {
+						if ( ! empty( $maj['is_hot'] ) ) {
+							update_post_meta( $maj_item_id, '_menu_item_is_hot', '1' );
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Add Footer CTA
+	$order++;
+	$footer_args = [
+		'menu-item-title'     => 'Xem tất cả ngành học →',
+		'menu-item-url'       => home_url( '/nganh-hoc/' ),
+		'menu-item-type'      => 'custom',
+		'menu-item-parent-id' => $parent_item->ID,
+		'menu-item-position'  => $order,
+		'menu-item-status'    => 'publish',
+	];
+	$footer_item_id = wp_update_nav_menu_item( $menu_id, 0, $footer_args );
+	if ( ! is_wp_error( $footer_item_id ) && $footer_item_id ) {
+		update_post_meta( $footer_item_id, '_menu_item_is_footer_bar', '1' );
+	}
+
+	// Renumber remaining items that were after parent_item so the menu order is cleanly preserved
+	foreach ( $items as $it ) {
+		if ( (int) $it->menu_item_parent === 0 && (int) $it->ID !== (int) $parent_item->ID && (int) $it->menu_order >= (int) $parent_item->menu_order ) {
+			$order++;
+			wp_update_post( [ 'ID' => $it->ID, 'menu_order' => $order ] );
+		}
+	}
+
+	ltdh_clear_mega_menu_cache();
+	return true;
+}
+
 
