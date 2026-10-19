@@ -1262,4 +1262,30 @@ div#ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle .arrow-unsor
 	}
 }
 
+/* Overview Content Typography Enhancement for Single Major and Single Program */
+#major-intro-content.prose,
+#major-intro-content.prose p,
+#major-intro-content.prose li,
+#tong-quan .prose,
+#tong-quan .prose p,
+#tong-quan .prose li {
+	font-size: 1rem;
+	line-height: 1.75;
+}
 
+#major-intro-content.prose p,
+#tong-quan .prose p {
+	margin-bottom: 1.25em;
+}
+
+@media (min-width: 768px) {
+	#major-intro-content.prose,
+	#major-intro-content.prose p,
+	#major-intro-content.prose li,
+	#tong-quan .prose,
+	#tong-quan .prose p,
+	#tong-quan .prose li {
+		font-size: 1.125rem;
+		line-height: 1.8;
+	}
+}

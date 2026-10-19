@@ -223,7 +223,7 @@ if ( ! empty( $faqs ) ) {
 
 				<!-- SECTION 2: PROGRAM OVERVIEW -->
 				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
-					<h2 class="text-lg md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Tổng quan chương trình</h2>
+					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Tổng quan chương trình</h2>
 
 
 					<?php
@@ -247,7 +247,7 @@ if ( ! empty( $faqs ) ) {
 					</div>
 					<?php if ( $benefits ) : ?>
 						<div class="mt-6 bg-teal-50/40 p-4 sm:p-5 rounded-2xl mb-6 border border-teal-100/60">
-							<h3 class="text-teal-900 font-bold text-base md:text-lg mb-2.5">Quyền lợi nổi bật</h3>
+							<h3 class="text-teal-900 font-bold text-lg md:text-xl mb-2.5">Quyền lợi nổi bật</h3>
 							<div class="prose prose-slate prose-base md:prose-lg max-w-none text-slate-800 text-base md:text-lg leading-relaxed">
 								<?php echo wp_kses_post( $benefits ); ?>
 							</div>
