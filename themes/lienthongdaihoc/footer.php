@@ -217,42 +217,6 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 </style>
 
 
-
-<!--Start of Tawk.to Script (Tối ưu PageSpeed: Lazy Load theo tương tác người dùng)-->
-<script type="text/javascript" data-no-optimize="1">
-var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
-(function(){
-	var loaded = false;
-	function loadTawk() {
-		if (loaded) return;
-		loaded = true;
-		var events = ['scroll', 'mousemove', 'touchstart', 'click'];
-		events.forEach(function(e) {
-			window.removeEventListener(e, loadTawk, { passive: true });
-		});
-		var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
-		s1.async = true;
-		s1.src = 'https://embed.tawk.to/6ad5e04f47604b34c4a30b76/1k59n8ecu';
-		s1.charset = 'UTF-8';
-		s1.setAttribute('crossorigin', '*');
-		s0.parentNode.insertBefore(s1, s0);
-	}
-	// Kích hoạt ngay khi có tương tác đầu tiên của người dùng
-	['scroll', 'mousemove', 'touchstart', 'click'].forEach(function(e) {
-		window.addEventListener(e, loadTawk, { once: true, passive: true });
-	});
-	// Tự động nạp sau 3.5s nếu người dùng chưa tương tác (không ảnh hưởng điểm Lighthouse)
-	if ('requestIdleCallback' in window) {
-		requestIdleCallback(function() {
-			setTimeout(loadTawk, 3500);
-		});
-	} else {
-		setTimeout(loadTawk, 3500);
-	}
-})();
-</script>
-<!--End of Tawk.to Script-->
-
 <?php wp_footer(); ?>
 </body>
 </html>
