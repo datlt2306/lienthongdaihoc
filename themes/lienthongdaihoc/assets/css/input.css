@@ -157,7 +157,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 /* Mega menu dropdown container */
 .nav-primary-menu li.menu-item-mega-menu > ul.sub-menu {
     position: absolute;
-    top: 95%;
+    top: 85%;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
     width: 880px;
