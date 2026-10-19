@@ -842,11 +842,6 @@ if ( ! empty( $faqs ) ) {
 								
 								<span class="text-[10px] sm:text-xs text-slate-500 font-medium block mt-0.5">Lộ trình chuẩn</span>
 							</div>
-
-							<div class="mt-2.5 pt-2 border-t border-amber-100/60 flex flex-wrap items-center justify-between text-[10px] sm:text-xs gap-1 text-slate-500">
-								<span>Hình thức:</span>
-								<span class="font-bold text-slate-800">Trực tuyến / Từ xa</span>
-							</div>
 						</div>
 					</div>
 
