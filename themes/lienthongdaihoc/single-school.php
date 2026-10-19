@@ -558,16 +558,20 @@ if ( ! empty( $school_faqs ) ) {
 							}
 
 							$status = get_post_meta( $prog_id, LTDH_META_ADMISSION_STATUS, true ) ?: 'tuyen-sinh';
-							$clean_title = get_the_title();
+							$school_code = (string) ( get_field( 'school_code', $school_id ) ?: get_post_meta( $school_id, 'school_code', true ) );
+							$school_short_name = (string) ( get_field( 'school_short_name', $school_id ) ?: ( get_field( 'badge', $school_id ) ?: '' ) );
+							$clean_title = (string) get_the_title();
 							if ( $school_title ) {
-								$clean_title = str_replace( ' - ' . $school_title, '', $clean_title );
-								$clean_title = str_replace( ' – ' . $school_title, '', $clean_title );
+								$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_title, '/' ) . '$/iu', '', $clean_title );
 							}
-							$school_short_name = get_field( 'school_short_name', $school_id ) ?: ( get_field( 'badge', $school_id ) ?: '' );
 							if ( $school_short_name ) {
-								$clean_title = str_replace( ' - ' . $school_short_name, '', $clean_title );
-								$clean_title = str_replace( ' – ' . $school_short_name, '', $clean_title );
+								$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_short_name, '/' ) . '$/iu', '', $clean_title );
 							}
+							if ( $school_code ) {
+								$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_title );
+							}
+							// Strip common school suffix abbreviations like " - ĐH GTVT", " - TMU", " - ĐH...", " - Trường...", " - Học viện..."
+							$clean_title = preg_replace( '/\s*[-–—]\s*(?:ĐH|Trường ĐH|Đại học|Viện ĐH|Học viện|[A-Z0-9]{2,}).*$/iu', '', $clean_title );
 
 							$types = wp_get_post_terms( $prog_id, 'training_type' );
 							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
@@ -587,11 +591,18 @@ if ( ! empty( $school_faqs ) ) {
 								$spec_title = get_field( 'chuyen_nganh', $prog_id ) ?: get_post_meta( $prog_id, 'chuyen_nganh', true );
 							}
 							if ( empty( $spec_title ) ) {
-								$candidate = trim( preg_replace( '/^(?:cử\s+nhân|kỹ\s+sư|liên\s+thông)\s+/iu', '', $clean_title ) );
-								$candidate = trim( preg_replace( '/\s*\([^)]*\)/iu', '', $candidate ) );
-								$candidate = trim( preg_replace( '/^ngành\s+/iu', '', $candidate ) );
-								if ( ! empty( $candidate ) && mb_strtolower( $candidate, 'UTF-8' ) !== mb_strtolower( $clean_major_name, 'UTF-8' ) ) {
-									$spec_title = $candidate;
+								$candidate = (string) $clean_title;
+								$candidate = preg_replace( '/\s*\([^)]*\)/iu', '', $candidate );
+								$candidate = preg_replace( '/\s*[-–—]\s*(?:hệ\s+)?(?:từ xa|đào tạo từ xa|vừa học vừa làm|vừa làm vừa học|vhvl|chính quy|online|tập trung|liên thông).*$/iu', '', $candidate );
+								$candidate = preg_replace( '/^(?:tuyển sinh\s+)?(?:liên\s+thông\s+(?:đại\s+học\s+)?)?(?:cử\s+nhân|kỹ\s+sư|ngành)\s+/iu', '', $candidate );
+								$candidate = trim( $candidate, " -–—\t\n\r\0\x0B" );
+								if ( ! empty( $candidate ) ) {
+									$c_lower      = mb_strtolower( $candidate, 'UTF-8' );
+									$m_lower      = mb_strtolower( $clean_major_name, 'UTF-8' );
+									$orig_m_lower = mb_strtolower( $major_name, 'UTF-8' );
+									if ( $c_lower !== $m_lower && $c_lower !== $orig_m_lower ) {
+										$spec_title = $candidate;
+									}
 								}
 							}
 

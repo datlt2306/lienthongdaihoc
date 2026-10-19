@@ -2391,56 +2391,19 @@ function ltdh_program_admin_edit_completeness_notice() {
 
 /**
  * Kiểm tra xem tên chương trình đào tạo đã tồn tại trong hệ thống hay chưa.
+ * Đã cho phép trùng tên chương trình vì các trường đào tạo khác nhau
+ * có thể mở cùng ngành học (ví dụ: nhiều trường cùng có ngành "Công nghệ thông tin").
  *
  * @param string $title Tên chương trình cần kiểm tra.
  * @param int    $exclude_post_id ID bài viết cần loại trừ (khi chỉnh sửa bài viết hiện có).
- * @return int|false ID của bài viết bị trùng nếu tìm thấy, ngược lại trả về false.
+ * @return int|false Luôn trả về false để cho phép trùng tên chương trình giữa các trường.
  */
 function ltdh_is_program_title_duplicate( $title, $exclude_post_id = 0 ) {
-	global $wpdb;
-
-	$clean_title = trim( (string) $title );
-	if ( '' === $clean_title ) {
-		return false;
-	}
-
-	$clean_title = preg_replace( '/\s+/', ' ', $clean_title );
-	$exclude_post_id = absint( $exclude_post_id );
-	$post_type = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
-
-	if ( $exclude_post_id > 0 ) {
-		$duplicate_id = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT ID FROM {$wpdb->posts}
-				WHERE post_type = %s
-				  AND post_status NOT IN ('trash', 'auto-draft')
-				  AND LOWER(TRIM(post_title)) = LOWER(%s)
-				  AND ID != %d
-				LIMIT 1",
-				$post_type,
-				$clean_title,
-				$exclude_post_id
-			)
-		);
-	} else {
-		$duplicate_id = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT ID FROM {$wpdb->posts}
-				WHERE post_type = %s
-				  AND post_status NOT IN ('trash', 'auto-draft')
-				  AND LOWER(TRIM(post_title)) = LOWER(%s)
-				LIMIT 1",
-				$post_type,
-				$clean_title
-			)
-		);
-	}
-
-	return $duplicate_id ? (int) $duplicate_id : false;
+	return false;
 }
 
 /**
- * Kiểm thực chặn lưu/xuất bản bài viết nếu tên chương trình bị trùng hoặc thiếu các trường bắt buộc trên ACF Admin.
+ * Kiểm thực khi lưu/xuất bản bài viết nếu thiếu các trường bắt buộc trên ACF Admin.
  */
 add_action( 'acf/validate_save_post', 'ltdh_validate_program_acf_publish_fields', 10 );
 function ltdh_validate_program_acf_publish_fields() {
@@ -2455,24 +2418,10 @@ function ltdh_validate_program_acf_publish_fields() {
 		return;
 	}
 
-	// 1. Kiểm tra trùng lặp tên chương trình (Bắt buộc kiểm tra cho cả Lưu nháp & Xuất bản)
+	// 1. Kiểm tra tiêu đề chương trình (Bắt buộc khi Xuất bản)
 	$post_title = isset( $_POST['post_title'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['post_title'] ) ) ) : '';
 
-	if ( '' !== $post_title ) {
-		$duplicate_id = ltdh_is_program_title_duplicate( $post_title, $post_id );
-		if ( $duplicate_id ) {
-			$dup_post   = get_post( $duplicate_id );
-			$dup_status = $dup_post ? ( 'publish' === $dup_post->post_status ? 'Đã xuất bản' : 'Bản nháp' ) : '';
-			$error_msg  = sprintf(
-				'Tên chương trình "%s" đã tồn tại trên hệ thống (bài viết #%d%s). Vui lòng đặt tên khác để tránh tạo trùng lặp.',
-				esc_html( $post_title ),
-				$duplicate_id,
-				$dup_status ? ' - ' . $dup_status : ''
-			);
-			acf_add_validation_error( 'post_title', $error_msg );
-			acf_add_validation_error( '', $error_msg );
-		}
-	} else {
+	if ( '' === $post_title ) {
 		// Tiêu đề rỗng khi cố gắng xuất bản
 		if ( ( isset( $_POST['post_status'] ) && 'publish' === $_POST['post_status'] ) || isset( $_POST['publish'] ) ) {
 			acf_add_validation_error( 'post_title', 'Vui lòng nhập tên (tiêu đề) chương trình đào tạo trước khi Xuất bản.' );
@@ -2525,189 +2474,3 @@ function ltdh_validate_program_acf_publish_fields() {
 		acf_add_validation_error( 'acf[field_program_requirements]', 'Vui lòng nhập nội dung trường "Điều kiện xét tuyển" ở Tab "Điều kiện & Hồ sơ xét tuyển" trước khi Xuất bản.' );
 	}
 }
-
-/**
- * Chặn lưu bài viết chương trình nếu tên bị trùng lặp (áp dụng cho Quick Edit & server-side save).
- */
-add_filter( 'wp_insert_post_data', 'ltdh_prevent_duplicate_program_title_on_save', 10, 4 );
-function ltdh_prevent_duplicate_program_title_on_save( $data, $postarr, $unsanitized_postarr, $update ) {
-	$post_type = $data['post_type'] ?? ( $postarr['post_type'] ?? '' );
-	if ( 'program' !== $post_type ) {
-		return $data;
-	}
-
-	$post_status = $data['post_status'] ?? ( $postarr['post_status'] ?? '' );
-	// Bỏ qua các trạng thái không phải bài viết lưu chính thức
-	if ( in_array( $post_status, [ 'auto-draft', 'trash', 'inherit' ], true ) ) {
-		return $data;
-	}
-
-	// Nếu đang thực hiện thao tác xóa vào thùng rác hoặc phục hồi
-	if ( isset( $_GET['action'] ) && in_array( $_GET['action'], [ 'trash', 'untrash' ], true ) ) {
-		return $data;
-	}
-
-	$title   = trim( wp_unslash( $data['post_title'] ?? '' ) );
-	$post_id = ! empty( $postarr['ID'] ) ? absint( $postarr['ID'] ) : 0;
-
-	if ( '' === $title ) {
-		return $data;
-	}
-
-	$duplicate_id = ltdh_is_program_title_duplicate( $title, $post_id );
-	if ( $duplicate_id ) {
-		// Quick edit qua AJAX inline-save
-		if ( wp_doing_ajax() && isset( $_POST['action'] ) && 'inline-save' === $_POST['action'] ) {
-			wp_die( sprintf( 'Lỗi: Tên chương trình "%s" đã tồn tại trên hệ thống (ID: #%d). Vui lòng chọn tên khác.', esc_html( $title ), $duplicate_id ) );
-		}
-
-		// Submit trực tiếp từ wp-admin
-		if ( is_admin() && ! wp_doing_cron() ) {
-			$dup_link  = get_edit_post_link( $duplicate_id );
-			$link_html = $dup_link ? ' (bài viết <a href="' . esc_url( $dup_link ) . '" target="_blank">#' . $duplicate_id . '</a>)' : ' (ID: #' . $duplicate_id . ')';
-			wp_die(
-				sprintf(
-					'<h1>Không thể lưu chương trình</h1><p>Tên chương trình <strong>%s</strong> đã tồn tại trên hệ thống%s.</p><p>Hệ thống không cho phép tạo 2 chương trình có tên giống nhau. Vui lòng quay lại và thay đổi tên chương trình.</p>',
-					esc_html( $title ),
-					$link_html
-				),
-				'Lỗi trùng tên chương trình',
-				[ 'back_link' => true ]
-			);
-		}
-	}
-
-	return $data;
-}
-
-/**
- * Chặn tạo/cập nhật chương trình trùng tên qua REST API (Gutenberg Block Editor).
- */
-add_filter( 'rest_pre_insert_program', 'ltdh_validate_duplicate_program_title_rest', 10, 2 );
-function ltdh_validate_duplicate_program_title_rest( $prepared_post, $request ) {
-	$title   = isset( $prepared_post->post_title ) ? trim( $prepared_post->post_title ) : '';
-	$post_id = isset( $prepared_post->ID ) ? absint( $prepared_post->ID ) : 0;
-
-	if ( '' !== $title ) {
-		$duplicate_id = ltdh_is_program_title_duplicate( $title, $post_id );
-		if ( $duplicate_id ) {
-			return new WP_Error(
-				'duplicate_program_title',
-				sprintf( 'Tên chương trình "%s" đã tồn tại trên hệ thống (ID: #%d). Vui lòng chọn một tên khác để tránh trùng lặp.', esc_html( $title ), $duplicate_id ),
-				[ 'status' => 400 ]
-			);
-		}
-	}
-
-	return $prepared_post;
-}
-
-/**
- * AJAX endpoint kiểm tra trùng lặp tên chương trình theo thời gian thực.
- */
-add_action( 'wp_ajax_ltdh_check_program_title_duplicate', 'ltdh_ajax_check_program_title_duplicate' );
-function ltdh_ajax_check_program_title_duplicate() {
-	$title   = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
-	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
-
-	if ( '' === $title ) {
-		wp_send_json_success( [ 'is_duplicate' => false ] );
-	}
-
-	$duplicate_id = ltdh_is_program_title_duplicate( $title, $post_id );
-	if ( $duplicate_id ) {
-		$dup_post   = get_post( $duplicate_id );
-		$dup_status = $dup_post ? ( 'publish' === $dup_post->post_status ? 'Đã xuất bản' : 'Bản nháp' ) : '';
-		$edit_link  = get_edit_post_link( $duplicate_id );
-		wp_send_json_success( [
-			'is_duplicate' => true,
-			'duplicate_id' => $duplicate_id,
-			'message'      => sprintf(
-				'⚠️ Tên chương trình "%s" đã tồn tại trên hệ thống (%s#%d%s). Vui lòng đổi tên khác để tránh tạo trùng lặp!',
-				esc_html( $title ),
-				$edit_link ? '<a href="' . esc_url( $edit_link ) . '" target="_blank" style="color: #991b1b; text-decoration: underline;">bài viết ' : 'ID: ',
-				$duplicate_id,
-				$edit_link ? ( $dup_status ? ' - ' . $dup_status : '' ) . '</a>' : ( $dup_status ? ' - ' . $dup_status : '' )
-			),
-		] );
-	} else {
-		wp_send_json_success( [ 'is_duplicate' => false ] );
-	}
-}
-
-/**
- * Script kiểm tra trùng lặp tên chương trình ngay khi nhập liệu trong Admin.
- */
-add_action( 'admin_footer-post.php', 'ltdh_admin_program_duplicate_title_checker' );
-add_action( 'admin_footer-post-new.php', 'ltdh_admin_program_duplicate_title_checker' );
-function ltdh_admin_program_duplicate_title_checker() {
-	$screen = get_current_screen();
-	if ( ! $screen || 'program' !== $screen->post_type ) {
-		return;
-	}
-	?>
-	<script>
-	jQuery(document).ready(function($) {
-		var $titleInput = $('#title');
-		if (!$titleInput.length) return;
-
-		var $postID = $('#post_ID');
-		var checkTimer = null;
-
-		function checkDuplicateTitle() {
-			var title = $.trim($titleInput.val());
-			var postId = $postID.length ? parseInt($postID.val(), 10) : 0;
-
-			if (!title) {
-				$('#ltdh-title-dup-alert').remove();
-				$titleInput.css({'border-color': '', 'background-color': ''});
-				return;
-			}
-
-			$.post(ajaxurl, {
-				action: 'ltdh_check_program_title_duplicate',
-				title: title,
-				post_id: postId
-			}, function(res) {
-				if (res && res.success && res.data && res.data.is_duplicate) {
-					var alertHtml = '<div id="ltdh-title-dup-alert" style="margin-top: 8px; padding: 10px 14px; background: #fef2f2; border: 1px solid #f87171; border-left: 4px solid #dc2626; border-radius: 4px; color: #991b1b; font-size: 13px; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">'
-						+ res.data.message
-						+ '</div>';
-					if ($('#ltdh-title-dup-alert').length) {
-						$('#ltdh-title-dup-alert').replaceWith(alertHtml);
-					} else {
-						$('#titlediv').after(alertHtml);
-					}
-					$titleInput.css({'border-color': '#dc2626', 'background-color': '#fff5f5'});
-				} else {
-					$('#ltdh-title-dup-alert').remove();
-					$titleInput.css({'border-color': '', 'background-color': ''});
-				}
-			});
-		}
-
-		$titleInput.on('input paste change', function() {
-			clearTimeout(checkTimer);
-			checkTimer = setTimeout(checkDuplicateTitle, 400);
-		});
-
-		$titleInput.on('blur', function() {
-			clearTimeout(checkTimer);
-			checkDuplicateTitle();
-		});
-
-		// Chạy kiểm tra ngay khi load nếu ô title đã có giá trị
-		if ($titleInput.val()) {
-			checkDuplicateTitle();
-		}
-	});
-	</script>
-	<?php
-}
-
-
-
-
-
-
-
