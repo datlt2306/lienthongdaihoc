@@ -3811,7 +3811,7 @@ function ltdh_get_program_discipline_name( int $program_id = 0 ): string {
 		return '';
 	}
 
-	// 1. Chuyên ngành đào tạo hẹp (specialization_title)
+	// 1. Chuyên ngành đào tạo hẹp (specialization_title / chuyen_nganh) nếu được khai báo riêng
 	$spec_title = function_exists( 'get_field' ) ? get_field( 'specialization_title', $program_id ) : '';
 	if ( empty( $spec_title ) ) {
 		$spec_title = get_post_meta( $program_id, 'specialization_title', true );
@@ -3830,7 +3830,40 @@ function ltdh_get_program_discipline_name( int $program_id = 0 ): string {
 		}
 	}
 
-	// 2. Ngành đào tạo liên kết (major_relationship)
+	// 2. Mặc định ăn theo tiêu đề bài viết (post_title) của chương trình
+	$raw_title = get_the_title( $program_id );
+	if ( ! empty( $raw_title ) ) {
+		$clean_title = (string) $raw_title;
+
+		// Bỏ tên trường hoặc mã trường ở đuôi nếu có (VD: " - ĐH GTVT", " - TMU")
+		$school_id   = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
+		$school_name = $school_id ? get_the_title( $school_id ) : '';
+		$school_code = $school_id ? ( ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' ) ?: get_post_meta( $school_id, 'school_code', true ) ) : '';
+
+		if ( $school_name ) {
+			$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_title );
+		}
+		if ( ! empty( $school_code ) ) {
+			$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_title );
+		}
+		$clean_title = preg_replace( '/\s*[-–—]\s*(?:ĐH|Trường ĐH|Đại học|Viện ĐH)[^)]*$/iu', '', $clean_title );
+
+		// Bỏ hệ đào tạo trong ngoặc đơn ở cuối nếu có (VD: "(Từ xa)", "(Chính quy)", "(Đào tạo từ xa)")
+		$clean_title = preg_replace( '/\s*\((?:hệ\s+)?(?:từ xa|đào tạo từ xa|vừa học vừa làm|vhvl|chính quy|online|tập trung|liên thông)[^)]*\)$/iu', '', $clean_title );
+
+		// Bỏ tiền tố tuyển sinh, liên thông, cử nhân, kỹ sư
+		$clean_title = preg_replace( '/^(?:tuyển sinh\s+)+/iu', '', $clean_title );
+		$clean_title = preg_replace( '/^(?:liên thông\s+(?:đại học\s+)?(?:ngành\s+)?)/iu', '', $clean_title );
+		$clean_title = preg_replace( '/^(?:cử nhân|kỹ sư|ngành)\s+/iu', '', $clean_title );
+
+		$clean_title = trim( $clean_title, " -–—\t\n\r\0\x0B" );
+
+		if ( ! empty( $clean_title ) ) {
+			return $clean_title;
+		}
+	}
+
+	// 3. Fallback: Ngành đào tạo liên kết (major_relationship) nếu tiêu đề rỗng
 	$major_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : 0;
 	if ( $major_id > 0 ) {
 		$major_name  = get_the_title( $major_id );
@@ -3841,12 +3874,7 @@ function ltdh_get_program_discipline_name( int $program_id = 0 ): string {
 		}
 	}
 
-	// 3. Fallback: Parse từ tiêu đề bài viết chương trình
-	$raw_title   = get_the_title( $program_id );
-	$clean_title = preg_replace( '/^(?:tuyển sinh\s+)?liên thông\s+(?:đại học\s+)?(?:ngành\s+)?/iu', '', (string) $raw_title );
-	$clean_title = preg_replace( '/^(?:cử nhân|kỹ sư|ngành)\s+/iu', '', $clean_title );
-	$clean_title = preg_replace( '/\s*[-–—(].*$/iu', '', $clean_title );
-	return trim( $clean_title, " -–\t\n\r\0\x0B" );
+	return '';
 }
 
 /**

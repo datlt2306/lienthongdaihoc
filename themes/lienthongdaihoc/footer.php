@@ -9,9 +9,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$hotline  = ltdh_get_hotline();
-$zalo     = ltdh_get_zalo_url();
+$hotline   = ltdh_get_hotline();
+$zalo      = ltdh_get_zalo_url();
 $messenger = ltdh_get_messenger_url();
+$address   = function_exists( 'ltdh_get_address' ) ? ltdh_get_address() : 'Số 71 ngõ 32/84 Đỗ Đức Dục, Nam Từ Liêm, HN';
+$email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lienthongdaihoc.com';
 ?>
 
 	<footer id="colophon" class="site-footer text-slate-400 pt-10 pb-28 md:py-16 border-t border-slate-800/80" style="background-color: #0d192d;">
@@ -71,14 +73,14 @@ $messenger = ltdh_get_messenger_url();
 								<svg class="w-4 h-4 text-[#00a2f4] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
 								<div class="min-w-0">
 									<strong class="text-white block font-bold text-[11px] uppercase tracking-wider">Trụ sở Hà Nội</strong>
-									<span class="text-slate-400">Số 71 ngõ 32/84 Đỗ Đức Dục, Nam Từ Liêm, HN</span>
+									<span class="text-slate-400"><?php echo esc_html( $address ); ?></span>
 								</div>
 							</li>
 							<li class="flex items-start gap-2.5 p-2 rounded-lg bg-slate-800/20 border border-slate-800/40">
 								<svg class="w-4 h-4 text-[#00a2f4] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
 								<div class="min-w-0">
 									<strong class="text-white block font-bold text-[11px] uppercase tracking-wider">Email Tuyển sinh</strong>
-									<!--email_off--><a href="mailto:tuvan@lienthongdaihoc.com" class="text-slate-400 hover:text-white transition-colors truncate block">tuvan@lienthongdaihoc.com</a><!--/email_off-->
+									<!--email_off--><a href="mailto:<?php echo esc_attr( $email ); ?>" class="text-slate-400 hover:text-white transition-colors truncate block"><?php echo esc_html( $email ); ?></a><!--/email_off-->
 								</div>
 							</li>
 						</ul>

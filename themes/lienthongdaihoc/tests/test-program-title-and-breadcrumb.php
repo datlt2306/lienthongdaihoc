@@ -58,6 +58,18 @@ function simulate_discipline_name( $spec_title, $major_name, $post_title ) {
 			return $clean_spec;
 		}
 	}
+	if ( ! empty( $post_title ) ) {
+		$clean_title = (string) $post_title;
+		$clean_title = preg_replace( '/\s*[-–—]\s*(?:ĐH|Trường ĐH|Đại học|Viện ĐH|TMU|GTVT)[^)]*$/iu', '', $clean_title );
+		$clean_title = preg_replace( '/\s*\((?:hệ\s+)?(?:từ xa|đào tạo từ xa|vừa học vừa làm|vhvl|chính quy|online|tập trung|liên thông)[^)]*\)$/iu', '', $clean_title );
+		$clean_title = preg_replace( '/^(?:tuyển sinh\s+)+/iu', '', $clean_title );
+		$clean_title = preg_replace( '/^(?:liên thông\s+(?:đại học\s+)?(?:ngành\s+)?)/iu', '', $clean_title );
+		$clean_title = preg_replace( '/^(?:cử nhân|kỹ sư|ngành)\s+/iu', '', $clean_title );
+		$clean_title = trim( $clean_title, " -–—\t\n\r\0\x0B" );
+		if ( ! empty( $clean_title ) ) {
+			return $clean_title;
+		}
+	}
 	if ( ! empty( $major_name ) ) {
 		$clean_major = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major_name ) );
 		$clean_major = preg_replace( '/\s*\([^)]*\)$/u', '', $clean_major );
@@ -65,10 +77,7 @@ function simulate_discipline_name( $spec_title, $major_name, $post_title ) {
 			return $clean_major;
 		}
 	}
-	$clean_title = preg_replace( '/^(?:tuyển sinh\s+)?liên thông\s+(?:đại học\s+)?(?:ngành\s+)?/iu', '', (string) $post_title );
-	$clean_title = preg_replace( '/^(?:cử nhân|kỹ sư|ngành)\s+/iu', '', $clean_title );
-	$clean_title = preg_replace( '/\s*[-–—(].*$/iu', '', $clean_title );
-	return trim( $clean_title, " -–\t\n\r\0\x0B" );
+	return '';
 }
 
 function simulate_banner_title( $discipline, $training_type ) {
@@ -94,6 +103,12 @@ $disc3 = simulate_discipline_name( '', 'Ngành Công nghệ thông tin', 'Công 
 $title3 = simulate_banner_title( $disc3, 'Chính quy' );
 ltdh_assert( $disc3 === 'Công nghệ thông tin', 'Case 3: In the absence of specialization, cleanly falls back to Major' );
 ltdh_assert( $title3 === 'Liên thông Công nghệ thông tin (Chính quy)', 'Case 3: Banner title resolves to "Liên thông Công nghệ thông tin (Chính quy)"' );
+
+// Case 4: Custom post title override by editor ("Công nghệ thông tin 123")
+$disc4 = simulate_discipline_name( '', 'Ngành Công nghệ thông tin', 'Công nghệ thông tin 123' );
+$title4 = simulate_banner_title( $disc4, 'Đào tạo từ xa' );
+ltdh_assert( $disc4 === 'Công nghệ thông tin 123', 'Case 4: Custom post title "Công nghệ thông tin 123" is respected' );
+ltdh_assert( $title4 === 'Liên thông Công nghệ thông tin 123 (Đào tạo từ xa)', 'Case 4: Banner title resolves to "Liên thông Công nghệ thông tin 123 (Đào tạo từ xa)"' );
 
 echo "\n===================================================================\n";
 echo "SUMMARY: $pass_count PASSED, $fail_count FAILED\n";

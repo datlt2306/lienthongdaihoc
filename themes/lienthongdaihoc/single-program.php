@@ -748,7 +748,7 @@ if ( ! empty( $faqs ) ) {
 									</div>
 
 									<div class="mt-4 pt-3 border-t border-emerald-200/60 text-xs text-emerald-800 font-semibold bg-emerald-50/70 p-2.5 rounded-lg leading-relaxed">
-										🎉 Vào học thẳng môn chuyên ngành. Thời gian đào tạo tiêu chuẩn (1.5 - 2 năm), không phải học bổ sung môn chuyển đổi.
+										🎉 Vào học thẳng môn chuyên ngành. Thời gian đào tạo tiêu chuẩn (<?php echo esc_html( $duration ); ?>), không phải học bổ sung môn chuyển đổi.
 									</div>
 								</div>
 

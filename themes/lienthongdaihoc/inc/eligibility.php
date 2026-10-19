@@ -798,7 +798,7 @@ function ltdh_elig_build_smart_alternatives( $input, $eligible_slice, $hierarchy
 			'major'              => $major_title,
 			'training_type'      => wp_get_post_terms( $prog_id, 'training_type', [ 'fields' => 'names' ] )[0] ?? 'Linh hoạt',
 			'tuition_fee'        => get_post_meta( $prog_id, 'tuition_fee', true ) ?: 'Theo quy định nhà trường',
-			'duration'           => get_post_meta( $prog_id, 'duration', true ) ?: '1.5 – 2 năm',
+			'duration'           => function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $prog_id ) : ( get_post_meta( $prog_id, 'duration', true ) ?: '1.5 – 2 năm' ),
 			'schedule'           => get_post_meta( $prog_id, 'schedule', true ) ?: 'Linh hoạt (Online/Tối/Cuối tuần)',
 			'campus_info'        => implode( ', ', wp_get_post_terms( $prog_id, 'campus', [ 'fields' => 'names' ] ) ) ?: 'Toàn quốc (Online)',
 			'is_alternative'     => true,
