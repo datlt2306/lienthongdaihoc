@@ -22,7 +22,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		<!-- Breadcrumbs -->
 		<nav class="text-sm text-slate-500 mb-6">
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-brand-primary">Trang chủ</a> / 
-			<a href="<?php echo esc_url( home_url( '/huong-dan/' ) ); ?>" class="hover:text-brand-primary">Hướng dẫn tuyển sinh</a> / 
+			<a href="<?php echo esc_url( get_post_type_archive_link( 'guide' ) ?: home_url( '/cam-nang/' ) ); ?>" class="hover:text-brand-primary">Cẩm nang tuyển sinh</a> / 
 			<span><?php the_title(); ?></span>
 		</nav>
 

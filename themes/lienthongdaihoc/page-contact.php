@@ -38,8 +38,9 @@ $address = ltdh_get_address();
 			<div class="lg:col-span-5 relative min-h-[350px] md:min-h-[450px] lg:min-h-[550px] bg-slate-50">
 				<!-- The custom contact banner image containing the counselor illustration and pathway -->
 				<?php
-				$raw_contact_banner = home_url( '/wp-content/uploads/2026/07/banner-contact.png' );
-				$opt_contact_banner = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $raw_contact_banner ) : $raw_contact_banner;
+				$opt_contact_banner = get_the_post_thumbnail_url( get_the_ID(), 'full' ) 
+					?: ( function_exists( 'ltdh_get_fallback_image' ) ? ltdh_get_fallback_image( 'contact' ) : '' )
+					?: get_theme_file_uri( 'assets/images/banner-contact.webp' );
 				?>
 				<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $opt_contact_banner ); ?>');"></div>
 			</div>
@@ -50,9 +51,9 @@ $address = ltdh_get_address();
 					<span class="inline-block bg-blue-50 text-[#00308b] text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">
 						ĐĂNG KÝ TRỰC TUYẾN
 					</span>
-					<h3 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
-						Nhận tư vấn miễn phí
-					</h3>
+					<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
+						Đăng ký nhận tư vấn tuyển sinh miễn phí
+					</h2>
 					<p class="text-sm text-slate-500 leading-relaxed">
 						Vui lòng cung cấp thông tin liên hệ, đội ngũ tuyển sinh của chúng tôi sẽ chủ động gọi lại hỗ trợ giải đáp lộ trình cho bạn sớm nhất.
 					</p>
@@ -65,39 +66,42 @@ $address = ltdh_get_address();
 		</div>
 
 		<!-- SECONDARY SECTIONS: OFFICE CARDS -->
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-			<!-- Office Card -->
-			<div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex gap-4">
-				<div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-xl shrink-0">
-					📍
+		<div class="mt-8">
+			<h2 class="sr-only">Thông tin liên hệ & Văn phòng hỗ trợ</h2>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				<!-- Office Card -->
+				<div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex gap-4">
+					<div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-xl shrink-0">
+						📍
+					</div>
+					<div>
+						<h3 class="font-bold text-slate-950 text-sm mb-1">Địa chỉ văn phòng</h3>
+						<p class="text-sm text-slate-500 leading-normal"><?php echo esc_html( $address ); ?></p>
+					</div>
 				</div>
-				<div>
-					<h4 class="font-bold text-slate-950 text-sm mb-1">Địa chỉ văn phòng</h4>
-					<p class="text-sm text-slate-500 leading-normal"><?php echo esc_html( $address ); ?></p>
-				</div>
-			</div>
 
-			<!-- Phone Card -->
-			<div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex gap-4">
-				<div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-xl shrink-0">
-					📞
+				<!-- Phone Card -->
+				<div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex gap-4">
+					<div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-xl shrink-0">
+						📞
+					</div>
+					<div>
+						<h3 class="font-bold text-slate-950 text-sm mb-1">Hotline tư vấn</h3>
+						<p class="text-sm text-[#00308b] font-bold leading-normal"><?php echo esc_html( $hotline ); ?></p>
+						<p class="text-sm text-slate-400 mt-0.5">Hỗ trợ 24/7 toàn quốc</p>
+					</div>
 				</div>
-				<div>
-					<h4 class="font-bold text-slate-950 text-sm mb-1">Hotline tư vấn</h4>
-					<p class="text-sm text-[#00308b] font-bold leading-normal"><?php echo esc_html( $hotline ); ?></p>
-					<p class="text-sm text-slate-400 mt-0.5">Hỗ trợ 24/7 toàn quốc</p>
-				</div>
-			</div>
 
-			<!-- Email Card -->
-			<div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex gap-4">
-				<div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-xl shrink-0">
-					✉
-				</div>
-				<div>
-					<h4 class="font-bold text-slate-950 text-sm mb-1">Địa chỉ Email</h4>
-					<p class="text-sm text-slate-500 leading-normal break-all"><?php echo esc_html( $email ); ?></p>
-					<p class="text-sm text-slate-400 mt-0.5">Phản hồi trong vòng 24h làm việc</p>
+				<!-- Email Card -->
+				<div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex gap-4">
+					<div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-xl shrink-0">
+						✉
+					</div>
+					<div>
+						<h3 class="font-bold text-slate-950 text-sm mb-1">Địa chỉ Email</h3>
+						<p class="text-sm text-slate-500 leading-normal break-all"><?php echo esc_html( $email ); ?></p>
+						<p class="text-sm text-slate-400 mt-0.5">Phản hồi trong vòng 24h làm việc</p>
+					</div>
 				</div>
 			</div>
 		</div>

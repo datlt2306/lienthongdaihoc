@@ -128,9 +128,9 @@ $years = range( $current_year, $current_year - 25 );
 				<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-xs text-white text-[11px] font-extrabold uppercase tracking-wider mb-2 border border-white/20">
 					<span>✍️ Form đăng ký xét tuyển 1:1</span>
 				</div>
-				<h3 class="text-xl sm:text-2xl font-black leading-tight m-0" style="color: #ffffff !important;">
+				<h2 class="text-xl sm:text-2xl font-black leading-tight m-0" style="color: #ffffff !important;">
 					Đăng ký thẩm định hồ sơ & xét miễn giảm tín chỉ
-				</h3>
+				</h2>
 				<p class="text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed m-0" style="color: #dbeafe !important;">
 					Điền thông tin và đính kèm bằng/bảng điểm (nếu có). Ban tuyển sinh sẽ thẩm định điều kiện trúng tuyển thực tế và gửi bảng đối chiếu tín chỉ miễn giảm hoàn toàn miễn phí.
 				</p>

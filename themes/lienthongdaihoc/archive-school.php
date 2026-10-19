@@ -234,7 +234,10 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 		?>
 			<!-- Header with view toggle -->
 			<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-slate-200 gap-4">
-				<p class="text-sm font-medium text-slate-500">Hiển thị tất cả các trường đại học đối tác tuyển sinh chính thức.</p>
+				<div>
+					<h2 class="text-xl sm:text-2xl font-black text-slate-900">Danh sách các trường Đại học tuyển sinh</h2>
+					<p class="text-sm font-medium text-slate-500 mt-1">Hiển thị tất cả các trường đại học đối tác tuyển sinh chính thức.</p>
+				</div>
 				<a href="<?php echo esc_url( add_query_arg( 'view', 'list' === $view_mode ? 'card' : 'list' ) ); ?>"
 				   class="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-brand-accent transition-all"
 				   title="<?php echo 'list' === $view_mode ? 'Chuyển sang Card' : 'Chuyển sang List'; ?>">

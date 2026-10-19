@@ -1311,7 +1311,7 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 		</div>
 		<div>
 			<label for="<?php echo esc_attr( $prefix . '-phone' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Số điện thoại *', 'ltdh'); ?></label>
-			<input type="tel" id="<?php echo esc_attr( $prefix . '-phone' ); ?>" name="your-phone" required autocomplete="tel" aria-required="true" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Số điện thoại liên hệ', 'ltdh'); ?>">
+			<input type="tel" id="<?php echo esc_attr( $prefix . '-phone' ); ?>" name="your-phone" required autocomplete="tel" aria-required="true" pattern="^(0|\+84)(3|5|7|8|9)[0-9]{8}$" title="Vui lòng nhập số điện thoại Việt Nam hợp lệ (10 chữ số)" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Số điện thoại liên hệ (10 số)'); ?>">
 		</div>
 		<div>
 			<div class="flex items-center justify-between mb-1">
@@ -1340,15 +1340,15 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 			<span><?php echo 'contact' === $type ? esc_html__('Gửi Liên Hệ') : esc_html__('Gửi Thông Tin Ngay'); ?></span>
 		</button>
 
-		<div class="flex lg:hidden items-center justify-center gap-3 text-[11px] text-slate-400 pt-0.5">
+		<div class="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 text-[11px] text-slate-400 pt-1 text-center">
 			<span class="inline-flex items-center gap-1 font-medium">
 				<svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"/></svg>
-				Bảo mật 100%
+				Bảo mật theo Nghị định 13/2023/NĐ-CP
 			</span>
-			<span class="text-slate-300">•</span>
+			<span class="hidden sm:inline text-slate-300">•</span>
 			<span class="inline-flex items-center gap-1 font-medium">
 				<svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-				Phản hồi 15 phút
+				Phản hồi trong 15 phút
 			</span>
 		</div>
 	</form>
@@ -2966,11 +2966,23 @@ function ltdh_get_major_unique_schools_count( int $major_id ): int {
 	return $count;
 }
 
-function ltdh_get_training_type_badge_html( string $type_name ): string {
+function ltdh_get_training_type_badge_html( string $type_name, string $type_slug = '' ): string {
 	if ( ! $type_name ) {
 		return '';
 	}
-	$badge_class = 'bg-blue-50 text-[#00308b] border border-blue-200';
+	$name_lower = mb_strtolower( trim( $type_name ) );
+	$slug_lower = sanitize_title( $type_slug ?: $type_name );
+
+	if ( in_array( $slug_lower, [ 'tu-xa', 'dao-tao-tu-xa', 'online' ], true ) || false !== strpos( $name_lower, 'từ xa' ) || false !== strpos( $name_lower, 'online' ) ) {
+		$badge_class = 'bg-sky-50 text-sky-700 border-sky-200';
+	} elseif ( in_array( $slug_lower, [ 'vua-hoc-vua-lam', 'vhvl', 'vua-lam-vua-hoc' ], true ) || false !== strpos( $name_lower, 'vừa học vừa làm' ) || false !== strpos( $name_lower, 'vừa làm vừa học' ) ) {
+		$badge_class = 'bg-amber-50 text-amber-700 border-amber-200';
+	} elseif ( in_array( $slug_lower, [ 'chinh-quy', 'chinh-quy-tap-trung' ], true ) || false !== strpos( $name_lower, 'chính quy' ) ) {
+		$badge_class = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+	} else {
+		$badge_class = 'bg-blue-50 text-[#00308b] border-blue-200';
+	}
+
 	return sprintf(
 		'<span class="%s text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide border shadow-xs inline-block leading-normal">%s</span>',
 		esc_attr( $badge_class ),

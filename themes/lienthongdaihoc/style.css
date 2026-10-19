@@ -1500,3 +1500,25 @@ div#ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle .arrow-unsor
 	}
 }
 
+/* Universal Accessible Focus Ring (WCAG 2.4.7 Focus Visible) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+	outline: 2px solid #00308b !important;
+	outline-offset: 2px !important;
+}
+
+/* Accordion Smooth Micro-interaction */
+details summary {
+	cursor: pointer;
+	user-select: none;
+	transition: color 0.15s ease-in-out;
+}
+details[open] summary svg.transition-transform {
+	transform: rotate(180deg);
+}
+
+

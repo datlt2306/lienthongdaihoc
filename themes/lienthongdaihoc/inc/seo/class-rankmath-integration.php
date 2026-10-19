@@ -462,6 +462,17 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			'url'                          => get_permalink( $program_id ),
 		];
 
+		$tuition_num = (float) get_field( 'tuition_amount', $program_id );
+		if ( $tuition_num > 0 ) {
+			$data['ltdh_program']['offers'] = [
+				'@type'         => 'Offer',
+				'price'         => $tuition_num,
+				'priceCurrency' => 'VND',
+				'availability'  => 'https://schema.org/InStock',
+				'url'           => get_permalink( $program_id ),
+			];
+		}
+
 		$faqs = get_field( 'faq', $program_id );
 		if ( ! empty( $faqs ) && is_array( $faqs ) ) {
 			$faq_elements = [];
@@ -1071,6 +1082,17 @@ function ltdh_output_native_schema_fallback() {
 			'educationalCredentialAwarded' => 'Bằng Cử nhân / Bằng Kỹ sư',
 			'url'                          => get_permalink( $program_id ),
 		];
+
+		$tuition_num = function_exists( 'get_field' ) ? (float) get_field( 'tuition_amount', $program_id ) : 0;
+		if ( $tuition_num > 0 ) {
+			$schemas[ count( $schemas ) - 1 ]['offers'] = [
+				'@type'         => 'Offer',
+				'price'         => $tuition_num,
+				'priceCurrency' => 'VND',
+				'availability'  => 'https://schema.org/InStock',
+				'url'           => get_permalink( $program_id ),
+			];
+		}
 	}
 
 	// 3. Schema BreadcrumbList

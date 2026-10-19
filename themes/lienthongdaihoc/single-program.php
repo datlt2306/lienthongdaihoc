@@ -242,13 +242,13 @@ if ( ! empty( $faqs ) ) {
 					$prog_fee_name     = $tuition ?: 'Theo thông báo tuyển sinh';
 					?>
 
-					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
+					<div class="prose prose-slate prose-base md:prose-lg max-w-none text-slate-800 text-base md:text-lg leading-relaxed md:leading-loose">
 						<?php the_content(); ?>
 					</div>
 					<?php if ( $benefits ) : ?>
-						<div class="mt-6 bg-teal-50/40 p-4 rounded-xl mb-6">
-							<h3 class="text-teal-800 font-bold text-base mb-2">Quyền lợi nổi bật</h3>
-							<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
+						<div class="mt-6 bg-teal-50/40 p-4 sm:p-5 rounded-2xl mb-6 border border-teal-100/60">
+							<h3 class="text-teal-900 font-bold text-base md:text-lg mb-2.5">Quyền lợi nổi bật</h3>
+							<div class="prose prose-slate prose-base md:prose-lg max-w-none text-slate-800 text-base md:text-lg leading-relaxed">
 								<?php echo wp_kses_post( $benefits ); ?>
 							</div>
 						</div>
@@ -256,35 +256,35 @@ if ( ! empty( $faqs ) ) {
 
 					<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí</span>
-							<span class="font-bold text-[#00308b] text-xs sm:text-sm leading-snug">
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Học phí</span>
+							<span class="font-bold text-[#00308b] text-sm sm:text-base leading-snug">
 								<?php 
 								echo esc_html( $tuition ?: 'Liên hệ' ); 
 								if ( $tuition_year ) {
-									echo ' <span class="text-[9px] font-normal text-slate-400 block sm:inline">(' . esc_html( $tuition_year ) . ')</span>';
+									echo ' <span class="text-[11px] font-normal text-slate-500 block sm:inline">(' . esc_html( $tuition_year ) . ')</span>';
 								}
 								?>
 							</span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Thời gian học</span>
+							<span class="font-bold text-slate-900 text-sm sm:text-base leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Danh hiệu văn bằng</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $degree_val ); ?></span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Danh hiệu văn bằng</span>
+							<span class="font-bold text-slate-900 text-sm sm:text-base leading-snug"><?php echo esc_html( $degree_val ); ?></span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Căn cứ pháp lý</span>
-							<span class="font-bold text-emerald-700 text-xs sm:text-sm leading-snug">Thông tư 27/2019/TT-BGDĐT</span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Căn cứ pháp lý</span>
+							<span class="font-bold text-emerald-700 text-sm sm:text-base leading-snug">Thông tư 27/2019/TT-BGDĐT</span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Hình thức học</span>
+							<span class="font-bold text-slate-900 text-sm sm:text-base leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php 
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Cơ sở học</span>
+							<span class="font-bold text-slate-900 text-sm sm:text-base leading-snug"><?php 
 								$display_campus = $learning_details['campus'] ?? '';
 								if ( empty( $display_campus ) || 'online' === strtolower( trim( $display_campus ) ) ) {
 									$display_campus = 'Toàn quốc';
@@ -294,13 +294,13 @@ if ( ! empty( $faqs ) ) {
 						</div>
 						<?php if ( $quota ) : ?>
 							<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-								<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
-								<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
+								<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
+								<span class="font-bold text-slate-900 text-sm sm:text-base leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
 							</div>
 						<?php endif; ?>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
-							<span class="font-bold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
+							<span class="font-bold text-[#EA580C] text-sm sm:text-base leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
 					</div>
 
@@ -320,7 +320,7 @@ if ( ! empty( $faqs ) ) {
 					</table>
 
 					<!-- Thông tin pháp lý văn bằng & Giá trị toàn quốc (Thông tư 27/2019/TT-BGDĐT) -->
-					<div class="mt-4 bg-emerald-50/50 rounded-xl p-4 text-xs md:text-sm text-slate-700 space-y-2 leading-relaxed">
+					<div class="mt-4 bg-emerald-50/50 rounded-2xl p-4 sm:p-5 text-sm md:text-base text-slate-800 space-y-2.5 leading-relaxed border border-emerald-100/60">
 						<?php if ( ! empty( $diploma_val ) ) : ?>
 							<p class="flex items-start gap-2">
 								<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
@@ -510,10 +510,10 @@ if ( ! empty( $faqs ) ) {
 				<?php if ( ! empty( $requirements ) || ! empty( $program_target_admission ) || $documents || $has_package || ! empty( $contact_formatted ) ) : ?>
 					<section id="dieu-kien-ho-so" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 						<!-- Hidden anchor targets for backward compatibility with existing links -->
-						<span id="dieu-kien-xet-tuyen" class="relative -top-36 block invisible pointer-events-none"></span>
-						<span id="doi-tuong-tuyen-sinh" class="relative -top-36 block invisible pointer-events-none"></span>
-						<span id="ho-so-can-nop" class="relative -top-36 block invisible pointer-events-none"></span>
-						<span id="thong-tin-lien-he" class="relative -top-36 block invisible pointer-events-none"></span>
+						<span id="dieu-kien-xet-tuyen" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+						<span id="doi-tuong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+						<span id="ho-so-can-nop" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+						<span id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
 
 						<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-2">
 							<div>
@@ -579,10 +579,10 @@ if ( ! empty( $faqs ) ) {
 											<div class="mt-4 pt-1">
 												<!-- Header quy định -->
 												<div class="flex flex-wrap items-center justify-between gap-2 mb-3.5">
-													<h4 class="font-bold text-slate-900 text-sm md:text-[15px] flex items-center gap-2">
+													<h3 class="font-bold text-slate-900 text-sm md:text-[15px] flex items-center gap-2">
 														<span class="w-2 h-2 rounded-full bg-[#00308b]"></span>
 														<span>Quy định đối tượng tuyển sinh: Ngành đúng &amp; Ngành gần</span>
-													</h4>
+													</h3>
 													<?php if ( ! empty( $t_item['regulation_title'] ) ) : ?>
 														<span class="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
 															<?php echo esc_html( $t_item['regulation_title'] ); ?>
@@ -605,7 +605,7 @@ if ( ! empty( $faqs ) ) {
 																		</svg>
 																	</div>
 																	<div>
-																		<h5 class="font-bold text-slate-900 text-base leading-snug">Nhóm ngành đúng</h5>
+																		<h4 class="font-bold text-slate-900 text-base leading-snug">Nhóm ngành đúng</h4>
 																		<span class="text-xs text-slate-500 font-medium">Học thẳng môn chuyên ngành</span>
 																	</div>
 																</div>
@@ -653,7 +653,7 @@ if ( ! empty( $faqs ) ) {
 																		</svg>
 																	</div>
 																	<div>
-																		<h5 class="font-bold text-slate-900 text-base leading-snug">Nhóm ngành gần</h5>
+																		<h4 class="font-bold text-slate-900 text-base leading-snug">Nhóm ngành gần</h4>
 																		<span class="text-xs text-slate-500 font-medium">Bổ sung kiến thức chuyển đổi</span>
 																	</div>
 																</div>
@@ -751,9 +751,9 @@ if ( ! empty( $faqs ) ) {
 													<!-- Content & Actions Column -->
 													<div class="min-w-0 flex-1">
 														<div class="flex flex-wrap items-center gap-2">
-															<h4 class="font-bold text-slate-900 text-sm sm:text-base leading-snug">
+															<h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug">
 																Bộ biểu mẫu & Hồ sơ tuyển sinh chính thức
-															</h4>
+															</h3>
 															<?php if ( ! empty( $card_badge ) ) : ?>
 																<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-white border border-slate-200/70 text-slate-600">
 																	<?php echo esc_html( $card_badge ); ?>
@@ -923,7 +923,7 @@ if ( ! empty( $faqs ) ) {
 										<div class="bg-white rounded-xl p-4 sm:p-4.5 shadow-xs transition-all duration-300">
 											<div class="flex items-center gap-2.5 mb-2">
 												<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-black shrink-0"><?php echo esc_html( $index + 1 ); ?></span>
-												<h5 class="font-extrabold text-slate-900 text-sm md:text-base"><?php echo esc_html( $item['subject_name'] ?? '' ); ?></h5>
+												<h4 class="font-extrabold text-slate-900 text-sm md:text-base"><?php echo esc_html( $item['subject_name'] ?? '' ); ?></h4>
 											</div>
 											<?php if ( ! empty( $item['condition_note'] ) ) : ?>
 												<p class="text-slate-700 text-xs md:text-sm leading-relaxed pl-8">

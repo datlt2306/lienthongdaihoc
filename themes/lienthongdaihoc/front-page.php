@@ -151,13 +151,13 @@ $zalo    = ltdh_get_zalo_url();
 
 
 	<!-- Search & Filters Container (Compact Single-Row Bar) -->
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-30 hidden">
-		<div class="bg-white rounded-xl shadow-xl border border-slate-100 p-4 md:p-5">
-			<form action="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" method="GET" class="space-y-3 md:space-y-0">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-30">
+		<div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-5">
+			<form action="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-center">
 				<!-- Keyword (always visible) -->
-				<div class="flex-grow min-w-[20%]">
+				<div class="w-full">
 					<label for="home-search-keyword" class="sr-only"><?php esc_html_e( 'Từ khóa tìm kiếm chương trình', 'ltdh' ); ?></label>
-					<input type="text" id="home-search-keyword" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[40px] md:min-h-[38px]" />
+					<input type="text" id="home-search-keyword" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[44px]" />
 				</div>
 
 				<?php
@@ -167,41 +167,47 @@ $zalo    = ltdh_get_zalo_url();
 				$types       = $filter_opts['types'] ?? [];
 				?>
 
-				<!-- Filters: stacked on mobile, inline on desktop -->
-				<div class="flex flex-col md:flex-row md:items-center md:gap-3 gap-2">
-					<div class="flex-1">
-						<select name="truong" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
-							<option value="">-- Chọn trường --</option>
-							<?php foreach ($schools as $sc) : ?>
-								<option value="<?php echo esc_attr($sc['slug']); ?>"><?php echo esc_html($sc['title']); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</div>
-					<div class="flex-1">
-						<select name="nganh" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
-							<option value="">-- Chọn ngành học --</option>
-							<?php foreach ($majors as $mj) : ?>
-								<option value="<?php echo esc_attr($mj['slug']); ?>"><?php echo esc_html($mj['title']); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</div>
-					<div class="flex-1">
-						<select name="he" class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none bg-white md:bg-transparent min-h-[40px] md:min-h-[38px]">
-							<option value="">-- Chọn hình thức đào tạo --</option>
-							<?php foreach ($types as $tp) : ?>
-								<option value="<?php echo esc_attr($tp['slug']); ?>"><?php echo esc_html($tp['name']); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</div>
+				<!-- School Select -->
+				<div class="w-full">
+					<label for="home-filter-truong" class="sr-only"><?php esc_html_e( 'Chọn trường', 'ltdh' ); ?></label>
+					<select id="home-filter-truong" name="truong" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px] cursor-pointer">
+						<option value="">-- Chọn trường --</option>
+						<?php foreach ($schools as $sc) : ?>
+							<option value="<?php echo esc_attr($sc['slug']); ?>"><?php echo esc_html($sc['title']); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</div>
 
-					<div class="flex gap-2 md:shrink-0">
-						<button type="submit" class="flex-1 md:flex-none bg-brand-primary hover:bg-brand-darkBlue text-white font-extrabold text-sm px-5 py-2.5 rounded-lg transition-all uppercase tracking-wider min-h-[40px] md:min-h-[38px]">
-							Tìm kiếm
-						</button>
-						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition-all flex items-center justify-center min-h-[40px] md:min-h-[38px]" title="Reset bộ lọc">
-							🔄
-						</a>
-					</div>
+				<!-- Major Select -->
+				<div class="w-full">
+					<label for="home-filter-nganh" class="sr-only"><?php esc_html_e( 'Chọn ngành học', 'ltdh' ); ?></label>
+					<select id="home-filter-nganh" name="nganh" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px] cursor-pointer">
+						<option value="">-- Chọn ngành học --</option>
+						<?php foreach ($majors as $mj) : ?>
+							<option value="<?php echo esc_attr($mj['slug']); ?>"><?php echo esc_html($mj['title']); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</div>
+
+				<!-- Training Mode Select -->
+				<div class="w-full">
+					<label for="home-filter-he" class="sr-only"><?php esc_html_e( 'Chọn hình thức đào tạo', 'ltdh' ); ?></label>
+					<select id="home-filter-he" name="he" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px] cursor-pointer">
+						<option value="">-- Chọn hình thức đào tạo --</option>
+						<?php foreach ($types as $tp) : ?>
+							<option value="<?php echo esc_attr($tp['slug']); ?>"><?php echo esc_html($tp['name']); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</div>
+
+				<!-- Submit Buttons -->
+				<div class="flex gap-2 w-full">
+					<button type="submit" class="flex-1 bg-brand-primary hover:bg-brand-darkBlue active:scale-95 text-white font-extrabold text-sm px-5 py-2.5 rounded-xl transition-all uppercase tracking-wider min-h-[44px] shadow-sm">
+						Tìm kiếm
+					</button>
+					<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-500 rounded-xl transition-all flex items-center justify-center min-h-[44px] w-11 shrink-0" title="Reset bộ lọc">
+						🔄
+					</a>
 				</div>
 			</form>
 		</div>
@@ -1007,9 +1013,9 @@ $zalo    = ltdh_get_zalo_url();
 						<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
 						<span>Thông tin xác thực</span>
 					</div>
-					<h3 class="text-xl md:text-2xl font-black font-display tracking-tight text-white uppercase leading-tight">
+					<h2 class="text-xl md:text-2xl font-black font-display tracking-tight text-white uppercase leading-tight">
 						<?php echo esc_html( $w_heading ); ?>
-					</h3>
+					</h2>
 					<p class="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed">
 						<?php echo esc_html( $w_desc ); ?>
 					</p>
@@ -1247,7 +1253,7 @@ $zalo    = ltdh_get_zalo_url();
 			<div class="lg:col-span-7 space-y-6">
 				<div class="text-left space-y-2">
 					<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">Đăng ký trực tuyến</span>
-					<h3 class="text-2xl md:text-3xl font-black text-slate-900">Nhận tư vấn miễn phí</h3>
+					<h2 class="text-2xl md:text-3xl font-black text-slate-900">Đăng ký nhận tư vấn miễn phí</h2>
 					<p class="text-slate-500 text-sm">Vui lòng cung cấp thông tin liên hệ, đội ngũ tuyển sinh của chúng tôi sẽ chủ động gọi lại hỗ trợ giải đáp lộ trình cho bạn sớm nhất.</p>
 				</div>
 

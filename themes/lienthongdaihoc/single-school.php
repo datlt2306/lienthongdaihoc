@@ -445,7 +445,7 @@ if ( ! empty( $school_faqs ) ) {
 				<!-- PROGRAMS OFFERED -->
 				<section id="chuong-trinh-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
 					<!-- Hidden anchor target for backward compatibility -->
-					<span id="nganh-dao-tao" class="relative -top-36 block invisible pointer-events-none"></span>
+					<span id="nganh-dao-tao" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
 
 					<?php
 					$meta_status_filter = [

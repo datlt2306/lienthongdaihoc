@@ -191,9 +191,9 @@ $recent_posts = get_posts( [ 'numberposts' => 5 ] );
 				<!-- Articles Section -->
 				<div class="space-y-6">
 					<div class="flex items-center justify-between pb-3 border-b border-slate-200">
-						<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider">
+						<h2 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider">
 							<?php echo $active_cat ? esc_html( $active_cat->name ) : 'Bài viết mới nhất'; ?>
-						</h3>
+						</h2>
 						<span class="text-sm text-slate-400 font-bold bg-slate-100 px-2.5 py-1 rounded-full"><?php echo esc_html( $blog_query->found_posts ); ?> Bài viết</span>
 					</div>
 

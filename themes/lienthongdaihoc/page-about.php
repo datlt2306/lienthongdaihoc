@@ -58,7 +58,9 @@ get_header();
 				<p><?php echo esc_html( $about_vision ); ?></p>
 			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
+			<div class="pt-6 border-t border-slate-100">
+				<h2 class="text-xl sm:text-2xl font-black text-slate-900 mb-6">Sứ mệnh & Giá trị cốt lõi</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div class="bg-slate-50 p-6 rounded-lg border border-slate-100">
 					<h3 class="font-bold text-slate-800 text-lg mb-2"><?php echo esc_html( $about_cv_title ); ?></h3>
 					<p class="text-sm text-slate-500"><?php echo esc_html( $about_cv ); ?></p>
@@ -68,6 +70,7 @@ get_header();
 					<p class="text-sm text-slate-500">Mở rộng đối tác với hơn 50+ trường đại học chính quy, hỗ trợ giải đáp lộ trình học cho hàng chục ngàn học viên mỗi năm.</p>
 				</div>
 			</div>
+		</div>
 		</article>
 
 	</div>

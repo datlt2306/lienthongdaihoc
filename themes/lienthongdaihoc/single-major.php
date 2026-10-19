@@ -236,10 +236,10 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 						: get_the_content( null, false, $major_id );
 					?>
 					<div class="relative">
-						<div id="major-intro-content" class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base overflow-hidden transition-all duration-500 max-h-[350px] relative">
+						<div id="major-intro-content" class="prose prose-slate prose-base md:prose-lg max-w-none text-slate-800 text-base md:text-lg leading-relaxed md:leading-loose overflow-hidden transition-all duration-500 max-h-[380px] relative">
 							<?php echo apply_filters( 'the_content', $overview_markup ); ?>
 							<!-- Gradient Overlay for fade-out effect -->
-							<div id="major-intro-overlay" class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none transition-opacity duration-300"></div>
+							<div id="major-intro-overlay" class="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none transition-opacity duration-300"></div>
 						</div>
 						
 						<div id="major-intro-btn-container" class="hidden justify-center mt-4 border-t border-slate-100 pt-4">
@@ -278,7 +278,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 						
 						if (!content || !overlay || !container || !button) return;
 						
-						var limit = 350;
+						var limit = 380;
 						var storageKey = 'ltdh_major_intro_expanded_<?php echo $major_id; ?>';
 						var isExpanded = false;
 						
@@ -667,7 +667,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 										🎓
 									</div>
 									<div class="min-w-0 flex-1">
-										<h4 class="font-bold text-slate-800 text-xs sm:text-sm group-hover:text-[#00308b] transition-colors truncate"><?php echo esc_html( $rel_title ); ?></h4>
+										<h3 class="font-bold text-slate-800 text-xs sm:text-sm group-hover:text-[#00308b] transition-colors truncate"><?php echo esc_html( $rel_title ); ?></h3>
 										<?php if ( $rel_code ) : ?>
 											<span class="text-[10px] text-slate-400 font-medium">Mã ngành: <?php echo esc_html( $rel_code ); ?></span>
 										<?php endif; ?>
