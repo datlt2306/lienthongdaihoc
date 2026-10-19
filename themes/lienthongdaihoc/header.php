@@ -1,20 +1,25 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <!DOCTYPE html>
-<html <?php language_attributes(); ?>>
+<html <?php language_attributes(); ?> class="overflow-x-clip">
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap" media="print" onload="this.media='all'">
-	<noscript>
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap">
-	</noscript>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap">
 
 	<style id="ltdh-critical-typography">
 		html { scroll-behavior: smooth; }
 		@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+		html, body {
+			font-family: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			overflow-x: clip;
+		}
+		#mobile-menu.translate-x-full {
+			visibility: hidden;
+			pointer-events: none;
+		}
 		h1, h2, h3, h4, h5, h6,
 		h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
 		h1 strong, h2 strong, h3 strong, h4 strong, h5 strong, h6 strong,

@@ -1456,6 +1456,48 @@ function ltdh_fallback_sync_major_content( $post_id, $post ) {
 }
 
 /**
+ * Auto-populate major_overview ACF field from wp_posts.post_content
+ * when the custom field meta is empty or not yet initialized in database.
+ * Ensures the editor never appears empty for posts containing legacy content.
+ */
+add_filter( 'acf/load_value/name=major_overview', 'ltdh_acf_load_major_overview_from_post_content', 10, 3 );
+function ltdh_acf_load_major_overview_from_post_content( $value, $post_id, $field ) {
+	if ( ( empty( $value ) || '' === trim( (string) $value ) ) && is_numeric( $post_id ) && (int) $post_id > 0 ) {
+		$post = get_post( (int) $post_id );
+		if ( $post && ! empty( $post->post_content ) ) {
+			return $post->post_content;
+		}
+	}
+	return $value;
+}
+
+/**
+ * Auto-migrate legacy post_content to major_overview postmeta for all major posts.
+ * Runs once in WP Admin to permanently sync database without manual saving.
+ */
+add_action( 'admin_init', 'ltdh_auto_migrate_major_overview_meta' );
+function ltdh_auto_migrate_major_overview_meta() {
+	if ( get_transient( 'ltdh_major_overview_migrated_v1' ) ) {
+		return;
+	}
+	$majors = get_posts( [
+		'post_type'      => 'major',
+		'posts_per_page' => -1,
+		'post_status'    => 'any',
+	] );
+	if ( ! empty( $majors ) && is_array( $majors ) ) {
+		foreach ( $majors as $m ) {
+			$meta = get_post_meta( $m->ID, 'major_overview', true );
+			if ( ( empty( $meta ) || '' === trim( (string) $meta ) ) && ! empty( $m->post_content ) ) {
+				update_post_meta( $m->ID, 'major_overview', $m->post_content );
+				update_post_meta( $m->ID, '_major_overview', 'field_major_overview' );
+			}
+		}
+	}
+	set_transient( 'ltdh_major_overview_migrated_v1', 1, DAY_IN_SECONDS * 30 );
+}
+
+/**
  * Sanitize and validate verification metadata.
  *
  * @param string $meta_name Field or meta name.

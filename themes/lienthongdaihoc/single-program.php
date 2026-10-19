@@ -171,7 +171,7 @@ if ( ! empty( $faqs ) ) {
 		<!-- CONTENT GRID -->
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 			<!-- Main Column -->
-			<div class="lg:col-span-2 space-y-6 md:space-y-8">
+			<div class="lg:col-span-2 space-y-6 md:space-y-8 min-w-0">
 				
 				<?php 
 				$admission_status = function_exists( 'ltdh_get_program_admission_status' ) 
@@ -305,19 +305,21 @@ if ( ! empty( $faqs ) ) {
 					</div>
 
 					<!-- Semantic HTML Table for Search Engine Snippets & AI LLM Crawlers -->
-					<table class="sr-only" aria-label="Bảng tóm tắt thông số chương trình tuyển sinh">
-						<caption>Thông số kỹ thuật chương trình tuyển sinh Liên thông</caption>
-						<tbody>
-							<tr><th>Trường đào tạo</th><td><?php echo esc_html( $prog_school_name ); ?></td></tr>
-							<tr><th>Chuyên ngành</th><td><?php echo esc_html( $clean_major ?: $prog_clean_name ); ?></td></tr>
-							<tr><th>Hình thức đào tạo</th><td><?php echo esc_html( $prog_mode_name ); ?></td></tr>
-							<tr><th>Đối tượng đầu vào</th><td>Trung cấp / Cao đẳng</td></tr>
-							<tr><th>Thời gian đào tạo</th><td><?php echo esc_html( $prog_dur_name ); ?></td></tr>
-							<tr><th>Mức học phí</th><td><?php echo esc_html( $prog_fee_name ); ?></td></tr>
-							<tr><th>Danh hiệu văn bằng</th><td><?php echo esc_html( $degree_val ); ?></td></tr>
-							<tr><th>Hạn nộp hồ sơ</th><td><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></td></tr>
-						</tbody>
-					</table>
+					<div class="sr-only">
+						<table aria-label="Bảng tóm tắt thông số chương trình tuyển sinh">
+							<caption>Thông số kỹ thuật chương trình tuyển sinh Liên thông</caption>
+							<tbody>
+								<tr><th>Trường đào tạo</th><td><?php echo esc_html( $prog_school_name ); ?></td></tr>
+								<tr><th>Chuyên ngành</th><td><?php echo esc_html( $clean_major ?: $prog_clean_name ); ?></td></tr>
+								<tr><th>Hình thức đào tạo</th><td><?php echo esc_html( $prog_mode_name ); ?></td></tr>
+								<tr><th>Đối tượng đầu vào</th><td>Trung cấp / Cao đẳng</td></tr>
+								<tr><th>Thời gian đào tạo</th><td><?php echo esc_html( $prog_dur_name ); ?></td></tr>
+								<tr><th>Mức học phí</th><td><?php echo esc_html( $prog_fee_name ); ?></td></tr>
+								<tr><th>Danh hiệu văn bằng</th><td><?php echo esc_html( $degree_val ); ?></td></tr>
+								<tr><th>Hạn nộp hồ sơ</th><td><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></td></tr>
+							</tbody>
+						</table>
+					</div>
 
 					<!-- Thông tin pháp lý văn bằng & Giá trị toàn quốc (Thông tư 27/2019/TT-BGDĐT) -->
 					<div class="mt-4 bg-emerald-50/50 rounded-2xl p-4 sm:p-5 text-sm md:text-base text-slate-800 space-y-2.5 leading-relaxed border border-emerald-100/60">
@@ -611,21 +613,21 @@ if ( ! empty( $faqs ) ) {
 													<div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs border-t-4 border-t-emerald-500 p-4 sm:p-5 flex flex-col justify-between min-w-0">
 														<div>
 															<!-- Header: Icon squircle + Tiêu đề + Badge -->
-															<div class="pb-3 border-b border-slate-100 space-y-1">
-																<div class="flex items-center justify-between gap-2">
-																	<div class="flex items-center gap-2.5 min-w-0">
-																		<div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
-																			<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+															<div class="pb-3 border-b border-slate-100 space-y-1.5">
+																<div class="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
+																	<div class="flex items-center gap-2 min-w-0">
+																		<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+																			<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 																				<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 																			</svg>
 																		</div>
-																		<h4 class="font-bold text-slate-900 text-sm sm:text-base leading-tight">Nhóm ngành đúng</h4>
+																		<h4 class="font-bold text-slate-900 text-sm sm:text-base leading-tight whitespace-nowrap">Nhóm ngành đúng</h4>
 																	</div>
 																	<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70 shrink-0">
 																		Không học bổ sung
 																	</span>
 																</div>
-																<p class="text-[11px] text-slate-500 font-medium pl-10.5">Học thẳng môn chuyên ngành</p>
+																<p class="text-[11px] text-slate-500 font-medium pl-9 sm:pl-10">Học thẳng môn chuyên ngành</p>
 															</div>
 
 															<!-- Lợi thế nổi bật của nhóm ngành đúng -->
@@ -674,21 +676,21 @@ if ( ! empty( $faqs ) ) {
 													<div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs border-t-4 border-t-amber-500 p-4 sm:p-5 flex flex-col justify-between min-w-0">
 														<div>
 															<!-- Header: Icon squircle + Tiêu đề + Badge -->
-															<div class="pb-3 border-b border-slate-100 space-y-1">
-																<div class="flex items-center justify-between gap-2">
-																	<div class="flex items-center gap-2.5 min-w-0">
-																		<div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
-																			<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+															<div class="pb-3 border-b border-slate-100 space-y-1.5">
+																<div class="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
+																	<div class="flex items-center gap-2 min-w-0">
+																		<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+																			<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 																				<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
 																			</svg>
 																		</div>
-																		<h4 class="font-bold text-slate-900 text-sm sm:text-base leading-tight">Nhóm ngành gần</h4>
+																		<h4 class="font-bold text-slate-900 text-sm sm:text-base leading-tight whitespace-nowrap">Nhóm ngành gần</h4>
 																	</div>
 																	<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/70 shrink-0">
 																		+ <?php echo sprintf( '%02d', (int) ( $t_item['bridge_count'] ?: 3 ) ); ?> học phần
 																	</span>
 																</div>
-																<p class="text-[11px] text-slate-500 font-medium pl-10.5">Bổ sung kiến thức chuyển đổi</p>
+																<p class="text-[11px] text-slate-500 font-medium pl-9 sm:pl-10">Bổ sung kiến thức chuyển đổi</p>
 															</div>
 
 															<!-- Quy định tổ chức học chuyển đổi -->
