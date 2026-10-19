@@ -156,8 +156,8 @@ DryFieldsTestSuite::assert(
 	"Program: Field 'tuition_increase_roadmap' is removed"
 );
 DryFieldsTestSuite::assert(
-	! isset( $program_fields_by_name['duration'] ),
-	"Program: Field 'duration' is removed"
+	isset( $program_fields_by_name['duration'] ),
+	"Program: Field 'duration' is present as optional override"
 );
 DryFieldsTestSuite::assert(
 	! isset( $program_fields_by_name['exemption_title'] ),
@@ -183,7 +183,6 @@ $hidden_keys = [
 	'field_program_contact_info',
 	'field_program_documents',
 	'field_program_tuition_increase_roadmap',
-	'field_program_duration',
 	'field_program_exemption_title',
 	'field_program_exemption_intro',
 	'field_program_exemption_items',

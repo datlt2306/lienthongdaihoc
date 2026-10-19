@@ -1012,6 +1012,14 @@
         "placeholder": "Ví dụ: 200.000 đ / hồ sơ hoặc Miễn phí (Để trống nếu không thu)"
       },
       {
+        "key": "field_program_duration",
+        "label": "Thời gian học (Tùy chọn ghi đè)",
+        "name": "duration",
+        "type": "text",
+        "instructions": "Để trống hệ thống sẽ tự động kế thừa từ Trường đào tạo (chuẩn DRY). Chỉ điền nếu chương trình này có thời gian đào tạo đặc thù (ví dụ: 1.5 - 2 năm, Tối thiểu 1.5 năm...).",
+        "placeholder": "Ví dụ: 1.5 - 2 năm (Để trống để tự động lấy theo trường)"
+      },
+      {
         "key": "field_tab_prog_faq",
         "label": "Câu hỏi thường gặp",
         "name": "",

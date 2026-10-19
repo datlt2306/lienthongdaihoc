@@ -183,6 +183,9 @@ if ( ! function_exists( 'get_permalink' ) ) {
 
 if ( ! function_exists( 'get_post_meta' ) ) {
 	function get_post_meta( $id, $key, $single = true ) {
+		if ( isset( $GLOBALS['mock_post_meta'][ $id ][ $key ] ) ) {
+			return $GLOBALS['mock_post_meta'][ $id ][ $key ];
+		}
 		if ( $key === '_is_hot' && $id === 201 ) {
 			return '1';
 		}
@@ -367,6 +370,78 @@ test_assert( in_array( 'menu-item-mega-menu', $admin_res[0]->classes, true ), 'P
 test_assert( in_array( 'menu-item-category', $admin_res[1]->classes, true ), 'Custom category 11 gets menu-item-category' );
 test_assert( in_array( 'menu-item-object-major', $admin_res[2]->classes, true ), 'Custom sub-major 12 gets menu-item-object-major' );
 test_assert( in_array( 'ltdh-view-all-link', $admin_res[3]->classes, true ), 'Custom CTA 13 gets ltdh-view-all-link' );
+
+// Test 7: Training Types Menu (Standard Vertical Dropdown, NOT Mega Menu)
+echo "\nTEST 7: Non-major Taxonomy Menu ('Hình thức liên thông' Standard Dropdown)\n";
+$training_menu_items = [
+	(object) [
+		'ID'               => 20,
+		'title'            => 'Hình thức liên thông',
+		'url'              => home_url( '/hinh-thuc-dao-tao/' ),
+		'menu_item_parent' => 0,
+		'classes'          => [],
+		'object'           => 'custom',
+		'type'             => 'custom',
+	],
+	(object) [
+		'ID'               => 21,
+		'title'            => 'Chính quy',
+		'url'              => home_url( '/hinh-thuc-dao-tao/chinh-quy/' ),
+		'menu_item_parent' => 20,
+		'classes'          => [],
+		'object'           => 'training_type',
+		'type'             => 'taxonomy',
+	],
+	(object) [
+		'ID'               => 22,
+		'title'            => 'Đào tạo từ xa',
+		'url'              => home_url( '/hinh-thuc-dao-tao/dao-tao-tu-xa/' ),
+		'menu_item_parent' => 20,
+		'classes'          => [],
+		'object'           => 'training_type',
+		'type'             => 'taxonomy',
+	],
+	(object) [
+		'ID'               => 23,
+		'title'            => 'Vừa học vừa làm',
+		'url'              => home_url( '/hinh-thuc-dao-tao/vua-hoc-vua-lam/' ),
+		'menu_item_parent' => 20,
+		'classes'          => [],
+		'object'           => 'training_type',
+		'type'             => 'taxonomy',
+	],
+];
+
+$training_res = ltdh_dynamic_menu_submenu_injection( $training_menu_items, (object) [ 'theme_location' => 'primary-menu' ] );
+test_assert( ! in_array( 'menu-item-mega-menu', $training_res[0]->classes, true ), 'Parent "Hình thức liên thông" does NOT have menu-item-mega-menu' );
+test_assert( ! in_array( 'menu-item-category', $training_res[1]->classes, true ), 'Child "Chính quy" does NOT have menu-item-category' );
+test_assert( ! in_array( 'menu-item-category', $training_res[2]->classes, true ), 'Child "Đào tạo từ xa" does NOT have menu-item-category' );
+test_assert( ! in_array( 'menu-item-category', $training_res[3]->classes, true ), 'Child "Vừa học vừa làm" does NOT have menu-item-category' );
+
+$training_child_html = ltdh_mega_menu_nav_menu_start_el(
+	'<a href="' . $training_res[1]->url . '">' . $training_res[1]->title . '</a>',
+	$training_res[1],
+	1,
+	(object) [ 'theme_location' => 'primary-menu', 'menu_class' => 'nav-primary-menu' ]
+);
+test_assert( strpos( $training_child_html, 'mega-cat-header-link' ) === false, 'Child does NOT render mega-cat-header-link' );
+test_assert( strpos( $training_child_html, 'mega-cat-icon' ) === false, 'Child does NOT render mega-cat-icon' );
+
+// Test 8: Explicit Opt-Out (_menu_item_is_mega_menu = '0')
+echo "\nTEST 8: Explicit Opt-Out (_menu_item_is_mega_menu = '0')\n";
+$GLOBALS['mock_post_meta'][30] = [ '_menu_item_is_mega_menu' => '0' ];
+
+$opt_out_items = [
+	(object) [
+		'ID'               => 30,
+		'title'            => 'Chuyên ngành',
+		'url'              => home_url( '/nganh-hoc/' ),
+		'menu_item_parent' => 0,
+		'classes'          => [],
+	],
+];
+$opt_out_res = ltdh_dynamic_menu_submenu_injection( $opt_out_items, (object) [ 'theme_location' => 'primary-menu' ] );
+test_assert( ! in_array( 'menu-item-mega-menu', $opt_out_res[0]->classes, true ), 'Explicitly opted out item (ID 30) does NOT get menu-item-mega-menu' );
 
 echo "\n===================================================================\n";
 if ( $all_passed ) {

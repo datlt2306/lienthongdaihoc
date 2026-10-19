@@ -802,7 +802,9 @@ function ltdh_override_field_program_admission_fee_label( $field ) {
 
 add_filter( 'acf/load_field/key=field_program_duration', 'ltdh_override_field_program_duration_label' );
 function ltdh_override_field_program_duration_label( $field ) {
-	$field['label'] = 'Thời gian học';
+	$field['label']        = 'Thời gian học (Tùy chọn ghi đè)';
+	$field['instructions'] = 'Để trống hệ thống sẽ tự động kế thừa từ Trường đào tạo (chuẩn DRY). Chỉ điền nếu chương trình này có thời gian đào tạo đặc thù (ví dụ: 1.5 - 2 năm, Tối thiểu 1.5 năm...).';
+	$field['placeholder']  = 'Ví dụ: 1.5 - 2 năm (Để trống để tự động lấy theo trường)';
 	return $field;
 }
 
@@ -909,7 +911,8 @@ add_filter( 'acf/prepare_field/key=field_program_disadvantages', '__return_false
 add_filter( 'acf/prepare_field/key=field_program_contact_info', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_documents', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_tuition_increase_roadmap', '__return_false' );
-add_filter( 'acf/prepare_field/key=field_program_duration', '__return_false' );
+// Keep duration visible on Program for program-specific training duration override
+// add_filter( 'acf/prepare_field/key=field_program_duration', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_exemption_title', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_exemption_intro', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_program_exemption_items', '__return_false' );
@@ -2274,9 +2277,9 @@ function ltdh_get_program_data_completeness( $post_id ) {
 	}
 
 	// 4. Kiểm tra: Thời gian học
-	$duration = get_post_meta( $post_id, 'duration', true );
+	$duration = function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $post_id ) : get_post_meta( $post_id, 'duration', true );
 	if ( empty( $duration ) ) {
-		$p0_missing[] = 'Trường "Thời gian học" (Tab Học phí & Thời gian học): Đang để trống (ví dụ: "1.5 - 2 năm").';
+		$p0_missing[] = 'Trường "Thời gian học" (Tab Học phí & Thời gian học): Đang để trống cả ở Chương trình và Trường đào tạo (ví dụ: "1.5 - 2 năm").';
 	}
 
 	// 5. Kiểm tra: Yêu cầu & Hồ sơ

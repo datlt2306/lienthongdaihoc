@@ -358,10 +358,10 @@ echo "-------------------------------------------------------------------\n";
 
 $test_uris = [
 	'/' => [ 'active_expected' => 'Trang chủ' ],
-	'/he-dao-tao/' => [ 'active_expected' => 'Liên thông đại học' ],
-	'/he-dao-tao/tu-xa/' => [ 'active_expected' => 'Từ xa' ],
-	'/he-dao-tao/vua-hoc-vua-lam/' => [ 'active_expected' => 'Vừa học vừa làm' ],
-	'/nganh-hoc/' => [ 'active_expected' => 'Ngành học' ],
+	'/hinh-thuc-dao-tao/' => [ 'active_expected' => 'Liên thông đại học' ],
+	'/hinh-thuc-dao-tao/dao-tao-tu-xa/' => [ 'active_expected' => 'Từ xa' ],
+	'/hinh-thuc-dao-tao/vua-hoc-vua-lam/' => [ 'active_expected' => 'Vừa học vừa làm' ],
+	'/nhom-nganh/' => [ 'active_expected' => 'Nhóm Ngành' ],
 	'/truong-doi-tac/' => [ 'active_expected' => 'Trường' ],
 	'/tin-tuc/' => [ 'active_expected' => 'Kiến thức liên thông' ],
 	'/kiem-tra-dieu-kien/' => [ 'active_expected' => 'Kiểm tra điều kiện' ],
