@@ -473,3 +473,65 @@ Integrity mode: development
 - [ ] Thư mục `wp-content/uploads/` được bảo vệ tuyệt đối: mọi file `.php` hoặc script ngụy trang đuôi `.jpg` khi truy cập qua web server đều bị từ chối thực thi (trả về 403 Forbidden hoặc 404).
 - [ ] Database không còn các bài viết spam casino hoặc adult (truy vấn tìm kiếm từ khóa cờ bạc/OnlyFans trong `wp_posts` trả về 0 kết quả).
 - [ ] Cấu hình trong `wp-config.php` có khai báo `DISALLOW_FILE_EDIT` là `true` và `WP_DEBUG_DISPLAY` là `false`.
+
+
+## 2026-10-19T11:10:42Z
+
+Conduct a comprehensive Page Template Architecture Audit for the WordPress website lienthongdaihoc.com, evaluating existing template structures against UX, SEO, Accessibility, and Conversion guidelines to produce evidence-based standardization standards and a phased implementation roadmap.
+
+Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc
+Integrity mode: development
+
+## Reference Guidelines
+- Nielsen Norman Group (NN/g): 10 Usability Heuristics
+- W3C WAI Page Structure & WCAG 2.2 Guidelines
+- Google Search Central: Creating Helpful Content & SEO Starter Guide
+- GOV.UK Design System: Task-oriented page structure principles (adapted for Vietnamese university admission context)
+
+## Requirements
+
+### R1. Theme Repository & Page Inventory Discovery
+- Inspect theme structure, PHP template files, template hierarchy, CPT registrations (School, Major, Program), taxonomies, ACF field groups, header/footer, and reusable template parts in `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc`.
+- Discover and catalog all existing page types (Homepage, School archive/single, Major archive/single, Program archive/single, Blog/Guide, Search/Filter, Consultation, FAQ, Policy pages, Error/Utility pages).
+- Document actual URLs and template file paths; explicitly note limitations if any source is inaccessible.
+
+### R2. Current Template Outline Extraction
+- For each discovered page type, extract its actual rendered outline in tree hierarchy format.
+- Document H1/H2/H3 heading hierarchy, displayed data fields, primary/secondary CTAs, forms/lead capture points, internal links/related modules, reusable components, and empty/conditional states.
+- Differentiate semantic DOM order, visual order, and heading levels.
+
+### R3. Comprehensive Multi-Dimensional Evaluation & Scoring
+- Evaluate templates across 9 dimensions: User intent, Information architecture, Content completeness, SEO/Search intent, Accessibility (WCAG 2.2 semantic markup), Lead-generation effectiveness, Cross-template consistency, Responsive usability, and Maintainability.
+- Apply the 100-point scoring framework (User Intent: 25, IA & Nav: 20, Content & SEO: 20, Lead-Gen UX: 20, Accessibility: 15).
+- Document every finding with: Finding ID, Page Type, Severity (P0-P3), Current Behavior, Code Evidence (file path & line numbers), Rationale, Recommended Action, Expected Benefit, and Verification Method.
+
+### R4. Standardized Template Outlines & Cross-Template Consistency
+- Define recommended template standards for every confirmed page type (Homepage, School Detail, Major Detail, Program Detail, Listings/Search, Guide/Article, Consultation).
+- Categorize sections into MUST-HAVE, OPTIONAL, and SHOULD-NOT-HAVE with rationale, heading level, CTA, and data dependencies.
+- Conduct cross-template consistency analysis to identify duplicate/fragmented sections, inconsistent CTAs/headings, and catalog reusable components.
+
+### R5. Audit Documentation & Phased Roadmap Deliverables
+- Compile all findings into 5 structured Markdown deliverables under `docs/audit/`:
+  1. `docs/audit/page-template-audit.md` (Full comprehensive report with Executive Summary, 100-pt score, and Top 5 findings).
+  2. `docs/audit/page-inventory.md` (Complete inventory of page types, CPTs, templates, and URLs).
+  3. `docs/audit/template-outline-matrix.md` (Current vs recommended outline comparison trees).
+  4. `docs/audit/recommended-template-standards.md` (Must-have/optional/should-not-have section specs).
+  5. `docs/audit/prioritized-backlog.md` (Phased implementation roadmap across Phases 1-5 with human decisions checklist).
+- Strictly AUDIT ONLY: Do not modify any PHP, CSS, SCSS, JS, or database files.
+- Strictly NO git commits and NO git pushes.
+
+## Acceptance Criteria
+
+### Audit Deliverables Completeness
+- [ ] All 5 deliverable Markdown files exist in `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/docs/audit/`.
+- [ ] `page-template-audit.md` contains all 15 required sections from the specification.
+- [ ] Every major finding in the report includes a unique Finding ID, Severity level (P0, P1, P2, or P3), file path, and line number evidence.
+- [ ] The 100-point audit scoring framework is fully evaluated across all 5 dimensions with explicit evidence and notes on unverified items.
+- [ ] Standardized outlines classify all sections into MUST-HAVE, OPTIONAL, and SHOULD-NOT-HAVE for each page type.
+- [ ] A prioritized backlog is organized into 5 implementation phases with explicit dependencies.
+- [ ] A list of human decisions requiring website owner approval is documented.
+
+### Non-Destructive Integrity Guardrails
+- [ ] Zero source code files modified in the theme repository (`git status --porcelain` shows only untracked files in `docs/audit/`).
+- [ ] Zero git commits created.
+- [ ] Zero git pushes executed.

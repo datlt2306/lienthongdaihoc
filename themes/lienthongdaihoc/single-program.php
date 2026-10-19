@@ -576,61 +576,63 @@ if ( ! empty( $faqs ) ) {
 										<?php if ( ! empty( $program_target_admission ) ) : 
 											$t_item = $program_target_admission;
 										?>
-											<div class="border border-slate-200/80 rounded-xl overflow-hidden bg-white shadow-2xs">
-												<!-- Header thẻ quy định của trường -->
-												<div class="bg-slate-50/80 px-4 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
-													<div class="flex items-center gap-2">
-														<div class="w-6 h-6 rounded-md bg-[#00308b]/10 text-[#00308b] flex items-center justify-center shrink-0">
-															<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-																<path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-																<path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-															</svg>
-														</div>
-														<h4 class="font-bold text-slate-900 text-sm md:text-[15px]">
-															Quy định đối tượng tuyển sinh: Ngành đúng &amp; Ngành gần
-														</h4>
-													</div>
+											<div class="mt-4 pt-1">
+												<!-- Header quy định -->
+												<div class="flex flex-wrap items-center justify-between gap-2 mb-3.5">
+													<h4 class="font-bold text-slate-900 text-sm md:text-[15px] flex items-center gap-2">
+														<span class="w-2 h-2 rounded-full bg-[#00308b]"></span>
+														<span>Quy định đối tượng tuyển sinh: Ngành đúng &amp; Ngành gần</span>
+													</h4>
 													<?php if ( ! empty( $t_item['regulation_title'] ) ) : ?>
-														<span class="text-[11px] sm:text-xs font-medium text-slate-500 bg-white px-2.5 py-0.5 rounded-md border border-slate-200/70">
+														<span class="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
 															<?php echo esc_html( $t_item['regulation_title'] ); ?>
 														</span>
 													<?php endif; ?>
 												</div>
 
-												<!-- BẢNG 2 CỘT CHUẨN: NGÀNH ĐÚNG VS NGÀNH GẦN -->
-												<div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+												<!-- 2 CARDS GRID (Emerald & Amber Top-Border Cards matching website concept) -->
+												<div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
 													
 													<!-- CỘT 1: NHÓM NGÀNH ĐÚNG -->
-													<div class="p-4 sm:p-5 flex flex-col justify-between">
+													<div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm border-t-4 border-t-emerald-500 p-4 sm:p-5 flex flex-col justify-between">
 														<div>
-															<div class="pb-3 mb-3.5 border-b border-slate-100">
-																<div class="flex items-center gap-2">
-																	<span class="w-5 h-5 rounded-md bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-																		<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-																	</span>
-																	<h5 class="font-bold text-slate-900 text-sm sm:text-base">Nhóm ngành đúng</h5>
+															<!-- Header: Icon squircle + Tiêu đề + Badge -->
+															<div class="flex items-start justify-between gap-3 pb-3.5 border-b border-slate-100">
+																<div class="flex items-center gap-3">
+																	<div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+																		<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+																			<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																		</svg>
+																	</div>
+																	<div>
+																		<h5 class="font-bold text-slate-900 text-base leading-snug">Nhóm ngành đúng</h5>
+																		<span class="text-xs text-slate-500 font-medium">Học thẳng môn chuyên ngành</span>
+																	</div>
 																</div>
-																<div class="mt-1.5 pl-7">
-																	<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100/60">
-																		Học thẳng · Không học bổ sung
-																	</span>
-																</div>
+																<span class="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70 whitespace-nowrap">
+																	Không học bổ sung
+																</span>
 															</div>
 
-															<p class="text-xs text-slate-500 mb-2 font-medium">Bằng Cao đẳng các chuyên ngành:</p>
-															<?php if ( ! empty( $t_item['proper_majors'] ) ) : ?>
-																<div class="flex flex-wrap gap-1.5 mb-4">
-																	<?php foreach ( $t_item['proper_majors'] as $p_major ) : ?>
-																		<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200/60 transition-colors">
-																			<?php echo esc_html( $p_major ); ?>
-																		</span>
-																	<?php endforeach; ?>
-																</div>
-															<?php endif; ?>
+															<!-- Body: Danh sách chuyên ngành đúng -->
+															<div class="mt-4">
+																<p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">Bằng Cao đẳng các chuyên ngành:</p>
+																<?php if ( ! empty( $t_item['proper_majors'] ) ) : ?>
+																	<ul class="space-y-2 text-xs sm:text-[13px] text-slate-700">
+																		<?php foreach ( $t_item['proper_majors'] as $p_major ) : ?>
+																			<li class="flex items-start gap-2.5">
+																				<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+																				<span class="font-medium text-slate-800 leading-snug"><?php echo esc_html( $p_major ); ?></span>
+																			</li>
+																		<?php endforeach; ?>
+																	</ul>
+																<?php endif; ?>
+															</div>
 														</div>
 
-														<div class="mt-auto pt-3 border-t border-slate-100">
-															<div class="flex items-start gap-2 p-2.5 rounded-lg bg-emerald-50/40 border border-emerald-100/60 text-xs text-slate-700 leading-relaxed">
+														<!-- Footer: Ghi chú học phí & thời gian -->
+														<div class="mt-5 pt-3 border-t border-slate-100">
+															<div class="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/60 border border-emerald-100 text-xs text-slate-700 leading-relaxed">
 																<svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 																	<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 																</svg>
@@ -640,36 +642,45 @@ if ( ! empty( $faqs ) ) {
 													</div>
 
 													<!-- CỘT 2: NHÓM NGÀNH GẦN -->
-													<div class="p-4 sm:p-5 flex flex-col justify-between">
+													<div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm border-t-4 border-t-amber-500 p-4 sm:p-5 flex flex-col justify-between">
 														<div>
-															<div class="pb-3 mb-3.5 border-b border-slate-100">
-																<div class="flex items-center gap-2">
-																	<span class="w-5 h-5 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
-																		<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-																	</span>
-																	<h5 class="font-bold text-slate-900 text-sm sm:text-base">Nhóm ngành gần</h5>
+															<!-- Header: Icon squircle + Tiêu đề + Badge -->
+															<div class="flex items-start justify-between gap-3 pb-3.5 border-b border-slate-100">
+																<div class="flex items-center gap-3">
+																	<div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+																		<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+																			<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+																		</svg>
+																	</div>
+																	<div>
+																		<h5 class="font-bold text-slate-900 text-base leading-snug">Nhóm ngành gần</h5>
+																		<span class="text-xs text-slate-500 font-medium">Bổ sung kiến thức chuyển đổi</span>
+																	</div>
 																</div>
-																<div class="mt-1.5 pl-7">
-																	<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-100/60">
-																		Học bổ sung <?php echo sprintf( '%02d', (int) ( $t_item['bridge_count'] ?: 3 ) ); ?> học phần chuyển đổi
-																	</span>
-																</div>
+																<span class="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200/70 whitespace-nowrap">
+																	+ <?php echo sprintf( '%02d', (int) ( $t_item['bridge_count'] ?: 3 ) ); ?> học phần bổ sung
+																</span>
 															</div>
 
-															<p class="text-xs text-slate-500 mb-2 font-medium">Bằng Cao đẳng các ngành:</p>
-															<?php if ( ! empty( $t_item['near_majors'] ) ) : ?>
-																<div class="flex flex-wrap gap-1.5 mb-4">
-																	<?php foreach ( $t_item['near_majors'] as $n_major ) : ?>
-																		<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/60 transition-colors">
-																			<?php echo esc_html( $n_major ); ?>
-																		</span>
-																	<?php endforeach; ?>
-																</div>
-															<?php endif; ?>
+															<!-- Body: Danh sách ngành gần (2 cột ngăn nắp, không tràn dòng) -->
+															<div class="mt-4">
+																<p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">Bằng Cao đẳng các ngành:</p>
+																<?php if ( ! empty( $t_item['near_majors'] ) ) : ?>
+																	<ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs sm:text-[13px] text-slate-700">
+																		<?php foreach ( $t_item['near_majors'] as $n_major ) : ?>
+																			<li class="flex items-start gap-2">
+																				<span class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></span>
+																				<span class="font-medium text-slate-800 leading-snug"><?php echo esc_html( $n_major ); ?></span>
+																			</li>
+																		<?php endforeach; ?>
+																	</ul>
+																<?php endif; ?>
+															</div>
 														</div>
 
-														<div class="mt-auto pt-3 border-t border-slate-100">
-															<div class="flex items-start gap-2 p-2.5 rounded-lg bg-amber-50/40 border border-amber-100/60 text-xs text-slate-700 leading-relaxed">
+														<!-- Footer: Ghi chú học bổ sung -->
+														<div class="mt-5 pt-3 border-t border-slate-100">
+															<div class="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/60 border border-amber-100 text-xs text-slate-700 leading-relaxed">
 																<svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 																	<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
 																</svg>

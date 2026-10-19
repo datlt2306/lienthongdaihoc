@@ -119,13 +119,6 @@ if ( ! empty( $school_faqs ) ) {
 				<div class="min-w-0 flex-1">
 					<!-- Badges Row -->
 					<div class="flex flex-wrap items-center gap-2 mb-2 sm:mb-2.5">
-						<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/25 text-blue-200 border border-blue-400/35 text-[11px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-xs">
-							<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-								<path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a10.97 10.97 0 00-.25 2.309c0 .762.08 1.504.23 2.222a1 1 0 00.97.794h7.6a1 1 0 00.97-.794c.15-.718.23-1.46.23-2.222 0-.792-.089-1.564-.25-2.309l2.644-1.131a1 1 0 000-1.84l-7-3zM5.75 13.916a9.006 9.006 0 01-.75-2.584c.642.186 1.312.316 2 .385.064.632.182 1.243.348 1.826-.547.123-1.077.262-1.598.373zM10 14c-.696 0-1.365-.06-2-.172.186-.68.324-1.396.402-2.133.523.068 1.054.105 1.598.105s1.075-.037 1.598-.105c.078.737.216 1.453.402 2.133-.635.112-1.304.172-2 .172zm4.25-.084c-.521-.111-1.051-.25-1.598-.373.166-.583.284-1.194.348-1.826.688-.069 1.358-.199 2-.385a9.006 9.006 0 01-.75 2.584z"/>
-							</svg>
-							Trường Đối Tác Tuyển Sinh Liên Thông
-						</span>
-
 						<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/25 text-emerald-300 border border-emerald-400/35 text-[11px] sm:text-xs font-bold backdrop-blur-md shadow-xs">
 							<span class="relative flex h-2 w-2">
 								<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -734,7 +727,7 @@ if ( ! empty( $school_faqs ) ) {
 								$major_he_slugs = array_unique( array_column( $major['programs'], 'he' ) );
 								$programs_count   = count( $major['programs'] );
 								$first_prog       = ! empty( $major['programs'] ) ? $major['programs'][0] : null;
-								$primary_link     = $major_link ?: ( $first_prog ? $first_prog['permalink'] : '#' );
+								$primary_link     = ( $first_prog && ! empty( $first_prog['permalink'] ) ) ? $first_prog['permalink'] : ( $major_link ?: '#' );
 								$major_spec_names = array_unique( array_filter( array_column( $major['programs'], 'specialization' ) ) );
 								?>
 								<div class="ltdh-major-card group bg-white border border-slate-200/90 hover:border-blue-300 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
@@ -802,11 +795,22 @@ if ( ! empty( $school_faqs ) ) {
 											<?php endif; ?>
 
 											<!-- Major Name -->
-											<h3 class="font-extrabold text-slate-900 text-base sm:text-lg group-hover:text-[#00308b] transition-colors leading-snug mb-2">
+											<h3 class="font-extrabold text-slate-900 text-base sm:text-lg group-hover:text-[#00308b] transition-colors leading-snug mb-1">
 												<a href="<?php echo esc_url( $primary_link ); ?>">
 													Ngành <?php echo esc_html( $major['name'] ); ?>
 												</a>
 											</h3>
+
+											<?php 
+											$is_real_spec = ! empty( $first_prog['specialization'] )
+												&& mb_strtolower( trim( $first_prog['specialization'] ), 'UTF-8' ) !== mb_strtolower( trim( $major['name'] ), 'UTF-8' )
+												&& mb_strtolower( trim( $first_prog['specialization'] ), 'UTF-8' ) !== mb_strtolower( trim( preg_replace( '/^ngành\s+/iu', '', $major['name'] ) ), 'UTF-8' );
+											if ( $is_real_spec ) : ?>
+												<p class="text-xs text-slate-500 font-medium mb-2 flex items-center gap-1.5">
+													<span class="w-1.5 h-1.5 rounded-full bg-[#00308b]"></span>
+													<span>Chuyên ngành: <strong class="text-slate-800 font-semibold"><?php echo esc_html( $first_prog['specialization'] ); ?></strong></span>
+												</p>
+											<?php endif; ?>
 
 											<!-- Highlights Info Row -->
 											<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 mb-3.5">
@@ -828,18 +832,11 @@ if ( ! empty( $school_faqs ) ) {
 
 										<!-- Programs Selector Tray (Dedicated Action Area) -->
 										<div class="pt-3 border-t border-slate-100 mt-auto">
-											<div class="text-[11px] font-semibold text-slate-500 flex items-center justify-between mb-2">
-												<span class="flex items-center gap-1.5">
-													<svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-													</svg>
-													<span>Hệ đào tạo tuyển sinh:</span>
-												</span>
-												<?php if ( $major_link ) : ?>
-													<a href="<?php echo esc_url( $major_link ); ?>" class="text-[11px] font-medium text-slate-400 hover:text-[#00308b] transition-colors" title="Xem tổng quan về ngành">
-														Chi tiết ngành &rarr;
-													</a>
-												<?php endif; ?>
+											<div class="text-[11px] font-semibold text-slate-500 flex items-center gap-1.5 mb-2">
+												<svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+												</svg>
+												<span>Hệ đào tạo tuyển sinh:</span>
 											</div>
 
 											<?php 
@@ -852,7 +849,6 @@ if ( ! empty( $school_faqs ) ) {
 												$raw_type  = $prog['type_name'] ?: 'Đào tạo từ xa';
 												$label     = ( 0 !== stripos( $raw_type, 'hệ' ) ) ? 'Hệ ' . $raw_type : $raw_type;
 												$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
-												$spec_name = ! empty( $prog['specialization'] ) ? $prog['specialization'] : '';
 
 												$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
 												$btn_style = 'bg-indigo-50/70 hover:bg-indigo-600 text-indigo-900 hover:text-white border-indigo-200/90 hover:border-indigo-600';
@@ -864,24 +860,15 @@ if ( ! empty( $school_faqs ) ) {
 													$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
 													$btn_style = 'bg-amber-50/70 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-300/80 hover:border-amber-600';
 												}
-
-												$is_real_spec = ! empty( $spec_name )
-													&& mb_strtolower( trim( $spec_name ), 'UTF-8' ) !== mb_strtolower( trim( $major['name'] ), 'UTF-8' )
-													&& mb_strtolower( trim( $spec_name ), 'UTF-8' ) !== mb_strtolower( trim( preg_replace( '/^ngành\s+/iu', '', $major['name'] ) ), 'UTF-8' );
 											?>
 												<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
 												   class="group/btn w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-bold border transition-all flex items-center justify-between no-underline shadow-2xs hover:shadow-md active:scale-[0.99] <?php echo esc_attr( $btn_style ); ?>"
 												   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
 													<span class="flex items-center gap-2 min-w-0 mr-2">
 														<?php echo $icon_svg; ?>
-														<?php if ( $is_real_spec ) : ?>
-															<span class="truncate"><?php echo esc_html( $spec_name ); ?></span>
-															<span class="text-[11px] font-medium opacity-80 shrink-0 px-2 py-0.5 rounded-md bg-black/5"><?php echo esc_html( $label ); ?></span>
-														<?php else : ?>
-															<span class="truncate"><?php echo esc_html( $label ); ?></span>
-														<?php endif; ?>
+														<span class="truncate"><?php echo esc_html( $label ); ?></span>
 													</span>
-													<span class="inline-flex items-center gap-1 text-xs opacity-80 group-hover/btn:opacity-100 shrink-0 ml-auto">
+													<span class="inline-flex items-center gap-1 text-xs opacity-80 group-hover/btn:opacity-100 shrink-0 ml-auto whitespace-nowrap">
 														<span>Xem tuyển sinh</span>
 														<svg class="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 															<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
