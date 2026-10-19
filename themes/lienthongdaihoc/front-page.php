@@ -66,16 +66,16 @@ $zalo    = ltdh_get_zalo_url();
 							<a href="<?php echo esc_url($slide['link']); ?>" class="block w-full h-full">
 						<?php endif; ?>
 						
-						<div class="relative w-full h-auto min-h-[220px] sm:min-h-[350px] md:min-h-[450px] max-h-[800px] overflow-hidden bg-[#f8fafc]">
+						<div class="hero-banner-container relative w-full h-auto min-h-[220px] sm:min-h-[350px] md:min-h-[450px] max-h-[800px] overflow-hidden bg-[#002e8a]">
 							<!-- Main Banner Image -->
-							<picture class="relative z-10 block w-full h-auto max-h-[800px]">
+							<picture class="relative z-10 block w-full h-auto max-h-[800px] aspect-[1942/809]" style="aspect-ratio: 1942/809;">
 								<?php if ( ! empty( $slide_img_mobile ) && $slide_img_mobile !== $slide_img_desktop ) : ?>
 									<source media="(max-width: 768px)" srcset="<?php echo esc_url( $slide_img_mobile ); ?>" width="768" height="320">
 								<?php endif; ?>
 								<?php if ( ! empty( $slide_img_1400 ) && $slide_img_1400 !== $slide_img_desktop ) : ?>
 									<source media="(max-width: 1440px)" srcset="<?php echo esc_url( $slide_img_1400 ); ?>" width="1400" height="584">
 								<?php endif; ?>
-								<img src="<?php echo esc_url( $slide_img_desktop ); ?>" width="1942" height="809" alt="Banner Hero" class="<?php echo $hero_cls; ?>w-full h-auto max-h-[800px] object-cover object-center pointer-events-none" <?php echo $loading_attr; ?> decoding="async">
+								<img src="<?php echo esc_url( $slide_img_desktop ); ?>" width="1942" height="809" alt="Banner Hero" class="<?php echo $hero_cls; ?>w-full h-auto max-h-[800px] aspect-[1942/809] object-cover object-center pointer-events-none" style="aspect-ratio: 1942/809;" <?php echo $loading_attr; ?> decoding="async">
 							</picture>
 						</div>
 
@@ -151,7 +151,7 @@ $zalo    = ltdh_get_zalo_url();
 
 
 	<!-- Search & Filters Container (Compact Single-Row Bar) -->
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-30">
+	<div class="search-filters-bar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-30">
 		<div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-5">
 			<form action="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-center">
 				<!-- Keyword (always visible) -->
@@ -192,7 +192,7 @@ $zalo    = ltdh_get_zalo_url();
 				<!-- Training Mode Select -->
 				<div class="w-full">
 					<label for="home-filter-he" class="sr-only"><?php esc_html_e( 'Chọn hình thức đào tạo', 'ltdh' ); ?></label>
-					<select id="home-filter-he" name="he" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px] cursor-pointer">
+					<select name="he" id="home-filter-he" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px] cursor-pointer">
 						<option value="">-- Chọn hình thức đào tạo --</option>
 						<?php foreach ($types as $tp) : ?>
 							<option value="<?php echo esc_attr($tp['slug']); ?>"><?php echo esc_html($tp['name']); ?></option>
@@ -321,6 +321,9 @@ $zalo    = ltdh_get_zalo_url();
 								$address         = $school['address'];
 								$hotline         = $school['hotline'];
 								$thumb_url       = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'medium' ) : $school['thumb_url'];
+								if ( function_exists( 'ltdh_get_optimized_image_url' ) ) {
+									$thumb_url = ltdh_get_optimized_image_url( $thumb_url );
+								}
 								$logo_id         = $school['logo_id'];
 								$school_code     = ! empty( $school['code'] ) ? $school['code'] : ( get_post_meta( $school_id, 'school_code', true ) ?: '' );
 								$en_name         = ! empty( $school['en_name'] ) ? $school['en_name'] : get_post_meta( $school_id, 'english_name', true );
@@ -373,7 +376,9 @@ $zalo    = ltdh_get_zalo_url();
 												<?php echo wp_get_attachment_image($logo_id, 'thumbnail', false, [
 													'class'    => 'h-full w-full object-contain',
 													'alt'      => $logo_alt,
-													'sizes'    => '56px',
+													'width'    => 96,
+													'height'   => 96,
+													'sizes'    => '48px',
 													'loading'  => 'lazy',
 													'decoding' => 'async',
 												]); ?>

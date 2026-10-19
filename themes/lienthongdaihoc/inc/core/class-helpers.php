@@ -2513,6 +2513,11 @@ function ltdh_get_fallback_image( string $context = 'program', string $size = 'm
 		return $theme_uri . '/assets/images/banner-school.jpg';
 	}
 
+	if ( $context === 'contact' ) {
+		$contact_img = home_url( '/wp-content/uploads/2026/07/banner-contact.png' );
+		return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $contact_img ) : $contact_img;
+	}
+
 	$custom_share_image = null;
 	if ( function_exists( 'get_field' ) ) {
 		$custom_share_image = get_field( 'global_share_image', 'options' ) ?: get_field( 'global_share_image', 'option' );

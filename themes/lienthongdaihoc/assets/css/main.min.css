@@ -1637,6 +1637,9 @@
   .aspect-\[16\/10\] {
     aspect-ratio: 16/10;
   }
+  .aspect-\[1942\/809\] {
+    aspect-ratio: 1942/809;
+  }
   .aspect-video {
     aspect-ratio: var(--aspect-video);
   }
@@ -2719,6 +2722,9 @@
   }
   .bg-\[\#00a2f4\]\/20 {
     background-color: color-mix(in oklab, #00a2f4 20%, transparent);
+  }
+  .bg-\[\#002e8a\] {
+    background-color: #002e8a;
   }
   .bg-\[\#0068FF\] {
     background-color: #0068FF;

@@ -38,9 +38,9 @@ $address = ltdh_get_address();
 			<div class="lg:col-span-5 relative min-h-[350px] md:min-h-[450px] lg:min-h-[550px] bg-slate-50">
 				<!-- The custom contact banner image containing the counselor illustration and pathway -->
 				<?php
-				$opt_contact_banner = get_the_post_thumbnail_url( get_the_ID(), 'full' ) 
-					?: ( function_exists( 'ltdh_get_fallback_image' ) ? ltdh_get_fallback_image( 'contact' ) : '' )
-					?: get_theme_file_uri( 'assets/images/banner-contact.webp' );
+				$custom_banner      = get_the_post_thumbnail_url( get_the_ID(), 'full' );
+				$raw_contact_banner = $custom_banner ?: home_url( '/wp-content/uploads/2026/07/banner-contact.png' );
+				$opt_contact_banner = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $raw_contact_banner ) : $raw_contact_banner;
 				?>
 				<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $opt_contact_banner ); ?>');"></div>
 			</div>
