@@ -306,7 +306,6 @@ $major_html = ltdh_mega_menu_nav_menu_start_el(
 	(object) [ 'theme_location' => 'primary-menu' ]
 );
 test_assert( strpos( $major_html, 'class="mega-major-link"' ) !== false, 'Major link gets mega-major-link' );
-test_assert( strpos( $major_html, 'mega-major-hot' ) !== false, 'Hot major gets HOT badge' );
 
 // Test 5: Fallback Menu Rendering
 echo "\nTEST 5: Fallback Mega Menu Output\n";

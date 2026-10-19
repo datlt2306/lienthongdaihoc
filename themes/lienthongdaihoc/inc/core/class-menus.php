@@ -129,9 +129,6 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 															<span class="mega-major-bullet"></span>
 															<span class="mega-major-name"><?php echo esc_html($maj['title']); ?></span>
 														</span>
-														<?php if (! empty($maj['is_hot'])) : ?>
-															<span class="mega-major-hot">HOT</span>
-														<?php endif; ?>
 													</a>
 												</li>
 											<?php endforeach; ?>
@@ -872,7 +869,6 @@ function ltdh_mega_menu_nav_menu_start_el( $item_output, $item, $depth, $args ) 
 			. '<span class="mega-major-bullet"></span>'
 			. '<span class="mega-major-name">' . esc_html( $item->title ) . '</span>'
 			. '</span>'
-			. ( $is_hot ? '<span class="mega-major-hot">HOT</span>' : '' )
 			. '</a>';
 	}
 
