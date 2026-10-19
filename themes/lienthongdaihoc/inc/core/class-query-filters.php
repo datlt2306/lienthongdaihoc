@@ -908,8 +908,24 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 			$type_slug         = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->slug : '';
 			$nganh_slug        = get_post_field( 'post_name', $major_id );
 
+			// Check specialization (Chuyên ngành hẹp)
+			$spec_title = get_field( 'specialization_title', $prog_id ) ?: get_post_meta( $prog_id, 'specialization_title', true );
+			if ( empty( $spec_title ) ) {
+				$spec_title = get_field( 'chuyen_nganh', $prog_id ) ?: get_post_meta( $prog_id, 'chuyen_nganh', true );
+			}
+			if ( empty( $spec_title ) ) {
+				$clean_title = get_the_title( $prog_id );
+				$candidate = trim( preg_replace( '/^(?:cử\s+nhân|kỹ\s+sư|liên\s+thông)\s+/iu', '', $clean_title ) );
+				$candidate = trim( preg_replace( '/\s*\([^)]*\)/iu', '', $candidate ) );
+				$candidate = trim( preg_replace( '/^ngành\s+/iu', '', $candidate ) );
+				if ( ! empty( $candidate ) && mb_strtolower( $candidate, 'UTF-8' ) !== mb_strtolower( $clean_major_name, 'UTF-8' ) ) {
+					$spec_title = $candidate;
+				}
+			}
+
 			$schools_data[ $school_rel_id ]['programs'][] = [
 				'id'                => $prog_id,
+				'specialization'    => $spec_title,
 				'status'            => $status,
 				'type_name'         => $clean_type_name,
 				'opportunity_title' => $opportunity_title,
@@ -1029,11 +1045,14 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 						<?php 
 						$rendered_training_types = [];
 						foreach ( $sorted_programs as $prog ) : 
-							$type_key = ! empty( $prog['he'] ) ? $prog['he'] : ( ! empty( $prog['type_name'] ) ? sanitize_title( $prog['type_name'] ) : 'default' );
-							if ( isset( $rendered_training_types[ $type_key ] ) ) {
+							$spec_name       = ! empty( $prog['specialization'] ) ? $prog['specialization'] : '';
+							$type_key        = ! empty( $prog['he'] ) ? $prog['he'] : ( ! empty( $prog['type_name'] ) ? sanitize_title( $prog['type_name'] ) : 'default' );
+							$prog_unique_key = $spec_name ? ( $type_key . '_' . sanitize_title( $spec_name ) ) : $type_key;
+
+							if ( isset( $rendered_training_types[ $prog_unique_key ] ) ) {
 								continue;
 							}
-							$rendered_training_types[ $type_key ] = true;
+							$rendered_training_types[ $prog_unique_key ] = true;
 
 							$type_name_lower = mb_strtolower( trim( $prog['type_name'] ), 'UTF-8' );
 							
@@ -1051,6 +1070,9 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 
 							$raw_label     = $prog['type_name'] ? $prog['type_name'] : 'Xem chương trình';
 							$display_label = ( 0 !== stripos( $raw_label, 'hệ' ) ) ? 'Hệ ' . $raw_label : $raw_label;
+							if ( $spec_name && mb_strtolower( $spec_name, 'UTF-8' ) !== mb_strtolower( $prog['major_name'] ?? '', 'UTF-8' ) ) {
+								$display_label = $spec_name . ' (' . $display_label . ')';
+							}
 						?>
 							<?php if ( 'tam-ngung' === $prog['status'] ) : ?>
 								<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed">

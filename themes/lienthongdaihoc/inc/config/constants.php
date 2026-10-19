@@ -58,6 +58,7 @@ define( 'LTDH_TAX_MAJOR_CAT', 'major_cat' );
 // Meta keys (business-facing).
 define( 'LTDH_META_SCHOOL_REL', 'school_relationship' );
 define( 'LTDH_META_MAJOR_REL', 'major_relationship' );
+define( 'LTDH_META_SPECIALIZATION', 'specialization_title' );
 define( 'LTDH_META_ADMISSION_STATUS', 'admission_status' );
 define( 'LTDH_META_OFFERED_PROGRAMS', '_offered_programs' );
 define( 'LTDH_META_LAST_SCHOOL', '_last_known_school_id' );

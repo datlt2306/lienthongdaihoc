@@ -65,6 +65,29 @@ function ltdh_load_acf_field_groups_from_json() {
 }
 
 /**
+ * Register Specialization field for Program CPT to support sub-disciplines (e.g. Marketing, TMDT under QTKD).
+ */
+add_action( 'acf/init', 'ltdh_register_program_specialization_acf_fields', 10 );
+function ltdh_register_program_specialization_acf_fields() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	acf_add_local_field( [
+		'key'          => 'field_program_specialization',
+		'label'        => 'Chuyên ngành đào tạo (Nếu có)',
+		'name'         => 'specialization_title',
+		'type'         => 'text',
+		'parent'       => 'group_program_details',
+		'instructions' => 'Nếu chương trình đào tạo theo chuyên ngành hẹp của ngành (Ví dụ: Marketing, Thương mại điện tử thuộc Quản trị kinh doanh...). Để trống nếu tuyển sinh chung theo tên ngành.',
+		'placeholder'  => 'Ví dụ: Marketing, Thương mại điện tử, Logistics...',
+		'wrapper'      => [
+			'width' => '50',
+		],
+	] );
+}
+
+/**
  * Ensure School Overview Tab is registered directly to group_school_details.
  */
 add_action( 'acf/init', 'ltdh_register_school_overview_acf_fields', 15 );

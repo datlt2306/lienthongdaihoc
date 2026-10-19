@@ -563,6 +563,12 @@ if ( ! empty( $school_faqs ) ) {
 								$clean_title = str_replace( ' - ' . $school_title, '', $clean_title );
 								$clean_title = str_replace( ' – ' . $school_title, '', $clean_title );
 							}
+							$school_short_name = get_field( 'school_short_name', $school_id ) ?: ( get_field( 'badge', $school_id ) ?: '' );
+							if ( $school_short_name ) {
+								$clean_title = str_replace( ' - ' . $school_short_name, '', $clean_title );
+								$clean_title = str_replace( ' – ' . $school_short_name, '', $clean_title );
+							}
+
 							$types = wp_get_post_terms( $prog_id, 'training_type' );
 							$type_name = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->name : '';
 							$type_slug = ! empty( $types ) && ! is_wp_error( $types ) ? $types[0]->slug : '';
@@ -575,6 +581,20 @@ if ( ! empty( $school_faqs ) ) {
 							$prog_slug = get_post_field( 'post_name', $prog_id );
 							$major_slug = $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '';
 
+							// Check specialization (Chuyên ngành hẹp)
+							$spec_title = get_field( 'specialization_title', $prog_id ) ?: get_post_meta( $prog_id, 'specialization_title', true );
+							if ( empty( $spec_title ) ) {
+								$spec_title = get_field( 'chuyen_nganh', $prog_id ) ?: get_post_meta( $prog_id, 'chuyen_nganh', true );
+							}
+							if ( empty( $spec_title ) ) {
+								$candidate = trim( preg_replace( '/^(?:cử\s+nhân|kỹ\s+sư|liên\s+thông)\s+/iu', '', $clean_title ) );
+								$candidate = trim( preg_replace( '/\s*\([^)]*\)/iu', '', $candidate ) );
+								$candidate = trim( preg_replace( '/^ngành\s+/iu', '', $candidate ) );
+								if ( ! empty( $candidate ) && mb_strtolower( $candidate, 'UTF-8' ) !== mb_strtolower( $clean_major_name, 'UTF-8' ) ) {
+									$spec_title = $candidate;
+								}
+							}
+
 							// Determine badge classes based on training type name
 							$badge_class = 'bg-blue-50 text-[#00308b]';
 
@@ -583,6 +603,7 @@ if ( ! empty( $school_faqs ) ) {
 							$prog_data = [
 								'id'                => $prog_id,
 								'title'             => $clean_title,
+								'specialization'    => $spec_title,
 								'opportunity_title' => $opportunity_title,
 								'status'            => $status,
 								'type_name'         => $clean_type_name,
@@ -599,15 +620,8 @@ if ( ! empty( $school_faqs ) ) {
 								'thumb'             => $school_thumb_url,
 							];
 
-							$prog_he_key = $type_slug ?: ( $clean_type_name ? sanitize_title( $clean_type_name ) : 'default' );
-							if ( isset( $majors_data[ $major_key ]['programs'][ $prog_he_key ] ) ) {
-								$existing = $majors_data[ $major_key ]['programs'][ $prog_he_key ];
-								if ( $major_slug && false !== strpos( $prog_slug, $major_slug ) && false === strpos( $existing['slug'], $major_slug ) ) {
-									$majors_data[ $major_key ]['programs'][ $prog_he_key ] = $prog_data;
-								}
-							} else {
-								$majors_data[ $major_key ]['programs'][ $prog_he_key ] = $prog_data;
-							}
+							// Retain all programs without overwriting
+							$majors_data[ $major_key ]['programs'][ $prog_id ] = $prog_data;
 						}
 						wp_reset_postdata();
 
@@ -707,13 +721,15 @@ if ( ! empty( $school_faqs ) ) {
 								$m_id           = $major['id'];
 								$major_link     = $m_id ? add_query_arg( 'truong', get_post_field( 'post_name', $school_id ), get_permalink( $m_id ) ) : '';
 								$major_he_slugs = array_unique( array_column( $major['programs'], 'he' ) );
-								$programs_count = count( $major['programs'] );
-								$first_prog     = ! empty( $major['programs'] ) ? $major['programs'][0] : null;
-								$primary_link   = $major_link ?: ( $first_prog ? $first_prog['permalink'] : '#' );
+								$programs_count   = count( $major['programs'] );
+								$first_prog       = ! empty( $major['programs'] ) ? $major['programs'][0] : null;
+								$primary_link     = $major_link ?: ( $first_prog ? $first_prog['permalink'] : '#' );
+								$major_spec_names = array_unique( array_filter( array_column( $major['programs'], 'specialization' ) ) );
 								?>
 								<div class="ltdh-major-card group bg-white border border-slate-200/90 hover:border-blue-300 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
 									 data-major-name="<?php echo esc_attr( mb_strtolower( $major['name'], 'UTF-8' ) ); ?>"
 									 data-major-code="<?php echo esc_attr( mb_strtolower( $major['code'] ?? '', 'UTF-8' ) ); ?>"
+									 data-major-specs="<?php echo esc_attr( mb_strtolower( implode( ' ', $major_spec_names ), 'UTF-8' ) ); ?>"
 									 data-major-he="<?php echo esc_attr( implode( ' ', $major_he_slugs ) ); ?>">
 									
 									<!-- Thumbnail Area (16:9 ratio, smooth zoom on hover) -->
@@ -815,11 +831,17 @@ if ( ! empty( $school_faqs ) ) {
 												<?php endif; ?>
 											</div>
 
+											<?php 
+											$he_list          = array_filter( array_column( $major['programs'], 'he' ) );
+											$he_counts        = array_count_values( $he_list );
+											$has_duplicate_he = ! empty( $he_counts ) && max( $he_counts ) > 1;
+											?>
 											<?php if ( $programs_count === 1 && $first_prog ) : 
-												$prog     = $first_prog;
-												$raw_type = $prog['type_name'] ?: 'Đào tạo từ xa';
-												$label    = ( 0 !== stripos( $raw_type, 'hệ' ) ) ? 'Hệ ' . $raw_type : $raw_type;
-												$t_lower  = mb_strtolower( $raw_type, 'UTF-8' );
+												$prog      = $first_prog;
+												$raw_type  = $prog['type_name'] ?: 'Đào tạo từ xa';
+												$label     = ( 0 !== stripos( $raw_type, 'hệ' ) ) ? 'Hệ ' . $raw_type : $raw_type;
+												$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
+												$spec_name = ! empty( $prog['specialization'] ) ? $prog['specialization'] : '';
 
 												$icon_svg  = '<svg class="w-4 h-4 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
 												$btn_style = 'bg-indigo-50/70 hover:bg-indigo-600 text-indigo-900 hover:text-white border-indigo-200/90 hover:border-indigo-600';
@@ -835,11 +857,16 @@ if ( ! empty( $school_faqs ) ) {
 												<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
 												   class="group/btn w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-bold border transition-all flex items-center justify-between no-underline shadow-2xs hover:shadow-md active:scale-[0.99] <?php echo esc_attr( $btn_style ); ?>"
 												   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
-													<span class="flex items-center gap-2">
+													<span class="flex items-center gap-2 truncate">
 														<?php echo $icon_svg; ?>
-														<span><?php echo esc_html( $label ); ?></span>
+														<?php if ( $spec_name && mb_strtolower( $spec_name, 'UTF-8' ) !== mb_strtolower( $major['name'], 'UTF-8' ) ) : ?>
+															<span class="truncate"><?php echo esc_html( $spec_name ); ?></span>
+															<span class="text-[11px] font-medium opacity-80 shrink-0 px-2 py-0.5 rounded-md bg-black/5"><?php echo esc_html( $label ); ?></span>
+														<?php else : ?>
+															<span><?php echo esc_html( $label ); ?></span>
+														<?php endif; ?>
 													</span>
-													<span class="inline-flex items-center gap-1 text-xs opacity-80 group-hover/btn:opacity-100">
+													<span class="inline-flex items-center gap-1 text-xs opacity-80 group-hover/btn:opacity-100 shrink-0">
 														<span>Xem tuyển sinh</span>
 														<svg class="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 															<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
@@ -847,12 +874,13 @@ if ( ! empty( $school_faqs ) ) {
 													</span>
 												</a>
 											<?php else : ?>
-												<!-- 2 or more systems: Grid of action tiles -->
+												<!-- 2 or more systems/programs: Grid of action tiles -->
 												<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 													<?php foreach ( $major['programs'] as $prog ) : 
-														$raw_type = $prog['type_name'] ?: 'Xem chương trình';
-														$label    = ( 0 !== stripos( $raw_type, 'hệ' ) ) ? 'Hệ ' . $raw_type : $raw_type;
-														$t_lower  = mb_strtolower( $raw_type, 'UTF-8' );
+														$raw_type  = $prog['type_name'] ?: 'Xem chương trình';
+														$label     = ( 0 !== stripos( $raw_type, 'hệ' ) ) ? 'Hệ ' . $raw_type : $raw_type;
+														$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
+														$spec_name = ! empty( $prog['specialization'] ) ? $prog['specialization'] : '';
 
 														$icon_svg  = '<svg class="w-4 h-4 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
 														$btn_style = 'bg-slate-50 hover:bg-[#00308b] text-slate-800 hover:text-white border-slate-200/90 hover:border-[#00308b]';
@@ -868,9 +896,14 @@ if ( ! empty( $school_faqs ) ) {
 														<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
 														   class="group/btn py-2 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-between no-underline shadow-2xs hover:shadow-xs active:scale-[0.98] <?php echo esc_attr( $btn_style ); ?>"
 														   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
-															<span class="flex items-center gap-1.5 truncate">
+															<span class="flex items-center gap-1.5 min-w-0">
 																<?php echo $icon_svg; ?>
-																<span class="truncate"><?php echo esc_html( $label ); ?></span>
+																<?php if ( $spec_name && ( $has_duplicate_he || mb_strtolower( $spec_name, 'UTF-8' ) !== mb_strtolower( $major['name'], 'UTF-8' ) ) ) : ?>
+																	<span class="truncate font-extrabold"><?php echo esc_html( $spec_name ); ?></span>
+																	<span class="text-[10px] font-medium opacity-80 shrink-0 px-1.5 py-0.5 rounded bg-black/5"><?php echo esc_html( $prog['type_name'] ?: 'Từ xa' ); ?></span>
+																<?php else : ?>
+																	<span class="truncate"><?php echo esc_html( $label ); ?></span>
+																<?php endif; ?>
 															</span>
 															<svg class="w-3.5 h-3.5 opacity-60 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 																<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
@@ -920,9 +953,10 @@ if ( ! empty( $school_faqs ) ) {
 								cards.forEach(function(card) {
 									var name = card.getAttribute('data-major-name') || '';
 									var code = card.getAttribute('data-major-code') || '';
+									var specs = card.getAttribute('data-major-specs') || '';
 									var heList = (card.getAttribute('data-major-he') || '').split(' ');
 
-									var matchesSearch = !q || name.indexOf(q) !== -1 || code.indexOf(q) !== -1;
+									var matchesSearch = !q || name.indexOf(q) !== -1 || code.indexOf(q) !== -1 || specs.indexOf(q) !== -1;
 									var matchesHe = (activeHe === 'all') || heList.indexOf(activeHe) !== -1;
 
 									if (matchesSearch && matchesHe) {
