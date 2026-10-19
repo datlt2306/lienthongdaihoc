@@ -65,7 +65,7 @@ $school_tabs[] = [
 $school_tabs[] = [
 	'id'       => 'quy-trinh-tuyen-sinh',
 	'title'    => 'Quy trình',
-	'subtitle' => 'Lộ trình 4 bước',
+	'subtitle' => 'Lộ trình & Hồ sơ',
 	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
 ];
 
@@ -854,30 +854,34 @@ if ( ! empty( $school_faqs ) ) {
 												$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
 												$spec_name = ! empty( $prog['specialization'] ) ? $prog['specialization'] : '';
 
-												$icon_svg  = '<svg class="w-4 h-4 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
+												$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
 												$btn_style = 'bg-indigo-50/70 hover:bg-indigo-600 text-indigo-900 hover:text-white border-indigo-200/90 hover:border-indigo-600';
 
 												if ( false !== strpos( $t_lower, 'từ xa' ) ) {
-													$icon_svg  = '<svg class="w-4 h-4 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+													$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
 													$btn_style = 'bg-blue-50/80 hover:bg-[#00308b] text-[#00308b] hover:text-white border-blue-200/90 hover:border-[#00308b]';
 												} elseif ( false !== strpos( $t_lower, 'vừa học vừa làm' ) || false !== strpos( $t_lower, 'vừa làm vừa học' ) || false !== strpos( $t_lower, 'vhvl' ) ) {
-													$icon_svg  = '<svg class="w-4 h-4 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+													$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
 													$btn_style = 'bg-amber-50/70 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-300/80 hover:border-amber-600';
 												}
+
+												$is_real_spec = ! empty( $spec_name )
+													&& mb_strtolower( trim( $spec_name ), 'UTF-8' ) !== mb_strtolower( trim( $major['name'] ), 'UTF-8' )
+													&& mb_strtolower( trim( $spec_name ), 'UTF-8' ) !== mb_strtolower( trim( preg_replace( '/^ngành\s+/iu', '', $major['name'] ) ), 'UTF-8' );
 											?>
 												<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
 												   class="group/btn w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-bold border transition-all flex items-center justify-between no-underline shadow-2xs hover:shadow-md active:scale-[0.99] <?php echo esc_attr( $btn_style ); ?>"
 												   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
-													<span class="flex items-center gap-2 truncate">
+													<span class="flex items-center gap-2 min-w-0 mr-2">
 														<?php echo $icon_svg; ?>
-														<?php if ( $spec_name && mb_strtolower( $spec_name, 'UTF-8' ) !== mb_strtolower( $major['name'], 'UTF-8' ) ) : ?>
+														<?php if ( $is_real_spec ) : ?>
 															<span class="truncate"><?php echo esc_html( $spec_name ); ?></span>
 															<span class="text-[11px] font-medium opacity-80 shrink-0 px-2 py-0.5 rounded-md bg-black/5"><?php echo esc_html( $label ); ?></span>
 														<?php else : ?>
-															<span><?php echo esc_html( $label ); ?></span>
+															<span class="truncate"><?php echo esc_html( $label ); ?></span>
 														<?php endif; ?>
 													</span>
-													<span class="inline-flex items-center gap-1 text-xs opacity-80 group-hover/btn:opacity-100 shrink-0">
+													<span class="inline-flex items-center gap-1 text-xs opacity-80 group-hover/btn:opacity-100 shrink-0 ml-auto">
 														<span>Xem tuyển sinh</span>
 														<svg class="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 															<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
@@ -893,30 +897,34 @@ if ( ! empty( $school_faqs ) ) {
 														$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
 														$spec_name = ! empty( $prog['specialization'] ) ? $prog['specialization'] : '';
 
-														$icon_svg  = '<svg class="w-4 h-4 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
+														$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
 														$btn_style = 'bg-slate-50 hover:bg-[#00308b] text-slate-800 hover:text-white border-slate-200/90 hover:border-[#00308b]';
 
 														if ( false !== strpos( $t_lower, 'từ xa' ) ) {
-															$icon_svg  = '<svg class="w-4 h-4 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+															$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
 															$btn_style = 'bg-blue-50/70 hover:bg-[#00308b] text-[#00308b] hover:text-white border-blue-200/90 hover:border-[#00308b]';
 														} elseif ( false !== strpos( $t_lower, 'vừa học vừa làm' ) || false !== strpos( $t_lower, 'vừa làm vừa học' ) || false !== strpos( $t_lower, 'vhvl' ) ) {
-															$icon_svg  = '<svg class="w-4 h-4 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+															$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
 															$btn_style = 'bg-amber-50/60 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-200/90 hover:border-amber-600';
 														}
+
+														$prog_real_spec = ! empty( $spec_name )
+															&& mb_strtolower( trim( $spec_name ), 'UTF-8' ) !== mb_strtolower( trim( $major['name'] ), 'UTF-8' )
+															&& mb_strtolower( trim( $spec_name ), 'UTF-8' ) !== mb_strtolower( trim( preg_replace( '/^ngành\s+/iu', '', $major['name'] ) ), 'UTF-8' );
 													?>
 														<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
 														   class="group/btn py-2 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-between no-underline shadow-2xs hover:shadow-xs active:scale-[0.98] <?php echo esc_attr( $btn_style ); ?>"
 														   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
-															<span class="flex items-center gap-1.5 min-w-0">
+															<span class="flex items-center gap-1.5 min-w-0 mr-1.5">
 																<?php echo $icon_svg; ?>
-																<?php if ( $spec_name && ( $has_duplicate_he || mb_strtolower( $spec_name, 'UTF-8' ) !== mb_strtolower( $major['name'], 'UTF-8' ) ) ) : ?>
+																<?php if ( $prog_real_spec && ( $has_duplicate_he || count( $major['programs'] ) > 1 ) ) : ?>
 																	<span class="truncate font-extrabold"><?php echo esc_html( $spec_name ); ?></span>
 																	<span class="text-[10px] font-medium opacity-80 shrink-0 px-1.5 py-0.5 rounded bg-black/5"><?php echo esc_html( $prog['type_name'] ?: 'Từ xa' ); ?></span>
 																<?php else : ?>
 																	<span class="truncate"><?php echo esc_html( $label ); ?></span>
 																<?php endif; ?>
 															</span>
-															<svg class="w-3.5 h-3.5 opacity-60 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+															<svg class="w-3.5 h-3.5 opacity-60 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all shrink-0 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 																<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
 															</svg>
 														</a>
@@ -1064,6 +1072,66 @@ if ( ! empty( $school_faqs ) ) {
 					]
 				);
 				?>
+
+				<!-- OFFICIAL ADMISSION DOSSIER (GOOGLE DRIVE) -->
+				<?php
+				$school_admission_forms = function_exists( 'ltdh_get_school_admission_forms' ) ? ltdh_get_school_admission_forms( $school_id ) : [];
+				if ( ! empty( $school_admission_forms ) ) :
+					$primary_form = $school_admission_forms[0];
+					$has_multiple = count( $school_admission_forms ) > 1;
+				?>
+					<div id="ho-so-tuyen-sinh" class="relative overflow-hidden bg-gradient-to-br from-emerald-50/70 via-white to-blue-50/50 rounded-2xl border border-emerald-100/90 p-4.5 sm:p-6 shadow-xs hover:border-emerald-200 transition-all mb-6">
+						<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+							<div class="flex items-start gap-3.5 min-w-0">
+								<!-- Google Drive Brand Icon -->
+								<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-bold shrink-0 shadow-xs ring-4 ring-emerald-50">
+									<svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+										<path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm3.43 6l3.43 6h8.28l-3.43-6h-8.28zm8.71 7.5l3.43-6-6.57-11.5h-6.86l6.57 11.5 3.43 6z" opacity="0.25"/>
+										<path d="M19.85 13.5L16.42 7.5H9.57l3.43 6h6.85z" fill="#FFC107"/>
+										<path d="M7.71 3.5L1.15 15l3.43 6 3.43-6-3.43-6h3.13z" fill="#0066DA"/>
+										<path d="M8.28 17.5l-3.43 3.5h14.57l3.43-3.5H8.28z" fill="#00AC47"/>
+										<path d="M14.71 14.5l-3.43-6-3.43 6h6.86z" fill="#EA4335"/>
+									</svg>
+								</div>
+								<div class="min-w-0">
+									<div class="flex flex-wrap items-center gap-2 mb-1">
+										<h3 class="font-extrabold text-slate-900 text-base sm:text-lg leading-snug">
+											Bộ biểu mẫu &amp; Hồ sơ tuyển sinh chính thức
+										</h3>
+										<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 shrink-0">
+											Google Drive
+										</span>
+										<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-100 text-blue-800 shrink-0">
+											<?php echo esc_html( $primary_form['label'] ?? 'Thư mục hồ sơ trường' ); ?>
+										</span>
+									</div>
+									<p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+										Bao gồm phiếu đăng ký dự thi, sơ yếu lý lịch và các đơn xét miễn giảm môn. Xem trước, tải về hoặc in trực tiếp trên Google Drive của trường.
+									</p>
+								</div>
+							</div>
+
+							<!-- Main Action Button -->
+							<a href="<?php echo esc_url( $primary_form['url'] ); ?>" target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs hover:shadow-md transition-all shrink-0 cursor-pointer self-stretch sm:self-auto group" data-file-url="<?php echo esc_url( $primary_form['url'] ); ?>" data-file-title="Bộ biểu mẫu &amp; Hồ sơ tuyển sinh: <?php echo esc_attr( $school_title ); ?>">
+								<span>Mở trên Google Drive</span>
+								<svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+							</a>
+						</div>
+
+						<?php if ( $has_multiple ) : ?>
+							<!-- Additional Type-specific Drive Folders if available -->
+							<div class="mt-4 pt-3.5 border-t border-emerald-100/80 flex flex-wrap items-center gap-2">
+								<span class="text-xs font-bold text-slate-500 mr-1">Hoặc xem theo từng hệ:</span>
+								<?php foreach ( array_slice( $school_admission_forms, 1 ) as $sub_form ) : ?>
+									<a href="<?php echo esc_url( $sub_form['url'] ); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 rounded-lg text-xs font-semibold shadow-2xs transition-all">
+										<span>📁 <?php echo esc_html( $sub_form['label'] ); ?></span>
+										<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+									</a>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
 
 				<!-- SCHOOL SPECIFIC FAQ SECTION -->
 				<?php if ( ! empty( $school_faqs ) ) : ?>

@@ -122,10 +122,65 @@ $candidate = 'Marketing';
 $final_spec = $explicit_spec ?: $candidate;
 ltdh_assert( $final_spec === 'Marketing số & Truyền thông', 'Explicit specialization field takes priority over title parsing' );
 
-// Check single-school.php file contains no old overwrite pattern
+// Check school suffix stripping and false-positive prevention (GTVT case)
+$gtvt_school_title = 'Trường Đại học Giao thông Vận tải';
+$gtvt_school_short = '';
+$gtvt_school_code  = 'UTC';
+$gtvt_major_name   = 'Công nghệ thông tin';
+$gtvt_clean_major  = preg_replace( '/^ngành\s+/iu', '', trim( $gtvt_major_name ) );
+
+$gtvt_test_titles = [
+	'Công nghệ thông tin (Chính quy) - ĐH GTVT',
+	'Công nghệ thông tin – ĐH GTVT',
+	'Công nghệ thông tin (Từ xa) - ĐH GTVT',
+	'Công nghệ thông tin (Vừa học vừa làm) - ĐH GTVT',
+	'Liên thông ngành Công nghệ thông tin - Đào tạo từ xa - UTC',
+];
+
+function test_infer_spec( $raw_title, $school_title, $school_short, $school_code, $clean_major_name, $major_name ) {
+	$clean_title = (string) $raw_title;
+	if ( $school_title ) {
+		$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_title, '/' ) . '$/iu', '', $clean_title );
+	}
+	if ( $school_short ) {
+		$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_short, '/' ) . '$/iu', '', $clean_title );
+	}
+	if ( $school_code ) {
+		$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_title );
+	}
+	$clean_title = preg_replace( '/\s*[-–—]\s*(?:ĐH|Trường ĐH|Đại học|Viện ĐH|Học viện|[A-Z0-9]{2,}).*$/iu', '', $clean_title );
+
+	$candidate = $clean_title;
+	$candidate = preg_replace( '/\s*\([^)]*\)/iu', '', $candidate );
+	$candidate = preg_replace( '/\s*[-–—]\s*(?:hệ\s+)?(?:từ xa|đào tạo từ xa|vừa học vừa làm|vừa làm vừa học|vhvl|chính quy|online|tập trung|liên thông).*$/iu', '', $candidate );
+	$candidate = preg_replace( '/^(?:tuyển sinh\s+)?(?:liên\s+thông\s+(?:đại\s+học\s+)?)?(?:cử\s+nhân|kỹ\s+sư|ngành)\s+/iu', '', $candidate );
+	$candidate = trim( $candidate, " -–—\t\n\r\0\x0B" );
+
+	if ( ! empty( $candidate ) ) {
+		$c_lower      = mb_strtolower( $candidate, 'UTF-8' );
+		$m_lower      = mb_strtolower( $clean_major_name, 'UTF-8' );
+		$orig_m_lower = mb_strtolower( $major_name, 'UTF-8' );
+		if ( $c_lower !== $m_lower && $c_lower !== $orig_m_lower ) {
+			return $candidate;
+		}
+	}
+	return '';
+}
+
+foreach ( $gtvt_test_titles as $title ) {
+	$inferred = test_infer_spec( $title, $gtvt_school_title, $gtvt_school_short, $gtvt_school_code, $gtvt_clean_major, $gtvt_major_name );
+	ltdh_assert( $inferred === '', "GTVT title '$title' has NO false specialization inferred" );
+}
+
+// Check real specialization with school suffix (TMU case)
+$tmu_spec = test_infer_spec( 'Luật thương mại (Từ xa) - TMU', 'Trường Đại học Thương mại', 'TMU', 'TMU', 'Luật kinh tế', 'Ngành Luật kinh tế' );
+ltdh_assert( $tmu_spec === 'Luật thương mại', "TMU title correctly infers specialization 'Luật thương mại'" );
+
+// Check single-school.php file contains no old overwrite pattern & has shrink-0 SVGs
 $single_school_src = file_get_contents( __DIR__ . '/../single-school.php' );
 ltdh_assert( false === strpos( $single_school_src, "['programs'][ \$prog_he_key ]" ), 'single-school.php zero occurrences of overwriting programs by prog_he_key' );
 ltdh_assert( false !== strpos( $single_school_src, "data-major-specs" ), 'single-school.php contains data-major-specs attribute' );
+ltdh_assert( false !== strpos( $single_school_src, "w-4 h-4 shrink-0 text-[#00308b]" ), 'single-school.php uses shrink-0 on training type icons to prevent squishing' );
 
 echo "\n===================================================================\n";
 echo "SUMMARY: $pass_count PASSED, $fail_count FAILED\n";
@@ -134,3 +189,4 @@ echo "===================================================================\n";
 if ( $fail_count > 0 ) {
 	exit( 1 );
 }
+

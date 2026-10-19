@@ -914,12 +914,34 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 				$spec_title = get_field( 'chuyen_nganh', $prog_id ) ?: get_post_meta( $prog_id, 'chuyen_nganh', true );
 			}
 			if ( empty( $spec_title ) ) {
-				$clean_title = get_the_title( $prog_id );
-				$candidate = trim( preg_replace( '/^(?:cử\s+nhân|kỹ\s+sư|liên\s+thông)\s+/iu', '', $clean_title ) );
-				$candidate = trim( preg_replace( '/\s*\([^)]*\)/iu', '', $candidate ) );
-				$candidate = trim( preg_replace( '/^ngành\s+/iu', '', $candidate ) );
-				if ( ! empty( $candidate ) && mb_strtolower( $candidate, 'UTF-8' ) !== mb_strtolower( $clean_major_name, 'UTF-8' ) ) {
-					$spec_title = $candidate;
+				$prog_raw_title    = (string) get_the_title( $prog_id );
+				$prog_school_title = $school_rel_id ? get_the_title( $school_rel_id ) : '';
+				$prog_school_code  = $school_rel_id ? (string) ( get_field( 'school_code', $school_rel_id ) ?: get_post_meta( $school_rel_id, 'school_code', true ) ) : '';
+				$prog_school_short = $school_rel_id ? (string) ( get_field( 'school_short_name', $school_rel_id ) ?: ( get_field( 'badge', $school_rel_id ) ?: '' ) ) : '';
+
+				$candidate = $prog_raw_title;
+				if ( $prog_school_title ) {
+					$candidate = preg_replace( '/\s*[-–—]\s*' . preg_quote( $prog_school_title, '/' ) . '$/iu', '', $candidate );
+				}
+				if ( $prog_school_short ) {
+					$candidate = preg_replace( '/\s*[-–—]\s*' . preg_quote( $prog_school_short, '/' ) . '$/iu', '', $candidate );
+				}
+				if ( $prog_school_code ) {
+					$candidate = preg_replace( '/\s*[-–—]\s*' . preg_quote( $prog_school_code, '/' ) . '$/iu', '', $candidate );
+				}
+				$candidate = preg_replace( '/\s*[-–—]\s*(?:ĐH|Trường ĐH|Đại học|Viện ĐH|Học viện|[A-Z0-9]{2,}).*$/iu', '', $candidate );
+				$candidate = preg_replace( '/\s*\([^)]*\)/iu', '', $candidate );
+				$candidate = preg_replace( '/\s*[-–—]\s*(?:hệ\s+)?(?:từ xa|đào tạo từ xa|vừa học vừa làm|vừa làm vừa học|vhvl|chính quy|online|tập trung|liên thông).*$/iu', '', $candidate );
+				$candidate = preg_replace( '/^(?:tuyển sinh\s+)?(?:liên\s+thông\s+(?:đại\s+học\s+)?)?(?:cử\s+nhân|kỹ\s+sư|ngành)\s+/iu', '', $candidate );
+				$candidate = trim( $candidate, " -–—\t\n\r\0\x0B" );
+
+				if ( ! empty( $candidate ) ) {
+					$c_lower      = mb_strtolower( $candidate, 'UTF-8' );
+					$m_lower      = mb_strtolower( $clean_major_name, 'UTF-8' );
+					$orig_m_lower = mb_strtolower( get_the_title( $major_id ), 'UTF-8' );
+					if ( $c_lower !== $m_lower && $c_lower !== $orig_m_lower ) {
+						$spec_title = $candidate;
+					}
 				}
 			}
 
@@ -1057,14 +1079,14 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 							$type_name_lower = mb_strtolower( trim( $prog['type_name'] ), 'UTF-8' );
 							
 							// Defaults (Chính quy hoặc khác)
-							$icon_svg  = '<svg class="w-4 h-4 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
+							$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
 							$btn_style = 'bg-indigo-50/70 hover:bg-indigo-600 text-indigo-900 hover:text-white border-indigo-200/90 hover:border-indigo-600';
 
 							if ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
-								$icon_svg  = '<svg class="w-4 h-4 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+								$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
 								$btn_style = 'bg-blue-50/80 hover:bg-[#00308b] text-[#00308b] hover:text-white border-blue-200/90 hover:border-[#00308b]';
 							} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
-								$icon_svg  = '<svg class="w-4 h-4 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+								$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
 								$btn_style = 'bg-amber-50/50 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-200/80 hover:border-amber-600';
 							}
 
