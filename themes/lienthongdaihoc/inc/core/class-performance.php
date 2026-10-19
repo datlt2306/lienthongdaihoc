@@ -294,9 +294,6 @@ class LTDH_Performance {
 
 		// Remove classic theme styles and global styles inline SVG filters if not using FSE
 		wp_dequeue_style( 'classic-theme-styles' );
-		wp_dequeue_style( 'wp-block-library' );
-		wp_dequeue_style( 'wp-block-library-theme' );
-		wp_dequeue_style( 'global-styles' );
 
 		// Dequeue Contact Form 7 CSS and scripts on front page (modal uses custom AJAX lead capture)
 		if ( is_front_page() ) {
@@ -554,7 +551,7 @@ class LTDH_Performance {
 			return $html;
 		}
 
-		if ( 'swiper-css' === $handle || 'ltdh-main-style' === $handle || 'ltdh-theme-styles' === $handle ) {
+		if ( 'swiper-css' === $handle || 'ltdh-main-style' === $handle ) {
 			return sprintf(
 				'<link rel="preload" href="%s" as="style" onload="this.onload=null;this.rel=\'stylesheet\'"><noscript><link rel="stylesheet" href="%s"></noscript>' . "\n",
 				esc_url( $href ),

@@ -4,17 +4,18 @@
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Montserrat:wght@600;700;800&display=swap">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Montserrat:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
 	<noscript>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Montserrat:wght@600;700;800&display=swap">
 	</noscript>
 
-	<style id="ltdh-critical-above-fold">
-		*, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e2e8f0; }
-		html { line-height: 1.5; -webkit-text-size-adjust: 100%; font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; scroll-behavior: smooth; }
+	<style id="ltdh-critical-typography">
+		html { scroll-behavior: smooth; }
 		@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-		body { margin: 0; line-height: inherit; color: #1e293b; background-color: #fff; }
 		h1, h2, h3, h4, h5, h6,
 		h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
 		h1 strong, h2 strong, h3 strong, h4 strong, h5 strong, h6 strong,
@@ -24,70 +25,15 @@
 		h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, h6 .font-black {
 			font-weight: 600 !important;
 		}
-		.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-		.site-header { background-color: #fff; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; z-index: 60; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-		.max-w-7xl { max-width: 80rem; }
-		.mx-auto { margin-left: auto; margin-right: auto; }
-		.px-4 { padding-left: 1rem; padding-right: 1rem; }
-		@media (min-width: 640px) { .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; } }
-		@media (min-width: 1024px) { .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; } }
-		.h-16 { height: 4rem; }
-		@media (min-width: 640px) { .sm\:h-20 { height: 5rem; } }
-		.flex { display: flex; }
-		.items-center { align-items: center; }
-		.justify-between { justify-content: space-between; }
-		.gap-2 { gap: 0.5rem; }
-		.gap-3 { gap: 0.75rem; }
-		.gap-8 { gap: 2rem; }
-		.relative { position: relative; }
-		.shrink-0 { flex-shrink: 0; }
-		.hidden { display: none; }
-		@media (min-width: 1024px) {
-			.lg\:flex { display: flex; }
-			.lg\:hidden { display: none; }
-		}
-		.site-branding { display: flex; align-items: center; flex-shrink: 0; }
-		.site-branding img, .site-branding svg { display: block; max-height: 48px; width: auto; }
-		.bg-brand-accent { background-color: #ff7b00; }
-		.text-white { color: #fff; }
-		.rounded-lg { border-radius: 0.5rem; }
-		.rounded-xl { border-radius: 0.75rem; }
-		.rounded-2xl { border-radius: 1rem; }
-		.font-bold { font-weight: 700; }
-		.font-medium { font-weight: 500; }
-		.text-xs { font-size: 0.75rem; line-height: 1rem; }
-		.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-		.shadow-md { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
-		.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); }
-		.bg-slate-100 { background-color: #f1f5f9; }
-		.text-slate-700 { color: #334155; }
-		.w-10 { width: 2.5rem; }
-		.h-10 { height: 2.5rem; }
-		.w-full { width: 100%; }
-		.block { display: block; }
-		.hero-banner { aspect-ratio: 1942 / 809; width: 100%; height: auto; max-height: 800px; object-fit: cover; object-position: center; display: block; }
-		.hero-banner-container { background: linear-gradient(135deg, #002e8a 0%, #00184a 100%); min-height: 220px; position: relative; overflow: hidden; width: 100%; }
-		@media (min-width: 640px) { .hero-banner-container { min-height: 350px; } }
-		@media (min-width: 768px) { .hero-banner-container { min-height: 450px; } }
-		.hero-swiper { position: relative; overflow: hidden; list-style: none; padding: 0; z-index: 1; display: block; width: 100%; min-height: 220px; }
-		@media (min-width: 640px) { .hero-swiper { min-height: 350px; } }
-		@media (min-width: 768px) { .hero-swiper { min-height: 450px; } }
-		.hero-swiper .swiper-wrapper { position: relative; width: 100%; height: 100%; z-index: 1; display: flex; box-sizing: content-box; }
-		.hero-swiper .swiper-slide { flex-shrink: 0; width: 100%; height: 100%; position: relative; display: block; }
-		.search-filters-bar { margin-top: -1.5rem; position: relative; z-index: 30; }
-		@media (min-width: 640px) { .search-filters-bar { margin-top: -2rem; } }
-		.bg-white { background-color: #fff; }
-		.border-slate-100 { border-color: #f1f5f9; }
-		.border-slate-200 { border-color: #e2e8f0; }
-		.p-4 { padding: 1rem; }
-		@media (min-width: 640px) { .p-5 { padding: 1.25rem; } }
-		.grid { display: grid; }
-		.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-		@media (min-width: 640px) { .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-		@media (min-width: 1024px) { .lg\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+		.hero-banner { aspect-ratio: 1942 / 809; }
 	</style>
 
-
+	<?php
+	$ltdh_css_file = get_template_directory() . '/assets/css/main.min.css';
+	if ( file_exists( $ltdh_css_file ) ) :
+	?>
+	<link rel="preload" as="style" href="<?php echo esc_url( get_template_directory_uri() . '/assets/css/main.min.css?ver=' . filemtime( $ltdh_css_file ) ); ?>">
+	<?php endif; ?>
 
 	<?php wp_head(); ?>
 </head>
@@ -197,6 +143,5 @@
 	</header>
 
 	<?php if ( ! is_front_page() ) : ?>
-
 		<?php ltdh_breadcrumb(); ?>
 	<?php endif; ?>

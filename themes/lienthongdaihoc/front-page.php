@@ -66,7 +66,7 @@ $zalo    = ltdh_get_zalo_url();
 							<a href="<?php echo esc_url($slide['link']); ?>" class="block w-full h-full">
 						<?php endif; ?>
 						
-						<div class="hero-banner-container relative w-full h-auto min-h-[220px] sm:min-h-[350px] md:min-h-[450px] max-h-[800px] overflow-hidden bg-[#002e8a]">
+						<div class="relative w-full h-auto min-h-[220px] sm:min-h-[350px] md:min-h-[450px] max-h-[800px] overflow-hidden bg-[#f8fafc]">
 							<!-- Main Banner Image -->
 							<picture class="relative z-10 block w-full h-auto max-h-[800px] aspect-[1942/809]" style="aspect-ratio: 1942/809;">
 								<?php if ( ! empty( $slide_img_mobile ) && $slide_img_mobile !== $slide_img_desktop ) : ?>
@@ -151,7 +151,7 @@ $zalo    = ltdh_get_zalo_url();
 
 
 	<!-- Search & Filters Container (Compact Single-Row Bar) -->
-	<div class="search-filters-bar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-30">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-30">
 		<div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-5">
 			<form action="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-center">
 				<!-- Keyword (always visible) -->
