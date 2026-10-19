@@ -879,6 +879,8 @@ add_filter( 'acf/prepare_field/name=major_specializations', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_tab_major_career', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_major_opportunities', '__return_false' );
 add_filter( 'acf/prepare_field/name=career_opportunities', '__return_false' );
+add_filter( 'acf/prepare_field/key=field_major_entry_roadmaps', '__return_false' );
+add_filter( 'acf/prepare_field/name=major_entry_roadmaps', '__return_false' );
 
 // Remove duplicate and unused eligibility meta fields (use standard Taxonomies & pure admission requirements instead)
 add_filter( 'acf/prepare_field/key=field_elig_campuses', '__return_false' );

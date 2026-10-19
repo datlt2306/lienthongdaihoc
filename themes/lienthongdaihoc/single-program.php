@@ -547,7 +547,7 @@ if ( ! empty( $faqs ) ) {
 								$req_step++;
 							?>
 								<!-- BLOCK 1: ADMISSION REQUIREMENTS & TARGET APPLICANTS (Collapsible Details) -->
-								<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
+								<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors" open>
 									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
 										<div class="flex items-center gap-3 min-w-0">
 											<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
@@ -566,10 +566,21 @@ if ( ! empty( $faqs ) ) {
 											</svg>
 										</div>
 									</summary>
-									<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed space-y-3.5">
+									<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed space-y-4">
 										<?php if ( ! empty( $requirements ) ) : ?>
-											<div class="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed bg-slate-50/70 p-4 md:p-5 rounded-xl border border-slate-100/80">
-												<?php echo wp_kses_post( $requirements ); ?>
+											<!-- HÌNH THỨC XÉT TUYỂN (UI/UX Pro Max: Branded Callout Card) -->
+											<div class="flex items-start gap-3.5 p-4 rounded-xl bg-gradient-to-r from-blue-50/70 via-slate-50 to-blue-50/30 border border-blue-100/80 shadow-2xs">
+												<div class="w-9 h-9 rounded-xl bg-[#00308b] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+													<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+													</svg>
+												</div>
+												<div class="min-w-0 flex-1">
+													<span class="text-[11px] font-bold uppercase tracking-wider text-[#00308b] block mb-0.5">Phương thức xét tuyển</span>
+													<div class="text-sm sm:text-[15px] font-semibold text-slate-900 leading-snug [&>p]:m-0">
+														<?php echo wp_kses_post( $requirements ); ?>
+													</div>
+												</div>
 											</div>
 										<?php endif; ?>
 
@@ -578,50 +589,68 @@ if ( ! empty( $faqs ) ) {
 										?>
 											<div class="mt-4 pt-1">
 												<!-- Header quy định -->
-												<div class="flex flex-wrap items-center justify-between gap-2 mb-3.5">
-													<h3 class="font-bold text-slate-900 text-sm md:text-[15px] flex items-center gap-2">
-														<span class="w-2 h-2 rounded-full bg-[#00308b]"></span>
-														<span>Quy định đối tượng tuyển sinh: Ngành đúng &amp; Ngành gần</span>
+												<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-4 pb-3 border-b border-slate-100">
+													<h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2 min-w-0">
+														<span class="w-2 h-2 rounded-full bg-[#00308b] shrink-0"></span>
+														<span class="leading-snug">Quy định đối tượng tuyển sinh: Đúng ngành &amp; Ngành gần</span>
 													</h3>
 													<?php if ( ! empty( $t_item['regulation_title'] ) ) : ?>
-														<span class="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
-															<?php echo esc_html( $t_item['regulation_title'] ); ?>
+														<span class="inline-flex items-center text-xs font-medium text-slate-600 bg-slate-100/90 border border-slate-200/60 px-2.5 py-1 rounded-lg self-start sm:self-auto max-w-full min-w-0">
+															<svg class="w-3.5 h-3.5 text-slate-400 mr-1.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+																<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+															</svg>
+															<span class="truncate block min-w-0"><?php echo esc_html( $t_item['regulation_title'] ); ?></span>
 														</span>
 													<?php endif; ?>
 												</div>
 
-												<!-- 2 CARDS GRID (Emerald & Amber Top-Border Cards matching website concept) -->
-												<div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+												<!-- 2 CARDS GRID (Emerald & Amber Top-Border Cards - Balanced & Clean) -->
+												<div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 min-w-0">
 													
 													<!-- CỘT 1: NHÓM NGÀNH ĐÚNG -->
-													<div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm border-t-4 border-t-emerald-500 p-4 sm:p-5 flex flex-col justify-between">
+													<div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs border-t-4 border-t-emerald-500 p-4 sm:p-5 flex flex-col justify-between min-w-0">
 														<div>
 															<!-- Header: Icon squircle + Tiêu đề + Badge -->
-															<div class="flex items-start justify-between gap-3 pb-3.5 border-b border-slate-100">
-																<div class="flex items-center gap-3">
-																	<div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-																		<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-																			<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-																		</svg>
+															<div class="pb-3 border-b border-slate-100 space-y-1">
+																<div class="flex items-center justify-between gap-2">
+																	<div class="flex items-center gap-2.5 min-w-0">
+																		<div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+																			<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+																				<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																			</svg>
+																		</div>
+																		<h4 class="font-bold text-slate-900 text-sm sm:text-base leading-tight">Nhóm ngành đúng</h4>
 																	</div>
-																	<div>
-																		<h4 class="font-bold text-slate-900 text-base leading-snug">Nhóm ngành đúng</h4>
-																		<span class="text-xs text-slate-500 font-medium">Học thẳng môn chuyên ngành</span>
-																	</div>
+																	<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70 shrink-0">
+																		Không học bổ sung
+																	</span>
 																</div>
-																<span class="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70 whitespace-nowrap">
-																	Không học bổ sung
-																</span>
+																<p class="text-[11px] text-slate-500 font-medium pl-10.5">Học thẳng môn chuyên ngành</p>
+															</div>
+
+															<!-- Lợi thế nổi bật của nhóm ngành đúng -->
+															<div class="mt-3.5 p-2.5 rounded-xl bg-emerald-50/50 border border-emerald-100/70 text-xs text-slate-700">
+																<div class="flex items-center gap-1.5 font-bold text-emerald-800 mb-1">
+																	<svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+																		<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+																	</svg>
+																	<span>Đặc quyền thí sinh đúng ngành:</span>
+																</div>
+																<ul class="space-y-1 text-[11px] text-slate-600 leading-normal pl-4 list-disc">
+																	<li>Được công nhận chuyển đổi 100% học phần tương đương</li>
+																	<li>Vào học ngay môn chuyên ngành, không qua môn bổ sung</li>
+																	<li>Tối ưu chi phí học phí và rút ngắn thời gian nhận bằng</li>
+																</ul>
 															</div>
 
 															<!-- Body: Danh sách chuyên ngành đúng -->
-															<div class="mt-4">
-																<p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">Bằng Cao đẳng các chuyên ngành:</p>
+															<div class="mt-3.5">
+																<p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Bằng Cao đẳng các chuyên ngành:</p>
 																<?php if ( ! empty( $t_item['proper_majors'] ) ) : ?>
-																	<ul class="space-y-2 text-xs sm:text-[13px] text-slate-700">
+																	<ul class="space-y-1.5 text-xs sm:text-[13px] text-slate-700">
 																		<?php foreach ( $t_item['proper_majors'] as $p_major ) : ?>
-																			<li class="flex items-start gap-2.5">
-																				<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+																			<li class="flex items-center gap-2 py-0.5">
+																				<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
 																				<span class="font-medium text-slate-800 leading-snug"><?php echo esc_html( $p_major ); ?></span>
 																			</li>
 																		<?php endforeach; ?>
@@ -642,34 +671,47 @@ if ( ! empty( $faqs ) ) {
 													</div>
 
 													<!-- CỘT 2: NHÓM NGÀNH GẦN -->
-													<div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm border-t-4 border-t-amber-500 p-4 sm:p-5 flex flex-col justify-between">
+													<div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs border-t-4 border-t-amber-500 p-4 sm:p-5 flex flex-col justify-between min-w-0">
 														<div>
 															<!-- Header: Icon squircle + Tiêu đề + Badge -->
-															<div class="flex items-start justify-between gap-3 pb-3.5 border-b border-slate-100">
-																<div class="flex items-center gap-3">
-																	<div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-																		<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-																			<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-																		</svg>
+															<div class="pb-3 border-b border-slate-100 space-y-1">
+																<div class="flex items-center justify-between gap-2">
+																	<div class="flex items-center gap-2.5 min-w-0">
+																		<div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+																			<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+																				<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+																			</svg>
+																		</div>
+																		<h4 class="font-bold text-slate-900 text-sm sm:text-base leading-tight">Nhóm ngành gần</h4>
 																	</div>
-																	<div>
-																		<h4 class="font-bold text-slate-900 text-base leading-snug">Nhóm ngành gần</h4>
-																		<span class="text-xs text-slate-500 font-medium">Bổ sung kiến thức chuyển đổi</span>
-																	</div>
+																	<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/70 shrink-0">
+																		+ <?php echo sprintf( '%02d', (int) ( $t_item['bridge_count'] ?: 3 ) ); ?> học phần
+																	</span>
 																</div>
-																<span class="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200/70 whitespace-nowrap">
-																	+ <?php echo sprintf( '%02d', (int) ( $t_item['bridge_count'] ?: 3 ) ); ?> học phần bổ sung
-																</span>
+																<p class="text-[11px] text-slate-500 font-medium pl-10.5">Bổ sung kiến thức chuyển đổi</p>
 															</div>
 
-															<!-- Body: Danh sách ngành gần (2 cột ngăn nắp, không tràn dòng) -->
-															<div class="mt-4">
-																<p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">Bằng Cao đẳng các ngành:</p>
+															<!-- Quy định tổ chức học chuyển đổi -->
+															<div class="mt-3.5 p-2.5 rounded-xl bg-amber-50/50 border border-amber-100/70 text-xs text-slate-700">
+																<div class="flex items-center gap-1.5 font-bold text-amber-900 mb-1">
+																	<svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+																		<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+																	</svg>
+																	<span>Cách thức học bổ sung kiến thức:</span>
+																</div>
+																<p class="text-[11px] text-slate-600 leading-normal">
+																	Học viên được nhà trường bố trí học các học phần chuyển đổi song song theo hình thức trực tuyến linh hoạt, không làm gián đoạn tiến độ tốt nghiệp.
+																</p>
+															</div>
+
+															<!-- Body: Danh sách ngành gần (1 cột sạch sẽ, text 1 dòng không bao giờ gãy vỡ) -->
+															<div class="mt-3.5">
+																<p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Bằng Cao đẳng các ngành được áp dụng:</p>
 																<?php if ( ! empty( $t_item['near_majors'] ) ) : ?>
-																	<ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs sm:text-[13px] text-slate-700">
+																	<ul class="space-y-1.5 text-xs sm:text-[13px] text-slate-700">
 																		<?php foreach ( $t_item['near_majors'] as $n_major ) : ?>
-																			<li class="flex items-start gap-2">
-																				<span class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></span>
+																			<li class="flex items-center gap-2 py-0.5">
+																				<span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
 																				<span class="font-medium text-slate-800 leading-snug"><?php echo esc_html( $n_major ); ?></span>
 																			</li>
 																		<?php endforeach; ?>

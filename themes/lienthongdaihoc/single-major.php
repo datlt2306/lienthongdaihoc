@@ -15,8 +15,6 @@ $major_id   = get_the_ID();
 $major_code = get_field( 'major_code', $major_id );
 $career     = get_field( 'career_opportunities', $major_id );
 
-$entry_roadmaps   = get_field( 'major_entry_roadmaps', $major_id );
-$specializations  = get_field( 'major_specializations', $major_id );
 $related_majors   = get_field( 'major_related', $major_id );
 
 // Query parameters for filter & context tracking
