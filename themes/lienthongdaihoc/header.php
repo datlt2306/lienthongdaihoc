@@ -28,7 +28,7 @@
 <div id="page" class="site">
 	<!-- HEADER NAVIGATION (Matches mockup layout and brand colors) -->
 	<header id="masthead" class="site-header bg-white border-b border-slate-100 sticky top-0 z-[60] shadow-xs">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3 relative">
 			<!-- Logo Section -->
 			<div class="site-branding flex items-center shrink-0">
 				<?php ltdh_site_logo( 42 ); ?>

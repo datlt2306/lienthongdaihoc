@@ -3577,6 +3577,101 @@ function ltdh_get_program_admission_fee( int $program_id ) {
 }
 
 /**
+ * Lấy loại danh hiệu văn bằng tốt nghiệp của chương trình với cơ chế DRY kế thừa từ Ngành học (Major).
+ *
+ * Thứ tự ưu tiên:
+ * 1. Chương trình (CPT program) có giá trị ghi đè riêng (nếu có).
+ * 2. Ngành học (CPT major) có cấu hình degree_type chuẩn.
+ * 3. Fallback: "Cử nhân [Tên ngành]" hoặc "Cử nhân / Kỹ sư".
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return string Danh hiệu văn bằng tốt nghiệp.
+ */
+function ltdh_get_program_degree_type( int $program_id ): string {
+	if ( ! $program_id ) {
+		return 'Cử nhân / Kỹ sư';
+	}
+
+	// 1. Cấp Program: kiểm tra xem có giá trị ghi đè không
+	$prog_degree = function_exists( 'get_field' ) ? get_field( 'degree_type', $program_id ) : '';
+	if ( empty( $prog_degree ) ) {
+		$prog_degree = get_post_meta( $program_id, 'degree_type', true );
+	}
+
+	if ( ! empty( $prog_degree ) && ! empty( trim( (string) $prog_degree ) ) ) {
+		return trim( (string) $prog_degree );
+	}
+
+	// 2. Cấp Major (DRY): Kế thừa từ bài viết Ngành đào tạo
+	$major_id = ltdh_get_program_major_id( $program_id );
+	if ( $major_id > 0 ) {
+		$major_degree = function_exists( 'get_field' ) ? get_field( 'degree_type', $major_id ) : '';
+		if ( empty( $major_degree ) ) {
+			$major_degree = get_post_meta( $major_id, 'degree_type', true );
+		}
+		if ( ! empty( $major_degree ) && ! empty( trim( (string) $major_degree ) ) ) {
+			return trim( (string) $major_degree );
+		}
+
+		// Fallback tạo từ tên ngành chuẩn
+		$major_title = get_the_title( $major_id );
+		$clean_major = preg_replace( '/^ngành\s+/iu', '', trim( (string) $major_title ) );
+		if ( ! empty( $clean_major ) ) {
+			return 'Cử nhân ' . $clean_major;
+		}
+	}
+
+	return 'Cử nhân / Kỹ sư';
+}
+
+/**
+ * Lấy quy định và giá trị pháp lý văn bằng của chương trình với cơ chế DRY kế thừa từ Trường đào tạo (School).
+ *
+ * Thứ tự ưu tiên:
+ * 1. Chương trình (CPT program) có giá trị ghi đè riêng (nếu có).
+ * 2. Trường đào tạo (CPT school) có cấu hình diploma_value chuẩn.
+ * 3. Fallback: Văn bản pháp lý chuẩn Thông tư 27/2019/TT-BGDĐT ráp tên trường tự động.
+ *
+ * @param int $program_id ID của chương trình (CPT program).
+ * @return string Quy định & giá trị pháp lý văn bằng.
+ */
+function ltdh_get_program_diploma_value( int $program_id ): string {
+	if ( ! $program_id ) {
+		return '';
+	}
+
+	// 1. Cấp Program: kiểm tra xem có giá trị ghi đè không
+	$prog_diploma = function_exists( 'get_field' ) ? get_field( 'diploma_value', $program_id ) : '';
+	if ( empty( $prog_diploma ) ) {
+		$prog_diploma = get_post_meta( $program_id, 'diploma_value', true );
+	}
+
+	if ( ! empty( $prog_diploma ) && ! empty( trim( (string) $prog_diploma ) ) ) {
+		return trim( (string) $prog_diploma );
+	}
+
+	// 2. Cấp School (DRY): Kế thừa từ bài viết Trường đào tạo
+	$school_id = ltdh_get_program_school_id( $program_id );
+	if ( $school_id > 0 ) {
+		$school_diploma = function_exists( 'get_field' ) ? get_field( 'diploma_value', $school_id ) : '';
+		if ( empty( $school_diploma ) ) {
+			$school_diploma = get_post_meta( $school_id, 'diploma_value', true );
+		}
+		if ( ! empty( $school_diploma ) && ! empty( trim( (string) $school_diploma ) ) ) {
+			return trim( (string) $school_diploma );
+		}
+
+		$school_title = get_the_title( $school_id );
+		return sprintf(
+			'Bằng tốt nghiệp do %s cấp, phôi bằng chuẩn Bộ Giáo dục & Đào tạo. Theo Thông tư 27/2019/TT-BGDĐT, trên văn bằng không ghi hình thức đào tạo, có giá trị pháp lý tương đương bằng chính quy, đủ điều kiện học lên Thạc sĩ/Tiến sĩ hoặc thi tuyển công chức, viên chức nhà nước.',
+			esc_html( $school_title )
+		);
+	}
+
+	return 'Bằng tốt nghiệp chuẩn Bộ Giáo dục & Đào tạo. Theo Thông tư 27/2019/TT-BGDĐT, trên văn bằng không ghi hình thức đào tạo, có giá trị pháp lý tương đương bằng chính quy, đủ điều kiện học lên Thạc sĩ/Tiến sĩ hoặc thi tuyển công chức nhà nước.';
+}
+
+/**
  * Lấy danh sách các đợt tuyển sinh của chương trình với cơ chế DRY fallback về trường.
  *
  * @param int $program_id ID của chương trình (CPT program).

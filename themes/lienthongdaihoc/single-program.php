@@ -238,11 +238,12 @@ if ( ! empty( $faqs ) ) {
 					<?php
 					$learning_details = ltdh_get_program_learning_details( $program_id );
 					$tuition_year     = get_field( 'tuition_academic_year', $program_id );
-					$degree_val       = get_field( 'degree_type', $program_id ) ?: get_post_meta( $program_id, 'degree_type', true );
-					$clean_major      = preg_replace( '/^ngành\s+/iu', '', trim( (string) $major_title ) );
-					if ( empty( $degree_val ) ) {
-						$degree_val  = ! empty( $clean_major ) ? 'Cử nhân ' . $clean_major : 'Cử nhân / Kỹ sư';
-					}
+					$degree_val       = function_exists( 'ltdh_get_program_degree_type' ) 
+						? ltdh_get_program_degree_type( $program_id ) 
+						: ( get_field( 'degree_type', $program_id ) ?: get_post_meta( $program_id, 'degree_type', true ) ?: 'Cử nhân / Kỹ sư' );
+					$diploma_val      = function_exists( 'ltdh_get_program_diploma_value' )
+						? ltdh_get_program_diploma_value( $program_id )
+						: ( get_field( 'diploma_value', $program_id ) ?: '' );
 					$prog_clean_name   = get_the_title( $program_id );
 					$prog_school_name  = $school_title ?: 'trường đối tác';
 					$prog_mode_name    = ! empty( $learning_details['mode'] ) ? $learning_details['mode'] : 'Liên thông Đại học';
@@ -329,10 +330,17 @@ if ( ! empty( $faqs ) ) {
 
 					<!-- Thông tin pháp lý văn bằng & Giá trị toàn quốc (Thông tư 27/2019/TT-BGDĐT) -->
 					<div class="mt-4 bg-emerald-50/50 rounded-xl p-4 text-xs md:text-sm text-slate-700 space-y-2 leading-relaxed">
-						<p class="flex items-start gap-2">
-							<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
-							<span><strong>Không ghi hình thức đào tạo:</strong> Theo quy định tại Thông tư 27/2019/TT-BGDĐT của Bộ GD&ĐT, văn bằng đại học hiện hành không ghi hình thức đào tạo (không phân biệt Chính quy, Vừa làm vừa học hay Đào tạo từ xa).</span>
-						</p>
+						<?php if ( ! empty( $diploma_val ) ) : ?>
+							<p class="flex items-start gap-2">
+								<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
+								<span><strong>Quy định cấp bằng & Giá trị pháp lý:</strong> <?php echo nl2br( esc_html( $diploma_val ) ); ?></span>
+							</p>
+						<?php else : ?>
+							<p class="flex items-start gap-2">
+								<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
+								<span><strong>Không ghi hình thức đào tạo:</strong> Theo quy định tại Thông tư 27/2019/TT-BGDĐT của Bộ GD&ĐT, văn bằng đại học hiện hành không ghi hình thức đào tạo (không phân biệt Chính quy, Vừa làm vừa học hay Đào tạo từ xa).</span>
+							</p>
+						<?php endif; ?>
 						<p class="flex items-start gap-2">
 							<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
 							<span><strong>Giá trị sử dụng toàn quốc:</strong> Bằng có đầy đủ giá trị pháp lý để thi tuyển công chức, viên chức, xét nâng lương ngạch bậc và học tiếp lên Thạc sĩ, Tiến sĩ tại tất cả các cơ sở đào tạo trong và ngoài nước.</span>

@@ -145,6 +145,294 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     color: #00308b;
 }
 
+/* ============================================================
+   MEGA MENU — CHUYÊN NGÀNH / NGÀNH HỌC (DESKTOP)
+   ============================================================ */
+
+/* Top level mega menu item */
+.nav-primary-menu li.menu-item-mega-menu {
+    position: static;
+}
+
+/* Mega menu dropdown container */
+.nav-primary-menu li.menu-item-mega-menu > ul.sub-menu {
+    position: absolute;
+    top: calc(100% - 2px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    width: 880px;
+    max-width: calc(100vw - 2rem);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.04);
+    padding: 1.5rem 1.75rem 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem 1.75rem;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
+    pointer-events: none;
+    margin: 0;
+    list-style: none;
+}
+
+/* Hover bridge to prevent losing hover */
+.nav-primary-menu li.menu-item-mega-menu > ul.sub-menu::before {
+    content: '';
+    position: absolute;
+    top: -14px;
+    left: 0;
+    right: 0;
+    height: 14px;
+}
+
+.nav-primary-menu li.menu-item-mega-menu:hover > ul.sub-menu,
+.nav-primary-menu li.menu-item-mega-menu:focus-within > ul.sub-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+/* Hide chevron on category links inside mega menu */
+.nav-primary-menu .menu-item-category > a::after {
+    display: none !important;
+}
+
+/* Category Column inside Mega Menu */
+.nav-primary-menu li.menu-item-mega-menu > ul.sub-menu > li.menu-item-category {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    position: static;
+}
+
+/* Category Header Link */
+.mega-cat-header-link {
+    display: flex !important;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0 0 0.625rem 0 !important;
+    margin-bottom: 0.625rem;
+    border-bottom: 2px solid #f1f5f9 !important;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+.mega-cat-header-link:hover {
+    border-bottom-color: #00308b !important;
+}
+
+.mega-cat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    background: #eff6ff;
+    color: #00308b;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+.mega-cat-header-link:hover .mega-cat-icon {
+    background: #00308b;
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.mega-cat-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.mega-cat-name {
+    font-size: 0.875rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    line-height: 1.25;
+    transition: color 0.15s ease;
+}
+.mega-cat-header-link:hover .mega-cat-name {
+    color: #00308b !important;
+}
+
+.mega-cat-badge {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 0.125rem;
+}
+
+.mega-cat-arrow {
+    color: #94a3b8;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+.mega-cat-header-link:hover .mega-cat-arrow {
+    opacity: 1;
+    color: #00308b;
+    transform: translateX(0);
+}
+
+/* Majors List inside Category Column */
+.nav-primary-menu li.menu-item-mega-menu > ul.sub-menu > li.menu-item-category > ul.sub-menu {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    background: transparent !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+    transition: none !important;
+}
+
+.nav-primary-menu li.menu-item-mega-menu > ul.sub-menu > li.menu-item-category > ul.sub-menu > li {
+    display: block;
+    position: static;
+}
+
+/* Major Link Item */
+.mega-major-link {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.375rem 0.625rem !important;
+    border-radius: 0.5rem;
+    border: none !important;
+    color: #334155 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    gap: 0.5rem;
+}
+.mega-major-link:hover {
+    background: #f8fafc !important;
+    color: #00308b !important;
+    transform: translateX(2px);
+}
+
+.mega-major-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.mega-major-bullet {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background: #cbd5e1;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+.mega-major-link:hover .mega-major-bullet {
+    background: #00308b;
+    transform: scale(1.3);
+}
+
+.mega-major-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mega-major-hot {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.625rem;
+    font-weight: 800;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.375rem;
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+    letter-spacing: 0.025em;
+    flex-shrink: 0;
+}
+
+/* Mega Menu Footer Bar (Full Width across all columns) */
+.nav-primary-menu li.menu-item-mega-menu > ul.sub-menu > li.ltdh-view-all-link {
+    grid-column: 1 / -1;
+    display: block;
+    margin-top: 0.25rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.mega-footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1rem;
+    gap: 1rem;
+}
+
+.mega-footer-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #64748b;
+    min-width: 0;
+}
+
+.mega-footer-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e0e7ff;
+    color: #3730a3;
+    font-weight: 700;
+    font-size: 0.6875rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    flex-shrink: 0;
+}
+
+.mega-footer-btn {
+    display: inline-flex !important;
+    align-items: center;
+    background: #00308b !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    padding: 0.375rem 0.875rem !important;
+    border-radius: 0.5rem;
+    border: none !important;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.mega-footer-btn:hover {
+    background: #002266 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 48, 139, 0.2);
+}
+
+
 /* Mobile Nav styling */
 .nav-mobile-menu {
     display: flex;
@@ -279,6 +567,62 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     color: #00308b;
     background-color: #f1f5f9;
 }
+
+/* ============================================================
+   MEGA MENU — MOBILE ACCORDION (DRAWER)
+   ============================================================ */
+
+/* Mobile category row */
+.nav-mobile-menu li.menu-item-category > .mobile-menu-item-row {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 0.625rem;
+    margin: 0.25rem 0;
+}
+.nav-mobile-menu li.menu-item-category > .mobile-menu-item-row a {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #0f172a;
+    padding: 0.4rem 0.625rem;
+    min-height: 38px;
+}
+.nav-mobile-menu li.menu-item-category > .mobile-menu-item-row a:hover {
+    color: #00308b;
+    background: transparent;
+}
+
+/* Category sub-majors on mobile */
+.nav-mobile-menu li.menu-item-category > ul.sub-menu {
+    border-left: 2px solid #cbd5e1;
+    margin-left: 1rem;
+    padding-left: 0.625rem;
+    gap: 0.125rem;
+}
+.nav-mobile-menu li.menu-item-category > ul.sub-menu a {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #475569;
+    min-height: 34px;
+    padding: 0.25rem 0.5rem;
+}
+.nav-mobile-menu li.menu-item-category > ul.sub-menu a:hover {
+    color: #00308b;
+}
+
+/* View all on mobile */
+.nav-mobile-menu li.ltdh-view-all-link > .mobile-menu-item-row {
+    margin-top: 0.5rem;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 0.625rem;
+}
+.nav-mobile-menu li.ltdh-view-all-link > .mobile-menu-item-row a {
+    color: #00308b;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    justify-content: center;
+}
+
 
 /* Hot Majors Carousel styling */
 .hot-majors-swiper.swiper:not(.swiper-initialized) .swiper-wrapper {

@@ -238,7 +238,7 @@ function ltdh_compare_resolve_program( $program_id ) {
 		'admission_fee'         => get_field( 'admission_fee', $program_id ) ?: get_post_meta( $program_id, 'admission_fee', true ) ?: '',
 		'duration'              => $duration_str,
 		'duration_numeric'      => ltdh_compare_parse_duration( $duration_str ),
-		'degree_type'           => get_field( 'degree_type', $program_id ) ?: '',
+		'degree_type'           => function_exists( 'ltdh_get_program_degree_type' ) ? ltdh_get_program_degree_type( $program_id ) : ( get_field( 'degree_type', $program_id ) ?: '' ),
 		'schedule'              => get_field( 'schedule', $program_id ) ?: '',
 		'enrollment_period'     => $enrollment,
 		'enrollment_deadline'   => ltdh_compare_parse_enrollment_date( $enrollment ),
@@ -248,7 +248,7 @@ function ltdh_compare_resolve_program( $program_id ) {
 		'career_opportunities'  => get_field( 'career_opportunities', $program_id ) ?: '',
 		'advantages'            => get_field( 'program_benefits', $program_id ) ?: '',
 		'disadvantages'         => get_field( 'disadvantages', $program_id ) ?: '',
-		'diploma_value'         => get_field( 'diploma_value', $program_id ) ?: '',
+		'diploma_value'         => function_exists( 'ltdh_get_program_diploma_value' ) ? ltdh_get_program_diploma_value( $program_id ) : ( get_field( 'diploma_value', $program_id ) ?: '' ),
 		'why_choose_us'         => get_field( 'why_choose_us', $program_id ) ?: '',
 		'hotline'               => get_field( 'hotline_override', $program_id ) ?: ( $school_id ? get_field( 'hotline', $school_id ) : '' ) ?: get_field( 'global_hotline', 'options' ),
 	];

@@ -241,6 +241,15 @@
         "media_upload": 1
       },
       {
+        "key": "field_school_diploma_value",
+        "label": "Quy định & Giá trị pháp lý văn bằng của trường",
+        "name": "diploma_value",
+        "type": "textarea",
+        "instructions": "Quy định pháp lý chung về văn bằng do trường cấp theo Thông tư 27/2019/TT-BGDĐT. Mọi chương trình thuộc trường này sẽ tự động kế thừa (DRY). Để trống hệ thống sẽ tự động hiển thị mẫu quy chuẩn theo tên trường.",
+        "placeholder": "Ví dụ: Bằng tốt nghiệp do Trường Đại học Thương Mại cấp, phôi bằng chuẩn Bộ Giáo dục & Đào tạo. Theo Thông tư 27/2019/TT-BGDĐT, trên văn bằng không ghi hình thức đào tạo, có giá trị tương đương bằng chính quy...",
+        "rows": 3
+      },
+      {
         "key": "field_school_contact_info",
         "label": "Thông tin liên hệ & Tiếp nhận hồ sơ",
         "name": "contact_info",
@@ -461,6 +470,14 @@
         "name": "major_code",
         "type": "text",
         "instructions": "Mã ngành đào tạo chuẩn của Bộ GD&ĐT (Hiển thị tại Banner đầu trang, ví dụ: 7480201)"
+      },
+      {
+        "key": "field_major_degree_type",
+        "label": "Loại văn bằng tốt nghiệp chuẩn của ngành",
+        "name": "degree_type",
+        "type": "text",
+        "instructions": "Danh hiệu văn bằng tốt nghiệp chuẩn của ngành (Ví dụ: Cử nhân Luật kinh tế, Kỹ sư Công nghệ thông tin, Cử nhân Kế toán, Kiến trúc sư...). Toàn bộ các chương trình đào tạo thuộc ngành này sẽ tự động kế thừa (DRY).",
+        "placeholder": "Ví dụ: Cử nhân Luật kinh tế, Kỹ sư Công nghệ thông tin..."
       },
       {
         "key": "field_major_overview",
@@ -791,19 +808,19 @@
       },
       {
         "key": "field_program_degree_type",
-        "label": "Loại văn bằng tốt nghiệp",
+        "label": "Loại văn bằng tốt nghiệp (Tùy chọn ghi đè)",
         "name": "degree_type",
         "type": "text",
-        "instructions": "Danh hiệu văn bằng khi tốt nghiệp (Ví dụ: Cử nhân Luật kinh tế, Kỹ sư Công nghệ thông tin, Cử nhân Quản trị kinh doanh...).",
-        "placeholder": "Ví dụ: Cử nhân Luật kinh tế, Cử nhân Quản trị kinh doanh..."
+        "instructions": "Để trống hệ thống sẽ tự động kế thừa từ Ngành đào tạo (Khuyên dùng chuẩn DRY). Chỉ điền nếu chương trình này cấp danh hiệu văn bằng đặc thù khác với ngành.",
+        "placeholder": "Để trống để tự động lấy theo Ngành đào tạo..."
       },
       {
         "key": "field_program_diploma_value",
-        "label": "Giá trị pháp lý văn bằng",
+        "label": "Giá trị pháp lý văn bằng (Tùy chọn ghi đè)",
         "name": "diploma_value",
         "type": "textarea",
-        "instructions": "Quy định pháp lý của văn bằng (Theo Thông tư 27/2019/TT-BGDĐT không ghi hình thức đào tạo trên văn bằng, có giá trị học lên Thạc sĩ/Tiến sĩ hoặc thi tuyển công chức).",
-        "placeholder": "Ví dụ: Bằng Cử nhân chuẩn Bộ GD&ĐT, không ghi hình thức đào tạo trên văn bằng, đủ điều kiện thi công chức và học lên Thạc sĩ...",
+        "instructions": "Để trống hệ thống sẽ tự động kế thừa từ quy định của Trường đào tạo theo Thông tư 27/2019/TT-BGDĐT (Khuyên dùng chuẩn DRY). Chỉ điền nếu có văn bản pháp lý riêng.",
+        "placeholder": "Để trống để tự động lấy quy định theo Trường đào tạo...",
         "rows": 2
       },
       {

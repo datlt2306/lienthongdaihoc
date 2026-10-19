@@ -406,7 +406,7 @@ echo "-------------------------------------------------------------------\n";
 $footer_raw = file_get_contents( __DIR__ . '/../footer.php' );
 
 // Isolate Column 3 exactly between comments or container
-preg_match( '/<!-- Column 3:.*?<\/ul>\s*<\/div>/s', $footer_raw, $c3_match );
+preg_match( '/<!-- Column 3:.*?(?=<!-- Column 4:)/s', $footer_raw, $c3_match );
 $c3_block = $c3_match[0] ?? '';
 
 AdversarialHarness::assert(
