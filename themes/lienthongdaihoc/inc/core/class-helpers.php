@@ -176,21 +176,33 @@ function ltdh_get_messenger_url(): string {
  * Get the global contact email.
  */
 function ltdh_get_email(): string {
-	return ltdh_default('contact', 'email');
+	$email = '';
+	if ( function_exists( 'get_field' ) ) {
+		$email = (string) get_field( 'global_email', 'options' );
+	}
+	return trim( $email ) ?: ltdh_default( 'contact', 'email' );
 }
 
 /**
  * Get the global address.
  */
 function ltdh_get_address(): string {
-	return ltdh_default('contact', 'address');
+	$address = '';
+	if ( function_exists( 'get_field' ) ) {
+		$address = (string) get_field( 'global_address', 'options' );
+	}
+	return trim( $address ) ?: ltdh_default( 'contact', 'address' );
 }
 
 /**
  * Get the company name.
  */
 function ltdh_get_company_name(): string {
-	return ltdh_default('contact', 'company_name');
+	$name = '';
+	if ( function_exists( 'get_field' ) ) {
+		$name = (string) get_field( 'global_company_name', 'options' );
+	}
+	return trim( $name ) ?: ltdh_default( 'contact', 'company_name' );
 }
 
 /**

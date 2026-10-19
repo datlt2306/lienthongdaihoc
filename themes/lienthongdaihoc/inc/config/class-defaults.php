@@ -26,7 +26,7 @@ function ltdh_get_defaults( string $group ): array {
 			'zalo_url'   => 'https://zalo.me',
 			'messenger_url' => 'https://m.me',
 			'email'      => '[EMAIL_ADDRESS]',
-			'address'    => 'Hà Nội',
+			'address'    => 'Số 71 ngõ 32/84 Đỗ Đức Dục, Nam Từ Liêm, Hà Nội',
 			'company_name' => 'Cổng thông tin Tuyển sinh đối tác Đại học',
 		],
 		'navigation' => [

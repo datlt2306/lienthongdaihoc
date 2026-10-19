@@ -1181,6 +1181,30 @@
         "type": "url"
       },
       {
+        "key": "field_global_email",
+        "label": "Email liên hệ / tư vấn",
+        "name": "global_email",
+        "type": "email",
+        "instructions": "Email liên hệ chính thức hiển thị ở chân trang (Footer), trang Liên hệ và các văn bản điều khoản chính sách.",
+        "placeholder": "tuvan@lienthongdaihoc.com"
+      },
+      {
+        "key": "field_global_address",
+        "label": "Địa chỉ văn phòng tuyển sinh",
+        "name": "global_address",
+        "type": "text",
+        "instructions": "Địa chỉ văn phòng tiếp nhận hồ sơ / trụ sở hiển thị ở chân trang (Footer) và trang Liên hệ.",
+        "placeholder": "Số 71 ngõ 32/84 Đỗ Đức Dục, Nam Từ Liêm, Hà Nội"
+      },
+      {
+        "key": "field_global_company_name",
+        "label": "Tên đơn vị / Cổng thông tin",
+        "name": "global_company_name",
+        "type": "text",
+        "instructions": "Tên cổng thông tin hoặc pháp nhân đại diện hiển thị tại các trang điều khoản và bản quyền.",
+        "placeholder": "Cổng thông tin Tuyển sinh Liên thông Đại học"
+      },
+      {
         "key": "field_tab_crm",
         "label": "Tích hợp CRM",
         "type": "tab",
