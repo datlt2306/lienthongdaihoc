@@ -53,7 +53,7 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 			$url_path   = untrailingslashit($mi['url']);
 			$is_active  = ($current_path === $url_path || $active_parent === $mi['url']);
 			$has_sub    = ! empty($mi['sub']) && is_array($mi['sub']);
-			$is_mega    = ( $url_path === '/nganh-hoc' || in_array( mb_strtolower( trim( $mi['label'] ), 'UTF-8' ), [ 'chuyên ngành', 'ngành học' ], true ) );
+			$is_mega    = ( in_array( $url_path, [ '/nganh-hoc', '/nhom-nganh' ], true ) || in_array( mb_strtolower( trim( $mi['label'] ), 'UTF-8' ), [ 'chuyên ngành', 'ngành học', 'nhóm ngành', 'nhóm ngành đào tạo', 'ngành đào tạo' ], true ) );
 			$mega_data  = $is_mega ? ltdh_get_mega_menu_data() : [];
 			if ( $is_mega && ! empty( $mega_data ) ) {
 				$has_sub = true;
@@ -99,7 +99,7 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 							<?php endforeach; ?>
 							<li class="menu-item ltdh-view-all-link">
 								<div class="mobile-menu-item-row">
-									<a href="<?php echo esc_url(home_url('/nganh-hoc/')); ?>">Xem tất cả ngành →</a>
+									<a href="<?php echo esc_url(home_url('/nhom-nganh/')); ?>">Xem tất cả ngành →</a>
 								</div>
 							</li>
 						</ul>
@@ -142,7 +142,7 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 										<span class="mega-footer-tag">Tuyển sinh liên thông</span>
 										<span class="mega-footer-desc">Đầy đủ hệ: Chính quy, Từ xa &amp; Vừa học vừa làm</span>
 									</div>
-									<a href="<?php echo esc_url(home_url('/nganh-hoc/')); ?>" class="mega-footer-btn">
+									<a href="<?php echo esc_url(home_url('/nhom-nganh/')); ?>" class="mega-footer-btn">
 										<span>Xem tất cả ngành học</span>
 										<svg class="w-3.5 h-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -315,12 +315,26 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 		}
 
 		$is_top_level  = ( (int) ( $item->menu_item_parent ?? 0 ) === 0 );
+		$item_path     = ! empty( $item->url ) ? rtrim( (string) parse_url( $item->url, PHP_URL_PATH ), '/' ) : '';
 		$is_major_menu = $is_top_level && (
-			in_array( $title, [ 'chuyên ngành', 'ngành học', 'chuyên ngành học' ], true )
-			|| ( ! empty( $item->url ) && rtrim( (string) parse_url( $item->url, PHP_URL_PATH ), '/' ) === '/nganh-hoc' )
+			in_array( $title, [ 'chuyên ngành', 'ngành học', 'chuyên ngành học', 'nhóm ngành', 'nhóm ngành đào tạo', 'ngành đào tạo' ], true )
+			|| in_array( $item_path, [ '/nganh-hoc', '/nhom-nganh' ], true )
 			|| in_array( 'menu-item-mega-menu', (array) $item->classes, true )
 			|| ( function_exists( 'get_post_meta' ) && get_post_meta( $item->ID, '_menu_item_is_mega_menu', true ) === '1' )
 		);
+
+		// Auto-detect by child items: If any direct child has object major_cat or major
+		if ( ! $is_major_menu && $is_top_level ) {
+			foreach ( $sorted_menu_items as $sub_chk ) {
+				if ( (int) $sub_chk->menu_item_parent === (int) $item->ID ) {
+					if ( ( isset( $sub_chk->object ) && in_array( $sub_chk->object, [ LTDH_TAX_MAJOR_CAT, LTDH_CPT_MAJOR, 'major_cat', 'major' ], true ) )
+						|| ( isset( $sub_chk->type ) && $sub_chk->type === 'taxonomy' ) ) {
+						$is_major_menu = true;
+						break;
+					}
+				}
+			}
+		}
 
 		if ( $is_major_menu ) {
 			if ( ! in_array( 'menu-item-has-children', $item->classes, true ) ) {
@@ -520,7 +534,7 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 			$view_all->ID = $max_db_id;
 			$view_all->db_id = $max_db_id;
 			$view_all->title = 'Xem tất cả ngành →';
-			$view_all->url = home_url('/nganh-hoc/');
+			$view_all->url = home_url('/nhom-nganh/');
 			$view_all->menu_item_parent = $item->ID;
 			$view_all->classes = ['menu-item', 'ltdh-view-all-link'];
 			$view_all->type = 'custom';
@@ -733,7 +747,7 @@ function ltdh_get_mega_menu_data(): array {
 		}
 
 		$term_link = get_term_link( $cat );
-		$cat_url   = ( ! is_wp_error( $term_link ) && ! empty( $term_link ) ) ? $term_link : home_url( '/nganh-hoc/?nhom_nganh=' . $cat->slug );
+		$cat_url   = ( ! is_wp_error( $term_link ) && ! empty( $term_link ) ) ? $term_link : home_url( '/nhom-nganh/' . $cat->slug . '/' );
 
 		$result[ $cat->slug ] = [
 			'term_id' => (int) $cat->term_id,
@@ -769,7 +783,7 @@ function ltdh_get_mega_menu_data(): array {
 			'term_id' => 0,
 			'name'    => 'Ngành đào tạo khác',
 			'slug'    => 'khac',
-			'url'     => home_url( '/nganh-hoc/' ),
+			'url'     => home_url( '/nhom-nganh/' ),
 			'majors'  => $uncat_list,
 		];
 	}
@@ -923,10 +937,11 @@ function ltdh_menu_item_custom_fields( $item_id, $item, $depth, $args ) {
 	$mega_icon     = function_exists( 'get_post_meta' ) ? get_post_meta( $item_id, '_menu_item_mega_icon', true ) : '';
 	$is_footer_bar = function_exists( 'get_post_meta' ) ? get_post_meta( $item_id, '_menu_item_is_footer_bar', true ) : '';
 
-	// Auto detect mega menu for /nganh-hoc/ or 'chuyên ngành' if unset
+	// Auto detect mega menu for /nganh-hoc/, /nhom-nganh/ or 'chuyên ngành', 'nhóm ngành' if unset
 	if ( '' === $is_mega_menu && 0 === (int) $depth ) {
 		$title = mb_strtolower( trim( $item->title ?? '' ), 'UTF-8' );
-		if ( in_array( $title, [ 'chuyên ngành', 'ngành học' ], true ) || false !== strpos( (string) ( $item->url ?? '' ), '/nganh-hoc' ) ) {
+		$url   = (string) ( $item->url ?? '' );
+		if ( in_array( $title, [ 'chuyên ngành', 'ngành học', 'nhóm ngành', 'nhóm ngành đào tạo', 'ngành đào tạo' ], true ) || false !== strpos( $url, '/nganh-hoc' ) || false !== strpos( $url, '/nhom-nganh' ) ) {
 			$is_mega_menu = '1';
 		}
 	}
@@ -1149,8 +1164,8 @@ function ltdh_sync_mega_menu_items_to_nav_menu( int $menu_id ): bool {
 	foreach ( $items as $it ) {
 		if ( (int) $it->menu_item_parent === 0 ) {
 			$title = mb_strtolower( trim( $it->title ), 'UTF-8' );
-			if ( in_array( $title, [ 'chuyên ngành', 'ngành học', 'chuyên ngành học' ], true )
-				|| ( ! empty( $it->url ) && false !== strpos( $it->url, '/nganh-hoc' ) )
+			if ( in_array( $title, [ 'chuyên ngành', 'ngành học', 'chuyên ngành học', 'nhóm ngành', 'nhóm ngành đào tạo', 'ngành đào tạo' ], true )
+				|| ( ! empty( $it->url ) && ( false !== strpos( $it->url, '/nganh-hoc' ) || false !== strpos( $it->url, '/nhom-nganh' ) ) )
 				|| ( function_exists( 'get_post_meta' ) && get_post_meta( $it->ID, '_menu_item_is_mega_menu', true ) === '1' )
 			) {
 				$parent_item = $it;
@@ -1235,7 +1250,7 @@ function ltdh_sync_mega_menu_items_to_nav_menu( int $menu_id ): bool {
 	$order++;
 	$footer_args = [
 		'menu-item-title'     => 'Xem tất cả ngành học →',
-		'menu-item-url'       => home_url( '/nganh-hoc/' ),
+		'menu-item-url'       => home_url( '/nhom-nganh/' ),
 		'menu-item-type'      => 'custom',
 		'menu-item-parent-id' => $parent_item->ID,
 		'menu-item-position'  => $order,

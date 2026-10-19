@@ -14,9 +14,25 @@ get_header();
 global $wp_query;
 
 // Active filter state
-$selected_cat    = isset( $_GET['nhom_nganh'] ) ? sanitize_text_field( $_GET['nhom_nganh'] ) : '';
-$selected_search = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
-$selected_sort   = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
+$selected_cat = '';
+if ( ! empty( $_GET['nhom_nganh'] ) ) {
+	$selected_cat = sanitize_text_field( wp_unslash( $_GET['nhom_nganh'] ) );
+} elseif ( is_tax( 'major_cat' ) ) {
+	$queried_tax = get_queried_object();
+	$selected_cat = ( $queried_tax && ! empty( $queried_tax->slug ) ) ? $queried_tax->slug : '';
+} elseif ( ! empty( get_query_var( 'major_cat' ) ) ) {
+	$selected_cat = sanitize_text_field( get_query_var( 'major_cat' ) );
+} else {
+	$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
+	if ( preg_match( '#^/nhom-nganh/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $path_matches ) ) {
+		if ( 'page' !== $path_matches[1] ) {
+			$selected_cat = sanitize_text_field( $path_matches[1] );
+		}
+	}
+}
+
+$selected_search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+$selected_sort   = isset( $_GET['sort'] ) ? sanitize_text_field( wp_unslash( $_GET['sort'] ) ) : '';
 $selected_limit  = isset( $_GET['limit'] ) ? intval( $_GET['limit'] ) : 12;
 
 $has_active_filters = ( ! empty( $selected_cat ) || ! empty( $selected_search ) || ! empty( $selected_sort ) || ( isset( $_GET['limit'] ) && 12 !== $selected_limit ) );
@@ -32,7 +48,7 @@ if ( is_wp_error( $major_cats ) || ! is_array( $major_cats ) ) {
 
 $total_majors    = wp_count_posts( 'major' )->publish;
 $active_cat_term = $selected_cat ? get_term_by( 'slug', $selected_cat, 'major_cat' ) : null;
-$archive_link    = get_post_type_archive_link( 'major' ) ?: home_url( '/nganh-hoc/' );
+$archive_link    = home_url( '/nhom-nganh/' );
 
 // Preserved args for tabs
 $preserved_args = [];
@@ -155,7 +171,8 @@ $has_active_filters  = $active_filter_count > 0;
 							<?php foreach ( $active_filter_items as $item ) : 
 								$remove_args = $preserved_args;
 								unset( $remove_args[ $item['key'] ] );
-								$remove_url = ! empty( $remove_args ) ? add_query_arg( $remove_args, $archive_link ) : $archive_link;
+								$chip_base   = ( $item['key'] === 'nhom_nganh' || empty( $selected_cat ) ) ? home_url( '/nhom-nganh/' ) : home_url( '/nhom-nganh/' . $selected_cat . '/' );
+								$remove_url  = ! empty( $remove_args ) ? add_query_arg( $remove_args, $chip_base ) : $chip_base;
 							?>
 								<a href="<?php echo esc_url( $remove_url ); ?>" data-filter-key="<?php echo esc_attr( $item['key'] ); ?>" class="js-ltdh-chip-remove inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200/60 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-colors shrink-0 select-none">
 									<span class="truncate max-w-[140px]"><?php echo esc_html( $item['label'] ); ?></span>
@@ -241,8 +258,8 @@ $has_active_filters  = $active_filter_count > 0;
 						<?php foreach ( $major_cats as $cat ) : ?>
 							<?php
 							$is_cat_active = ( $selected_cat === $cat->slug );
-							$cat_args      = array_merge( $preserved_args, [ 'nhom_nganh' => $cat->slug ] );
-							$cat_tab_url   = add_query_arg( $cat_args, $archive_link );
+							$cat_base_url  = home_url( '/nhom-nganh/' . $cat->slug . '/' );
+							$cat_tab_url   = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $cat_base_url ) : $cat_base_url;
 							?>
 							<a href="<?php echo esc_url( $cat_tab_url ); ?>"
 							   data-cat="<?php echo esc_attr( $cat->slug ); ?>"

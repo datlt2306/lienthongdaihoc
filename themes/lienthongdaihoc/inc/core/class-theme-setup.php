@@ -91,6 +91,17 @@ function ltdh_enqueue_assets() {
 add_action( 'wp_enqueue_scripts', 'ltdh_enqueue_assets' );
 
 /**
+ * Exclude theme main.js from LiteSpeed optimization/combine so updates are immediate.
+ */
+add_filter( 'litespeed_optimize_js_excludes', function( $excludes ) {
+	if ( ! is_array( $excludes ) ) {
+		$excludes = [];
+	}
+	$excludes[] = 'main.js';
+	return $excludes;
+} );
+
+/**
  * Check if the current page should load program comparison logic.
  */
 function ltdh_compare_should_load() {

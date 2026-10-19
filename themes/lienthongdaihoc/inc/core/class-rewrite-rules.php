@@ -46,7 +46,10 @@ add_action( 'init', 'ltdh_register_training_type_rewrite' );
  */
 function ltdh_register_program_rewrite() {
 	// Paginated CPT Archives (must be top priority before single slugs)
+	add_rewrite_rule( '^nhom-nganh/page/([0-9]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major' ) . '&paged=$matches[1]', 'top' );
+	add_rewrite_rule( '^nhom-nganh/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major' ), 'top' );
 	add_rewrite_rule( '^nganh-hoc/page/([0-9]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major' ) . '&paged=$matches[1]', 'top' );
+	add_rewrite_rule( '^nganh-hoc/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major' ), 'top' );
 	add_rewrite_rule( '^(?:truong-doi-tac|truong-da-hoc)/page/([0-9]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) . '&paged=$matches[1]', 'top' );
 
 	// Paginated Blog / News Archive (tin-tuc) — must precede category rewrite rules
@@ -108,7 +111,7 @@ function ltdh_program_request_guard( $query_vars ) {
 	}
 
 	// Check if raw_slug is a CPT archive base slug
-	if ( 'nganh-hoc' === $raw_slug ) {
+	if ( in_array( $raw_slug, [ 'nhom-nganh', 'nganh-hoc' ], true ) ) {
 		unset( $query_vars['program'] );
 		unset( $query_vars['name'] );
 		$query_vars['post_type'] = 'major';
@@ -329,13 +332,51 @@ function ltdh_redirect_taxonomy_base() {
 		}
 	}
 
-	// 301 redirect: /nganh-hoc/slug/ → /nganh-slug/ (except archive base /nganh-hoc/ and paginated /nganh-hoc/page/X/)
-	if ( preg_match( '#^/nganh-hoc/([^/]+)/?$#i', $request_path, $matches ) ) {
-		$sub_slug = $matches[1];
-		if ( 'page' !== $sub_slug && ! empty( $sub_slug ) ) {
-			wp_redirect( home_url( '/nganh-' . $sub_slug . '/' ), 301 );
-			exit;
+	// 301 redirect: /nganh-hoc/slug/ → /nganh-slug/ (single major)
+	// and /nganh-hoc/ → /nhom-nganh/ (archive hub)
+	if ( preg_match( '#^/nganh-hoc(?:/([^/]+))?(?:/(page/\d+))?/?$#i', $request_path, $matches ) ) {
+		$sub_slug  = $matches[1] ?? '';
+		$page_part = $matches[2] ?? '';
+
+		if ( 'page' === $sub_slug ) {
+			$page_num = preg_replace( '/\D/', '', $request_path );
+			$redirect_url = home_url( '/nhom-nganh/page/' . $page_num . '/' );
+		} elseif ( ! empty( $sub_slug ) ) {
+			$redirect_url = home_url( '/nganh-' . $sub_slug . '/' );
+		} else {
+			$redirect_url = home_url( '/nhom-nganh/' );
+			if ( ! empty( $page_part ) ) {
+				$redirect_url = home_url( '/nhom-nganh/' . $page_part . '/' );
+			}
 		}
+
+		if ( ! empty( $_GET['nhom_nganh'] ) ) {
+			$cat          = sanitize_text_field( $_GET['nhom_nganh'] );
+			$redirect_url = home_url( '/nhom-nganh/' . $cat . '/' );
+			$q            = $_GET;
+			unset( $q['nhom_nganh'] );
+			if ( ! empty( $q ) ) {
+				$redirect_url = add_query_arg( $q, $redirect_url );
+			}
+		} elseif ( ! empty( $_GET ) ) {
+			$redirect_url = add_query_arg( $_GET, $redirect_url );
+		}
+
+		wp_redirect( $redirect_url, 301 );
+		exit;
+	}
+
+	// 301 redirect: /nhom-nganh/?nhom_nganh=slug → /nhom-nganh/slug/
+	if ( preg_match( '#^/nhom-nganh/?$#i', $request_path ) && ! empty( $_GET['nhom_nganh'] ) ) {
+		$cat          = sanitize_text_field( $_GET['nhom_nganh'] );
+		$redirect_url = home_url( '/nhom-nganh/' . $cat . '/' );
+		$q            = $_GET;
+		unset( $q['nhom_nganh'] );
+		if ( ! empty( $q ) ) {
+			$redirect_url = add_query_arg( $q, $redirect_url );
+		}
+		wp_redirect( $redirect_url, 301 );
+		exit;
 	}
 
 
@@ -405,6 +446,7 @@ function ltdh_redirect_taxonomy_base() {
 		wp_redirect( $redirect_url, 301 );
 		exit;
 	}
+
 
 	// 301 redirect: Clean legacy program URLs with duplicate terms
 	$legacy_program_slug_map = [
@@ -495,7 +537,7 @@ function ltdh_template_include_he_dao_tao( $template ) {
 		}
 	}
 
-	if ( preg_match( '#^/nganh-hoc(?:/page/\d+)?/?$#i', $request_path ) ) {
+	if ( preg_match( '#^/(?:nhom-nganh|nganh-hoc)(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path ) || is_tax( 'major_cat' ) ) {
 		global $wp_query;
 		if ( $wp_query ) {
 			$wp_query->is_404 = false;
@@ -527,9 +569,10 @@ add_filter( 'template_include', 'ltdh_template_include_he_dao_tao' );
  * Auto-flush rewrite rules once if tin-tuc rewrite version is not applied.
  */
 function ltdh_maybe_flush_tin_tuc_rewrites() {
-	if ( '2' !== get_option( 'ltdh_rewrite_version_tin_tuc' ) ) {
+	if ( '2' !== get_option( 'ltdh_rewrite_version_tin_tuc' ) || '1' !== get_option( 'ltdh_rewrite_version_nhom_nganh' ) ) {
 		flush_rewrite_rules( false );
 		update_option( 'ltdh_rewrite_version_tin_tuc', '2' );
+		update_option( 'ltdh_rewrite_version_nhom_nganh', '1' );
 	}
 }
 add_action( 'init', 'ltdh_maybe_flush_tin_tuc_rewrites', 99 );

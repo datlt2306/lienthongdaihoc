@@ -112,7 +112,7 @@ $messenger = ltdh_get_messenger_url();
 							<span class="text-xs font-bold md:font-semibold line-clamp-1">Trường đối tác</span>
 							<span class="text-[#00a2f4] text-xs font-bold md:hidden">›</span>
 						</a>
-						<a href="<?php echo esc_url( home_url( '/nganh-hoc/' ) ); ?>" 
+						<a href="<?php echo esc_url( home_url( '/nhom-nganh/' ) ); ?>" 
 						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-slate-800/40 md:bg-transparent border border-slate-800/70 md:border-none hover:bg-slate-800 md:hover:bg-transparent text-slate-300 hover:text-white active:scale-[0.98] md:active:scale-100 transition-all min-h-[42px] md:min-h-0 group">
 							<span class="text-xs font-bold md:font-semibold line-clamp-1">Ngành liên thông</span>
 							<span class="text-[#00a2f4] text-xs font-bold md:hidden">›</span>

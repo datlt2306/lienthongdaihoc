@@ -1555,13 +1555,34 @@ function ltdh_breadcrumb(): void {
 		if ( is_singular() ) {
 			$post_type = get_post_type();
 			if ( $post_type === 'program' ) {
-				$crumbs[] = [ 'label' => 'Liên thông Đại học', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
-				$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
+				$program_id   = (int) get_the_ID();
+				$program_name = function_exists( 'ltdh_get_program_banner_title' ) ? ltdh_get_program_banner_title( $program_id ) : get_the_title( $program_id );
+				$major_id     = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : 0;
+
+				if ( $major_id > 0 ) {
+					$terms = get_the_terms( $major_id, 'major_cat' );
+					if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+						$cat_term = $terms[0];
+						$cat_link = get_term_link( $cat_term );
+						if ( ! is_wp_error( $cat_link ) ) {
+							$crumbs[] = [ 'label' => $cat_term->name, 'url' => $cat_link ];
+						}
+					}
+					$crumbs[] = [ 'label' => get_the_title( $major_id ), 'url' => get_permalink( $major_id ) ];
+				} else {
+					$crumbs[] = [ 'label' => 'Liên thông Đại học', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
+				}
+
+				$crumbs[] = [ 'label' => $program_name, 'url' => '' ];
 			} elseif ( $post_type === 'school' ) {
 				$crumbs[] = [ 'label' => 'Trường đối tác', 'url' => get_post_type_archive_link( 'school' ) ?: home_url( '/truong-doi-tac/' ) ];
 				$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
 			} elseif ( $post_type === 'major' ) {
-				$crumbs[] = [ 'label' => 'Chuyên ngành', 'url' => home_url( '/nganh-hoc/' ) ];
+				$terms = get_the_terms( get_the_ID(), 'major_cat' );
+				$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => home_url( '/nhom-nganh/' ) ];
+				if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+					$crumbs[] = [ 'label' => $terms[0]->name, 'url' => get_term_link( $terms[0] ) ];
+				}
 				$major_label = get_the_title();
 				$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
 				if ( ! empty( $school_param ) ) {
@@ -1589,6 +1610,8 @@ function ltdh_breadcrumb(): void {
 			$term = get_queried_object();
 			if ( is_tax( 'training_type' ) ) {
 				$crumbs[] = [ 'label' => 'Liên thông Đại học', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
+			} elseif ( is_tax( 'major_cat' ) ) {
+				$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => home_url( '/nhom-nganh/' ) ];
 			}
 			$crumbs[] = [ 'label' => $term->name, 'url' => '' ];
 		} elseif ( is_post_type_archive() ) {
@@ -1596,7 +1619,7 @@ function ltdh_breadcrumb(): void {
 			if ( $post_type === 'school' ) {
 				$crumbs[] = [ 'label' => 'Trường đối tác', 'url' => '' ];
 			} elseif ( $post_type === 'major' ) {
-				$crumbs[] = [ 'label' => 'Chuyên ngành', 'url' => '' ];
+				$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => '' ];
 			} else {
 				$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => '' ];
 			}
@@ -1613,6 +1636,14 @@ function ltdh_breadcrumb(): void {
 					$crumbs[]    = [ 'label' => $term ? $term->name : esc_html( $m[1] ), 'url' => '' ];
 				} else {
 					$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => '' ];
+				}
+			} elseif ( preg_match( '#^/(?:nhom-nganh|nganh-hoc)(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path, $m ) ) {
+				if ( ! empty( $m[1] ) && 'page' !== $m[1] ) {
+					$term     = get_term_by( 'slug', sanitize_title( $m[1] ), 'major_cat' );
+					$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => home_url( '/nhom-nganh/' ) ];
+					$crumbs[] = [ 'label' => $term ? $term->name : esc_html( $m[1] ), 'url' => '' ];
+				} else {
+					$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => '' ];
 				}
 			} else {
 				$crumbs[] = [ 'label' => wp_title( '', false ) ?: 'Lưu trữ', 'url' => '' ];
@@ -2533,6 +2564,97 @@ function ltdh_filter_default_post_thumbnail_html( $html, $post_id, $post_thumbna
 	return $html;
 }
 add_filter( 'post_thumbnail_html', 'ltdh_filter_default_post_thumbnail_html', 20, 5 );
+
+/**
+ * Lấy URL ảnh thumbnail của Nhóm ngành (major_cat taxonomy).
+ * Hỗ trợ ACF field (category_thumbnail) và term meta (thumbnail_id / category_thumbnail).
+ *
+ * @param int|WP_Term|null $term Term ID or object.
+ * @param string           $size Image size.
+ * @return string
+ */
+function ltdh_get_major_cat_thumbnail_url( $term = null, string $size = 'medium_large' ): string {
+	if ( empty( $term ) ) {
+		return '';
+	}
+	$term_id = is_object( $term ) ? $term->term_id : (int) $term;
+	if ( ! $term_id ) {
+		return '';
+	}
+
+	// 1. Check ACF field
+	if ( function_exists( 'get_field' ) ) {
+		$thumb = get_field( 'category_thumbnail', 'term_' . $term_id )
+			?: get_field( 'category_thumbnail', 'major_cat_' . $term_id );
+		if ( ! empty( $thumb ) ) {
+			if ( is_numeric( $thumb ) ) {
+				$url = wp_get_attachment_image_url( (int) $thumb, $size );
+				if ( ! empty( $url ) ) {
+					return $url;
+				}
+			} elseif ( is_array( $thumb ) && ! empty( $thumb['url'] ) ) {
+				return $thumb['url'];
+			} elseif ( is_string( $thumb ) ) {
+				return $thumb;
+			}
+		}
+	}
+
+	// 2. Check WordPress term meta
+	$meta_thumb_id = get_term_meta( $term_id, 'category_thumbnail', true )
+		?: get_term_meta( $term_id, 'thumbnail_id', true );
+	if ( ! empty( $meta_thumb_id ) && is_numeric( $meta_thumb_id ) ) {
+		$url = wp_get_attachment_image_url( (int) $meta_thumb_id, $size );
+		if ( ! empty( $url ) ) {
+			return $url;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Lấy ảnh thumbnail hiển thị cho Card Ngành (Major).
+ * Ưu tiên:
+ * 1. Post featured image (thumbnail của bài viết)
+ * 2. Category thumbnail (ảnh đại diện của Nhóm ngành major_cat)
+ * 3. Fallback theme banner
+ *
+ * @param int|WP_Post|null $post_id Post ID or object.
+ * @param string           $size Image size.
+ * @return string
+ */
+function ltdh_get_major_card_thumbnail_url( $post_id = null, string $size = 'medium_large' ): string {
+	$pid = $post_id ? ( is_object( $post_id ) ? $post_id->ID : (int) $post_id ) : get_the_ID();
+	if ( ! $pid ) {
+		return get_stylesheet_directory_uri() . '/assets/images/banner-fallback.webp';
+	}
+
+	// 1. Featured image of the post
+	if ( has_post_thumbnail( $pid ) ) {
+		$thumb = get_the_post_thumbnail_url( $pid, $size );
+		if ( ! empty( $thumb ) ) {
+			return $thumb;
+		}
+	}
+
+	// 2. Category thumbnail of major_cat
+	$terms = get_the_terms( $pid, 'major_cat' );
+	if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+		foreach ( $terms as $t ) {
+			$cat_thumb = ltdh_get_major_cat_thumbnail_url( $t->term_id, $size );
+			if ( ! empty( $cat_thumb ) ) {
+				return $cat_thumb;
+			}
+		}
+	}
+
+	// 3. Fallback theme banner
+	if ( file_exists( get_template_directory() . '/assets/images/banner-hero-02.webp' ) ) {
+		return get_template_directory_uri() . '/assets/images/banner-hero-02.webp';
+	}
+	return get_template_directory_uri() . '/assets/images/banner-fallback.webp';
+}
 
 function ltdh_get_school_unique_majors_count( int $school_id ): int {
 	$cache_key = 'ltdh_school_majors_count_' . $school_id;
@@ -3669,6 +3791,109 @@ function ltdh_get_program_diploma_value( int $program_id ): string {
 	}
 
 	return 'Bằng tốt nghiệp chuẩn Bộ Giáo dục & Đào tạo. Theo Thông tư 27/2019/TT-BGDĐT, trên văn bằng không ghi hình thức đào tạo, có giá trị pháp lý tương đương bằng chính quy, đủ điều kiện học lên Thạc sĩ/Tiến sĩ hoặc thi tuyển công chức nhà nước.';
+}
+
+/**
+ * Lấy tên chuyên ngành hoặc ngành đào tạo chuẩn của chương trình (đã làm sạch tiền tố).
+ * Ưu tiên:
+ * 1. Chuyên ngành đào tạo hẹp (specialization_title / chuyen_nganh).
+ * 2. Ngành đào tạo liên kết (major_relationship).
+ * 3. Fallback: Tiêu đề bài viết chương trình đã làm sạch.
+ *
+ * @param int $program_id ID bài viết chương trình.
+ * @return string Tên chuyên ngành / ngành sạch (VD: "Luật thương mại", "Công nghệ thông tin").
+ */
+function ltdh_get_program_discipline_name( int $program_id = 0 ): string {
+	if ( ! $program_id ) {
+		$program_id = (int) get_the_ID();
+	}
+	if ( ! $program_id ) {
+		return '';
+	}
+
+	// 1. Chuyên ngành đào tạo hẹp (specialization_title)
+	$spec_title = function_exists( 'get_field' ) ? get_field( 'specialization_title', $program_id ) : '';
+	if ( empty( $spec_title ) ) {
+		$spec_title = get_post_meta( $program_id, 'specialization_title', true );
+	}
+	if ( empty( $spec_title ) ) {
+		$spec_title = function_exists( 'get_field' ) ? get_field( 'chuyen_nganh', $program_id ) : '';
+		if ( empty( $spec_title ) ) {
+			$spec_title = get_post_meta( $program_id, 'chuyen_nganh', true );
+		}
+	}
+	if ( ! empty( $spec_title ) && is_string( $spec_title ) ) {
+		$clean_spec = preg_replace( '/^(?:chuyên ngành|ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $spec_title ) );
+		$clean_spec = preg_replace( '/\s*\([^)]*\)$/u', '', $clean_spec );
+		if ( ! empty( $clean_spec ) ) {
+			return $clean_spec;
+		}
+	}
+
+	// 2. Ngành đào tạo liên kết (major_relationship)
+	$major_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : 0;
+	if ( $major_id > 0 ) {
+		$major_name  = get_the_title( $major_id );
+		$clean_major = preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( (string) $major_name ) );
+		$clean_major = preg_replace( '/\s*\([^)]*\)$/u', '', $clean_major );
+		if ( ! empty( $clean_major ) ) {
+			return $clean_major;
+		}
+	}
+
+	// 3. Fallback: Parse từ tiêu đề bài viết chương trình
+	$raw_title   = get_the_title( $program_id );
+	$clean_title = preg_replace( '/^(?:tuyển sinh\s+)?liên thông\s+(?:đại học\s+)?(?:ngành\s+)?/iu', '', (string) $raw_title );
+	$clean_title = preg_replace( '/^(?:cử nhân|kỹ sư|ngành)\s+/iu', '', $clean_title );
+	$clean_title = preg_replace( '/\s*[-–—(].*$/iu', '', $clean_title );
+	return trim( $clean_title, " -–\t\n\r\0\x0B" );
+}
+
+/**
+ * Lấy tiêu đề chuẩn cho banner và breadcrumb của chương trình.
+ * Công thức: 'Liên thông ' . [Discipline] . ' (' . [Clean Training Type] . ')'
+ *
+ * @param int $program_id ID bài viết chương trình.
+ * @return string Tiêu đề đầy đủ chuẩn (VD: "Liên thông Luật thương mại (Đào tạo từ xa)").
+ */
+function ltdh_get_program_banner_title( int $program_id = 0 ): string {
+	if ( ! $program_id ) {
+		$program_id = (int) get_the_ID();
+	}
+	if ( ! $program_id ) {
+		return '';
+	}
+
+	$discipline = ltdh_get_program_discipline_name( $program_id );
+
+	$training_types = get_the_terms( $program_id, 'training_type' );
+	$training_type  = ( ! empty( $training_types ) && ! is_wp_error( $training_types ) ) ? $training_types[0]->name : '';
+	$clean_type     = preg_replace( '/^hệ\s+/iu', '', trim( (string) $training_type ) );
+	$type_part      = ! empty( $clean_type ) ? ' (' . $clean_type . ')' : '';
+
+	if ( ! empty( $discipline ) ) {
+		return 'Liên thông ' . $discipline . $type_part;
+	}
+
+	$school_id   = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
+	$school_name = $school_id ? get_the_title( $school_id ) : '';
+	$school_code = $school_id ? ( ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' ) ?: get_post_meta( $school_id, 'school_code', true ) ) : '';
+
+	$raw_prog_title = get_the_title( $program_id );
+	$clean_prog     = trim( (string) $raw_prog_title );
+	$clean_prog     = preg_replace( '/^(?:tuyển sinh\s+)+/iu', '', $clean_prog );
+	$clean_prog     = preg_replace( '/^(?:cử nhân|kỹ sư)\s+/iu', '', $clean_prog );
+	if ( $school_name ) {
+		$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_prog );
+	}
+	if ( ! empty( $school_code ) ) {
+		$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
+	}
+	if ( ! preg_match( '/^liên thông/iu', $clean_prog ) ) {
+		$clean_prog = 'Liên thông ' . $clean_prog;
+	}
+
+	return $clean_prog;
 }
 
 /**

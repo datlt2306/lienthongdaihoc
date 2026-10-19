@@ -830,7 +830,15 @@ function ltdhInitTheme() {
 
         let searchTimeout = null;
         let activeAbortController = null;
-        const basePath = window.location.pathname.replace(/\/page\/\d+\/?$/, '/');
+        const rootArchiveUrl = '/nhom-nganh/';
+
+        // Sync catSelect with path if loaded directly from /nhom-nganh/{slug}/
+        if (catSelect && !catSelect.value) {
+            const initialPathMatch = window.location.pathname.match(/^\/nhom-nganh\/([^\/]+)(?:\/page\/\d+)?\/?$/i);
+            if (initialPathMatch && initialPathMatch[1] && initialPathMatch[1] !== 'page') {
+                catSelect.value = decodeURIComponent(initialPathMatch[1]);
+            }
+        }
 
         // Mobile Filter Accordion Toggle
         if (mobileFilterBtn && mobileFilterBody && !mobileFilterBtn._bound) {
@@ -886,14 +894,18 @@ function ltdhInitTheme() {
             const sortVal = sortSelect ? sortSelect.value : '';
             const limitVal = limitSelect ? limitSelect.value : '';
 
-            if (catVal) params.set('nhom_nganh', catVal);
+            let path = rootArchiveUrl;
+            if (catVal) {
+                path = `${rootArchiveUrl}${encodeURIComponent(catVal)}/`;
+            }
+
             if (sVal) params.set('s', sVal);
             if (sortVal) params.set('sort', sortVal);
             if (limitVal && limitVal !== '12') params.set('limit', limitVal);
             if (paged > 1) params.set('paged', paged);
 
             const queryString = params.toString();
-            return queryString ? `${basePath}?${queryString}` : basePath;
+            return queryString ? `${path}?${queryString}` : path;
         }
 
         function triggerFilter(options = {}) {
@@ -965,8 +977,8 @@ function ltdhInitTheme() {
                         mobileChipsWrapper.innerHTML = data.chips_html || '';
                     }
 
-                    const resetBtnHtml = `<a href="${basePath}" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]"><span>✕</span> <span>Xóa tất cả bộ lọc</span></a>`;
-                    const mobileResetHtml = `<a href="${basePath}" class="js-ltdh-reset-filter flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 min-h-[44px] transition-colors shrink-0" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
+                    const resetBtnHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]"><span>✕</span> <span>Xóa tất cả bộ lọc</span></a>`;
+                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 min-h-[44px] transition-colors shrink-0" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
 
                     if (desktopResetWrapper) {
                         desktopResetWrapper.innerHTML = data.has_active_filters ? resetBtnHtml : '';
@@ -1110,7 +1122,12 @@ function ltdhInitTheme() {
         // 8. Popstate (Browser Back / Forward)
         window.addEventListener('popstate', () => {
             const params = new URLSearchParams(window.location.search);
-            const catVal = params.get('nhom_nganh') || '';
+            let catVal = params.get('nhom_nganh') || '';
+            const pathMatch = window.location.pathname.match(/^\/nhom-nganh\/([^\/]+)(?:\/page\/\d+)?\/?$/i);
+            if (pathMatch && pathMatch[1] && pathMatch[1] !== 'page') {
+                catVal = decodeURIComponent(pathMatch[1]);
+            }
+
             const sVal = params.get('s') || '';
             const sortVal = params.get('sort') || '';
             const limitVal = params.get('limit') || '12';

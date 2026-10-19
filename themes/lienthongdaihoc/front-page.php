@@ -267,7 +267,7 @@ $zalo    = ltdh_get_zalo_url();
 			</div>
 
 			<div class="text-center mt-6 sm:mt-8">
-				<a href="<?php echo esc_url(home_url('/nganh-hoc/')); ?>"
+				<a href="<?php echo esc_url(home_url('/nhom-nganh/')); ?>"
 					class="inline-flex items-center gap-2 text-[#00308b] font-bold text-sm hover:underline">
 					Xem tất cả ngành học <span>→</span>
 				</a>

@@ -154,6 +154,20 @@ $is_base_archive = ! isset( $term->term_id );
 				?>
 			</div>
 
+		<?php elseif ( $taxonomy === 'major_cat' || is_tax( 'major_cat' ) ) : ?>
+			<!-- major_cat lists majors using clean card-major layout -->
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+				<?php
+				if ( have_posts() ) :
+					while ( have_posts() ) : the_post();
+						get_template_part( 'template-parts/cards/card-major' );
+					endwhile;
+				else :
+					echo '<div class="col-span-3 text-center py-12"><p class="text-slate-500 text-base">Hiện chưa có ngành nào thuộc nhóm ngành này.</p></div>';
+				endif;
+				?>
+			</div>
+
 		<?php else : ?>
 			<!-- campus or training_type lists programs -->
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">

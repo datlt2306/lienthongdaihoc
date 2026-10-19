@@ -252,24 +252,10 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 
 	$type_part = ! empty( $clean_type ) ? ' (' . $clean_type . ')' : '';
 
-	// Concise H1 formula for single program
-	if ( ! empty( $clean_major ) ) {
-		$banner_title = 'Liên thông ' . $clean_major . $type_part;
-	} else {
-		$raw_prog_title = get_the_title( $program_id );
-		$clean_prog     = trim( (string) $raw_prog_title );
-		$clean_prog     = preg_replace( '/^(?:tuyển sinh\s+)+/iu', '', $clean_prog );
-		if ( $school_name ) {
-			$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_prog );
-		}
-		if ( ! empty( $school_code ) ) {
-			$clean_prog = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_prog );
-		}
-		if ( ! preg_match( '/^liên thông/iu', $clean_prog ) ) {
-			$clean_prog = 'Liên thông ' . $clean_prog;
-		}
-		$banner_title = $clean_prog;
-	}
+	// Concise H1 formula for single program (harmonized with specialization & breadcrumbs)
+	$banner_title = function_exists( 'ltdh_get_program_banner_title' )
+		? ltdh_get_program_banner_title( $program_id )
+		: ( 'Liên thông ' . ( $clean_major ?: get_the_title( $program_id ) ) . $type_part );
 
 	// Clean subtitle without repeating school name
 	$banner_subtitle = sprintf(
@@ -283,16 +269,19 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	$banner_eyebrow  = [
 		'text' => 'Mạng lưới đại học đối tác ' . date( 'Y' ),
 	];
-} elseif ( is_post_type_archive( 'major' ) ) {
-	$banner_title    = 'Chuyên Ngành';
-	$banner_subtitle = 'Khám phá các ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
+} elseif ( is_tax( 'major_cat' ) || ( ! empty( $request_path ) && preg_match( '#^/nhom-nganh/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m_cat ) && 'page' !== $m_cat[1] ) ) {
+	$term            = is_tax( 'major_cat' ) ? get_queried_object() : ( ! empty( $m_cat[1] ) ? get_term_by( 'slug', sanitize_title( $m_cat[1] ), 'major_cat' ) : null );
+	$banner_title    = ( $term && ! empty( $term->name ) ) ? 'Nhóm ngành: ' . $term->name : 'Nhóm Ngành Đào Tạo';
+	$banner_subtitle = ( $term && ! empty( $term->description ) ) ? $term->description : 'Khám phá các ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
 	$banner_eyebrow  = [
 		'text' => 'Danh mục ngành đào tạo ' . date( 'Y' ),
 	];
-} elseif ( is_tax( 'major_cat' ) ) {
-	$term            = get_queried_object();
-	$banner_title    = ( $term && ! empty( $term->name ) ) ? 'Nhóm ngành: ' . $term->name : 'Chuyên Ngành';
-	$banner_subtitle = ( $term && ! empty( $term->description ) ) ? $term->description : 'Khám phá các ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
+	if ( $term && function_exists( 'ltdh_get_major_cat_thumbnail_url' ) ) {
+		$banner_image = ltdh_get_major_cat_thumbnail_url( $term->term_id, 'full' );
+	}
+} elseif ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/(?:nhom-nganh|nganh-hoc)(?:/page/\d+)?/?$#i', $request_path ) ) ) {
+	$banner_title    = 'Nhóm Ngành Đào Tạo';
+	$banner_subtitle = 'Khám phá các nhóm ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
 	$banner_eyebrow  = [
 		'text' => 'Danh mục ngành đào tạo ' . date( 'Y' ),
 	];

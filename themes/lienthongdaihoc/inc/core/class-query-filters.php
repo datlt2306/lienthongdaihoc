@@ -154,7 +154,7 @@ function ltdh_customize_archive_queries( $query ) {
 		$query->set( 'post_type', LTDH_CPT_PROGRAM );
 	}
 
-	if ( $query->is_post_type_archive( LTDH_CPT_SCHOOL ) || $query->is_post_type_archive( LTDH_CPT_MAJOR ) ) {
+	if ( $query->is_post_type_archive( LTDH_CPT_SCHOOL ) || $query->is_post_type_archive( LTDH_CPT_MAJOR ) || $query->is_tax( LTDH_TAX_MAJOR_CAT ) ) {
 		$limit        = isset( $_GET['limit'] ) ? intval( $_GET['limit'] ) : 12;
 		$valid_limits = [ 10, 12, 20, 24, 30, 36, 48, 50, 100, -1 ];
 		if ( in_array( $limit, $valid_limits, true ) ) {
@@ -169,8 +169,8 @@ function ltdh_customize_archive_queries( $query ) {
 		$query->set( 'order', 'ASC' );
 	}
 
-	if ( $query->is_post_type_archive( LTDH_CPT_MAJOR ) ) {
-		if ( ! empty( $_GET['nhom_nganh'] ) ) {
+	if ( $query->is_post_type_archive( LTDH_CPT_MAJOR ) || $query->is_tax( LTDH_TAX_MAJOR_CAT ) ) {
+		if ( ! empty( $_GET['nhom_nganh'] ) && ! $query->is_tax( LTDH_TAX_MAJOR_CAT ) ) {
 			$query->set( 'tax_query', [
 				[
 					'taxonomy' => LTDH_TAX_MAJOR_CAT,
@@ -1237,7 +1237,7 @@ function ltdh_ajax_filter_majors() {
 	}
 	$active_filter_count = count( $active_filter_items );
 	$has_active_filters  = $active_filter_count > 0;
-	$archive_link        = get_post_type_archive_link( LTDH_CPT_MAJOR ) ?: home_url( '/nganh-hoc/' );
+	$archive_link        = home_url( '/nhom-nganh/' );
 
 	// Preserved query parameters for URLs
 	$preserved_args = [];
@@ -1275,7 +1275,10 @@ function ltdh_ajax_filter_majors() {
 	// Render Pagination HTML
 	$pagination_html = '';
 	if ( $query->max_num_pages > 1 ) {
-		$pagination_base = add_query_arg( array_merge( $preserved_args, [ 'paged' => '%#%' ] ), $archive_link );
+		$current_base    = ! empty( $nhom_nganh ) ? home_url( '/nhom-nganh/' . $nhom_nganh . '/' ) : home_url( '/nhom-nganh/' );
+		$pagination_args = $preserved_args;
+		unset( $pagination_args['nhom_nganh'] );
+		$pagination_base = add_query_arg( array_merge( $pagination_args, [ 'paged' => '%#%' ] ), $current_base );
 
 		$page_links = paginate_links( [
 			'base'      => $pagination_base,
@@ -1301,7 +1304,13 @@ function ltdh_ajax_filter_majors() {
 			<?php foreach ( $active_filter_items as $item ) : 
 				$remove_args = $preserved_args;
 				unset( $remove_args[ $item['key'] ] );
-				$remove_url = ! empty( $remove_args ) ? add_query_arg( $remove_args, $archive_link ) : $archive_link;
+				if ( $item['key'] === 'nhom_nganh' ) {
+					unset( $remove_args['nhom_nganh'] );
+					$chip_base = home_url( '/nhom-nganh/' );
+				} else {
+					$chip_base = ! empty( $nhom_nganh ) ? home_url( '/nhom-nganh/' . $nhom_nganh . '/' ) : home_url( '/nhom-nganh/' );
+				}
+				$remove_url = ! empty( $remove_args ) ? add_query_arg( $remove_args, $chip_base ) : $chip_base;
 			?>
 				<a href="<?php echo esc_url( $remove_url ); ?>" data-filter-key="<?php echo esc_attr( $item['key'] ); ?>" class="js-ltdh-chip-remove inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200/60 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-colors shrink-0 select-none">
 					<span class="truncate max-w-[140px]"><?php echo esc_html( $item['label'] ); ?></span>

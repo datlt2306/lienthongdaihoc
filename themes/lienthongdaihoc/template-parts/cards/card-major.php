@@ -2,7 +2,15 @@
 /**
  * Card Major Partial
  *
- * @package ltdh
+ * Displays a major card in directory listings and taxonomy archives.
+ * Conforms to clean minimalist card layout (Image #2 specification):
+ * - Clean aspect-[16/10] thumbnail
+ * - Prominent Category badge (e.g. XÃ HỘI - DỊCH VỤ)
+ * - Title "Ngành [Title]"
+ * - Rich excerpt / overview description
+ * - Action button "Khám phá ngành học →"
+ *
+ * @package lienthongdaihoc
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,61 +18,63 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $major_id = get_the_ID();
-$thumb    = get_the_post_thumbnail_url( $major_id, 'medium_large' );
-if ( empty( $thumb ) ) {
-	$major_fallbacks = [
-		get_stylesheet_directory_uri() . '/assets/images/banner-program.jpg',
-		get_stylesheet_directory_uri() . '/assets/images/banner-hero-02.webp',
-		get_stylesheet_directory_uri() . '/assets/images/banner-default.jpg',
-	];
-	$idx   = $major_id % count( $major_fallbacks );
-	$thumb = $major_fallbacks[ $idx ];
-}
 
-// Get count of distinct schools actively offering this major
-$schools_count = function_exists( 'ltdh_get_major_unique_schools_count' )
-	? ltdh_get_major_unique_schools_count( $major_id )
-	: 0;
+// 1. Resolve thumbnail: Post thumbnail -> Category thumbnail -> Fallback banner
+$thumb = function_exists( 'ltdh_get_major_card_thumbnail_url' )
+	? ltdh_get_major_card_thumbnail_url( $major_id, 'medium_large' )
+	: ( get_the_post_thumbnail_url( $major_id, 'medium_large' ) ?: get_stylesheet_directory_uri() . '/assets/images/banner-fallback.webp' );
 
-// Get category term
+// 2. Resolve Category Term
 $terms    = get_the_terms( $major_id, 'major_cat' );
 $cat_name = ( ! empty( $terms ) && ! is_wp_error( $terms ) ) ? $terms[0]->name : 'Ngành đào tạo';
+
+// 3. Format Title with "Ngành" prefix if not already present
+$raw_title     = get_the_title( $major_id );
+$display_title = preg_match( '/^ngành\s+/iu', $raw_title ) ? $raw_title : 'Ngành ' . $raw_title;
+
+// 4. Resolve Excerpt / Overview description
+$excerpt = get_the_excerpt( $major_id );
+if ( empty( trim( $excerpt ) ) ) {
+	$overview = get_post_meta( $major_id, 'major_overview', true );
+	if ( ! empty( $overview ) ) {
+		$excerpt = wp_strip_all_tags( $overview );
+	} else {
+		$excerpt = wp_strip_all_tags( get_post_field( 'post_content', $major_id ) );
+	}
+}
+$excerpt = wp_trim_words( $excerpt, 40, ' [...]' );
 ?>
-<div class="bg-white border border-slate-100/80 rounded-xl md:rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:border-brand-primary/20 transition-all duration-300 flex flex-col justify-between group">
+
+<div class="bg-white border border-slate-200/80 rounded-2xl md:rounded-3xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
 	
 	<!-- Header Thumbnail Area -->
-	<div class="relative aspect-[4/3] sm:aspect-[16/10] md:aspect-auto md:h-60 lg:h-64 bg-slate-100 overflow-hidden">
-		<img src="<?php echo esc_url( $thumb ); ?>" alt="<?php the_title_attribute(); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
-		<div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-900/20 to-transparent"></div>
-
-		<?php if ( $schools_count > 0 ) : ?>
-			<div class="absolute bottom-2 right-2 md:bottom-3 md:right-3">
-				<span class="inline-flex items-center gap-1 px-2 py-0.5 md:px-2.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-emerald-600 text-white shadow-xs backdrop-blur-md">
-					<span><?php echo esc_html( $schools_count ); ?></span> trường tuyển sinh
-				</span>
-			</div>
-		<?php endif; ?>
+	<div class="relative aspect-[16/10] bg-slate-100 overflow-hidden">
+		<a href="<?php the_permalink(); ?>" class="block w-full h-full" tabindex="-1" aria-hidden="true">
+			<img src="<?php echo esc_url( $thumb ); ?>" alt="<?php echo esc_attr( $display_title ); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+		</a>
 	</div>
 
 	<!-- Card Body -->
-	<div class="p-3 sm:p-4 md:p-6 flex-1 flex flex-col justify-between">
+	<div class="p-5 sm:p-6 flex-1 flex flex-col justify-between">
 		<div>
-			<div class="text-[10px] sm:text-xs font-bold text-brand-primary uppercase tracking-wider mb-1 line-clamp-1">
+			<div class="text-xs font-extrabold text-[#00308b] tracking-wider uppercase mb-1.5 line-clamp-1">
 				<?php echo esc_html( $cat_name ); ?>
 			</div>
-			<h3 class="font-black text-slate-900 text-xs sm:text-base md:text-xl hover:text-brand-primary transition-colors mb-1.5 sm:mb-2.5 line-clamp-2 leading-tight sm:leading-snug">
-				<a href="<?php the_permalink(); ?>">Ngành <?php the_title(); ?></a>
+			<h3 class="font-bold text-slate-900 text-lg sm:text-xl md:text-2xl hover:text-brand-primary transition-colors mb-2.5 sm:mb-3 line-clamp-2 leading-snug">
+				<a href="<?php the_permalink(); ?>"><?php echo esc_html( $display_title ); ?></a>
 			</h3>
-			<p class="hidden md:block text-sm text-slate-500 line-clamp-2 leading-relaxed mb-4">
-				<?php echo esc_html( wp_strip_all_tags( get_the_excerpt() ) ); ?>
+			<p class="text-xs sm:text-sm text-slate-600 line-clamp-4 leading-relaxed mb-5 font-normal">
+				<?php echo esc_html( $excerpt ); ?>
 			</p>
 		</div>
 
 		<!-- Action Footer -->
-		<div class="pt-2.5 sm:pt-3 md:pt-4 border-t border-slate-100 mt-auto">
-			<a href="<?php the_permalink(); ?>" class="w-full inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-slate-100 hover:bg-brand-primary text-slate-700 hover:text-white py-2 sm:py-2.5 md:py-3 px-2 sm:px-3 md:px-4 rounded-lg md:rounded-xl font-bold transition-all text-xs sm:text-sm group/btn min-h-[38px] md:min-h-[44px]">
-				<span>Khám phá</span><span class="hidden sm:inline">ngành học</span>
-				<svg class="w-3.5 h-3.5 md:w-4 md:h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+		<div class="pt-5 border-t border-slate-100/90 mt-auto">
+			<a href="<?php the_permalink(); ?>" class="w-full inline-flex items-center justify-center gap-2 bg-[#f0f4f9] hover:bg-[#e2e8f0] text-[#324158] hover:text-[#0f172a] font-bold py-3.5 sm:py-4 px-5 rounded-2xl text-sm sm:text-[15px] transition-all duration-200 group/btn">
+				<span>Khám phá ngành học</span>
+				<svg class="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M5 12h14M12 5l7 7-7 7" />
+				</svg>
 			</a>
 		</div>
 	</div>

@@ -43,7 +43,9 @@ function ltdh_seo_dynamic_title( $title ) {
 		}
 		$clean_type = preg_replace( '/^hệ\s+/iu', '', trim( (string) $training_type ) );
 
-		$clean_major = $major ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major ) ) : '';
+		$clean_major = function_exists( 'ltdh_get_program_discipline_name' )
+			? ltdh_get_program_discipline_name( $program_id )
+			: ( $major ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major ) ) : '' );
 		if ( empty( $clean_major ) ) {
 			$raw_title   = get_the_title( $program_id );
 			$clean_major = preg_replace( '/^(?:tuyển sinh\s+)?liên thông\s+(?:đại học\s+)?(?:ngành\s+)?/iu', '', $raw_title );
@@ -145,7 +147,7 @@ function ltdh_seo_archive_document_title( $title ) {
 		return sprintf( 'Các Hình Thức Tuyển Sinh Liên Thông Đại Học %d: Từ Xa, VHVL, CQ', $year );
 	}
 
-	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/nganh-hoc/?#i', $request_path ) ) ) {
+	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/(?:nhom-nganh|nganh-hoc)/?#i', $request_path ) ) ) {
 		return sprintf( 'Các Ngành Tuyển Sinh Liên Thông Đại Học %d | Danh Sách Mới Nhất', $year );
 	}
 
@@ -206,7 +208,9 @@ function ltdh_seo_dynamic_description( $desc ) {
 		}
 		$clean_type = preg_replace( '/^hệ\s+/iu', '', trim( (string) $training_type ) );
 
-		$clean_major = $major ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major ) ) : '';
+		$clean_major = function_exists( 'ltdh_get_program_discipline_name' )
+			? ltdh_get_program_discipline_name( $program_id )
+			: ( $major ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major ) ) : '' );
 		if ( empty( $clean_major ) ) {
 			$raw_title   = get_the_title( $program_id );
 			$clean_major = preg_replace( '/^(?:tuyển sinh\s+)?liên thông\s+(?:đại học\s+)?(?:ngành\s+)?/iu', '', $raw_title );
@@ -229,8 +233,8 @@ function ltdh_seo_dynamic_description( $desc ) {
 		);
 	}
 
-	// 1. Archive Major (/nganh-hoc/)
-	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/nganh-hoc/?#i', $request_path ) ) ) {
+	// 1. Archive Major (/nhom-nganh/, /nganh-hoc/)
+	if ( is_post_type_archive( 'major' ) || ( ! empty( $request_path ) && preg_match( '#^/(?:nhom-nganh|nganh-hoc)/?#i', $request_path ) ) ) {
 		return sprintf(
 			'Danh sách ngành tuyển sinh liên thông đại học năm %d: CNTT, Quản trị kinh doanh, Kế toán, Ngôn ngữ Anh... Xem chỉ tiêu, điều kiện và học phí chi tiết.',
 			$year
@@ -413,7 +417,9 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			$training_type = $terms[0]->name;
 		}
 		$clean_type  = preg_replace( '/^hệ\s+/iu', '', trim( (string) $training_type ) );
-		$clean_major = $major ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major ) ) : '';
+		$clean_major = function_exists( 'ltdh_get_program_discipline_name' )
+			? ltdh_get_program_discipline_name( $program_id )
+			: ( $major ? preg_replace( '/^(?:ngành|cử nhân|kỹ sư)\s+/iu', '', trim( $major ) ) : '' );
 		if ( empty( $clean_major ) ) {
 			$raw_title   = get_the_title( $program_id );
 			$clean_major = preg_replace( '/^(?:tuyển sinh\s+)?liên thông\s+(?:đại học\s+)?(?:ngành\s+)?/iu', '', $raw_title );
@@ -673,16 +679,63 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 		return $new_crumbs;
 	}
 
-	// ---- Default: fix CPT archive labels ----
-	foreach ( $crumbs as $key => $crumb ) {
-		$lower_label = mb_strtolower( $crumb[0], 'UTF-8' );
-		if ( in_array( $lower_label, [ 'trường học', 'truong', 'truong-lien-ket', 'truong-doi-tac', 'trường đối tác', 'schools', 'school' ], true ) ) {
-			$crumbs[ $key ][0] = 'Trường đối tác';
+	// ---- Single program: Trang chủ > [Nhóm ngành] > [Ngành học] > [Tên chuẩn chương trình] ----
+	if ( is_singular( LTDH_CPT_PROGRAM ) ) {
+		$program_id   = get_the_ID();
+		$program_name = function_exists( 'ltdh_get_program_banner_title' )
+			? ltdh_get_program_banner_title( $program_id )
+			: get_the_title( $program_id );
+
+		$crumbs = [
+			ltdh_seo_crumb( $home_label, $home_url ),
+		];
+
+		$major_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : 0;
+		if ( $major_id > 0 ) {
+			$terms = get_the_terms( $major_id, 'major_cat' );
+			if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+				$cat_term = $terms[0];
+				$cat_link = get_term_link( $cat_term );
+				if ( ! is_wp_error( $cat_link ) ) {
+					$crumbs[] = ltdh_seo_crumb( $cat_term->name, $cat_link );
+				}
+			}
+			$crumbs[] = ltdh_seo_crumb( get_the_title( $major_id ), get_permalink( $major_id ) );
+		} else {
+			$crumbs[] = ltdh_seo_crumb( 'Liên thông Đại học', home_url( '/hinh-thuc-dao-tao/' ) );
 		}
+
+		$crumbs[] = ltdh_seo_crumb( $program_name );
+
+		return $crumbs;
 	}
 
-	// ---- Single major: If school context exists, append school to crumb ----
+	// ---- Taxonomy major_cat: Trang chủ > [Tên nhóm ngành] ----
+	if ( is_tax( 'major_cat' ) ) {
+		$term = get_queried_object();
+		return [
+			ltdh_seo_crumb( $home_label, $home_url ),
+			ltdh_seo_crumb( $term ? $term->name : 'Nhóm ngành' ),
+		];
+	}
+
+	// ---- Single major: Trang chủ > [Tên nhóm ngành] > [Tên ngành] ----
 	if ( is_singular( 'major' ) ) {
+		$post_id    = get_the_ID();
+		$terms      = get_the_terms( $post_id, 'major_cat' );
+		$major_term = ( ! empty( $terms ) && ! is_wp_error( $terms ) ) ? $terms[0] : null;
+
+		$crumbs = [
+			ltdh_seo_crumb( $home_label, $home_url ),
+		];
+
+		if ( $major_term ) {
+			$crumbs[] = ltdh_seo_crumb( $major_term->name, get_term_link( $major_term ) );
+		} else {
+			$crumbs[] = ltdh_seo_crumb( 'Nhóm ngành', home_url( '/nhom-nganh/' ) );
+		}
+
+		$title = get_the_title( $post_id );
 		$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
 		if ( ! empty( $school_param ) ) {
 			$school_obj = is_numeric( $school_param ) ? get_post( intval( $school_param ) ) : get_page_by_path( sanitize_title( $school_param ), OBJECT, 'school' );
@@ -695,11 +748,23 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 			if ( $school_obj ) {
 				$s_code = get_post_meta( $school_obj->ID, 'school_code', true );
 				$s_name = $s_code ? $s_code : preg_replace( '/^trường\s+đại\s+học\s+/iu', 'ĐH ', get_the_title( $school_obj->ID ) );
-				$last_idx = count( $crumbs ) - 1;
-				if ( $last_idx >= 0 && ! str_contains( $crumbs[ $last_idx ][0], '–' ) && ! str_contains( $crumbs[ $last_idx ][0], '-' ) ) {
-					$crumbs[ $last_idx ][0] .= ' – ' . $s_name;
-				}
+				$title .= ' – ' . $s_name;
 			}
+		}
+
+		$crumbs[] = ltdh_seo_crumb( $title );
+		return $crumbs;
+	}
+
+	// ---- Default: fix CPT archive labels ----
+	foreach ( $crumbs as $key => $crumb ) {
+		$lower_label = mb_strtolower( $crumb[0], 'UTF-8' );
+		if ( in_array( $lower_label, [ 'trường học', 'truong', 'truong-lien-ket', 'truong-doi-tac', 'trường đối tác', 'schools', 'school' ], true ) ) {
+			$crumbs[ $key ][0] = 'Trường đối tác';
+		}
+		if ( in_array( $lower_label, [ 'chương trình đào tạo', 'chuong-trinh', 'chương trình', 'programs', 'program' ], true ) ) {
+			$crumbs[ $key ][0] = 'Liên thông Đại học';
+			$crumbs[ $key ][1] = home_url( '/hinh-thuc-dao-tao/' );
 		}
 	}
 

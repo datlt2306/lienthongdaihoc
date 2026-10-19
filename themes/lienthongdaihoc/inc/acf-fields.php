@@ -88,6 +88,49 @@ function ltdh_register_program_specialization_acf_fields() {
 }
 
 /**
+ * Register category thumbnail field for major_cat taxonomy.
+ */
+add_action( 'acf/init', 'ltdh_register_major_cat_acf_fields', 12 );
+function ltdh_register_major_cat_acf_fields() {
+	if ( ! function_exists( 'acf_add_local_field_group' ) ) {
+		return;
+	}
+
+	acf_add_local_field_group( [
+		'key'                   => 'group_major_cat_settings',
+		'title'                 => 'Cài đặt Nhóm ngành',
+		'fields'                => [
+			[
+				'key'          => 'field_major_cat_thumbnail',
+				'label'        => 'Ảnh đại diện nhóm ngành (Thumbnail)',
+				'name'         => 'category_thumbnail',
+				'type'         => 'image',
+				'instructions' => 'Ảnh đại diện cho nhóm ngành, dùng hiển thị trên trang danh mục nhóm ngành hoặc làm ảnh mặc định cho các ngành bên trong khi chưa upload ảnh riêng.',
+				'required'     => 0,
+				'return_format'=> 'id',
+				'preview_size' => 'medium',
+				'library'      => 'all',
+			],
+		],
+		'location'              => [
+			[
+				[
+					'param'    => 'taxonomy',
+					'operator' => '==',
+					'value'    => 'major_cat',
+				],
+			],
+		],
+		'menu_order'            => 0,
+		'position'              => 'normal',
+		'style'                 => 'default',
+		'label_placement'       => 'top',
+		'instruction_placement' => 'label',
+		'active'                => true,
+	] );
+}
+
+/**
  * Ensure School Overview Tab is registered directly to group_school_details.
  */
 add_action( 'acf/init', 'ltdh_register_school_overview_acf_fields', 15 );
