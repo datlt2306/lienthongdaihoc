@@ -3407,66 +3407,6 @@ function ltdh_get_major_target_admissions( int $major_id ): array {
 		}
 	}
 
-	// 2. Fallback nếu chưa lưu trong admin và là ngành CNTT (Mặc định cho trường UTC như đề án)
-	if ( empty( $results ) ) {
-		$major_slug = get_post_field( 'post_name', $major_id );
-		$major_name = get_the_title( $major_id );
-		$is_cntt    = false;
-		if ( $major_slug && ( str_contains( $major_slug, 'cong-nghe-thong-tin' ) || str_contains( $major_slug, 'cntt' ) || str_contains( $major_slug, 'tin-hoc' ) ) ) {
-			$is_cntt = true;
-		} else {
-			$prog_title_lower = mb_strtolower( (string) $major_name, 'UTF-8' );
-			if ( str_contains( $prog_title_lower, 'công nghệ thông tin' ) || str_contains( $prog_title_lower, 'cntt' ) ) {
-				$is_cntt = true;
-			}
-		}
-
-		if ( $is_cntt ) {
-			$utc_school = get_page_by_path( 'truong-dai-hoc-giao-thong-van-tai', OBJECT, 'school' );
-			if ( ! $utc_school ) {
-				$utc_schools = get_posts( [
-					'post_type'   => 'school',
-					'title'       => 'Trường Đại học Giao thông Vận tải',
-					'numberposts' => 1,
-				] );
-				$utc_school = $utc_schools[0] ?? null;
-			}
-			$utc_id = $utc_school ? $utc_school->ID : 0;
-
-			$results[] = [
-				'school_id'        => $utc_id,
-				'school_title'     => $utc_school ? get_the_title( $utc_id ) : 'Trường Đại học Giao thông Vận tải',
-				'school_slug'      => $utc_school ? $utc_school->post_name : 'truong-dai-hoc-giao-thong-van-tai',
-				'school_badge'     => 'UTC',
-				'regulation_title' => 'Theo Đề án tuyển sinh Trường Đại học Giao thông Vận tải (UTC)',
-				'proper_majors'    => [
-					'Khoa học máy tính',
-					'Công nghệ thông tin',
-					'Ứng dụng phần mềm',
-					'Công nghệ kỹ thuật máy tính',
-					'Lập trình máy tính',
-				],
-				'near_majors'      => [
-					'Kỹ thuật sửa chữa lắp ráp máy tính',
-					'Thiết kế mạch điện tử trên máy tính',
-					'Truyền thông và mạng máy tính',
-					'Công nghệ kỹ thuật máy tính',
-					'Điện tử máy tính',
-					'Đồ họa đa phương tiện',
-					'Tin học văn phòng',
-					'Tin học viễn thông ứng dụng',
-					'Tin học ứng dụng',
-					'Xử lý dữ liệu',
-					'Quản trị cơ sở dữ liệu',
-					'Quản trị mạng máy tính',
-					'và các ngành tương đương',
-				],
-				'bridge_note'      => 'Thí sinh các ngành này phải học bổ sung 03 học phần trong quá trình đào tạo theo yêu cầu của chương trình đào tạo.',
-				'bridge_count'     => 3,
-			];
-		}
-	}
-
 	return $results;
 }
 

@@ -944,9 +944,9 @@ if ( ! empty( $faqs ) ) {
 											<?php endif; ?>
 
 											<?php 
-											$exemption_target_url = ! empty( $admission_package['drive_url'] ) ? $admission_package['drive_url'] : ( $admission_package['primary_url'] ?? '' );
+											$exemption_target_url = ! empty( $item['form_url'] ) ? $item['form_url'] : ( $item['file_url'] ?? '' );
 											if ( ! empty( $exemption_target_url ) ) :
-												$is_ex_drive = ! empty( $admission_package['drive_url'] ) || ( function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $exemption_target_url ) );
+												$is_ex_drive = function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $exemption_target_url );
 											?>
 												<div class="mt-3 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
 													<div class="flex items-center gap-2 min-w-0">
