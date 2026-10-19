@@ -387,7 +387,9 @@ $has_active_filters  = $active_filter_count > 0;
 						<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 						</span>
+						<label for="program-search-keyword" class="sr-only">Tìm tên ngành, trường...</label>
 						<input type="text" 
+							   id="program-search-keyword"
 							   name="s" 
 							   value="<?php echo esc_attr( $selected_search ); ?>" 
 							   placeholder="Tìm tên ngành, trường..." 
@@ -396,7 +398,8 @@ $has_active_filters  = $active_filter_count > 0;
 
 					<!-- 2. Region / Location Select -->
 					<div>
-						<select name="khu_vuc" class="w-full py-2.5 px-3.5 border border-slate-200/60 rounded-xl text-sm font-medium bg-slate-50/30 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+						<label for="program-region-select" class="sr-only">Tất cả khu vực</label>
+						<select id="program-region-select" name="khu_vuc" class="w-full py-2.5 px-3.5 border border-slate-200/60 rounded-xl text-sm font-medium bg-slate-50/30 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
 							<option value="">Tất cả khu vực</option>
 							<?php
 							$default_regions = [
@@ -715,9 +718,9 @@ $has_active_filters  = $active_filter_count > 0;
 
 								<!-- Program Name (Primary Hero Headline) -->
 								<div class="mb-1.5 sm:mb-2">
-									<h2 class="font-black text-slate-900 text-xs sm:text-base md:text-lg hover:text-brand-primary leading-tight sm:leading-snug line-clamp-2 min-h-[28px] sm:min-h-[40px] transition-colors">
+									<h3 class="font-black text-slate-900 text-xs sm:text-base md:text-lg hover:text-brand-primary leading-tight sm:leading-snug line-clamp-2 min-h-[28px] sm:min-h-[40px] transition-colors">
 										<a href="<?php the_permalink(); ?>"><?php echo esc_html( $card_headline ); ?></a>
-									</h2>
+									</h3>
 								</div>
 
 								<!-- Key Information List (Hidden on mobile for Apple-minimal compact card UX, visible on sm+) -->

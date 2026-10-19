@@ -190,7 +190,9 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 	<!-- Register Button -->
 	<?php
 	$register_link = '#register';
-	if ( ! is_singular( [ 'major', 'program', 'school' ] ) ) {
+	if ( is_front_page() || is_home() ) {
+		$register_link = '#register-section';
+	} elseif ( ! is_singular( [ 'major', 'program', 'school' ] ) ) {
 		$register_link = home_url( '/lien-he/' );
 	}
 	?>

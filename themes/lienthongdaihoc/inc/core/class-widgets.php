@@ -1445,7 +1445,7 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 
 
 	<!-- Consultation Form -->
-	<section id="register" class="bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-6 relative overflow-hidden">
+	<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-6 relative overflow-hidden">
 		<div class="inline-flex lg:hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-primary/5 text-brand-primary text-[11px] font-bold tracking-wide uppercase mb-3">
 			<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
 			<span>Tư vấn tuyển sinh</span>
@@ -1615,7 +1615,7 @@ function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
 	<?php endif; ?>
 
 	<!-- Consultation Form -->
-	<section id="register" class="bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-6 relative overflow-hidden">
+	<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-6 relative overflow-hidden">
 		<div class="inline-flex lg:hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-primary/5 text-brand-primary text-[11px] font-bold tracking-wide uppercase mb-3">
 			<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
 			<span>Tư vấn tuyển sinh</span>

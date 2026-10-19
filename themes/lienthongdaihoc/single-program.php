@@ -1159,13 +1159,13 @@ if ( ! empty( $faqs ) ) {
 			</div>
 
 			<div>
-				<label class="block text-xs font-bold text-slate-700 mb-1">Họ và tên của bạn <span class="text-red-500">*</span></label>
-				<input type="text" name="name" required class="w-full border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b] focus:outline-none" placeholder="Nguyễn Văn A">
+				<label for="ltdh-lm-name" class="block text-xs font-bold text-slate-700 mb-1">Họ và tên của bạn <span class="text-red-500">*</span></label>
+				<input type="text" id="ltdh-lm-name" name="name" required autocomplete="name" aria-required="true" class="w-full border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b] focus:outline-none" placeholder="Nguyễn Văn A">
 			</div>
 
 			<div>
-				<label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại nhận tài liệu (Zalo) <span class="text-red-500">*</span></label>
-				<input type="tel" name="phone" required class="w-full border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b] focus:outline-none" placeholder="0912 345 678">
+				<label for="ltdh-lm-phone" class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại nhận tài liệu (Zalo) <span class="text-red-500">*</span></label>
+				<input type="tel" id="ltdh-lm-phone" name="phone" required autocomplete="tel" aria-required="true" class="w-full border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b] focus:outline-none" placeholder="0912 345 678">
 				<p class="text-[11px] text-slate-400 mt-1">Hệ thống sẽ mở file trực tiếp và gửi bản dự phòng qua Zalo cho bạn.</p>
 			</div>
 

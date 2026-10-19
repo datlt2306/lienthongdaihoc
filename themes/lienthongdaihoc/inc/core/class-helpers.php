@@ -1284,6 +1284,9 @@ function ltdh_render_contact_form(): void {
  * @param array  $hidden_fields
  */
 function ltdh_render_native_form(string $type = 'consultation', array $hidden_fields = []): void {
+	static $form_instance = 0;
+	$form_instance++;
+	$prefix = "ltdh-lead-{$type}-{$form_instance}";
 ?>
 	<form action="" method="POST" class="space-y-3 lg:space-y-4">
 		<?php wp_nonce_field( 'ltdh_native_lead_submit_action', 'ltdh_native_lead_nonce' ); ?>
@@ -1298,30 +1301,30 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 		<?php endforeach; ?>
 
 		<div class="hidden" style="display:none !important;" aria-hidden="true">
-			<label for="hp_website">Website URL</label>
-			<input type="text" name="hp_website" id="hp_website" tabindex="-1" autocomplete="off" value="">
+			<label for="<?php echo esc_attr( $prefix . '-hp' ); ?>">Website URL</label>
+			<input type="text" name="hp_website" id="<?php echo esc_attr( $prefix . '-hp' ); ?>" tabindex="-1" autocomplete="off" value="">
 		</div>
 
 		<div>
-			<label class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Họ và tên *'); ?></label>
-			<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Họ và tên của bạn'); ?>">
+			<label for="<?php echo esc_attr( $prefix . '-name' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Họ và tên *', 'ltdh'); ?></label>
+			<input type="text" id="<?php echo esc_attr( $prefix . '-name' ); ?>" name="your-name" required autocomplete="name" aria-required="true" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Họ và tên của bạn', 'ltdh'); ?>">
 		</div>
 		<div>
-			<label class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Số điện thoại *'); ?></label>
-			<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Số điện thoại liên hệ'); ?>">
+			<label for="<?php echo esc_attr( $prefix . '-phone' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Số điện thoại *', 'ltdh'); ?></label>
+			<input type="tel" id="<?php echo esc_attr( $prefix . '-phone' ); ?>" name="your-phone" required autocomplete="tel" aria-required="true" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Số điện thoại liên hệ', 'ltdh'); ?>">
 		</div>
 		<div>
 			<div class="flex items-center justify-between mb-1">
-				<label class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600"><?php esc_html_e('Nội dung cần tư vấn'); ?></label>
+				<label for="<?php echo esc_attr( $prefix . '-message' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600"><?php esc_html_e('Nội dung cần tư vấn', 'ltdh'); ?></label>
 				<span class="text-[10px] text-slate-400 lg:hidden">Không bắt buộc</span>
 			</div>
-			<textarea name="your-message" rows="2" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all lg:h-24 resize-none" placeholder="<?php esc_attr_e('Nhập câu hỏi hoặc yêu cầu cụ thể...'); ?>"></textarea>
+			<textarea id="<?php echo esc_attr( $prefix . '-message' ); ?>" name="your-message" rows="2" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all lg:h-24 resize-none" placeholder="<?php esc_attr_e('Nhập câu hỏi hoặc yêu cầu cụ thể...', 'ltdh'); ?>"></textarea>
 		</div>
 
 		<?php if ( 'contact' !== $type ) : ?>
 			<div class="pt-0.5">
-				<label class="flex items-start gap-2.5 p-2.5 sm:p-3 rounded-xl bg-amber-50/80 border border-amber-200/90 cursor-pointer hover:bg-amber-100/60 transition-colors select-none">
-					<input type="checkbox" name="is_group_reg" value="1" class="mt-0.5 w-4 h-4 rounded border-amber-300 text-brand-primary focus:ring-brand-primary">
+				<label for="<?php echo esc_attr( $prefix . '-group' ); ?>" class="flex items-start gap-2.5 p-2.5 sm:p-3 rounded-xl bg-amber-50/80 border border-amber-200/90 cursor-pointer hover:bg-amber-100/60 transition-colors select-none">
+					<input type="checkbox" id="<?php echo esc_attr( $prefix . '-group' ); ?>" name="is_group_reg" value="1" class="mt-0.5 w-4 h-4 rounded border-amber-300 text-brand-primary focus:ring-brand-primary">
 					<span class="text-xs sm:text-sm text-slate-700 leading-snug">
 						🎁 <strong class="font-bold text-amber-900">Đăng ký theo nhóm:</strong> Tư vấn cho tôi suất học bổng đồng hành (khi cùng bạn bè tìm hiểu từ 2 người trở lên)
 					</span>

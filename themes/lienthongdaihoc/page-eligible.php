@@ -23,7 +23,7 @@ if ( function_exists( 'ltdh_elig_get_check_results' ) ) {
 get_header();
 ?>
 
-<main class="min-h-screen bg-slate-50/50">
+<main id="primary" tabindex="-1" class="site-main min-h-screen bg-slate-50/50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 
 	<!-- Checker Container -->

@@ -156,7 +156,8 @@ $zalo    = ltdh_get_zalo_url();
 			<form action="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" method="GET" class="space-y-3 md:space-y-0">
 				<!-- Keyword (always visible) -->
 				<div class="flex-grow min-w-[20%]">
-					<input type="text" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[40px] md:min-h-[38px]" />
+					<label for="home-search-keyword" class="sr-only"><?php esc_html_e( 'Từ khóa tìm kiếm chương trình', 'ltdh' ); ?></label>
+					<input type="text" id="home-search-keyword" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full border border-slate-200 rounded-lg px-3 py-2.5 md:py-2 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[40px] md:min-h-[38px]" />
 				</div>
 
 				<?php
@@ -1229,7 +1230,7 @@ $zalo    = ltdh_get_zalo_url();
 	</section>
 
 	<!-- 9. DYNAMIC CONSULTATION FORM SECTION -->
-	<section id="register-section" class="py-8 sm:py-12 md:py-16 bg-white">
+	<section id="register-section" class="scroll-mt-20 md:scroll-mt-24 py-8 sm:py-12 md:py-16 bg-white">
 		<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 border border-slate-100 shadow-xl rounded-xl p-5 sm:p-6 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center bg-gradient-to-tr from-[#EFF6FF]/35 to-white">
 			<!-- Graduate photo column -->
 			<div class="lg:col-span-5 hidden lg:block">

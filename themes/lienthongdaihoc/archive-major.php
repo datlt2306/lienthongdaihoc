@@ -196,7 +196,9 @@ $has_active_filters  = $active_filter_count > 0;
 						<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 						</span>
+						<label for="major-search-keyword" class="sr-only">Tìm tên ngành, mã ngành</label>
 						<input type="text" 
+							   id="major-search-keyword"
 							   name="s" 
 							   value="<?php echo esc_attr( $selected_search ); ?>" 
 							   placeholder="Tìm tên ngành, mã ngành..." 
@@ -205,7 +207,8 @@ $has_active_filters  = $active_filter_count > 0;
 
 					<!-- 2. Nhóm ngành Select -->
 					<div>
-						<select name="nhom_nganh" class="w-full py-2.5 px-3.5 border border-slate-200 rounded-xl text-sm font-medium bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+						<label for="major-cat-select" class="sr-only">Tất cả nhóm ngành</label>
+						<select id="major-cat-select" name="nhom_nganh" class="w-full py-2.5 px-3.5 border border-slate-200 rounded-xl text-sm font-medium bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
 							<option value="">Tất cả nhóm ngành</option>
 							<?php if ( ! empty( $major_cats ) ) : ?>
 								<?php foreach ( $major_cats as $cat ) : ?>

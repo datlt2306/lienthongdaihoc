@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 ?>
 
-<main class="min-h-screen bg-slate-50">
+<main id="primary" tabindex="-1" class="site-main min-h-screen bg-slate-50">
 	<section class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary text-white py-20 md:py-32 overflow-hidden">
 		<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(white 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
 		<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-accent/20 rounded-full blur-3xl"></div>
