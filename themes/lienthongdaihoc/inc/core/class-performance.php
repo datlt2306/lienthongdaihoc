@@ -62,6 +62,9 @@ class LTDH_Performance {
 		add_filter( 'googlesitekit_tagmanager_tag_blocked', [ __CLASS__, 'block_sitekit_tags' ] );
 		add_filter( 'googlesitekit_analytics-4_tag_blocked', [ __CLASS__, 'block_sitekit_tags' ] );
 		add_action( 'wp_head', [ __CLASS__, 'render_delayed_analytics_loader' ], 2 );
+
+		// 11. Async Non-Critical Styles (Eliminates Render-Blocking CSS)
+		add_filter( 'style_loader_tag', [ __CLASS__, 'async_non_critical_styles' ], 10, 4 );
 	}
 
 	/**
@@ -529,6 +532,34 @@ class LTDH_Performance {
 		})();
 		</script>
 		<?php
+	}
+
+	/**
+	 * 11. Load Non-Critical CSS Asynchronously (Zero Render-Blocking)
+	 *
+	 * Uses rel="preload" and onload swap for secondary stylesheets (e.g. Swiper CSS),
+	 * eliminating render-blocking penalty while keeping zero CLS via inline critical CSS.
+	 *
+	 * @param string $html   The link tag HTML.
+	 * @param string $handle The stylesheet handle.
+	 * @param string $href   The stylesheet URL.
+	 * @param string $media  The stylesheet media attribute.
+	 * @return string
+	 */
+	public static function async_non_critical_styles( $html, $handle, $href, $media ) {
+		if ( is_admin() ) {
+			return $html;
+		}
+
+		if ( 'swiper-css' === $handle ) {
+			return sprintf(
+				'<link rel="preload" href="%s" as="style" onload="this.onload=null;this.rel=\'stylesheet\'"><noscript><link rel="stylesheet" href="%s"></noscript>' . "\n",
+				esc_url( $href ),
+				esc_url( $href )
+			);
+		}
+
+		return $html;
 	}
 }
 

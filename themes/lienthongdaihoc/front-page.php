@@ -98,8 +98,33 @@ $zalo    = ltdh_get_zalo_url();
 	</section>
 
 
-	<!-- Styling specifically for pagination position and arrows -->
+	<!-- Styling specifically for pagination position, arrows and critical layout -->
 	<style>
+		.hero-swiper {
+			position: relative;
+			overflow: hidden;
+			list-style: none;
+			padding: 0;
+			z-index: 1;
+			display: block;
+		}
+		.hero-swiper .swiper-wrapper {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			z-index: 1;
+			display: flex;
+			transition-property: transform;
+			box-sizing: content-box;
+		}
+		.hero-swiper .swiper-slide {
+			flex-shrink: 0;
+			width: 100%;
+			height: 100%;
+			position: relative;
+			transition-property: transform;
+			display: block;
+		}
 		.hero-swiper .swiper-pagination-bullet-active {
 			background: #f5bf23 !important;
 			width: 24px;

@@ -13,6 +13,13 @@
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Montserrat:wght@600;700;800&display=swap">
 	</noscript>
 
+	<?php
+	$ltdh_css_file = get_template_directory() . '/assets/css/main.min.css';
+	if ( file_exists( $ltdh_css_file ) ) :
+	?>
+	<link rel="preload" as="style" href="<?php echo esc_url( get_template_directory_uri() . '/assets/css/main.min.css?ver=' . filemtime( $ltdh_css_file ) ); ?>">
+	<?php endif; ?>
+
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>

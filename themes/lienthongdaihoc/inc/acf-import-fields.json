@@ -782,6 +782,31 @@
         "ui": 1
       },
       {
+        "key": "field_program_specialization",
+        "label": "Chuyên ngành đào tạo (Nếu có)",
+        "name": "specialization_title",
+        "type": "text",
+        "instructions": "Nếu chương trình đào tạo theo chuyên ngành hẹp của ngành (Ví dụ: Marketing, Thương mại điện tử thuộc Quản trị kinh doanh; Luật thương mại thuộc Luật kinh tế...). Để trống nếu tuyển sinh chung theo tên ngành.",
+        "placeholder": "Ví dụ: Marketing, Thương mại điện tử, Luật thương mại..."
+      },
+      {
+        "key": "field_program_degree_type",
+        "label": "Loại văn bằng tốt nghiệp",
+        "name": "degree_type",
+        "type": "text",
+        "instructions": "Danh hiệu văn bằng khi tốt nghiệp (Ví dụ: Cử nhân Luật kinh tế, Kỹ sư Công nghệ thông tin, Cử nhân Quản trị kinh doanh...).",
+        "placeholder": "Ví dụ: Cử nhân Luật kinh tế, Cử nhân Quản trị kinh doanh..."
+      },
+      {
+        "key": "field_program_diploma_value",
+        "label": "Giá trị pháp lý văn bằng",
+        "name": "diploma_value",
+        "type": "textarea",
+        "instructions": "Quy định pháp lý của văn bằng (Theo Thông tư 27/2019/TT-BGDĐT không ghi hình thức đào tạo trên văn bằng, có giá trị học lên Thạc sĩ/Tiến sĩ hoặc thi tuyển công chức).",
+        "placeholder": "Ví dụ: Bằng Cử nhân chuẩn Bộ GD&ĐT, không ghi hình thức đào tạo trên văn bằng, đủ điều kiện thi công chức và học lên Thạc sĩ...",
+        "rows": 2
+      },
+      {
         "key": "field_program_benefits",
         "label": "Quyền lợi nổi bật",
         "name": "program_benefits",
