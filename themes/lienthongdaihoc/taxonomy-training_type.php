@@ -641,7 +641,7 @@ $has_active_filters  = $active_filter_count > 0;
 					$school_logo_id   = $school_rel_id ? ltdh_get_school_image_id( $school_rel_id ) : 0;
 					$school_logo_url  = $school_rel_id && function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_rel_id, 'thumbnail' ) : get_stylesheet_directory_uri() . '/assets/images/cropped-logo-scaled-2.webp';
 					$tuition          = get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ';
-					$duration         = get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm';
+					$duration         = function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $prog_id ) : ( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' );
 			?>
 					<div class="bg-white border border-slate-200/90 rounded-xl md:rounded-2xl overflow-hidden shadow-2xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between group"
 						 data-compare-btn

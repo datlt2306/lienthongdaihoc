@@ -194,7 +194,7 @@ function ltdh_compare_resolve_program( $program_id ) {
 	$campus_name = ! empty( $campus_names ) ? implode( ', ', $campus_names ) : $learning_details['campus'];
 
 	$tuition_str  = get_field( 'tuition_fee', $program_id ) ?: '';
-	$duration_str = get_field( 'duration', $program_id ) ?: '';
+	$duration_str = function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $program_id ) : ( get_field( 'duration', $program_id ) ?: '' );
 	$enrollment   = get_field( 'enrollment_period', $program_id ) ?: '';
 
 	$school_logo = '';

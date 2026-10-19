@@ -68,7 +68,7 @@ $is_base_archive = ! isset( $term->term_id );
 									<div class="space-y-1.5 text-sm text-slate-500 py-3 border-t border-slate-100">
 										<p>Hình thức đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
 										<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee', $prog_id ) ?: 'Liên hệ' ); ?></span></p>
-										<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' ); ?></span></p>
+										<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $prog_id ) : ( get_field( 'duration', $prog_id ) ?: '1.5 - 2 năm' ) ); ?></span></p>
 										<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
 										<?php if ( ! empty( $groups ) ) : ?>
 											<p>Tổ hợp: <span class="font-bold text-slate-700"><?php echo esc_html( $groups ); ?></span></p>
@@ -217,7 +217,7 @@ $is_base_archive = ! isset( $term->term_id );
 								<div class="space-y-1.5 text-sm text-slate-500 py-3 border-t border-slate-100">
 									<p>Hình thức đào tạo: <span class="font-bold text-slate-700"><?php echo esc_html( $type_name ); ?></span></p>
 									<p>Học phí: <span class="font-bold text-brand-primary"><?php echo esc_html( get_field( 'tuition_fee' ) ?: 'Liên hệ' ); ?></span></p>
-									<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( get_field( 'duration' ) ?: '1.5 - 2 năm' ); ?></span></p>
+									<p>Thời gian: <span class="font-bold text-slate-700"><?php echo esc_html( function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( get_the_ID() ) : ( get_field( 'duration' ) ?: '1.5 - 2 năm' ) ); ?></span></p>
 									<p>Cơ sở: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['campus'] ); ?></span></p>
 									<p>Hình thức: <span class="font-bold text-slate-700"><?php echo esc_html( $learning_details['mode'] ); ?></span></p>
 									<?php if ( ! empty( $groups ) ) : ?>
