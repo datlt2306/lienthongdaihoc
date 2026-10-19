@@ -576,78 +576,105 @@ if ( ! empty( $faqs ) ) {
 										<?php if ( ! empty( $program_target_admission ) ) : 
 											$t_item = $program_target_admission;
 										?>
-											<div class="border border-slate-200/90 rounded-xl overflow-hidden bg-white shadow-2xs">
+											<div class="border border-slate-200/80 rounded-xl overflow-hidden bg-white shadow-2xs">
 												<!-- Header thẻ quy định của trường -->
-												<div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200/90 flex flex-wrap items-center justify-between gap-2">
+												<div class="bg-slate-50/80 px-4 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
 													<div class="flex items-center gap-2">
-														<span class="w-6 h-6 rounded-lg bg-[#00308b] text-white flex items-center justify-center font-bold text-xs shrink-0">
-															🏛️
-														</span>
-														<h4 class="font-bold text-slate-900 text-sm md:text-base">
-															Quy định đối tượng tuyển sinh: Ngành đúng & Ngành gần
+														<div class="w-6 h-6 rounded-md bg-[#00308b]/10 text-[#00308b] flex items-center justify-center shrink-0">
+															<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+																<path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+																<path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+															</svg>
+														</div>
+														<h4 class="font-bold text-slate-900 text-sm md:text-[15px]">
+															Quy định đối tượng tuyển sinh: Ngành đúng &amp; Ngành gần
 														</h4>
 													</div>
 													<?php if ( ! empty( $t_item['regulation_title'] ) ) : ?>
-														<span class="text-xs font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+														<span class="text-[11px] sm:text-xs font-medium text-slate-500 bg-white px-2.5 py-0.5 rounded-md border border-slate-200/70">
 															<?php echo esc_html( $t_item['regulation_title'] ); ?>
 														</span>
 													<?php endif; ?>
 												</div>
 
-												<!-- BẢNG 2 CỘT CHUẨN: CHỈ CÓ NGÀNH ĐÚNG VS NGÀNH GẦN -->
-												<div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+												<!-- BẢNG 2 CỘT CHUẨN: NGÀNH ĐÚNG VS NGÀNH GẦN -->
+												<div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
 													
 													<!-- CỘT 1: NHÓM NGÀNH ĐÚNG -->
-													<div class="p-4 sm:p-5 bg-emerald-50/15 flex flex-col justify-between">
+													<div class="p-4 sm:p-5 flex flex-col justify-between">
 														<div>
-															<div class="flex items-center justify-between gap-2 border-b border-emerald-100 pb-3 mb-3.5">
+															<div class="pb-3 mb-3.5 border-b border-slate-100">
 																<div class="flex items-center gap-2">
-																	<span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">✓</span>
-																	<h5 class="font-bold text-slate-900 text-sm md:text-base">Nhóm Ngành Đúng</h5>
+																	<span class="w-5 h-5 rounded-md bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+																		<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+																	</span>
+																	<h5 class="font-bold text-slate-900 text-sm sm:text-base">Nhóm ngành đúng</h5>
 																</div>
-																<span class="px-2.5 py-1 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-lg border border-emerald-200">
-																	Không học bổ sung
-																</span>
+																<div class="mt-1.5 pl-7">
+																	<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100/60">
+																		Học thẳng · Không học bổ sung
+																	</span>
+																</div>
 															</div>
 
-															<p class="text-xs text-slate-600 mb-2.5 font-medium">Thí sinh tốt nghiệp Cao đẳng các chuyên ngành:</p>
+															<p class="text-xs text-slate-500 mb-2 font-medium">Bằng Cao đẳng các chuyên ngành:</p>
 															<?php if ( ! empty( $t_item['proper_majors'] ) ) : ?>
-																<ul class="space-y-2 pl-4 list-disc text-slate-800 text-xs sm:text-sm mb-4">
+																<div class="flex flex-wrap gap-1.5 mb-4">
 																	<?php foreach ( $t_item['proper_majors'] as $p_major ) : ?>
-																		<li><span class="font-semibold text-slate-900"><?php echo esc_html( $p_major ); ?></span></li>
+																		<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200/60 transition-colors">
+																			<?php echo esc_html( $p_major ); ?>
+																		</span>
 																	<?php endforeach; ?>
-																</ul>
+																</div>
 															<?php endif; ?>
 														</div>
 
-														<div class="mt-4 pt-3 border-t border-emerald-200/60 text-xs text-emerald-800 font-semibold bg-emerald-50/70 p-2.5 rounded-lg leading-relaxed">
-															🎉 Vào học thẳng môn chuyên ngành. Thời gian đào tạo tiêu chuẩn (<?php echo esc_html( $duration ); ?>), không phải học bổ sung môn chuyển đổi.
+														<div class="mt-auto pt-3 border-t border-slate-100">
+															<div class="flex items-start gap-2 p-2.5 rounded-lg bg-emerald-50/40 border border-emerald-100/60 text-xs text-slate-700 leading-relaxed">
+																<svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+																	<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+																</svg>
+																<span><strong class="text-emerald-800 font-semibold">Vào học thẳng:</strong> Thời gian đào tạo tiêu chuẩn (<?php echo esc_html( $duration ); ?>), không phải học bổ sung môn chuyển đổi.</span>
+															</div>
 														</div>
 													</div>
 
 													<!-- CỘT 2: NHÓM NGÀNH GẦN -->
-													<div class="p-4 sm:p-5 bg-amber-50/15 flex flex-col justify-between">
+													<div class="p-4 sm:p-5 flex flex-col justify-between">
 														<div>
-															<div class="flex items-center justify-between gap-2 border-b border-amber-100 pb-3 mb-3.5">
+															<div class="pb-3 mb-3.5 border-b border-slate-100">
 																<div class="flex items-center gap-2">
-																	<span class="w-6 h-6 rounded-md bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-xs shrink-0">⚡</span>
-																	<h5 class="font-bold text-slate-900 text-sm md:text-base">Nhóm Ngành Gần</h5>
+																	<span class="w-5 h-5 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+																		<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+																	</span>
+																	<h5 class="font-bold text-slate-900 text-sm sm:text-base">Nhóm ngành gần</h5>
 																</div>
-																<span class="px-2.5 py-1 bg-amber-50 text-amber-900 text-xs font-bold rounded-lg border border-amber-200">
-																	+ <?php echo sprintf( '%02d', (int) ( $t_item['bridge_count'] ?: 3 ) ); ?> Học phần bổ sung
-																</span>
+																<div class="mt-1.5 pl-7">
+																	<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-100/60">
+																		Học bổ sung <?php echo sprintf( '%02d', (int) ( $t_item['bridge_count'] ?: 3 ) ); ?> học phần chuyển đổi
+																	</span>
+																</div>
 															</div>
 
-															<p class="text-xs text-slate-600 mb-2.5 font-medium">Thí sinh tốt nghiệp Cao đẳng các ngành:</p>
+															<p class="text-xs text-slate-500 mb-2 font-medium">Bằng Cao đẳng các ngành:</p>
 															<?php if ( ! empty( $t_item['near_majors'] ) ) : ?>
-																<p class="text-xs sm:text-sm text-slate-800 leading-relaxed mb-4">
-																	<?php echo esc_html( implode( '; ', $t_item['near_majors'] ) ); ?>.
-																</p>
+																<div class="flex flex-wrap gap-1.5 mb-4">
+																	<?php foreach ( $t_item['near_majors'] as $n_major ) : ?>
+																		<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/60 transition-colors">
+																			<?php echo esc_html( $n_major ); ?>
+																		</span>
+																	<?php endforeach; ?>
+																</div>
 															<?php endif; ?>
 														</div>
 
-														<div class="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed font-medium">
-															⚠️ <strong>Quy định bắt buộc:</strong> <?php echo esc_html( $t_item['bridge_note'] ); ?>
+														<div class="mt-auto pt-3 border-t border-slate-100">
+															<div class="flex items-start gap-2 p-2.5 rounded-lg bg-amber-50/40 border border-amber-100/60 text-xs text-slate-700 leading-relaxed">
+																<svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+																	<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+																</svg>
+																<span><strong class="text-amber-800 font-semibold">Quy định bổ sung:</strong> <?php echo esc_html( $t_item['bridge_note'] ); ?></span>
+															</div>
 														</div>
 													</div>
 
