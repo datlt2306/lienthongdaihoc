@@ -613,13 +613,16 @@ if ( ! empty( $faqs ) ) {
 										<?php endif; ?>
 
 										<?php if ( ! empty( $admission_package['has_package'] ) ) : 
-											$drive_target_url = ! empty( $admission_package['drive_url'] ) ? $admission_package['drive_url'] : ( $admission_package['primary_url'] ?? $form_url );
-											$is_drive_action  = ! empty( $admission_package['drive_url'] ) || ( function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $drive_target_url ) );
-											$card_badge       = $admission_package['source_label'] ?: 'Hồ sơ chính thức';
+											$drive_target_url  = ! empty( $admission_package['drive_url'] ) ? $admission_package['drive_url'] : ( $admission_package['primary_url'] ?? $form_url );
+											$is_drive_action   = ! empty( $admission_package['drive_url'] ) || ( function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $drive_target_url ) );
+											$card_badge        = $admission_package['source_label'] ?: 'Hồ sơ chính thức';
+											$school_drive_url  = $admission_package['school_drive_url'] ?? '';
+											$has_general_drive = ! empty( $school_drive_url ) && ( $school_drive_url !== $drive_target_url );
+											$school_title_text = ! empty( $admission_package['school_title'] ) ? $admission_package['school_title'] : ( $school_title ?? 'Nhà trường' );
 										?>
 											<!-- GOOGLE DRIVE ADMISSION PACKAGE CARD -->
 											<div class="relative overflow-hidden bg-gradient-to-br from-emerald-50/70 via-white to-blue-50/50 rounded-2xl border border-emerald-100/90 p-4 sm:p-5 mt-4 shadow-2xs transition-all hover:border-emerald-200">
-												<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+												<div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
 													<div class="flex items-start gap-3.5 min-w-0">
 														<!-- Google Drive Brand Icon Container -->
 														<div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-bold shrink-0 shadow-xs ring-4 ring-emerald-50">
@@ -646,16 +649,34 @@ if ( ! empty( $faqs ) ) {
 																<?php endif; ?>
 															</div>
 															<p class="text-xs text-slate-600 leading-relaxed">
-																Bao gồm phiếu đăng ký dự thi, sơ yếu lý lịch và các đơn xét miễn giảm môn. Xem trước, tải về hoặc in trực tiếp trên Google Drive của trường.
+																<?php if ( $has_general_drive ) : ?>
+																	Bao gồm phiếu đăng ký dự thi, sơ yếu lý lịch và các biểu mẫu tuyển sinh. Bạn có thể mở trực tiếp hồ sơ theo hệ/ngành hoặc truy cập thư mục chung của nhà trường trên Google Drive.
+																<?php else : ?>
+																	Bao gồm phiếu đăng ký dự thi, sơ yếu lý lịch và các đơn xét miễn giảm môn. Xem trước, tải về hoặc in trực tiếp trên Google Drive<?php echo ! empty( $school_title_text ) ? ' của ' . esc_html( $school_title_text ) : ''; ?>.
+																<?php endif; ?>
 															</p>
 														</div>
 													</div>
 
-													<!-- Action Button with Lead Magnet -->
-													<a href="<?php echo esc_url( $drive_target_url ); ?>" <?php echo $is_drive_action ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs hover:shadow-md transition-all shrink-0 cursor-pointer self-stretch sm:self-auto group" data-file-url="<?php echo esc_url( $drive_target_url ); ?>" data-file-title="Bộ biểu mẫu & Hồ sơ tuyển sinh: <?php echo esc_attr( get_the_title( $program_id ) ); ?>">
-														<span>Mở trên Google Drive</span>
-														<svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-													</a>
+													<!-- Action Buttons -->
+													<?php if ( $has_general_drive ) : ?>
+														<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0 w-full lg:w-auto">
+															<a href="<?php echo esc_url( $drive_target_url ); ?>" <?php echo $is_drive_action ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs hover:shadow-md transition-all shrink-0 cursor-pointer group" data-file-url="<?php echo esc_url( $drive_target_url ); ?>" data-file-title="Bộ biểu mẫu & Hồ sơ tuyển sinh: <?php echo esc_attr( get_the_title( $program_id ) ); ?>">
+																<span><?php echo ( ( $admission_package['source'] ?? '' ) === 'school_type' ) ? 'Mở hồ sơ theo hệ' : 'Mở hồ sơ chương trình'; ?></span>
+																<svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+															</a>
+															<a href="<?php echo esc_url( $school_drive_url ); ?>" target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 text-xs sm:text-sm font-bold rounded-xl transition-all shrink-0 cursor-pointer group shadow-2xs" data-file-url="<?php echo esc_url( $school_drive_url ); ?>" data-file-title="Thư mục hồ sơ chung: <?php echo esc_attr( $school_title_text ); ?>">
+																<svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+																<span>Thư mục chung toàn trường</span>
+																<svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+															</a>
+														</div>
+													<?php else : ?>
+														<a href="<?php echo esc_url( $drive_target_url ); ?>" <?php echo $is_drive_action ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs hover:shadow-md transition-all shrink-0 cursor-pointer self-stretch sm:self-auto group" data-file-url="<?php echo esc_url( $drive_target_url ); ?>" data-file-title="Bộ biểu mẫu & Hồ sơ tuyển sinh: <?php echo esc_attr( get_the_title( $program_id ) ); ?>">
+															<span>Mở trên Google Drive</span>
+															<svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+														</a>
+													<?php endif; ?>
 												</div>
 											</div>
 										<?php endif; ?>

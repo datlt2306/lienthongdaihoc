@@ -1463,33 +1463,6 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 		?>
 	</section>
 
-	<!-- ADMISSION FORMS DOWNLOAD (Sidebar) -->
-	<?php
-	$school_admission_forms = function_exists( 'ltdh_get_school_admission_forms' ) ? ltdh_get_school_admission_forms( $school_id ) : [];
-	if ( ! empty( $school_admission_forms ) ) :
-	?>
-		<section class="bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-5">
-			<div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-3">
-				<span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-sm font-bold shrink-0">📂</span>
-				<h3 class="text-base font-extrabold text-slate-900 leading-snug">Hồ sơ tuyển sinh</h3>
-			</div>
-			<p class="text-xs text-slate-500 mb-3.5 leading-relaxed">Mở thư mục Google Drive chính thức để xem và tải biểu mẫu hồ sơ xét tuyển.</p>
-			<div class="space-y-2">
-				<?php foreach ( $school_admission_forms as $form_item ) : 
-					$is_item_drive = ! empty( $form_item['is_drive'] ) || ( function_exists( 'ltdh_is_google_drive_url' ) && ltdh_is_google_drive_url( $form_item['url'] ) );
-				?>
-					<a href="<?php echo esc_url( $form_item['url'] ); ?>" <?php echo $is_item_drive ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="flex items-center justify-between gap-2 p-2.5 <?php echo $is_item_drive ? 'bg-emerald-50/50 hover:bg-emerald-50 border-emerald-100/70 text-emerald-800' : 'bg-blue-50/50 hover:bg-blue-50 border-blue-100/70 text-[#00308b]'; ?> rounded-lg border text-xs font-semibold transition-all cursor-pointer group">
-						<span class="truncate"><?php echo esc_html( $form_item['label'] ); ?></span>
-						<?php if ( $is_item_drive ) : ?>
-							<svg class="w-4 h-4 text-emerald-600 shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-						<?php else : ?>
-							<svg class="w-4 h-4 text-[#00308b] shrink-0 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-						<?php endif; ?>
-					</a>
-				<?php endforeach; ?>
-			</div>
-		</section>
-	<?php endif; ?>
 
 	<!-- RELATED NEWS & ANNOUNCEMENTS (Sidebar) -->
 	<?php

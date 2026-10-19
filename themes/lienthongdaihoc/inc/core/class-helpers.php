@@ -639,16 +639,20 @@ function ltdh_get_or_create_admission_zip( array $documents, string $slug_prefix
  */
 function ltdh_get_program_admission_package( int $program_id ): array {
 	$empty_package = [
-		'has_package'   => false,
-		'source'        => '',
-		'source_label'  => '',
-		'bundle_url'    => '',
-		'bundle_title'  => '',
-		'bundle_ext'    => '',
-		'documents'     => [],
-		'is_single'     => true,
-		'primary_url'   => '',
-		'primary_title' => '',
+		'has_package'      => false,
+		'source'           => '',
+		'source_label'     => '',
+		'drive_url'        => '',
+		'bundle_url'       => '',
+		'bundle_title'     => '',
+		'bundle_ext'       => '',
+		'drive_folder_url' => '',
+		'school_drive_url' => '',
+		'school_title'     => '',
+		'documents'        => [],
+		'is_single'        => true,
+		'primary_url'      => '',
+		'primary_title'    => '',
 	];
 
 	if ( ! $program_id ) {
@@ -722,13 +726,18 @@ function ltdh_get_program_admission_package( int $program_id ): array {
 	// ----------------------------------------------------
 	// CẤP 3: KIỂM TRA LINK DRIVE CHUNG CỦA TRƯỜNG (SCHOOL DEFAULT)
 	// ----------------------------------------------------
-	if ( empty( $drive_url ) && $school_id > 0 ) {
-		$school_drive = ltdh_get_field_or_meta( 'admission_drive_folder_url', $school_id );
-		if ( ! empty( $school_drive ) ) {
-			$drive_url     = trim( (string) $school_drive );
-			$source        = 'school_default';
-			$source_label  = 'Mẫu chuẩn của trường';
+	$school_drive = '';
+	if ( $school_id > 0 ) {
+		$school_drive_raw = ltdh_get_field_or_meta( 'admission_drive_folder_url', $school_id );
+		if ( ! empty( $school_drive_raw ) ) {
+			$school_drive = trim( (string) $school_drive_raw );
 		}
+	}
+
+	if ( empty( $drive_url ) && ! empty( $school_drive ) ) {
+		$drive_url     = $school_drive;
+		$source        = 'school_default';
+		$source_label  = 'Mẫu chuẩn của trường';
 	}
 
 	// ----------------------------------------------------
@@ -780,6 +789,8 @@ function ltdh_get_program_admission_package( int $program_id ): array {
 		'bundle_title'     => $title,
 		'bundle_ext'       => $is_drive ? 'drive' : 'pdf',
 		'drive_folder_url' => $is_drive ? $target_url : '',
+		'school_drive_url' => $school_drive,
+		'school_title'     => $school_id > 0 ? get_the_title( $school_id ) : '',
 		'documents'        => [
 			[
 				'label'       => $title,

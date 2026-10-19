@@ -6039,6 +6039,9 @@
     .lg\:w-48 {
       width: calc(var(--spacing) * 48);
     }
+    .lg\:w-auto {
+      width: auto;
+    }
     .lg\:grid-cols-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -6056,6 +6059,9 @@
     }
     .lg\:flex-row {
       flex-direction: row;
+    }
+    .lg\:items-center {
+      align-items: center;
     }
     .lg\:items-stretch {
       align-items: stretch;
