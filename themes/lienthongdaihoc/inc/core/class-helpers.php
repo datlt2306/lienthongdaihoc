@@ -3045,53 +3045,78 @@ function ltdh_get_program_admission_status( int $program_id ): string {
 /**
  * Get dynamic admission deadline display based on batches or enrollment_period.
  */
-function ltdh_get_program_admission_deadline_display(int $program_id): string {
+function ltdh_get_program_admission_deadline_display( int $program_id ): string {
+	$legacy_period = trim( (string) ( get_field( 'enrollment_period', $program_id ) ?: get_post_meta( $program_id, 'enrollment_period', true ) ) );
+
 	$batches = function_exists( 'ltdh_get_program_admission_batches' )
 		? ltdh_get_program_admission_batches( $program_id )
 		: ( get_field( 'admission_batches', $program_id ) ?: [] );
-	if (is_array($batches) && ! empty($batches)) {
+
+	if ( is_array( $batches ) && ! empty( $batches ) ) {
 		$sap_mo_batches = [];
 		$all_closed     = true;
 
-		foreach ($batches as $b) {
+		foreach ( $batches as $b ) {
 			$status             = $b['batch_status'] ?? '';
-			$batch_name         = $b['batch_name'] ?? '';
-			$clean_name         = preg_replace('/^Tuyển sinh\s*/ui', '', $batch_name);
-			$application_period = $b['application_period'] ?? '';
-			
-			if ($status === 'dang-nhan') {
-				return esc_html($clean_name) . ': ' . esc_html($application_period);
+			$batch_name         = trim( (string) ( $b['batch_name'] ?? '' ) );
+			$clean_name         = trim( preg_replace( '/^Tuyển sinh\s*/ui', '', $batch_name ) );
+			$application_period = trim( (string) ( $b['application_period'] ?? '' ) );
+
+			if ( 'dang-nhan' === $status ) {
+				// 1. Nếu có ngày nhận hồ sơ cụ thể
+				if ( ! empty( $application_period ) && '-' !== $application_period ) {
+					return ! empty( $clean_name ) 
+						? esc_html( $clean_name ) . ': ' . esc_html( $application_period )
+						: esc_html( $application_period );
+				}
+
+				// 2. Nếu ngày nhận hồ sơ trong đợt để trống: ưu tiên lấy ô "Hạn hồ sơ" (Tab Tổng quan) nếu có nội dung có nghĩa
+				if ( ! empty( $legacy_period ) && ! in_array( $legacy_period, [ 'Đang nhận hồ sơ', 'Tuyển sinh theo đợt' ], true ) ) {
+					return esc_html( $legacy_period );
+				}
+
+				// 3. Fallback an toàn (tránh vỡ chuỗi "Đợt 1:")
+				return ! empty( $clean_name ) 
+					? 'Đang nhận hồ sơ (' . esc_html( $clean_name ) . ')'
+					: 'Đang nhận hồ sơ';
 			}
-			if ($status !== 'da-dong') {
+
+			if ( 'da-dong' !== $status ) {
 				$all_closed = false;
 			}
+
 			$sap_mo_batches[] = [
 				'status' => $status,
 				'name'   => $clean_name,
 				'period' => $application_period,
 			];
 		}
-		
-		// If no batch is active, try to find a "sap-mo" batch
-		foreach ($sap_mo_batches as $b) {
-			if ($b['status'] === 'sap-mo') {
-				return esc_html($b['name']) . ' (Sắp mở): ' . esc_html($b['period']);
+
+		// Nếu không có đợt đang nhận hồ sơ, kiểm tra đợt sắp mở
+		foreach ( $sap_mo_batches as $b ) {
+			if ( 'sap-mo' === $b['status'] ) {
+				$period = trim( (string) ( $b['period'] ?? '' ) );
+				if ( ! empty( $period ) && '-' !== $period ) {
+					return ( ! empty( $b['name'] ) ? esc_html( $b['name'] ) . ' (Sắp mở): ' : 'Sắp mở: ' ) . esc_html( $period );
+				}
+				return ! empty( $b['name'] ) 
+					? esc_html( $b['name'] ) . ' (Sắp mở nhận hồ sơ)'
+					: 'Sắp mở nhận hồ sơ';
 			}
 		}
 
 		// Nếu tất cả các đợt đã đóng ('da-dong')
-		if ($all_closed) {
+		if ( $all_closed ) {
 			return 'Đã hết chỉ tiêu tuyển sinh';
 		}
 	}
 
 	// Fallback to legacy enrollment_period
-	$legacy_period = get_field('enrollment_period', $program_id);
-	$status        = ltdh_get_program_admission_status($program_id);
-	if ('tam-ngung' === $status) {
-		return (! empty($legacy_period) && $legacy_period !== 'Tuyển sinh theo đợt') ? $legacy_period : 'Đã hết chỉ tiêu tuyển sinh';
+	$status = ltdh_get_program_admission_status( $program_id );
+	if ( 'tam-ngung' === $status ) {
+		return ( ! empty( $legacy_period ) && 'Tuyển sinh theo đợt' !== $legacy_period ) ? esc_html( $legacy_period ) : 'Đã hết chỉ tiêu tuyển sinh';
 	}
-	return ! empty($legacy_period) ? $legacy_period : 'Đang nhận hồ sơ';
+	return ! empty( $legacy_period ) ? esc_html( $legacy_period ) : 'Đang nhận hồ sơ';
 }
 
 

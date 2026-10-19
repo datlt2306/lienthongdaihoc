@@ -808,7 +808,14 @@ function ltdh_override_field_program_duration_label( $field ) {
 
 add_filter( 'acf/load_field/key=field_program_period', 'ltdh_override_field_program_period_label' );
 function ltdh_override_field_program_period_label( $field ) {
-	$field['label'] = 'Hạn hồ sơ';
+	$field['label']        = 'Hạn hồ sơ';
+	$field['instructions'] = 'Nhập thông tin hạn hồ sơ (Ví dụ: "Tuyển sinh liên tục trong năm", "Đến hết 30/11/2026"...). Nếu có khai báo chi tiết tại Tab "Các đợt tuyển sinh" kèm ngày nhận hồ sơ cụ thể, hệ thống sẽ tự động đồng bộ theo đợt đang mở.';
+	return $field;
+}
+
+add_filter( 'acf/load_field/key=field_program_batch_application_period', 'ltdh_override_field_program_batch_app_period' );
+function ltdh_override_field_program_batch_app_period( $field ) {
+	$field['placeholder'] = 'Để trống nếu nhận liên tục, hoặc nhập: Đến 30/11/2026';
 	return $field;
 }
 

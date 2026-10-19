@@ -442,11 +442,17 @@ if ( ! empty( $faqs ) ) {
 									<div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-6 lg:gap-8">
 										
 										<!-- Cột 1: Hạn nộp hồ sơ -->
-										<?php if ( ! empty( $b_data['app_period'] ) ) : ?>
+										<?php 
+										$batch_app_text = $b_data['app_period'];
+										if ( empty( $batch_app_text ) && $is_open && ! empty( $enrollment ) ) {
+											$batch_app_text = $enrollment;
+										}
+										?>
+										<?php if ( ! empty( $batch_app_text ) ) : ?>
 											<div>
 												<span class="text-xs font-semibold text-slate-500 block mb-1">Hạn nộp hồ sơ</span>
 												<span class="<?php echo $is_open ? 'text-sm font-bold text-amber-950' : 'text-sm font-semibold text-slate-800'; ?> block leading-snug">
-													<?php echo esc_html( $b_data['app_period'] ); ?>
+													<?php echo esc_html( $batch_app_text ); ?>
 												</span>
 											</div>
 										<?php endif; ?>

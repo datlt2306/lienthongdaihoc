@@ -195,7 +195,9 @@ function ltdh_compare_resolve_program( $program_id ) {
 
 	$tuition_str  = get_field( 'tuition_fee', $program_id ) ?: '';
 	$duration_str = function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $program_id ) : ( get_field( 'duration', $program_id ) ?: '' );
-	$enrollment   = get_field( 'enrollment_period', $program_id ) ?: '';
+	$enrollment   = function_exists( 'ltdh_get_program_admission_deadline_display' ) 
+		? ltdh_get_program_admission_deadline_display( $program_id ) 
+		: ( get_field( 'enrollment_period', $program_id ) ?: '' );
 
 	$school_logo = '';
 	if ( $school_id ) {

@@ -259,78 +259,89 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 		$new_items[] = $item;
 		$title = mb_strtolower(trim($item->title), 'UTF-8');
 
-		if ( in_array( $title, [ 'liên thông đại học', 'liên thông' ], true ) || in_array( $title, [ 'hình thức học', 'hệ đào tạo', 'hình thức đào tạo' ], true ) ) {
-			$filtered_items = [];
-			foreach ($new_items as $ni) {
-				if ((int) $ni->menu_item_parent === (int) $item->ID) {
-					continue;
+		if ( in_array( $title, [ 'liên thông đại học', 'liên thông' ], true ) || in_array( $title, [ 'hình thức học', 'hệ đào tạo', 'hình thức đào tạo', 'hình thức liên thông' ], true ) ) {
+			// Check if this item ALREADY has saved children directly in WordPress Menu
+			$has_saved_training_children = false;
+			foreach ( $sorted_menu_items as $chk_training ) {
+				if ( (int) $chk_training->menu_item_parent === (int) $item->ID ) {
+					$has_saved_training_children = true;
+					break;
 				}
-				$filtered_items[] = $ni;
 			}
-			$new_items = $filtered_items;
 
-			$item->classes[] = 'menu-item-has-children';
+			if ( ! $has_saved_training_children ) {
+				$item->classes[] = 'menu-item-has-children';
 
-			$allowed_training_types = ['chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam'];
-			$types = get_terms([
-				'taxonomy'   => LTDH_TAX_TRAINING_TYPE,
-				'slug'       => $allowed_training_types,
-				'hide_empty' => false,
-			]);
-			if (! is_wp_error($types) && is_array($types)) {
-				$types = array_values(array_filter($types, function($t) use ($allowed_training_types) {
-					return in_array($t->slug, $allowed_training_types, true);
-				}));
-				foreach ($types as $t) {
-					$term_link = function_exists( 'get_term_link' ) ? get_term_link( $t ) : '';
-					$url = ( ! is_wp_error( $term_link ) && ! empty( $term_link ) ) ? $term_link : home_url( '/hinh-thuc-dao-tao/' . $t->slug . '/' );
+				$allowed_training_types = ['chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam'];
+				$types = get_terms([
+					'taxonomy'   => LTDH_TAX_TRAINING_TYPE,
+					'slug'       => $allowed_training_types,
+					'hide_empty' => false,
+				]);
+				if (! is_wp_error($types) && is_array($types)) {
+					$types = array_values(array_filter($types, function($t) use ($allowed_training_types) {
+						return in_array($t->slug, $allowed_training_types, true);
+					}));
+					foreach ($types as $t) {
+						$term_link = function_exists( 'get_term_link' ) ? get_term_link( $t ) : '';
+						$url = ( ! is_wp_error( $term_link ) && ! empty( $term_link ) ) ? $term_link : home_url( '/hinh-thuc-dao-tao/' . $t->slug . '/' );
 
-					$max_db_id++;
-					$sub_item                = new stdClass();
-					$sub_item->ID            = $max_db_id;
-					$sub_item->db_id         = $max_db_id;
-					$sub_item->title         = $t->name;
-					$sub_item->url           = $url;
-					$sub_item->menu_item_parent = $item->ID;
-					$sub_item->classes       = ['menu-item', 'menu-item-type-taxonomy', 'menu-item-object-training_type'];
-					$sub_item->type          = 'taxonomy';
-					$sub_item->object        = LTDH_TAX_TRAINING_TYPE;
-					$sub_item->object_id     = $t->term_id;
-					$sub_item->post_parent   = 0;
-					$sub_item->post_title    = $t->name;
-					$sub_item->post_status   = 'publish';
-					$sub_item->post_type     = 'nav_menu_item';
-					$sub_item->menu_order    = 0;
-					$sub_item->target        = '';
-					$sub_item->attr_title    = '';
-					$sub_item->description   = '';
-					$sub_item->xfn           = '';
-					$sub_item->current       = false;
-					$sub_item->current_item_parent  = false;
-					$sub_item->current_item_ancestor = false;
+						$max_db_id++;
+						$sub_item                = new stdClass();
+						$sub_item->ID            = $max_db_id;
+						$sub_item->db_id         = $max_db_id;
+						$sub_item->title         = $t->name;
+						$sub_item->url           = $url;
+						$sub_item->menu_item_parent = $item->ID;
+						$sub_item->classes       = ['menu-item', 'menu-item-type-taxonomy', 'menu-item-object-training_type'];
+						$sub_item->type          = 'taxonomy';
+						$sub_item->object        = LTDH_TAX_TRAINING_TYPE;
+						$sub_item->object_id     = $t->term_id;
+						$sub_item->post_parent   = 0;
+						$sub_item->post_title    = $t->name;
+						$sub_item->post_status   = 'publish';
+						$sub_item->post_type     = 'nav_menu_item';
+						$sub_item->menu_order    = 0;
+						$sub_item->target        = '';
+						$sub_item->attr_title    = '';
+						$sub_item->description   = '';
+						$sub_item->xfn           = '';
+						$sub_item->current       = false;
+						$sub_item->current_item_parent  = false;
+						$sub_item->current_item_ancestor = false;
 
-					$new_items[] = $sub_item;
+						$new_items[] = $sub_item;
+					}
 				}
 			}
 		}
 
 		$is_top_level  = ( (int) ( $item->menu_item_parent ?? 0 ) === 0 );
 		$item_path     = ! empty( $item->url ) ? rtrim( (string) parse_url( $item->url, PHP_URL_PATH ), '/' ) : '';
-		$is_major_menu = $is_top_level && (
-			in_array( $title, [ 'chuyên ngành', 'ngành học', 'chuyên ngành học', 'nhóm ngành', 'nhóm ngành đào tạo', 'ngành đào tạo' ], true )
-			|| in_array( $item_path, [ '/nganh-hoc', '/nhom-nganh' ], true )
-			|| in_array( 'menu-item-mega-menu', (array) $item->classes, true )
-			|| ( function_exists( 'get_post_meta' ) && get_post_meta( $item->ID, '_menu_item_is_mega_menu', true ) === '1' )
-		);
+		$explicit_mega = function_exists( 'get_post_meta' ) ? get_post_meta( $item->ID, '_menu_item_is_mega_menu', true ) : '';
 
-		// Auto-detect by child items: If any direct child has object major_cat or major
-		if ( ! $is_major_menu && $is_top_level ) {
-			foreach ( $sorted_menu_items as $sub_chk ) {
-				if ( (int) $sub_chk->menu_item_parent === (int) $item->ID ) {
-					if ( ( isset( $sub_chk->object ) && in_array( $sub_chk->object, [ LTDH_TAX_MAJOR_CAT, LTDH_CPT_MAJOR, 'major_cat', 'major' ], true ) )
-						|| ( isset( $sub_chk->type ) && $sub_chk->type === 'taxonomy' ) ) {
-						$is_major_menu = true;
-						break;
+		if ( '0' === $explicit_mega ) {
+			// Explicitly turned off by admin: Never treat as mega menu
+			$is_major_menu = false;
+		} elseif ( '1' === $explicit_mega ) {
+			// Explicitly turned on by admin
+			$is_major_menu = $is_top_level;
+		} else {
+			// Default / Unset: Auto-detect ONLY for academic major categories or majors
+			$is_major_menu = $is_top_level && (
+				in_array( $title, [ 'chuyên ngành', 'ngành học', 'chuyên ngành học', 'nhóm ngành', 'nhóm ngành đào tạo', 'ngành đào tạo' ], true )
+				|| in_array( $item_path, [ '/nganh-hoc', '/nhom-nganh' ], true )
+				|| in_array( 'menu-item-mega-menu', (array) $item->classes, true )
+			);
+
+			// Auto-detect by child items: STRICTLY if any direct child has object major_cat or major
+			if ( ! $is_major_menu && $is_top_level ) {
+				foreach ( $sorted_menu_items as $sub_chk ) {
+					if ( (int) $sub_chk->menu_item_parent === (int) $item->ID ) {
+						if ( isset( $sub_chk->object ) && in_array( $sub_chk->object, [ LTDH_TAX_MAJOR_CAT, LTDH_CPT_MAJOR, 'major_cat', 'major' ], true ) ) {
+							$is_major_menu = true;
+							break;
+						}
 					}
 				}
 			}
@@ -1032,7 +1043,7 @@ function ltdh_save_menu_item_custom_fields( $menu_id, $menu_item_db_id, $args ) 
 	if ( isset( $_POST['menu_item_is_mega_menu'][ $menu_item_db_id ] ) ) {
 		update_post_meta( $menu_item_db_id, '_menu_item_is_mega_menu', '1' );
 	} else {
-		delete_post_meta( $menu_item_db_id, '_menu_item_is_mega_menu' );
+		update_post_meta( $menu_item_db_id, '_menu_item_is_mega_menu', '0' );
 	}
 
 	if ( isset( $_POST['menu_item_is_cat_header'][ $menu_item_db_id ] ) ) {

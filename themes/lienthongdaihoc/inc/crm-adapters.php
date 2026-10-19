@@ -320,17 +320,30 @@ function ltdh_sync_erpnext_adapter( $payload, $endpoint = '', $token = '' ) {
 
 	$company = defined( 'LTDH_ERPNEXT_COMPANY' ) ? LTDH_ERPNEXT_COMPANY : 'Liên thông giao thông vận tải';
 
+	// Tự động phân loại trường đẩy vào ERPNext
+	$school_name  = ! empty( $payload['school'] ) ? $payload['school'] : '';
+	$program_name = ! empty( $payload['program'] ) ? $payload['program'] : '';
+
+	$target_school = 'Nội bộ (Các ngành khác)';
+	if ( stripos( $school_name, 'Giao thông' ) !== false || 
+	     stripos( $school_name, 'GTVT' ) !== false || 
+	     stripos( $program_name, 'Giao thông' ) !== false || 
+	     stripos( $program_name, 'GTVT' ) !== false ) {
+		$target_school = 'ĐH Giao thông Vận tải';
+	}
+
 	$body_data = [
-		'naming_series'        => 'CRM-LEAD-.YYYY.-',
-		'lead_name'            => $payload['name'],
-		'mobile_no'            => $payload['phone'],
-		'phone'                => $payload['phone'],
-		'email_id'             => ! empty( $payload['email'] ) ? $payload['email'] : '',
-		'company'              => $company,
-		'territory'            => 'Vietnam',
-		'utm_source'           => 'Website',
-		'status'               => 'Lead',
-		'qualification_status' => 'Unqualified',
+		'naming_series'         => 'CRM-LEAD-.YYYY.-',
+		'lead_name'             => $payload['name'],
+		'mobile_no'             => $payload['phone'],
+		'phone'                 => $payload['phone'],
+		'email_id'              => ! empty( $payload['email'] ) ? $payload['email'] : '',
+		'company'               => $company,
+		'territory'             => 'Vietnam',
+		'utm_source'            => 'Website',
+		'status'                => 'Lead',
+		'qualification_status'  => 'Unqualified',
+		'custom_trường_đăng_ký' => $target_school,
 	];
 
 	if ( ! empty( $notes ) ) {
