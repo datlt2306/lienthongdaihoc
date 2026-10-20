@@ -7,7 +7,10 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap" media="print" onload="this.media='all'">
+	<noscript>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap">
+	</noscript>
 
 	<style id="ltdh-critical-typography">
 		html { scroll-behavior: smooth; }
@@ -57,7 +60,7 @@
 	$ltdh_css_file = get_template_directory() . '/assets/css/main.min.css';
 	if ( file_exists( $ltdh_css_file ) ) :
 	?>
-	<link rel="preload" as="style" href="<?php echo esc_url( get_template_directory_uri() . '/assets/css/main.min.css?ver=' . filemtime( $ltdh_css_file ) ); ?>">
+	<link rel="preload" as="style" href="<?php echo esc_url( get_template_directory_uri() . '/assets/css/main.min.css?ver=' . filemtime( $ltdh_css_file ) ); ?>" fetchpriority="high">
 	<?php endif; ?>
 
 	<?php wp_head(); ?>
