@@ -133,26 +133,6 @@ $zalo_share_url   = 'https://sp.zalo.me/plugins/share?url=' . rawurlencode( $soc
 				</div>
 			</a>
 
-			<!-- 4. Native Device Share (Web Share API for iOS / Android / macOS Safari) -->
-			<button type="button"
-			        id="ltdh-native-program-share-btn"
-			        data-title="<?php echo esc_attr( $clean_title ); ?>"
-			        data-url="<?php echo esc_url( $program_url ); ?>"
-			        data-type="program"
-			        class="ltdh-share-btn ltdh-native-share-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors cursor-pointer group"
-			        role="menuitem"
-			        title="Mở menu chia sẻ hệ thống">
-				<span class="w-9 h-9 rounded-xl bg-orange-50 text-brand-accent flex items-center justify-center shrink-0 border border-orange-100 group-hover:scale-105 transition-transform shadow-2xs">
-					<svg class="w-4 h-4 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-					</svg>
-				</span>
-				<div class="flex-1 min-w-0">
-					<span class="block text-xs sm:text-sm font-bold text-slate-800">Chia sẻ qua ứng dụng khác</span>
-					<span class="block text-[11px] text-slate-500">AirDrop, Tin nhắn, Menu hệ thống</span>
-				</div>
-			</button>
-
 		</div>
 
 	</div>
