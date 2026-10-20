@@ -137,6 +137,11 @@ function ltdhInitTheme() {
 
     function openMenu() {
         if (!menu || !overlay) return;
+        const header = document.getElementById('masthead');
+        if (header) {
+            header.classList.remove('is-hidden');
+            document.documentElement.classList.remove('ltdh-header-hidden');
+        }
         menu.classList.remove('translate-x-full');
         overlay.classList.remove('opacity-0', 'pointer-events-none');
         overlay.classList.add('opacity-100');
@@ -169,6 +174,9 @@ function ltdhInitTheme() {
     if (overlay && !overlay._bound) {
         overlay._bound = true;
         overlay.addEventListener('click', closeMenu, { passive: true });
+        overlay.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
     }
 
     document.addEventListener('keydown', (e) => {
@@ -275,6 +283,88 @@ function ltdhInitTheme() {
     }
 
     initMobileFloatingBarScroll();
+
+    // ----------------------------------------------------
+    // 1c. Header Floating Island - Scroll-Aware Auto-Hide (Apple iOS Style)
+    // ----------------------------------------------------
+    function initHeaderScrollAutoHide() {
+        const header = document.getElementById('masthead');
+        if (!header || header._scrollAutoHideInit) return;
+        header._scrollAutoHideInit = true;
+
+        const mobileMenu = document.getElementById('mobile-menu');
+        let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+        let ticking = false;
+        const threshold = 8;
+        let isHidden = header.classList.contains('is-hidden');
+
+        function hideHeader() {
+            // Never hide if mobile menu drawer is open
+            if (mobileMenu && !mobileMenu.classList.contains('translate-x-full')) return;
+            header.classList.add('is-hidden');
+            document.documentElement.classList.add('ltdh-header-hidden');
+            isHidden = true;
+        }
+
+        function showHeader() {
+            header.classList.remove('is-hidden');
+            document.documentElement.classList.remove('ltdh-header-hidden');
+            isHidden = false;
+        }
+
+        function updateHeaderState() {
+            // ONLY execute auto-hide on mobile devices (< 1024px)
+            if (window.innerWidth >= 1024) {
+                if (isHidden) showHeader();
+                ticking = false;
+                return;
+            }
+
+            const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+            const diff = currentScrollY - lastScrollY;
+
+            // 1. Near top of page: always show
+            if (currentScrollY < 60) {
+                if (isHidden) showHeader();
+            }
+            // 2. Scroll Down: hide
+            else if (diff > threshold && !isHidden) {
+                hideHeader();
+            }
+            // 3. Scroll Up: show
+            else if (diff < -threshold && isHidden) {
+                showHeader();
+            }
+
+            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateHeaderState);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // Touch top edge to reveal header instantly on mobile
+        document.addEventListener('touchstart', (e) => {
+            if (isHidden && e.touches && e.touches[0].clientY < 60) {
+                showHeader();
+            }
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024 && isHidden) {
+                showHeader();
+            }
+        }, { passive: true });
+
+        window.ltdhShowHeader = showHeader;
+        window.ltdhHideHeader = hideHeader;
+    }
+
+    initHeaderScrollAutoHide();
 
     // ----------------------------------------------------
     // 2. Swiper Sliders Initialization (Hero & School Partners)
@@ -522,7 +612,7 @@ function ltdhInitTheme() {
     }
 
     function ltdhDrawerTouchMoveLock(e) {
-        const scrollable = e.target.closest('#catalog-drawer-major-filter-wrapper, #catalog-drawer-filter-wrapper');
+        const scrollable = e.target.closest('#catalog-drawer-major-filter-wrapper, #catalog-drawer-filter-wrapper, #home-drawer-filter-wrapper');
         if (!scrollable) {
             if (e.cancelable) e.preventDefault();
             return;

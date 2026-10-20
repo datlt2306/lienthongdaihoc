@@ -1013,6 +1013,45 @@ button,
 body.admin-bar #masthead {
     top: 32px !important;
 }
+
+/* Floating Island Header & Auto-Hide (Mobile only) */
+@media (max-width: 1023px) {
+    #masthead {
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        will-change: transform, opacity;
+    }
+
+    #masthead.is-hidden {
+        transform: translateY(-150%) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* Secondary sticky tabs adapt when header is hidden on mobile */
+    html.ltdh-header-hidden .ltdh-sticky-nav,
+    html.ltdh-header-hidden #ltdh-major-sticky-nav,
+    html.ltdh-header-hidden #ltdh-school-sticky-nav,
+    html.ltdh-header-hidden #ltdh-program-sticky-nav {
+        top: 0.5rem !important;
+    }
+    body.admin-bar html.ltdh-header-hidden .ltdh-sticky-nav,
+    html.ltdh-header-hidden body.admin-bar .ltdh-sticky-nav,
+    html.ltdh-header-hidden body.admin-bar #ltdh-major-sticky-nav,
+    html.ltdh-header-hidden body.admin-bar #ltdh-school-sticky-nav,
+    html.ltdh-header-hidden body.admin-bar #ltdh-program-sticky-nav {
+        top: calc(46px + 0.5rem) !important;
+    }
+}
+
+/* Desktop: enforce original static sticky header (never hidden, never transformed) */
+@media (min-width: 1024px) {
+    #masthead {
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transition: none !important;
+    }
+}
 body.admin-bar .ltdh-sticky-nav,
 body.admin-bar #ltdh-major-sticky-nav,
 body.admin-bar #ltdh-school-sticky-nav,

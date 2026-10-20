@@ -150,68 +150,282 @@ $zalo    = ltdh_get_zalo_url();
 	</style>
 
 
-	<!-- Search & Filters Container (Compact Single-Row Bar) -->
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-30">
-		<div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-5">
-			<form action="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-center">
-				<!-- Keyword (always visible) -->
-				<div class="w-full">
-					<label for="home-search-keyword" class="sr-only"><?php esc_html_e( 'Từ khóa tìm kiếm chương trình', 'ltdh' ); ?></label>
-					<input type="text" id="home-search-keyword" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none placeholder-slate-400 font-medium min-h-[44px]" />
-				</div>
+	<!-- Search & Filters Container (Compact Mobile Trigger + Desktop Bar) -->
+	<section class="bg-slate-50">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 sm:-mt-8 relative z-30">
+			
+			<!-- MOBILE COMPACT SEARCH TRIGGER BAR (Visible only on < md) -->
+			<div class="md:hidden pt-3 sm:pt-0">
+				<button type="button" 
+				        id="ltdh-mobile-home-filter-btn"
+				        aria-expanded="false"
+				        aria-controls="ltdh-home-filter-drawer"
+				        class="w-full bg-white rounded-2xl shadow-md hover:shadow-lg border border-slate-200/90 p-3 flex items-center justify-between gap-3 text-left transition-all active:scale-[0.99] cursor-pointer">
+					<div class="flex items-center gap-2.5 min-w-0">
+						<div class="w-9 h-9 rounded-xl bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
+							<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+							</svg>
+						</div>
+						<div class="min-w-0">
+							<span class="block text-xs sm:text-sm font-bold text-slate-800 truncate">Tìm kiếm ngành &amp; trường học</span>
+							<span class="block text-[11px] text-slate-400 truncate">Chọn trường, ngành, hình thức đào tạo...</span>
+						</div>
+					</div>
+					<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-primary text-white text-xs font-bold shrink-0 shadow-xs">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+						</svg>
+						<span>Bộ lọc</span>
+					</div>
+				</button>
+			</div>
 
+			<!-- DESKTOP FILTER BAR (Visible only on >= md) -->
+			<div id="home-desktop-filter-wrapper" class="hidden md:block bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-5">
 				<?php
 				$filter_opts = ltdh_get_cached_filter_options();
 				$schools     = $filter_opts['schools'] ?? [];
 				$majors      = $filter_opts['majors'] ?? [];
 				$types       = $filter_opts['types'] ?? [];
 				?>
+				<form id="home-filter-form" action="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" method="GET" class="space-y-4 md:space-y-0 md:grid md:grid-cols-5 md:gap-3 md:items-center">
+					<!-- Keyword -->
+					<div class="w-full">
+						<label for="home-search-keyword" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5"><?php esc_html_e( 'Từ khóa tìm kiếm', 'ltdh' ); ?></label>
+						<div class="relative">
+							<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+							</span>
+							<input type="text" id="home-search-keyword" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-xl text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none placeholder-slate-400 min-h-[44px] transition-all bg-slate-50/50 focus:bg-white" />
+						</div>
+					</div>
 
-				<!-- School Select -->
-				<div class="w-full">
-					<label for="home-filter-truong" class="sr-only"><?php esc_html_e( 'Chọn trường', 'ltdh' ); ?></label>
-					<select id="home-filter-truong" name="truong" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px] cursor-pointer">
-						<option value="">-- Chọn trường --</option>
-						<?php foreach ($schools as $sc) : ?>
-							<option value="<?php echo esc_attr($sc['slug']); ?>"><?php echo esc_html($sc['title']); ?></option>
-						<?php endforeach; ?>
-					</select>
-				</div>
+					<!-- School Select -->
+					<div class="w-full">
+						<label for="home-filter-truong" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5"><?php esc_html_e( 'Chọn trường', 'ltdh' ); ?></label>
+						<select id="home-filter-truong" name="truong" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+							<option value="">-- Chọn trường --</option>
+							<?php foreach ($schools as $sc) : ?>
+								<option value="<?php echo esc_attr($sc['slug']); ?>"><?php echo esc_html($sc['title']); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
 
-				<!-- Major Select -->
-				<div class="w-full">
-					<label for="home-filter-nganh" class="sr-only"><?php esc_html_e( 'Chọn ngành học', 'ltdh' ); ?></label>
-					<select id="home-filter-nganh" name="nganh" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px] cursor-pointer">
-						<option value="">-- Chọn ngành học --</option>
-						<?php foreach ($majors as $mj) : ?>
-							<option value="<?php echo esc_attr($mj['slug']); ?>"><?php echo esc_html($mj['title']); ?></option>
-						<?php endforeach; ?>
-					</select>
-				</div>
+					<!-- Major Select -->
+					<div class="w-full">
+						<label for="home-filter-nganh" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5"><?php esc_html_e( 'Chọn ngành học', 'ltdh' ); ?></label>
+						<select id="home-filter-nganh" name="nganh" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+							<option value="">-- Chọn ngành học --</option>
+							<?php foreach ($majors as $mj) : ?>
+								<option value="<?php echo esc_attr($mj['slug']); ?>"><?php echo esc_html($mj['title']); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
 
-				<!-- Training Mode Select -->
-				<div class="w-full">
-					<label for="home-filter-he" class="sr-only"><?php esc_html_e( 'Chọn hình thức đào tạo', 'ltdh' ); ?></label>
-					<select name="he" id="home-filter-he" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:outline-none bg-white min-h-[44px] cursor-pointer">
-						<option value="">-- Chọn hình thức đào tạo --</option>
-						<?php foreach ($types as $tp) : ?>
-							<option value="<?php echo esc_attr($tp['slug']); ?>"><?php echo esc_html($tp['name']); ?></option>
-						<?php endforeach; ?>
-					</select>
-				</div>
+					<!-- Training Mode Select -->
+					<div class="w-full">
+						<label for="home-filter-he" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5"><?php esc_html_e( 'Hình thức đào tạo', 'ltdh' ); ?></label>
+						<select name="he" id="home-filter-he" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+							<option value="">-- Chọn hình thức đào tạo --</option>
+							<?php foreach ($types as $tp) : ?>
+								<option value="<?php echo esc_attr($tp['slug']); ?>"><?php echo esc_html($tp['name']); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
 
-				<!-- Submit Buttons -->
-				<div class="flex gap-2 w-full">
-					<button type="submit" class="flex-1 bg-brand-primary hover:bg-brand-darkBlue active:scale-95 text-white font-extrabold text-sm px-5 py-2.5 rounded-xl transition-all uppercase tracking-wider min-h-[44px] shadow-sm">
-						Tìm kiếm
-					</button>
-					<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-500 rounded-xl transition-all flex items-center justify-center min-h-[44px] w-11 shrink-0" title="Reset bộ lọc">
-						🔄
-					</a>
-				</div>
-			</form>
+					<!-- Submit Buttons (Visible on desktop) -->
+					<div class="hidden md:flex gap-2 w-full">
+						<button type="submit" class="flex-1 bg-brand-primary hover:bg-brand-darkBlue active:scale-95 text-white font-extrabold text-sm px-5 py-2.5 rounded-xl transition-all uppercase tracking-wider min-h-[44px] shadow-sm cursor-pointer">
+							Tìm kiếm
+						</button>
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-500 rounded-xl transition-all flex items-center justify-center min-h-[44px] w-11 shrink-0" title="Reset bộ lọc">
+							🔄
+						</a>
+					</div>
+				</form>
+			</div>
 		</div>
-	</div>
+
+		<!-- OFF-CANVAS SEARCH DRAWER (SLIDES IN FROM LEFT ON MOBILE) -->
+		<div id="ltdh-home-filter-drawer-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[70] transition-opacity duration-300 opacity-0 pointer-events-none md:hidden touch-none" style="touch-action: none;" aria-hidden="true"></div>
+
+		<aside id="ltdh-home-filter-drawer" 
+		       class="fixed inset-y-0 left-0 w-[86%] max-w-[340px] bg-white shadow-2xl z-[80] transform -translate-x-full transition-transform duration-300 ease-out flex flex-col md:hidden"
+		       role="dialog" 
+		       aria-modal="true" 
+		       aria-label="Bộ lọc tìm kiếm chương trình tuyển sinh">
+
+			<!-- Drawer Top Header -->
+			<div class="px-4 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/90 shrink-0 touch-none" style="touch-action: none;">
+				<div class="flex items-center gap-2">
+					<svg class="w-5 h-5 text-brand-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+					</svg>
+					<h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Bộ lọc tìm kiếm</h3>
+				</div>
+				<button type="button" 
+						id="ltdh-home-filter-drawer-close" 
+						class="p-2 -mr-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+						aria-label="Đóng bộ lọc">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+				</button>
+			</div>
+
+			<!-- Drawer Scrollable Content Wrapper -->
+			<div id="home-drawer-filter-wrapper" class="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4" style="overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
+				<!-- #home-filter-form relocated here on mobile via JS -->
+			</div>
+
+			<!-- Drawer Sticky Footer -->
+			<div class="p-3.5 border-t border-slate-100 bg-white flex items-center gap-2.5 shrink-0 shadow-lg touch-none" style="touch-action: none;">
+				<button type="button" 
+						id="ltdh-home-drawer-reset-btn"
+						class="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs text-center transition-all cursor-pointer">
+					Xóa lọc
+				</button>
+				<button type="button" 
+						id="ltdh-home-drawer-submit-btn" 
+						class="flex-2 py-2.5 px-4 rounded-xl bg-[#00308b] hover:bg-blue-900 active:scale-95 text-white font-extrabold text-xs text-center shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+					<svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+					</svg>
+					<span>Tìm kiếm ngay</span>
+				</button>
+			</div>
+		</aside>
+
+		<script>
+		(function() {
+			function setupHomeFilterDrawer() {
+				var openBtn = document.getElementById('ltdh-mobile-home-filter-btn');
+				var closeBtn = document.getElementById('ltdh-home-filter-drawer-close');
+				var drawer = document.getElementById('ltdh-home-filter-drawer');
+				var overlay = document.getElementById('ltdh-home-filter-drawer-overlay');
+				var submitBtn = document.getElementById('ltdh-home-drawer-submit-btn');
+				var resetBtn = document.getElementById('ltdh-home-drawer-reset-btn');
+				var desktopWrapper = document.getElementById('home-desktop-filter-wrapper');
+				var drawerWrapper = document.getElementById('home-drawer-filter-wrapper');
+				var filterForm = document.getElementById('home-filter-form');
+
+				var touchStartY = 0;
+				function onTouchStart(e) {
+					if (e.touches && e.touches.length === 1) {
+						touchStartY = e.touches[0].clientY;
+					}
+				}
+
+				function onTouchMoveLock(e) {
+					var scrollable = e.target.closest('#home-drawer-filter-wrapper');
+					if (!scrollable) {
+						if (e.cancelable) e.preventDefault();
+						return;
+					}
+					if (e.touches && e.touches.length === 1) {
+						var currentY = e.touches[0].clientY;
+						var deltaY = currentY - touchStartY;
+						if (scrollable.scrollTop <= 0 && deltaY > 0) {
+							if (e.cancelable) e.preventDefault();
+							return;
+						}
+						var maxScroll = scrollable.scrollHeight - scrollable.clientHeight;
+						if (scrollable.scrollTop >= maxScroll && deltaY < 0) {
+							if (e.cancelable) e.preventDefault();
+							return;
+						}
+					}
+				}
+
+				function relocate() {
+					if (!filterForm) return;
+					if (window.innerWidth < 768) {
+						if (drawerWrapper && !drawerWrapper.contains(filterForm)) {
+							drawerWrapper.appendChild(filterForm);
+						}
+					} else {
+						if (desktopWrapper && !desktopWrapper.contains(filterForm)) {
+							desktopWrapper.appendChild(filterForm);
+						}
+						closeDrawer();
+					}
+				}
+
+				function openDrawer() {
+					if (!drawer || !overlay) return;
+					relocate();
+					drawer.classList.remove('-translate-x-full');
+					drawer.classList.add('translate-x-0');
+					overlay.classList.remove('opacity-0', 'pointer-events-none');
+					overlay.classList.add('opacity-100', 'pointer-events-auto');
+					document.documentElement.classList.add('overflow-hidden');
+					document.body.classList.add('overflow-hidden');
+					document.addEventListener('touchstart', onTouchStart, { passive: true });
+					document.addEventListener('touchmove', onTouchMoveLock, { passive: false });
+					if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
+				}
+
+				function closeDrawer() {
+					if (!drawer || !overlay) return;
+					drawer.classList.remove('translate-x-0');
+					drawer.classList.add('-translate-x-full');
+					overlay.classList.remove('opacity-100', 'pointer-events-auto');
+					overlay.classList.add('opacity-0', 'pointer-events-none');
+					document.documentElement.classList.remove('overflow-hidden');
+					document.body.classList.remove('overflow-hidden');
+					document.removeEventListener('touchstart', onTouchStart);
+					document.removeEventListener('touchmove', onTouchMoveLock);
+					if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
+				}
+
+				if (overlay) {
+					overlay.addEventListener('touchmove', function(e) {
+						if (e.cancelable) e.preventDefault();
+					}, { passive: false });
+					overlay.addEventListener('wheel', function(e) {
+						if (e.cancelable) e.preventDefault();
+					}, { passive: false });
+				}
+
+				if (openBtn) openBtn.onclick = openDrawer;
+				if (closeBtn) closeBtn.onclick = closeDrawer;
+				if (overlay) overlay.onclick = closeDrawer;
+
+				if (submitBtn && filterForm) {
+					submitBtn.onclick = function() {
+						filterForm.submit();
+					};
+				}
+
+				if (resetBtn && filterForm) {
+					resetBtn.onclick = function() {
+						var keyword = document.getElementById('home-search-keyword');
+						var truong = document.getElementById('home-filter-truong');
+						var nganh = document.getElementById('home-filter-nganh');
+						var he = document.getElementById('home-filter-he');
+						if (keyword) keyword.value = '';
+						if (truong) truong.value = '';
+						if (nganh) nganh.value = '';
+						if (he) he.value = '';
+					};
+				}
+
+				document.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') closeDrawer();
+				});
+
+				relocate();
+				window.addEventListener('resize', relocate);
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', setupHomeFilterDrawer);
+			} else {
+				setupHomeFilterDrawer();
+			}
+		})();
+		</script>
+	</section>
+	
 
 	<!-- 2. HOT PROGRAMS SECTION -->
 	<section class="py-8 sm:py-12 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
@@ -358,8 +572,8 @@ $zalo    = ltdh_get_zalo_url();
 												 class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
 											<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent pointer-events-none"></div>
 											<?php if ( ! empty( $school_region ) ) : ?>
-												<span class="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 bg-slate-900/60 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
-													<svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+												<span class="absolute top-3 right-3 bg-slate-900/60 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
+													<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 														<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 														<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 													</svg>
@@ -369,7 +583,7 @@ $zalo    = ltdh_get_zalo_url();
 										</div>
 
 										<!-- Logo trường -->
-										<div class="h-14 w-14 sm:h-16 sm:w-16 bg-white rounded-2xl border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.12)] -mt-7 sm:-mt-8 ml-3.5 sm:ml-5 z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105">
+										<div class="h-14 w-14 sm:h-16 sm:w-16 bg-white rounded-2xl border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.12)] -mt-7 sm:-mt-8 ml-4 sm:ml-5 z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105">
 											<?php if ($logo_id) : 
 												$logo_alt = get_post_meta( $logo_id, '_wp_attachment_image_alt', true ) ?: ( 'Logo ' . ( $school['title'] ?? '' ) );
 											?>
@@ -388,12 +602,12 @@ $zalo    = ltdh_get_zalo_url();
 										</div>
 
 										<!-- Nội dung thẻ -->
-										<div class="p-3.5 sm:p-5 pt-2 flex-1 flex flex-col justify-between text-left">
+										<div class="p-4 sm:p-5 pt-2 flex-1 flex flex-col justify-between text-left">
 											<div>
 												<!-- Mã trường & Địa điểm -->
-												<div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 min-h-[20px]">
+												<div class="flex items-center gap-2 mb-1.5 min-h-[20px]">
 													<?php if ( ! empty( $school_code ) ) : ?>
-														<span class="font-bold text-[#00308b] bg-blue-50 px-1.5 py-0.5 rounded text-[10px] border border-blue-100">Mã: <?php echo esc_html( $school_code ); ?></span>
+														<span class="font-bold text-[#00308b] bg-blue-50 px-2 py-0.5 rounded text-[11px] border border-blue-100">Mã: <?php echo esc_html( $school_code ); ?></span>
 													<?php endif; ?>
 													<?php if ( ! empty( $school_location ) ) : ?>
 														<span class="text-xs text-slate-500 font-medium truncate"><?php echo esc_html( $school_location ); ?></span>
@@ -401,25 +615,25 @@ $zalo    = ltdh_get_zalo_url();
 												</div>
 
 												<!-- Tên trường -->
-												<h3 class="font-extrabold text-slate-900 text-sm md:text-[15px] tracking-tight leading-snug min-h-[38px] sm:min-h-[40px] line-clamp-2 mt-0.5 group-hover:text-[#00308b] transition-colors">
+												<h3 class="font-extrabold text-slate-900 text-sm md:text-[15px] tracking-tight leading-snug line-clamp-2 mt-0.5 group-hover:text-[#00308b] transition-colors">
 													<a href="<?php echo esc_url($school['permalink']); ?>">
 														<?php echo esc_html($school['title']); ?>
 													</a>
 												</h3>
 
-												<!-- Tên tiếng Anh (Hidden on Mobile) -->
+												<!-- Tên tiếng Anh -->
 												<?php if ( ! empty( $en_name ) ) : ?>
-													<p class="hidden sm:block text-xs text-slate-400 font-medium line-clamp-1 italic mt-1" title="<?php echo esc_attr( $en_name ); ?>">
+													<p class="text-xs text-slate-400 font-medium line-clamp-1 italic mt-1" title="<?php echo esc_attr( $en_name ); ?>">
 														<?php echo esc_html( $en_name ); ?>
 													</p>
 												<?php endif; ?>
 
-												<!-- Địa chỉ trường (Hidden on Mobile - city shown above) -->
+												<!-- Địa chỉ trường -->
 												<?php
 												$display_address = ! empty( $address ) && 'Việt Nam' !== $address ? $address : ( ! empty( $school_location ) ? 'Cơ sở: ' . $school_location : '' );
 												if ( ! empty( $display_address ) ) :
 												?>
-													<div class="hidden sm:flex mt-3 pt-2.5 border-t border-slate-100 items-start gap-1.5 text-xs text-slate-500 min-h-[36px]">
+													<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-start gap-1.5 text-xs text-slate-500 min-h-[36px]">
 														<svg class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 															<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 															<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -432,12 +646,11 @@ $zalo    = ltdh_get_zalo_url();
 											</div>
 
 											<!-- Nút Tìm hiểu chi tiết -->
-											<div class="mt-2.5 pt-2 sm:mt-3.5 sm:pt-3 border-t border-slate-100">
+											<div class="mt-3.5 pt-3 border-t border-slate-100">
 												<a href="<?php echo esc_url($school['permalink']); ?>" 
-												   class="w-full text-center py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 shadow-2xs group-hover:shadow-sm whitespace-nowrap">
-													<span class="sm:hidden">Xem trường</span>
-													<span class="hidden sm:inline">Tìm hiểu chi tiết</span>
-													<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+												   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
+													<span>Tìm hiểu chi tiết</span>
+													<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 														<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
 													</svg>
 												</a>
