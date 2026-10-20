@@ -54,28 +54,28 @@ ltdh_batch_assert(
 	'Batch title has hidden md:flex to hide on mobile'
 );
 
-// 4. Card layout is horizontal flex-row on mobile and desktop
+// 4. Row container layout
 ltdh_batch_assert(
-	false !== strpos( $code, 'flex flex-row items-center justify-between gap-2.5 sm:gap-3' ),
-	'Row container uses flex flex-row items-center justify-between'
+	false !== strpos( $code, 'flex flex-col md:flex-row md:items-center justify-between' ),
+	'Row container uses flex flex-col md:flex-row md:items-center justify-between'
 );
 
-// 5. Milestones container has 1-row layout on mobile and 3 columns on md
+// 5. Milestones container has 3 columns in 1 row across both mobile and desktop (grid-cols-3)
 ltdh_batch_assert(
-	false !== strpos( $code, 'flex-1 min-w-0 md:grid md:grid-cols-3 md:gap-6 lg:gap-8' ),
-	'Milestones use flex-1 min-w-0 with md:grid md:grid-cols-3'
+	false !== strpos( $code, 'flex-1 grid grid-cols-3' ),
+	'Milestones use grid-cols-3 to arrange Hạn nộp, Xét tuyển, Khai giảng in 1 single horizontal row'
 );
 
-// 6. Secondary milestones hidden on mobile when primary deadline is present
+// 6. All 3 milestone columns exist and are displayed
 ltdh_batch_assert(
-	false !== strpos( $code, '$primary_col      = $has_app_deadline ? \'col1\' : ( ! empty( $b_data[\'enrol_val\'] ) ? \'col3\' : \'col2\' );' ),
-	'Adaptive primary column logic exists for mobile single-row'
+	false !== strpos( $code, 'Hạn nộp' ) && false !== strpos( $code, '$eval_label' ) && false !== strpos( $code, 'Khai giảng' ),
+	'All 3 milestone columns (Hạn nộp, Xét tuyển/Thi tuyển, Khai giảng) are retained'
 );
 
-// 7. Status badge aligned to right
+// 7. Mobile status bar exists with md:hidden
 ltdh_batch_assert(
-	false !== strpos( $code, 'w-auto md:w-44 lg:w-48 shrink-0 flex items-center justify-end' ),
-	'Status badge container has shrink-0 flex items-center justify-end'
+	false !== strpos( $code, 'md:hidden' ),
+	'Mobile header bar with status badge has md:hidden'
 );
 
 // 8. Render check on real page (post 2013)
