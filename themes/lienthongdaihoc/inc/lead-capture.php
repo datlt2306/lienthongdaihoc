@@ -554,10 +554,22 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	}
 
 	$name_val  = is_array( $posted_data['your-name'] ?? '' ) ? reset( $posted_data['your-name'] ) : ( $posted_data['your-name'] ?? '' );
+	if ( empty( $name_val ) ) {
+		$name_val = is_array( $posted_data['cf_name'] ?? '' ) ? reset( $posted_data['cf_name'] ) : ( $posted_data['cf_name'] ?? '' );
+	}
 	$phone_val = is_array( $posted_data['your-phone'] ?? '' ) ? reset( $posted_data['your-phone'] ) : ( $posted_data['your-phone'] ?? '' );
+	if ( empty( $phone_val ) ) {
+		$phone_val = is_array( $posted_data['cf_phone'] ?? '' ) ? reset( $posted_data['cf_phone'] ) : ( $posted_data['cf_phone'] ?? '' );
+	}
 	$email_val = is_array( $posted_data['your-email'] ?? '' ) ? reset( $posted_data['your-email'] ) : ( $posted_data['your-email'] ?? '' );
+	if ( empty( $email_val ) ) {
+		$email_val = is_array( $posted_data['cf_email'] ?? '' ) ? reset( $posted_data['cf_email'] ) : ( $posted_data['cf_email'] ?? '' );
+	}
 	$subj_val  = is_array( $posted_data['your-subject'] ?? '' ) ? reset( $posted_data['your-subject'] ) : ( $posted_data['your-subject'] ?? '' );
 	$msg_val   = is_array( $posted_data['your-message'] ?? '' ) ? reset( $posted_data['your-message'] ) : ( $posted_data['your-message'] ?? '' );
+	if ( empty( $msg_val ) ) {
+		$msg_val = is_array( $posted_data['cf_message'] ?? '' ) ? reset( $posted_data['cf_message'] ) : ( $posted_data['cf_message'] ?? '' );
+	}
 
 	$name    = sanitize_text_field( $name_val );
 	$phone   = sanitize_text_field( $phone_val );
@@ -567,6 +579,24 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 
 	if ( ! empty( $subject ) && '-- Chọn chủ đề liên hệ --' !== $subject ) {
 		$message = "[Chủ đề: " . $subject . "]\n" . $message;
+	}
+
+	// Capture previous school & graduation year if present (e.g. from evaluation form)
+	$previous_school = isset( $posted_data['previous_school'] ) ? sanitize_text_field( is_array( $posted_data['previous_school'] ) ? reset( $posted_data['previous_school'] ) : $posted_data['previous_school'] ) : '';
+	$graduation      = isset( $posted_data['graduation'] ) ? sanitize_text_field( is_array( $posted_data['graduation'] ) ? reset( $posted_data['graduation'] ) : $posted_data['graduation'] ) : '';
+	if ( '-- Chọn năm --' === $graduation ) {
+		$graduation = '';
+	}
+
+	$eval_notes = [];
+	if ( ! empty( $previous_school ) ) {
+		$eval_notes[] = "Trường đã tốt nghiệp: " . $previous_school;
+	}
+	if ( ! empty( $graduation ) ) {
+		$eval_notes[] = "Năm tốt nghiệp: " . $graduation;
+	}
+	if ( ! empty( $eval_notes ) ) {
+		$message = "[" . implode( " | ", $eval_notes ) . "]" . ( $message ? "\n" . $message : "" );
 	}
 
 	// Perform spam check
@@ -597,6 +627,9 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	if ( ( empty( $raw_prog ) || '-- Chọn ngành hoặc hệ học --' === $raw_prog ) && ! empty( $posted_data['program_id'] ) ) {
 		$raw_prog = is_array( $posted_data['program_id'] ) ? reset( $posted_data['program_id'] ) : $posted_data['program_id'];
 	}
+	if ( ( empty( $raw_prog ) || '-- Chọn ngành hoặc hệ học --' === $raw_prog ) && ! empty( $posted_data['elig_program_id'] ) ) {
+		$raw_prog = is_array( $posted_data['elig_program_id'] ) ? reset( $posted_data['elig_program_id'] ) : $posted_data['elig_program_id'];
+	}
 
 	if ( ! empty( $raw_prog ) ) {
 		if ( is_numeric( $raw_prog ) && (int) $raw_prog > 0 ) {
@@ -620,8 +653,36 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	$campus        = isset( $posted_data['campus'] ) ? sanitize_text_field( is_array( $posted_data['campus'] ) ? reset( $posted_data['campus'] ) : $posted_data['campus'] ) : '';
 
 	$referral_source = isset( $posted_data['referral_source'] ) ? esc_url_raw( $posted_data['referral_source'] ) : '';
+
+	// Resolve check_id and enrich referral source if coming from eligibility check
+	$check_id = isset( $posted_data['elig_check_id'] ) ? absint( is_array( $posted_data['elig_check_id'] ) ? reset( $posted_data['elig_check_id'] ) : $posted_data['elig_check_id'] ) : 0;
+	if ( $check_id > 0 ) {
+		global $wpdb;
+		$check_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ltdh_eligibility_checks WHERE id = %d", $check_id ) );
+		if ( $check_row ) {
+			if ( empty( $campus ) && ! empty( $check_row->input_campus ) ) {
+				$campus = $check_row->input_campus;
+			}
+			if ( empty( $training_type ) && ! empty( $check_row->input_training_type ) ) {
+				$training_type = $check_row->input_training_type;
+			}
+			$is_verification_required = ( $program_id && function_exists( 'get_field' ) && get_field( 'elig_min_education', $program_id ) ) ? '1' : '0';
+			$referral_source = 'eligibility_checker?education_level=' . urlencode( (string) $check_row->input_education ) . 
+				'&current_major=' . urlencode( (string) $check_row->input_major_id ) . 
+				'&previous_school=' . urlencode( (string) ( $previous_school ?: $check_row->input_previous_school ) ) .
+				'&desired_major=' . urlencode( (string) $check_row->input_desired_major ) . 
+				'&birth_year=' . urlencode( (string) ( $graduation ?: $check_row->input_graduation ) ) . 
+				'&verification_required=' . $is_verification_required;
+		}
+	}
+
 	if ( empty( $referral_source ) ) {
-		$referral_source = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( $_SERVER['HTTP_REFERER'] ) : '';
+		$form_ctx = isset( $posted_data['form_context'] ) ? sanitize_text_field( is_array( $posted_data['form_context'] ) ? reset( $posted_data['form_context'] ) : $posted_data['form_context'] ) : '';
+		if ( 'eligibility_evaluation' === $form_ctx ) {
+			$referral_source = 'eligibility_evaluation_form';
+		} else {
+			$referral_source = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( $_SERVER['HTTP_REFERER'] ) : '';
+		}
 	}
 
 	$is_group_reg = ! empty( $posted_data['is_group_reg'] ) || ! empty( $posted_data['group_reg'] ) || ! empty( $posted_data['dang-ky-nhom'] );

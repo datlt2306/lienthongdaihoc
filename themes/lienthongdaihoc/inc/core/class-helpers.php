@@ -1240,6 +1240,8 @@ function ltdh_get_form_shortcode( string $context = 'consultation' ): string {
 		'consultation' => 'cf7_consultation_form_id',
 		'contact'      => 'cf7_contact_form_id',
 		'program'      => 'cf7_program_form_id',
+		'evaluation'   => 'cf7_evaluation_form_id',
+		'eligibility'  => 'cf7_evaluation_form_id',
 	];
 
 	$form_id    = '';
@@ -1259,22 +1261,14 @@ function ltdh_get_form_shortcode( string $context = 'consultation' ): string {
 		$form_id = ltdh_default( 'forms', $context . '_form_id' );
 	}
 
-	// 3. Fallback to cf7_default_form_id
-	if ( empty( $form_id ) ) {
-		if ( function_exists( 'get_field' ) ) {
-			$form_id = get_field( 'cf7_default_form_id', 'options' );
-		}
-		if ( empty( $form_id ) ) {
-			$form_id = get_option( 'options_cf7_default_form_id' ) ?: get_option( 'cf7_default_form_id' );
-		}
-	}
-
-	// 4. Auto-detect published CF7 form by slug/title if still empty
+	// 3. Auto-detect published CF7 form by slug/title if still empty
 	if ( empty( $form_id ) && post_type_exists( 'wpcf7_contact_form' ) ) {
 		$slugs = [
 			'contact'      => [ 'form-lien-he', 'lien-he', 'contact-form-1' ],
 			'consultation' => [ 'form-tu-van', 'tu-van', 'consultation-form' ],
 			'program'      => [ 'form-tu-van', 'form-chuong-trinh', 'consultation-form' ],
+			'evaluation'   => [ 'form-tham-dinh-ho-so', 'form-tham-dinh', 'tham-dinh', 'evaluation-form' ],
+			'eligibility'  => [ 'form-tham-dinh-ho-so', 'form-tham-dinh', 'tham-dinh', 'evaluation-form' ],
 		];
 		$candidates = $slugs[ $context ] ?? [ 'form-tu-van', 'form-lien-he' ];
 		foreach ( $candidates as $candidate_slug ) {
@@ -1286,11 +1280,39 @@ function ltdh_get_form_shortcode( string $context = 'consultation' ): string {
 		}
 	}
 
+	// 4. Fallback to cf7_default_form_id if not evaluation/contact
+	if ( empty( $form_id ) && ! in_array( $context, [ 'evaluation', 'eligibility' ], true ) ) {
+		if ( function_exists( 'get_field' ) ) {
+			$form_id = get_field( 'cf7_default_form_id', 'options' );
+		}
+		if ( empty( $form_id ) ) {
+			$form_id = get_option( 'options_cf7_default_form_id' ) ?: get_option( 'cf7_default_form_id' );
+		}
+	}
+
 	if ( ! empty( $form_id ) ) {
 		return do_shortcode( '[contact-form-7 id="' . esc_attr( $form_id ) . '"]' );
 	}
 
 	return '';
+}
+
+/**
+ * Render an evaluation / eligibility form with automatic fallback.
+ *
+ * @param array $context_hidden_fields Optional hidden fields to inject.
+ */
+function ltdh_render_evaluation_form( array $context_hidden_fields = [] ): void {
+	$GLOBALS['ltdh_cf7_context_hidden_fields'] = $context_hidden_fields;
+
+	$shortcode = ltdh_get_form_shortcode( 'evaluation' );
+	if ( ! empty( $shortcode ) ) {
+		echo $shortcode; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$GLOBALS['ltdh_cf7_context_hidden_fields'] = [];
+		return;
+	}
+	$GLOBALS['ltdh_cf7_context_hidden_fields'] = [];
+	ltdh_render_native_form( 'evaluation', $context_hidden_fields );
 }
 
 /**
@@ -1365,6 +1387,32 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 			<label for="<?php echo esc_attr( $prefix . '-phone' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Số điện thoại *', 'ltdh'); ?></label>
 			<input type="tel" id="<?php echo esc_attr( $prefix . '-phone' ); ?>" name="your-phone" required autocomplete="tel" aria-required="true" pattern="^(0|\+84)(3|5|7|8|9)[0-9]{8}$" title="Vui lòng nhập số điện thoại Việt Nam hợp lệ (10 chữ số)" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Số điện thoại liên hệ (10 số)'); ?>">
 		</div>
+
+		<?php if ( 'evaluation' === $type ) : ?>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+				<div>
+					<label for="<?php echo esc_attr( $prefix . '-email' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Email nhận kết quả', 'ltdh'); ?></label>
+					<input type="email" id="<?php echo esc_attr( $prefix . '-email' ); ?>" name="your-email" autocomplete="email" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="Ví dụ: name@example.com">
+				</div>
+				<div>
+					<label for="<?php echo esc_attr( $prefix . '-school' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Trường đã tốt nghiệp', 'ltdh'); ?></label>
+					<input type="text" id="<?php echo esc_attr( $prefix . '-school' ); ?>" name="previous_school" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="Ví dụ: CĐ Kinh Tế...">
+				</div>
+				<div>
+					<label for="<?php echo esc_attr( $prefix . '-grad' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600 mb-1"><?php esc_html_e('Năm tốt nghiệp', 'ltdh'); ?></label>
+					<select id="<?php echo esc_attr( $prefix . '-grad' ); ?>" name="graduation" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all bg-white">
+						<option value="">-- Chọn năm --</option>
+						<?php
+						$current_y = (int) date( 'Y' );
+						for ( $y = $current_y; $y >= $current_y - 25; $y-- ) :
+						?>
+							<option value="<?php echo esc_attr( $y ); ?>"><?php echo esc_html( $y ); ?></option>
+						<?php endfor; ?>
+					</select>
+				</div>
+			</div>
+		<?php endif; ?>
+
 		<div>
 			<div class="flex items-center justify-between mb-1">
 				<label for="<?php echo esc_attr( $prefix . '-message' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600"><?php esc_html_e('Nội dung cần tư vấn', 'ltdh'); ?></label>
@@ -1389,7 +1437,7 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 		<?php endif; ?>
 
 		<button type="submit" class="w-full bg-brand-primary text-white py-3 lg:py-3.5 rounded-xl lg:rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-brand-darkBlue active:scale-[0.98] transition-all mt-1 lg:mt-2 min-h-[44px] flex items-center justify-center gap-2">
-			<span><?php echo 'contact' === $type ? esc_html__('Gửi Liên Hệ') : esc_html__('Gửi Thông Tin Ngay'); ?></span>
+			<span><?php echo 'contact' === $type ? esc_html__('Gửi Liên Hệ') : ( 'evaluation' === $type ? esc_html__('GỬI YÊU CẦU ĐỐI CHIẾU HỒ SƠ & TƯ VẤN') : esc_html__('Gửi Thông Tin Ngay') ); ?></span>
 		</button>
 
 		<div class="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 text-[11px] text-slate-400 pt-1 text-center">

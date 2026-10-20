@@ -132,7 +132,7 @@ $years = range( $current_year, $current_year - 25 );
 					Đăng ký thẩm định hồ sơ & xét miễn giảm tín chỉ
 				</h2>
 				<p class="text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed m-0" style="color: #dbeafe !important;">
-					Điền thông tin và đính kèm bằng/bảng điểm (nếu có). Ban tuyển sinh sẽ thẩm định điều kiện trúng tuyển thực tế và gửi bảng đối chiếu tín chỉ miễn giảm hoàn toàn miễn phí.
+					Điền thông tin để ban tuyển sinh thẩm định điều kiện trúng tuyển thực tế và gửi bảng đối chiếu tín chỉ miễn giảm hoàn toàn miễn phí.
 				</p>
 			</div>
 			<div class="hidden md:flex w-14 h-14 rounded-2xl bg-white/10 border border-white/15 items-center justify-center text-3xl shrink-0 text-white shadow-inner">
@@ -163,117 +163,14 @@ $years = range( $current_year, $current_year - 25 );
 			</span>
 		</div>
 
-		<!-- Unified Lead Capture & Profile Verification Form -->
-		<form id="elig-consultation-form" class="space-y-5" autocomplete="off" enctype="multipart/form-data">
-		<input type="hidden" name="elig_check_id" id="elig-check-id" value="">
-		<input type="hidden" name="elig_program_id" id="elig-program-id" value="">
-		
-		<!-- Block 1: Contact Info -->
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			<div class="space-y-1.5">
-				<label class="block text-sm font-bold text-slate-700">Họ và tên *</label>
-				<input type="text" name="cf_name" id="elig-lead-name" class="elig-input" placeholder="Ví dụ: Nguyễn Văn A" required>
-			</div>
-			<div class="space-y-1.5">
-				<label class="block text-sm font-bold text-slate-700">Số điện thoại liên hệ *</label>
-				<input type="tel" name="cf_phone" id="elig-lead-phone" class="elig-input" placeholder="Ví dụ: 0912345678" required>
-			</div>
-		</div>
-
-		<!-- Block 2: Email & Previous School & Graduation Year -->
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-			<div class="space-y-1.5">
-				<label class="block text-sm font-bold text-slate-700">Email nhận kết quả</label>
-				<input type="email" name="cf_email" id="elig-lead-email" class="elig-input" placeholder="Ví dụ: name@example.com">
-			</div>
-			<div class="space-y-1.5">
-				<label class="block text-sm font-bold text-slate-700">Trường đã tốt nghiệp</label>
-				<input type="text" name="previous_school" id="elig-lead-school" class="elig-input" placeholder="Ví dụ: CĐ Kinh Tế, CĐ Công Thương...">
-			</div>
-			<div class="space-y-1.5">
-				<label class="block text-sm font-bold text-slate-700">Năm tốt nghiệp</label>
-				<select name="graduation" id="elig-lead-graduation" class="elig-select">
-					<option value="">-- Chọn năm --</option>
-					<?php foreach ( $years as $y ) : ?>
-						<option value="<?php echo esc_attr( $y ); ?>"><?php echo esc_html( $y ); ?></option>
-					<?php endforeach; ?>
-				</select>
-			</div>
-		</div>
-
-		<!-- Block 3: Degree & Transcript Upload / Links (Clean, No Nested Outer Borders) -->
-		<div class="border-t border-slate-100 pt-5 space-y-3">
-			<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-				<label class="block text-sm font-bold text-slate-800">Tài liệu đính kèm đối chiếu (Bằng tốt nghiệp & Bảng điểm)</label>
-				<span class="text-xs text-slate-400 font-medium">Không bắt buộc • Ảnh chụp hoặc PDF dưới 5MB</span>
-			</div>
-
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<!-- Degree upload -->
-				<div class="space-y-1.5">
-					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-						<span>🎓</span> 1. Bằng tốt nghiệp (TC / CĐ)
-					</label>
-					<div class="border border-dashed border-slate-300 hover:border-[#00308b] rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-blue-50/30 group" onclick="document.getElementById('degree-file-input').click()">
-						<input type="file" id="degree-file-input" name="degree_file" accept="image/*,application/pdf" class="hidden">
-						<svg class="w-6 h-6 text-slate-400 group-hover:text-[#00308b] transition-colors mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-						</svg>
-						<span id="degree-file-label" class="text-xs text-slate-600 font-bold text-center break-all">Tải ảnh hoặc PDF bằng cấp lên</span>
-					</div>
-					<input type="text" name="degree_link" class="elig-input text-xs" placeholder="Hoặc dán link Google Drive / ảnh bằng cấp...">
-				</div>
-
-				<!-- Transcript upload -->
-				<div class="space-y-1.5">
-					<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-						<span>📊</span> 2. Bảng điểm tốt nghiệp
-					</label>
-					<div class="border border-dashed border-slate-300 hover:border-[#00308b] rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-blue-50/30 group" onclick="document.getElementById('transcript-file-input').click()">
-						<input type="file" id="transcript-file-input" name="transcript_file" accept="image/*,application/pdf" class="hidden">
-						<svg class="w-6 h-6 text-slate-400 group-hover:text-[#00308b] transition-colors mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-						</svg>
-						<span id="transcript-file-label" class="text-xs text-slate-600 font-bold text-center break-all">Tải ảnh hoặc PDF bảng điểm lên</span>
-					</div>
-					<input type="text" name="transcript_link" class="elig-input text-xs" placeholder="Hoặc dán link Google Drive / ảnh bảng điểm...">
-				</div>
-			</div>
-		</div>
-
-		<!-- Block 4: Message -->
-		<div class="space-y-1.5">
-			<label class="block text-sm font-bold text-slate-700">Ghi chú hoặc câu hỏi thêm (Nếu có)</label>
-			<textarea name="cf_message" id="elig-lead-message" rows="2" class="elig-input" placeholder="Ví dụ: Mong muốn học lớp tối thứ 7 & CN, thắc mắc về miễn giảm môn học..."></textarea>
-		</div>
-
-		<!-- Group Registration Option: Left-accent bar instead of full bounding box -->
-		<div class="p-3 bg-amber-50/60 border-l-4 border-l-amber-400 rounded-r-xl">
-			<label class="flex items-start gap-2.5 cursor-pointer select-none">
-				<input type="checkbox" name="is_group_reg" id="elig-group-reg" value="1" class="mt-0.5 rounded border-amber-300 text-brand-primary focus:ring-brand-primary">
-				<span class="text-xs text-slate-700 font-medium leading-snug">
-					🎁 <strong class="font-bold text-amber-900">Đăng ký theo nhóm:</strong> Tư vấn cho tôi suất học bổng đồng hành khi nộp hồ sơ cùng bạn bè (từ 2 người trở lên).
-				</span>
-			</label>
-		</div>
-
-		<!-- Block 5: Consent -->
-		<div class="flex items-start gap-2 pt-1 text-xs text-slate-500">
-			<input type="checkbox" name="consent_data" id="elig-consent-data" checked required class="mt-0.5 rounded border-slate-300 text-brand-primary focus:ring-brand-primary">
-			<label for="elig-consent-data">Tôi đồng ý cho phép xử lý dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP để nhận thông tin tư vấn tuyển sinh.</label>
-		</div>
-
-		<!-- Block 6: reCAPTCHA -->
-		<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
-			<?php ltdh_render_recaptcha_field( 'elig_lead' ); ?>
-		<?php endif; ?>
-
-		<!-- Submit button -->
-		<button type="submit" id="elig-lead-submit-btn" class="elig-btn elig-btn-primary elig-btn-full w-full py-3.5 text-sm md:text-base font-bold flex justify-center items-center gap-2 shadow-md hover:shadow-lg transition-all">
-			<span class="elig-btn-text">GỬI YÊU CẦU ĐỐI CHIẾU HỒ SƠ & TƯ VẤN</span>
-			<span class="elig-btn-loading hidden">Đang gửi hồ sơ...</span>
-		</button>
-	</form>
+		<!-- Contact Form 7: Unified Lead Capture & Profile Verification Form (Evaluation) -->
+		<?php
+		if ( function_exists( 'ltdh_render_evaluation_form' ) ) {
+			ltdh_render_evaluation_form();
+		} elseif ( function_exists( 'ltdh_get_form_shortcode' ) ) {
+			echo ltdh_get_form_shortcode( 'evaluation' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+		?>
 	</div>
 </div>
 

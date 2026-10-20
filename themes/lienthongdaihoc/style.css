@@ -764,16 +764,48 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 	opacity: 1;
 }
 
-/* Arrow styling for desktop */
+/* Arrow styling for desktop dropdown menus (ASCII-safe vector chevron to prevent mojibake) */
 .nav-primary-menu .menu-item-has-children > a::after {
-	content: ' ▾';
-	font-size: 0.75rem;
-	margin-left: 0.25rem;
+	content: '';
 	display: inline-block;
-	transition: transform 0.2s;
+	width: 0.38rem;
+	height: 0.38rem;
+	border-right: 1.5px solid currentColor;
+	border-bottom: 1.5px solid currentColor;
+	transform: rotate(45deg);
+	margin-left: 0.35rem;
+	margin-bottom: 0.15rem;
+	vertical-align: middle;
+	transition: transform 0.2s ease, margin-bottom 0.2s ease;
 }
 .nav-primary-menu .menu-item-has-children:hover > a::after {
-	transform: rotate(180deg);
+	transform: rotate(-135deg);
+	margin-bottom: -0.1rem;
+}
+
+@supports ((-webkit-mask: url("")) or (mask: url(""))) {
+	.nav-primary-menu .menu-item-has-children > a::after {
+		width: 0.8rem;
+		height: 0.8rem;
+		border: none;
+		margin-left: 0.25rem;
+		margin-bottom: 0;
+		vertical-align: -0.12rem;
+		background-color: currentColor;
+		-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+		transform: rotate(0deg);
+		transition: transform 0.2s ease;
+	}
+	.nav-primary-menu .menu-item-has-children:hover > a::after {
+		transform: rotate(180deg);
+		margin-bottom: 0;
+	}
+}
+
+/* Don't show redundant dropdown chevron inside mega menu category items */
+.nav-primary-menu li.menu-item-category > a::after {
+	display: none !important;
 }
 
 /* Custom Contact Form 7 form styling */
@@ -1402,7 +1434,7 @@ div#ez-toc-container p.ez-toc-title {
 }
 
 #ez-toc-container .ez-toc-title::before {
-	content: "📑" !important;
+	content: "\01F4D1" !important;
 	font-size: 1.05rem !important;
 	line-height: 1 !important;
 }
@@ -1505,10 +1537,10 @@ div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle svg {
 	height: 9px !important;
 }
 
-/* 4. Text indicator: Thu gọn / Mở rộng */
+/* 4. Text indicator: Thu gọn / Mở rộng (escaped for charset resilience) */
 #ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle::after,
 div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle::after {
-	content: "Thu gọn" !important;
+	content: "Thu g\001ECDn" !important;
 	font-size: 0.75rem !important;
 	font-weight: 700 !important;
 	letter-spacing: 0.01em !important;
@@ -1516,7 +1548,7 @@ div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle::after {
 
 #ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle::after,
 div#ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle::after {
-	content: "Mở rộng" !important;
+	content: "M\001EDF  r\001ED9ng" !important;
 }
 
 #ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle .arrow-unsorted-368013,

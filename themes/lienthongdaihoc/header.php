@@ -73,6 +73,10 @@
 </a>
 
 <div id="page" class="site">
+	<?php
+	$header_hotline     = function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496';
+	$header_clean_phone = preg_replace( '/\D/', '', $header_hotline );
+	?>
 	<!-- HEADER NAVIGATION (Mobile: Floating Glass Island with Auto-Hide | Desktop: Classic Sticky Navbar) -->
 	<header id="masthead" class="site-header sticky top-0 z-[60] w-full pt-2 px-2.5 lg:pt-0 lg:px-0 lg:bg-white lg:border-b lg:border-slate-100 lg:shadow-xs pointer-events-none lg:pointer-events-auto transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:transform-none lg:opacity-100 translate-y-0 opacity-100">
 		<div class="ltdh-header-island pointer-events-auto relative bg-white/90 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_rgba(15,23,42,0.08),0_1px_3px_rgba(15,23,42,0.04)] rounded-2xl px-3.5 h-14 flex items-center justify-between gap-2.5 transition-all duration-300 lg:bg-transparent lg:backdrop-blur-none lg:border-0 lg:shadow-none lg:rounded-none lg:h-20 lg:max-w-7xl lg:mx-auto lg:px-4 sm:lg:px-6 lg:px-8 lg:gap-3">
@@ -96,7 +100,7 @@
 					'fallback_cb'    => 'ltdh_default_primary_menu',
 				] );
 				?>
-				<a href="<?php echo esc_url( home_url( '/lien-he/' ) ); ?>" class="flex items-center bg-brand-accent text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-md shadow-brand-accent/20 hover:bg-[#e06e00] hover:shadow-lg active:scale-95 transition-all tracking-wide">
+				<a href="tel:<?php echo esc_attr( $header_clean_phone ); ?>" class="flex items-center bg-brand-accent text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-md shadow-brand-accent/20 hover:bg-[#e06e00] hover:shadow-lg active:scale-95 transition-all tracking-wide" aria-label="Gọi hotline <?php echo esc_attr( $header_hotline ); ?>">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mr-2">
 						<path fill-rule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 0 0 6.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clip-rule="evenodd" />
 					</svg>
@@ -106,7 +110,7 @@
 
 			<!-- Mobile Actions (Ergonomic Touch Targets & Visual Hierarchy) -->
 			<div class="flex lg:hidden items-center gap-2 shrink-0">
-				<a href="<?php echo esc_url( home_url( '/lien-he/' ) ); ?>" class="flex items-center gap-1.5 bg-gradient-to-r from-[#fe8100] to-[#ea580c] text-white px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full font-bold text-xs sm:text-sm shadow-sm shadow-orange-500/25 hover:shadow-md hover:brightness-105 active:scale-95 transition-all tracking-wide shrink-0">
+				<a href="tel:<?php echo esc_attr( $header_clean_phone ); ?>" class="flex items-center gap-1.5 bg-gradient-to-r from-[#fe8100] to-[#ea580c] text-white px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full font-bold text-xs sm:text-sm shadow-sm shadow-orange-500/25 hover:shadow-md hover:brightness-105 active:scale-95 transition-all tracking-wide shrink-0" aria-label="Gọi hotline <?php echo esc_attr( $header_hotline ); ?>">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5 shrink-0">
 						<path fill-rule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 0 0 6.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clip-rule="evenodd" />
 					</svg>
@@ -152,7 +156,7 @@
 		
 		<!-- Pinned Bottom CTA Bar -->
 		<div class="p-4 sm:p-5 border-t border-slate-100 bg-white shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
-			<a href="<?php echo esc_url( home_url( '/lien-he/' ) ); ?>" class="flex items-center justify-center w-full min-h-[44px] bg-gradient-to-r from-[#fe8100] to-[#ea580c] text-white py-3 px-4 rounded-full font-bold text-sm tracking-wide shadow-lg shadow-orange-500/20 hover:brightness-105 active:scale-98 transition-all">
+			<a href="tel:<?php echo esc_attr( $header_clean_phone ); ?>" class="flex items-center justify-center w-full min-h-[44px] bg-gradient-to-r from-[#fe8100] to-[#ea580c] text-white py-3 px-4 rounded-full font-bold text-sm tracking-wide shadow-lg shadow-orange-500/20 hover:brightness-105 active:scale-98 transition-all" aria-label="Gọi hotline <?php echo esc_attr( $header_hotline ); ?>">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-2 shrink-0">
 					<path fill-rule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 0 0 6.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clip-rule="evenodd" />
 				</svg>

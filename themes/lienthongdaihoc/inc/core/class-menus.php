@@ -1215,6 +1215,33 @@ function ltdh_mobile_nav_menu_start_el( $item_output, $item, $depth, $args ) {
 }
 add_filter( 'walker_nav_menu_start_el', 'ltdh_mobile_nav_menu_start_el', 10, 4 );
 
+/**
+ * Append "Liên hệ" menu item specifically to the mobile navigation drawer menu.
+ *
+ * @param string   $items The HTML list content for the menu items.
+ * @param stdClass $args  An object containing wp_nav_menu() arguments.
+ * @return string
+ */
+function ltdh_append_mobile_contact_menu_item( $items, $args ) {
+	if ( isset( $args->menu_class ) && strpos( $args->menu_class, 'nav-mobile-menu' ) !== false ) {
+		$contact_url  = home_url( '/lien-he/' );
+		$contact_path = '/lien-he';
+		$current_path = untrailingslashit( parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ) );
+		$is_active    = ( $current_path === $contact_path );
+		$active_class = $is_active ? ' current-menu-item' : '';
+
+		if ( strpos( $items, 'href="' . esc_url( $contact_url ) . '"' ) === false && strpos( $items, '/lien-he/' ) === false ) {
+			$items .= '<li class="menu-item menu-item-type-custom menu-item-object-custom' . esc_attr( $active_class ) . '">';
+			$items .= '<div class="mobile-menu-item-row">';
+			$items .= '<a href="' . esc_url( $contact_url ) . '">Liên hệ</a>';
+			$items .= '</div>';
+			$items .= '</li>';
+		}
+	}
+	return $items;
+}
+add_filter( 'wp_nav_menu_items', 'ltdh_append_mobile_contact_menu_item', 20, 2 );
+
 // ----------------------------------------------------
 // 7. Mega Menu Helpers & Desktop Filters
 // ----------------------------------------------------
