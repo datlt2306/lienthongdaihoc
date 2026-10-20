@@ -428,6 +428,27 @@ $program_tabs[] = [
 					</div>
 
 					<!-- Batches List (Spacious Horizontal Rows) -->
+					<?php 
+					// Find the active batch to display on mobile (default to first 'dang-nhan', or first 'sap-mo', or latest batch)
+					$active_mobile_batch_idx = null;
+					foreach ( $parsed_batches as $idx => $batch ) {
+						if ( 'dang-nhan' === ( $batch['status'] ?? '' ) ) {
+							$active_mobile_batch_idx = $idx;
+							break;
+						}
+					}
+					if ( null === $active_mobile_batch_idx ) {
+						foreach ( $parsed_batches as $idx => $batch ) {
+							if ( 'sap-mo' === ( $batch['status'] ?? '' ) ) {
+								$active_mobile_batch_idx = $idx;
+								break;
+							}
+						}
+					}
+					if ( null === $active_mobile_batch_idx && ! empty( $parsed_batches ) ) {
+						$active_mobile_batch_idx = array_key_last( $parsed_batches );
+					}
+					?>
 					<div class="space-y-3.5">
 						<?php foreach ( $parsed_batches as $b_idx => $b_data ) : 
 							$status      = $b_data['status'];
@@ -436,79 +457,82 @@ $program_tabs[] = [
 							$is_closed   = ( $status === 'da-dong' );
 
 							if ( $is_open ) {
-								$row_class = 'bg-emerald-50/40 border-2 border-emerald-500 shadow-md shadow-emerald-500/10 rounded-2xl p-3';
+								$row_class = 'bg-emerald-50/40 border-2 border-emerald-500 shadow-md shadow-emerald-500/10 rounded-2xl p-3 sm:p-4';
 							} elseif ( $is_upcoming ) {
-								$row_class = 'bg-blue-50/25 border border-blue-200/70 rounded-2xl p-4 sm:p-5';
+								$row_class = 'bg-blue-50/25 border border-blue-200/70 rounded-2xl p-3 sm:p-5';
 							} else {
-								$row_class = 'bg-slate-50/60 border border-slate-200/60 rounded-2xl p-3 opacity-80 hover:opacity-100 transition-opacity';
+								$row_class = 'bg-slate-50/60 border border-slate-200/60 rounded-2xl p-3 sm:p-4 opacity-80 hover:opacity-100 transition-opacity';
 							}
+
+							$is_active_for_mobile = ( $b_idx === $active_mobile_batch_idx );
+							$mobile_vis_class     = $is_active_for_mobile ? '' : 'hidden md:block';
 						?>
-							<div class="transition-all <?php echo esc_attr( $row_class ); ?>">
-								<div class="flex flex-col md:flex-row md:items-center justify-between sm:gap-3">
+							<div class="transition-all <?php echo esc_attr( trim( $row_class . ' ' . $mobile_vis_class ) ); ?>">
+								<div class="flex flex-row items-center justify-between gap-2.5 sm:gap-3">
 									
-									<!-- 1. Tên đợt (Thu gọn vừa vặn, không chiếm khoảng trống thừa) -->
-									<div class="w-auto md:w-24 shrink-0 flex items-center justify-between md:flex-col md:items-start md:justify-center gap-1">
+									<!-- 1. Tên đợt (Ẩn trên mobile theo yêu cầu, hiển thị từ tablet/desktop md:flex) -->
+									<div class="hidden md:flex w-24 shrink-0 flex-col items-start justify-center gap-1">
 										<h3 class="<?php echo $is_open ? 'text-sm font-bold text-slate-900' : 'text-sm font-bold text-slate-700'; ?>">
 											<?php echo esc_html( $b_data['title'] ); ?>
 										</h3>
-										
 									</div>
 
-									<!-- 2. Các mốc thời gian trải rộng ở giữa (Theo đúng quy trình: Hạn nộp -> Xét tuyển/Thi tuyển -> Khai giảng) -->
-									<div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-6 lg:gap-8">
+									<!-- 2. Các mốc thời gian: Trên mobile hiển thị gọn 1 mốc chính (1 hàng), trên md: trải rộng 3 cột -->
+									<?php 
+									$batch_app_text = $b_data['app_period'];
+									if ( empty( $batch_app_text ) && $is_open && ! empty( $enrollment ) ) {
+										$batch_app_text = $enrollment;
+									}
+									$has_app_deadline = ! empty( $batch_app_text );
+									$primary_col      = $has_app_deadline ? 'col1' : ( ! empty( $b_data['enrol_val'] ) ? 'col3' : 'col2' );
+									?>
+									<div class="flex-1 min-w-0 md:grid md:grid-cols-3 md:gap-6 lg:gap-8">
 										
 										<!-- Cột 1: Hạn nộp hồ sơ -->
-										<?php 
-										$batch_app_text = $b_data['app_period'];
-										if ( empty( $batch_app_text ) && $is_open && ! empty( $enrollment ) ) {
-											$batch_app_text = $enrollment;
-										}
-										?>
-										<?php if ( ! empty( $batch_app_text ) ) : ?>
-											<div>
-												<span class="text-xs font-semibold text-slate-500 block mb-1">Hạn nộp hồ sơ</span>
-												<span class="<?php echo $is_open ? 'text-sm font-bold text-amber-950' : 'text-sm font-semibold text-slate-800'; ?> block leading-snug">
+										<?php if ( $has_app_deadline ) : ?>
+											<div class="min-w-0">
+												<span class="text-[11px] sm:text-xs font-semibold text-slate-500 block leading-tight mb-0.5 sm:mb-1">Hạn nộp hồ sơ</span>
+												<span class="<?php echo $is_open ? 'text-xs sm:text-sm font-bold text-amber-950' : 'text-xs sm:text-sm font-semibold text-slate-800'; ?> block leading-snug truncate">
 													<?php echo esc_html( $batch_app_text ); ?>
 												</span>
 											</div>
 										<?php endif; ?>
 
-										<!-- Cột 2: Xét tuyển / Thi tuyển (Đặt ở giữa theo tiến trình) -->
-										<div>
-											<span class="text-xs font-semibold text-slate-500 block mb-1"><?php echo esc_html( $eval_label ); ?></span>
-											<span class="<?php echo $is_open ? 'text-sm font-bold text-slate-900' : 'text-sm font-medium text-slate-700'; ?> block leading-snug">
+										<!-- Cột 2: Xét tuyển / Thi tuyển -->
+										<div class="<?php echo ( 'col2' === $primary_col ) ? 'min-w-0' : 'hidden md:block'; ?>">
+											<span class="text-[11px] sm:text-xs font-semibold text-slate-500 block leading-tight mb-0.5 sm:mb-1"><?php echo esc_html( $eval_label ); ?></span>
+											<span class="<?php echo $is_open ? 'text-xs sm:text-sm font-bold text-slate-900' : 'text-xs sm:text-sm font-medium text-slate-700'; ?> block leading-snug truncate">
 												<?php echo esc_html( $b_data['eval_val'] ?: ( $is_chinh_quy ? 'Thi tuyển theo đợt' : 'Xét tuyển hồ sơ' ) ); ?>
 											</span>
 										</div>
 
-										<!-- Cột 3: Khai giảng (Mốc cuối cùng) -->
-										<div>
-											<span class="text-xs font-semibold text-slate-500 block mb-1">Khai giảng dự kiến</span>
-											<span class="<?php echo $is_open ? 'text-sm font-bold text-[#00308b]' : 'text-sm font-medium text-slate-700'; ?> block leading-snug">
+										<!-- Cột 3: Khai giảng -->
+										<div class="<?php echo ( 'col3' === $primary_col ) ? 'min-w-0' : 'hidden md:block'; ?>">
+											<span class="text-[11px] sm:text-xs font-semibold text-slate-500 block leading-tight mb-0.5 sm:mb-1">Khai giảng dự kiến</span>
+											<span class="<?php echo $is_open ? 'text-xs sm:text-sm font-bold text-[#00308b]' : 'text-xs sm:text-sm font-medium text-slate-700'; ?> block leading-snug truncate">
 												<?php echo esc_html( $b_data['enrol_val'] ?: 'Theo kế hoạch' ); ?>
 											</span>
 										</div>
 
 									</div>
 
-									<!-- 3. Trạng thái bên phải: Thay nút bằng chữ "Đang nhận hồ sơ" siêu nổi bật -->
-									<div class="w-auto md:w-44 lg:w-48 shrink-0 flex items-center justify-start md:justify-end pt-1 md:pt-0">
-										
+									<!-- 3. Trạng thái bên phải -->
+									<div class="w-auto md:w-44 lg:w-48 shrink-0 flex items-center justify-end">
 										<?php if ( $is_open ) : ?>
-											<div class="inline-flex items-center gap-2 px-4 py-2 sm:px-3 sm:py-2.5 rounded-full bg-emerald-600 text-white font-black text-xs sm:text-sm shadow-md ring-4 ring-emerald-500/20 whitespace-nowrap">
-												<span class="relative flex h-2.5 w-2.5">
+											<div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-3 sm:py-2.5 rounded-full bg-emerald-600 text-white font-black text-xs sm:text-sm shadow-md ring-2 sm:ring-4 ring-emerald-500/20 whitespace-nowrap">
+												<span class="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
 													<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-													<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+													<span class="relative inline-flex rounded-full h-full w-full bg-white"></span>
 												</span>
 												<span>Đang nhận hồ sơ</span>
 											</div>
 										<?php elseif ( $is_upcoming ) : ?>
-											<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+											<span class="inline-flex items-center px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 whitespace-nowrap">
 												Sắp mở nhận
 											</span>
 										<?php else : ?>
 											<?php if ( $is_closed ) : ?>
-												<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-200 text-slate-600">
+												<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-200 text-slate-600 whitespace-nowrap">
 													Đã kết thúc
 												</span>
 											<?php endif; ?>

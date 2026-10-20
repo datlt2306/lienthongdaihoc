@@ -284,40 +284,26 @@ function ltdh_on_review_deleted( $post_id ) {
 
 /**
  * Upload and optimize review images securely.
- *
- * Enforces:
- * - Binary MIME check via finfo_file (image/jpeg, image/png, image/webp)
+ * Standardized via WordPress Media Attachment System to seamlessly support:
+ * - Direct offloading to Cloudflare R2 / S3
+ * - Automatic local file deletion via Offloader ("Full Cloud Migration")
  * - Maximum 3 images per review, max 2.5MB per image
- * - Isolated directory with .htaccess script execution disable
- * - Automatic image resizing (max 1200px) and WebP/JPEG compression
+ * - Strict binary MIME validation (JPEG, PNG, WebP)
  * - Safe randomized filename hash
  *
  * @param array $files_array The $_FILES['review_images'] structure
- * @param int   $program_id
- * @return array Array of image items: [ ['url' => ..., 'thumb' => ...] ]
+ * @param int   $program_id  Target Program ID
+ * @param int   $review_id   Attached Review Post ID
+ * @return array Array of image items: [ ['id' => ..., 'url' => ..., 'thumb' => ...] ]
  */
-function ltdh_handle_review_images_upload( array $files_array, int $program_id ): array {
+function ltdh_handle_review_images_upload( array $files_array, int $program_id, int $review_id = 0 ): array {
 	if ( empty( $files_array['name'] ) || ! is_array( $files_array['name'] ) ) {
 		return [];
 	}
 
-	$upload_dir = wp_upload_dir();
-	$year       = gmdate( 'Y' );
-	$month      = gmdate( 'm' );
-	$target_dir = $upload_dir['basedir'] . "/program-reviews/{$year}/{$month}";
-	$target_url = $upload_dir['baseurl'] . "/program-reviews/{$year}/{$month}";
-
-	if ( ! file_exists( $target_dir ) ) {
-		wp_mkdir_p( $target_dir );
-	}
-
-	// Deploy security .htaccess in program-reviews directory if not exists
-	$base_reviews_dir = $upload_dir['basedir'] . '/program-reviews';
-	$htaccess_file    = $base_reviews_dir . '/.htaccess';
-	if ( ! file_exists( $htaccess_file ) ) {
-		$htaccess_content = "# Anti-execution protection for user uploads\n<FilesMatch \"\.(php|phtml|php3|php4|php5|php7|php8|phps|pl|py|jsp|asp|sh|cgi|shtml)$\">\n    Deny from all\n</FilesMatch>\nphp_flag engine off\nOptions -Indexes -ExecCGI\n";
-		@file_put_contents( $htaccess_file, $htaccess_content );
-	}
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/media.php';
 
 	$allowed_mimes = [
 		'image/jpeg' => 'jpg',
@@ -357,40 +343,36 @@ function ltdh_handle_review_images_upload( array $files_array, int $program_id )
 		}
 
 		$ext         = $allowed_mimes[ $real_mime ];
-		$random_hash = wp_generate_password( 12, false, false );
-		$filename    = sprintf( 'rev_%d_%s_%s.%s', $program_id, gmdate( 'Ymd_His' ), $random_hash, $ext );
-		$dest_path   = $target_dir . '/' . $filename;
-		$dest_url    = $target_url . '/' . $filename;
+		$random_hash = wp_generate_password( 8, false, false );
+		$clean_name  = sprintf( 'review_%d_%s_%s.%s', $program_id, gmdate( 'Ymd_His' ), $random_hash, $ext );
 
-		if ( ! move_uploaded_file( $tmp_name, $dest_path ) ) {
-			continue;
-		}
-
-		// Downscale & optimize using WP_Image_Editor if large
-		$thumb_url = $dest_url;
-		$editor    = wp_get_image_editor( $dest_path );
-		if ( ! is_wp_error( $editor ) ) {
-			$size = $editor->get_size();
-			if ( $size['width'] > 1200 || $size['height'] > 1200 ) {
-				$editor->resize( 1200, 1200, false );
-				$editor->save( $dest_path, $real_mime );
-			}
-
-			// Generate 300x300 thumbnail
-			$thumb_filename = sprintf( 'thumb_rev_%d_%s_%s.%s', $program_id, gmdate( 'Ymd_His' ), $random_hash, $ext );
-			$thumb_path     = $target_dir . '/' . $thumb_filename;
-			$editor_thumb   = wp_get_image_editor( $dest_path );
-			if ( ! is_wp_error( $editor_thumb ) ) {
-				$editor_thumb->resize( 300, 300, true );
-				$editor_thumb->save( $thumb_path, $real_mime );
-				$thumb_url = $target_url . '/' . $thumb_filename;
-			}
-		}
-
-		$uploaded_results[] = [
-			'url'   => esc_url_raw( $dest_url ),
-			'thumb' => esc_url_raw( $thumb_url ),
+		$file_entry = [
+			'name'     => $clean_name,
+			'type'     => $real_mime,
+			'tmp_name' => $tmp_name,
+			'error'    => 0,
+			'size'     => $file_size,
 		];
+
+		// Sideload into WordPress Media library attached to review post.
+		// Triggers standard hooks ('wp_generate_attachment_metadata') which
+		// auto-offloads to Cloudflare R2 and deletes the local file from server.
+		$attachment_id = media_handle_sideload(
+			$file_entry,
+			$review_id,
+			sprintf( 'Ảnh phản hồi thực tế chương trình #%d', $program_id )
+		);
+
+		if ( ! is_wp_error( $attachment_id ) ) {
+			$full_url  = wp_get_attachment_image_url( $attachment_id, 'full' );
+			$thumb_url = wp_get_attachment_image_url( $attachment_id, 'thumbnail' ) ?: $full_url;
+
+			$uploaded_results[] = [
+				'id'    => (int) $attachment_id,
+				'url'   => esc_url_raw( $full_url ),
+				'thumb' => esc_url_raw( $thumb_url ),
+			];
+		}
 	}
 
 	return $uploaded_results;
@@ -501,12 +483,6 @@ function ltdh_handle_submit_program_review() {
 		}
 	}
 
-	// Handle Image Uploads securely
-	$uploaded_images = [];
-	if ( ! empty( $_FILES['review_images'] ) ) {
-		$uploaded_images = ltdh_handle_review_images_upload( $_FILES['review_images'], $program_id );
-	}
-
 	// Create Review Post (Status: pending for editorial safety)
 	$program_title = get_the_title( $program_id );
 	$post_title    = sprintf( '%s đánh giá: %s (%d★)', $author_name, $program_title, $rating );
@@ -523,6 +499,12 @@ function ltdh_handle_submit_program_review() {
 
 	if ( is_wp_error( $review_id ) || ! $review_id ) {
 		wp_send_json_error( [ 'message' => 'Có lỗi xảy ra khi lưu đánh giá. Vui lòng thử lại.' ] );
+	}
+
+	// Handle Image Uploads securely and offload to Cloudflare R2
+	$uploaded_images = [];
+	if ( ! empty( $_FILES['review_images'] ) ) {
+		$uploaded_images = ltdh_handle_review_images_upload( $_FILES['review_images'], $program_id, $review_id );
 	}
 
 	// Save Post Meta
@@ -772,8 +754,20 @@ function ltdh_render_review_card( int $review_id ) {
 				<?php if ( ! empty( $images ) ) : ?>
 					<div class="flex items-center gap-2 mb-3 overflow-x-auto py-1">
 						<?php foreach ( $images as $img ) :
-							$img_url   = is_array( $img ) ? ( $img['url'] ?? '' ) : (string) $img;
-							$img_thumb = is_array( $img ) ? ( $img['thumb'] ?? $img_url ) : $img_url;
+							$img_url   = '';
+							$img_thumb = '';
+							if ( is_array( $img ) ) {
+								if ( ! empty( $img['id'] ) ) {
+									$img_url   = wp_get_attachment_image_url( (int) $img['id'], 'full' ) ?: ( $img['url'] ?? '' );
+									$img_thumb = wp_get_attachment_image_url( (int) $img['id'], 'thumbnail' ) ?: ( $img['thumb'] ?? $img_url );
+								} else {
+									$img_url   = $img['url'] ?? '';
+									$img_thumb = $img['thumb'] ?? $img_url;
+								}
+							} elseif ( is_string( $img ) ) {
+								$img_url   = $img;
+								$img_thumb = $img;
+							}
 							if ( empty( $img_url ) ) {
 								continue;
 							}
@@ -1036,7 +1030,16 @@ function ltdh_render_review_metabox_html( $post ) {
 				<td>
 					<div style="display: flex; gap: 10px; flex-wrap: wrap;">
 						<?php foreach ( $images as $img ) :
-							$url = is_array( $img ) ? ( $img['url'] ?? '' ) : (string) $img;
+							$url = '';
+							if ( is_array( $img ) ) {
+								if ( ! empty( $img['id'] ) ) {
+									$url = wp_get_attachment_image_url( (int) $img['id'], 'full' ) ?: ( $img['url'] ?? '' );
+								} else {
+									$url = $img['url'] ?? '';
+								}
+							} else {
+								$url = (string) $img;
+							}
 							if ( $url ) : ?>
 								<a href="<?php echo esc_url( $url ); ?>" target="_blank">
 									<img src="<?php echo esc_url( $url ); ?>" style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
@@ -1094,5 +1097,22 @@ function ltdh_save_program_review_metabox( $post_id ) {
 
 	if ( isset( $_POST['ltdh_admin_official_reply'] ) ) {
 		update_post_meta( $post_id, '_review_official_reply', sanitize_textarea_field( $_POST['ltdh_admin_official_reply'] ) );
+	}
+}
+
+/**
+ * Clean up attached images when a review is deleted (also purges from Cloudflare R2 via offloader)
+ */
+add_action( 'before_delete_post', 'ltdh_cleanup_review_attachments', 10, 2 );
+function ltdh_cleanup_review_attachments( $post_id, $post ) {
+	if ( $post && $post->post_type === 'program_review' ) {
+		$images = get_post_meta( $post_id, '_review_images', true );
+		if ( is_array( $images ) ) {
+			foreach ( $images as $img ) {
+				if ( is_array( $img ) && ! empty( $img['id'] ) ) {
+					wp_delete_attachment( (int) $img['id'], true );
+				}
+			}
+		}
 	}
 }
