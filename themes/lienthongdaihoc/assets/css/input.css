@@ -881,24 +881,31 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    gap: 12px;
+    gap: 14px;
+    padding: 0 16px;
 }
 .hot-majors-swiper.swiper:not(.swiper-initialized) .swiper-wrapper::-webkit-scrollbar {
     display: none;
 }
 .hot-majors-swiper.swiper:not(.swiper-initialized) .swiper-slide {
-    flex: 0 0 calc(45% - 6px);
+    flex: 0 0 calc(55% - 8px);
     min-width: 0;
-    scroll-snap-align: start;
+    scroll-snap-align: center;
 }
 @media (min-width: 640px) {
+    .hot-majors-swiper.swiper:not(.swiper-initialized) .swiper-wrapper {
+        padding: 0;
+        gap: 16px;
+    }
     .hot-majors-swiper.swiper:not(.swiper-initialized) .swiper-slide {
-        flex: 0 0 calc(28% - 8px);
+        flex: 0 0 calc(30% - 10px);
+        scroll-snap-align: start;
     }
 }
 @media (min-width: 1024px) {
     .hot-majors-swiper.swiper:not(.swiper-initialized) .swiper-slide {
         flex: 1 1 0%;
+        scroll-snap-align: none;
     }
 }
 .hot-majors-pagination .swiper-pagination-bullet {

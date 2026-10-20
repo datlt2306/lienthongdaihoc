@@ -499,8 +499,10 @@ function ltdhInitTheme() {
             const hotMajorsSwiperEl = document.querySelector('.hot-majors-swiper');
             if (hotMajorsSwiperEl && !hotMajorsSwiperEl.classList.contains('swiper-initialized')) {
                 new Swiper('.hot-majors-swiper', {
-                    slidesPerView: 2.2,
-                    spaceBetween: 12,
+                    centeredSlides: true,
+                    initialSlide: 1,
+                    slidesPerView: 1.8,
+                    spaceBetween: 14,
                     watchSlidesProgress: true,
                     grabCursor: true,
                     pagination: {
@@ -509,14 +511,20 @@ function ltdhInitTheme() {
                     },
                     breakpoints: {
                         480: {
-                            slidesPerView: 2.5,
+                            centeredSlides: true,
+                            initialSlide: 1,
+                            slidesPerView: 2.1,
                             spaceBetween: 14,
                         },
                         640: {
-                            slidesPerView: 3.5,
+                            centeredSlides: false,
+                            initialSlide: 0,
+                            slidesPerView: 3.2,
                             spaceBetween: 16,
                         },
                         1024: {
+                            centeredSlides: false,
+                            initialSlide: 0,
                             slidesPerView: 5,
                             spaceBetween: 16,
                             allowTouchMove: false,

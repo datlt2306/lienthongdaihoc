@@ -73,20 +73,20 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 
 				<!-- Hình thức đào tạo mong muốn -->
 				<div class="space-y-1.5">
-					<label class="block text-xs sm:text-sm font-bold text-slate-700">Hình thức đào tạo mong muốn</label>
+					<label class="block text-xs sm:text-sm font-bold text-slate-700">Hình thức liên thông mong muốn</label>
 					<select name="training_type" class="elig-select">
-						<option value="">Chưa xác định / Gợi ý cho tôi</option>
-						<option value="tu-xa">Đào tạo từ xa (Trực tuyến 100%)</option>
-						<option value="vua-hoc-vua-lam">Vừa học vừa làm (Tối & Cuối tuần)</option>
-						<option value="chinh-quy">Chính quy (Tập trung)</option>
+						<option value="">Chưa xác định</option>
+						<option value="tu-xa">Đào tạo từ xa</option>
+						<option value="vua-hoc-vua-lam">Vừa học vừa làm</option>
+						<option value="chinh-quy">Chính quy</option>
 					</select>
 				</div>
 
 				<!-- Cơ sở học mong muốn -->
 				<div class="space-y-1.5">
-					<label class="block text-xs sm:text-sm font-bold text-slate-700">Khu vực / Cơ sở muốn học</label>
+					<label class="block text-xs sm:text-sm font-bold text-slate-700">Cơ sở muốn học</label>
 					<select name="campus" class="elig-select">
-						<option value="">Không quan trọng / Bất kỳ đâu</option>
+						<option value="">Không quan trọng</option>
 						<?php 
 						$campuses = get_terms( [ 'taxonomy' => 'campus', 'hide_empty' => false ] );
 						if ( ! is_wp_error( $campuses ) && ! empty( $campuses ) ) {
@@ -110,7 +110,7 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 					<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
 					</svg>
-					<span>XEM CHƯƠNG TRÌNH PHÙ HỢP</span>
+					<span>Xem chương trình phù hợp</span>
 				</span>
 				<span class="elig-btn-loading hidden">Đang tìm kiếm chương trình...</span>
 			</button>

@@ -437,8 +437,8 @@ $zalo    = ltdh_get_zalo_url();
 			</div>
 
 			<!-- Swiper Carousel Container (Mobile swipeable, Desktop 5 columns) -->
-			<div class="relative -mx-4 px-4 sm:mx-0 sm:px-0">
-				<div class="swiper hot-majors-swiper !overflow-visible sm:!overflow-hidden">
+			<div class="relative -mx-4 sm:mx-0">
+				<div class="swiper hot-majors-swiper overflow-hidden">
 					<div class="swiper-wrapper py-2">
 						<?php
 						$hot_majors = ltdh_get_hot_majors();
