@@ -18,6 +18,114 @@ window.ltdhToggleSubmenu = window.ltdhToggleSubmenu || function(btn, e) {
     btn.setAttribute('aria-label', isOpen ? 'Thu gọn menu con' : 'Mở rộng menu con');
 };
 
+// Global Share & Clipboard Utilities
+window.ltdhCopyToClipboard = window.ltdhCopyToClipboard || function(text, onSuccess, onError) {
+    if (!text) {
+        if (onError) onError(new Error('No text provided to copy'));
+        return;
+    }
+
+    function fallbackExecCopy(val, onSucc, onErr) {
+        try {
+            const textArea = document.createElement('textarea');
+            textArea.value = val;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '-9999px';
+            textArea.style.left = '-9999px';
+            textArea.style.opacity = '0';
+            textArea.setAttribute('readonly', '');
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            if (successful) {
+                if (onSucc) onSucc();
+            } else {
+                if (onErr) onErr(new Error('execCommand copy failed'));
+            }
+        } catch (err) {
+            if (onErr) onErr(err);
+        }
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function() {
+            if (onSuccess) onSuccess();
+        }).catch(function() {
+            fallbackExecCopy(text, onSuccess, onError);
+        });
+    } else {
+        fallbackExecCopy(text, onSuccess, onError);
+    }
+};
+
+window.ltdhOpenSharePopup = window.ltdhOpenSharePopup || function(e, url, title) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!url || url === '#' || url.startsWith('javascript:')) return false;
+
+    const width = 600;
+    const height = 550;
+    const left = Math.max(0, (window.screen.width - width) / 2);
+    const top = Math.max(0, (window.screen.height - height) / 2);
+    const windowFeatures = `scrollbars=yes,resizable=yes,toolbar=no,location=yes,width=${width},height=${height},top=${top},left=${left}`;
+
+    try {
+        const win = window.open(url, title || 'ltdh_share_window', windowFeatures);
+        if (!win || win.closed || typeof win.closed === 'undefined') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            win.focus();
+        }
+    } catch (err) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+    return false;
+};
+
+window.ltdhCopyPostLink = window.ltdhCopyPostLink || function(btn) {
+    if (!btn) return;
+    const rawUrl = btn.getAttribute('data-url') || window.location.href;
+    const shareUrl = (window.location.protocol.startsWith('http') && window.location.href) ? window.location.href : rawUrl;
+    const toast = document.getElementById('ltdh-share-toast');
+    const toastMsg = document.getElementById('ltdh-share-toast-msg');
+
+    function triggerToast(msg) {
+        if (!toast) return;
+        if (toastMsg && msg) toastMsg.textContent = msg;
+        toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+        toast.classList.add('opacity-100', 'translate-y-0');
+        clearTimeout(btn._toastTimer);
+        btn._toastTimer = setTimeout(function() {
+            toast.classList.remove('opacity-100', 'translate-y-0');
+            toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+        }, 2500);
+    }
+
+    if (!btn._origHtml) {
+        btn._origHtml = btn.innerHTML;
+    }
+
+    window.ltdhCopyToClipboard(shareUrl, function() {
+        btn.innerHTML = `
+            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span class="text-emerald-700 font-bold">Đã sao chép link!</span>
+        `;
+        btn.classList.add('bg-emerald-50', 'border-emerald-300');
+        triggerToast('✓ Đã sao chép liên kết bài viết vào bộ nhớ tạm!');
+
+        clearTimeout(btn._resetTimer);
+        btn._resetTimer = setTimeout(function() {
+            btn.innerHTML = btn._origHtml;
+            btn.classList.remove('bg-emerald-50', 'border-emerald-300');
+        }, 2500);
+    }, function() {
+        triggerToast('Không thể tự động sao chép. Vui lòng copy URL từ thanh địa chỉ.');
+    });
+};
+
 function ltdhInitTheme() {
     // ----------------------------------------------------
     // 1. Mobile Menu Offcanvas Drawer & Collapsible Accordion
@@ -32,6 +140,7 @@ function ltdhInitTheme() {
         menu.classList.remove('translate-x-full');
         overlay.classList.remove('opacity-0', 'pointer-events-none');
         overlay.classList.add('opacity-100');
+        document.documentElement.classList.add('overflow-hidden');
         document.body.classList.add('overflow-hidden');
     }
 
@@ -40,6 +149,7 @@ function ltdhInitTheme() {
         menu.classList.add('translate-x-full');
         overlay.classList.remove('opacity-100');
         overlay.classList.add('opacity-0', 'pointer-events-none');
+        document.documentElement.classList.remove('overflow-hidden');
         document.body.classList.remove('overflow-hidden');
     }
 
@@ -97,6 +207,74 @@ function ltdhInitTheme() {
             closeMenu();
         });
     }
+
+    // ----------------------------------------------------
+    // 1b. Mobile Floating Dynamic Bar - Scroll-Aware Auto-Hide (Apple iOS Style)
+    // ----------------------------------------------------
+    function initMobileFloatingBarScroll() {
+        const bar = document.getElementById('ltdh-global-mobile-bar');
+        if (!bar || bar._scrollInit) return;
+        bar._scrollInit = true;
+
+        let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+        let ticking = false;
+        const threshold = 8;
+        let isHidden = false;
+
+        function updateBarState() {
+            const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const docHeight = document.documentElement.scrollHeight;
+            const diff = currentScrollY - lastScrollY;
+
+            // 1. Near top of page: always show
+            if (currentScrollY < 60) {
+                if (isHidden) showBar();
+            }
+            // 2. Near bottom of page: always show
+            else if (currentScrollY + windowHeight >= docHeight - 80) {
+                if (isHidden) showBar();
+            }
+            // 3. Scroll Down: hide
+            else if (diff > threshold && !isHidden) {
+                hideBar();
+            }
+            // 4. Scroll Up: show
+            else if (diff < -threshold && isHidden) {
+                showBar();
+            }
+
+            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+            ticking = false;
+        }
+
+        function hideBar() {
+            bar.classList.add('translate-y-[150%]', 'opacity-0', 'pointer-events-none');
+            bar.classList.remove('translate-y-0', 'opacity-100');
+            isHidden = true;
+        }
+
+        function showBar() {
+            bar.classList.remove('translate-y-[150%]', 'opacity-0', 'pointer-events-none');
+            bar.classList.add('translate-y-0', 'opacity-100');
+            isHidden = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateBarState);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchstart', (e) => {
+            if (isHidden && e.touches && e.touches[0].clientY > window.innerHeight - 70) {
+                showBar();
+            }
+        }, { passive: true });
+    }
+
+    initMobileFloatingBarScroll();
 
     // ----------------------------------------------------
     // 2. Swiper Sliders Initialization (Hero & School Partners)
@@ -333,6 +511,55 @@ function ltdhInitTheme() {
     }
 
     // ----------------------------------------------------
+    // Shared Mobile Drawer Scroll Lock Manager (Prevents Background Touch/Wheel Scroll)
+    // ----------------------------------------------------
+    let ltdhDrawerTouchStartY = 0;
+
+    function ltdhDrawerTouchStart(e) {
+        if (e.touches && e.touches.length === 1) {
+            ltdhDrawerTouchStartY = e.touches[0].clientY;
+        }
+    }
+
+    function ltdhDrawerTouchMoveLock(e) {
+        const scrollable = e.target.closest('#catalog-drawer-major-filter-wrapper, #catalog-drawer-filter-wrapper');
+        if (!scrollable) {
+            if (e.cancelable) e.preventDefault();
+            return;
+        }
+
+        if (e.touches && e.touches.length === 1) {
+            const currentY = e.touches[0].clientY;
+            const deltaY = currentY - ltdhDrawerTouchStartY;
+
+            if (scrollable.scrollTop <= 0 && deltaY > 0) {
+                if (e.cancelable) e.preventDefault();
+                return;
+            }
+
+            const maxScroll = scrollable.scrollHeight - scrollable.clientHeight;
+            if (scrollable.scrollTop >= maxScroll && deltaY < 0) {
+                if (e.cancelable) e.preventDefault();
+                return;
+            }
+        }
+    }
+
+    function ltdhLockDrawerScroll() {
+        document.documentElement.classList.add('overflow-hidden');
+        document.body.classList.add('overflow-hidden');
+        document.addEventListener('touchstart', ltdhDrawerTouchStart, { passive: true });
+        document.addEventListener('touchmove', ltdhDrawerTouchMoveLock, { passive: false });
+    }
+
+    function ltdhUnlockDrawerScroll() {
+        document.documentElement.classList.remove('overflow-hidden');
+        document.body.classList.remove('overflow-hidden');
+        document.removeEventListener('touchstart', ltdhDrawerTouchStart);
+        document.removeEventListener('touchmove', ltdhDrawerTouchMoveLock);
+    }
+
+    // ----------------------------------------------------
     // 3. Program Search & AJAX Filtering with SEO URL Sync
     // ----------------------------------------------------
     function initProgramArchiveFilter() {
@@ -353,6 +580,85 @@ function ltdhInitTheme() {
         const mobileFilterChevron = document.getElementById('ltdh-mobile-filter-chevron');
         const mobileFilterBtnText = document.getElementById('ltdh-mobile-filter-btn-text');
         const mobileCloseBtn = document.getElementById('ltdh-mobile-filter-close');
+
+        // Mobile Off-Canvas Drawer Elements
+        const filterDrawer = document.getElementById('ltdh-filter-drawer');
+        const filterOverlay = document.getElementById('ltdh-filter-drawer-overlay');
+        const drawerCloseBtn = document.getElementById('ltdh-filter-drawer-close');
+        const drawerApplyBtn = document.getElementById('ltdh-drawer-apply-btn');
+        const desktopWrapper = document.getElementById('catalog-desktop-filter-wrapper');
+        const drawerWrapper = document.getElementById('catalog-drawer-filter-wrapper');
+
+        function relocateDrawerForm() {
+            if (!mobileFilterBody) return;
+            if (window.innerWidth < 768) {
+                if (drawerWrapper && !drawerWrapper.contains(mobileFilterBody)) {
+                    drawerWrapper.appendChild(mobileFilterBody);
+                }
+            } else {
+                if (desktopWrapper && !desktopWrapper.contains(mobileFilterBody)) {
+                    desktopWrapper.appendChild(mobileFilterBody);
+                }
+                closeFilterDrawer();
+            }
+        }
+
+        function openFilterDrawer() {
+            if (!filterDrawer || !filterOverlay) return;
+            relocateDrawerForm();
+            filterDrawer.classList.remove('-translate-x-full');
+            filterDrawer.classList.add('translate-x-0');
+            filterOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            filterOverlay.classList.add('opacity-100', 'pointer-events-auto');
+            ltdhLockDrawerScroll();
+            if (mobileFilterBtn) mobileFilterBtn.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeFilterDrawer() {
+            if (!filterDrawer || !filterOverlay) return;
+            filterDrawer.classList.remove('translate-x-0');
+            filterDrawer.classList.add('-translate-x-full');
+            filterOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+            filterOverlay.classList.add('opacity-0', 'pointer-events-none');
+            ltdhUnlockDrawerScroll();
+            if (mobileFilterBtn) mobileFilterBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        if (filterOverlay && !filterOverlay._scrollBlocked) {
+            filterOverlay._scrollBlocked = true;
+            filterOverlay.addEventListener('touchmove', (e) => {
+                if (e.cancelable) e.preventDefault();
+            }, { passive: false });
+            filterOverlay.addEventListener('wheel', (e) => {
+                if (e.cancelable) e.preventDefault();
+            }, { passive: false });
+        }
+
+        relocateDrawerForm();
+        window.addEventListener('resize', relocateDrawerForm);
+
+        if (mobileFilterBtn && !mobileFilterBtn._boundDrawer) {
+            mobileFilterBtn._boundDrawer = true;
+            mobileFilterBtn.addEventListener('click', openFilterDrawer);
+        }
+        if (drawerCloseBtn && !drawerCloseBtn._boundDrawer) {
+            drawerCloseBtn._boundDrawer = true;
+            drawerCloseBtn.addEventListener('click', closeFilterDrawer);
+        }
+        if (filterOverlay && !filterOverlay._boundDrawer) {
+            filterOverlay._boundDrawer = true;
+            filterOverlay.addEventListener('click', closeFilterDrawer);
+        }
+        if (drawerApplyBtn && !drawerApplyBtn._boundDrawer) {
+            drawerApplyBtn._boundDrawer = true;
+            drawerApplyBtn.addEventListener('click', closeFilterDrawer);
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeFilterDrawer();
+        });
+
+        window.ltdhCloseFilterDrawer = closeFilterDrawer;
+        window.ltdhOpenFilterDrawer = openFilterDrawer;
 
         const searchInput = filterForm.querySelector('input[name="s"]');
         const regionSelect = filterForm.querySelector('select[name="khu_vuc"]');
@@ -500,6 +806,13 @@ function ltdhInitTheme() {
                     if (countDisplay && typeof data.found_posts !== 'undefined') {
                         countDisplay.textContent = data.found_posts;
                     }
+                    const mobileCountDisplay = document.getElementById('catalog-count-display-mobile');
+                    if (mobileCountDisplay && typeof data.found_posts !== 'undefined') {
+                        mobileCountDisplay.textContent = data.found_posts;
+                    }
+                    document.querySelectorAll('.js-filter-count-badge').forEach(b => {
+                        b.textContent = `(${data.found_posts})`;
+                    });
 
                     if (paginationContainer) {
                         paginationContainer.innerHTML = data.pagination_html || '';
@@ -510,7 +823,7 @@ function ltdhInitTheme() {
                     }
 
                     const resetBtnHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 border border-rose-100 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]"><span>✕</span> <span>Xóa tất cả bộ lọc</span></a>`;
-                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 min-h-[44px] transition-colors shrink-0" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
+                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 min-h-[38px] transition-colors" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
 
                     if (desktopResetWrapper) {
                         desktopResetWrapper.innerHTML = data.has_active_filters ? resetBtnHtml : '';
@@ -521,14 +834,14 @@ function ltdhInitTheme() {
 
                     if (mobileFilterBadge) {
                         mobileFilterBadge.innerHTML = (data.active_filter_count > 0)
-                            ? `<span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[11px] font-black rounded-full bg-[#EA580C] text-white shrink-0 min-w-[20px] shadow-2xs">${data.active_filter_count}</span>`
+                            ? `<span class="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black rounded-full bg-[#EA580C] text-white shrink-0 min-w-[18px]">${data.active_filter_count}</span>`
                             : '';
                     }
                     if (mobileFilterBtn) {
                         if (data.has_active_filters) {
-                            mobileFilterBtn.className = 'flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs bg-blue-50/90 border-blue-200/90 text-[#00308b]';
+                            mobileFilterBtn.className = 'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border font-bold text-xs transition-all duration-200 min-h-[38px] cursor-pointer shadow-2xs bg-blue-50 border-blue-200 text-[#00308b]';
                         } else {
-                            mobileFilterBtn.className = 'flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs bg-slate-50 hover:bg-slate-100 border-slate-200/80 text-slate-700';
+                            mobileFilterBtn.className = 'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border font-bold text-xs transition-all duration-200 min-h-[38px] cursor-pointer shadow-2xs bg-white hover:bg-slate-50 border-slate-200 text-slate-700';
                         }
                     }
 
@@ -557,12 +870,7 @@ function ltdhInitTheme() {
         filterForm.addEventListener('submit', (e) => {
             e.preventDefault();
             triggerFilter({ paged: 1, pushUrl: true });
-            if (mobileFilterBody && !mobileFilterBody.classList.contains('hidden') && window.innerWidth < 768) {
-                mobileFilterBody.classList.add('hidden');
-                if (mobileFilterBtn) mobileFilterBtn.setAttribute('aria-expanded', 'false');
-                if (mobileFilterChevron) mobileFilterChevron.classList.remove('rotate-180');
-                if (mobileFilterBtnText) mobileFilterBtnText.textContent = 'Bộ lọc & Tìm kiếm';
-            }
+            closeFilterDrawer();
         });
 
         // 2. Dropdown changes
@@ -630,7 +938,7 @@ function ltdhInitTheme() {
         // 6. Reset Filters (Delegated for catalog)
         document.addEventListener('click', (e) => {
             if (!container || !document.body.contains(container)) return;
-            const resetBtn = e.target.closest('#catalog-desktop-reset .js-ltdh-reset-filter, #catalog-mobile-reset .js-ltdh-reset-filter');
+            const resetBtn = e.target.closest('#catalog-desktop-reset .js-ltdh-reset-filter, #catalog-mobile-reset .js-ltdh-reset-filter, #ltdh-drawer-reset-btn, .js-ltdh-reset-filter');
             if (!resetBtn) return;
             e.preventDefault();
 
@@ -817,11 +1125,93 @@ function ltdhInitTheme() {
         const mobileApplyBtnCount = document.getElementById('major-apply-btn-count');
         const pillsContainer = document.getElementById('major-pills-container');
         const paginationContainer = document.getElementById('major-pagination-container');
-        const mobileFilterBtn = document.getElementById('ltdh-mobile-filter-btn');
+        const mobileFilterBtn = document.getElementById('ltdh-mobile-major-filter-btn') || document.getElementById('ltdh-mobile-filter-btn');
         const mobileFilterBody = document.getElementById('major-filter-body');
         const mobileFilterChevron = document.getElementById('ltdh-mobile-filter-chevron');
-        const mobileFilterBtnText = document.getElementById('ltdh-mobile-filter-btn-text');
+        const mobileFilterBtnText = document.getElementById('ltdh-mobile-major-filter-btn-text') || document.getElementById('ltdh-mobile-filter-btn-text');
         const mobileCloseBtn = document.getElementById('ltdh-mobile-filter-close');
+
+        // Mobile Off-Canvas Drawer Elements
+        const filterDrawer = document.getElementById('ltdh-major-filter-drawer');
+        const filterOverlay = document.getElementById('ltdh-major-filter-drawer-overlay');
+        const drawerCloseBtn = document.getElementById('ltdh-major-filter-drawer-close');
+        const drawerApplyBtn = document.getElementById('ltdh-major-drawer-apply-btn');
+        const desktopWrapper = document.getElementById('catalog-desktop-major-filter-wrapper');
+        const drawerWrapper = document.getElementById('catalog-drawer-major-filter-wrapper');
+
+        function relocateMajorDrawerForm() {
+            if (!mobileFilterBody) return;
+            if (window.innerWidth < 768) {
+                if (drawerWrapper && !drawerWrapper.contains(mobileFilterBody)) {
+                    drawerWrapper.appendChild(mobileFilterBody);
+                }
+            } else {
+                if (desktopWrapper && !desktopWrapper.contains(mobileFilterBody)) {
+                    desktopWrapper.appendChild(mobileFilterBody);
+                }
+                closeMajorFilterDrawer();
+            }
+        }
+
+        function openMajorFilterDrawer() {
+            if (!filterDrawer || !filterOverlay) return;
+            relocateMajorDrawerForm();
+            filterDrawer.classList.remove('-translate-x-full');
+            filterDrawer.classList.add('translate-x-0');
+            filterOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            filterOverlay.classList.add('opacity-100', 'pointer-events-auto');
+            ltdhLockDrawerScroll();
+            if (mobileFilterBtn) mobileFilterBtn.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeMajorFilterDrawer() {
+            if (!filterDrawer || !filterOverlay) return;
+            filterDrawer.classList.remove('translate-x-0');
+            filterDrawer.classList.add('-translate-x-full');
+            filterOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+            filterOverlay.classList.add('opacity-0', 'pointer-events-none');
+            ltdhUnlockDrawerScroll();
+            if (mobileFilterBtn) mobileFilterBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        if (filterOverlay && !filterOverlay._scrollBlocked) {
+            filterOverlay._scrollBlocked = true;
+            filterOverlay.addEventListener('touchmove', (e) => {
+                if (e.cancelable) e.preventDefault();
+            }, { passive: false });
+            filterOverlay.addEventListener('wheel', (e) => {
+                if (e.cancelable) e.preventDefault();
+            }, { passive: false });
+        }
+
+        relocateMajorDrawerForm();
+        window.addEventListener('resize', relocateMajorDrawerForm);
+
+        if (mobileFilterBtn && !mobileFilterBtn._boundMajorDrawer) {
+            mobileFilterBtn._boundMajorDrawer = true;
+            mobileFilterBtn.addEventListener('click', openMajorFilterDrawer);
+        }
+        if (drawerCloseBtn && !drawerCloseBtn._boundMajorDrawer) {
+            drawerCloseBtn._boundMajorDrawer = true;
+            drawerCloseBtn.addEventListener('click', closeMajorFilterDrawer);
+        }
+        if (filterOverlay && !filterOverlay._boundMajorDrawer) {
+            filterOverlay._boundMajorDrawer = true;
+            filterOverlay.addEventListener('click', closeMajorFilterDrawer);
+        }
+        if (drawerApplyBtn && !drawerApplyBtn._boundMajorDrawer) {
+            drawerApplyBtn._boundMajorDrawer = true;
+            drawerApplyBtn.addEventListener('click', () => {
+                triggerFilter({ paged: 1, pushUrl: true });
+                closeMajorFilterDrawer();
+            });
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMajorFilterDrawer();
+        });
+
+        window.ltdhCloseMajorFilterDrawer = closeMajorFilterDrawer;
+        window.ltdhOpenMajorFilterDrawer = openMajorFilterDrawer;
 
         const searchInput = filterForm.querySelector('input[name="s"]');
         const catSelect = filterForm.querySelector('select[name="nhom_nganh"]');
@@ -837,29 +1227,6 @@ function ltdhInitTheme() {
             const initialPathMatch = window.location.pathname.match(/^\/nhom-nganh\/([^\/]+)(?:\/page\/\d+)?\/?$/i);
             if (initialPathMatch && initialPathMatch[1] && initialPathMatch[1] !== 'page') {
                 catSelect.value = decodeURIComponent(initialPathMatch[1]);
-            }
-        }
-
-        // Mobile Filter Accordion Toggle
-        if (mobileFilterBtn && mobileFilterBody && !mobileFilterBtn._bound) {
-            mobileFilterBtn._bound = true;
-            function toggleMobileFilter() {
-                const isHidden = mobileFilterBody.classList.contains('hidden');
-                if (isHidden) {
-                    mobileFilterBody.classList.remove('hidden');
-                    mobileFilterBtn.setAttribute('aria-expanded', 'true');
-                    if (mobileFilterChevron) mobileFilterChevron.classList.add('rotate-180');
-                    if (mobileFilterBtnText) mobileFilterBtnText.textContent = 'Thu gọn bộ lọc';
-                } else {
-                    mobileFilterBody.classList.add('hidden');
-                    mobileFilterBtn.setAttribute('aria-expanded', 'false');
-                    if (mobileFilterChevron) mobileFilterChevron.classList.remove('rotate-180');
-                    if (mobileFilterBtnText) mobileFilterBtnText.textContent = 'Bộ lọc & Tìm kiếm';
-                }
-            }
-            mobileFilterBtn.addEventListener('click', toggleMobileFilter);
-            if (mobileCloseBtn) {
-                mobileCloseBtn.addEventListener('click', toggleMobileFilter);
             }
         }
 
@@ -965,6 +1332,13 @@ function ltdhInitTheme() {
                     if (countDisplay && typeof data.found_posts !== 'undefined') {
                         countDisplay.textContent = data.found_posts;
                     }
+                    const mobileCountDisplay = document.getElementById('catalog-major-count-display-mobile');
+                    if (mobileCountDisplay && typeof data.found_posts !== 'undefined') {
+                        mobileCountDisplay.textContent = data.found_posts;
+                    }
+                    document.querySelectorAll('.js-major-filter-count-badge').forEach(b => {
+                        b.textContent = `(${data.found_posts})`;
+                    });
                     if (mobileApplyBtnCount && typeof data.found_posts !== 'undefined') {
                         mobileApplyBtnCount.textContent = data.found_posts;
                     }
@@ -977,8 +1351,8 @@ function ltdhInitTheme() {
                         mobileChipsWrapper.innerHTML = data.chips_html || '';
                     }
 
-                    const resetBtnHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]"><span>✕</span> <span>Xóa tất cả bộ lọc</span></a>`;
-                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 min-h-[44px] transition-colors shrink-0" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
+                    const resetBtnHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 border border-rose-100 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]"><span>✕</span> <span>Xóa tất cả bộ lọc</span></a>`;
+                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 min-h-[38px] transition-colors" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
 
                     if (desktopResetWrapper) {
                         desktopResetWrapper.innerHTML = data.has_active_filters ? resetBtnHtml : '';
@@ -989,14 +1363,14 @@ function ltdhInitTheme() {
 
                     if (mobileFilterBadge) {
                         mobileFilterBadge.innerHTML = (data.active_filter_count > 0)
-                            ? `<span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[11px] font-black rounded-full bg-[#EA580C] text-white shrink-0 min-w-[20px] shadow-2xs">${data.active_filter_count}</span>`
+                            ? `<span class="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black rounded-full bg-[#EA580C] text-white shrink-0 min-w-[18px]">${data.active_filter_count}</span>`
                             : '';
                     }
                     if (mobileFilterBtn) {
                         if (data.has_active_filters) {
-                            mobileFilterBtn.className = 'flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs bg-blue-50/90 border-blue-200/90 text-[#00308b]';
+                            mobileFilterBtn.className = 'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border font-bold text-xs transition-all duration-200 min-h-[38px] cursor-pointer shadow-2xs bg-blue-50 border-blue-200 text-[#00308b]';
                         } else {
-                            mobileFilterBtn.className = 'flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs bg-slate-50 hover:bg-slate-100 border-slate-200/80 text-slate-700';
+                            mobileFilterBtn.className = 'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border font-bold text-xs transition-all duration-200 min-h-[38px] cursor-pointer shadow-2xs bg-white hover:bg-slate-50 border-slate-200 text-slate-700';
                         }
                     }
 
@@ -1021,12 +1395,7 @@ function ltdhInitTheme() {
         filterForm.addEventListener('submit', (e) => {
             e.preventDefault();
             triggerFilter({ paged: 1, pushUrl: true });
-            if (mobileFilterBody && !mobileFilterBody.classList.contains('hidden') && window.innerWidth < 768) {
-                mobileFilterBody.classList.add('hidden');
-                if (mobileFilterBtn) mobileFilterBtn.setAttribute('aria-expanded', 'false');
-                if (mobileFilterChevron) mobileFilterChevron.classList.remove('rotate-180');
-                if (mobileFilterBtnText) mobileFilterBtnText.textContent = 'Bộ lọc & Tìm kiếm';
-            }
+            closeMajorFilterDrawer();
         });
 
         // 2. Dropdown changes
@@ -1238,6 +1607,57 @@ function ltdhInitTheme() {
     }
 
     initStatsCounter();
+
+    // ----------------------------------------------------
+    // Post Sharing & Clipboard Module
+    // ----------------------------------------------------
+    function initPostSharing() {
+        // Unhide native share button if supported by browser/device
+        const nativeShareBtn = document.getElementById('ltdh-native-share-btn');
+        if (nativeShareBtn && typeof navigator.share === 'function') {
+            nativeShareBtn.classList.remove('hidden');
+            if (!nativeShareBtn._bound) {
+                nativeShareBtn._bound = true;
+                nativeShareBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const title = nativeShareBtn.getAttribute('data-title') || document.title;
+                    const url = nativeShareBtn.getAttribute('data-url') || window.location.href;
+                    navigator.share({
+                        title: title,
+                        text: title,
+                        url: url
+                    }).catch(() => {
+                        // User cancelled, safe to ignore
+                    });
+                });
+            }
+        }
+
+        // Delegate popup handler to social share buttons
+        document.querySelectorAll('.ltdh-post-share-section .ltdh-share-btn[data-share-type]').forEach(btn => {
+            if (btn._boundPopup) return;
+            btn._boundPopup = true;
+            btn.addEventListener('click', (e) => {
+                const url = btn.getAttribute('href');
+                const type = btn.getAttribute('data-share-type') || 'Social';
+                if (url && url !== '#' && !url.startsWith('javascript:')) {
+                    window.ltdhOpenSharePopup(e, url, type);
+                }
+            });
+        });
+
+        // Delegate copy post link button
+        const copyBtn = document.getElementById('ltdh-copy-post-btn');
+        if (copyBtn && !copyBtn._bound) {
+            copyBtn._bound = true;
+            copyBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.ltdhCopyPostLink(copyBtn);
+            });
+        }
+    }
+
+    initPostSharing();
 }
 
 if (document.readyState === 'loading') {

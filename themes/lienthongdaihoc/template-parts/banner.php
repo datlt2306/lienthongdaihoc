@@ -177,29 +177,20 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 
 	} else {
 		// General Major Eyebrow Pill
-		if ( ! empty( $major_code ) ) {
-			$banner_eyebrow = [
-				'text' => 'Ngành đào tạo chuẩn Bộ GD&ĐT • Mã: ' . $major_code,
-				'url'  => '#truong-tuyen-sinh',
-			];
-		} else {
-			$banner_eyebrow = [
-				'text' => 'Hệ thống đào tạo Liên thông Đại học',
-				'url'  => '#truong-tuyen-sinh',
-			];
-		}
+		$banner_eyebrow = [
+			'text' => 'Ngành đào tạo chuẩn Bộ GD&ĐT',
+			'url'  => '#truong-tuyen-sinh',
+		];
 
-		$code_suffix = $major_code ? ' • Mã ngành: ' . $major_code : '';
 		if ( ! empty( $clean_type ) ) {
 			$banner_subtitle = sprintf(
-				'Chương trình đào tạo Liên thông Đại học (%s) ngành %s. Danh sách trường đào tạo, lộ trình công nhận tín chỉ và học phí năm %d%s.',
+				'Chương trình đào tạo Liên thông Đại học (%s) ngành %s. Danh sách trường đào tạo, lộ trình công nhận tín chỉ và học phí năm %d.',
 				$clean_type,
 				$clean_major,
-				$year,
-				$code_suffix
+				$year
 			);
 		} else {
-			$banner_subtitle = 'Danh sách các trường đại học tuyển sinh, lộ trình công nhận tín chỉ và học phí năm ' . $year . $code_suffix;
+			$banner_subtitle = 'Danh sách các trường đại học tuyển sinh, lộ trình công nhận tín chỉ và học phí năm ' . $year;
 		}
 
 		$banner_image = get_the_post_thumbnail_url( $major_id, 'full' ) ?: '';
@@ -425,15 +416,7 @@ if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url'
 }
 ?>
 
-	<section class="relative w-full bg-gradient-to-tr from-[#0F172A] via-[#1E293B] to-brand-primary text-white py-12 md:py-16 overflow-hidden">
-	<?php if ( ! empty( $banner_image ) ) : ?>
-		<!-- Banner Background Image with Gradient Overlay -->
-		<div class="absolute inset-0 z-0">
-			<img src="<?php echo esc_url( $banner_image ); ?>" class="hero-banner skip-lazy no-lazy w-full h-full object-cover object-center scale-105 <?php echo is_singular( 'post' ) ? 'opacity-20 blur-[2px]' : 'opacity-25 blur-[1px]'; ?>" alt="<?php echo esc_attr( $banner_title ); ?>" width="1920" height="400" loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
-			<div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/80 to-brand-primary/80"></div>
-		</div>
-	<?php endif; ?>
-
+	<section class="relative w-full bg-gradient-to-tr from-[#0F172A] via-[#1E293B] to-brand-primary text-white py-5 sm:py-8 md:py-16 overflow-hidden">
 	<!-- Ambient Grid Pattern & Glow -->
 	<div class="absolute inset-0 opacity-15 pointer-events-none z-0" style="background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 24px 24px;"></div>
 	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-primary/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -441,7 +424,7 @@ if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url'
 	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
 		<?php if ( is_singular( 'post' ) ) : ?>
 			<?php if ( ! empty( $post_cat ) || ! empty( $school_name ) ) : ?>
-				<div class="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
+				<div class="flex flex-wrap items-center gap-2 mb-2 sm:mb-4">
 					<?php if ( ! empty( $post_cat ) ) : ?>
 						<a href="<?php echo esc_url( get_category_link( $post_cat->term_id ) ); ?>" 
 						   class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs sm:text-sm uppercase tracking-wider backdrop-blur-md border border-white/20 transition-all duration-200 no-underline shadow-xs">
@@ -458,29 +441,29 @@ if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url'
 				</div>
 			<?php endif; ?>
 		<?php elseif ( ! empty( $banner_eyebrow ) ) : ?>
-			<div class="mb-3 sm:mb-4">
+			<div class="mb-2 sm:mb-4">
 				<?php if ( ! empty( $banner_eyebrow['url'] ) ) : ?>
 					<a href="<?php echo esc_url( $banner_eyebrow['url'] ); ?>" 
 					   title="<?php echo esc_attr( $banner_eyebrow['text'] ); ?>"
-					   class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md transition-all duration-200 no-underline shadow-xs hover:border-white/30 group">
-						<svg class="w-4 h-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
-						<span class="truncate max-w-[280px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
+					   class="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md transition-all duration-200 no-underline shadow-xs hover:border-white/30 group">
+						<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
+						<span class="truncate max-w-[240px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
 						<span class="text-white/60 group-hover:text-white transition-colors text-xs font-normal shrink-0">→</span>
 					</a>
 				<?php else : ?>
-					<span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md shadow-xs">
-						<svg class="w-4 h-4 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
-						<span class="truncate max-w-[280px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
+					<span class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md shadow-xs">
+						<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
+						<span class="truncate max-w-[240px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
 					</span>
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 
-		<h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
+		<h1 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
 			<?php echo esc_html( $banner_title ); ?>
 		</h1>
 		<?php if ( ! empty( $banner_subtitle ) ) : ?>
-			<p class="text-slate-200/90 text-sm md:text-base font-medium max-w-2xl mt-2.5 leading-relaxed">
+			<p class="text-slate-200/90 text-xs sm:text-sm md:text-base font-medium max-w-2xl mt-1.5 sm:mt-2.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
 				<?php echo esc_html( $banner_subtitle ); ?>
 			</p>
 		<?php endif; ?>

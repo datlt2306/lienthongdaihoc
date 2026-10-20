@@ -132,31 +132,8 @@ class LTDH_Performance {
 				echo '<link rel="preload" as="image" href="' . esc_url( $fallback_href ) . '" imagesrcset="' . $srcset_str . '" imagesizes="(max-width: 768px) 100vw, (max-width: 1440px) 1335px, 1942px" type="image/webp" fetchpriority="high">' . "\n";
 			}
 			return;
-		} elseif ( is_singular( 'program' ) ) {
-			$school_id = get_field( 'school_relationship' );
-			if ( is_array( $school_id ) && ! empty( $school_id ) ) {
-				$school_id = $school_id[0];
-			}
-			if ( is_object( $school_id ) ) {
-				$school_id = $school_id->ID;
-			}
-			$lcp_image_url = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: ( $school_id ? get_field( 'school_banner', (int) $school_id ) : '' );
-			if ( empty( $lcp_image_url ) ) {
-				$lcp_image_url = get_template_directory_uri() . '/assets/images/banner-program.jpg';
-			}
 		} elseif ( is_singular( 'school' ) ) {
 			$lcp_image_url = get_field( 'school_banner' ) ?: get_the_post_thumbnail_url( get_the_ID(), 'full' );
-			if ( empty( $lcp_image_url ) ) {
-				$lcp_image_url = get_template_directory_uri() . '/assets/images/banner-school.jpg';
-			}
-		} elseif ( is_singular( 'major' ) ) {
-			$lcp_image_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
-		} elseif ( is_singular( 'post' ) ) {
-			$lcp_image_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
-		} elseif ( is_post_type_archive( 'program' ) || is_tax( 'training_type' ) || is_tax( 'campus' ) ) {
-			$lcp_image_url = get_template_directory_uri() . '/assets/images/banner-program.jpg';
-		} elseif ( is_post_type_archive( 'school' ) ) {
-			$lcp_image_url = get_template_directory_uri() . '/assets/images/banner-school.jpg';
 		}
 
 		if ( ! empty( $lcp_image_url ) ) {
@@ -335,6 +312,11 @@ class LTDH_Performance {
 		header( 'X-Frame-Options: SAMEORIGIN' );
 		header( 'X-XSS-Protection: 1; mode=block' );
 		header( 'Referrer-Policy: strict-origin-when-cross-origin' );
+		header( 'Permissions-Policy: camera=(), microphone=(), geolocation=()' );
+
+		if ( is_ssl() || ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && 'https' === $_SERVER['HTTP_X_FORWARDED_PROTO'] ) ) {
+			header( 'Strict-Transport-Security: max-age=31536000; includeSubDomains' );
+		}
 	}
 
 	/**

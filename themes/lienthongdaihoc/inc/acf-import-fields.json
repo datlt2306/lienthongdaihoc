@@ -465,13 +465,6 @@
         "endpoint": 0
       },
       {
-        "key": "field_major_code",
-        "label": "Mã ngành",
-        "name": "major_code",
-        "type": "text",
-        "instructions": "Mã ngành đào tạo chuẩn của Bộ GD&ĐT (Hiển thị tại Banner đầu trang, ví dụ: 7480201)"
-      },
-      {
         "key": "field_major_degree_type",
         "label": "Loại văn bằng tốt nghiệp chuẩn của ngành",
         "name": "degree_type",

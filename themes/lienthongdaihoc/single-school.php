@@ -83,7 +83,7 @@ if ( ! empty( $school_faqs ) ) {
 <main id="primary" class="site-main bg-slate-50">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
 		<?php 
-		$banner_image = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'full' ) : ( get_field( 'school_banner', $school_id ) ?: get_template_directory_uri() . '/assets/images/banner-school.jpg' );
+		$banner_image = function_exists( 'ltdh_get_school_cover_url' ) ? ltdh_get_school_cover_url( $school_id, 'full' ) : get_field( 'school_banner', $school_id );
 		?>
 
 		<!-- SCHOOL BRAND HERO BANNER (Redesigned with UI/UX Pro Max) -->
@@ -682,10 +682,10 @@ if ( ! empty( $school_faqs ) ) {
 										<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
 									</svg>
 								</span>
-								<label for="ltdh-major-search-input" class="sr-only">Tìm kiếm tên ngành, mã ngành</label>
+								<label for="ltdh-major-search-input" class="sr-only">Tìm kiếm ngành học</label>
 								<input type="text"
 									   id="ltdh-major-search-input"
-									   placeholder="Tìm kiếm tên ngành, mã ngành..."
+									   placeholder="Tìm kiếm ngành học..."
 									   class="w-full pl-9 pr-8 py-2 rounded-xl text-xs sm:text-sm border border-slate-200 bg-slate-50/70 focus:bg-white focus:border-[#00308b] focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-slate-400">
 								<button type="button"
 										id="ltdh-major-search-clear"
@@ -747,15 +747,8 @@ if ( ! empty( $school_faqs ) ) {
 										</a>
 										<div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent pointer-events-none"></div>
 
-										<!-- Top Badges on Thumbnail: Mã ngành (Left) & Đang tuyển sinh (Right) -->
-										<div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1.5 z-10 pointer-events-none">
-											<?php if ( ! empty( $major['code'] ) ) : ?>
-												<span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-900/85 text-white backdrop-blur-md shadow-xs border border-white/10">
-													Mã: <?php echo esc_html( $major['code'] ); ?>
-												</span>
-											<?php else : ?>
-												<span></span>
-											<?php endif; ?>
+										<!-- Top Badges on Thumbnail: Đang tuyển sinh (Right) -->
+										<div class="absolute top-2.5 right-2.5 flex items-center justify-end z-10 pointer-events-none">
 
 											<?php 
 											$major_has_active   = false;

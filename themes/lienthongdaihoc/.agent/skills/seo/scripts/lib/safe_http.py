@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import ipaddress
+import os
 import socket
 from urllib.parse import urljoin, urlparse, urlunparse
 
@@ -65,6 +66,8 @@ def _port_for(parsed) -> int:
 
 
 def _is_blocked_ip(ip_text: str) -> bool:
+    if os.environ.get("ALLOW_PRIVATE_IPS") == "1" or os.environ.get("ALLOW_LOCAL_URLS") == "1":
+        return False
     ip = ipaddress.ip_address(ip_text)
     return (
         ip.is_private

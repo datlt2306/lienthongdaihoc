@@ -42,7 +42,7 @@ if ( empty( trim( $excerpt ) ) ) {
 		$excerpt = wp_strip_all_tags( get_post_field( 'post_content', $major_id ) );
 	}
 }
-$excerpt = wp_trim_words( $excerpt, 40, ' [...]' );
+$excerpt = wp_trim_words( $excerpt, 45, '...' );
 ?>
 
 <div class="bg-white border border-slate-200/80 rounded-2xl md:rounded-3xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
@@ -63,7 +63,7 @@ $excerpt = wp_trim_words( $excerpt, 40, ' [...]' );
 			<h3 class="font-bold text-slate-900 text-base sm:text-xl md:text-2xl hover:text-brand-primary transition-colors mb-2.5 sm:mb-3 line-clamp-2 leading-snug">
 				<a href="<?php the_permalink(); ?>"><?php echo esc_html( $display_title ); ?></a>
 			</h3>
-			<p class="hidden sm:block text-sm sm:text-base text-slate-600 line-clamp-4 leading-relaxed mb-4 sm:mb-5 font-normal">
+			<p class="card-major-excerpt text-sm sm:text-base text-slate-600 leading-relaxed mb-4 sm:mb-5 font-normal">
 				<?php echo esc_html( $excerpt ); ?>
 			</p>
 		</div>

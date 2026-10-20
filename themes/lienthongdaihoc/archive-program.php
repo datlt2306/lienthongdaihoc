@@ -279,13 +279,13 @@ $has_active_filters  = $active_filter_count > 0;
 <main id="primary" class="site-main bg-slate-50 min-h-screen">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-8 sm:py-8 md:py-12">
 
-		<!-- ============ TOP FILTER BAR (FULL-WIDTH) ============ -->
-		<div class="bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm mb-8 transition-all">
+		<!-- ============ DESKTOP TOP FILTER BAR (FULL-WIDTH, VISIBLE ONLY ON >= MD) ============ -->
+		<div id="catalog-desktop-filter-wrapper" class="hidden md:block bg-white border border-slate-100 rounded-2xl p-5 md:p-6 shadow-sm mb-8 transition-all">
 			
 			<!-- Header inside Filter: Page Title, Found Counter & Desktop Reset Action -->
-			<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 sm:pb-5 border-b border-slate-100 gap-3">
+			<div class="flex flex-row items-center justify-between pb-4 border-b border-slate-100 gap-3">
 				<div>
 					<h2 id="catalog-heading-title" class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
 						<?php echo $active_type_term ? 'Liên thông ' . esc_html( preg_replace( '/^(hệ|liên\s+thông)\s+/iu', '', $active_type_term->name ) ) : 'Chương trình tuyển sinh Liên thông Đại học'; ?>
@@ -294,7 +294,7 @@ $has_active_filters  = $active_filter_count > 0;
 						Tìm thấy <strong id="catalog-count-display" class="text-brand-primary font-extrabold text-sm md:text-base"><?php echo esc_html( $query->found_posts ); ?></strong> chương trình phù hợp.
 					</p>
 				</div>
-				<div id="catalog-desktop-reset" class="hidden sm:block">
+				<div id="catalog-desktop-reset">
 					<?php if ( $has_active_filters ) : ?>
 						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 border border-rose-100 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]">
 							<span>✕</span> <span>Xóa tất cả bộ lọc</span>
@@ -303,68 +303,8 @@ $has_active_filters  = $active_filter_count > 0;
 				</div>
 			</div>
 
-			<!-- Mobile Filter Bar: Toggle Trigger & Active Filter Chips (Visible only on < md) -->
-			<div class="md:hidden mt-3">
-				<div class="flex items-center gap-2">
-					<button type="button" 
-							id="ltdh-mobile-filter-btn" 
-							aria-expanded="false" 
-							aria-controls="catalog-filter-body"
-							class="flex-1 flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition-all duration-200 min-h-[44px] cursor-pointer shadow-2xs <?php echo $has_active_filters ? 'bg-blue-50/90 border-blue-200/90 text-[#00308b]' : 'bg-slate-50 hover:bg-slate-100 border-slate-200/80 text-slate-700'; ?>">
-						<div class="flex items-center gap-2 min-w-0">
-							<svg class="w-4 h-4 text-current shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-							</svg>
-							<span id="ltdh-mobile-filter-btn-text">Bộ lọc &amp; Tìm kiếm</span>
-							<span id="catalog-mobile-filter-badge">
-								<?php if ( $active_filter_count > 0 ) : ?>
-									<span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[11px] font-black rounded-full bg-[#EA580C] text-white shrink-0 min-w-[20px] shadow-2xs">
-										<?php echo esc_html( $active_filter_count ); ?>
-									</span>
-								<?php endif; ?>
-							</span>
-						</div>
-						<svg id="ltdh-mobile-filter-chevron" class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-						</svg>
-					</button>
-
-					<div id="catalog-mobile-reset">
-						<?php if ( $has_active_filters ) : ?>
-							<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" 
-							   class="js-ltdh-reset-filter flex items-center justify-center gap-1 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 hover:bg-rose-100 min-h-[44px] transition-colors shrink-0"
-							   title="Xóa tất cả bộ lọc">
-								<span>✕ Xóa lọc</span>
-							</a>
-						<?php endif; ?>
-					</div>
-				</div>
-
-				<!-- Active Filter Chips (Scrollable row) -->
-				<div id="catalog-mobile-chips">
-					<?php if ( ! empty( $active_filter_items ) ) : ?>
-						<div class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pt-2.5 pb-0.5">
-							<?php foreach ( $active_filter_items as $item ) : 
-								$remove_url = remove_query_arg( $item['key'] );
-								if ( 'he' === $item['key'] ) {
-									$remove_url = home_url( '/hinh-thuc-dao-tao/' );
-									if ( ! empty( $preserved_args ) ) {
-										$remove_url = add_query_arg( $preserved_args, $remove_url );
-									}
-								}
-							?>
-								<a href="<?php echo esc_url( $remove_url ); ?>" data-filter-key="<?php echo esc_attr( $item['key'] ); ?>" class="js-ltdh-chip-remove inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200/60 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-colors shrink-0 select-none">
-									<span class="truncate max-w-[140px]"><?php echo esc_html( $item['label'] ); ?></span>
-									<span class="text-blue-400 hover:text-rose-600 font-bold ml-0.5">✕</span>
-								</a>
-							<?php endforeach; ?>
-						</div>
-					<?php endif; ?>
-				</div>
-			</div>
-
-			<!-- Filter Form Controls (Collapsible on mobile, fully visible on desktop) -->
-			<div id="catalog-filter-body" class="hidden md:block pt-4 md:pt-0">
+			<!-- Filter Form Controls (Rendered here initially on desktop SSR) -->
+			<div id="catalog-filter-body" class="pt-4 md:pt-0">
 				<?php
 				$form_action = home_url( '/hinh-thuc-dao-tao/' );
 				if ( $active_type_term ) {
@@ -384,22 +324,24 @@ $has_active_filters  = $active_filter_count > 0;
 					
 					<!-- 1. Search Box -->
 					<div class="relative sm:col-span-2 md:col-span-1">
-						<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-						</span>
-						<label for="program-search-keyword" class="sr-only">Tìm tên ngành, trường...</label>
-						<input type="text" 
-							   id="program-search-keyword"
-							   name="s" 
-							   value="<?php echo esc_attr( $selected_search ); ?>" 
-							   placeholder="Tìm tên ngành, trường..." 
-							   class="w-full pl-10 pr-4 py-2.5 border border-slate-200/60 rounded-xl text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none placeholder-slate-400 min-h-[44px] transition-all bg-slate-50/30 focus:bg-white">
+						<label for="program-search-keyword" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Tìm kiếm</label>
+						<div class="relative">
+							<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+							</span>
+							<input type="text" 
+								   id="program-search-keyword"
+								   name="s" 
+								   value="<?php echo esc_attr( $selected_search ); ?>" 
+								   placeholder="Tìm tên ngành, trường..." 
+								   class="w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-xl text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none placeholder-slate-400 min-h-[44px] transition-all bg-slate-50/50 focus:bg-white">
+						</div>
 					</div>
 
 					<!-- 2. Region / Location Select -->
 					<div>
-						<label for="program-region-select" class="sr-only">Tất cả khu vực</label>
-						<select id="program-region-select" name="khu_vuc" class="w-full py-2.5 px-3.5 border border-slate-200/60 rounded-xl text-sm font-medium bg-slate-50/30 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+						<label for="program-region-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Khu vực</label>
+						<select id="program-region-select" name="khu_vuc" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
 							<option value="">Tất cả khu vực</option>
 							<?php
 							$default_regions = [
@@ -432,9 +374,10 @@ $has_active_filters  = $active_filter_count > 0;
 						</select>
 					</div>
 
-					<!-- 2. School Select -->
+					<!-- 3. School Select -->
 					<div>
-						<select name="truong" class="w-full py-2.5 px-3.5 border border-slate-200/60 rounded-xl text-sm font-medium bg-slate-50/30 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+						<label for="program-school-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Trường đối tác</label>
+						<select id="program-school-select" name="truong" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
 							<option value="">Tất cả trường đối tác</option>
 							<?php if ( ! empty( $schools_list ) ) : ?>
 								<?php foreach ( $schools_list as $sch ) : ?>
@@ -449,9 +392,10 @@ $has_active_filters  = $active_filter_count > 0;
 						</select>
 					</div>
 
-					<!-- 3. Major Select -->
+					<!-- 4. Major Select -->
 					<div>
-						<select name="nganh" class="w-full py-2.5 px-3.5 border border-slate-200/60 rounded-xl text-sm font-medium bg-slate-50/30 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+						<label for="program-major-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Chuyên ngành</label>
+						<select id="program-major-select" name="nganh" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
 							<option value="">Tất cả chuyên ngành</option>
 							<?php if ( ! empty( $majors_list ) ) : ?>
 								<?php foreach ( $majors_list as $maj ) : ?>
@@ -463,9 +407,10 @@ $has_active_filters  = $active_filter_count > 0;
 						</select>
 					</div>
 
-					<!-- 4. Sorting Select -->
+					<!-- 5. Sorting Select -->
 					<div>
-						<select name="sort" class="w-full py-2.5 px-3.5 border border-slate-200/60 rounded-xl text-sm font-medium bg-slate-50/30 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+						<label for="program-sort-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Sắp xếp</label>
+						<select id="program-sort-select" name="sort" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
 							<option value="" <?php selected( $selected_sort, '' ); ?>>Sắp xếp: Mặc định</option>
 							<option value="title_asc" <?php selected( $selected_sort, 'title_asc' ); ?>>Tên chương trình (A-Z)</option>
 							<option value="title_desc" <?php selected( $selected_sort, 'title_desc' ); ?>>Tên chương trình (Z-A)</option>
@@ -476,115 +421,299 @@ $has_active_filters  = $active_filter_count > 0;
 				</div>
 
 				<!-- Row 2: Quick Pill Tabs for Training Types -->
-				<div id="catalog-pills-container" class="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
-					<span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1 shrink-0">Hình thức đào tạo:</span>
+				<div id="catalog-pills-container" class="pt-3 border-t border-slate-100">
+					<span class="block md:inline-block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2 md:mb-0 md:mr-2 shrink-0">Hình thức đào tạo:</span>
 					
-					<!-- All Systems Tab -->
-					<?php
-					$is_all_active = empty( $selected_type );
-					$all_url = home_url( '/hinh-thuc-dao-tao/' );
-					$preserved_args = [];
-					if ( $selected_school ) $preserved_args['truong'] = $selected_school;
-					if ( $selected_nhom )   $preserved_args['nganh']  = $selected_nhom;
-					if ( $selected_search ) $preserved_args['s']      = $selected_search;
-					if ( $selected_sort )   $preserved_args['sort']   = $selected_sort;
-					if ( ! empty( $preserved_args ) ) {
-						$all_url = add_query_arg( $preserved_args, $all_url );
-					}
-					?>
-					<a href="<?php echo esc_url( $all_url ); ?>"
-					   data-type=""
-					   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold transition-all min-h-[34px] <?php echo $is_all_active ? 'bg-brand-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'; ?>">
-						<span>Tất cả</span>
-						<span class="pill-badge text-[11px] px-1.5 py-0.2 rounded-full font-black <?php echo $is_all_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
-							<?php echo esc_html( $total_programs ); ?>
-						</span>
-					</a>
+					<div class="inline-flex flex-wrap items-center gap-1.5 sm:gap-2">
+						<!-- All Systems Tab -->
+						<?php
+						$is_all_active = empty( $selected_type );
+						$all_url = home_url( '/hinh-thuc-dao-tao/' );
+						$preserved_args = [];
+						if ( $selected_school ) $preserved_args['truong'] = $selected_school;
+						if ( $selected_nhom )   $preserved_args['nganh']  = $selected_nhom;
+						if ( $selected_search ) $preserved_args['s']      = $selected_search;
+						if ( $selected_sort )   $preserved_args['sort']   = $selected_sort;
+						if ( ! empty( $preserved_args ) ) {
+							$all_url = add_query_arg( $preserved_args, $all_url );
+						}
+						?>
+						<a href="<?php echo esc_url( $all_url ); ?>"
+						   data-type=""
+						   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold transition-all min-h-[34px] <?php echo $is_all_active ? 'bg-brand-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'; ?>">
+							<span>Tất cả</span>
+							<span class="pill-badge text-[11px] px-1.5 py-0.2 rounded-full font-black <?php echo $is_all_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+								<?php echo esc_html( $total_programs ); ?>
+							</span>
+						</a>
 
-					<!-- Dynamic Training Types Tabs (Hides systems with 0 count) -->
-					<?php if ( ! is_wp_error( $all_types ) && ! empty( $all_types ) ) : ?>
-						<?php foreach ( $all_types as $t_term ) : ?>
-							<?php
-							$t_count = $t_counts[ $t_term->slug ] ?? ( $t_counts['tu-xa'] ?? 0 );
-							$is_active = ( $selected_type === $t_term->slug || ( ( 'tu-xa' === $selected_type || 'dao-tao-tu-xa' === $selected_type ) && ( 'tu-xa' === $t_term->slug || 'dao-tao-tu-xa' === $t_term->slug ) ) );
+						<!-- Dynamic Training Types Tabs (Hides systems with 0 count) -->
+						<?php if ( ! is_wp_error( $all_types ) && ! empty( $all_types ) ) : ?>
+							<?php foreach ( $all_types as $t_term ) : ?>
+								<?php
+								$t_count = $t_counts[ $t_term->slug ] ?? ( $t_counts['tu-xa'] ?? 0 );
+								$is_active = ( $selected_type === $t_term->slug || ( ( 'tu-xa' === $selected_type || 'dao-tao-tu-xa' === $selected_type ) && ( 'tu-xa' === $t_term->slug || 'dao-tao-tu-xa' === $t_term->slug ) ) );
 
-							// Hide training types with 0 programs unless currently active
-							if ( $t_count === 0 && ! $is_active ) {
-								continue;
-							}
+								// Hide training types with 0 programs unless currently active
+								if ( $t_count === 0 && ! $is_active ) {
+									continue;
+								}
 
-							$t_link   = get_term_link( $t_term );
-							$type_url = ( ! is_wp_error( $t_link ) && ! empty( $t_link ) ) ? $t_link : home_url( '/hinh-thuc-dao-tao/' . $t_term->slug . '/' );
-							if ( ! empty( $preserved_args ) ) {
-								$type_url = add_query_arg( $preserved_args, $type_url );
-							}
-							?>
-							<a href="<?php echo esc_url( $type_url ); ?>"
-							   data-type="<?php echo esc_attr( $t_term->slug ); ?>"
-							   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold transition-all min-h-[34px] <?php echo $is_active ? 'bg-brand-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'; ?>">
-								<span><?php echo esc_html( $t_term->name ); ?></span>
-								<span class="pill-badge text-[11px] px-1.5 py-0.2 rounded-full font-black <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
-									<?php echo esc_html( $t_count ); ?>
-								</span>
-							</a>
-						<?php endforeach; ?>
+								$t_link   = get_term_link( $t_term );
+								$type_url = ( ! is_wp_error( $t_link ) && ! empty( $t_link ) ) ? $t_link : home_url( '/hinh-thuc-dao-tao/' . $t_term->slug . '/' );
+								if ( ! empty( $preserved_args ) ) {
+									$type_url = add_query_arg( $preserved_args, $type_url );
+								}
+								?>
+								<a href="<?php echo esc_url( $type_url ); ?>"
+								   data-type="<?php echo esc_attr( $t_term->slug ); ?>"
+								   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold transition-all min-h-[34px] <?php echo $is_active ? 'bg-brand-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'; ?>">
+									<span><?php echo esc_html( $t_term->name ); ?></span>
+									<span class="pill-badge text-[11px] px-1.5 py-0.2 rounded-full font-black <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+										<?php echo esc_html( $t_count ); ?>
+									</span>
+								</a>
+							<?php endforeach; ?>
+						<?php endif; ?>
+					</div>
+				</div>
+
+				</form>
+			</div><!-- #catalog-filter-body -->
+
+		</div><!-- #catalog-desktop-filter-wrapper -->
+
+		<!-- ============ MOBILE COMPACT BAR (ULTRA COMPACT, VISIBLE ONLY ON < MD) ============ -->
+		<div class="md:hidden flex items-center justify-between gap-3 mb-3 px-0.5">
+			<div class="min-w-0">
+				<p class="text-xs font-bold text-slate-500 truncate">
+					Tìm thấy <strong id="catalog-count-display-mobile" class="text-brand-primary font-black text-sm"><?php echo esc_html( $query->found_posts ); ?></strong> chương trình
+				</p>
+			</div>
+
+			<div class="flex items-center gap-2 shrink-0">
+				<div id="catalog-mobile-reset">
+					<?php if ( $has_active_filters ) : ?>
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" 
+						   class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 min-h-[38px] transition-colors"
+						   title="Xóa tất cả bộ lọc">
+							<span>✕ Xóa lọc</span>
+						</a>
 					<?php endif; ?>
 				</div>
 
-				<!-- Mobile Action Buttons (Visible inside open filter on < md) -->
-				<div class="pt-3 border-t border-slate-100 flex items-center gap-2 md:hidden">
-					<button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-[#00308b] hover:bg-blue-900 text-white font-extrabold text-sm shadow-sm transition-all flex items-center justify-center gap-2 min-h-[46px] cursor-pointer">
-						<svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-						<span>Áp dụng bộ lọc (<?php echo esc_html( $query->found_posts ); ?>)</span>
-					</button>
-					<button type="button" id="ltdh-mobile-filter-close" class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm min-h-[46px] transition-colors cursor-pointer">
-						Đóng
-					</button>
-				</div>
+				<button type="button" 
+						id="ltdh-mobile-filter-btn" 
+						aria-expanded="false" 
+						aria-controls="ltdh-filter-drawer"
+						class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border font-bold text-xs transition-all duration-200 min-h-[38px] cursor-pointer shadow-2xs <?php echo $has_active_filters ? 'bg-blue-50 border-blue-200 text-[#00308b]' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'; ?>">
+					<svg class="w-4 h-4 text-current shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+					</svg>
+					<span id="ltdh-mobile-filter-btn-text">Bộ lọc</span>
+					<span id="catalog-mobile-filter-badge">
+						<?php if ( $active_filter_count > 0 ) : ?>
+							<span class="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black rounded-full bg-[#EA580C] text-white shrink-0 min-w-[18px]">
+								<?php echo esc_html( $active_filter_count ); ?>
+							</span>
+						<?php endif; ?>
+					</span>
+				</button>
+			</div>
+		</div>
 
-			</form>
-		</div><!-- #catalog-filter-body -->
+		<!-- Mobile Active Filter Chips (Scrollable row) -->
+		<div id="catalog-mobile-chips" class="md:hidden -mt-1 mb-3">
+			<?php if ( ! empty( $active_filter_items ) ) : ?>
+				<div class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1">
+					<?php foreach ( $active_filter_items as $item ) : 
+						$remove_url = remove_query_arg( $item['key'] );
+						if ( 'he' === $item['key'] ) {
+							$remove_url = home_url( '/hinh-thuc-dao-tao/' );
+							if ( ! empty( $preserved_args ) ) {
+								$remove_url = add_query_arg( $preserved_args, $remove_url );
+							}
+						}
+					?>
+						<a href="<?php echo esc_url( $remove_url ); ?>" data-filter-key="<?php echo esc_attr( $item['key'] ); ?>" class="js-ltdh-chip-remove inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-blue-50 text-blue-900 border border-blue-200/60 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-colors shrink-0 select-none">
+							<span class="truncate max-w-[140px]"><?php echo esc_html( $item['label'] ); ?></span>
+							<span class="text-blue-400 hover:text-rose-600 font-bold ml-0.5">✕</span>
+						</a>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
+		</div>
+
+		<!-- ============ OFF-CANVAS FILTER DRAWER (SLIDES IN FROM LEFT ON MOBILE) ============ -->
+		<div id="ltdh-filter-drawer-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[70] transition-opacity duration-300 opacity-0 pointer-events-none md:hidden touch-none" style="touch-action: none;" aria-hidden="true"></div>
+
+		<aside id="ltdh-filter-drawer" 
+		       class="fixed inset-y-0 left-0 w-[86%] max-w-[340px] bg-white shadow-2xl z-[80] transform -translate-x-full transition-transform duration-300 ease-out flex flex-col md:hidden"
+		       role="dialog" 
+		       aria-modal="true" 
+		       aria-label="Bộ lọc tìm kiếm chương trình">
+
+			<!-- Drawer Top Header -->
+			<div class="px-4 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/90 shrink-0 touch-none" style="touch-action: none;">
+				<div class="flex items-center gap-2">
+					<svg class="w-5 h-5 text-brand-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+					</svg>
+					<h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Bộ lọc chương trình</h3>
+				</div>
+				<button type="button" 
+						id="ltdh-filter-drawer-close" 
+						class="p-2 -mr-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+						aria-label="Đóng bộ lọc">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+				</button>
+			</div>
+
+			<!-- Drawer Scrollable Content Wrapper -->
+			<div id="catalog-drawer-filter-wrapper" class="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4" style="overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
+				<!-- #catalog-filter-body relocated here on mobile via JS -->
+			</div>
+
+			<!-- Drawer Sticky Footer -->
+			<div class="p-3.5 border-t border-slate-100 bg-white flex items-center gap-2.5 shrink-0 shadow-lg touch-none" style="touch-action: none;">
+				<button type="button" 
+						id="ltdh-drawer-reset-btn"
+						class="js-ltdh-reset-filter flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs text-center transition-all cursor-pointer">
+					Xóa lọc
+				</button>
+				<button type="button" 
+						id="ltdh-drawer-apply-btn" 
+						class="flex-2 py-2.5 px-4 rounded-xl bg-[#00308b] hover:bg-blue-900 active:scale-95 text-white font-extrabold text-xs text-center shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+					<span>Áp dụng</span>
+					<span class="js-filter-count-badge font-bold">(<?php echo esc_html( $query->found_posts ); ?>)</span>
+				</button>
+			</div>
+		</aside>
 
 		<script>
 		(function() {
-			function initMobileFilter() {
-				var btn = document.getElementById('ltdh-mobile-filter-btn');
-				var body = document.getElementById('catalog-filter-body');
-				var chevron = document.getElementById('ltdh-mobile-filter-chevron');
-				var btnText = document.getElementById('ltdh-mobile-filter-btn-text');
-				var closeBtn = document.getElementById('ltdh-mobile-filter-close');
-				if (!btn || !body || btn._bound) return;
-				btn._bound = true;
+			function setupFilterDrawer() {
+				var openBtn = document.getElementById('ltdh-mobile-filter-btn');
+				var closeBtn = document.getElementById('ltdh-filter-drawer-close');
+				var drawer = document.getElementById('ltdh-filter-drawer');
+				var overlay = document.getElementById('ltdh-filter-drawer-overlay');
+				var applyBtn = document.getElementById('ltdh-drawer-apply-btn');
+				var desktopWrapper = document.getElementById('catalog-desktop-filter-wrapper');
+				var drawerWrapper = document.getElementById('catalog-drawer-filter-wrapper');
+				var filterBody = document.getElementById('catalog-filter-body');
 
-				function toggleFilter() {
-					var isHidden = body.classList.contains('hidden');
-					if (isHidden) {
-						body.classList.remove('hidden');
-						btn.setAttribute('aria-expanded', 'true');
-						if (chevron) chevron.classList.add('rotate-180');
-						if (btnText) btnText.textContent = 'Thu gọn bộ lọc';
-					} else {
-						body.classList.add('hidden');
-						btn.setAttribute('aria-expanded', 'false');
-						if (chevron) chevron.classList.remove('rotate-180');
-						if (btnText) btnText.textContent = 'Bộ lọc & Tìm kiếm';
+				var touchStartY = 0;
+				function onTouchStart(e) {
+					if (e.touches && e.touches.length === 1) {
+						touchStartY = e.touches[0].clientY;
 					}
 				}
 
-				btn.addEventListener('click', toggleFilter);
-				if (closeBtn) {
-					closeBtn.addEventListener('click', toggleFilter);
+				function onTouchMoveLock(e) {
+					var scrollable = e.target.closest('#catalog-drawer-filter-wrapper');
+					if (!scrollable) {
+						if (e.cancelable) e.preventDefault();
+						return;
+					}
+					if (e.touches && e.touches.length === 1) {
+						var currentY = e.touches[0].clientY;
+						var deltaY = currentY - touchStartY;
+						if (scrollable.scrollTop <= 0 && deltaY > 0) {
+							if (e.cancelable) e.preventDefault();
+							return;
+						}
+						var maxScroll = scrollable.scrollHeight - scrollable.clientHeight;
+						if (scrollable.scrollTop >= maxScroll && deltaY < 0) {
+							if (e.cancelable) e.preventDefault();
+							return;
+						}
+					}
 				}
+
+				function relocate() {
+					if (!filterBody) return;
+					if (window.innerWidth < 768) {
+						if (drawerWrapper && !drawerWrapper.contains(filterBody)) {
+							drawerWrapper.appendChild(filterBody);
+						}
+					} else {
+						if (desktopWrapper && !desktopWrapper.contains(filterBody)) {
+							desktopWrapper.appendChild(filterBody);
+						}
+						closeDrawer();
+					}
+				}
+
+				function openDrawer() {
+					if (!drawer || !overlay) return;
+					relocate();
+					drawer.classList.remove('-translate-x-full');
+					drawer.classList.add('translate-x-0');
+					overlay.classList.remove('opacity-0', 'pointer-events-none');
+					overlay.classList.add('opacity-100', 'pointer-events-auto');
+					document.documentElement.classList.add('overflow-hidden');
+					document.body.classList.add('overflow-hidden');
+					document.addEventListener('touchstart', onTouchStart, { passive: true });
+					document.addEventListener('touchmove', onTouchMoveLock, { passive: false });
+					if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
+				}
+
+				function closeDrawer() {
+					if (!drawer || !overlay) return;
+					drawer.classList.remove('translate-x-0');
+					drawer.classList.add('-translate-x-full');
+					overlay.classList.remove('opacity-100', 'pointer-events-auto');
+					overlay.classList.add('opacity-0', 'pointer-events-none');
+					document.documentElement.classList.remove('overflow-hidden');
+					document.body.classList.remove('overflow-hidden');
+					document.removeEventListener('touchstart', onTouchStart);
+					document.removeEventListener('touchmove', onTouchMoveLock);
+					if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
+				}
+
+				if (overlay) {
+					overlay.addEventListener('touchmove', function(e) {
+						if (e.cancelable) e.preventDefault();
+					}, { passive: false });
+					overlay.addEventListener('wheel', function(e) {
+						if (e.cancelable) e.preventDefault();
+					}, { passive: false });
+				}
+
+				relocate();
+				window.addEventListener('resize', relocate);
+
+				if (openBtn && !openBtn._drawerBound) {
+					openBtn._drawerBound = true;
+					openBtn.addEventListener('click', openDrawer);
+				}
+				if (closeBtn && !closeBtn._drawerBound) {
+					closeBtn._drawerBound = true;
+					closeBtn.addEventListener('click', closeDrawer);
+				}
+				if (overlay && !overlay._drawerBound) {
+					overlay._drawerBound = true;
+					overlay.addEventListener('click', closeDrawer);
+				}
+				if (applyBtn && !applyBtn._drawerBound) {
+					applyBtn._drawerBound = true;
+					applyBtn.addEventListener('click', closeDrawer);
+				}
+				document.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') closeDrawer();
+				});
+
+				window.ltdhCloseFilterDrawer = closeDrawer;
+				window.ltdhOpenFilterDrawer = openDrawer;
 			}
 
 			if (document.readyState === 'loading') {
-				document.addEventListener('DOMContentLoaded', initMobileFilter);
+				document.addEventListener('DOMContentLoaded', setupFilterDrawer);
 			} else {
-				initMobileFilter();
+				setupFilterDrawer();
 			}
 		})();
 		</script>
-	</div>
 
 		<!-- ============ PROGRAM RESULTS GRID (2 COLUMNS ON MOBILE, 3 ON DESKTOP) ============ -->
 		<div id="program-results-wrapper" class="relative">
@@ -669,27 +798,31 @@ $has_active_filters  = $active_filter_count > 0;
 								<div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/10 to-slate-900/40 pointer-events-none"></div>
 								
 								<!-- Badges Floating on Cover Image: Status (Left) & Training Type (Right) -->
-								<div class="absolute top-2 left-2 right-2 md:top-2.5 md:left-2.5 md:right-2.5 z-10 pointer-events-none flex items-center justify-between gap-1.5">
-									<div class="flex items-center gap-1">
+								<div class="absolute top-2 left-2 right-2 md:top-2.5 md:left-2.5 md:right-2.5 z-10 pointer-events-none flex items-center justify-between gap-1.5 min-w-0">
+									<div class="flex items-center shrink-0">
 										<?php if ( 'tam-ngung' === $admission_status ) : ?>
-											<span class="bg-slate-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1 backdrop-blur-md shrink-0">
-												<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-												Tạm dừng
+											<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-slate-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Tạm dừng tuyển sinh" aria-label="Tạm dừng tuyển sinh">
+												<span class="w-2.5 h-2.5 sm:w-2 sm:h-2 rounded-full bg-slate-400 shadow-sm ring-1 ring-white/80"></span>
+												<span class="hidden sm:inline uppercase tracking-wider">Tạm dừng</span>
 											</span>
 										<?php elseif ( 'sap-mo' === $admission_status ) : ?>
-											<span class="bg-amber-500/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md backdrop-blur-md shrink-0">
-												Sắp mở
+											<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-amber-500/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Sắp mở đợt mới" aria-label="Sắp mở đợt mới">
+												<span class="w-2.5 h-2.5 sm:w-2 sm:h-2 rounded-full bg-amber-400 shadow-sm ring-1 ring-white/80"></span>
+												<span class="hidden sm:inline uppercase tracking-wider">Sắp mở</span>
 											</span>
 										<?php else : ?>
-											<span class="bg-emerald-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1 backdrop-blur-md shrink-0">
-												<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-												Tuyển sinh
+											<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-emerald-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Đang tuyển sinh" aria-label="Đang tuyển sinh">
+												<span class="relative flex h-2.5 w-2.5 sm:h-2 sm:w-2">
+													<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+													<span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-2 sm:w-2 bg-emerald-500 sm:bg-white shadow-sm ring-1 ring-white/80"></span>
+												</span>
+												<span class="hidden sm:inline uppercase tracking-wider">Tuyển sinh</span>
 											</span>
 										<?php endif; ?>
 									</div>
 
 									<?php if ( ! empty( $clean_type_name ) ) : ?>
-										<span class="inline-flex items-center px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold shrink-0 tracking-wide <?php echo esc_attr( $badge_class ); ?>">
+										<span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold shrink-0 tracking-wide truncate max-w-[calc(100%-32px)] sm:max-w-none <?php echo esc_attr( $badge_class ); ?>">
 											<?php echo esc_html( $clean_type_name ); ?>
 										</span>
 									<?php endif; ?>

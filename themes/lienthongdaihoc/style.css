@@ -1407,6 +1407,11 @@ div#ez-toc-container.toc_close .ez-toc-title-toggle a.ez-toc-toggle .arrow-unsor
 	transform: rotate(180deg) !important;
 }
 
+#ez-toc-container.toc_close nav,
+div#ez-toc-container.toc_close nav {
+	display: none !important;
+}
+
 #ez-toc-container nav {
 	display: block !important;
 	width: 100% !important;
@@ -1519,6 +1524,20 @@ details summary {
 }
 details[open] summary svg.transition-transform {
 	transform: rotate(180deg);
+}
+
+/* Card Major Excerpt - exactly 3 lines */
+.card-major-excerpt {
+	display: -webkit-box !important;
+	-webkit-box-orient: vertical !important;
+	-webkit-line-clamp: 3 !important;
+	overflow: hidden !important;
+}
+
+@media (max-width: 639px) {
+	.card-major-excerpt {
+		display: none !important;
+	}
 }
 
 

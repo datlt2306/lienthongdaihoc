@@ -40,6 +40,9 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<div class="prose prose-slate max-w-none text-slate-700 text-base leading-relaxed">
 						<?php the_content(); ?>
 					</div>
+
+					<!-- Share Component -->
+					<?php get_template_part( 'template-parts/post-share' ); ?>
 				</article>
 			</div>
 

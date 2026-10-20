@@ -42,7 +42,9 @@ function ltdh_eztoc_get_default_config(): array {
 
 		// Tính năng tương tác (Thu gọn / Mở rộng / Cuộn mượt)
 		'visibility'                 => 1,            // Cho phép người dùng bấm nút Thu gọn / Mở rộng
-		'visibility_hide_by_default' => 0,            // Mặc định luôn mở sẵn khi tải trang
+		'visibility_hide_by_default' => 1,            // Mặc định luôn đóng (thu gọn) khi tải trang
+		'visibility_hide_by_device'  => [ 'mobile', 'desktop' ], // Đóng trên cả mobile và desktop
+		'css_container_class'        => 'toc_close',  // Khởi tạo container ở trạng thái đóng (toc_close)
 		'smooth_scroll'              => 1,            // Bật hiệu ứng cuộn mượt khi click liên kết
 		'smooth_scroll_offset'       => 120,          // Bù trừ 120px cho fixed header & navigation trên desktop
 		'mobile_smooth_scroll_offset'=> 100,          // Bù trừ 100px trên thiết bị di động
@@ -65,7 +67,7 @@ function ltdh_eztoc_sync_database_settings(): void {
 		return;
 	}
 
-	$cache_key = 'ltdh_eztoc_config_synced_v1';
+	$cache_key = 'ltdh_eztoc_config_synced_v2';
 	if ( get_transient( $cache_key ) ) {
 		return;
 	}
@@ -91,7 +93,21 @@ function ltdh_eztoc_sync_database_settings(): void {
 		}
 	}
 
-	// 2. Đảm bảo các thông số trải nghiệm quan trọng luôn chuẩn
+	// 2. Ép buộc cấu hình mặc định là đóng (thu gọn) theo yêu cầu
+	if ( empty( $current_opt['visibility_hide_by_default'] ) ) {
+		$current_opt['visibility_hide_by_default'] = 1;
+		$updated                                   = true;
+	}
+	if ( empty( $current_opt['visibility_hide_by_device'] ) || ! is_array( $current_opt['visibility_hide_by_device'] ) ) {
+		$current_opt['visibility_hide_by_device'] = [ 'mobile', 'desktop' ];
+		$updated                                  = true;
+	}
+	if ( empty( $current_opt['css_container_class'] ) || false === strpos( (string) $current_opt['css_container_class'], 'toc_close' ) ) {
+		$current_opt['css_container_class'] = trim( ( $current_opt['css_container_class'] ?? '' ) . ' toc_close' );
+		$updated                            = true;
+	}
+
+	// 3. Đảm bảo các thông số trải nghiệm quan trọng luôn chuẩn
 	$critical_keys = [
 		'position',
 		'start',
@@ -102,7 +118,6 @@ function ltdh_eztoc_sync_database_settings(): void {
 		'show_hierarchy',
 		'counter',
 		'visibility',
-		'visibility_hide_by_default',
 		'smooth_scroll',
 		'smooth_scroll_offset',
 		'mobile_smooth_scroll_offset',
@@ -152,6 +167,13 @@ function ltdh_eztoc_filter_runtime_options( $options ) {
 		$options['theme'] = $defaults['theme'];
 	}
 
+	// Luôn đảm bảo mặc định đóng (thu gọn) trên runtime
+	$options['visibility_hide_by_default'] = true;
+	$options['visibility_hide_by_device']  = [ 'mobile', 'desktop' ];
+	if ( empty( $options['css_container_class'] ) || false === strpos( (string) $options['css_container_class'], 'toc_close' ) ) {
+		$options['css_container_class'] = trim( ( $options['css_container_class'] ?? '' ) . ' toc_close' );
+	}
+
 	return $options;
 }
 
@@ -168,6 +190,17 @@ function ltdh_eztoc_filter_individual_option( $value, $key, $default ) {
 		case 'auto_insert_post_types':
 			$existing = is_array( $value ) ? $value : [];
 			return array_values( array_unique( array_merge( $existing, $defaults[ $key ] ) ) );
+
+		case 'visibility_hide_by_default':
+			return true;
+
+		case 'visibility_hide_by_device':
+			return [ 'mobile', 'desktop' ];
+
+		case 'css_container_class':
+			return ! empty( $value ) && false !== strpos( (string) $value, 'toc_close' )
+				? $value
+				: trim( ( (string) $value ) . ' toc_close' );
 
 		case 'smooth_scroll_offset':
 			return ! empty( $value ) ? (int) $value : $defaults['smooth_scroll_offset'];

@@ -86,7 +86,7 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 					'label' => 'Ngành học',
 					'key' => 'major',
 					'render' => function( $item ) {
-						return $item['major'] ? esc_html( $item['major']['title'] . ' (' . $item['major']['code'] . ')' ) : '<span class="text-slate-300 italic">Chưa cập nhật</span>';
+						return $item['major'] ? esc_html( $item['major']['title'] ) : '<span class="text-slate-300 italic">Chưa cập nhật</span>';
 					}
 				],
 				[

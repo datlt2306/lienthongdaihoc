@@ -513,27 +513,31 @@ function ltdh_ajax_filter_programs() {
 						<div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/10 to-slate-900/40 pointer-events-none"></div>
 						
 						<!-- Badges Floating on Cover Image: Status (Left) & Training Type (Right) -->
-						<div class="absolute top-2 left-2 right-2 md:top-2.5 md:left-2.5 md:right-2.5 z-10 pointer-events-none flex items-center justify-between gap-1.5">
-							<div class="flex items-center gap-1">
+						<div class="absolute top-2 left-2 right-2 md:top-2.5 md:left-2.5 md:right-2.5 z-10 pointer-events-none flex items-center justify-between gap-1.5 min-w-0">
+							<div class="flex items-center shrink-0">
 								<?php if ( 'tam-ngung' === $admission_status ) : ?>
-									<span class="bg-slate-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1 backdrop-blur-md shrink-0">
-										<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-										Tạm dừng
+									<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-slate-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Tạm dừng tuyển sinh" aria-label="Tạm dừng tuyển sinh">
+										<span class="w-2.5 h-2.5 sm:w-2 sm:h-2 rounded-full bg-slate-400 shadow-sm ring-1 ring-white/80"></span>
+										<span class="hidden sm:inline uppercase tracking-wider">Tạm dừng</span>
 									</span>
 								<?php elseif ( 'sap-mo' === $admission_status ) : ?>
-									<span class="bg-amber-500/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md backdrop-blur-md shrink-0">
-										Sắp mở
+									<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-amber-500/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Sắp mở đợt mới" aria-label="Sắp mở đợt mới">
+										<span class="w-2.5 h-2.5 sm:w-2 sm:h-2 rounded-full bg-amber-400 shadow-sm ring-1 ring-white/80"></span>
+										<span class="hidden sm:inline uppercase tracking-wider">Sắp mở</span>
 									</span>
 								<?php else : ?>
-									<span class="bg-emerald-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1 backdrop-blur-md shrink-0">
-										<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-										Tuyển sinh
+									<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-emerald-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Đang tuyển sinh" aria-label="Đang tuyển sinh">
+										<span class="relative flex h-2.5 w-2.5 sm:h-2 sm:w-2">
+											<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+											<span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-2 sm:w-2 bg-emerald-500 sm:bg-white shadow-sm ring-1 ring-white/80"></span>
+										</span>
+										<span class="hidden sm:inline uppercase tracking-wider">Tuyển sinh</span>
 									</span>
 								<?php endif; ?>
 							</div>
 
 							<?php if ( ! empty( $clean_type_name ) ) : ?>
-								<span class="inline-flex items-center px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold shrink-0 tracking-wide <?php echo esc_attr( $badge_class ); ?>">
+								<span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold shrink-0 tracking-wide truncate max-w-[calc(100%-32px)] sm:max-w-none <?php echo esc_attr( $badge_class ); ?>">
 									<?php echo esc_html( $clean_type_name ); ?>
 								</span>
 							<?php endif; ?>

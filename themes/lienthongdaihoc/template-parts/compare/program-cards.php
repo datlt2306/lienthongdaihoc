@@ -116,7 +116,7 @@ $sections = [
 								
 								// Resolve value
 								if ( $attr['key'] === 'major' ) {
-									$value = $item['major'] ? esc_html( $item['major']['title'] . ' (' . $item['major']['code'] . ')' ) : '<span class="text-slate-300 italic text-xs">Chưa cập nhật</span>';
+									$value = $item['major'] ? esc_html( $item['major']['title'] ) : '<span class="text-slate-300 italic text-xs">Chưa cập nhật</span>';
 								} elseif ( in_array( $attr['key'], [ 'admission_requirements', 'required_documents', 'target_students', 'diploma_value', 'advantages', 'disadvantages' ], true ) ) {
 									$val = $item[ $attr['key'] ] ?? '';
 									$value = ltdh_compare_format_checklist( $val );

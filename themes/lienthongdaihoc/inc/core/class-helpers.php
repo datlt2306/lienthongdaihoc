@@ -1689,9 +1689,9 @@ function ltdh_breadcrumb(): void {
 	}
 
 	if ( ! empty( $html ) ) {
-		echo '<div class="ltdh-breadcrumb bg-slate-50/60 border-b border-slate-100 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-1.5">';
+		echo '<div class="ltdh-breadcrumb bg-slate-50/60 border-b border-slate-100 "><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-1.5">';
 		echo $html;
-		echo '</div>';
+		echo '</div></div>';
 	}
 }
 
@@ -3841,7 +3841,7 @@ function ltdh_get_program_discipline_name( int $program_id = 0 ): string {
 	// 2. Mặc định ăn theo tiêu đề bài viết (post_title) của chương trình
 	$raw_title = get_the_title( $program_id );
 	if ( ! empty( $raw_title ) ) {
-		$clean_title = (string) $raw_title;
+		$clean_title = html_entity_decode( wp_strip_all_tags( (string) $raw_title ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 
 		// Bỏ tên trường hoặc mã trường ở đuôi nếu có (VD: " - ĐH GTVT", " - TMU")
 		$school_id   = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
@@ -3849,15 +3849,22 @@ function ltdh_get_program_discipline_name( int $program_id = 0 ): string {
 		$school_code = $school_id ? ( ( function_exists( 'get_field' ) ? get_field( 'school_code', $school_id ) : '' ) ?: get_post_meta( $school_id, 'school_code', true ) ) : '';
 
 		if ( $school_name ) {
-			$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_title );
+			$school_name = html_entity_decode( wp_strip_all_tags( (string) $school_name ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 		}
-		if ( ! empty( $school_code ) ) {
-			$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_title );
-		}
-		$clean_title = preg_replace( '/\s*[-–—]\s*(?:ĐH|Trường ĐH|Đại học|Viện ĐH)[^)]*$/iu', '', $clean_title );
 
-		// Bỏ hệ đào tạo trong ngoặc đơn ở cuối nếu có (VD: "(Từ xa)", "(Chính quy)", "(Đào tạo từ xa)")
-		$clean_title = preg_replace( '/\s*\((?:hệ\s+)?(?:từ xa|đào tạo từ xa|vừa học vừa làm|vhvl|chính quy|online|tập trung|liên thông)[^)]*\)$/iu', '', $clean_title );
+		for ( $i = 0; $i < 3; $i++ ) {
+			if ( $school_name ) {
+				$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_name, '/' ) . '$/iu', '', $clean_title );
+			}
+			if ( ! empty( $school_code ) ) {
+				$clean_title = preg_replace( '/\s*[-–—]\s*' . preg_quote( $school_code, '/' ) . '$/iu', '', $clean_title );
+			}
+			$clean_title = preg_replace( '/\s*[-–—]\s*(?:ĐH|Trường ĐH|Đại học|Viện ĐH)[^)]*$/iu', '', $clean_title );
+
+			// Bỏ hệ đào tạo trong ngoặc đơn ở cuối nếu có (VD: "(Từ xa)", "(Chính quy)", "(Đào tạo từ xa)")
+			$clean_title = preg_replace( '/\s*\((?:hệ\s+)?(?:từ xa|đào tạo từ xa|vừa học vừa làm|vhvl|chính quy|online|tập trung|liên thông)[^)]*\)$/iu', '', $clean_title );
+			$clean_title = trim( $clean_title, " -–—\t\n\r\0\x0B" );
+		}
 
 		// Bỏ tiền tố tuyển sinh, liên thông, cử nhân, kỹ sư
 		$clean_title = preg_replace( '/^(?:tuyển sinh\s+)+/iu', '', $clean_title );

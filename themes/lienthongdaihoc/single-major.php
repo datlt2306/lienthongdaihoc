@@ -657,8 +657,9 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 							<?php foreach ( $related_majors as $rel_major ) : 
 								$rel_id    = is_object( $rel_major ) ? $rel_major->ID : (int) $rel_major;
 								$rel_title = get_the_title( $rel_id );
-								$rel_code  = get_field( 'major_code', $rel_id );
 								$rel_url   = get_permalink( $rel_id );
+								$rel_terms = get_the_terms( $rel_id, 'major_cat' );
+								$rel_cat   = ( ! empty( $rel_terms ) && ! is_wp_error( $rel_terms ) ) ? $rel_terms[0]->name : 'Chương trình liên thông';
 							?>
 								<a href="<?php echo esc_url( $rel_url ); ?>" class="group p-3.5 rounded-xl border border-slate-200/80 hover:border-[#00308b] hover:shadow-xs transition-all bg-slate-50/50 flex items-center gap-3">
 									<div class="w-10 h-10 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center font-bold text-base shrink-0 group-hover:bg-[#00308b] group-hover:text-white transition-colors">
@@ -666,9 +667,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 									</div>
 									<div class="min-w-0 flex-1">
 										<h3 class="font-bold text-slate-800 text-xs sm:text-sm group-hover:text-[#00308b] transition-colors truncate"><?php echo esc_html( $rel_title ); ?></h3>
-										<?php if ( $rel_code ) : ?>
-											<span class="text-[10px] text-slate-400 font-medium">Mã ngành: <?php echo esc_html( $rel_code ); ?></span>
-										<?php endif; ?>
+										<span class="text-[11px] text-slate-400 font-medium"><?php echo esc_html( $rel_cat ); ?></span>
 									</div>
 								</a>
 							<?php endforeach; ?>

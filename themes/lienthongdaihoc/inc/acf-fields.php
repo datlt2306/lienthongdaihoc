@@ -882,6 +882,10 @@ add_filter( 'acf/prepare_field/name=career_opportunities', '__return_false' );
 add_filter( 'acf/prepare_field/key=field_major_entry_roadmaps', '__return_false' );
 add_filter( 'acf/prepare_field/name=major_entry_roadmaps', '__return_false' );
 
+// Remove/hide 'Mã ngành' (major_code) from Major CPT in admin area (Liên thông không dùng mã xét tuyển)
+add_filter( 'acf/prepare_field/key=field_major_code', '__return_false' );
+add_filter( 'acf/prepare_field/name=major_code', '__return_false' );
+
 // Remove duplicate and unused eligibility meta fields (use standard Taxonomies & pure admission requirements instead)
 add_filter( 'acf/prepare_field/key=field_elig_campuses', '__return_false' );
 add_filter( 'acf/prepare_field/name=elig_campuses', '__return_false' );
@@ -915,6 +919,12 @@ function ltdh_remove_support_services_field( $field ) {
 		return false;
 	}
 	return $field;
+}
+
+// Admin CSS to hide any residual major_code field elements
+add_action( 'admin_head', 'ltdh_hide_major_code_admin_css' );
+function ltdh_hide_major_code_admin_css() {
+	echo '<style>.acf-field[data-name="major_code"], .acf-field[data-key="field_major_code"] { display: none !important; }</style>';
 }
 
 
