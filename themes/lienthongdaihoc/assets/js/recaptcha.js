@@ -216,6 +216,11 @@
 			return;
 		}
 
+		// Skip Contact Form 7 forms (CF7 handles its own AJAX submissions and reCAPTCHA)
+		if ((form.classList && form.classList.contains('wpcf7-form')) || form.querySelector('input[name="_wpcf7"]')) {
+			return;
+		}
+
 		// Skip AJAX forms that handle their own submissions and tokens
 		var ajaxFormIds = [
 			'ltdh-lead-magnet-form',

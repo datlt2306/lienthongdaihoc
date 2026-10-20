@@ -656,13 +656,23 @@ function ltdh_handle_native_form_submit() {
 		return;
 	}
 
+	// Bỏ qua nếu đây là Contact Form 7 (CF7 xử lý độc lập qua hook riêng của CF7)
+	if ( isset( $_POST['_wpcf7'] ) || isset( $_POST['_wpcf7_version'] ) || isset( $_POST['_wpcf7_unit_tag'] ) ) {
+		return;
+	}
+
+	// Chỉ xử lý native form khi có token nonce của native form
+	if ( ! isset( $_POST['ltdh_native_lead_nonce'] ) ) {
+		return;
+	}
+
 	if ( ! isset( $_POST['your-name'] ) || ! isset( $_POST['your-phone'] ) ) {
 		return;
 	}
 
 	// 1. Kiểm tra xác thực WordPress CSRF Nonce Token bắt buộc
-	$nonce = isset( $_POST['ltdh_native_lead_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ltdh_native_lead_nonce'] ) ) : '';
-	if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'ltdh_native_lead_submit_action' ) ) {
+	$nonce = sanitize_text_field( wp_unslash( $_POST['ltdh_native_lead_nonce'] ) );
+	if ( ! wp_verify_nonce( $nonce, 'ltdh_native_lead_submit_action' ) ) {
 		wp_die(
 			esc_html__( 'Phiên làm việc bảo mật đã hết hạn hoặc yêu cầu không hợp lệ. Vui lòng tải lại trang và thử lại.', 'lienthongdaihoc' ),
 			esc_html__( 'Lỗi Bảo Mật CSRF', 'lienthongdaihoc' ),
