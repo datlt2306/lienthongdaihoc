@@ -44,7 +44,7 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 
 	foreach ($menu_items as $mi) {
 		$item_path = untrailingslashit($mi['url']);
-		if ($current_path === $item_path || strpos($current_path, $item_path) === 0) {
+		if ($item_path !== '' && ($current_path === $item_path || strpos($current_path, $item_path . '/') === 0)) {
 			$active_parent = $mi['url'];
 			break;
 		}
@@ -71,26 +71,30 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 			if ( $is_mega && ! empty( $mega_data ) ) {
 				$has_sub = true;
 			}
-			$li_classes = 'menu-item' . ($is_active ? ' current-menu-item' : '') . ($has_sub ? ' menu-item-has-children' : '') . ($is_mega ? ' menu-item-mega-menu' : '');
+			$is_mobile_open = ( $is_active && $has_sub && $location === 'mobile' );
+			$li_classes = 'menu-item' . ($is_active ? ' current-menu-item current-menu-ancestor' : '') . ($has_sub ? ' menu-item-has-children' : '') . ($is_mega ? ' menu-item-mega-menu' : '') . ($is_mobile_open ? ' is-open' : '');
 		?>
 			<li class="<?php echo esc_attr(trim($li_classes)); ?>">
 				<?php if ($is_mega && ! empty($mega_data)) : ?>
 					<?php if ($location === 'mobile') : ?>
 						<div class="mobile-menu-item-row">
 							<a href="<?php echo esc_url(home_url($mi['url'])); ?>"><?php echo esc_html($mi['label']); ?></a>
-							<button type="button" class="mobile-submenu-toggle" aria-expanded="false" aria-label="Mở rộng menu con" onclick="ltdhToggleSubmenu(this, event)">
+							<button type="button" class="mobile-submenu-toggle" aria-expanded="<?php echo $is_mobile_open ? 'true' : 'false'; ?>" aria-label="Mở rộng menu con" onclick="ltdhToggleSubmenu(this, event)">
 								<svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
 								</svg>
 							</button>
 						</div>
 						<ul class="sub-menu">
-							<?php foreach ($mega_data as $cat) : ?>
-								<li class="menu-item menu-item-has-children menu-item-category">
+							<?php foreach ($mega_data as $cat) : 
+								$is_cat_active = ( ! empty( $route_info['major_cat_slug'] ) && $cat['slug'] === $route_info['major_cat_slug'] );
+								$cat_li_class  = 'menu-item menu-item-has-children menu-item-category' . ( $is_cat_active ? ' current-menu-ancestor is-open' : '' );
+							?>
+								<li class="<?php echo esc_attr( $cat_li_class ); ?>">
 									<div class="mobile-menu-item-row">
 										<a href="<?php echo esc_url($cat['url']); ?>"><?php echo esc_html($cat['name']); ?></a>
 										<?php if (! empty($cat['majors'])) : ?>
-											<button type="button" class="mobile-submenu-toggle" aria-expanded="false" aria-label="Mở rộng nhóm ngành" onclick="ltdhToggleSubmenu(this, event)">
+											<button type="button" class="mobile-submenu-toggle" aria-expanded="<?php echo $is_cat_active ? 'true' : 'false'; ?>" aria-label="Mở rộng nhóm ngành" onclick="ltdhToggleSubmenu(this, event)">
 												<svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
 												</svg>
@@ -102,8 +106,17 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 										$has_more       = count($cat['majors']) > 5;
 									?>
 										<ul class="sub-menu">
-											<?php foreach ($visible_majors as $maj) : ?>
-												<li class="menu-item">
+											<?php foreach ($visible_majors as $maj) : 
+												$is_maj_active = ( $route_info['is_major'] && ! empty( $route_info['major_id'] ) && (int) ( $maj['id'] ?? 0 ) === (int) $route_info['major_id'] );
+												if ( ! $is_maj_active && $route_info['is_major'] && ! empty( $maj['url'] ) ) {
+													$maj_p = untrailingslashit( parse_url( $maj['url'], PHP_URL_PATH ) );
+													if ( $maj_p === ( $route_info['path'] ?? '' ) ) {
+														$is_maj_active = true;
+													}
+												}
+												$maj_class = 'menu-item' . ( $is_maj_active ? ' current-menu-item' : '' );
+											?>
+												<li class="<?php echo esc_attr( $maj_class ); ?>">
 													<div class="mobile-menu-item-row">
 														<a href="<?php echo esc_url($maj['url']); ?>"><?php echo esc_html($maj['title']); ?></a>
 													</div>
@@ -134,8 +147,11 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 					<?php else : ?>
 						<a href="<?php echo esc_url(home_url($mi['url'])); ?>"><?php echo esc_html($mi['label']); ?></a>
 						<ul class="sub-menu">
-							<?php foreach ($mega_data as $cat) : ?>
-								<li class="menu-item menu-item-has-children menu-item-category">
+							<?php foreach ($mega_data as $cat) : 
+								$is_cat_active = ( ! empty( $route_info['major_cat_slug'] ) && $cat['slug'] === $route_info['major_cat_slug'] );
+								$cat_li_class  = 'menu-item menu-item-has-children menu-item-category' . ( $is_cat_active ? ' current-menu-ancestor' : '' );
+							?>
+								<li class="<?php echo esc_attr( $cat_li_class ); ?>">
 									<a href="<?php echo esc_url($cat['url']); ?>" class="mega-cat-header-link">
 										<span class="mega-cat-icon"><?php echo ltdh_get_major_cat_icon($cat['slug']); ?></span>
 										<span class="mega-cat-info">
@@ -153,8 +169,17 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 										$has_more       = count($cat['majors']) > 5;
 									?>
 										<ul class="sub-menu">
-											<?php foreach ($visible_majors as $maj) : ?>
-												<li class="menu-item">
+											<?php foreach ($visible_majors as $maj) : 
+												$is_maj_active = ( $route_info['is_major'] && ! empty( $route_info['major_id'] ) && (int) ( $maj['id'] ?? 0 ) === (int) $route_info['major_id'] );
+												if ( ! $is_maj_active && $route_info['is_major'] && ! empty( $maj['url'] ) ) {
+													$maj_p = untrailingslashit( parse_url( $maj['url'], PHP_URL_PATH ) );
+													if ( $maj_p === ( $route_info['path'] ?? '' ) ) {
+														$is_maj_active = true;
+													}
+												}
+												$maj_class = 'menu-item' . ( $is_maj_active ? ' current-menu-item' : '' );
+											?>
+												<li class="<?php echo esc_attr( $maj_class ); ?>">
 													<a href="<?php echo esc_url($maj['url']); ?>" class="mega-major-link">
 														<span class="mega-major-left">
 															<span class="mega-major-bullet"></span>
@@ -168,7 +193,7 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 													<a href="<?php echo esc_url($cat['url']); ?>" class="mega-cat-more-link" title="<?php echo esc_attr('Xem tất cả ngành thuộc nhóm ' . $cat['name']); ?>">
 														<span class="mega-cat-more-text">Xem tất cả</span>
 														<svg class="w-3.5 h-3.5 mega-cat-more-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7m0 0l-7 7m7-7H3" />
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
 														</svg>
 													</a>
 												</li>
@@ -198,7 +223,7 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 						<div class="mobile-menu-item-row">
 							<a href="<?php echo esc_url(home_url($mi['url'])); ?>"><?php echo esc_html($mi['label']); ?></a>
 							<?php if ($has_sub) : ?>
-								<button type="button" class="mobile-submenu-toggle" aria-expanded="false" aria-label="Mở rộng menu con" onclick="ltdhToggleSubmenu(this, event)">
+								<button type="button" class="mobile-submenu-toggle" aria-expanded="<?php echo $is_mobile_open ? 'true' : 'false'; ?>" aria-label="Mở rộng menu con" onclick="ltdhToggleSubmenu(this, event)">
 									<svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
 									</svg>
@@ -211,12 +236,31 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 					<?php if ($has_sub) : ?>
 						<ul class="sub-menu">
 							<?php foreach ($mi['sub'] as $sub) :
-								$sub_path     = untrailingslashit($sub['url']);
+								$sub_path      = untrailingslashit($sub['url']);
 								$is_sub_active = ($current_path === $sub_path);
+
+								if ( ! $is_sub_active && ! empty( $route_info ) ) {
+									if ( ( $route_info['is_program'] || $route_info['is_training_archive'] ) && ! empty( $route_info['training_type_slug'] ) ) {
+										$sub_slug = basename( $sub_path );
+										$matching_slugs = [ $route_info['training_type_slug'] ];
+										if ( in_array( $route_info['training_type_slug'], [ 'dao-tao-tu-xa', 'tu-xa' ], true ) ) {
+											$matching_slugs = [ 'dao-tao-tu-xa', 'tu-xa' ];
+										}
+										if ( in_array( $sub_slug, $matching_slugs, true ) ) {
+											$is_sub_active = true;
+										}
+									}
+								}
 								$sub_class    = $is_sub_active ? ' current-menu-item' : '';
 							?>
 								<li class="menu-item<?php echo esc_attr($sub_class); ?>">
-									<a href="<?php echo esc_url(home_url($sub['url'])); ?>"><?php echo esc_html($sub['label']); ?></a>
+									<?php if ($location === 'mobile') : ?>
+										<div class="mobile-menu-item-row">
+											<a href="<?php echo esc_url(home_url($sub['url'])); ?>"><?php echo esc_html($sub['label']); ?></a>
+										</div>
+									<?php else : ?>
+										<a href="<?php echo esc_url(home_url($sub['url'])); ?>"><?php echo esc_html($sub['label']); ?></a>
+									<?php endif; ?>
 								</li>
 							<?php endforeach; ?>
 						</ul>
@@ -405,7 +449,7 @@ function ltdh_get_current_route_info( string $uri = '' ): array {
 	return $info;
 }
 
-function ltdh_menu_add_active_classes( $menu_items ) {
+function ltdh_menu_add_active_classes( $menu_items, $args = null ) {
 	if ( empty( $menu_items ) || ! is_array( $menu_items ) ) {
 		return $menu_items;
 	}
@@ -414,11 +458,10 @@ function ltdh_menu_add_active_classes( $menu_items ) {
 	$current_url = untrailingslashit( $current_url );
 	$route_info  = ltdh_get_current_route_info();
 
+	// 1. Standard URL matching
 	foreach ( $menu_items as $key => $item ) {
 		$item_url  = trailingslashit( parse_url( $item->url, PHP_URL_PATH ) );
 		$item_url  = untrailingslashit( $item_url );
-		$item_path = $item_url;
-		$title     = mb_strtolower( trim( (string) $item->title ), 'UTF-8' );
 
 		// Standard URL matching
 		if ( $current_url === $item_url ) {
@@ -427,46 +470,201 @@ function ltdh_menu_add_active_classes( $menu_items ) {
 			continue;
 		}
 
-		if ( $item_url && $current_url !== '/' && strpos( $current_url, $item_url ) === 0 ) {
+		if ( $item_url !== '' && $item_url !== '/' && $current_url !== '/' && $current_url !== '' && strpos( $current_url, $item_url . '/' ) === 0 ) {
 			$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
 		}
+	}
 
-		// Contextual matching: Program -> Training Type menu
-		if ( $route_info['is_program'] || $route_info['is_training_archive'] ) {
-			$training_titles = [ 'hình thức đào tạo', 'hình thức liên thông', 'liên thông đại học', 'liên thông', 'hệ đào tạo', 'hình thức học' ];
-			$training_paths  = [ '/hinh-thuc-dao-tao', '/he-dao-tao', '/chuong-trinh' ];
-			if ( in_array( $title, $training_titles, true ) || in_array( $item_path, $training_paths, true ) ) {
-				$menu_items[ $key ]->classes[] = 'current-menu-item';
-				$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+	// 2. Program / Training Type Contextual Highlighting
+	if ( $route_info['is_program'] || $route_info['is_training_archive'] ) {
+		$training_top_level_ids = [];
+		$target_training_slugs  = [];
+		if ( ! empty( $route_info['training_type_slug'] ) ) {
+			$target_training_slugs[] = $route_info['training_type_slug'];
+			if ( in_array( $route_info['training_type_slug'], [ 'dao-tao-tu-xa', 'tu-xa' ], true ) ) {
+				$target_training_slugs = array_merge( $target_training_slugs, [ 'dao-tao-tu-xa', 'tu-xa' ] );
 			}
 		}
 
-		// Contextual matching: School -> Schools menu
-		if ( $route_info['is_school'] || $route_info['is_school_archive'] ) {
-			$school_titles = [ 'trường đối tác', 'trường đào tạo', 'trường đại học', 'danh sách trường', 'trường', 'đối tác' ];
-			$school_paths  = [ '/truong-doi-tac', '/truong-dao-tao', '/truong', '/danh-sach-truong' ];
-			if ( in_array( $title, $school_titles, true ) || in_array( $item_path, $school_paths, true ) ) {
-				$menu_items[ $key ]->classes[] = 'current-menu-item';
-				$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+		foreach ( $menu_items as $key => $item ) {
+			$item_path = untrailingslashit( parse_url( $item->url, PHP_URL_PATH ) );
+			$title     = mb_strtolower( trim( (string) $item->title ), 'UTF-8' );
+			$is_top    = ( 0 === (int) $item->menu_item_parent );
+
+			if ( $is_top ) {
+				$training_titles = [ 'hình thức đào tạo', 'hình thức liên thông', 'liên thông đại học', 'liên thông', 'hệ đào tạo', 'hình thức học' ];
+				$training_paths  = [ '/hinh-thuc-dao-tao', '/he-dao-tao', '/chuong-trinh' ];
+				if ( in_array( $title, $training_titles, true ) || in_array( $item_path, $training_paths, true ) ) {
+					$menu_items[ $key ]->classes[] = 'current-menu-item';
+					$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+					$menu_items[ $key ]->classes[] = 'current-menu-parent';
+					$menu_items[ $key ]->current   = true;
+					$training_top_level_ids[]      = (int) $item->ID;
+				}
 			}
 		}
 
-		// Contextual matching: Major -> Majors menu
-		if ( $route_info['is_major'] || $route_info['is_major_archive'] ) {
-			$major_titles = [ 'nhóm ngành', 'ngành học', 'chuyên ngành', 'chuyên ngành học', 'nhóm ngành đào tạo', 'ngành đào tạo', 'ngành' ];
-			$major_paths  = [ '/nhom-nganh', '/nganh-hoc', '/chuyen-nganh', '/nganh' ];
-			if ( in_array( $title, $major_titles, true ) || in_array( $item_path, $major_paths, true ) || in_array( 'menu-item-mega-menu', (array) $item->classes, true ) ) {
-				$menu_items[ $key ]->classes[] = 'current-menu-item';
-				$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+		// Highlight matching training type sub-item
+		if ( ! empty( $target_training_slugs ) ) {
+			foreach ( $menu_items as $key => $item ) {
+				$parent_id = (int) $item->menu_item_parent;
+				if ( in_array( $parent_id, $training_top_level_ids, true ) || ( ! empty( $item->object ) && 'training_type' === $item->object ) ) {
+					$item_path = untrailingslashit( parse_url( $item->url, PHP_URL_PATH ) );
+					$is_match  = false;
+
+					foreach ( $target_training_slugs as $slug ) {
+						if ( preg_match( '#/(?:hinh-thuc-dao-tao|he-dao-tao)/' . preg_quote( $slug, '#' ) . '(?:/|$)#i', $item_path ) ) {
+							$is_match = true;
+							break;
+						}
+					}
+
+					if ( ! $is_match && ! empty( $item->object_id ) && function_exists( 'get_term' ) ) {
+						$t = get_term( (int) $item->object_id, LTDH_TAX_TRAINING_TYPE );
+						if ( $t && ! is_wp_error( $t ) && in_array( $t->slug, $target_training_slugs, true ) ) {
+							$is_match = true;
+						}
+					}
+
+					if ( ! $is_match ) {
+						$t_title = mb_strtolower( trim( (string) $item->title ), 'UTF-8' );
+						if ( in_array( 'dao-tao-tu-xa', $target_training_slugs, true ) || in_array( 'tu-xa', $target_training_slugs, true ) ) {
+							if ( in_array( $t_title, [ 'từ xa', 'đào tạo từ xa' ], true ) ) {
+								$is_match = true;
+							}
+						} elseif ( in_array( 'chinh-quy', $target_training_slugs, true ) && 'chính quy' === $t_title ) {
+							$is_match = true;
+						} elseif ( in_array( 'vua-hoc-vua-lam', $target_training_slugs, true ) && 'vừa học vừa làm' === $t_title ) {
+							$is_match = true;
+						}
+					}
+
+					if ( $is_match ) {
+						$menu_items[ $key ]->classes[] = 'current-menu-item';
+						$menu_items[ $key ]->current   = true;
+					}
+				}
+			}
+		}
+	}
+
+	// 3. School Contextual Highlighting
+	if ( $route_info['is_school'] || $route_info['is_school_archive'] ) {
+		foreach ( $menu_items as $key => $item ) {
+			$item_path = untrailingslashit( parse_url( $item->url, PHP_URL_PATH ) );
+			$title     = mb_strtolower( trim( (string) $item->title ), 'UTF-8' );
+			$is_top    = ( 0 === (int) $item->menu_item_parent );
+
+			if ( $is_top ) {
+				$school_titles = [ 'trường đối tác', 'trường đào tạo', 'trường đại học', 'danh sách trường', 'trường', 'đối tác' ];
+				$school_paths  = [ '/truong-doi-tac', '/truong-dao-tao', '/truong', '/danh-sach-truong' ];
+				if ( in_array( $title, $school_titles, true ) || in_array( $item_path, $school_paths, true ) ) {
+					$menu_items[ $key ]->classes[] = 'current-menu-item';
+					$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+					$menu_items[ $key ]->current   = true;
+				}
+			} elseif ( $route_info['is_school'] && ! empty( $route_info['school_id'] ) ) {
+				if ( (int) $item->object_id === $route_info['school_id'] ) {
+					$menu_items[ $key ]->classes[] = 'current-menu-item';
+					$menu_items[ $key ]->current   = true;
+				}
+			}
+		}
+	}
+
+	// 4. Major Contextual Highlighting
+	if ( $route_info['is_major'] || $route_info['is_major_archive'] ) {
+		$major_top_level_ids = [];
+		foreach ( $menu_items as $key => $item ) {
+			$item_path = untrailingslashit( parse_url( $item->url, PHP_URL_PATH ) );
+			$title     = mb_strtolower( trim( (string) $item->title ), 'UTF-8' );
+			$is_top    = ( 0 === (int) $item->menu_item_parent );
+
+			if ( $is_top ) {
+				$major_titles = [ 'nhóm ngành', 'ngành học', 'chuyên ngành', 'chuyên ngành học', 'nhóm ngành đào tạo', 'ngành đào tạo', 'ngành' ];
+				$major_paths  = [ '/nhom-nganh', '/nganh-hoc', '/chuyen-nganh', '/nganh' ];
+				if ( in_array( $title, $major_titles, true ) || in_array( $item_path, $major_paths, true ) || in_array( 'menu-item-mega-menu', (array) $item->classes, true ) ) {
+					$menu_items[ $key ]->classes[] = 'current-menu-item';
+					$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+					$menu_items[ $key ]->classes[] = 'current-menu-parent';
+					$menu_items[ $key ]->current   = true;
+					$major_top_level_ids[]         = (int) $item->ID;
+				}
 			}
 		}
 
+		if ( ! empty( $major_top_level_ids ) ) {
+			$cat_col_ids = [];
+
+			// Highlight Category Header
+			if ( ! empty( $route_info['major_cat_slug'] ) ) {
+				$target_cat_slug = $route_info['major_cat_slug'];
+				foreach ( $menu_items as $key => $item ) {
+					if ( in_array( (int) $item->menu_item_parent, $major_top_level_ids, true ) ) {
+						$is_cat_match = false;
+						$classes_arr  = (array) $item->classes;
+
+						if ( in_array( 'menu-cat-' . $target_cat_slug, $classes_arr, true ) ) {
+							$is_cat_match = true;
+						} elseif ( ! empty( $item->url ) && preg_match( '#/nhom-nganh/' . preg_quote( $target_cat_slug, '#' ) . '(?:/|$)#i', $item->url ) ) {
+							$is_cat_match = true;
+						}
+
+						if ( $is_cat_match ) {
+							$cat_col_ids[] = (int) $item->ID;
+							$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+							$menu_items[ $key ]->classes[] = 'current-menu-parent';
+							if ( $route_info['is_major_archive'] && ! $route_info['is_major'] ) {
+								$menu_items[ $key ]->classes[] = 'current-menu-item';
+								$menu_items[ $key ]->current   = true;
+							}
+						}
+					}
+				}
+			}
+
+			// Highlight Major Item (and prevent view-all button from being marked active)
+			if ( $route_info['is_major'] && ! empty( $route_info['major_id'] ) ) {
+				foreach ( $menu_items as $key => $item ) {
+					$parent_id = (int) $item->menu_item_parent;
+					if ( in_array( $parent_id, $cat_col_ids, true ) || in_array( $parent_id, $major_top_level_ids, true ) || ( ! empty( $item->object ) && 'major' === $item->object ) ) {
+						if ( in_array( 'ltdh-view-all-link', (array) $item->classes, true ) || stripos( (string) $item->title, 'tất cả' ) !== false ) {
+							continue;
+						}
+
+						$is_major_match = false;
+						if ( (int) $item->object_id === $route_info['major_id'] ) {
+							$is_major_match = true;
+						} else {
+							$item_path = untrailingslashit( parse_url( $item->url, PHP_URL_PATH ) );
+							if ( $item_path === $route_info['path'] || ( ! empty( $route_info['path'] ) && strpos( $route_info['path'], $item_path ) === 0 ) ) {
+								$is_major_match = true;
+							}
+						}
+
+						if ( $is_major_match ) {
+							$menu_items[ $key ]->classes[] = 'current-menu-item';
+							$menu_items[ $key ]->current   = true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 5. Final class deduplication and sanitize
+	foreach ( $menu_items as $key => $item ) {
+		// Clean false positives from view all links
+		if ( in_array( 'ltdh-view-all-link', (array) $item->classes, true ) || stripos( (string) $item->title, 'tất cả' ) !== false ) {
+			$menu_items[ $key ]->classes = array_diff( (array) $menu_items[ $key ]->classes, [ 'current-menu-item', 'current-menu-ancestor', 'current_page_item', 'current-menu-parent' ] );
+			$menu_items[ $key ]->current = false;
+		}
 		$menu_items[ $key ]->classes = array_values( array_unique( (array) $menu_items[ $key ]->classes ) );
 	}
 
 	return $menu_items;
 }
-add_filter( 'wp_nav_menu_objects', 'ltdh_menu_add_active_classes' );
+add_filter( 'wp_nav_menu_objects', 'ltdh_menu_add_active_classes', 20, 2 );
 
 // ----------------------------------------------------
 // 3. Dynamic Menu Submenu Injection
@@ -883,47 +1081,73 @@ add_filter('wp_nav_menu_objects', 'ltdh_dynamic_menu_submenu_injection', 10, 2);
 // 4. Highlight Menu for Training Type Pages
 // ----------------------------------------------------
 
-function ltdh_highlight_menu_parameters($classes, $item) {
-	$current_url = home_url($_SERVER['REQUEST_URI'] ?? '/');
-	$item_url    = $item->url;
-	if (! $item_url) {
+function ltdh_highlight_menu_parameters( $classes, $item, $args = null, $depth = 0 ) {
+	$current_url = home_url( $_SERVER['REQUEST_URI'] ?? '/' );
+	$item_url    = $item->url ?? '';
+	if ( ! $item_url ) {
 		return $classes;
 	}
 
-	$current_parts = wp_parse_url($current_url);
-	$item_parts    = wp_parse_url($item_url);
+	$route_info = function_exists( 'ltdh_get_current_route_info' ) ? ltdh_get_current_route_info() : [];
 
-	if (! isset($item_parts['path']) || ! isset($current_parts['path'])) {
-		return $classes;
-	}
-
-	if (preg_match('#/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $item_parts['path'], $item_match) && 'page' !== $item_match[1]) {
-		if (preg_match('#/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $current_match) && 'page' !== $current_match[1]) {
-			if ($item_match[1] === $current_match[1]) {
-				$classes[] = 'current-menu-item';
+	// 1. Mobile Menu accordion auto-open on active ancestry
+	if ( $args && isset( $args->menu_class ) && strpos( $args->menu_class, 'nav-mobile-menu' ) !== false ) {
+		if ( in_array( 'current-menu-ancestor', $classes, true ) || in_array( 'current-menu-item', $classes, true ) ) {
+			if ( in_array( 'menu-item-has-children', $classes, true ) ) {
+				$classes[] = 'is-open';
 			}
 		}
 	}
 
-	if (isset($item_parts['query'])) {
-		parse_str($item_parts['query'], $item_query);
-		if (isset($item_query['he'])) {
+	// 2. Training Type Query Parameter & Path Highlighting
+	$current_parts = wp_parse_url( $current_url );
+	$item_parts    = wp_parse_url( $item_url );
+
+	if ( isset( $item_parts['path'], $current_parts['path'] ) ) {
+		if ( preg_match( '#/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $item_parts['path'], $item_match ) && 'page' !== $item_match[1] ) {
+			if ( preg_match( '#/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $current_match ) && 'page' !== $current_match[1] ) {
+				if ( $item_match[1] === $current_match[1] ) {
+					$classes[] = 'current-menu-item';
+				}
+			}
+		}
+	}
+
+	if ( isset( $item_parts['query'] ) ) {
+		parse_str( $item_parts['query'], $item_query );
+		if ( isset( $item_query['he'] ) ) {
 			$current_he = '';
-			if (preg_match('#/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $m) && 'page' !== $m[1]) {
+			if ( ! empty( $route_info['training_type_slug'] ) ) {
+				$current_he = $route_info['training_type_slug'];
+			} elseif ( isset( $current_parts['path'] ) && preg_match( '#/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)(?:/page/\d+)?/?$#i', $current_parts['path'], $m ) && 'page' !== $m[1] ) {
 				$current_he = $m[1];
-			} elseif (isset($current_parts['query'])) {
-				parse_str($current_parts['query'], $current_query);
+			} elseif ( isset( $current_parts['query'] ) ) {
+				parse_str( $current_parts['query'], $current_query );
 				$current_he = $current_query['he'] ?? '';
 			}
-			if ($current_he && $item_query['he'] === $current_he) {
-				$classes[] = 'current-menu-item';
+
+			if ( $current_he ) {
+				$matching_he = [ $current_he ];
+				if ( in_array( $current_he, [ 'dao-tao-tu-xa', 'tu-xa' ], true ) ) {
+					$matching_he = [ 'dao-tao-tu-xa', 'tu-xa' ];
+				}
+				if ( in_array( $item_query['he'], $matching_he, true ) ) {
+					$classes[] = 'current-menu-item';
+				}
 			}
 		}
 	}
 
-	return $classes;
+	// 3. Prevent 'Xem tất cả' button from ever having current-menu-item on single pages
+	if ( in_array( 'ltdh-view-all-link', $classes, true ) || ( isset( $item->title ) && stripos( $item->title, 'tất cả' ) !== false ) ) {
+		if ( ! empty( $route_info['is_major'] ) || ! empty( $route_info['is_program'] ) || ! empty( $route_info['is_school'] ) ) {
+			$classes = array_diff( $classes, [ 'current-menu-item', 'current-menu-ancestor', 'current_page_item', 'current-menu-parent' ] );
+		}
+	}
+
+	return array_values( array_unique( $classes ) );
 }
-add_filter('nav_menu_css_class', 'ltdh_highlight_menu_parameters', 10, 2);
+add_filter( 'nav_menu_css_class', 'ltdh_highlight_menu_parameters', 10, 4 );
 
 // ----------------------------------------------------
 // 5. Hot Majors Helper
@@ -977,7 +1201,8 @@ function ltdh_mobile_nav_menu_start_el( $item_output, $item, $depth, $args ) {
 	$has_children = in_array( 'menu-item-has-children', (array) $item->classes, true );
 
 	if ( $has_children ) {
-		$toggle_btn = '<button type="button" class="mobile-submenu-toggle" aria-expanded="false" aria-label="' . esc_attr__( 'Mở rộng menu con', 'ltdh' ) . '" onclick="ltdhToggleSubmenu(this, event)">'
+		$is_open    = in_array( 'is-open', (array) $item->classes, true ) || in_array( 'current-menu-ancestor', (array) $item->classes, true );
+		$toggle_btn = '<button type="button" class="mobile-submenu-toggle" aria-expanded="' . ( $is_open ? 'true' : 'false' ) . '" aria-label="' . esc_attr__( 'Mở rộng menu con', 'ltdh' ) . '" onclick="ltdhToggleSubmenu(this, event)">'
 			. '<svg class="w-4 h-4 text-slate-500 shrink-0 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">'
 			. '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />'
 			. '</svg>'

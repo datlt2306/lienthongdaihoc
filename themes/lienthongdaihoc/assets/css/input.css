@@ -341,6 +341,22 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     transform: translateX(0);
 }
 
+/* Active Category Column in Mega Menu */
+.nav-primary-menu li.menu-item-category.current-menu-ancestor > a.mega-cat-header-link,
+.nav-primary-menu li.menu-item-category.current-menu-item > a.mega-cat-header-link {
+    background: #f0f7ff;
+    border-color: #bfdbfe;
+}
+.nav-primary-menu li.menu-item-category.current-menu-ancestor > a.mega-cat-header-link .mega-cat-name,
+.nav-primary-menu li.menu-item-category.current-menu-item > a.mega-cat-header-link .mega-cat-name {
+    color: #00308b !important;
+}
+.nav-primary-menu li.menu-item-category.current-menu-ancestor > a.mega-cat-header-link .mega-cat-icon,
+.nav-primary-menu li.menu-item-category.current-menu-item > a.mega-cat-header-link .mega-cat-icon {
+    background: #00308b;
+    color: #ffffff;
+}
+
 /* Majors List inside Category Column */
 .nav-primary-menu li.menu-item-mega-menu > ul.sub-menu > li.menu-item-category > ul.sub-menu {
     position: static !important;
@@ -386,6 +402,20 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     background: #f8fafc !important;
     color: #00308b !important;
     transform: translateX(2px);
+}
+
+/* Active Major Item in Mega Menu */
+.nav-primary-menu li.current-menu-item > a.mega-major-link,
+.nav-primary-menu li.current-menu-item a.mega-major-link,
+.mega-major-link.is-active {
+    background: #eff6ff !important;
+    color: #00308b !important;
+    font-weight: 700 !important;
+}
+.nav-primary-menu li.current-menu-item a.mega-major-link .mega-major-bullet,
+.mega-major-link.is-active .mega-major-bullet {
+    background: #00308b !important;
+    transform: scale(1.4);
 }
 
 .mega-major-left {
@@ -567,10 +597,24 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 }
 .nav-mobile-menu .current-menu-item > a,
 .nav-mobile-menu .current_page_item > a,
-.nav-mobile-menu .current-menu-ancestor > a {
+.nav-mobile-menu .current-menu-ancestor > a,
+.nav-mobile-menu .current-menu-item > .mobile-menu-item-row > a,
+.nav-mobile-menu .current_page_item > .mobile-menu-item-row > a,
+.nav-mobile-menu .current-menu-ancestor > .mobile-menu-item-row > a {
     color: #00308b;
     background-color: #eff6ff;
     font-weight: 700;
+}
+.nav-mobile-menu ul.sub-menu .current-menu-item > a,
+.nav-mobile-menu ul.sub-menu .current-menu-item > .mobile-menu-item-row > a {
+    color: #00308b;
+    background-color: #eff6ff;
+    font-weight: 700;
+}
+.nav-mobile-menu li.menu-item-category.current-menu-ancestor > .mobile-menu-item-row,
+.nav-mobile-menu li.menu-item-category.current-menu-item > .mobile-menu-item-row {
+    background: #eff6ff;
+    border-color: #bfdbfe;
 }
 
 /* Accordion Toggle Button */
