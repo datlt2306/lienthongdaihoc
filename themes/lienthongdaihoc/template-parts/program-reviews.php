@@ -308,12 +308,15 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 
 		<!-- Modal Body Form: 2-Column Responsive Layout -->
 		<div class="p-5 sm:p-7 overflow-y-auto flex-1">
-			<form id="ltdh-program-review-form" method="POST" enctype="multipart/form-data">
+			<form id="ltdh-program-review-form" method="POST" action="javascript:void(0);" onsubmit="return ltdhSubmitReviewForm(event);" enctype="multipart/form-data">
 				
 				<!-- Hidden Security Fields -->
 				<input type="hidden" name="action" value="ltdh_submit_program_review">
 				<input type="hidden" name="nonce" value="<?php echo esc_attr( $nonce ); ?>">
 				<input type="hidden" name="program_id" value="<?php echo esc_attr( $program_id ); ?>">
+				<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
+					<?php ltdh_render_recaptcha_field( 'program_review' ); ?>
+				<?php endif; ?>
 				<!-- Honeypot anti-spam (invisible to humans) -->
 				<input type="text" name="website_url_hp" value="" tabindex="-1" autocomplete="off" style="display:none !important; visibility:hidden !important;" aria-hidden="true">
 
@@ -440,7 +443,7 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 										Họ và tên <span class="text-red-500">*</span>
 									</label>
 									<input type="text" 
-									       name="author_name" 
+									       name="student_name" 
 									       id="ltdh-author-name" 
 									       required 
 									       placeholder="Nguyễn Văn A" 
@@ -515,6 +518,7 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 
 						<button type="submit" 
 						        id="ltdh-submit-review-btn" 
+						        onclick="return ltdhSubmitReviewForm(event);"
 						        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#EA580C] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50">
 							<svg id="ltdh-submit-spinner" class="hidden w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
 							<span id="ltdh-submit-btn-text">Gửi đánh giá chương trình</span>
@@ -759,28 +763,44 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 			});
 		}
 
-		// Handle Form Submission via AJAX
-		if (form) {
-			form.addEventListener('submit', function(e) {
-				e.preventDefault();
-				var errorDiv = document.getElementById('ltdh-review-error');
-				var submitBtn = document.getElementById('ltdh-submit-review-btn');
-				var spinner = document.getElementById('ltdh-submit-spinner');
-				var btnText = document.getElementById('ltdh-submit-btn-text');
+		// Global Safe Form Submission Handler (Prevents Any Accidental Page Navigation)
+		window.ltdhSubmitReviewForm = function(e) {
+			if (e) {
+				if (typeof e.preventDefault === 'function') e.preventDefault();
+				if (typeof e.stopPropagation === 'function') e.stopPropagation();
+			}
 
-				if (errorDiv) errorDiv.classList.add('hidden');
+			if (!form) {
+				form = document.getElementById('ltdh-program-review-form');
+			}
+			if (!form) return false;
 
+			if (form.reportValidity && !form.reportValidity()) {
+				return false;
+			}
+
+			var errorDiv = document.getElementById('ltdh-review-error');
+			var submitBtn = document.getElementById('ltdh-submit-review-btn');
+			var spinner = document.getElementById('ltdh-submit-spinner');
+			var btnText = document.getElementById('ltdh-submit-btn-text');
+
+			if (errorDiv) errorDiv.classList.add('hidden');
+
+			if (submitBtn) submitBtn.disabled = true;
+			if (spinner) spinner.classList.remove('hidden');
+			if (btnText) btnText.textContent = 'Đang gửi...';
+
+			function executeAjax(token) {
 				var formData = new FormData(form);
+				if (token) {
+					formData.append('g-recaptcha-response', token);
+					formData.append('recaptcha_token', token);
+				}
 
 				// Append compressed blobs
 				compressedFiles.forEach(function(item, i) {
 					formData.append('review_images[' + i + ']', item.blob, item.name);
 				});
-
-				// Loading state
-				if (submitBtn) submitBtn.disabled = true;
-				if (spinner) spinner.classList.remove('hidden');
-				if (btnText) btnText.textContent = 'Đang gửi...';
 
 				var xhr = new XMLHttpRequest();
 				xhr.open('POST', ajaxUrl, true);
@@ -825,7 +845,25 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 					}
 				};
 				xhr.send(formData);
-			});
+			}
+
+			if (typeof window.ltdhGetRecaptchaToken === 'function') {
+				window.ltdhGetRecaptchaToken('program_review', form)
+					.then(function(token) {
+						executeAjax(token);
+					})
+					.catch(function() {
+						executeAjax('');
+					});
+			} else {
+				executeAjax('');
+			}
+
+			return false;
+		};
+
+		if (form) {
+			form.addEventListener('submit', window.ltdhSubmitReviewForm);
 		}
 
 		// Filter Buttons logic (Shopee Chips)

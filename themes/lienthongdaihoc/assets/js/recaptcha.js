@@ -221,7 +221,8 @@
 			'ltdh-lead-magnet-form',
 			'elig-unified-form',
 			'elig-consultation-form',
-			'elig-advanced-verify-form'
+			'elig-advanced-verify-form',
+			'ltdh-program-review-form'
 		];
 		if (form.id && ajaxFormIds.indexOf(form.id) !== -1) {
 			return;

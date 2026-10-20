@@ -421,7 +421,7 @@ $banner_verif = ( is_singular( 'program' ) && function_exists( 'ltdh_get_program
 $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source_title'] : 'Nguồn chính thức';
 ?>
 
-	<section class="relative w-full bg-gradient-to-tr from-[#0F172A] via-[#1E293B] to-brand-primary text-white py-6 sm:py-8 md:py-14 overflow-hidden">
+	<section class="relative w-full bg-gradient-to-tr from-[#0F172A] via-[#1E293B] to-brand-primary text-white py-7 sm:py-10 md:py-16 overflow-hidden">
 	<!-- Ambient Grid Pattern & Glow -->
 	<div class="absolute inset-0 opacity-15 pointer-events-none z-0" style="background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 24px 24px;"></div>
 	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-primary/20 rounded-full blur-3xl pointer-events-none"></div>
