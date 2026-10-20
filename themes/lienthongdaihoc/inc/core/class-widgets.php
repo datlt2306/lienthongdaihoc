@@ -602,7 +602,7 @@ class LTDH_Widget_Consultation_Form extends WP_Widget {
 
 		echo $args['before_widget'];
 		?>
-		<div class="ltdh-widget-form ltdh-sidebar-form">
+		<div class="ltdh-widget-form ltdh-sidebar-form hidden lg:block">
 			<?php if ( ! empty( $title ) ) : ?>
 				<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2"><?php echo esc_html( $title ); ?></h3>
 			<?php endif; ?>
@@ -1119,7 +1119,7 @@ function ltdh_render_default_guide_sidebar() {
 	$global_zalo  = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me';
 	?>
 	<!-- Sidebar register widget -->
-	<section class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+	<section class="hidden lg:block bg-white rounded-lg shadow-sm border border-slate-200 p-6">
 		<h3 class="text-lg font-bold text-slate-900 mb-2">Nhận thêm thông tin chi tiết</h3>
 		<p class="text-sm text-slate-500 mb-4">Để lại câu hỏi của bạn. Ban tuyển sinh đại học đối tác sẽ giải đáp nhanh chóng sau 15 phút.</p>
 		
@@ -1223,7 +1223,7 @@ function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
 	?>
 
 	<!-- CONSULTATION FORM -->
-	<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+	<section id="register" class="hidden lg:block scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 		<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
 		<p class="text-sm text-slate-500 mb-4">Hãy để lại thông tin, ban tư vấn tuyển sinh sẽ liên hệ và giải đáp lộ trình cụ thể cho bạn trong vòng 15 phút.</p>
 		
@@ -1427,7 +1427,7 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 
 
 	<!-- Consultation Form -->
-	<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-6 relative overflow-hidden">
+	<section id="register" class="hidden lg:block scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-6 relative overflow-hidden">
 		<div class="inline-flex lg:hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-primary/5 text-brand-primary text-[11px] font-bold tracking-wide uppercase mb-3">
 			<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
 			<span>Tư vấn tuyển sinh</span>
@@ -1600,7 +1600,7 @@ function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
 	<?php endif; ?>
 
 	<!-- Consultation Form -->
-	<section id="register" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-6 relative overflow-hidden">
+	<section id="register" class="hidden lg:block scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-6 relative overflow-hidden">
 		<div class="inline-flex lg:hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-primary/5 text-brand-primary text-[11px] font-bold tracking-wide uppercase mb-3">
 			<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
 			<span>Tư vấn tuyển sinh</span>

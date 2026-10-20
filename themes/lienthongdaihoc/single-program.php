@@ -507,7 +507,7 @@ $program_tabs[] = [
 										<!-- Cột 1: Hạn nộp hồ sơ -->
 										<div class="pl-1.5 md:pl-0 min-w-0">
 											<span class="text-[10px] sm:text-xs font-bold sm:font-semibold text-slate-400 sm:text-slate-500 block leading-tight mb-1 uppercase tracking-tight sm:normal-case">Hạn nộp</span>
-											<span class="<?php echo $is_open ? 'text-xs sm:text-sm font-black sm:font-bold text-amber-950' : 'text-xs sm:text-sm font-semibold text-slate-800'; ?> block leading-tight sm:leading-snug">
+											<span class="<?php echo $is_open ? 'text-xs sm:text-sm font-black sm:font-bold text-amber-950' : 'text-xs font-medium text-slate-800'; ?> block leading-tight sm:leading-snug">
 												<?php echo esc_html( $batch_app_text ?: 'Liên tục' ); ?>
 											</span>
 										</div>
@@ -515,7 +515,7 @@ $program_tabs[] = [
 										<!-- Cột 2: Xét tuyển / Thi tuyển -->
 										<div class="pl-1.5 md:pl-0 min-w-0">
 											<span class="text-[10px] sm:text-xs font-bold sm:font-semibold text-slate-400 sm:text-slate-500 block leading-tight mb-1 uppercase tracking-tight sm:normal-case"><?php echo esc_html( $eval_label ); ?></span>
-											<span class="<?php echo $is_open ? 'text-xs sm:text-sm font-bold text-slate-900' : 'text-xs sm:text-sm font-medium text-slate-700'; ?> block leading-tight sm:leading-snug">
+											<span class="<?php echo $is_open ? 'text-xs sm:text-sm font-bold text-slate-900' : 'text-xs font-medium text-slate-700'; ?> block leading-tight sm:leading-snug">
 												<?php echo esc_html( $b_data['eval_val'] ?: ( $is_chinh_quy ? 'Thi tuyển theo đợt' : 'Xét tuyển hồ sơ' ) ); ?>
 											</span>
 										</div>
@@ -523,7 +523,7 @@ $program_tabs[] = [
 										<!-- Cột 3: Khai giảng -->
 										<div class="pl-1.5 md:pl-0 min-w-0">
 											<span class="text-[10px] sm:text-xs font-bold sm:font-semibold text-slate-400 sm:text-slate-500 block leading-tight mb-1 uppercase tracking-tight sm:normal-case">Khai giảng</span>
-											<span class="<?php echo $is_open ? 'text-xs sm:text-sm font-bold text-[#00308b]' : 'text-xs sm:text-sm font-medium text-slate-700'; ?> block leading-tight sm:leading-snug">
+											<span class="<?php echo $is_open ? 'text-xs sm:text-sm font-bold text-[#00308b]' : 'text-xs font-medium text-slate-700'; ?> block leading-tight sm:leading-snug">
 												<?php echo esc_html( $b_data['enrol_val'] ?: 'Theo kế hoạch' ); ?>
 											</span>
 										</div>
@@ -798,17 +798,17 @@ $program_tabs[] = [
 														<!-- Action Buttons Row -->
 														<div class="mt-3.5 flex flex-wrap items-center gap-2.5">
 															<?php if ( $has_general_drive ) : ?>
-																<a href="<?php echo esc_url( $drive_target_url ); ?>" <?php echo $is_drive_action ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#00308b] hover:bg-[#002266] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $drive_target_url ); ?>" data-file-title="Bộ biểu mẫu & Hồ sơ tuyển sinh: <?php echo esc_attr( get_the_title( $program_id ) ); ?>">
+																<a href="<?php echo esc_url( $drive_target_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#00308b] hover:bg-[#002266] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $drive_target_url ); ?>" data-file-title="Bộ biểu mẫu & Hồ sơ tuyển sinh: <?php echo esc_attr( get_the_title( $program_id ) ); ?>">
 																	<span><?php echo ( ( $admission_package['source'] ?? '' ) === 'school_type' ) ? 'Mở hồ sơ theo hệ' : 'Mở hồ sơ chương trình'; ?></span>
 																	<svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
 																</a>
-																<a href="<?php echo esc_url( $school_drive_url ); ?>" target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200/80 text-xs sm:text-sm font-medium rounded-lg shadow-2xs transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $school_drive_url ); ?>" data-file-title="Thư mục hồ sơ chung: <?php echo esc_attr( $school_title_text ); ?>">
+																<a href="<?php echo esc_url( $school_drive_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200/80 text-xs sm:text-sm font-medium rounded-lg shadow-2xs transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $school_drive_url ); ?>" data-file-title="Thư mục hồ sơ chung: <?php echo esc_attr( $school_title_text ); ?>">
 																	<svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
 																	<span>Thư mục chung toàn trường</span>
 																	<svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
 																</a>
 															<?php else : ?>
-																<a href="<?php echo esc_url( $drive_target_url ); ?>" <?php echo $is_drive_action ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#00308b] hover:bg-[#002266] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $drive_target_url ); ?>" data-file-title="Bộ biểu mẫu & Hồ sơ tuyển sinh: <?php echo esc_attr( get_the_title( $program_id ) ); ?>">
+																<a href="<?php echo esc_url( $drive_target_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#00308b] hover:bg-[#002266] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $drive_target_url ); ?>" data-file-title="Bộ biểu mẫu & Hồ sơ tuyển sinh: <?php echo esc_attr( get_the_title( $program_id ) ); ?>">
 																	<span>Mở trên Google Drive</span>
 																	<svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
 																</a>
@@ -998,7 +998,7 @@ $program_tabs[] = [
 															Mẫu đơn xét miễn môn: <strong class="text-slate-800"><?php echo esc_html( $item['subject_name'] ?? 'Môn học' ); ?></strong>
 														</span>
 													</div>
-													<a href="<?php echo esc_url( $exemption_target_url ); ?>" <?php echo $is_ex_drive ? '' : 'download'; ?> target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-1.5 px-3 py-1.5 <?php echo $is_ex_drive ? 'bg-emerald-50 hover:bg-emerald-600 text-emerald-900 hover:text-white border border-emerald-200/80 hover:border-emerald-600' : 'bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white border border-amber-200/80 hover:border-amber-600'; ?> text-xs font-bold rounded-lg transition-all shrink-0 cursor-pointer shadow-2xs self-start sm:self-auto" data-file-url="<?php echo esc_url( $exemption_target_url ); ?>" data-file-title="Mẫu đơn xét miễn môn - <?php echo esc_attr( $item['subject_name'] ?? '' ); ?>">
+													<a href="<?php echo esc_url( $exemption_target_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-1.5 px-3 py-1.5 <?php echo $is_ex_drive ? 'bg-emerald-50 hover:bg-emerald-600 text-emerald-900 hover:text-white border border-emerald-200/80 hover:border-emerald-600' : 'bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white border border-amber-200/80 hover:border-amber-600'; ?> text-xs font-bold rounded-lg transition-all shrink-0 cursor-pointer shadow-2xs self-start sm:self-auto" data-file-url="<?php echo esc_url( $exemption_target_url ); ?>" data-file-title="Mẫu đơn xét miễn môn - <?php echo esc_attr( $item['subject_name'] ?? '' ); ?>">
 														<?php if ( $is_ex_drive ) : ?>
 															<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
 															<span>Mở trên Google Drive</span>
@@ -1027,7 +1027,7 @@ $program_tabs[] = [
 
 						<?php if ( $curriculum_type === 'image' ) : ?>
 							<!-- Clickable Label Card for Image (Responsive & Touch-Friendly) -->
-							<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 bg-slate-50/90 hover:bg-blue-50/60 rounded-xl sm:rounded-2xl border border-slate-100 hover:border-blue-200/80 transition-all duration-200 group shadow-2xs hover:shadow-md block">
+							<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 bg-slate-50/90 hover:bg-blue-50/60 rounded-xl sm:rounded-2xl border border-slate-100 hover:border-blue-200/80 transition-all duration-200 group shadow-2xs hover:shadow-md block">
 								<div class="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0">
 									<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-100/90 text-[#00308b] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5 sm:mt-0">
 										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -1054,7 +1054,7 @@ $program_tabs[] = [
 										<p class="text-xs text-slate-500">Bản PDF chính thức từ nhà trường liệt kê lộ trình các học kỳ và danh sách môn học</p>
 									</div>
 								</div>
-								<a href="<?php echo esc_url( $curriculum_url ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $curriculum_url ); ?>" data-file-title="Khung chương trình: <?php echo esc_attr( get_the_title() ); ?>">
+								<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $curriculum_url ); ?>" data-file-title="Khung chương trình: <?php echo esc_attr( get_the_title() ); ?>">
 									<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 									<span>Tải Khung Chương Trình (PDF)</span>
 								</a>
@@ -1313,34 +1313,22 @@ function ltdhInitLeadMagnet() {
 	const docLabel       = document.getElementById('ltdh-lm-doc-name-label');
 	const errorEl        = document.getElementById('ltdh-lm-error');
 
-	// Attach click handlers to all .ltdh-lead-magnet-btn elements
-	document.querySelectorAll('.ltdh-lead-magnet-btn').forEach(btn => {
-		btn.addEventListener('click', function(e) {
-			const isUnlocked  = sessionStorage.getItem('ltdh_lead_magnet_unlocked');
-			const targetUrl   = this.getAttribute('data-file-url') || this.getAttribute('href');
-			const targetTitle = this.getAttribute('data-file-title') || 'Tài liệu tuyển sinh';
-
-			if (isUnlocked === '1') {
-				// Already unlocked in this session, allow default download
-				return true;
-			}
-
-			// Intercept and open modal
-			e.preventDefault();
-			if (fileUrlInput) fileUrlInput.value = targetUrl;
-			if (fileTitleInput) fileTitleInput.value = targetTitle;
-			if (docLabel) docLabel.textContent = targetTitle;
-			if (errorEl) {
-				errorEl.textContent = '';
-				errorEl.classList.add('hidden');
-			}
-			if (modal) {
-				modal.classList.remove('hidden');
-				modal.classList.add('flex');
-				document.body.style.overflow = 'hidden';
-			}
-		});
-	});
+	// Document buttons open in new tab with rel="nofollow noopener noreferrer" natively.
+	// Keep modal trigger available if gated action is explicitly requested.
+	window.ltdhOpenLeadMagnetModal = function(targetUrl, targetTitle) {
+		if (fileUrlInput) fileUrlInput.value = targetUrl || '';
+		if (fileTitleInput) fileTitleInput.value = targetTitle || '';
+		if (docLabel) docLabel.textContent = targetTitle || 'Tài liệu tuyển sinh';
+		if (errorEl) {
+			errorEl.textContent = '';
+			errorEl.classList.add('hidden');
+		}
+		if (modal) {
+			modal.classList.remove('hidden');
+			modal.classList.add('flex');
+			document.body.style.overflow = 'hidden';
+		}
+	};
 
 	// Close on modal backdrop click
 	if (modal) {

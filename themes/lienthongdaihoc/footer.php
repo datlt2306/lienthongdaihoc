@@ -185,16 +185,14 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
      class="fixed inset-x-3.5 max-w-md mx-auto z-40 bg-white/92 backdrop-blur-xl border border-white/80 shadow-[0_10px_35px_rgba(15,23,42,0.16),0_2px_8px_rgba(15,23,42,0.08)] p-1.5 rounded-full flex items-center justify-between gap-2 md:hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform translate-y-0 opacity-100 will-change-transform"
      style="bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));">
 	
-	<!-- Messenger Button (Left Circle) -->
-	<a href="<?php echo esc_url( $messenger ); ?>" 
+	<!-- Zalo Button (Left Circle) -->
+	<a href="<?php echo esc_url( $zalo ); ?>" 
 	   target="_blank" 
-	   rel="noopener" 
-	   class="flex items-center justify-center h-10 w-10 bg-gradient-to-br from-[#00c6ff] to-[#0072ff] hover:opacity-90 active:scale-90 rounded-full shrink-0 transition-all shadow-xs" 
-	   aria-label="Nhắn tin Messenger"
-	   title="Nhắn tin Messenger">
-		<svg class="w-5 h-5 fill-current text-white" viewBox="0 0 24 24">
-			<path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.914 1.448 5.518 3.7 7.205V22l3.39-1.859c.91.253 1.87.392 2.87.392 5.523 0 10-4.146 10-9.258C22 6.145 17.523 2 12 2zm1.26 12.18l-2.45-2.61-4.78 2.61 5.26-5.59 2.5 2.61 4.73-2.61-5.26 5.59z"/>
-		</svg>
+	   rel="noopener noreferrer" 
+	   class="flex items-center justify-center h-10 w-10 bg-gradient-to-br from-[#0080ff] to-[#0052cc] hover:opacity-90 active:scale-90 rounded-full shrink-0 transition-all shadow-xs text-white" 
+	   aria-label="Nhắn tin Zalo"
+	   title="Nhắn tin Zalo">
+		<span class="font-display font-black text-xs tracking-tight">Zalo</span>
 	</a>
 
 	<!-- Register Consultation Button (Center Pill) -->
@@ -207,7 +205,8 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 	}
 	?>
 	<a href="<?php echo esc_url( $register_link ); ?>" 
-	   class="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#00308b] via-[#004bb5] to-[#00a2f4] hover:brightness-110 active:scale-[0.97] text-white font-bold text-xs sm:text-sm h-10 px-3.5 rounded-full shadow-md shadow-[#00308b]/20 transition-all min-w-0">
+	   class="js-open-consultation-modal flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#00308b] via-[#004bb5] to-[#00a2f4] hover:brightness-110 active:scale-[0.97] text-white font-bold text-xs sm:text-sm h-10 px-3.5 rounded-full shadow-md shadow-[#00308b]/20 transition-all min-w-0"
+	   aria-haspopup="dialog">
 		<span class="truncate font-display font-bold">Đăng ký tư vấn ngay</span>
 	</a>
 
@@ -288,6 +287,170 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 })();
 </script>
 
+
+<!-- CONSULTATION POPUP MODAL (MOBILE & DESKTOP) -->
+<?php
+$modal_hidden = [
+	'referral_source' => home_url( add_query_arg( [], $GLOBALS['wp']->request ?? '' ) ),
+];
+$modal_title    = 'Đăng ký nhận tư vấn tuyển sinh';
+$modal_subtitle = 'Để lại thông tin, ban tư vấn sẽ liên hệ và giải đáp lộ trình cụ thể cho bạn trong 15 phút.';
+
+if ( is_singular( 'program' ) ) {
+	$cur_pid = get_the_ID();
+	$modal_hidden['program_id']         = $cur_pid;
+	$modal_hidden['current_program_id'] = $cur_pid;
+	$modal_school_id = get_field( 'school_relationship', $cur_pid );
+	if ( $modal_school_id ) {
+		$sid = is_object( $modal_school_id ) ? $modal_school_id->ID : (int) $modal_school_id;
+		$modal_hidden['school_id']         = $sid;
+		$modal_hidden['current_school_id'] = $sid;
+	}
+	$modal_major_id = get_field( 'major_relationship', $cur_pid );
+	if ( ! empty( $modal_major_id ) ) {
+		$mid = is_object( $modal_major_id ) ? $modal_major_id->ID : ( is_array( $modal_major_id ) && ! empty( $modal_major_id[0] ) ? ( is_object( $modal_major_id[0] ) ? $modal_major_id[0]->ID : (int) $modal_major_id[0] ) : (int) $modal_major_id );
+		$modal_hidden['major_id']         = $mid;
+		$modal_hidden['current_major_id'] = $mid;
+	}
+	$modal_title    = 'Đăng ký tư vấn chương trình';
+	$modal_subtitle = get_the_title( $cur_pid );
+} elseif ( is_singular( 'school' ) ) {
+	$cur_sid = get_the_ID();
+	$modal_hidden['school_id']         = $cur_sid;
+	$modal_hidden['current_school_id'] = $cur_sid;
+	$modal_title    = 'Đăng ký vào ' . get_the_title( $cur_sid );
+	$modal_subtitle = 'Nhận tư vấn hồ sơ và hỗ trợ xử lý thủ tục nhập học nhanh chóng.';
+} elseif ( is_singular( 'major' ) ) {
+	$cur_mid = get_the_ID();
+	$modal_hidden['major_id']         = $cur_mid;
+	$modal_hidden['current_major_id'] = $cur_mid;
+	$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
+	if ( ! empty( $school_param ) ) {
+		if ( is_numeric( $school_param ) ) {
+			$s_post = get_post( intval( $school_param ) );
+		} else {
+			$cpt_school = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
+			$s_post     = get_page_by_path( sanitize_title( $school_param ), OBJECT, $cpt_school );
+		}
+		if ( $s_post && 'publish' === $s_post->post_status && ( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) === $s_post->post_type ) {
+			$modal_hidden['school_id']         = $s_post->ID;
+			$modal_hidden['current_school_id'] = $s_post->ID;
+		}
+	}
+	$modal_title    = 'Đăng ký tư vấn ngành ' . get_the_title( $cur_mid );
+	$modal_subtitle = 'Ban tư vấn sẽ gửi danh sách trường và lộ trình học tối ưu cho bạn.';
+}
+?>
+<div id="ltdh-consultation-modal" 
+     class="fixed inset-0 z-[999] hidden overflow-y-auto bg-slate-900/60 backdrop-blur-xs items-center justify-center p-3 sm:p-5"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="ltdh-consultation-modal-title">
+	<div class="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-100 overflow-hidden transform transition-all my-auto">
+		<!-- Modal Header -->
+		<div class="bg-gradient-to-r from-[#00308b] via-[#004bb5] to-[#002266] px-5 py-4 text-white flex items-center justify-between">
+			<div class="flex items-center gap-3 min-w-0">
+				<div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-lg shrink-0 border border-white/20">
+					🎓
+				</div>
+				<div class="min-w-0">
+					<h3 id="ltdh-consultation-modal-title" class="font-extrabold text-sm sm:text-base leading-tight truncate">
+						<?php echo esc_html( $modal_title ); ?>
+					</h3>
+					<p class="text-[11px] sm:text-xs text-blue-200 mt-0.5 truncate">
+						<?php echo esc_html( $modal_subtitle ); ?>
+					</p>
+				</div>
+			</div>
+			<button type="button" 
+			        onclick="window.ltdhCloseConsultationModal && window.ltdhCloseConsultationModal()" 
+			        class="p-2 -mr-1.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer shrink-0" 
+			        aria-label="Đóng popup">
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"></path></svg>
+			</button>
+		</div>
+
+		<!-- Modal Body -->
+		<div class="p-5 sm:p-6 max-h-[calc(90vh-80px)] overflow-y-auto">
+			<?php
+			if ( function_exists( 'ltdh_render_consultation_form' ) ) {
+				ltdh_render_consultation_form( $modal_hidden );
+			}
+			?>
+		</div>
+	</div>
+</div>
+
+<script>
+(function() {
+	function openConsultationModal(e) {
+		if (e && e.preventDefault) e.preventDefault();
+		var modal = document.getElementById('ltdh-consultation-modal');
+		if (modal) {
+			modal.classList.remove('hidden');
+			modal.classList.add('flex');
+			document.body.style.overflow = 'hidden';
+			var firstInput = modal.querySelector('input[name="your-name"], input[type="text"]:not([tabindex="-1"]), input[type="tel"]');
+			if (firstInput) {
+				setTimeout(function() { firstInput.focus(); }, 100);
+			}
+		}
+	}
+
+	function closeConsultationModal() {
+		var modal = document.getElementById('ltdh-consultation-modal');
+		if (modal) {
+			modal.classList.add('hidden');
+			modal.classList.remove('flex');
+			document.body.style.overflow = '';
+		}
+	}
+
+	window.ltdhOpenConsultationModal = openConsultationModal;
+	window.ltdhCloseConsultationModal = closeConsultationModal;
+
+	document.addEventListener('DOMContentLoaded', function() {
+		// Attach to all elements marked with js-open-consultation-modal
+		document.querySelectorAll('.js-open-consultation-modal, .ltdh-open-consultation-modal, [data-target="#ltdh-consultation-modal"]').forEach(function(el) {
+			el.addEventListener('click', openConsultationModal);
+		});
+
+		// On mobile (< 1024px), intercept any clicks to #register anchors
+		document.querySelectorAll('a[href="#register"], a[href="#register-section"]').forEach(function(el) {
+			el.addEventListener('click', function(e) {
+				if (window.innerWidth < 1024) {
+					openConsultationModal(e);
+				}
+			});
+		});
+
+		// Close modal on backdrop click
+		var modal = document.getElementById('ltdh-consultation-modal');
+		if (modal) {
+			modal.addEventListener('click', function(e) {
+				if (e.target === modal) {
+					closeConsultationModal();
+				}
+			});
+		}
+
+		// Close modal on Escape
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
+				closeConsultationModal();
+			}
+		});
+
+		// If returned from successful form submission and on mobile, open modal to show success alert
+		if (window.location.search.indexOf('submit_success=1') !== -1 && window.innerWidth < 1024) {
+			var successBox = modal ? modal.querySelector('.text-green-800') : null;
+			if (successBox) {
+				openConsultationModal();
+			}
+		}
+	});
+})();
+</script>
 
 <?php wp_footer(); ?>
 </body>

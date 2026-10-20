@@ -567,7 +567,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 										<p class="text-xs text-slate-500">Tệp PDF chính thức liệt kê lộ trình các học kỳ, khối lượng tín chỉ và môn học</p>
 									</div>
 								</div>
-								<a href="<?php echo esc_url( $major_curriculum['url'] ); ?>" download target="_blank" rel="noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $major_curriculum['url'] ); ?>" data-file-title="<?php echo esc_attr( $major_curriculum['title'] ); ?>">
+								<a href="<?php echo esc_url( $major_curriculum['url'] ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $major_curriculum['url'] ); ?>" data-file-title="<?php echo esc_attr( $major_curriculum['title'] ); ?>">
 									<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 									<span>Tải Khung Chương Trình (PDF)</span>
 								</a>

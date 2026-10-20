@@ -286,7 +286,7 @@ $years = range( $current_year, $current_year - 25 );
 <div class="elig-cta-bar mt-8">
 	<div class="elig-cta-channels grid grid-cols-1 sm:grid-cols-3 gap-3">
 		<?php $elig_hotline = function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : ( ( function_exists( 'get_field' ) ? get_field( 'global_hotline', 'options' ) : '' ) ?: '0988 991 496' ); ?>
-		<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $elig_hotline ) ); ?>" class="elig-cta-card flex flex-col items-center justify-center p-4 bg-white border border-slate-200/90 rounded-2xl hover:border-blue-400 hover:shadow-xs transition-all text-center group no-underline">
+		<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $elig_hotline ) ); ?>" class="elig-cta-card hidden sm:flex flex-col items-center justify-center p-4 bg-white border border-slate-200/90 rounded-2xl hover:border-blue-400 hover:shadow-xs transition-all text-center group no-underline">
 			<div class="w-10 h-10 rounded-xl bg-blue-50 text-[#00308b] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
 				<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
@@ -297,7 +297,7 @@ $years = range( $current_year, $current_year - 25 );
 		</a>
 
 		<?php $elig_zalo = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : ( function_exists( 'get_field' ) ? get_field( 'global_zalo_url', 'options' ) : '' ); if ( $elig_zalo ) : ?>
-		<a href="<?php echo esc_url( $elig_zalo ); ?>" target="_blank" class="elig-cta-card flex flex-col items-center justify-center p-4 bg-white border border-slate-200/90 rounded-2xl hover:border-emerald-400 hover:shadow-xs transition-all text-center group no-underline" rel="noopener">
+		<a href="<?php echo esc_url( $elig_zalo ); ?>" target="_blank" class="elig-cta-card hidden sm:flex flex-col items-center justify-center p-4 bg-white border border-slate-200/90 rounded-2xl hover:border-emerald-400 hover:shadow-xs transition-all text-center group no-underline" rel="noopener">
 			<div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
 				<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a.75.75 0 01-.974-.94 4.542 4.542 0 00.56-1.572C3.125 16.92 2 14.606 2 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />

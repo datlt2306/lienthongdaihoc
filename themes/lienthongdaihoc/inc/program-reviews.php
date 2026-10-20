@@ -524,6 +524,9 @@ function ltdh_handle_submit_program_review() {
 	// Set rate limit (1 hour)
 	set_transient( $rate_key, 1, HOUR_IN_SECONDS );
 
+	// Trigger rating stats and schema recalculation
+	ltdh_recalculate_program_rating_stats( $program_id );
+
 	wp_send_json_success( [
 		'message'     => 'Cảm ơn bạn! Đánh giá đã được gửi thành công. Ban Tuyển Sinh sẽ kiểm duyệt và hiển thị lên chương trình sớm nhất.',
 		'is_verified' => $is_verified,
@@ -853,11 +856,41 @@ function ltdh_get_program_review_schema_ld( int $program_id ): ?array {
 		return null;
 	}
 
+	// Explicit program name formula for SEO & Schema (e.g. "Liên thông ngành Logistics hệ Đào tạo từ xa")
+	$discipline = function_exists( 'ltdh_get_program_discipline_name' ) ? ltdh_get_program_discipline_name( $program_id ) : '';
+	if ( empty( $discipline ) ) {
+		$raw_title  = get_the_title( $program_id );
+		$discipline = preg_replace( '/^(?:cử nhân|kỹ sư|ngành|chuyên ngành|liên thông(?:\s+đại học)?)\s+/iu', '', trim( (string) $raw_title ) );
+	}
+	$discipline = preg_replace( '/^(?:ngành|chuyên ngành)\s+/iu', '', trim( $discipline ) );
+
+	$training_types = get_the_terms( $program_id, 'training_type' );
+	$training_type  = ( ! empty( $training_types ) && ! is_wp_error( $training_types ) ) ? $training_types[0]->name : '';
+	$clean_type     = preg_replace( '/^hệ\s+/iu', '', trim( (string) $training_type ) );
+
+	$program_name = 'Liên thông ngành ' . ( $discipline ?: get_the_title( $program_id ) );
+	if ( ! empty( $clean_type ) ) {
+		$program_name .= ' hệ ' . $clean_type;
+	}
+
+	$school_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
+	if ( ! $school_id ) {
+		$school_rel = get_field( 'school_relationship', $program_id ) ?: get_post_meta( $program_id, 'school_relationship', true );
+		if ( is_array( $school_rel ) ) {
+			$school_id = ! empty( $school_rel[0] ) ? ( is_object( $school_rel[0] ) ? $school_rel[0]->ID : (int) $school_rel[0] ) : 0;
+		} elseif ( is_numeric( $school_rel ) ) {
+			$school_id = (int) $school_rel;
+		}
+	}
+
+	$school_name = $school_id ? get_the_title( $school_id ) : '';
+
 	$schema = [
 		'@context'        => 'https://schema.org',
 		'@type'           => 'Course',
-		'name'            => get_the_title( $program_id ),
-		'description'     => wp_strip_all_tags( get_the_excerpt( $program_id ) ?: get_the_title( $program_id ) ),
+		'name'            => $program_name,
+		'description'     => wp_strip_all_tags( get_the_excerpt( $program_id ) ?: ( $program_name . ( $school_name ? ' tại ' . $school_name : '' ) ) ),
+		'url'             => get_permalink( $program_id ),
 		'aggregateRating' => [
 			'@type'       => 'AggregateRating',
 			'ratingValue' => (string) $stats['average'],
@@ -867,22 +900,74 @@ function ltdh_get_program_review_schema_ld( int $program_id ): ?array {
 		],
 	];
 
+	if ( ! empty( $school_name ) ) {
+		$schema['provider'] = [
+			'@type'  => 'CollegeOrUniversity',
+			'name'   => $school_name,
+			'sameAs' => get_permalink( $school_id ),
+		];
+	}
+
+	// Top published reviews for Google Rich Snippets
+	$recent_reviews = get_posts( [
+		'post_type'      => 'program_review',
+		'post_status'    => 'publish',
+		'posts_per_page' => 5,
+		'meta_query'     => [
+			[
+				'key'     => '_review_program_id',
+				'value'   => $program_id,
+				'compare' => '=',
+				'type'    => 'NUMERIC',
+			],
+		],
+		'orderby'        => 'date',
+		'order'          => 'DESC',
+	] );
+
+	if ( ! empty( $recent_reviews ) ) {
+		$schema['review'] = [];
+		foreach ( $recent_reviews as $r_post ) {
+			$author_name = get_post_meta( $r_post->ID, '_review_author_name', true ) ?: 'Học viên ẩn danh';
+			$r_rating    = (int) get_post_meta( $r_post->ID, '_review_rating', true ) ?: 5;
+			$r_date      = get_the_date( 'Y-m-d', $r_post->ID );
+			$r_content   = wp_strip_all_tags( $r_post->post_content );
+
+			$schema['review'][] = [
+				'@type'         => 'Review',
+				'author'        => [
+					'@type' => 'Person',
+					'name'  => ltdh_mask_student_name( $author_name ),
+				],
+				'datePublished' => $r_date,
+				'reviewBody'    => $r_content,
+				'reviewRating'  => [
+					'@type'       => 'Rating',
+					'ratingValue' => (string) $r_rating,
+					'bestRating'  => '5',
+					'worstRating' => '1',
+				],
+			];
+		}
+	}
+
 	return $schema;
 }
 
 // ----------------------------------------------------
-// 8. Custom Admin Columns & Meta Boxes in WP Dashboard
+// 8. Custom Admin Columns, Quick Actions & Meta Boxes
 // ----------------------------------------------------
 add_filter( 'manage_program_review_posts_columns', 'ltdh_program_review_custom_columns' );
 function ltdh_program_review_custom_columns( $columns ) {
 	$new = [];
-	$new['cb']          = $columns['cb'];
-	$new['title']       = 'Tiêu đề';
-	$new['author_info'] = 'Học viên & SĐT';
-	$new['program_ref'] = 'Chương trình';
-	$new['rating']      = 'Điểm số';
-	$new['verified']    = 'Xác thực';
-	$new['date']        = 'Ngày gửi';
+	$new['cb']           = $columns['cb'];
+	$new['title']        = 'Tiêu đề';
+	$new['author_info']  = 'Học viên & SĐT';
+	$new['program_ref']  = 'Chương trình đào tạo';
+	$new['rating']       = 'Điểm số';
+	$new['quick_action'] = 'Duyệt nhanh';
+	$new['verified']     = 'Xác thực';
+	$new['date']         = 'Ngày gửi';
 	return $new;
 }
 
@@ -905,9 +990,40 @@ function ltdh_program_review_column_content( $column, $post_id ) {
 		case 'program_ref':
 			$pid = (int) get_post_meta( $post_id, '_review_program_id', true );
 			if ( $pid && get_post( $pid ) ) {
-				echo '<a href="' . esc_url( get_edit_post_link( $pid ) ) . '" target="_blank" style="font-weight:600;">' . esc_html( get_the_title( $pid ) ) . '</a>';
+				$edit_link = get_edit_post_link( $pid );
+				$view_link = get_permalink( $pid );
+				echo '<div style="margin-bottom: 5px;">';
+				echo '<a href="' . esc_url( $edit_link ) . '" target="_blank" style="font-weight: 600; color: #1e293b; text-decoration: none;">' . esc_html( get_the_title( $pid ) ) . '</a>';
+				echo '</div>';
+				if ( $view_link ) {
+					echo '<a href="' . esc_url( $view_link . '#danh-gia' ) . '" target="_blank" class="button button-small" style="display: inline-flex; align-items: center; gap: 3px; font-size: 11px; padding: 0 8px; height: 24px; line-height: 22px; color: #00308b; border-color: #cbd5e1; background: #f8fafc;" title="Xem phần đánh giá của chương trình trên website">';
+					echo '<span style="display:inline-block; font-size:12px;">↗</span> Xem bài viết';
+					echo '</a>';
+				}
 			} else {
 				echo '<span style="color:#999;">Không xác định</span>';
+			}
+			break;
+
+		case 'quick_action':
+			$post_status = get_post_status( $post_id );
+			if ( $post_status === 'pending' ) {
+				$approve_url = wp_nonce_url(
+					admin_url( 'admin-post.php?action=ltdh_quick_approve_review&post_id=' . $post_id ),
+					'ltdh_quick_approve_' . $post_id
+				);
+				echo '<a href="' . esc_url( $approve_url ) . '" class="button button-small button-primary" style="background: #059669; border-color: #047857; color: #fff; font-weight: 600; font-size: 11px; height: 26px; line-height: 24px; padding: 0 10px;" title="Duyệt xuất bản ngay lập tức">';
+				echo '✓ Duyệt ngay';
+				echo '</a>';
+			} elseif ( $post_status === 'publish' ) {
+				$unapprove_url = wp_nonce_url(
+					admin_url( 'admin-post.php?action=ltdh_quick_unapprove_review&post_id=' . $post_id ),
+					'ltdh_quick_unapprove_' . $post_id
+				);
+				echo '<span style="display: inline-block; color: #059669; font-weight: 600; font-size: 12px; margin-bottom: 2px;">✓ Đã xuất bản</span><br>';
+				echo '<a href="' . esc_url( $unapprove_url ) . '" style="color: #94a3b8; font-size: 11px; text-decoration: none;" title="Chuyển về trạng thái chờ duyệt">(Bỏ duyệt)</a>';
+			} else {
+				echo '<span style="color: #64748b; font-size: 11px;">' . esc_html( ucfirst( $post_status ) ) . '</span>';
 			}
 			break;
 
@@ -924,6 +1040,125 @@ function ltdh_program_review_column_content( $column, $post_id ) {
 				echo '<span style="color:#999;">Chưa</span>';
 			}
 			break;
+	}
+}
+
+// Add Quick Approve and View Program action links in list table row actions
+add_filter( 'post_row_actions', 'ltdh_program_review_row_actions', 10, 2 );
+function ltdh_program_review_row_actions( $actions, $post ) {
+	if ( $post->post_type !== 'program_review' ) {
+		return $actions;
+	}
+
+	$pid = (int) get_post_meta( $post->ID, '_review_program_id', true );
+
+	// 1. Quick Approve / Unapprove row action
+	if ( $post->post_status === 'pending' && current_user_can( 'edit_post', $post->ID ) ) {
+		$approve_url = wp_nonce_url(
+			admin_url( 'admin-post.php?action=ltdh_quick_approve_review&post_id=' . $post->ID ),
+			'ltdh_quick_approve_' . $post->ID
+		);
+		$actions['quick_approve'] = sprintf(
+			'<a href="%s" style="color: #059669; font-weight: bold;">✓ Duyệt nhanh</a>',
+			esc_url( $approve_url )
+		);
+	} elseif ( $post->post_status === 'publish' && current_user_can( 'edit_post', $post->ID ) ) {
+		$unapprove_url = wp_nonce_url(
+			admin_url( 'admin-post.php?action=ltdh_quick_unapprove_review&post_id=' . $post->ID ),
+			'ltdh_quick_unapprove_' . $post->ID
+		);
+		$actions['quick_unapprove'] = sprintf(
+			'<a href="%s" style="color: #d97706;">Bỏ duyệt</a>',
+			esc_url( $unapprove_url )
+		);
+	}
+
+	// 2. Direct link to view program review section on website
+	if ( $pid && get_post( $pid ) ) {
+		$view_url = get_permalink( $pid );
+		if ( $view_url ) {
+			$actions['view_program'] = sprintf(
+				'<a href="%s" target="_blank" style="color: #00308b; font-weight: 600;">Xem bài viết ↗</a>',
+				esc_url( $view_url . '#danh-gia' )
+			);
+		}
+	}
+
+	return $actions;
+}
+
+// Handlers for Admin Quick Approve & Unapprove
+add_action( 'admin_post_ltdh_quick_approve_review', 'ltdh_handle_quick_approve_review' );
+function ltdh_handle_quick_approve_review() {
+	$post_id = isset( $_GET['post_id'] ) ? (int) $_GET['post_id'] : 0;
+	if ( ! $post_id || get_post_type( $post_id ) !== 'program_review' ) {
+		wp_die( 'Đánh giá không hợp lệ.' );
+	}
+
+	check_admin_referer( 'ltdh_quick_approve_' . $post_id );
+
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		wp_die( 'Bạn không có quyền duyệt đánh giá này.' );
+	}
+
+	wp_update_post( [
+		'ID'          => $post_id,
+		'post_status' => 'publish',
+	] );
+
+	$program_id = (int) get_post_meta( $post_id, '_review_program_id', true );
+	if ( $program_id ) {
+		ltdh_recalculate_program_rating_stats( $program_id );
+	}
+
+	$redirect_to = isset( $_GET['redirect_to'] ) && $_GET['redirect_to'] === 'edit'
+		? get_edit_post_link( $post_id, 'url' )
+		: admin_url( 'edit.php?post_type=program_review' );
+
+	$redirect_to = add_query_arg( 'ltdh_approved', '1', $redirect_to );
+	wp_safe_redirect( $redirect_to );
+	exit;
+}
+
+add_action( 'admin_post_ltdh_quick_unapprove_review', 'ltdh_handle_quick_unapprove_review' );
+function ltdh_handle_quick_unapprove_review() {
+	$post_id = isset( $_GET['post_id'] ) ? (int) $_GET['post_id'] : 0;
+	if ( ! $post_id || get_post_type( $post_id ) !== 'program_review' ) {
+		wp_die( 'Đánh giá không hợp lệ.' );
+	}
+
+	check_admin_referer( 'ltdh_quick_unapprove_' . $post_id );
+
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		wp_die( 'Bạn không có quyền thao tác đánh giá này.' );
+	}
+
+	wp_update_post( [
+		'ID'          => $post_id,
+		'post_status' => 'pending',
+	] );
+
+	$program_id = (int) get_post_meta( $post_id, '_review_program_id', true );
+	if ( $program_id ) {
+		ltdh_recalculate_program_rating_stats( $program_id );
+	}
+
+	$redirect_to = add_query_arg( 'ltdh_unapproved', '1', admin_url( 'edit.php?post_type=program_review' ) );
+	wp_safe_redirect( $redirect_to );
+	exit;
+}
+
+// Admin Flash Notices
+add_action( 'admin_notices', 'ltdh_review_admin_notices' );
+function ltdh_review_admin_notices() {
+	global $pagenow, $typenow;
+	if ( $typenow === 'program_review' ) {
+		if ( ! empty( $_GET['ltdh_approved'] ) ) {
+			echo '<div class="notice notice-success is-dismissible"><p><strong>✓ Đã duyệt xuất bản đánh giá thành công!</strong> Điểm số và mã Google Schema trên trang chương trình đã được cập nhật.</p></div>';
+		}
+		if ( ! empty( $_GET['ltdh_unapproved'] ) ) {
+			echo '<div class="notice notice-warning is-dismissible"><p>Đã chuyển đánh giá về trạng thái Chờ duyệt (Pending).</p></div>';
+		}
 	}
 }
 
@@ -962,18 +1197,44 @@ function ltdh_render_review_metabox_html( $post ) {
 		'order'          => 'ASC',
 	] );
 	?>
+	<?php if ( $post->post_status === 'pending' ) : 
+		$approve_url = wp_nonce_url(
+			admin_url( 'admin-post.php?action=ltdh_quick_approve_review&post_id=' . $post->ID . '&redirect_to=edit' ),
+			'ltdh_quick_approve_' . $post->ID
+		);
+	?>
+		<div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+			<div style="color: #065f46; font-size: 13px;">
+				<strong style="display: block; font-size: 14px; margin-bottom: 2px;">⏳ Đánh giá này đang ở trạng thái Chờ duyệt</strong>
+				Đánh giá chưa hiển thị trên trang web và chưa được tính vào Google Schema.
+			</div>
+			<a href="<?php echo esc_url( $approve_url ); ?>" class="button button-primary" style="background: #059669; border-color: #047857; font-weight: bold; font-size: 13px; padding: 6px 16px; height: auto; text-decoration: none;">
+				✓ Duyệt & Xuất bản ngay
+			</a>
+		</div>
+	<?php endif; ?>
+
 	<table class="form-table" style="max-width: 800px;">
 		<tr>
 			<th scope="row"><label for="ltdh_admin_program_id">Chương trình đào tạo:</label></th>
 			<td>
-				<select name="ltdh_admin_program_id" id="ltdh_admin_program_id" style="width: 100%; max-width: 450px;">
-					<option value="">-- Chọn chương trình --</option>
-					<?php foreach ( $programs as $p ) : ?>
-						<option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( $program_id, $p->ID ); ?>>
-							<?php echo esc_html( $p->post_title ); ?>
-						</option>
-					<?php endforeach; ?>
-				</select>
+				<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+					<select name="ltdh_admin_program_id" id="ltdh_admin_program_id" style="width: 100%; max-width: 450px;">
+						<option value="">-- Chọn chương trình --</option>
+						<?php foreach ( $programs as $p ) : ?>
+							<option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( $program_id, $p->ID ); ?>>
+								<?php echo esc_html( $p->post_title ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+					<?php if ( $program_id && get_post( $program_id ) ) : 
+						$view_url = get_permalink( $program_id );
+					?>
+						<a href="<?php echo esc_url( $view_url . '#danh-gia' ); ?>" target="_blank" class="button button-secondary" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: #00308b;" title="Mở trang chi tiết chương trình trên website và cuộn tới mục Đánh giá">
+							<span style="font-size: 13px;">↗</span> Xem bài viết trên web
+						</a>
+					<?php endif; ?>
+				</div>
 			</td>
 		</tr>
 		<tr>
