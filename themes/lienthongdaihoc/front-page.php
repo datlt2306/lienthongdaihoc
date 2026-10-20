@@ -615,7 +615,7 @@ $zalo    = ltdh_get_zalo_url();
 												</div>
 
 												<!-- Tên trường -->
-												<h3 class="font-extrabold text-slate-900 text-sm md:text-[15px] tracking-tight leading-snug line-clamp-2 mt-0.5 group-hover:text-[#00308b] transition-colors">
+												<h3 class="font-extrabold text-slate-900 text-sm md:text-[15px] tracking-tight leading-snug line-clamp-1 mt-0.5 group-hover:text-[#00308b] transition-colors">
 													<a href="<?php echo esc_url($school['permalink']); ?>">
 														<?php echo esc_html($school['title']); ?>
 													</a>
