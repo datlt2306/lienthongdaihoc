@@ -21,7 +21,6 @@
 		initForm();
 		initNavigation();
 		initResultsActions();
-		initFileUpload();
 		initShareAndCopy();
 		initUrlAndInitialResults();
 	}
@@ -374,33 +373,7 @@
 	}
 
 	function initFileUpload() {
-		var degreeInput = document.getElementById('degree-file-input');
-		var degreeLabel = document.getElementById('degree-file-label');
-		if (degreeInput && degreeLabel) {
-			degreeInput.addEventListener('change', function () {
-				if (degreeInput.files.length > 0) {
-					degreeLabel.textContent = "Đã chọn: " + degreeInput.files[0].name;
-					degreeLabel.style.color = '#10b981'; // emerald-500
-				} else {
-					degreeLabel.textContent = "Tải ảnh hoặc PDF bằng cấp lên";
-					degreeLabel.style.color = '';
-				}
-			});
-		}
-
-		var transInput = document.getElementById('transcript-file-input');
-		var transLabel = document.getElementById('transcript-file-label');
-		if (transInput && transLabel) {
-			transInput.addEventListener('change', function () {
-				if (transInput.files.length > 0) {
-					transLabel.textContent = "Đã chọn: " + transInput.files[0].name;
-					transLabel.style.color = '#10b981'; // emerald-500
-				} else {
-					transLabel.textContent = "Tải ảnh hoặc PDF bảng điểm lên";
-					transLabel.style.color = '';
-				}
-			});
-		}
+		// Document uploads removed per specification - kept for backwards compatibility
 	}
 
 	// ----------------------------------------------------
@@ -653,15 +626,15 @@
 		}
 
 		// Pre-fill fields in Consultation lead capture form at the bottom
-		var checkIdField = document.getElementById('elig-check-id');
-		if (checkIdField) checkIdField.value = data.check_id || '';
+		var checkIdFields = document.querySelectorAll('#elig-lead-section input[name="elig_check_id"], #elig-check-id');
+		checkIdFields.forEach(function (f) { f.value = data.check_id || ''; });
 
 		var topProg = (data.programs && data.programs[0]) || (data.alternatives && data.alternatives[0]);
 		var selectedProgTitleEl = document.getElementById('elig-selected-program-title');
-		var progIdField = document.getElementById('elig-program-id');
+		var progIdFields = document.querySelectorAll('#elig-lead-section input[name="elig_program_id"], #elig-program-id');
 
 		if (topProg) {
-			if (progIdField) progIdField.value = topProg.program_id;
+			progIdFields.forEach(function (f) { f.value = topProg.program_id; });
 			if (selectedProgTitleEl) {
 				var schoolTitle = (topProg.school && topProg.school.title) ? topProg.school.title : '';
 				selectedProgTitleEl.textContent = (schoolTitle ? (schoolTitle + ' — ') : '') + topProg.title;
@@ -674,7 +647,6 @@
 
 		// Lead form submission & Card verification triggers
 		initLeadForm();
-		initFileUpload();
 		initCardVerifyListeners();
 	}
 
@@ -962,6 +934,25 @@
 	var currentLeadId = null;
 
 	function initLeadForm() {
+		var leadSection = document.getElementById('elig-lead-section');
+		if (!leadSection) return;
+
+		// Listen to Contact Form 7 submission success event
+		if (leadSection.dataset.cf7Bound !== 'true') {
+			leadSection.dataset.cf7Bound = 'true';
+			leadSection.addEventListener('wpcf7mailsent', function (e) {
+				var targetForm = e.target;
+				if (targetForm) {
+					targetForm.innerHTML = '<div class="elig-lead-success bg-emerald-50 border border-emerald-200 text-emerald-900 p-6 md:p-8 rounded-2xl text-center space-y-3 animate-fade-in shadow-sm">' +
+						'<div class="text-4xl">🎉</div>' +
+						'<h4 class="text-xl font-black text-emerald-900">Gửi yêu cầu đối chiếu hồ sơ thành công!</h4>' +
+						'<p class="text-sm text-emerald-700 max-w-lg mx-auto leading-relaxed">Hệ thống đã tiếp nhận thông tin của bạn. Ban tư vấn chuyên môn sẽ thẩm định hồ sơ, đối chiếu điều kiện nhập học thực tế và liên hệ hỗ trợ bạn trong vòng 24 giờ làm việc.</p>' +
+					'</div>';
+					leadSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				}
+			});
+		}
+
 		var formEl = document.getElementById('elig-consultation-form');
 		if (!formEl || formEl.dataset.bound === 'true') return;
 		formEl.dataset.bound = 'true';
@@ -979,18 +970,6 @@
 				if (submitBtn) submitBtn.disabled = false;
 				if (btnText) btnText.classList.remove('hidden');
 				if (btnLoading) btnLoading.classList.add('hidden');
-			}
-
-			// Validate file sizes (max 5MB each)
-			var degreeInput = document.getElementById('degree-file-input');
-			if (degreeInput && degreeInput.files.length > 0 && degreeInput.files[0].size > 5 * 1024 * 1024) {
-				alert('Dung lượng tệp bằng cấp vượt quá giới hạn 5MB cho phép.');
-				return;
-			}
-			var transInput = document.getElementById('transcript-file-input');
-			if (transInput && transInput.files.length > 0 && transInput.files[0].size > 5 * 1024 * 1024) {
-				alert('Dung lượng tệp bảng điểm vượt quá giới hạn 5MB cho phép.');
-				return;
 			}
 
 			if (submitBtn) submitBtn.disabled = true;
@@ -1025,7 +1004,7 @@
 					formEl.innerHTML = '<div class="elig-lead-success bg-emerald-50 border border-emerald-200 text-emerald-900 p-6 md:p-8 rounded-2xl text-center space-y-3 animate-fade-in shadow-sm">' +
 						'<div class="text-4xl">🎉</div>' +
 						'<h4 class="text-xl font-black text-emerald-900">Gửi yêu cầu đối chiếu hồ sơ thành công!</h4>' +
-						'<p class="text-sm text-emerald-700 max-w-lg mx-auto leading-relaxed">Hệ thống đã tiếp nhận đầy đủ thông tin và tài liệu của bạn. Ban tư vấn chuyên môn sẽ thẩm định hồ sơ, đối chiếu điều kiện nhập học thực tế và liên hệ hỗ trợ bạn trong vòng 24 giờ làm việc.</p>' +
+						'<p class="text-sm text-emerald-700 max-w-lg mx-auto leading-relaxed">Hệ thống đã tiếp nhận thông tin của bạn. Ban tư vấn chuyên môn sẽ thẩm định hồ sơ, đối chiếu điều kiện nhập học thực tế và liên hệ hỗ trợ bạn trong vòng 24 giờ làm việc.</p>' +
 					'</div>';
 				} else {
 					alert(json.data && json.data.message ? json.data.message : 'Có lỗi xảy ra.');
@@ -1111,9 +1090,9 @@
 				var programId = verifyBtn.getAttribute('data-program-id');
 				var progTitle = verifyBtn.getAttribute('data-program-title');
 				
-				var progIdField = document.getElementById('elig-program-id');
-				if (progIdField && programId) {
-					progIdField.value = programId;
+				var progIdFields = document.querySelectorAll('#elig-lead-section input[name="elig_program_id"], #elig-program-id');
+				if (programId) {
+					progIdFields.forEach(function (f) { f.value = programId; });
 				}
 				
 				if (!progTitle) {

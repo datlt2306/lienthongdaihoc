@@ -704,7 +704,7 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	// Suppress duplicate plain-text emails from Contact Form 7.
 	// The theme's HTML notification system (ltdh_trigger_email_notifications)
 	// handles sending branded HTML confirmation to the student and lead alert to the admin.
-	$contact_form->skip_mail = true;
+	add_filter( 'wpcf7_skip_mail', '__return_true' );
 }
 
 // ----------------------------------------------------

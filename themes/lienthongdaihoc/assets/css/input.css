@@ -572,7 +572,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     justify-content: space-between;
     width: 100%;
     border-radius: 0.75rem;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 .mobile-menu-item-row:hover {
     background-color: #f8fafc;
@@ -595,54 +595,62 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     background-color: #f1f5f9;
     color: #00308b;
 }
-.nav-mobile-menu .current-menu-item > a,
-.nav-mobile-menu .current_page_item > a,
-.nav-mobile-menu .current-menu-ancestor > a,
-.nav-mobile-menu .current-menu-item > .mobile-menu-item-row > a,
-.nav-mobile-menu .current_page_item > .mobile-menu-item-row > a,
-.nav-mobile-menu .current-menu-ancestor > .mobile-menu-item-row > a {
+
+/* Level 1: Ancestor State (Parent of open submenu, e.g. 'Nhóm Ngành' while viewing a major)
+   Clean text accent, NO heavy background pill so the active leaf stands out cleanly */
+.nav-mobile-menu > li.current-menu-ancestor > .mobile-menu-item-row > a,
+.nav-mobile-menu > li.current-menu-ancestor > a,
+.nav-mobile-menu > li.menu-item-has-children.is-open > .mobile-menu-item-row > a,
+.nav-mobile-menu > li.menu-item-has-children.is-open > a {
     color: #00308b;
-    background-color: #eff6ff;
     font-weight: 700;
-}
-.nav-mobile-menu ul.sub-menu .current-menu-item > a,
-.nav-mobile-menu ul.sub-menu .current-menu-item > .mobile-menu-item-row > a {
-    color: #00308b;
-    background-color: #eff6ff;
-    font-weight: 700;
-}
-.nav-mobile-menu li.menu-item-category.current-menu-ancestor > .mobile-menu-item-row,
-.nav-mobile-menu li.menu-item-category.current-menu-item > .mobile-menu-item-row {
-    background: #eff6ff;
-    border-color: #bfdbfe;
+    background-color: transparent;
 }
 
-/* Accordion Toggle Button */
+/* Level 1: Standalone Active Leaf (e.g. 'Liên hệ' or 'Trang chủ' without submenus) */
+.nav-mobile-menu > li:not(.menu-item-has-children).current-menu-item > .mobile-menu-item-row > a,
+.nav-mobile-menu > li:not(.menu-item-has-children).current-menu-item > a,
+.nav-mobile-menu > li:not(.menu-item-has-children).current_page_item > .mobile-menu-item-row > a,
+.nav-mobile-menu > li:not(.menu-item-has-children).current_page_item > a {
+    color: #00308b;
+    background-color: #eff6ff;
+    font-weight: 700;
+    border-left: 3px solid #00308b;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+/* Level 1: Archive Root Item (When user is directly on /nhom-nganh/ archive itself) */
+.nav-mobile-menu > li.menu-item-has-children.current-menu-item:not(.current-menu-ancestor) > .mobile-menu-item-row > a {
+    color: #00308b;
+    background-color: #eff6ff;
+    font-weight: 700;
+}
+
+/* Accordion Toggle Button — Seamless Ghost Icon Button */
 .mobile-submenu-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    min-height: 38px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
     padding: 0;
-    border: 1px solid #fff;
-    background: #f8fafc;
+    border: none;
+    background: transparent;
     cursor: pointer;
-    border-radius: 0.625rem;
+    border-radius: 0.5rem;
     color: #64748b;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     flex-shrink: 0;
-    margin-right: 0.25rem;
+    margin-right: 0.35rem;
 }
-.mobile-submenu-toggle:hover,
-.mobile-submenu-toggle:focus-visible {
-    background-color: #f1f5f9;
+.mobile-submenu-toggle:hover {
+    background-color: rgba(148, 163, 184, 0.15);
     color: #00308b;
-    border-color: #cbd5e1;
 }
 .mobile-submenu-toggle:active {
     transform: scale(0.92);
@@ -655,8 +663,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 }
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-menu-item-row .mobile-submenu-toggle,
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-submenu-toggle {
-    background-color: #eff6ff;
-    border-color: #fff;
+    background-color: transparent;
     color: #00308b;
 }
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-menu-item-row .mobile-submenu-toggle svg,
@@ -667,12 +674,12 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 /* Sub-menu tree guide & accordion animation */
 .nav-mobile-menu ul.sub-menu {
     list-style: none;
-    padding: 0 0 0 0.875rem;
-    margin: 0 0 0 0.75rem;
+    padding: 0 0 0 0.75rem;
+    margin: 0 0 0 0.875rem;
     border-left: 2px solid #e2e8f0;
     display: flex;
     flex-direction: column;
-    gap: 0.125rem;
+    gap: 0.25rem;
     max-height: 0;
     opacity: 0;
     overflow: hidden;
@@ -680,10 +687,10 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     pointer-events: none;
 }
 .nav-mobile-menu li.menu-item-has-children.is-open > ul.sub-menu {
-    max-height: 1200px;
+    max-height: 1400px;
     opacity: 1;
     margin-top: 0.25rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.625rem;
     pointer-events: auto;
 }
 .nav-mobile-menu ul.sub-menu li {
@@ -696,29 +703,51 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     min-height: 40px;
     padding: 0.375rem 0.625rem;
     border-radius: 0.5rem;
+    transition: all 0.15s ease;
 }
-.nav-mobile-menu ul.sub-menu a:hover,
-.nav-mobile-menu ul.sub-menu .current-menu-item > a {
+.nav-mobile-menu ul.sub-menu a:hover {
     color: #00308b;
     background-color: #f1f5f9;
+}
+
+/* Standard Sub-menu Active Leaf (for 2-level menus like 'Hình thức đào tạo') */
+.nav-mobile-menu ul.sub-menu > li:not(.menu-item-category).current-menu-item > a,
+.nav-mobile-menu ul.sub-menu > li:not(.menu-item-category).current-menu-item > .mobile-menu-item-row > a {
+    background-color: #00308b !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 1px 3px rgba(0, 48, 139, 0.2) !important;
+}
+.nav-mobile-menu ul.sub-menu > li:not(.menu-item-category).current-menu-item > a::before,
+.nav-mobile-menu ul.sub-menu > li:not(.menu-item-category).current-menu-item > .mobile-menu-item-row > a::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
 }
 
 /* ============================================================
    MEGA MENU — MOBILE ACCORDION (DRAWER)
    ============================================================ */
 
-/* Mobile category row */
+/* Level 2: Category Row */
 .nav-mobile-menu li.menu-item-category > .mobile-menu-item-row {
     background: #f8fafc;
-    border: 1px solid #f1f5f9;
+    border: 1px solid #e2e8f0;
     border-radius: 0.625rem;
     margin: 0.25rem 0;
+    transition: all 0.15s ease;
 }
 .nav-mobile-menu li.menu-item-category > .mobile-menu-item-row a {
     font-size: 0.875rem;
-    font-weight: 700;
-    color: #0f172a;
-    padding: 0.4rem 0.625rem;
+    font-weight: 600;
+    color: #334155;
+    padding: 0.45rem 0.75rem;
     min-height: 38px;
 }
 .nav-mobile-menu li.menu-item-category > .mobile-menu-item-row a:hover {
@@ -726,10 +755,38 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     background: transparent;
 }
 
-/* Category sub-majors on mobile */
+/* Level 2: Open / Ancestor Category Header (Frame containing the active major)
+   Clean crisp card with subtle border, NOT a solid blue blob */
+.nav-mobile-menu li.menu-item-category.is-open > .mobile-menu-item-row,
+.nav-mobile-menu li.menu-item-category.current-menu-ancestor > .mobile-menu-item-row {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+.nav-mobile-menu li.menu-item-category.is-open > .mobile-menu-item-row a,
+.nav-mobile-menu li.menu-item-category.current-menu-ancestor > .mobile-menu-item-row a {
+    color: #0f172a;
+    font-weight: 700;
+}
+.nav-mobile-menu li.menu-item-category.is-open > .mobile-menu-item-row .mobile-submenu-toggle,
+.nav-mobile-menu li.menu-item-category.current-menu-ancestor > .mobile-menu-item-row .mobile-submenu-toggle {
+    color: #00308b;
+}
+
+/* Level 2: Direct Category Archive Selected (When visiting /nhom-nganh/ky-thuat-cong-nghe/ directly) */
+.nav-mobile-menu li.menu-item-category.current-menu-item:not(.current-menu-ancestor) > .mobile-menu-item-row {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+.nav-mobile-menu li.menu-item-category.current-menu-item:not(.current-menu-ancestor) > .mobile-menu-item-row a {
+    color: #00308b;
+    font-weight: 700;
+}
+
+/* Level 3: Category Sub-majors tree container on mobile */
 .nav-mobile-menu li.menu-item-category > ul.sub-menu {
     border-left: 2px solid #cbd5e1;
-    margin-left: 1rem;
+    margin-left: 0.875rem;
     padding-left: 0.625rem;
     gap: 0.125rem;
 }
@@ -737,25 +794,83 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     font-size: 0.8125rem;
     font-weight: 500;
     color: #475569;
-    min-height: 34px;
-    padding: 0.25rem 0.5rem;
+    min-height: 36px;
+    padding: 0.35rem 0.625rem;
+    border-radius: 0.5rem;
+    transition: all 0.15s ease;
 }
 .nav-mobile-menu li.menu-item-category > ul.sub-menu a:hover {
     color: #00308b;
+    background-color: #f1f5f9;
 }
 
-/* View all on mobile */
+/* Level 3: ACTIVE LEAF MAJOR ('Công nghệ thông tin' when viewing its single page)
+   Unmistakable royal blue focal point with white active dot indicator */
+.nav-mobile-menu li.menu-item-category > ul.sub-menu li.current-menu-item > a,
+.nav-mobile-menu li.menu-item-category > ul.sub-menu li.current-menu-item > .mobile-menu-item-row > a,
+.nav-mobile-menu li.menu-item-object-major.current-menu-item > a,
+.nav-mobile-menu li.menu-item-object-major.current-menu-item > .mobile-menu-item-row > a {
+    background-color: #00308b !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 2px 4px -1px rgba(0, 48, 139, 0.25), 0 1px 2px -1px rgba(0, 48, 139, 0.15) !important;
+    padding-left: 0.75rem !important;
+}
+.nav-mobile-menu li.menu-item-category > ul.sub-menu li.current-menu-item > a::before,
+.nav-mobile-menu li.menu-item-category > ul.sub-menu li.current-menu-item > .mobile-menu-item-row > a::before,
+.nav-mobile-menu li.menu-item-object-major.current-menu-item > a::before,
+.nav-mobile-menu li.menu-item-object-major.current-menu-item > .mobile-menu-item-row > a::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Category 'Xem tất cả' within category */
+.nav-mobile-menu .mega-cat-more-mobile {
+    color: #00308b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.35rem 0.625rem;
+    border-radius: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.nav-mobile-menu .mega-cat-more-mobile:hover {
+    background-color: #eff6ff;
+}
+
+/* Level 2 Global CTA: 'Xem tất cả ngành học →' on mobile
+   Understated discovery button, never pretends to be an active state */
 .nav-mobile-menu li.ltdh-view-all-link > .mobile-menu-item-row {
-    margin-top: 0.5rem;
-    background: #eff6ff;
-    border: 1px solid #dbeafe;
+    margin-top: 0.625rem;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
     border-radius: 0.625rem;
+    transition: all 0.15s ease;
+}
+.nav-mobile-menu li.ltdh-view-all-link > .mobile-menu-item-row:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
 }
 .nav-mobile-menu li.ltdh-view-all-link > .mobile-menu-item-row a {
-    color: #00308b;
-    font-weight: 700;
+    color: #475569;
+    font-weight: 600;
     font-size: 0.8125rem;
     justify-content: center;
+    min-height: 38px;
+    padding: 0.45rem 0.75rem;
+    gap: 0.375rem;
+}
+.nav-mobile-menu li.ltdh-view-all-link > .mobile-menu-item-row:hover a {
+    color: #00308b;
+    background: transparent;
 }
 
 
