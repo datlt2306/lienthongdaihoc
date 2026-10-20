@@ -633,14 +633,7 @@ $program_tabs[] = [
 														<span class="w-2 h-2 rounded-full bg-[#00308b] shrink-0"></span>
 														<span class="leading-snug">Quy định đối tượng tuyển sinh: Đúng ngành &amp; Ngành gần</span>
 													</h3>
-													<?php if ( ! empty( $t_item['regulation_title'] ) ) : ?>
-														<span class="inline-flex items-center text-xs text-slate-500 bg-slate-100/90 border border-slate-200/60 px-2.5 py-1 rounded-md self-start sm:self-auto max-w-full min-w-0">
-															<svg class="w-3.5 h-3.5 text-slate-400 mr-1.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-																<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-															</svg>
-															<span class="truncate block min-w-0"><?php echo esc_html( $t_item['regulation_title'] ); ?></span>
-														</span>
-													<?php endif; ?>
+													
 												</div>
 
 												<!-- Danh sách 2 nhóm: Đúng ngành & Ngành gần (Tinh gọn, chuẩn concept màu Brand Primary Navy & Brand Accent Amber) -->

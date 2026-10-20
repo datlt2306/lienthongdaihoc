@@ -132,8 +132,14 @@ function ltdh_get_mailer_from_name(): string {
 		}
 	}
 
+	// Respect WP Mail SMTP settings if configured
+	$smtp_opts = get_option( 'wp_mail_smtp' );
+	if ( is_array( $smtp_opts ) && ! empty( $smtp_opts['mail']['from_name'] ) ) {
+		return sanitize_text_field( $smtp_opts['mail']['from_name'] );
+	}
+
 	$site_title = get_bloginfo( 'name' );
-	return ! empty( $site_title ) ? $site_title : 'Cổng Tuyển Sinh Liên Thông Đại Học';
+	return ! empty( $site_title ) ? $site_title : 'Liên Thông Đại Học';
 }
 
 /**
@@ -151,18 +157,24 @@ function ltdh_get_mailer_from_address(): string {
 		}
 	}
 
+	// Respect WP Mail SMTP settings if configured
+	$smtp_opts = get_option( 'wp_mail_smtp' );
+	if ( is_array( $smtp_opts ) && ! empty( $smtp_opts['mail']['from_email'] ) && is_email( $smtp_opts['mail']['from_email'] ) ) {
+		return sanitize_email( $smtp_opts['mail']['from_email'] );
+	}
+
+	// Fallback to domain email (e.g. hotro@lienthongdaihoc.com)
+	$host = parse_url( home_url(), PHP_URL_HOST );
+	if ( ! empty( $host ) && false === strpos( $host, 'localhost' ) && false === strpos( $host, '.local' ) ) {
+		return 'hotro@' . $host;
+	}
+
 	$admin_email = get_option( 'admin_email' );
 	if ( is_email( $admin_email ) && false === strpos( $admin_email, 'localhost' ) && false === strpos( $admin_email, '.local' ) ) {
 		return sanitize_email( $admin_email );
 	}
 
-	// Safe fallback domain email preventing PHPMailer localhost failure
-	$host = parse_url( home_url(), PHP_URL_HOST );
-	if ( ! empty( $host ) && false === strpos( $host, 'localhost' ) && false === strpos( $host, '.local' ) ) {
-		return 'tuyensinh@' . $host;
-	}
-
-	return 'tuyensinh@lienthongdaihoc.edu.vn';
+	return 'hotro@lienthongdaihoc.com';
 }
 
 /**
