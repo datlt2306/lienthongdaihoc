@@ -1454,8 +1454,8 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<!-- 9. DYNAMIC CONSULTATION FORM SECTION -->
-	<section id="register-section" class="scroll-mt-20 md:scroll-mt-24 py-8 sm:py-12 md:py-16 bg-white">
+	<!-- 9. DYNAMIC CONSULTATION FORM SECTION (Hidden on mobile per UX specification) -->
+	<section id="register-section" class="hidden md:block scroll-mt-20 md:scroll-mt-24 py-8 sm:py-12 md:py-16 bg-white">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-20">
 			<div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden grid grid-cols-1 lg:grid-cols-12 mb-12">
 			
