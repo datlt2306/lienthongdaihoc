@@ -1392,6 +1392,19 @@ function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
 			data-compare-school-name="<?php echo esc_attr( $school_title ); ?>">
 		<span>📊</span> <span>Thêm vào so sánh</span>
 	</button>
+
+	<!-- SHARE PROGRAM BUTTON (Desktop Sidebar) -->
+	<button type="button"
+			class="hidden lg:flex w-full text-center bg-blue-50/80 hover:bg-blue-100 text-[#00308b] py-3.5 rounded-xl font-bold transition-all ltdh-program-sidebar-share-btn text-sm items-center justify-center gap-2 mt-3 min-h-[44px] cursor-pointer border border-blue-200/70 select-none shadow-2xs"
+			data-url="<?php echo esc_url( get_permalink( $program_id ) ); ?>"
+			data-title="<?php echo esc_attr( get_the_title( $program_id ) ); ?>"
+			data-type="program"
+			title="Chia sẻ chương trình đào tạo này">
+		<svg class="w-4 h-4 text-[#00308b] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+		</svg>
+		<span>Chia sẻ chương trình</span>
+	</button>
 <?php
 }
 
