@@ -590,11 +590,18 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 
 	// Resolve program ID (accepts numeric ID or title string, supports array from CF7 select)
 	$program_id = 0;
-	if ( isset( $posted_data['current_program_id'] ) ) {
+	$raw_prog   = '';
+	if ( ! empty( $posted_data['current_program_id'] ) ) {
 		$raw_prog = is_array( $posted_data['current_program_id'] ) ? reset( $posted_data['current_program_id'] ) : $posted_data['current_program_id'];
+	}
+	if ( ( empty( $raw_prog ) || '-- Chọn ngành hoặc hệ học --' === $raw_prog ) && ! empty( $posted_data['program_id'] ) ) {
+		$raw_prog = is_array( $posted_data['program_id'] ) ? reset( $posted_data['program_id'] ) : $posted_data['program_id'];
+	}
+
+	if ( ! empty( $raw_prog ) ) {
 		if ( is_numeric( $raw_prog ) && (int) $raw_prog > 0 ) {
 			$program_id = intval( $raw_prog );
-		} elseif ( is_string( $raw_prog ) && ! empty( $raw_prog ) && '-- Chọn ngành hoặc hệ học --' !== $raw_prog ) {
+		} elseif ( is_string( $raw_prog ) && '-- Chọn ngành hoặc hệ học --' !== $raw_prog ) {
 			$cpt_prog   = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
 			$found_prog = get_page_by_title( $raw_prog, OBJECT, $cpt_prog );
 			if ( $found_prog ) {
@@ -603,9 +610,6 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 				$message = "[Nguyện vọng/Ngành: " . sanitize_text_field( $raw_prog ) . "]\n" . $message;
 			}
 		}
-	} elseif ( isset( $posted_data['program_id'] ) ) {
-		$raw_prog   = is_array( $posted_data['program_id'] ) ? reset( $posted_data['program_id'] ) : $posted_data['program_id'];
-		$program_id = absint( $raw_prog );
 	}
 
 	$school_raw    = is_array( $posted_data['current_school_id'] ?? ( $posted_data['school_id'] ?? 0 ) ) ? reset( $posted_data['current_school_id'] ?? ( $posted_data['school_id'] ?? 0 ) ) : ( $posted_data['current_school_id'] ?? ( $posted_data['school_id'] ?? 0 ) );

@@ -2490,10 +2490,33 @@ function ltdh_cf7_dynamic_programs($tag, $replace) {
 		$tag['values'][]     = '';
 		$tag['labels'][]     = '-- Chọn ngành hoặc hệ học --';
 
+		$curr_id = 0;
+		if ( ! empty( $GLOBALS['ltdh_cf7_context_hidden_fields']['current_program_id'] ) ) {
+			$curr_id = (int) $GLOBALS['ltdh_cf7_context_hidden_fields']['current_program_id'];
+		} elseif ( ! empty( $GLOBALS['ltdh_cf7_context_hidden_fields']['program_id'] ) ) {
+			$curr_id = (int) $GLOBALS['ltdh_cf7_context_hidden_fields']['program_id'];
+		} elseif ( function_exists( 'is_singular' ) && is_singular( 'program' ) ) {
+			$curr_id = get_the_ID();
+		}
+
+		$selected_idx = 0;
+		$idx = 1;
 		foreach ($programs as $p) {
+			$idx++;
 			$tag['raw_values'][] = (string) $p->ID;
 			$tag['values'][]     = (string) $p->ID;
 			$tag['labels'][]     = $p->post_title;
+
+			if ( $curr_id && (int) $p->ID === $curr_id ) {
+				$selected_idx = $idx;
+			}
+		}
+
+		if ( $selected_idx > 0 ) {
+			if ( ! isset( $tag['options'] ) || ! is_array( $tag['options'] ) ) {
+				$tag['options'] = [];
+			}
+			$tag['options'][] = 'default:' . $selected_idx;
 		}
 	}
 	return $tag;

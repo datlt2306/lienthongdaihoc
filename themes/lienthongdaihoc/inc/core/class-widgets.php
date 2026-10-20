@@ -602,7 +602,7 @@ class LTDH_Widget_Consultation_Form extends WP_Widget {
 
 		echo $args['before_widget'];
 		?>
-		<div class="ltdh-widget-form">
+		<div class="ltdh-widget-form ltdh-sidebar-form">
 			<?php if ( ! empty( $title ) ) : ?>
 				<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2"><?php echo esc_html( $title ); ?></h3>
 			<?php endif; ?>
@@ -618,14 +618,19 @@ class LTDH_Widget_Consultation_Form extends WP_Widget {
 					'referral_source' => get_permalink(),
 				];
 				if ( is_singular( 'program' ) ) {
+					$hidden['program_id']         = get_the_ID();
 					$hidden['current_program_id'] = get_the_ID();
 					$school_id = get_field( 'school_relationship', get_the_ID() );
 					if ( $school_id ) {
-						$hidden['current_school_id'] = is_object( $school_id ) ? $school_id->ID : (int) $school_id;
+						$resolved_sid = is_object( $school_id ) ? $school_id->ID : (int) $school_id;
+						$hidden['school_id']         = $resolved_sid;
+						$hidden['current_school_id'] = $resolved_sid;
 					}
 				} elseif ( is_singular( 'school' ) ) {
+					$hidden['school_id']         = get_the_ID();
 					$hidden['current_school_id'] = get_the_ID();
 				} elseif ( is_singular( 'major' ) ) {
+					$hidden['major_id']         = get_the_ID();
 					$hidden['current_major_id'] = get_the_ID();
 					$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
 					if ( ! empty( $school_param ) ) {
@@ -636,6 +641,7 @@ class LTDH_Widget_Consultation_Form extends WP_Widget {
 							$s_post     = get_page_by_path( sanitize_title( $school_param ), OBJECT, $cpt_school );
 						}
 						if ( $s_post && 'publish' === $s_post->post_status && ( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) === $s_post->post_type ) {
+							$hidden['school_id']         = $s_post->ID;
 							$hidden['current_school_id'] = $s_post->ID;
 						}
 					}
@@ -1122,6 +1128,7 @@ function ltdh_render_default_guide_sidebar() {
 				<span class="font-bold">Gửi thông tin thành công!</span> Chúng tôi sẽ liên hệ lại sớm nhất.
 			</div>
 		<?php endif; ?>
+		<div class="ltdh-sidebar-form">
 		<?php 
 		if ( function_exists( 'ltdh_render_consultation_form' ) ) {
 			ltdh_render_consultation_form( [
@@ -1131,6 +1138,7 @@ function ltdh_render_default_guide_sidebar() {
 			ltdh_render_recaptcha_field( 'sidebar_lead' );
 		}
 		?>
+		</div>
 	</section>
 
 	<!-- Zalo / Call Card -->
@@ -1219,16 +1227,21 @@ function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
 		<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>
 		<p class="text-sm text-slate-500 mb-4">Hãy để lại thông tin, ban tư vấn tuyển sinh sẽ liên hệ và giải đáp lộ trình cụ thể cho bạn trong vòng 15 phút.</p>
 		
+		<div class="ltdh-sidebar-form">
 		<?php 
 		if ( function_exists( 'ltdh_render_consultation_form' ) ) {
 			ltdh_render_consultation_form( [
+				'program_id'         => $program_id,
 				'current_program_id' => $program_id,
+				'school_id'          => $school_id,
 				'current_school_id'  => $school_id,
+				'major_id'           => $major_id,
 				'current_major_id'   => $major_id,
 				'referral_source'    => get_permalink(),
 			] );
 		}
 		?>
+		</div>
 	</section>
 
 	<!-- ZALO GROUP COMMUNITY WIDGET -->
@@ -1435,14 +1448,17 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 		<h3 class="text-base lg:text-lg font-bold text-slate-900 mb-1.5 lg:mb-2 leading-snug">Đăng ký vào <?php echo esc_html( $school_title ); ?></h3>
 		<p class="text-xs lg:text-sm text-slate-500 mb-4 leading-relaxed">Nhận tư vấn hồ sơ miễn phí, hỗ trợ xử lý thủ tục nhập học nhanh chóng.</p>
 		
+		<div class="ltdh-sidebar-form">
 		<?php 
 		if ( function_exists( 'ltdh_render_consultation_form' ) ) {
 			ltdh_render_consultation_form( [
+				'school_id'         => $school_id,
 				'current_school_id' => $school_id,
 				'referral_source'   => get_permalink(),
 			] );
 		}
 		?>
+		</div>
 	</section>
 
 
@@ -1617,18 +1633,22 @@ function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
 			<?php endif; ?>
 		</p>
 		
+		<div class="ltdh-sidebar-form">
 		<?php 
 		if ( function_exists( 'ltdh_render_consultation_form' ) ) {
 			$consultation_hidden = [
+				'major_id'         => $major_id,
 				'current_major_id' => $major_id,
 				'referral_source'  => get_permalink(),
 			];
 			if ( $context_school ) {
+				$consultation_hidden['school_id']         = $school_id;
 				$consultation_hidden['current_school_id'] = $school_id;
 			}
 			ltdh_render_consultation_form( $consultation_hidden );
 		}
 		?>
+		</div>
 	</section>
 
 	<!-- RELATED NEWS & ANNOUNCEMENTS (Sidebar) -->

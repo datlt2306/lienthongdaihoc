@@ -795,6 +795,79 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     margin-bottom: 0 !important;
 }
 
+/* ----------------------------------------------------
+   Responsive Layout Rules for Sidebars & Narrow Containers
+   ---------------------------------------------------- */
+.wpcf7,
+.ltdh-contact-form-wrapper,
+.ltdh-widget-form,
+.ltdh-sidebar-form {
+    container-type: inline-size;
+}
+
+@container (max-width: 540px) {
+    .ltdh-cf7-form .grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.875rem !important;
+    }
+    .ltdh-cf7-form input[type="submit"] {
+        width: 100% !important;
+    }
+    .ltdh-cf7-form .flex-col,
+    .ltdh-cf7-form .sm\:flex-row {
+        flex-direction: column !important;
+        gap: 0.375rem !important;
+    }
+    .ltdh-cf7-form .sm\:inline {
+        display: none !important;
+    }
+}
+
+/* Explicit Sidebar, Aside and Widget Container Overrides */
+aside .ltdh-cf7-form .grid,
+.widget-area .ltdh-cf7-form .grid,
+.ltdh-widget-form .ltdh-cf7-form .grid,
+.ltdh-sidebar-form .ltdh-cf7-form .grid,
+.ltdh-sidebar-form .grid,
+#program-sidebar .ltdh-cf7-form .grid,
+#school-sidebar .ltdh-cf7-form .grid,
+#major-sidebar .ltdh-cf7-form .grid,
+#guide-sidebar .ltdh-cf7-form .grid,
+#secondary .ltdh-cf7-form .grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.875rem !important;
+}
+
+aside .ltdh-cf7-form input[type="submit"],
+.widget-area .ltdh-cf7-form input[type="submit"],
+.ltdh-widget-form .ltdh-cf7-form input[type="submit"],
+.ltdh-sidebar-form .ltdh-cf7-form input[type="submit"],
+.ltdh-sidebar-form input[type="submit"],
+#program-sidebar .ltdh-cf7-form input[type="submit"],
+#school-sidebar .ltdh-cf7-form input[type="submit"],
+#major-sidebar .ltdh-cf7-form input[type="submit"],
+#guide-sidebar .ltdh-cf7-form input[type="submit"],
+#secondary .ltdh-cf7-form input[type="submit"] {
+    width: 100% !important;
+}
+
+aside .ltdh-cf7-form .sm\:flex-row,
+.widget-area .ltdh-cf7-form .sm\:flex-row,
+.ltdh-widget-form .ltdh-cf7-form .sm\:flex-row,
+.ltdh-sidebar-form .ltdh-cf7-form .sm\:flex-row,
+.ltdh-sidebar-form .sm\:flex-row {
+    flex-direction: column !important;
+    gap: 0.375rem !important;
+}
+
+aside .ltdh-cf7-form .sm\:inline,
+.widget-area .ltdh-cf7-form .sm\:inline,
+.ltdh-widget-form .ltdh-cf7-form .sm\:inline,
+.ltdh-sidebar-form .ltdh-cf7-form .sm\:inline,
+.ltdh-sidebar-form .sm\:inline {
+    display: none !important;
+}
+
 /* Contact Form 7 Validation and Status Feedback */
 .wpcf7 form .wpcf7-response-output {
     margin: 1rem 0 0 0 !important;
