@@ -443,6 +443,73 @@ $opt_out_items = [
 $opt_out_res = ltdh_dynamic_menu_submenu_injection( $opt_out_items, (object) [ 'theme_location' => 'primary-menu' ] );
 test_assert( ! in_array( 'menu-item-mega-menu', $opt_out_res[0]->classes, true ), 'Explicitly opted out item (ID 30) does NOT get menu-item-mega-menu' );
 
+// Test 9: Major Group Cap at 5 & "Xem tất cả" Link
+echo "\nTEST 9: Major Group Cap at 5 & 'Xem tất cả' Link\n";
+// Set mock_posts_return to return 7 majors
+$GLOBALS['mock_posts_return'] = [
+	(object) [ 'ID' => 101, 'post_title' => 'Ngành 1', 'post_name' => 'n1' ],
+	(object) [ 'ID' => 102, 'post_title' => 'Ngành 2', 'post_name' => 'n2' ],
+	(object) [ 'ID' => 103, 'post_title' => 'Ngành 3', 'post_name' => 'n3' ],
+	(object) [ 'ID' => 104, 'post_title' => 'Ngành 4', 'post_name' => 'n4' ],
+	(object) [ 'ID' => 105, 'post_title' => 'Ngành 5', 'post_name' => 'n5' ],
+	(object) [ 'ID' => 106, 'post_title' => 'Ngành 6', 'post_name' => 'n6' ],
+	(object) [ 'ID' => 107, 'post_title' => 'Ngành 7', 'post_name' => 'n7' ],
+];
+
+$test9_nav_items = [
+	(object) [
+		'ID'               => 50,
+		'title'            => 'Ngành học',
+		'url'              => home_url( '/nhom-nganh/' ),
+		'menu_item_parent' => 0,
+		'classes'          => [ 'menu-item' ],
+	],
+];
+
+$test9_injected = ltdh_dynamic_menu_submenu_injection( $test9_nav_items, (object) [ 'theme_location' => 'primary-menu' ] );
+
+// Find category item
+$cat_item = null;
+foreach ( $test9_injected as $item ) {
+	if ( in_array( 'menu-item-category', (array) $item->classes, true ) ) {
+		$cat_item = $item;
+		break;
+	}
+}
+test_assert( $cat_item !== null, 'Category item exists in Test 9' );
+
+// Count children of this category
+$cat_majors = [];
+$cat_more   = null;
+foreach ( $test9_injected as $item ) {
+	if ( (int) $item->menu_item_parent === (int) $cat_item->ID ) {
+		if ( in_array( 'menu-item-object-major', (array) $item->classes, true ) ) {
+			$cat_majors[] = $item;
+		}
+		if ( in_array( 'menu-item-cat-more', (array) $item->classes, true ) ) {
+			$cat_more = $item;
+		}
+	}
+}
+
+test_assert( count( $cat_majors ) === 5, 'Exactly 5 majors displayed even though 7 exist' );
+test_assert( $cat_more !== null, "'Xem tất cả' item exists under category" );
+test_assert( $cat_more && ! empty( $cat_more->url ), "'Xem tất cả' has valid category URL" );
+
+// Test start_el rendering for 'Xem tất cả'
+$more_html = ltdh_mega_menu_nav_menu_start_el(
+	'',
+	$cat_more,
+	2,
+	(object) [ 'theme_location' => 'primary-menu', 'menu_class' => 'nav-primary-menu' ]
+);
+test_assert( strpos( $more_html, 'class="mega-cat-more-link"' ) !== false, "Renders 'mega-cat-more-link' CSS class" );
+test_assert( strpos( $more_html, 'Xem tất cả' ) !== false, "Contains text 'Xem tất cả'" );
+test_assert( strpos( $more_html, 'mega-cat-more-icon' ) !== false, "Contains 'mega-cat-more-icon' SVG" );
+
+// Reset mock
+unset( $GLOBALS['mock_posts_return'] );
+
 echo "\n===================================================================\n";
 if ( $all_passed ) {
 	echo "ALL MEGA MENU TESTS PASSED!\n";

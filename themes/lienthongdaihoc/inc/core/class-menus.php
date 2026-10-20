@@ -84,15 +84,30 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 											</button>
 										<?php endif; ?>
 									</div>
-									<?php if (! empty($cat['majors'])) : ?>
+									<?php if (! empty($cat['majors'])) : 
+										$visible_majors = array_slice($cat['majors'], 0, 5);
+										$has_more       = count($cat['majors']) > 5;
+									?>
 										<ul class="sub-menu">
-											<?php foreach ($cat['majors'] as $maj) : ?>
+											<?php foreach ($visible_majors as $maj) : ?>
 												<li class="menu-item">
 													<div class="mobile-menu-item-row">
 														<a href="<?php echo esc_url($maj['url']); ?>"><?php echo esc_html($maj['title']); ?></a>
 													</div>
 												</li>
 											<?php endforeach; ?>
+											<?php if ($has_more) : ?>
+												<li class="menu-item menu-item-cat-more ltdh-cat-more-link">
+													<div class="mobile-menu-item-row">
+														<a href="<?php echo esc_url($cat['url']); ?>" class="mega-cat-more-mobile text-xs font-bold text-[#00308b] py-1.5 flex items-center gap-1">
+															<span>Xem tất cả</span>
+															<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+															</svg>
+														</a>
+													</div>
+												</li>
+											<?php endif; ?>
 										</ul>
 									<?php endif; ?>
 								</li>
@@ -120,9 +135,12 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 											</svg>
 										</span>
 									</a>
-									<?php if (! empty($cat['majors'])) : ?>
+									<?php if (! empty($cat['majors'])) : 
+										$visible_majors = array_slice($cat['majors'], 0, 5);
+										$has_more       = count($cat['majors']) > 5;
+									?>
 										<ul class="sub-menu">
-											<?php foreach ($cat['majors'] as $maj) : ?>
+											<?php foreach ($visible_majors as $maj) : ?>
 												<li class="menu-item">
 													<a href="<?php echo esc_url($maj['url']); ?>" class="mega-major-link">
 														<span class="mega-major-left">
@@ -132,6 +150,16 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 													</a>
 												</li>
 											<?php endforeach; ?>
+											<?php if ($has_more) : ?>
+												<li class="menu-item menu-item-cat-more ltdh-cat-more-link">
+													<a href="<?php echo esc_url($cat['url']); ?>" class="mega-cat-more-link" title="<?php echo esc_attr('Xem tất cả ngành thuộc nhóm ' . $cat['name']); ?>">
+														<span class="mega-cat-more-text">Xem tất cả</span>
+														<svg class="w-3.5 h-3.5 mega-cat-more-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7m0 0l-7 7m7-7H3" />
+														</svg>
+													</a>
+												</li>
+											<?php endif; ?>
 										</ul>
 									<?php endif; ?>
 								</li>
@@ -567,6 +595,84 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 		}
 	}
 
+	// Enforce UI/UX rule: Each category column displays at most 5 majors; if > 5, append "Xem tất cả"
+	$cat_items_map = [];
+	foreach ( $new_items as $it ) {
+		if ( in_array( 'menu-item-category', (array) $it->classes, true ) ) {
+			$cat_items_map[ (int) $it->ID ] = $it;
+		}
+	}
+
+	if ( ! empty( $cat_items_map ) ) {
+		$cat_majors_total = [];
+		foreach ( $new_items as $it ) {
+			$p_id = (int) $it->menu_item_parent;
+			if ( isset( $cat_items_map[ $p_id ] ) && in_array( 'menu-item-object-major', (array) $it->classes, true ) ) {
+				$cat_majors_total[ $p_id ] = ( $cat_majors_total[ $p_id ] ?? 0 ) + 1;
+			}
+		}
+
+		$final_items    = [];
+		$cat_seen_count = [];
+
+		foreach ( $new_items as $it ) {
+			$p_id = (int) $it->menu_item_parent;
+
+			if ( isset( $cat_items_map[ $p_id ] ) && in_array( 'menu-item-object-major', (array) $it->classes, true ) ) {
+				if ( ! isset( $cat_seen_count[ $p_id ] ) ) {
+					$cat_seen_count[ $p_id ] = 0;
+				}
+				$cat_seen_count[ $p_id ]++;
+
+				if ( $cat_seen_count[ $p_id ] <= 5 ) {
+					$final_items[] = $it;
+				}
+
+				if ( $cat_seen_count[ $p_id ] === 5 && ( $cat_majors_total[ $p_id ] ?? 0 ) > 5 ) {
+					$cat_obj = $cat_items_map[ $p_id ];
+					$max_db_id++;
+					$more_item                        = new stdClass();
+					$more_item->ID                    = $max_db_id;
+					$more_item->db_id                 = $max_db_id;
+					$more_item->title                 = 'Xem tất cả';
+					$more_item->url                   = $cat_obj->url;
+					$more_item->menu_item_parent      = $p_id;
+					$more_item->classes               = [
+						'menu-item',
+						'menu-item-cat-more',
+						'ltdh-cat-more-link',
+					];
+					$more_item->type                  = 'custom';
+					$more_item->object                = '';
+					$more_item->object_id             = 0;
+					$more_item->post_parent           = 0;
+					$more_item->post_title            = 'Xem tất cả';
+					$more_item->post_status           = 'publish';
+					$more_item->post_type             = 'nav_menu_item';
+					$more_item->menu_order            = 0;
+					$more_item->target                = '';
+					$more_item->attr_title            = 'Xem tất cả ngành thuộc nhóm ' . esc_attr( $cat_obj->title );
+					$more_item->description           = '';
+					$more_item->xfn                   = '';
+					$more_item->current               = false;
+					$more_item->current_item_parent   = false;
+					$more_item->current_item_ancestor = false;
+					$final_items[]                    = $more_item;
+				}
+
+				continue;
+			}
+
+			if ( in_array( 'menu-item-cat-more', (array) $it->classes, true ) ) {
+				continue;
+			}
+
+			$final_items[] = $it;
+		}
+
+		$new_items = $final_items;
+	}
+
 	return $new_items;
 }
 add_filter('wp_nav_menu_objects', 'ltdh_dynamic_menu_submenu_injection', 10, 2);
@@ -894,6 +1000,15 @@ function ltdh_mega_menu_nav_menu_start_el( $item_output, $item, $depth, $args ) 
 			. '<span class="mega-major-bullet"></span>'
 			. '<span class="mega-major-name">' . esc_html( $item->title ) . '</span>'
 			. '</span>'
+			. '</a>';
+	}
+
+	if ( $is_desktop && ( in_array( 'menu-item-cat-more', $classes, true ) || in_array( 'ltdh-cat-more-link', $classes, true ) ) && $depth === 2 ) {
+		return '<a href="' . esc_url( $item->url ) . '" class="mega-cat-more-link" title="' . esc_attr( $item->attr_title ?: ( 'Xem tất cả ' . $item->title ) ) . '">'
+			. '<span class="mega-cat-more-text">' . esc_html( $item->title ?: 'Xem tất cả' ) . '</span>'
+			. '<svg class="w-3.5 h-3.5 mega-cat-more-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">'
+			. '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>'
+			. '</svg>'
 			. '</a>';
 	}
 
