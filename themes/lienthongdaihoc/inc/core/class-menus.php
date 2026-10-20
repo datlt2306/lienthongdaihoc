@@ -40,6 +40,8 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 
 	$current_path = untrailingslashit(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
 	$active_parent = '';
+	$route_info    = function_exists('ltdh_get_current_route_info') ? ltdh_get_current_route_info() : [];
+
 	foreach ($menu_items as $mi) {
 		$item_path = untrailingslashit($mi['url']);
 		if ($current_path === $item_path || strpos($current_path, $item_path) === 0) {
@@ -52,6 +54,17 @@ function ltdh_render_fallback_menu(string $location, string $ul_class = ''): voi
 		<?php foreach ($menu_items as $mi) :
 			$url_path   = untrailingslashit($mi['url']);
 			$is_active  = ($current_path === $url_path || $active_parent === $mi['url']);
+
+			if ( ! $is_active && ! empty( $route_info ) ) {
+				$mi_label = mb_strtolower( trim( $mi['label'] ), 'UTF-8' );
+				if ( ( $route_info['is_program'] || $route_info['is_training_archive'] ) && ( in_array( $url_path, [ '/hinh-thuc-dao-tao', '/he-dao-tao', '/chuong-trinh' ], true ) || in_array( $mi_label, [ 'hình thức đào tạo', 'hình thức liên thông', 'liên thông đại học', 'liên thông', 'hệ đào tạo', 'hình thức học' ], true ) ) ) {
+					$is_active = true;
+				} elseif ( ( $route_info['is_school'] || $route_info['is_school_archive'] ) && ( in_array( $url_path, [ '/truong-doi-tac', '/truong-dao-tao', '/truong', '/danh-sach-truong' ], true ) || in_array( $mi_label, [ 'trường đối tác', 'trường đào tạo', 'trường', 'đối tác', 'danh sách trường' ], true ) ) ) {
+					$is_active = true;
+				} elseif ( ( $route_info['is_major'] || $route_info['is_major_archive'] ) && ( in_array( $url_path, [ '/nhom-nganh', '/nganh-hoc', '/chuyen-nganh', '/nganh' ], true ) || in_array( $mi_label, [ 'nhóm ngành', 'ngành học', 'chuyên ngành', 'chuyên ngành học', 'nhóm ngành đào tạo', 'ngành đào tạo', 'ngành' ], true ) ) ) {
+					$is_active = true;
+				}
+			}
 			$has_sub    = ! empty($mi['sub']) && is_array($mi['sub']);
 			$is_mega    = ( in_array( $url_path, [ '/nganh-hoc', '/nhom-nganh' ], true ) || in_array( mb_strtolower( trim( $mi['label'] ), 'UTF-8' ), [ 'chuyên ngành', 'ngành học', 'nhóm ngành', 'nhóm ngành đào tạo', 'ngành đào tạo' ], true ) );
 			$mega_data  = $is_mega ? ltdh_get_mega_menu_data() : [];
@@ -237,34 +250,223 @@ function ltdh_default_footer_menu(): void {
 }
 
 // ----------------------------------------------------
-// 2. Menu Active Class Logic
+// 2. Menu Active Class Logic & Route Context Detection
 // ----------------------------------------------------
 
-function ltdh_menu_add_active_classes($menu_items) {
-	if (empty($menu_items) || ! is_array($menu_items)) {
+/**
+ * Retrieve comprehensive current page/route context for accurate menu highlighting.
+ *
+ * @param string $uri Optional URI to check, defaults to $_SERVER['REQUEST_URI'].
+ * @return array
+ */
+function ltdh_get_current_route_info( string $uri = '' ): array {
+	static $cache = [];
+	if ( empty( $uri ) ) {
+		$uri = $_SERVER['REQUEST_URI'] ?? '/';
+	}
+	if ( isset( $cache[ $uri ] ) ) {
+		return $cache[ $uri ];
+	}
+
+	$path = trim( (string) parse_url( $uri, PHP_URL_PATH ), '/' );
+
+	$info = [
+		'uri'                 => $uri,
+		'path'                => '/' . $path,
+		'is_program'          => false,
+		'program_id'          => 0,
+		'training_type_slug'  => '',
+		'is_school'           => false,
+		'school_id'           => 0,
+		'is_major'            => false,
+		'major_id'            => 0,
+		'major_cat_slug'      => '',
+		'is_training_archive' => false,
+		'is_school_archive'   => false,
+		'is_major_archive'    => false,
+	];
+
+	$cpt_program = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
+	$cpt_school  = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
+	$cpt_major   = defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major';
+
+	// 1. Check WordPress native conditional tags
+	if ( function_exists( 'is_singular' ) ) {
+		if ( is_singular( $cpt_program ) ) {
+			$info['is_program'] = true;
+			$info['program_id'] = (int) get_the_ID();
+		} elseif ( is_singular( $cpt_school ) ) {
+			$info['is_school']  = true;
+			$info['school_id']  = (int) get_the_ID();
+		} elseif ( is_singular( $cpt_major ) ) {
+			$info['is_major']   = true;
+			$info['major_id']   = (int) get_the_ID();
+		}
+	}
+
+	// 2. Check global $post if conditional tags did not fire
+	if ( ! $info['is_program'] && ! $info['is_school'] && ! $info['is_major'] ) {
+		global $post;
+		if ( ! empty( $post->post_type ) ) {
+			if ( $post->post_type === $cpt_program ) {
+				$info['is_program'] = true;
+				$info['program_id'] = (int) $post->ID;
+			} elseif ( $post->post_type === $cpt_school ) {
+				$info['is_school']  = true;
+				$info['school_id']  = (int) $post->ID;
+			} elseif ( $post->post_type === $cpt_major ) {
+				$info['is_major']   = true;
+				$info['major_id']   = (int) $post->ID;
+			}
+		}
+	}
+
+	// 3. Fallback resolution via URL slug for testing/simulated environments
+	if ( ! $info['is_program'] && ! $info['is_school'] && ! $info['is_major'] && ! empty( $path ) ) {
+		if ( preg_match( '#^(?:nganh-|nganh/)([^/]+)$#i', $path, $m_match ) ) {
+			if ( function_exists( 'get_posts' ) ) {
+				$pts = get_posts( [
+					'name'           => $m_match[1],
+					'post_type'      => $cpt_major,
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+				] );
+				if ( ! empty( $pts ) ) {
+					$info['is_major'] = true;
+					$info['major_id'] = (int) $pts[0]->ID;
+				}
+			}
+		} elseif ( preg_match( '#^(?:truong-|truong/)([^/]+)$#i', $path ) ) {
+			if ( function_exists( 'get_posts' ) ) {
+				$pts = get_posts( [
+					'name'           => $path,
+					'post_type'      => $cpt_school,
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+				] );
+				if ( ! empty( $pts ) ) {
+					$info['is_school'] = true;
+					$info['school_id'] = (int) $pts[0]->ID;
+				}
+			}
+		} else {
+			if ( function_exists( 'get_posts' ) ) {
+				$pts = get_posts( [
+					'name'           => $path,
+					'post_type'      => $cpt_program,
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+				] );
+				if ( ! empty( $pts ) ) {
+					$info['is_program'] = true;
+					$info['program_id'] = (int) $pts[0]->ID;
+				}
+			}
+		}
+	}
+
+	// 4. Retrieve associated taxonomies for matched items
+	if ( $info['is_program'] && $info['program_id'] && function_exists( 'get_the_terms' ) ) {
+		$tax_tt = defined( 'LTDH_TAX_TRAINING_TYPE' ) ? LTDH_TAX_TRAINING_TYPE : 'training_type';
+		$terms  = get_the_terms( $info['program_id'], $tax_tt );
+		if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+			$info['training_type_slug'] = $terms[0]->slug;
+		}
+	}
+
+	if ( $info['is_major'] && $info['major_id'] && function_exists( 'get_the_terms' ) ) {
+		$tax_mc = defined( 'LTDH_TAX_MAJOR_CAT' ) ? LTDH_TAX_MAJOR_CAT : 'major_cat';
+		$cats   = get_the_terms( $info['major_id'], $tax_mc );
+		if ( ! empty( $cats ) && ! is_wp_error( $cats ) ) {
+			$info['major_cat_slug'] = $cats[0]->slug;
+		}
+	}
+
+	// 5. Taxonomy & Archive route matching
+	if ( preg_match( '#^(?:hinh-thuc-dao-tao|he-dao-tao)(?:/([^/]+))?#i', $path, $t_match ) ) {
+		$info['is_training_archive'] = true;
+		if ( ! empty( $t_match[1] ) && 'page' !== $t_match[1] ) {
+			$info['training_type_slug'] = $t_match[1];
+		}
+	}
+
+	if ( preg_match( '#^(?:nhom-nganh|nganh-hoc)(?:/([^/]+))?#i', $path, $c_match ) ) {
+		$info['is_major_archive'] = true;
+		if ( ! empty( $c_match[1] ) && 'page' !== $c_match[1] ) {
+			$info['major_cat_slug'] = $c_match[1];
+		}
+	}
+
+	if ( preg_match( '#^(?:truong-doi-tac|truong-dao-tao|danh-sach-truong)#i', $path ) ) {
+		$info['is_school_archive'] = true;
+	}
+
+	$cache[ $uri ] = $info;
+	return $info;
+}
+
+function ltdh_menu_add_active_classes( $menu_items ) {
+	if ( empty( $menu_items ) || ! is_array( $menu_items ) ) {
 		return $menu_items;
 	}
 
-	$current_url = trailingslashit(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
-	$current_url = untrailingslashit($current_url);
+	$current_url = trailingslashit( parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH ) );
+	$current_url = untrailingslashit( $current_url );
+	$route_info  = ltdh_get_current_route_info();
 
-	foreach ($menu_items as $key => $item) {
-		$item_url = trailingslashit(parse_url($item->url, PHP_URL_PATH));
-		$item_url = untrailingslashit($item_url);
+	foreach ( $menu_items as $key => $item ) {
+		$item_url  = trailingslashit( parse_url( $item->url, PHP_URL_PATH ) );
+		$item_url  = untrailingslashit( $item_url );
+		$item_path = $item_url;
+		$title     = mb_strtolower( trim( (string) $item->title ), 'UTF-8' );
 
-		if ($current_url === $item_url) {
-			$menu_items[$key]->classes[] = 'current-menu-item';
+		// Standard URL matching
+		if ( $current_url === $item_url ) {
+			$menu_items[ $key ]->classes[] = 'current-menu-item';
+			$menu_items[ $key ]->current   = true;
 			continue;
 		}
 
-		if ($item_url && $current_url !== '/' && strpos($current_url, $item_url) === 0) {
-			$menu_items[$key]->classes[] = 'current-menu-ancestor';
+		if ( $item_url && $current_url !== '/' && strpos( $current_url, $item_url ) === 0 ) {
+			$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
 		}
+
+		// Contextual matching: Program -> Training Type menu
+		if ( $route_info['is_program'] || $route_info['is_training_archive'] ) {
+			$training_titles = [ 'hình thức đào tạo', 'hình thức liên thông', 'liên thông đại học', 'liên thông', 'hệ đào tạo', 'hình thức học' ];
+			$training_paths  = [ '/hinh-thuc-dao-tao', '/he-dao-tao', '/chuong-trinh' ];
+			if ( in_array( $title, $training_titles, true ) || in_array( $item_path, $training_paths, true ) ) {
+				$menu_items[ $key ]->classes[] = 'current-menu-item';
+				$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+			}
+		}
+
+		// Contextual matching: School -> Schools menu
+		if ( $route_info['is_school'] || $route_info['is_school_archive'] ) {
+			$school_titles = [ 'trường đối tác', 'trường đào tạo', 'trường đại học', 'danh sách trường', 'trường', 'đối tác' ];
+			$school_paths  = [ '/truong-doi-tac', '/truong-dao-tao', '/truong', '/danh-sach-truong' ];
+			if ( in_array( $title, $school_titles, true ) || in_array( $item_path, $school_paths, true ) ) {
+				$menu_items[ $key ]->classes[] = 'current-menu-item';
+				$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+			}
+		}
+
+		// Contextual matching: Major -> Majors menu
+		if ( $route_info['is_major'] || $route_info['is_major_archive'] ) {
+			$major_titles = [ 'nhóm ngành', 'ngành học', 'chuyên ngành', 'chuyên ngành học', 'nhóm ngành đào tạo', 'ngành đào tạo', 'ngành' ];
+			$major_paths  = [ '/nhom-nganh', '/nganh-hoc', '/chuyen-nganh', '/nganh' ];
+			if ( in_array( $title, $major_titles, true ) || in_array( $item_path, $major_paths, true ) || in_array( 'menu-item-mega-menu', (array) $item->classes, true ) ) {
+				$menu_items[ $key ]->classes[] = 'current-menu-item';
+				$menu_items[ $key ]->classes[] = 'current-menu-ancestor';
+			}
+		}
+
+		$menu_items[ $key ]->classes = array_values( array_unique( (array) $menu_items[ $key ]->classes ) );
 	}
 
 	return $menu_items;
 }
-add_filter('wp_nav_menu_objects', 'ltdh_menu_add_active_classes');
+add_filter( 'wp_nav_menu_objects', 'ltdh_menu_add_active_classes' );
 
 // ----------------------------------------------------
 // 3. Dynamic Menu Submenu Injection
