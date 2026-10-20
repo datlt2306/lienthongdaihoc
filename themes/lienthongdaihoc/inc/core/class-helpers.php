@@ -1551,148 +1551,95 @@ function ltdh_site_logo_mobile(int $max_height = 36): void {
 // ----------------------------------------------------
 
 function ltdh_breadcrumb(): void {
-	$type = get_query_var( 'ltdh_compare' );
-	if ( $type ) {
-		echo '<div class="ltdh-breadcrumb bg-slate-50/60 border-b border-slate-100 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-1.5">';
-		echo '<a href="' . esc_url( home_url( '/' ) ) . '" class="hover:text-brand-primary transition-colors font-medium">Trang chủ</a>';
-		echo ' <span class="mx-1 text-slate-300 font-light">/</span> ';
-		echo '<a href="' . esc_url( home_url( '/hinh-thuc-dao-tao/' ) ) . '" class="hover:text-brand-primary transition-colors font-medium">Liên thông Đại học</a>';
-		echo ' <span class="mx-1 text-slate-300 font-light">/</span> ';
-		echo '<span class="text-slate-700 font-semibold">So sánh chương trình</span>';
-		echo '</div>';
+	// 1. Primary: Rank Math breadcrumb engine
+	if ( function_exists( 'rank_math_the_breadcrumbs' ) ) {
+		// Respect admin setting: if breadcrumbs are toggled off in Rank Math settings, output nothing.
+		if ( class_exists( '\RankMath\Helper' ) && ! \RankMath\Helper::is_breadcrumbs_enabled() ) {
+			return;
+		}
+
+		ob_start();
+		rank_math_the_breadcrumbs();
+		$html = trim( (string) ob_get_clean() );
+
+		if ( ! empty( $html ) ) {
+			echo '<div class="ltdh-breadcrumb bg-slate-50/60 border-b border-slate-100">';
+			echo '<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-1.5">';
+			echo $html;
+			echo '</div>';
+			echo '</div>';
+			return;
+		}
+	}
+
+	// 2. Fallback: Minimal native breadcrumbs (only active if Rank Math is deactivated)
+	if ( is_front_page() ) {
 		return;
 	}
 
-	$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
-	$is_he_dao_tao = (bool) preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path );
+	$crumbs = [ [ 'label' => 'Trang chủ', 'url' => home_url( '/' ) ] ];
 
-	$html = '';
-	if ( ! $is_he_dao_tao && function_exists( 'rank_math_the_breadcrumbs' ) ) {
-		ob_start();
-		rank_math_the_breadcrumbs();
-		$html = ob_get_clean();
-	}
-
-	if ( empty( trim( $html ) ) ) {
-		// Custom fallback breadcrumbs
-		$crumbs   = [];
-		$crumbs[] = [ 'label' => 'Trang chủ', 'url' => home_url( '/' ) ];
-
-		if ( is_singular() ) {
-			$post_type = get_post_type();
-			if ( $post_type === 'program' ) {
-				$program_id   = (int) get_the_ID();
-				$program_name = function_exists( 'ltdh_get_program_banner_title' ) ? ltdh_get_program_banner_title( $program_id ) : get_the_title( $program_id );
-				$major_id     = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : 0;
-
-				if ( $major_id > 0 ) {
-					$terms = get_the_terms( $major_id, 'major_cat' );
-					if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
-						$cat_term = $terms[0];
-						$cat_link = get_term_link( $cat_term );
-						if ( ! is_wp_error( $cat_link ) ) {
-							$crumbs[] = [ 'label' => $cat_term->name, 'url' => $cat_link ];
-						}
-					}
-					$crumbs[] = [ 'label' => get_the_title( $major_id ), 'url' => get_permalink( $major_id ) ];
-				} else {
-					$crumbs[] = [ 'label' => 'Liên thông Đại học', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
+	if ( is_singular( 'program' ) ) {
+		$program_id   = (int) get_the_ID();
+		$program_name = function_exists( 'ltdh_get_program_banner_title' ) ? ltdh_get_program_banner_title( $program_id ) : get_the_title( $program_id );
+		$major_id     = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : 0;
+		if ( $major_id > 0 ) {
+			$terms = get_the_terms( $major_id, 'major_cat' );
+			if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+				$cat_link = get_term_link( $terms[0] );
+				if ( ! is_wp_error( $cat_link ) ) {
+					$crumbs[] = [ 'label' => $terms[0]->name, 'url' => $cat_link ];
 				}
-
-				$crumbs[] = [ 'label' => $program_name, 'url' => '' ];
-			} elseif ( $post_type === 'school' ) {
-				$crumbs[] = [ 'label' => 'Trường đối tác', 'url' => get_post_type_archive_link( 'school' ) ?: home_url( '/truong-doi-tac/' ) ];
-				$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
-			} elseif ( $post_type === 'major' ) {
-				$terms = get_the_terms( get_the_ID(), 'major_cat' );
-				$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => home_url( '/nhom-nganh/' ) ];
-				if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-					$crumbs[] = [ 'label' => $terms[0]->name, 'url' => get_term_link( $terms[0] ) ];
-				}
-				$major_label = get_the_title();
-				$school_param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
-				if ( ! empty( $school_param ) ) {
-					$school_obj = is_numeric( $school_param ) ? get_post( intval( $school_param ) ) : get_page_by_path( sanitize_title( $school_param ), OBJECT, 'school' );
-					if ( ! $school_obj ) {
-						$by_code = get_posts( [ 'post_type' => 'school', 'meta_key' => 'school_code', 'meta_value' => sanitize_text_field( $school_param ), 'numberposts' => 1 ] );
-						if ( ! empty( $by_code ) ) {
-							$school_obj = $by_code[0];
-						}
-					}
-					if ( $school_obj ) {
-						$s_code = get_post_meta( $school_obj->ID, 'school_code', true );
-						$s_name = $s_code ?: preg_replace( '/^trường\s+đại\s+học\s+/iu', 'ĐH ', get_the_title( $school_obj->ID ) );
-						$major_label .= ' – ' . $s_name;
-					}
-				}
-				$crumbs[] = [ 'label' => $major_label, 'url' => '' ];
-			} elseif ( $post_type === 'post' ) {
-				$crumbs[] = [ 'label' => 'Tin tức', 'url' => home_url( '/tin-tuc/' ) ];
-				$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
-			} else {
-				$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
 			}
-		} elseif ( is_tax() || is_category() || is_tag() ) {
-			$term = get_queried_object();
-			if ( is_tax( 'training_type' ) ) {
-				$crumbs[] = [ 'label' => 'Liên thông Đại học', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
-			} elseif ( is_tax( 'major_cat' ) ) {
-				$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => home_url( '/nhom-nganh/' ) ];
-			}
-			$crumbs[] = [ 'label' => $term->name, 'url' => '' ];
-		} elseif ( is_post_type_archive() ) {
-			$post_type = get_query_var( 'post_type' );
-			if ( $post_type === 'school' ) {
-				$crumbs[] = [ 'label' => 'Trường đối tác', 'url' => '' ];
-			} elseif ( $post_type === 'major' ) {
-				$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => '' ];
-			} else {
-				$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => '' ];
-			}
-		} elseif ( is_home() ) {
-			$crumbs[] = [ 'label' => 'Tin tức', 'url' => '' ];
+			$crumbs[] = [ 'label' => get_the_title( $major_id ), 'url' => get_permalink( $major_id ) ];
 		} else {
-			// Check if we are on training_type virtual archive /hinh-thuc-dao-tao/ or /he-dao-tao/
-			$request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
-			if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path, $m ) ) {
-				if ( ! empty( $m[1] ) && 'page' !== $m[1] ) {
-					$slug_lookup = ( 'tu-xa' === $m[1] ) ? 'dao-tao-tu-xa' : $m[1];
-					$term        = get_term_by( 'slug', $slug_lookup, 'training_type' ) ?: get_term_by( 'slug', $m[1], 'training_type' );
-					$crumbs[]    = [ 'label' => 'Hình thức đào tạo', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
-					$crumbs[]    = [ 'label' => $term ? $term->name : esc_html( $m[1] ), 'url' => '' ];
-				} else {
-					$crumbs[] = [ 'label' => 'Hình thức đào tạo', 'url' => '' ];
-				}
-			} elseif ( preg_match( '#^/(?:nhom-nganh|nganh-hoc)(?:/([^/]+))?(?:/page/\d+)?/?$#i', $request_path, $m ) ) {
-				if ( ! empty( $m[1] ) && 'page' !== $m[1] ) {
-					$term     = get_term_by( 'slug', sanitize_title( $m[1] ), 'major_cat' );
-					$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => home_url( '/nhom-nganh/' ) ];
-					$crumbs[] = [ 'label' => $term ? $term->name : esc_html( $m[1] ), 'url' => '' ];
-				} else {
-					$crumbs[] = [ 'label' => 'Nhóm ngành', 'url' => '' ];
-				}
-			} else {
-				$crumbs[] = [ 'label' => wp_title( '', false ) ?: 'Lưu trữ', 'url' => '' ];
-			}
+			$crumbs[] = [ 'label' => 'Liên thông Đại học', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
 		}
-
-		// Render crumbs
-		$html_parts = [];
-		foreach ( $crumbs as $crumb ) {
-			if ( ! empty( $crumb['url'] ) ) {
-				$html_parts[] = '<a href="' . esc_url( $crumb['url'] ) . '" class="hover:text-brand-primary transition-colors font-medium shrink-0">' . esc_html( $crumb['label'] ) . '</a>';
-			} else {
-				$html_parts[] = '<span class="text-slate-700 font-semibold shrink-0">' . esc_html( $crumb['label'] ) . '</span>';
-			}
+		$crumbs[] = [ 'label' => $program_name, 'url' => '' ];
+	} elseif ( is_singular( 'school' ) ) {
+		$crumbs[] = [ 'label' => 'Trường đối tác', 'url' => home_url( '/truong-doi-tac/' ) ];
+		$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
+	} elseif ( is_singular( 'major' ) ) {
+		$terms = get_the_terms( get_the_ID(), 'major_cat' );
+		if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+			$crumbs[] = [ 'label' => $terms[0]->name, 'url' => get_term_link( $terms[0] ) ];
 		}
-		$html = implode( ' <span class="mx-1 text-slate-300 font-light shrink-0">/</span> ', $html_parts );
+		$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
+	} elseif ( is_singular( 'post' ) || is_home() || is_category() ) {
+		$crumbs[] = [ 'label' => 'Tin tức', 'url' => home_url( '/tin-tuc/' ) ];
+		if ( is_category() ) {
+			$cat = get_queried_object();
+			if ( $cat ) {
+				$crumbs[] = [ 'label' => $cat->name, 'url' => '' ];
+			}
+		} elseif ( is_singular( 'post' ) ) {
+			$crumbs[] = [ 'label' => get_the_title(), 'url' => '' ];
+		}
+	} elseif ( is_tax( 'training_type' ) ) {
+		$crumbs[] = [ 'label' => 'Liên thông Đại học', 'url' => home_url( '/hinh-thuc-dao-tao/' ) ];
+		$term     = get_queried_object();
+		if ( $term ) {
+			$crumbs[] = [ 'label' => $term->name, 'url' => '' ];
+		}
+	} else {
+		$crumbs[] = [ 'label' => wp_title( '', false ) ?: 'Nội dung', 'url' => '' ];
 	}
 
-	if ( ! empty( $html ) ) {
-		echo '<div class="ltdh-breadcrumb bg-slate-50/60 border-b border-slate-100 "><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-1.5">';
-		echo $html;
-		echo '</div></div>';
+	echo '<div class="ltdh-breadcrumb bg-slate-50/60 border-b border-slate-100">';
+	echo '<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none flex items-center gap-1.5">';
+	echo '<nav aria-label="breadcrumbs" class="rank-math-breadcrumb"><p>';
+	$count = count( $crumbs );
+	foreach ( $crumbs as $idx => $c ) {
+		if ( ! empty( $c['url'] ) && $idx < $count - 1 ) {
+			echo '<a href="' . esc_url( $c['url'] ) . '">' . esc_html( $c['label'] ) . '</a>';
+			echo '<span class="separator"> - </span>';
+		} else {
+			echo '<span class="last">' . esc_html( $c['label'] ) . '</span>';
+		}
 	}
+	echo '</p></nav>';
+	echo '</div>';
+	echo '</div>';
 }
 
 // ----------------------------------------------------
