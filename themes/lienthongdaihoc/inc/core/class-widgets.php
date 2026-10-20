@@ -1058,7 +1058,7 @@ class LTDH_Widget_School_Info extends WP_Widget {
 
 
 // =========================================================================
-// CUSTOM WIDGET 8: BANNER THẦY/CÔ TƯ VẤN TUYỂN SINH (THEO NGÀNH & LINK ZALO)
+// CUSTOM WIDGET 8: BANNER THẦY/CÔ TƯ VẤN TUYỂN SINH (THEO TRƯỜNG & NGÀNH)
 // =========================================================================
 
 /**
@@ -1083,20 +1083,140 @@ function ltdh_format_zalo_url( $zalo_or_phone ) {
 }
 
 /**
+ * Helper: Retrieve all School IDs offering programs for a given Major.
+ *
+ * @param int $major_id
+ * @return int[]
+ */
+function ltdh_get_schools_for_major( $major_id ) {
+	$major_id = absint( $major_id );
+	if ( ! $major_id ) {
+		return [];
+	}
+
+	$cpt_prog = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
+	$key_rel  = defined( 'LTDH_META_MAJOR_REL' ) ? LTDH_META_MAJOR_REL : 'major_relationship';
+
+	$progs = get_posts( [
+		'post_type'      => $cpt_prog,
+		'post_status'    => 'publish',
+		'posts_per_page' => 50,
+		'fields'         => 'ids',
+		'meta_query'     => [
+			'relation' => 'OR',
+			[
+				'key'     => $key_rel,
+				'value'   => $major_id,
+				'compare' => '=',
+			],
+			[
+				'key'     => $key_rel,
+				'value'   => '"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => $key_rel,
+				'value'   => 's:' . strlen( (string) $major_id ) . ':"' . $major_id . '"',
+				'compare' => 'LIKE',
+			],
+			[
+				'key'     => $key_rel,
+				'value'   => 'i:' . $major_id . ';',
+				'compare' => 'LIKE',
+			],
+		],
+	] );
+
+	$school_ids = [];
+	foreach ( $progs as $pid ) {
+		$sid = (int) get_post_meta( $pid, 'school_relationship', true );
+		if ( $sid > 0 ) {
+			$school_ids[] = $sid;
+		}
+	}
+
+	return array_values( array_unique( $school_ids ) );
+}
+
+/**
+ * Helper: Detect the current School post ID from various contexts.
+ *
+ * @return int
+ */
+function ltdh_detect_current_school_id() {
+	$cur_id    = get_the_ID();
+	$post_type = $cur_id ? get_post_type( $cur_id ) : '';
+
+	// 1. Direct school singular
+	if ( 'school' === $post_type || is_singular( 'school' ) ) {
+		return (int) $cur_id;
+	}
+
+	// 2. Query parameters (?truong=..., ?school=..., ?from_school=...)
+	$param = isset( $_GET['truong'] ) ? sanitize_text_field( wp_unslash( $_GET['truong'] ) ) : ( isset( $_GET['from_school'] ) ? sanitize_text_field( wp_unslash( $_GET['from_school'] ) ) : ( isset( $_GET['school'] ) ? sanitize_text_field( wp_unslash( $_GET['school'] ) ) : '' ) );
+	if ( ! empty( $param ) ) {
+		if ( is_numeric( $param ) ) {
+			return (int) $param;
+		}
+		$cpt_school = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
+		$s_post     = get_page_by_path( sanitize_title( $param ), OBJECT, $cpt_school );
+		if ( $s_post && 'publish' === $s_post->post_status ) {
+			return (int) $s_post->ID;
+		}
+	}
+
+	// 3. Theme helper if present
+	if ( function_exists( 'ltdh_get_current_context_school_id' ) ) {
+		$sid = ltdh_get_current_context_school_id();
+		if ( $sid > 0 ) {
+			return (int) $sid;
+		}
+	}
+
+	// 4. Program singular -> school_relationship
+	if ( 'program' === $post_type || is_singular( 'program' ) ) {
+		$s_rel = function_exists( 'get_field' ) ? get_field( 'school_relationship', $cur_id ) : get_post_meta( $cur_id, 'school_relationship', true );
+		if ( ! empty( $s_rel ) ) {
+			if ( is_array( $s_rel ) ) {
+				$first = reset( $s_rel );
+				return is_object( $first ) ? (int) $first->ID : (int) $first;
+			}
+			return is_object( $s_rel ) ? (int) $s_rel->ID : (int) $s_rel;
+		}
+	}
+
+	// 5. Post or guide singular -> school_relationship
+	if ( in_array( $post_type, [ 'post', 'guide' ], true ) || is_singular( [ 'post', 'guide' ] ) ) {
+		$s_rel = function_exists( 'get_field' ) ? get_field( 'school_relationship', $cur_id ) : get_post_meta( $cur_id, 'school_relationship', true );
+		if ( ! empty( $s_rel ) ) {
+			if ( is_array( $s_rel ) ) {
+				$first = reset( $s_rel );
+				return is_object( $first ) ? (int) $first->ID : (int) $first;
+			}
+			return is_object( $s_rel ) ? (int) $s_rel->ID : (int) $s_rel;
+		}
+	}
+
+	return 0;
+}
+
+/**
  * Helper: Detect the current Major post ID from various contexts.
  *
  * @return int
  */
 function ltdh_detect_current_major_id() {
+	$cur_id    = get_the_ID();
+	$post_type = $cur_id ? get_post_type( $cur_id ) : '';
+
 	// 1. Single Major
-	if ( is_singular( 'major' ) ) {
-		return (int) get_the_ID();
+	if ( 'major' === $post_type || is_singular( 'major' ) ) {
+		return (int) $cur_id;
 	}
 
 	// 2. Single Program -> check major_relationship
-	if ( is_singular( 'program' ) ) {
-		$prog_id = get_the_ID();
-		$rel = function_exists( 'get_field' ) ? get_field( 'major_relationship', $prog_id ) : get_post_meta( $prog_id, 'major_relationship', true );
+	if ( 'program' === $post_type || is_singular( 'program' ) ) {
+		$rel = function_exists( 'get_field' ) ? get_field( 'major_relationship', $cur_id ) : get_post_meta( $cur_id, 'major_relationship', true );
 		if ( is_array( $rel ) && ! empty( $rel ) ) {
 			$first = is_object( $rel[0] ) ? $rel[0]->ID : $rel[0];
 			if ( (int) $first > 0 ) {
@@ -1110,8 +1230,7 @@ function ltdh_detect_current_major_id() {
 	}
 
 	// 3. Single Post or Guide -> check related_majors
-	if ( is_singular( [ 'post', 'guide' ] ) ) {
-		$cur_id  = get_the_ID();
+	if ( in_array( $post_type, [ 'post', 'guide' ], true ) || is_singular( [ 'post', 'guide' ] ) ) {
 		$related = function_exists( 'get_field' ) ? get_field( 'related_majors', $cur_id ) : get_post_meta( $cur_id, 'related_majors', true );
 		if ( is_array( $related ) && ! empty( $related ) ) {
 			$first = is_object( $related[0] ) ? $related[0]->ID : $related[0];
@@ -1144,39 +1263,43 @@ class LTDH_Widget_Advisor_Banner extends WP_Widget {
 	public function __construct() {
 		parent::__construct(
 			'ltdh_advisor_banner',
-			__( '[LTDH] Banner Thầy/Cô Tư Vấn (Theo Ngành)', 'ltdh' ),
+			__( '[LTDH] Banner Thầy/Cô Tư Vấn (Theo Trường & Ngành)', 'ltdh' ),
 			[
-				'description'                 => __( 'Hiển thị ảnh banner tư vấn (Thầy Đạt hoặc người hợp tác) linh hoạt theo từng ngành. Click ảnh nhảy sang Zalo SĐT của từng người.', 'ltdh' ),
+				'description'                 => __( 'Hiển thị ảnh banner tư vấn (Thầy Đạt hoặc người hợp tác). Chỉ cần chọn Trường là tất cả ngành thuộc trường sẽ tự động theo. Click ảnh nhảy sang Zalo SĐT của từng người.', 'ltdh' ),
 				'customize_selective_refresh' => true,
 			]
 		);
 	}
 
 	public function widget( $args, $instance ) {
-		$title            = ! empty( $instance['title'] ) ? $instance['title'] : '';
-		$display_mode     = ! empty( $instance['display_mode'] ) ? $instance['display_mode'] : 'auto_by_major';
-		$open_new_tab     = ! isset( $instance['open_new_tab'] ) || ! empty( $instance['open_new_tab'] );
-		$rounded_corners  = ! empty( $instance['rounded_corners'] ) ? $instance['rounded_corners'] : 'rounded-2xl';
+		$title             = ! empty( $instance['title'] ) ? $instance['title'] : '';
+		$display_mode      = ! empty( $instance['display_mode'] ) ? $instance['display_mode'] : 'auto_by_school';
+		$open_new_tab      = ! isset( $instance['open_new_tab'] ) || ! empty( $instance['open_new_tab'] );
+		$rounded_corners   = ! empty( $instance['rounded_corners'] ) ? $instance['rounded_corners'] : 'rounded-2xl';
 
 		// Advisor 1 (Default: Thầy Đạt)
-		$default_image_1  = home_url( '/wp-content/uploads/2026/10/banner-thay-dat-cropped.webp' );
-		$advisor_1_name   = ! empty( $instance['advisor_1_name'] ) ? $instance['advisor_1_name'] : 'Thầy Đạt';
-		$advisor_1_phone  = ! empty( $instance['advisor_1_phone'] ) ? $instance['advisor_1_phone'] : '0988 991 496';
-		$advisor_1_zalo   = ! empty( $instance['advisor_1_zalo'] ) ? $instance['advisor_1_zalo'] : '';
-		$advisor_1_image  = ! empty( $instance['advisor_1_image'] ) ? $instance['advisor_1_image'] : $default_image_1;
-		$advisor_1_alt    = ! empty( $instance['advisor_1_alt'] ) ? $instance['advisor_1_alt'] : ( 'Tư vấn cùng ' . $advisor_1_name );
+		$default_image_1   = home_url( '/wp-content/uploads/2026/10/banner-thay-dat-cropped.webp' );
+		$advisor_1_name    = ! empty( $instance['advisor_1_name'] ) ? $instance['advisor_1_name'] : 'Thầy Đạt';
+		$advisor_1_phone   = ! empty( $instance['advisor_1_phone'] ) ? $instance['advisor_1_phone'] : '0988 991 496';
+		$advisor_1_zalo    = ! empty( $instance['advisor_1_zalo'] ) ? $instance['advisor_1_zalo'] : '';
+		$advisor_1_image   = ! empty( $instance['advisor_1_image'] ) ? $instance['advisor_1_image'] : $default_image_1;
+		$advisor_1_alt     = ! empty( $instance['advisor_1_alt'] ) ? $instance['advisor_1_alt'] : ( 'Tư vấn cùng ' . $advisor_1_name );
 
 		// Advisor 2 (Partner)
-		$advisor_2_name   = ! empty( $instance['advisor_2_name'] ) ? $instance['advisor_2_name'] : 'Chuyên viên tư vấn';
-		$advisor_2_phone  = ! empty( $instance['advisor_2_phone'] ) ? $instance['advisor_2_phone'] : '';
-		$advisor_2_zalo   = ! empty( $instance['advisor_2_zalo'] ) ? $instance['advisor_2_zalo'] : '';
-		$advisor_2_image  = ! empty( $instance['advisor_2_image'] ) ? $instance['advisor_2_image'] : '';
-		$advisor_2_alt    = ! empty( $instance['advisor_2_alt'] ) ? $instance['advisor_2_alt'] : ( 'Tư vấn cùng ' . $advisor_2_name );
-		$advisor_2_majors = ! empty( $instance['advisor_2_majors'] ) && is_array( $instance['advisor_2_majors'] ) ? array_map( 'absint', $instance['advisor_2_majors'] ) : [];
+		$advisor_2_name    = ! empty( $instance['advisor_2_name'] ) ? $instance['advisor_2_name'] : 'Chuyên viên tư vấn';
+		$advisor_2_phone   = ! empty( $instance['advisor_2_phone'] ) ? $instance['advisor_2_phone'] : '';
+		$advisor_2_zalo    = ! empty( $instance['advisor_2_zalo'] ) ? $instance['advisor_2_zalo'] : '';
+		$advisor_2_image   = ! empty( $instance['advisor_2_image'] ) ? $instance['advisor_2_image'] : '';
+		$advisor_2_alt     = ! empty( $instance['advisor_2_alt'] ) ? $instance['advisor_2_alt'] : ( 'Tư vấn cùng ' . $advisor_2_name );
+		$advisor_2_schools = ! empty( $instance['advisor_2_schools'] ) && is_array( $instance['advisor_2_schools'] ) ? array_map( 'absint', $instance['advisor_2_schools'] ) : [];
+		$advisor_2_majors  = ! empty( $instance['advisor_2_majors'] ) && is_array( $instance['advisor_2_majors'] ) ? array_map( 'absint', $instance['advisor_2_majors'] ) : [];
+
+		// Context Detection
+		$current_school_id = ltdh_detect_current_school_id();
+		$current_major_id  = ltdh_detect_current_major_id();
 
 		// Determine Active Advisor (1 or 2)
-		$active_advisor   = 1;
-		$current_major_id = ltdh_detect_current_major_id();
+		$active_advisor = 1;
 
 		if ( 'always_1' === $display_mode ) {
 			$active_advisor = 1;
@@ -1185,16 +1308,47 @@ class LTDH_Widget_Advisor_Banner extends WP_Widget {
 		} elseif ( 'random' === $display_mode && ! empty( $advisor_2_image ) ) {
 			$active_advisor = ( wp_rand( 1, 2 ) === 2 ) ? 2 : 1;
 		} else {
-			// auto_by_major: check post meta override on current major first
-			if ( $current_major_id > 0 ) {
-				$manual_override = get_post_meta( $current_major_id, '_ltdh_assigned_advisor', true );
-				if ( 'advisor_2' === $manual_override && ! empty( $advisor_2_image ) ) {
-					$active_advisor = 2;
-				} elseif ( 'advisor_1' === $manual_override ) {
-					$active_advisor = 1;
-				} elseif ( ! empty( $advisor_2_majors ) && in_array( $current_major_id, $advisor_2_majors, true ) && ! empty( $advisor_2_image ) ) {
-					$active_advisor = 2;
+			// auto_by_school (Default): School assignment takes precedence!
+			$is_advisor_2 = false;
+
+			// 1. Direct school context (Trang trường, hoặc Chương trình thuộc trường, hoặc URL ?truong=...)
+			if ( $current_school_id > 0 ) {
+				$school_override = get_post_meta( $current_school_id, '_ltdh_assigned_advisor', true );
+				if ( 'advisor_2' === $school_override ) {
+					$is_advisor_2 = true;
+				} elseif ( 'advisor_1' === $school_override ) {
+					$is_advisor_2 = false;
+				} elseif ( ! empty( $advisor_2_schools ) && in_array( $current_school_id, $advisor_2_schools, true ) ) {
+					$is_advisor_2 = true;
 				}
+			}
+
+			// 2. Major context: Nếu đang ở trang Ngành học (single-major)
+			if ( ! $is_advisor_2 && $current_major_id > 0 ) {
+				$major_override = get_post_meta( $current_major_id, '_ltdh_assigned_advisor', true );
+				if ( 'advisor_2' === $major_override ) {
+					$is_advisor_2 = true;
+				} elseif ( 'advisor_1' === $major_override ) {
+					$is_advisor_2 = false;
+				} elseif ( ! empty( $advisor_2_majors ) && in_array( $current_major_id, $advisor_2_majors, true ) ) {
+					$is_advisor_2 = true;
+				} else {
+					// "Tất cả ngành thuộc trường sẽ phải theo":
+					// Kiểm tra xem các trường đào tạo ngành này có trường nào nằm trong danh sách trường của Người 2 không!
+					if ( ! empty( $advisor_2_schools ) ) {
+						$offering_schools = ltdh_get_schools_for_major( $current_major_id );
+						$intersect = array_intersect( $offering_schools, $advisor_2_schools );
+						if ( ! empty( $intersect ) ) {
+							$is_advisor_2 = true;
+						}
+					}
+				}
+			}
+
+			if ( $is_advisor_2 && ! empty( $advisor_2_image ) ) {
+				$active_advisor = 2;
+			} else {
+				$active_advisor = 1;
 			}
 		}
 
@@ -1244,6 +1398,7 @@ class LTDH_Widget_Advisor_Banner extends WP_Widget {
 			   aria-label="<?php echo esc_attr( 'Chat Zalo tư vấn cùng ' . ( $name ?: 'Ban Tuyển Sinh' ) ); ?>"
 			   data-advisor="<?php echo esc_attr( $active_advisor ); ?>"
 			   data-advisor-name="<?php echo esc_attr( $name ); ?>"
+			   data-school-id="<?php echo esc_attr( $current_school_id ); ?>"
 			   data-major-id="<?php echo esc_attr( $current_major_id ); ?>">
 				<img src="<?php echo esc_url( $image ); ?>" 
 				     alt="<?php echo esc_attr( $alt ?: ( 'Tư vấn tuyển sinh cùng ' . $name ) ); ?>" 
@@ -1256,24 +1411,33 @@ class LTDH_Widget_Advisor_Banner extends WP_Widget {
 	}
 
 	public function form( $instance ) {
-		$title            = ! empty( $instance['title'] ) ? $instance['title'] : '';
-		$display_mode     = ! empty( $instance['display_mode'] ) ? $instance['display_mode'] : 'auto_by_major';
-		$open_new_tab     = ! isset( $instance['open_new_tab'] ) || ! empty( $instance['open_new_tab'] );
-		$rounded_corners  = ! empty( $instance['rounded_corners'] ) ? $instance['rounded_corners'] : 'rounded-2xl';
+		$title             = ! empty( $instance['title'] ) ? $instance['title'] : '';
+		$display_mode      = ! empty( $instance['display_mode'] ) ? $instance['display_mode'] : 'auto_by_school';
+		$open_new_tab      = ! isset( $instance['open_new_tab'] ) || ! empty( $instance['open_new_tab'] );
+		$rounded_corners   = ! empty( $instance['rounded_corners'] ) ? $instance['rounded_corners'] : 'rounded-2xl';
 
-		$default_image_1  = home_url( '/wp-content/uploads/2026/10/banner-thay-dat-cropped.webp' );
-		$advisor_1_name   = ! empty( $instance['advisor_1_name'] ) ? $instance['advisor_1_name'] : 'Thầy Đạt';
-		$advisor_1_phone  = ! empty( $instance['advisor_1_phone'] ) ? $instance['advisor_1_phone'] : '0988 991 496';
-		$advisor_1_zalo   = ! empty( $instance['advisor_1_zalo'] ) ? $instance['advisor_1_zalo'] : '';
-		$advisor_1_image  = ! empty( $instance['advisor_1_image'] ) ? $instance['advisor_1_image'] : $default_image_1;
-		$advisor_1_alt    = ! empty( $instance['advisor_1_alt'] ) ? $instance['advisor_1_alt'] : 'Thầy Đạt đồng hành cùng bạn - Tư vấn tuyển sinh trực tiếp';
+		$default_image_1   = home_url( '/wp-content/uploads/2026/10/banner-thay-dat-cropped.webp' );
+		$advisor_1_name    = ! empty( $instance['advisor_1_name'] ) ? $instance['advisor_1_name'] : 'Thầy Đạt';
+		$advisor_1_phone   = ! empty( $instance['advisor_1_phone'] ) ? $instance['advisor_1_phone'] : '0988 991 496';
+		$advisor_1_zalo    = ! empty( $instance['advisor_1_zalo'] ) ? $instance['advisor_1_zalo'] : '';
+		$advisor_1_image   = ! empty( $instance['advisor_1_image'] ) ? $instance['advisor_1_image'] : $default_image_1;
+		$advisor_1_alt     = ! empty( $instance['advisor_1_alt'] ) ? $instance['advisor_1_alt'] : 'Thầy Đạt đồng hành cùng bạn - Tư vấn tuyển sinh trực tiếp';
 
-		$advisor_2_name   = ! empty( $instance['advisor_2_name'] ) ? $instance['advisor_2_name'] : '';
-		$advisor_2_phone  = ! empty( $instance['advisor_2_phone'] ) ? $instance['advisor_2_phone'] : '';
-		$advisor_2_zalo   = ! empty( $instance['advisor_2_zalo'] ) ? $instance['advisor_2_zalo'] : '';
-		$advisor_2_image  = ! empty( $instance['advisor_2_image'] ) ? $instance['advisor_2_image'] : '';
-		$advisor_2_alt    = ! empty( $instance['advisor_2_alt'] ) ? $instance['advisor_2_alt'] : '';
-		$advisor_2_majors = ! empty( $instance['advisor_2_majors'] ) && is_array( $instance['advisor_2_majors'] ) ? array_map( 'absint', $instance['advisor_2_majors'] ) : [];
+		$advisor_2_name    = ! empty( $instance['advisor_2_name'] ) ? $instance['advisor_2_name'] : '';
+		$advisor_2_phone   = ! empty( $instance['advisor_2_phone'] ) ? $instance['advisor_2_phone'] : '';
+		$advisor_2_zalo    = ! empty( $instance['advisor_2_zalo'] ) ? $instance['advisor_2_zalo'] : '';
+		$advisor_2_image   = ! empty( $instance['advisor_2_image'] ) ? $instance['advisor_2_image'] : '';
+		$advisor_2_alt     = ! empty( $instance['advisor_2_alt'] ) ? $instance['advisor_2_alt'] : '';
+		$advisor_2_schools = ! empty( $instance['advisor_2_schools'] ) && is_array( $instance['advisor_2_schools'] ) ? array_map( 'absint', $instance['advisor_2_schools'] ) : [];
+		$advisor_2_majors  = ! empty( $instance['advisor_2_majors'] ) && is_array( $instance['advisor_2_majors'] ) ? array_map( 'absint', $instance['advisor_2_majors'] ) : [];
+
+		$schools = get_posts( [
+			'post_type'      => defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		] );
 
 		$majors = get_posts( [
 			'post_type'      => defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major',
@@ -1339,7 +1503,7 @@ class LTDH_Widget_Advisor_Banner extends WP_Widget {
 			</p>
 		</div>
 
-		<!-- SECTION 2: Người Tư Vấn 2 (Người Hợp Tác Theo Ngành) -->
+		<!-- SECTION 2: Người Tư Vấn 2 (Người Hợp Tác Theo Trường) -->
 		<div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
 			<div style="font-weight: 700; color: #166534; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
 				<span>🤝 Người tư vấn 2 (Người hợp tác)</span>
@@ -1382,34 +1546,67 @@ class LTDH_Widget_Advisor_Banner extends WP_Widget {
 				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'advisor_2_alt' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'advisor_2_alt' ) ); ?>" type="text" value="<?php echo esc_attr( $advisor_2_alt ); ?>">
 			</p>
 
-			<!-- Phân công ngành học -->
-			<div class="ltdh-majors-box" style="border-top: 1px dashed #86efac; padding-top: 10px; margin-top: 10px;">
+			<!-- PHÂN CÔNG THEO TRƯỜNG ĐÀO TẠO (TRỌNG TÂM) -->
+			<div class="ltdh-schools-box" style="border-top: 1px dashed #86efac; padding-top: 10px; margin-top: 12px;">
 				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-					<strong style="color: #166534; font-size: 12px;"><?php esc_html_e( 'Chọn ngành Người 2 phụ trách:', 'ltdh' ); ?></strong>
+					<strong style="color: #166534; font-size: 13px;">🏛️ Chọn các TRƯỜNG Người 2 phụ trách:</strong>
 					<span style="font-size: 11px;">
-						<a href="#" class="ltdh-majors-select-all"><?php esc_html_e( 'Chọn hết', 'ltdh' ); ?></a> | 
-						<a href="#" class="ltdh-majors-deselect-all"><?php esc_html_e( 'Bỏ chọn', 'ltdh' ); ?></a>
+						<a href="#" class="ltdh-schools-select-all"><?php esc_html_e( 'Chọn hết', 'ltdh' ); ?></a> | 
+						<a href="#" class="ltdh-schools-deselect-all"><?php esc_html_e( 'Bỏ chọn', 'ltdh' ); ?></a>
 					</span>
 				</div>
-				<input type="text" class="widefat ltdh-major-filter-input" placeholder="🔍 Gõ để tìm nhanh tên ngành..." style="margin-bottom: 6px; font-size: 12px; padding: 3px 6px;">
-				<div class="ltdh-majors-list" style="max-height: 150px; overflow-y: auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px;">
-					<?php if ( ! empty( $majors ) ) : ?>
-						<?php foreach ( $majors as $m ) : 
-							$is_checked = in_array( (int) $m->ID, $advisor_2_majors, true );
+				<input type="text" class="widefat ltdh-school-filter-input" placeholder="🔍 Gõ để tìm nhanh tên trường..." style="margin-bottom: 6px; font-size: 12px; padding: 3px 6px;">
+				<div class="ltdh-schools-list" style="max-height: 160px; overflow-y: auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px;">
+					<?php if ( ! empty( $schools ) ) : ?>
+						<?php foreach ( $schools as $sch ) : 
+							$is_sch_checked = in_array( (int) $sch->ID, $advisor_2_schools, true );
 						?>
-							<label class="ltdh-major-item" style="display: block; margin-bottom: 4px; font-size: 12px; cursor: pointer;">
-								<input type="checkbox" class="ltdh-major-checkbox" name="<?php echo esc_attr( $this->get_field_name( 'advisor_2_majors' ) ); ?>[]" value="<?php echo esc_attr( $m->ID ); ?>" <?php checked( $is_checked ); ?>>
-								<span><?php echo esc_html( $m->post_title ); ?></span>
+							<label class="ltdh-school-item" style="display: block; margin-bottom: 5px; font-size: 12px; cursor: pointer;">
+								<input type="checkbox" class="ltdh-school-checkbox" name="<?php echo esc_attr( $this->get_field_name( 'advisor_2_schools' ) ); ?>[]" value="<?php echo esc_attr( $sch->ID ); ?>" <?php checked( $is_sch_checked ); ?>>
+								<span><strong><?php echo esc_html( $sch->post_title ); ?></strong></span>
 							</label>
 						<?php endforeach; ?>
 					<?php else : ?>
-						<p style="font-size: 11px; color: #64748b; margin: 4px 0;"><?php esc_html_e( 'Chưa có ngành học nào được tạo.', 'ltdh' ); ?></p>
+						<p style="font-size: 11px; color: #64748b; margin: 4px 0;"><?php esc_html_e( 'Chưa có trường nào được tạo.', 'ltdh' ); ?></p>
 					<?php endif; ?>
 				</div>
-				<p class="description" style="font-size: 11px; margin-top: 6px; color: #166534; line-height: 1.4;">
-					💡 <em>Khi người xem vào các ngành được tích chọn ở trên (hoặc chương trình thuộc ngành đó), banner Người 2 và link Zalo Người 2 sẽ tự động hiển thị!</em>
-				</p>
+				<div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; padding: 8px 10px; margin-top: 8px;">
+					<p style="font-size: 11px; margin: 0; color: #065f46; line-height: 1.45;">
+						🎯 <strong>Quy tắc tự động:</strong> Chỉ cần tích chọn Trường ở trên, <strong>tất cả các ngành học và chương trình đào tạo thuộc trường đó</strong> sẽ tự động hiển thị banner và link Zalo của <strong>Người 2</strong>! Các trường còn lại sẽ hiển thị Người 1.
+					</p>
+				</div>
 			</div>
+
+			<!-- PHÂN CÔNG THÊM THEO NGÀNH HỌC (TÙY CHỌN PHỤ) -->
+			<details style="margin-top: 10px; border-top: 1px dashed #cbd5e1; padding-top: 8px;">
+				<summary style="font-size: 12px; font-weight: 600; color: #475569; cursor: pointer;">
+					📂 Chọn thêm ngành cụ thể (Tùy chọn phụ nếu cần gán lẻ)
+				</summary>
+				<div class="ltdh-majors-box" style="margin-top: 8px;">
+					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+						<span style="color: #475569; font-size: 11px;"><?php esc_html_e( 'Ngành lẻ bổ sung:', 'ltdh' ); ?></span>
+						<span style="font-size: 11px;">
+							<a href="#" class="ltdh-majors-select-all"><?php esc_html_e( 'Chọn hết', 'ltdh' ); ?></a> | 
+							<a href="#" class="ltdh-majors-deselect-all"><?php esc_html_e( 'Bỏ chọn', 'ltdh' ); ?></a>
+						</span>
+					</div>
+					<input type="text" class="widefat ltdh-major-filter-input" placeholder="🔍 Gõ để tìm nhanh tên ngành..." style="margin-bottom: 6px; font-size: 12px; padding: 3px 6px;">
+					<div class="ltdh-majors-list" style="max-height: 130px; overflow-y: auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px;">
+						<?php if ( ! empty( $majors ) ) : ?>
+							<?php foreach ( $majors as $m ) : 
+								$is_checked = in_array( (int) $m->ID, $advisor_2_majors, true );
+							?>
+								<label class="ltdh-major-item" style="display: block; margin-bottom: 4px; font-size: 12px; cursor: pointer;">
+									<input type="checkbox" class="ltdh-major-checkbox" name="<?php echo esc_attr( $this->get_field_name( 'advisor_2_majors' ) ); ?>[]" value="<?php echo esc_attr( $m->ID ); ?>" <?php checked( $is_checked ); ?>>
+									<span><?php echo esc_html( $m->post_title ); ?></span>
+								</label>
+							<?php endforeach; ?>
+						<?php else : ?>
+							<p style="font-size: 11px; color: #64748b; margin: 4px 0;"><?php esc_html_e( 'Chưa có ngành học nào được tạo.', 'ltdh' ); ?></p>
+						<?php endif; ?>
+					</div>
+				</div>
+			</details>
 		</div>
 
 		<!-- SECTION 3: Cài Đặt Hiển Thị & Giao Diện -->
@@ -1421,7 +1618,7 @@ class LTDH_Widget_Advisor_Banner extends WP_Widget {
 			<p style="margin: 0 0 8px 0;">
 				<label for="<?php echo esc_attr( $this->get_field_id( 'display_mode' ) ); ?>"><?php esc_html_e( 'Chế độ hiển thị:', 'ltdh' ); ?></label>
 				<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'display_mode' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'display_mode' ) ); ?>">
-					<option value="auto_by_major" <?php selected( $display_mode, 'auto_by_major' ); ?>>⚡ Tự động theo ngành phụ trách (Khuyên dùng)</option>
+					<option value="auto_by_school" <?php selected( $display_mode, 'auto_by_school' ); ?>>⚡ Tự động theo Trường & Ngành (Khuyên dùng: Chọn trường là tất cả ngành thuộc trường tự động theo)</option>
 					<option value="always_1" <?php selected( $display_mode, 'always_1' ); ?>>👨‍🏫 Cố định luôn hiển thị Người 1</option>
 					<option value="always_2" <?php selected( $display_mode, 'always_2' ); ?>>🤝 Cố định luôn hiển thị Người 2</option>
 					<option value="random" <?php selected( $display_mode, 'random' ); ?>>🎲 Xoay vòng ngẫu nhiên 50/50 (Chia đều khách)</option>
@@ -1447,24 +1644,25 @@ class LTDH_Widget_Advisor_Banner extends WP_Widget {
 	}
 
 	public function update( $new_instance, $old_instance ) {
-		$instance                     = [];
-		$instance['title']            = sanitize_text_field( $new_instance['title'] ?? '' );
-		$instance['display_mode']     = in_array( $new_instance['display_mode'] ?? '', [ 'auto_by_major', 'always_1', 'always_2', 'random' ], true ) ? $new_instance['display_mode'] : 'auto_by_major';
-		$instance['open_new_tab']     = ! empty( $new_instance['open_new_tab'] );
-		$instance['rounded_corners']  = in_array( $new_instance['rounded_corners'] ?? '', [ 'rounded-2xl', 'rounded-xl', 'rounded-none' ], true ) ? $new_instance['rounded_corners'] : 'rounded-2xl';
+		$instance                      = [];
+		$instance['title']             = sanitize_text_field( $new_instance['title'] ?? '' );
+		$instance['display_mode']      = in_array( $new_instance['display_mode'] ?? '', [ 'auto_by_school', 'always_1', 'always_2', 'random' ], true ) ? $new_instance['display_mode'] : 'auto_by_school';
+		$instance['open_new_tab']      = ! empty( $new_instance['open_new_tab'] );
+		$instance['rounded_corners']   = in_array( $new_instance['rounded_corners'] ?? '', [ 'rounded-2xl', 'rounded-xl', 'rounded-none' ], true ) ? $new_instance['rounded_corners'] : 'rounded-2xl';
 
-		$instance['advisor_1_name']   = sanitize_text_field( $new_instance['advisor_1_name'] ?? 'Thầy Đạt' );
-		$instance['advisor_1_phone']  = sanitize_text_field( $new_instance['advisor_1_phone'] ?? '' );
-		$instance['advisor_1_zalo']   = sanitize_text_field( $new_instance['advisor_1_zalo'] ?? '' );
-		$instance['advisor_1_image']  = esc_url_raw( $new_instance['advisor_1_image'] ?? '' );
-		$instance['advisor_1_alt']    = sanitize_text_field( $new_instance['advisor_1_alt'] ?? '' );
+		$instance['advisor_1_name']    = sanitize_text_field( $new_instance['advisor_1_name'] ?? 'Thầy Đạt' );
+		$instance['advisor_1_phone']   = sanitize_text_field( $new_instance['advisor_1_phone'] ?? '' );
+		$instance['advisor_1_zalo']    = sanitize_text_field( $new_instance['advisor_1_zalo'] ?? '' );
+		$instance['advisor_1_image']   = esc_url_raw( $new_instance['advisor_1_image'] ?? '' );
+		$instance['advisor_1_alt']     = sanitize_text_field( $new_instance['advisor_1_alt'] ?? '' );
 
-		$instance['advisor_2_name']   = sanitize_text_field( $new_instance['advisor_2_name'] ?? '' );
-		$instance['advisor_2_phone']  = sanitize_text_field( $new_instance['advisor_2_phone'] ?? '' );
-		$instance['advisor_2_zalo']   = sanitize_text_field( $new_instance['advisor_2_zalo'] ?? '' );
-		$instance['advisor_2_image']  = esc_url_raw( $new_instance['advisor_2_image'] ?? '' );
-		$instance['advisor_2_alt']    = sanitize_text_field( $new_instance['advisor_2_alt'] ?? '' );
-		$instance['advisor_2_majors'] = ! empty( $new_instance['advisor_2_majors'] ) && is_array( $new_instance['advisor_2_majors'] ) ? array_map( 'absint', $new_instance['advisor_2_majors'] ) : [];
+		$instance['advisor_2_name']    = sanitize_text_field( $new_instance['advisor_2_name'] ?? '' );
+		$instance['advisor_2_phone']   = sanitize_text_field( $new_instance['advisor_2_phone'] ?? '' );
+		$instance['advisor_2_zalo']    = sanitize_text_field( $new_instance['advisor_2_zalo'] ?? '' );
+		$instance['advisor_2_image']   = esc_url_raw( $new_instance['advisor_2_image'] ?? '' );
+		$instance['advisor_2_alt']     = sanitize_text_field( $new_instance['advisor_2_alt'] ?? '' );
+		$instance['advisor_2_schools'] = ! empty( $new_instance['advisor_2_schools'] ) && is_array( $new_instance['advisor_2_schools'] ) ? array_map( 'absint', $new_instance['advisor_2_schools'] ) : [];
+		$instance['advisor_2_majors']  = ! empty( $new_instance['advisor_2_majors'] ) && is_array( $new_instance['advisor_2_majors'] ) ? array_map( 'absint', $new_instance['advisor_2_majors'] ) : [];
 
 		return $instance;
 	}
@@ -1521,7 +1719,30 @@ jQuery(document).ready(function($) {
 		btn.hide();
 	});
 
-	// 3. Quick Filter Majors in Checklist
+	// 3. Quick Filter Schools in Checklist
+	$(document).on('input', '.ltdh-school-filter-input', function() {
+		var q = $(this).val().toLowerCase().trim();
+		var list = $(this).closest('.ltdh-schools-box').find('.ltdh-school-item');
+		list.each(function() {
+			var text = $(this).text().toLowerCase();
+			$(this).toggle(text.indexOf(q) !== -1);
+		});
+	});
+
+	// 4. Select All / Deselect All Schools
+	$(document).on('click', '.ltdh-schools-select-all', function(e) {
+		e.preventDefault();
+		var box = $(this).closest('.ltdh-schools-box');
+		box.find('.ltdh-school-checkbox:visible').prop('checked', true).trigger('change');
+	});
+
+	$(document).on('click', '.ltdh-schools-deselect-all', function(e) {
+		e.preventDefault();
+		var box = $(this).closest('.ltdh-schools-box');
+		box.find('.ltdh-school-checkbox:visible').prop('checked', false).trigger('change');
+	});
+
+	// 5. Quick Filter Majors in Checklist
 	$(document).on('input', '.ltdh-major-filter-input', function() {
 		var q = $(this).val().toLowerCase().trim();
 		var list = $(this).closest('.ltdh-majors-box').find('.ltdh-major-item');
@@ -1531,7 +1752,7 @@ jQuery(document).ready(function($) {
 		});
 	});
 
-	// 4. Select All / Deselect All Majors
+	// 6. Select All / Deselect All Majors
 	$(document).on('click', '.ltdh-majors-select-all', function(e) {
 		e.preventDefault();
 		var box = $(this).closest('.ltdh-majors-box');
@@ -1549,27 +1770,31 @@ JS;
 }
 
 /**
- * Register meta box on Major post type to select advisor override.
+ * Register meta box on School and Major post types to select advisor override.
  */
-function ltdh_register_major_advisor_meta_box() {
-	$cpt_major = defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major';
+function ltdh_register_advisor_meta_boxes() {
+	$cpt_school = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
+	$cpt_major  = defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major';
+
 	add_meta_box(
-		'ltdh_major_advisor_override',
+		'ltdh_advisor_override',
 		__( '👤 Chuyên viên tư vấn phụ trách', 'ltdh' ),
-		'ltdh_render_major_advisor_meta_box',
-		$cpt_major,
+		'ltdh_render_advisor_meta_box',
+		[ $cpt_school, $cpt_major ],
 		'side',
 		'default'
 	);
 }
-add_action( 'add_meta_boxes', 'ltdh_register_major_advisor_meta_box' );
+add_action( 'add_meta_boxes', 'ltdh_register_advisor_meta_boxes' );
 
-function ltdh_render_major_advisor_meta_box( $post ) {
-	wp_nonce_field( 'ltdh_major_advisor_nonce', 'ltdh_major_advisor_nonce_field' );
-	$current = get_post_meta( $post->ID, '_ltdh_assigned_advisor', true ) ?: 'default';
+function ltdh_render_advisor_meta_box( $post ) {
+	wp_nonce_field( 'ltdh_advisor_nonce', 'ltdh_advisor_nonce_field' );
+	$current   = get_post_meta( $post->ID, '_ltdh_assigned_advisor', true ) ?: 'default';
+	$post_type = get_post_type( $post );
+	$label     = ( 'school' === $post_type ) ? 'trường này (và toàn bộ ngành/chương trình thuộc trường)' : 'ngành này';
 	?>
 	<p class="description" style="margin-bottom:8px; font-size:12px;">
-		<?php esc_html_e( 'Chọn chuyên viên xuất hiện trên banner tư vấn khi người xem vào ngành này:', 'ltdh' ); ?>
+		<?php printf( esc_html__( 'Chọn chuyên viên xuất hiện trên banner tư vấn khi người xem vào %s:', 'ltdh' ), esc_html( $label ) ); ?>
 	</p>
 	<select name="ltdh_assigned_advisor" class="widefat" style="margin-bottom:6px;">
 		<option value="default" <?php selected( $current, 'default' ); ?>><?php esc_html_e( '⚡ Tự động (Theo phân công trong Widget)', 'ltdh' ); ?></option>
@@ -1579,8 +1804,8 @@ function ltdh_render_major_advisor_meta_box( $post ) {
 	<?php
 }
 
-function ltdh_save_major_advisor_meta_box( $post_id ) {
-	if ( ! isset( $_POST['ltdh_major_advisor_nonce_field'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ltdh_major_advisor_nonce_field'] ) ), 'ltdh_major_advisor_nonce' ) ) {
+function ltdh_save_advisor_meta_box( $post_id ) {
+	if ( ! isset( $_POST['ltdh_advisor_nonce_field'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ltdh_advisor_nonce_field'] ) ), 'ltdh_advisor_nonce' ) ) {
 		return;
 	}
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
@@ -1596,7 +1821,7 @@ function ltdh_save_major_advisor_meta_box( $post_id ) {
 		}
 	}
 }
-add_action( 'save_post_major', 'ltdh_save_major_advisor_meta_box' );
+add_action( 'save_post', 'ltdh_save_advisor_meta_box' );
 
 
 // =========================================================================

@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Suite: LTDH Advisor Banner Widget & Multi-Counselor Switching
+ * Test Suite: LTDH Advisor Banner Widget & Multi-Counselor Switching by School & Major
  *
  * @package lienthongdaihoc
  */
@@ -12,7 +12,7 @@ class Test_Advisor_Banner_Widget {
 
 	public static function run() {
 		echo "\n==================================================\n";
-		echo "STARTING TEST SUITE: ADVISOR BANNER WIDGET\n";
+		echo "STARTING TEST SUITE: ADVISOR BANNER WIDGET (BY SCHOOL & MAJOR)\n";
 		echo "==================================================\n\n";
 
 		$passed = 0;
@@ -60,16 +60,16 @@ class Test_Advisor_Banner_Widget {
 			echo "❌ TC-04 FAILED: LTDH_Widget_Advisor_Banner not found in WP Widget Factory\n";
 		}
 
-		// TC-05: Query param major detection
+		// TC-05: Query param school detection
 		$total++;
-		$_GET['nganh'] = '1694';
-		$detected_id = ltdh_detect_current_major_id();
-		unset( $_GET['nganh'] );
-		if ( 1694 === $detected_id ) {
-			echo "✅ TC-05: Accurately detects major ID from query parameters\n";
+		$_GET['truong'] = '1853';
+		$detected_school_id = ltdh_detect_current_school_id();
+		unset( $_GET['truong'] );
+		if ( 1853 === $detected_school_id ) {
+			echo "✅ TC-05: Accurately detects school ID from query parameters (?truong=1853)\n";
 			$passed++;
 		} else {
-			echo "❌ TC-05 FAILED: Expected 1694, got $detected_id\n";
+			echo "❌ TC-05 FAILED: Expected 1853, got $detected_school_id\n";
 		}
 
 		// TC-06: Dynamic Sidebar Params filter strips card wrapper
@@ -90,20 +90,20 @@ class Test_Advisor_Banner_Widget {
 			echo "❌ TC-06 FAILED: Failed to strip card classes: $new_before\n";
 		}
 
-		// TC-07: Widget Render Default Advisor (Advisor 1 - Thầy Đạt)
-		$total++;
+		// Setup widget fixture
 		$widget_obj = new LTDH_Widget_Advisor_Banner();
 		$instance = [
-			'advisor_1_name'   => 'Thầy Đạt',
-			'advisor_1_phone'  => '0988 991 496',
-			'advisor_1_image'  => 'http://example.com/thay-dat.jpg',
-			'advisor_1_alt'    => 'Thầy Đạt tư vấn trực tiếp',
-			'advisor_2_name'   => 'Cô Mai',
-			'advisor_2_phone'  => '0912 345 678',
-			'advisor_2_image'  => 'http://example.com/co-mai.jpg',
-			'advisor_2_majors' => [ 9999 ], // major 9999 belongs to Advisor 2
-			'display_mode'     => 'auto_by_major',
-			'open_new_tab'     => true,
+			'advisor_1_name'    => 'Thầy Đạt',
+			'advisor_1_phone'   => '0988 991 496',
+			'advisor_1_image'   => 'http://example.com/thay-dat.jpg',
+			'advisor_1_alt'     => 'Thầy Đạt tư vấn trực tiếp',
+			'advisor_2_name'    => 'Cô Mai',
+			'advisor_2_phone'   => '0912 345 678',
+			'advisor_2_image'   => 'http://example.com/co-mai.jpg',
+			'advisor_2_schools' => [ 1853 ], // GTVT belongs to Advisor 2!
+			'advisor_2_majors'  => [],
+			'display_mode'      => 'auto_by_school',
+			'open_new_tab'      => true,
 		];
 		$args = [
 			'before_widget' => '<div class="widget bg-white border border-slate-200 rounded-xl p-5 md:p-6 shadow-xs">',
@@ -112,66 +112,116 @@ class Test_Advisor_Banner_Widget {
 			'after_title'   => '</h3>',
 		];
 
+		// TC-07: Widget Render Default Advisor (Advisor 1 - Thầy Đạt) when no school context or non-assigned school
+		$total++;
 		ob_start();
 		$widget_obj->widget( $args, $instance );
 		$html_default = ob_get_clean();
 
 		if ( str_contains( $html_default, 'thay-dat.jpg' ) && str_contains( $html_default, 'https://zalo.me/0988991496' ) && ! str_contains( $html_default, 'p-5' ) ) {
-			echo "✅ TC-07: Renders Advisor 1 (Thầy Đạt) and phone 0988991496 with seamless wrapper\n";
+			echo "✅ TC-07: Renders Advisor 1 (Thầy Đạt) and phone 0988991496 when school is unassigned\n";
 			$passed++;
 		} else {
 			echo "❌ TC-07 FAILED: Output did not match Advisor 1:\n$html_default\n";
 		}
 
-		// TC-08: Widget Render Switch to Advisor 2 when matching Major is viewed
+		// TC-08: All programs under assigned school AUTOMATICALLY switch to Advisor 2!
 		$total++;
-		$_GET['nganh'] = '9999';
-		ob_start();
-		$widget_obj->widget( $args, $instance );
-		$html_advisor2 = ob_get_clean();
-		unset( $_GET['nganh'] );
+		$gtvt_programs = get_posts( [
+			'post_type'   => 'program',
+			'meta_key'    => 'school_relationship',
+			'meta_value'  => 1853,
+			'numberposts' => 1,
+			'fields'      => 'ids',
+		] );
 
-		if ( str_contains( $html_advisor2, 'co-mai.jpg' ) && str_contains( $html_advisor2, 'https://zalo.me/0912345678' ) && str_contains( $html_advisor2, 'data-advisor="2"' ) ) {
-			echo "✅ TC-08: Automatically switches to Advisor 2 (Cô Mai) & link 0912345678 for assigned major\n";
-			$passed++;
+		if ( ! empty( $gtvt_programs ) ) {
+			$gtvt_program_id = $gtvt_programs[0];
+			global $post;
+			$original_post = $post;
+			$post = get_post( $gtvt_program_id );
+			setup_postdata( $post );
+
+			ob_start();
+			$widget_obj->widget( $args, $instance );
+			$html_prog = ob_get_clean();
+
+			$post = $original_post;
+			if ( $post ) setup_postdata( $post );
+
+			if ( str_contains( $html_prog, 'co-mai.jpg' ) && str_contains( $html_prog, 'https://zalo.me/0912345678' ) && str_contains( $html_prog, 'data-advisor="2"' ) ) {
+				echo "✅ TC-08: Program under assigned school (ĐH GTVT) AUTOMATICALLY switches to Advisor 2\n";
+				$passed++;
+			} else {
+				echo "❌ TC-08 FAILED: Program did not switch to Advisor 2:\n$html_prog\n";
+			}
 		} else {
-			echo "❌ TC-08 FAILED: Output did not switch to Advisor 2:\n$html_advisor2\n";
+			echo "⚠️ TC-08 SKIPPED: No program found for school 1853\n";
 		}
 
-		// TC-09: Post Meta Override takes precedence
+		// TC-09: Major page with school query param (?truong=1853) switches to Advisor 2!
 		$total++;
-		// Create temporary test major post
-		$test_major_id = wp_insert_post( [
-			'post_title'  => 'Test Ngành Tư Vấn',
-			'post_type'   => 'major',
+		$_GET['truong'] = '1853';
+		ob_start();
+		$widget_obj->widget( $args, $instance );
+		$html_major_school = ob_get_clean();
+		unset( $_GET['truong'] );
+
+		if ( str_contains( $html_major_school, 'co-mai.jpg' ) && str_contains( $html_major_school, 'https://zalo.me/0912345678' ) && str_contains( $html_major_school, 'data-advisor="2"' ) ) {
+			echo "✅ TC-09: Major page viewed in context of assigned school (?truong=1853) displays Advisor 2\n";
+			$passed++;
+		} else {
+			echo "❌ TC-09 FAILED: Major page with school query failed:\n$html_major_school\n";
+		}
+
+		// TC-10: Non-assigned school (e.g. school 2364 - ĐH Thương mại) retains Advisor 1 (Thầy Đạt)!
+		$total++;
+		$_GET['truong'] = '2364';
+		ob_start();
+		$widget_obj->widget( $args, $instance );
+		$html_other_school = ob_get_clean();
+		unset( $_GET['truong'] );
+
+		if ( str_contains( $html_other_school, 'thay-dat.jpg' ) && str_contains( $html_other_school, 'data-advisor="1"' ) ) {
+			echo "✅ TC-10: Other school (ĐH Thương mại) correctly retains Advisor 1 (Thầy Đạt)\n";
+			$passed++;
+		} else {
+			echo "❌ TC-10 FAILED: Other school output failed:\n$html_other_school\n";
+		}
+
+		// TC-11: School Post Meta Override takes precedence
+		$total++;
+		$test_school_id = wp_insert_post( [
+			'post_title'  => 'Test Trường Tư Vấn',
+			'post_type'   => 'school',
 			'post_status' => 'publish',
 		] );
-		update_post_meta( $test_major_id, '_ltdh_assigned_advisor', 'advisor_2' );
+		update_post_meta( $test_school_id, '_ltdh_assigned_advisor', 'advisor_2' );
 
-		$_GET['nganh'] = (string) $test_major_id;
+		$_GET['truong'] = (string) $test_school_id;
 		ob_start();
 		$widget_obj->widget( $args, $instance );
 		$html_override = ob_get_clean();
-		unset( $_GET['nganh'] );
-		wp_delete_post( $test_major_id, true );
+		unset( $_GET['truong'] );
+		wp_delete_post( $test_school_id, true );
 
 		if ( str_contains( $html_override, 'co-mai.jpg' ) && str_contains( $html_override, 'https://zalo.me/0912345678' ) ) {
-			echo "✅ TC-09: Per-major post meta override successfully switches to Advisor 2\n";
+			echo "✅ TC-11: Per-school post meta override successfully switches to Advisor 2\n";
 			$passed++;
 		} else {
-			echo "❌ TC-09 FAILED: Override failed:\n$html_override\n";
+			echo "❌ TC-11 FAILED: Per-school override failed:\n$html_override\n";
 		}
 
-		// TC-10: CSS Verification in style.css
+		// TC-12: CSS Verification in style.css
 		$total++;
 		$style_css = file_get_contents( dirname( __DIR__ ) . '/style.css' );
 		if ( str_contains( $style_css, '.widget.widget_ltdh_advisor_banner' ) &&
 		     str_contains( $style_css, 'line-height: 0 !important' ) &&
 		     str_contains( $style_css, 'padding: 0 !important' ) ) {
-			echo "✅ TC-10: style.css contains zero-margin, zero-padding rules for banner widgets\n";
+			echo "✅ TC-12: style.css contains zero-margin, zero-padding rules for banner widgets\n";
 			$passed++;
 		} else {
-			echo "❌ TC-10 FAILED: CSS rules missing in style.css\n";
+			echo "❌ TC-12 FAILED: CSS rules missing in style.css\n";
 		}
 
 		echo "\n==================================================\n";
