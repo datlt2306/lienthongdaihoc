@@ -272,8 +272,9 @@ class LTDH_Performance {
 		// Remove classic theme styles and global styles inline SVG filters if not using FSE
 		wp_dequeue_style( 'classic-theme-styles' );
 
-		// Dequeue Contact Form 7 CSS and scripts on front page (modal uses custom AJAX lead capture)
-		if ( is_front_page() ) {
+		// Dequeue Contact Form 7 CSS and scripts on front page only if CF7 consultation form is not active
+		$has_front_cf7 = function_exists( 'ltdh_get_form_shortcode' ) ? ! empty( ltdh_get_form_shortcode( 'consultation' ) ) : false;
+		if ( is_front_page() && ! $has_front_cf7 ) {
 			wp_dequeue_style( 'wp-block-library' );
 			wp_dequeue_style( 'wp-block-library-theme' );
 			wp_dequeue_style( 'global-styles' );

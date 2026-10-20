@@ -319,7 +319,7 @@ $has_active_filters  = $active_filter_count > 0;
 			</div>
 
 			<!-- Drawer Sticky Footer -->
-			<div class="p-3.5 border-t border-slate-100 bg-white flex items-center gap-2.5 shrink-0 shadow-lg touch-none" style="touch-action: none;">
+			<div class="p-3.5 border-t border-slate-100 bg-white flex items-center gap-2.5 shrink-0 shadow-lg" style="touch-action: manipulation;">
 				<button type="button" 
 						id="ltdh-major-drawer-reset-btn"
 						class="js-ltdh-reset-filter flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs text-center transition-all cursor-pointer">
@@ -342,6 +342,7 @@ $has_active_filters  = $active_filter_count > 0;
 				var drawer = document.getElementById('ltdh-major-filter-drawer');
 				var overlay = document.getElementById('ltdh-major-filter-drawer-overlay');
 				var applyBtn = document.getElementById('ltdh-major-drawer-apply-btn');
+				var resetBtn = document.getElementById('ltdh-major-drawer-reset-btn');
 				var desktopWrapper = document.getElementById('catalog-desktop-major-filter-wrapper');
 				var drawerWrapper = document.getElementById('catalog-drawer-major-filter-wrapper');
 				var filterBody = document.getElementById('major-filter-body');
@@ -354,6 +355,7 @@ $has_active_filters  = $active_filter_count > 0;
 				}
 
 				function onTouchMoveLock(e) {
+					if (e.target.closest('button, a, input, select, label')) return;
 					var scrollable = e.target.closest('#catalog-drawer-major-filter-wrapper');
 					if (!scrollable) {
 						if (e.cancelable) e.preventDefault();
@@ -428,6 +430,7 @@ $has_active_filters  = $active_filter_count > 0;
 				if (closeBtn) closeBtn.onclick = closeDrawer;
 				if (overlay) overlay.onclick = closeDrawer;
 				if (applyBtn) applyBtn.onclick = closeDrawer;
+				if (resetBtn) resetBtn.onclick = closeDrawer;
 
 				relocate();
 				window.addEventListener('resize', relocate);

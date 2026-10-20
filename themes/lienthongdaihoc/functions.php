@@ -51,6 +51,7 @@ require_once __DIR__ . '/inc/search-engine.php';
 require_once __DIR__ . '/inc/comparison.php';
 require_once __DIR__ . '/inc/eligibility.php';
 require_once __DIR__ . '/inc/eligibility-rules.php';
+require_once __DIR__ . '/inc/program-reviews.php';
 
 if ( file_exists( __DIR__ . '/inc/seo/class-rankmath-integration.php' ) ) {
 	require_once __DIR__ . '/inc/seo/class-rankmath-integration.php';

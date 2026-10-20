@@ -471,7 +471,7 @@ function ltdh_ajax_filter_programs() {
 			$prog_types       = wp_get_post_terms( $prog_id, 'training_type' );
 			$type_name        = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->name : '';
 			$t_name           = $type_name;
-			$type_slug        = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->slug : '';
+			$card_type_slug   = ! empty( $prog_types ) && ! is_wp_error( $prog_types ) ? $prog_types[0]->slug : '';
 			$clean_type_name  = preg_replace( '/^hệ\s+/iu', '', trim( $t_name ) );
 			$card_headline    = function_exists( 'ltdh_format_program_card_headline' )
 				? ltdh_format_program_card_headline( get_the_title( $prog_id ), $school_code, $school_name, $clean_major_name )
@@ -601,7 +601,7 @@ function ltdh_ajax_filter_programs() {
 								data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 								data-compare-title="<?php echo esc_attr( $card_headline ); ?>"
 								data-compare-slug="<?php echo esc_attr( get_post_field( 'post_name', $prog_id ) ); ?>"
-								data-compare-he="<?php echo esc_attr( $type_slug ); ?>"
+								data-compare-he="<?php echo esc_attr( $card_type_slug ); ?>"
 								data-compare-nganh="<?php echo esc_attr( $major_rel_id ? get_post_field( 'post_name', $major_rel_id ) : '' ); ?>"
 								data-compare-major-name="<?php echo esc_attr( $clean_major_name ); ?>"
 								data-compare-school-name="<?php echo esc_attr( $school_name ); ?>">

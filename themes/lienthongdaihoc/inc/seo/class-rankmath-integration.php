@@ -94,16 +94,20 @@ function ltdh_seo_dynamic_title( $title ) {
 			return $title; // Respect custom title from Rank Math metabox on front page!
 		}
 		$rm_titles = get_option( 'rank-math-options-titles', [] );
-		if ( ! empty( $rm_titles['homepage_title'] ) ) {
-			return $title; // Respect custom setting in Rank Math -> Titles & Meta -> Homepage!
+		$custom_rm_home_title = trim( (string) ( $rm_titles['homepage_title'] ?? '' ) );
+		// Rank Math default placeholders: '%sitename% %page% %sep% %sitedesc%', '%sitename% %sep% %sitedesc%', '%title% %sep% %sitename%'
+		if ( ! empty( $custom_rm_home_title ) && ! in_array( $custom_rm_home_title, [ '%sitename% %page% %sep% %sitedesc%', '%sitename% %sep% %sitedesc%', '%title% %sep% %sitename%' ], true ) ) {
+			return $title; // Respect custom non-default setting in Rank Math -> Titles & Meta -> Homepage!
 		}
-		return sprintf( 'Liên Thông Đại Học %d: Từ Xa, Vừa Học Vừa Làm, Chính Quy', $year );
+		return sprintf( 'Liên Thông Đại Học %d: Đào Tạo Từ Xa & Vừa Học Vừa Làm', $year );
 	}
 
 	// 2. Singular Pages: Check if user customized in Rank Math metabox
-	$post_id = get_the_ID();
-	if ( $post_id && ltdh_seo_has_custom_title( $post_id ) ) {
-		return $title; // Respect user custom title in Rank Math metabox!
+	if ( is_singular() ) {
+		$post_id = get_the_ID();
+		if ( $post_id && ltdh_seo_has_custom_title( $post_id ) ) {
+			return $title; // Respect user custom title in Rank Math metabox!
+		}
 	}
 
 	if ( is_page( 'cau-hoi-thuong-gap' ) || ( ! empty( $request_path ) && preg_match( '#^/cau-hoi-thuong-gap/?#i', $request_path ) ) ) {
@@ -261,6 +265,14 @@ function ltdh_seo_archive_document_title( $title ) {
 		return sprintf( 'Các Trường Tuyển Sinh Liên Thông Đại Học %d | Danh Sách Mới', $year );
 	}
 
+	if ( is_home() || ( ! empty( $request_path ) && preg_match( '#^/tin-tuc/?#i', $request_path ) ) ) {
+		$posts_page_id = (int) get_option( 'page_for_posts' );
+		if ( $posts_page_id && ltdh_seo_has_custom_title( $posts_page_id ) ) {
+			return $title;
+		}
+		return sprintf( 'Tin Tuyển Sinh Liên Thông Đại Học %d | Thông Báo Mới Nhất', $year );
+	}
+
 	return $title;
 }
 add_filter( 'rank_math/frontend/title', 'ltdh_seo_archive_document_title', 20 );
@@ -294,9 +306,22 @@ function ltdh_seo_dynamic_description( $desc ) {
 	}
 
 	// 2. Singular Posts & Pages: Check if user customized in Rank Math metabox
-	$post_id = get_the_ID();
-	if ( $post_id && ltdh_seo_has_custom_description( $post_id ) ) {
-		return $desc; // Respect user custom description in Rank Math metabox!
+	if ( is_singular() ) {
+		$post_id = get_the_ID();
+		if ( $post_id && ltdh_seo_has_custom_description( $post_id ) ) {
+			return $desc; // Respect user custom description in Rank Math metabox!
+		}
+	}
+
+	if ( is_home() || ( ! empty( $request_path ) && preg_match( '#^/tin-tuc/?#i', $request_path ) ) ) {
+		$posts_page_id = (int) get_option( 'page_for_posts' );
+		if ( $posts_page_id && ltdh_seo_has_custom_description( $posts_page_id ) ) {
+			return $desc;
+		}
+		return sprintf(
+			'Tin tức tuyển sinh liên thông đại học năm %d: thông báo xét tuyển, lịch khai giảng, học phí và hướng dẫn nộp hồ sơ từ các trường đại học hàng đầu.',
+			$year
+		);
 	}
 
 	if ( is_page( 'cau-hoi-thuong-gap' ) || ( ! empty( $request_path ) && preg_match( '#^/cau-hoi-thuong-gap/?#i', $request_path ) ) ) {
@@ -309,6 +334,29 @@ function ltdh_seo_dynamic_description( $desc ) {
 	if ( is_page( 'kiem-tra-dieu-kien' ) || ( ! empty( $request_path ) && preg_match( '#^/kiem-tra-dieu-kien/?#i', $request_path ) ) ) {
 		return sprintf(
 			'Công cụ tra cứu và đối chiếu điều kiện tuyển sinh liên thông đại học năm %d. Hướng dẫn lộ trình học cho người tốt nghiệp Trung cấp, Cao đẳng nhận bằng nhanh.',
+			$year
+		);
+	}
+
+	if ( is_singular( 'school' ) ) {
+		$school_id   = get_the_ID();
+		$school_name = get_the_title( $school_id );
+		$school_code = get_post_meta( $school_id, 'school_code', true );
+		$code_str    = $school_code ? " ($school_code)" : '';
+		return sprintf(
+			'Thông tin tuyển sinh liên thông đại học tại %s%s năm %d: chỉ tiêu, ngành đào tạo, hình thức đào tạo từ xa, vừa học vừa làm và chính sách học phí.',
+			$school_name,
+			$code_str,
+			$year
+		);
+	}
+
+	if ( is_singular( 'major' ) ) {
+		$major_id   = get_the_ID();
+		$major_name = get_the_title( $major_id );
+		return sprintf(
+			'Thông tin tuyển sinh liên thông đại học ngành %s năm %d: lộ trình đào tạo, điều kiện xét tuyển văn bằng, danh sách trường đào tạo và cơ hội nghề nghiệp.',
+			$major_name,
 			$year
 		);
 	}
@@ -438,9 +486,15 @@ function ltdh_seo_dynamic_description( $desc ) {
 					$year
 				);
 			}
-		} elseif ( is_tax( 'major_cat' ) ) {
+		} elseif ( is_tax( 'major_cat' ) || ( ! empty( $request_path ) && preg_match( '#^/nhom-nganh/([^/]+)(?:/page/\d+)?/?$#i', $request_path, $m_cat ) && 'page' !== $m_cat[1] ) ) {
 			$term = get_queried_object();
+			if ( ( ! $term || ! isset( $term->name ) ) && ! empty( $m_cat[1] ) ) {
+				$term = get_term_by( 'slug', sanitize_title( $m_cat[1] ), 'major_cat' );
+			}
 			if ( $term && isset( $term->name ) ) {
+				if ( isset( $term->term_id ) && ltdh_seo_has_custom_term_description( $term->term_id ) ) {
+					return $desc; // Respect user custom term description!
+				}
 				return sprintf(
 					'Danh sách các ngành đào tạo thuộc nhóm %s tuyển sinh liên thông đại học năm %d. Thông tin chỉ tiêu, trường đào tạo và thời gian nhận hồ sơ.',
 					$term->name,
@@ -659,26 +713,40 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			$iso_duration = 'P3Y';
 		}
 
-		$tuition_num = (float) get_field( 'tuition_amount', $program_id );
-		$offers_data = null;
+		$tuition_num   = (float) get_field( 'tuition_amount', $program_id );
+		$tuition_unit  = get_field( 'tuition_unit', $program_id );
+		$total_credits = (int) get_field( 'tuition_total_credits', $program_id );
+
+		$calculated_price = 0;
+		$price_is_total   = false;
 		if ( $tuition_num > 0 ) {
-			$offers_data = [
-				'@type'         => 'Offer',
-				'price'         => $tuition_num,
-				'priceCurrency' => 'VND',
-				'availability'  => 'https://schema.org/InStock',
-				'url'           => get_permalink( $program_id ),
-			];
+			if ( 'tin-chi' === $tuition_unit && $total_credits > 0 ) {
+				$calculated_price = $tuition_num * $total_credits;
+				$price_is_total   = true;
+			} elseif ( 'toan-khoa' === $tuition_unit ) {
+				$calculated_price = $tuition_num;
+				$price_is_total   = true;
+			}
 		}
 
-		$course_mode = $clean_type ?: ( $training_type ?: 'Liên thông Đại học' );
+		$offers_data = [
+			'@type'        => 'Offer',
+			'category'     => 'Paid',
+			'availability' => 'https://schema.org/InStock',
+			'url'          => get_permalink( $program_id ),
+		];
+		if ( $price_is_total && $calculated_price > 0 ) {
+			$offers_data['price']         = (string) $calculated_price;
+			$offers_data['priceCurrency'] = 'VND';
+		}
+
+		$course_mode  = $clean_type ?: ( $training_type ?: 'Liên thông Đại học' );
 		$provider_url = $school_id ? ( get_field( 'website', $school_id ) ?: get_permalink( $school_id ) ) : home_url( '/' );
 
 		// Course Schema (with hasCourseInstance and offers for rich snippet eligibility)
 		// Injected only if user has not defined a custom Course schema in Rank Math Schema Builder
 		if ( ! ltdh_seo_has_user_schema( $data, 'Course' ) ) {
 			$data['ltdh_course'] = [
-				'@context'                     => 'https://schema.org',
 				'@type'                        => 'Course',
 				'name'                         => $schema_program_name,
 				'description'                  => get_the_excerpt( $program_id ) ?: ( 'Chương trình tuyển sinh Liên thông Đại học ngành ' . $clean_major ),
@@ -703,7 +771,6 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		// Injected only if user has not defined one in Rank Math Schema Builder
 		if ( ! ltdh_seo_has_user_schema( $data, 'EducationalOccupationalProgram' ) ) {
 			$data['ltdh_program'] = [
-				'@context'                     => 'https://schema.org',
 				'@type'                        => 'EducationalOccupationalProgram',
 				'name'                         => $schema_program_name,
 				'description'                  => get_the_excerpt( $program_id ) ?: ( 'Chương trình tuyển sinh Liên thông Đại học ngành ' . $clean_major . ' chuẩn Bộ GD&ĐT.' ),
@@ -748,7 +815,6 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				}
 				if ( ! empty( $faq_elements ) ) {
 					$data['ltdh_faq'] = [
-						'@context'   => 'https://schema.org',
 						'@type'      => 'FAQPage',
 						'mainEntity' => $faq_elements,
 					];
@@ -771,19 +837,29 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			}
 
 			$official_website = get_field( 'website', $school_id );
+			$school_permalink = get_permalink( $school_id );
+			$school_title     = get_the_title( $school_id );
+			$univ_id          = $official_website ? ( rtrim( $official_website, '/' ) . '/#organization' ) : ( $school_permalink . '#organization' );
 
 			$data['ltdh_university'] = [
-				'@context' => 'https://schema.org',
-				'@type'    => 'CollegeOrUniversity',
-				'name'     => get_the_title(),
-				'url'      => get_permalink( $school_id ),
-				'address'  => [
-					'@type'          => 'PostalAddress',
-					'streetAddress'  => get_field( 'address', $school_id ) ?: 'Hà Nội',
-					'addressCountry' => 'VN',
-				],
-				'telephone' => get_field( 'hotline', $school_id ) ?: '',
+				'@type' => 'CollegeOrUniversity',
+				'@id'   => $univ_id,
+				'name'  => $school_title,
+				'url'   => $official_website ?: $school_permalink,
 			];
+
+			$address_val = get_field( 'address', $school_id );
+			if ( ! empty( $address_val ) ) {
+				$data['ltdh_university']['address'] = [
+					'@type'          => 'PostalAddress',
+					'streetAddress'  => $address_val,
+					'addressCountry' => 'VN',
+				];
+			}
+			$hotline_val = get_field( 'hotline', $school_id );
+			if ( ! empty( $hotline_val ) ) {
+				$data['ltdh_university']['telephone'] = $hotline_val;
+			}
 
 			if ( ! empty( $school_logo ) ) {
 				$data['ltdh_university']['logo']  = $school_logo;
@@ -793,6 +869,20 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			if ( ! empty( $official_website ) ) {
 				$data['ltdh_university']['sameAs'] = [ $official_website ];
 			}
+
+			$data['ltdh_school_about'] = [
+				'@type'      => 'AboutPage',
+				'@id'        => $school_permalink . '#webpage',
+				'url'        => $school_permalink,
+				'name'       => $school_title . ' - Tuyển sinh Liên thông Đại học',
+				'isPartOf'   => [
+					'@id' => home_url( '/#website' ),
+				],
+				'about'      => [
+					'@id' => $univ_id,
+				],
+				'inLanguage' => 'vi-VN',
+			];
 		}
 
 		if ( ! ltdh_seo_has_user_schema( $data, 'FAQPage' ) && function_exists( 'ltdh_get_school_faqs' ) ) {
@@ -816,7 +906,6 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				}
 				if ( ! empty( $faq_elements ) ) {
 					$data['ltdh_school_faq'] = [
-						'@context'   => 'https://schema.org',
 						'@type'      => 'FAQPage',
 						'mainEntity' => $faq_elements,
 					];
@@ -839,7 +928,6 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		// Discipline / Program Schema for Major (if not added via Schema Builder)
 		if ( ! ltdh_seo_has_user_schema( $data, 'EducationalOccupationalProgram' ) ) {
 			$data['ltdh_major_program'] = [
-				'@context'                     => 'https://schema.org',
 				'@type'                        => 'EducationalOccupationalProgram',
 				'name'                         => 'Chương trình đào tạo ngành ' . get_the_title( $major_id ),
 				'description'                  => get_the_excerpt( $major_id ) ?: ( 'Thông tin tuyển sinh và lộ trình liên thông đại học ngành ' . get_the_title( $major_id ) ),
@@ -871,7 +959,6 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				}
 				if ( ! empty( $faq_elements ) ) {
 					$data['ltdh_major_faq'] = [
-						'@context'   => 'https://schema.org',
 						'@type'      => 'FAQPage',
 						'mainEntity' => $faq_elements,
 					];
@@ -905,7 +992,6 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				}
 				if ( ! empty( $faq_elements ) ) {
 					$data['ltdh_faq_page'] = [
-						'@context'   => 'https://schema.org',
 						'@type'      => 'FAQPage',
 						'mainEntity' => $faq_elements,
 					];
@@ -966,17 +1052,41 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		}
 	}
 
-	// 5. Enforce Vietnamese language (vi-VN) across all nodes
-	foreach ( $data as $k => $v ) {
-		if ( is_array( $v ) && isset( $v['inLanguage'] ) ) {
-			$data[ $k ]['inLanguage'] = 'vi-VN';
-		}
-	}
+	// 5. Enforce Vietnamese language (vi-VN) across all nodes recursively
+	$data = ltdh_seo_enforce_vietnamese_language( $data );
 
 	// 6. Clean all HTML entities (&amp;, &#039;, etc.) across all strings
 	return ltdh_seo_clean_schema_strings( $data );
 }
 add_filter( 'rank_math/json_ld', 'ltdh_seo_inject_custom_schema', 99, 2 );
+
+/**
+ * Filter Rank Math's default schema language so entities like Article / BlogPosting use vi-VN.
+ */
+add_filter( 'rank_math/schema/language', function() {
+	return 'vi-VN';
+}, 99 );
+
+add_filter( 'rank_math/schema/validated_data', function( $data ) {
+	return ltdh_seo_enforce_vietnamese_language( $data );
+}, 99 );
+
+/**
+ * Recursively enforce Vietnamese language attribute across all schema nodes.
+ */
+function ltdh_seo_enforce_vietnamese_language( $value ) {
+	if ( is_array( $value ) ) {
+		foreach ( $value as $k => $v ) {
+			if ( 'inLanguage' === $k && is_string( $v ) ) {
+				$value[ $k ] = 'vi-VN';
+			} else {
+				$value[ $k ] = ltdh_seo_enforce_vietnamese_language( $v );
+			}
+		}
+		return $value;
+	}
+	return $value;
+}
 
 /**
  * Ensure HTML lang attribute is consistently set to Vietnamese (vi)
@@ -1019,15 +1129,16 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 		return [
 			ltdh_seo_crumb( $home_label, $home_url ),
 			ltdh_seo_crumb( 'Liên thông Đại học', home_url( '/hinh-thuc-dao-tao/' ) ),
-			ltdh_seo_crumb( 'So sánh chương trình' ),
+			ltdh_seo_crumb( 'So sánh chương trình', home_url( '/so-sanh/' ) ),
 		];
 	}
 
 	// ---- Blog archive: is_home() ----
 	if ( is_home() ) {
+		$tin_tuc_url = get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/tin-tuc/' );
 		return [
 			ltdh_seo_crumb( $home_label, $home_url ),
-			ltdh_seo_crumb( 'Tin tức' ),
+			ltdh_seo_crumb( 'Tin tức', $tin_tuc_url ),
 		];
 	}
 
@@ -1035,10 +1146,11 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 	if ( is_category() ) {
 		$tin_tuc_url = get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/tin-tuc/' );
 		$cat         = get_queried_object();
+		$cat_url     = ( $cat && ! is_wp_error( get_category_link( $cat->term_id ) ) ) ? get_category_link( $cat->term_id ) : '';
 		return [
 			ltdh_seo_crumb( $home_label, $home_url ),
 			ltdh_seo_crumb( 'Tin tức', $tin_tuc_url ),
-			ltdh_seo_crumb( $cat ? $cat->name : 'Danh mục' ),
+			ltdh_seo_crumb( $cat ? $cat->name : 'Danh mục', $cat_url ),
 		];
 	}
 
@@ -1066,18 +1178,19 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 			$new_crumbs[] = ltdh_seo_crumb( $post_cat->name, get_category_link( $post_cat->term_id ) );
 		}
 
-		$new_crumbs[] = ltdh_seo_crumb( get_the_title() );
+		$new_crumbs[] = ltdh_seo_crumb( get_the_title( $post_id ), get_permalink( $post_id ) );
 
 		return $new_crumbs;
 	}
 
 	// ---- Taxonomy training_type: Trang chủ > Liên thông Đại học > [Tên hình thức] ----
 	if ( is_tax( LTDH_TAX_TRAINING_TYPE ) ) {
-		$term = get_queried_object();
+		$term     = get_queried_object();
+		$term_url = ( $term && ! is_wp_error( get_term_link( $term ) ) ) ? get_term_link( $term ) : '';
 		return [
 			ltdh_seo_crumb( $home_label, $home_url ),
 			ltdh_seo_crumb( 'Liên thông Đại học', home_url( '/hinh-thuc-dao-tao/' ) ),
-			ltdh_seo_crumb( $term ? $term->name : 'Hình thức đào tạo' ),
+			ltdh_seo_crumb( $term ? $term->name : 'Hình thức đào tạo', $term_url ),
 		];
 	}
 
@@ -1107,17 +1220,38 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 			$crumbs[] = ltdh_seo_crumb( 'Liên thông Đại học', home_url( '/hinh-thuc-dao-tao/' ) );
 		}
 
-		$crumbs[] = ltdh_seo_crumb( $program_name );
+		$crumbs[] = ltdh_seo_crumb( $program_name, get_permalink( $program_id ) );
 
 		return $crumbs;
 	}
 
 	// ---- Taxonomy major_cat: Trang chủ > [Tên nhóm ngành] ----
 	if ( is_tax( 'major_cat' ) ) {
-		$term = get_queried_object();
+		$term     = get_queried_object();
+		$term_url = ( $term && ! is_wp_error( get_term_link( $term ) ) ) ? get_term_link( $term ) : '';
 		return [
 			ltdh_seo_crumb( $home_label, $home_url ),
-			ltdh_seo_crumb( $term ? $term->name : 'Nhóm ngành' ),
+			ltdh_seo_crumb( $term ? $term->name : 'Nhóm ngành', $term_url ),
+		];
+	}
+
+	// ---- Single school: Trang chủ > Trường đối tác > [Tên trường] ----
+	if ( is_singular( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) ) {
+		$school_id = get_the_ID();
+		return [
+			ltdh_seo_crumb( $home_label, $home_url ),
+			ltdh_seo_crumb( 'Trường đối tác', home_url( '/truong-doi-tac/' ) ),
+			ltdh_seo_crumb( get_the_title( $school_id ), get_permalink( $school_id ) ),
+		];
+	}
+
+	// ---- Single guide: Trang chủ > Cẩm nang > [Tiêu đề cẩm nang] ----
+	if ( is_singular( 'guide' ) ) {
+		$guide_id = get_the_ID();
+		return [
+			ltdh_seo_crumb( $home_label, $home_url ),
+			ltdh_seo_crumb( 'Cẩm nang', home_url( '/cam-nang/' ) ),
+			ltdh_seo_crumb( get_the_title( $guide_id ), get_permalink( $guide_id ) ),
 		];
 	}
 
@@ -1154,15 +1288,19 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 			}
 		}
 
-		$crumbs[] = ltdh_seo_crumb( $title );
+		$crumbs[] = ltdh_seo_crumb( $title, get_permalink( $post_id ) );
 		return $crumbs;
 	}
 
-	// ---- Default: fix CPT archive labels ----
+	// ---- Default: fix CPT archive labels & ensure valid URLs ----
+	$last_index = count( $crumbs ) - 1;
 	foreach ( $crumbs as $key => $crumb ) {
 		$lower_label = mb_strtolower( $crumb[0], 'UTF-8' );
 		if ( in_array( $lower_label, [ 'trường học', 'truong', 'truong-lien-ket', 'truong-doi-tac', 'trường đối tác', 'schools', 'school' ], true ) ) {
 			$crumbs[ $key ][0] = 'Trường đối tác';
+			if ( empty( $crumbs[ $key ][1] ) || $key !== $last_index ) {
+				$crumbs[ $key ][1] = home_url( '/truong-doi-tac/' );
+			}
 		}
 		if ( in_array( $lower_label, [ 'chương trình đào tạo', 'chuong-trinh', 'chương trình', 'programs', 'program' ], true ) ) {
 			$crumbs[ $key ][0] = 'Liên thông Đại học';
@@ -1170,6 +1308,13 @@ function ltdh_seo_override_breadcrumb_items( $crumbs, $class ) {
 		}
 		if ( in_array( $lower_label, [ 'ngành học', 'nganh-hoc', 'nganh', 'majors', 'major', 'nhóm ngành' ], true ) ) {
 			$crumbs[ $key ][0] = 'Nhóm ngành';
+			if ( empty( $crumbs[ $key ][1] ) || $key !== $last_index ) {
+				$crumbs[ $key ][1] = home_url( '/nhom-nganh/' );
+			}
+		}
+		// If terminal item has empty URL and we are on a singular post, fill with permalink for Schema.org
+		if ( $key === $last_index && empty( $crumbs[ $key ][1] ) && is_singular() ) {
+			$crumbs[ $key ][1] = get_permalink();
 		}
 	}
 
@@ -1436,6 +1581,33 @@ function ltdh_output_native_schema_fallback() {
 		$mode_terms  = defined( 'LTDH_TAX_TRAINING_TYPE' ) ? wp_get_post_terms( $program_id, LTDH_TAX_TRAINING_TYPE ) : [];
 		$mode_name   = ( ! empty( $mode_terms ) && ! is_wp_error( $mode_terms ) ) ? $mode_terms[0]->name : 'Đại học từ xa';
 
+		$tuition_num   = function_exists( 'get_field' ) ? (float) get_field( 'tuition_amount', $program_id ) : 0;
+		$tuition_unit  = function_exists( 'get_field' ) ? get_field( 'tuition_unit', $program_id ) : '';
+		$total_credits = function_exists( 'get_field' ) ? (int) get_field( 'tuition_total_credits', $program_id ) : 0;
+
+		$calc_price     = 0;
+		$has_calc_price = false;
+		if ( $tuition_num > 0 ) {
+			if ( 'tin-chi' === $tuition_unit && $total_credits > 0 ) {
+				$calc_price     = $tuition_num * $total_credits;
+				$has_calc_price = true;
+			} elseif ( 'toan-khoa' === $tuition_unit ) {
+				$calc_price     = $tuition_num;
+				$has_calc_price = true;
+			}
+		}
+
+		$fallback_offer = [
+			'@type'        => 'Offer',
+			'category'     => 'Paid',
+			'availability' => 'https://schema.org/InStock',
+			'url'          => get_permalink( $program_id ),
+		];
+		if ( $has_calc_price && $calc_price > 0 ) {
+			$fallback_offer['price']         = (string) $calc_price;
+			$fallback_offer['priceCurrency'] = 'VND';
+		}
+
 		$schemas[] = [
 			'@context'                     => 'https://schema.org',
 			'@type'                        => 'Course',
@@ -1452,13 +1624,7 @@ function ltdh_output_native_schema_fallback() {
 				'courseMode'     => $mode_name,
 				'courseWorkload' => $duration,
 			],
-			'offers'                       => [
-				'@type'         => 'Offer',
-				'price'         => is_numeric( $tuition_raw ) ? $tuition_raw : '0',
-				'priceCurrency' => 'VND',
-				'availability'  => 'https://schema.org/InStock',
-				'url'           => get_permalink( $program_id ),
-			],
+			'offers'                       => $fallback_offer,
 		];
 
 		$schemas[] = [
@@ -1475,18 +1641,8 @@ function ltdh_output_native_schema_fallback() {
 			'programPrerequisites'         => 'Tốt nghiệp trình độ Trung cấp hoặc Cao đẳng theo quy chế tuyển sinh của Bộ GD&ĐT',
 			'educationalCredentialAwarded' => 'Bằng Cử nhân / Bằng Kỹ sư',
 			'url'                          => get_permalink( $program_id ),
+			'offers'                       => $fallback_offer,
 		];
-
-		$tuition_num = function_exists( 'get_field' ) ? (float) get_field( 'tuition_amount', $program_id ) : 0;
-		if ( $tuition_num > 0 ) {
-			$schemas[ count( $schemas ) - 1 ]['offers'] = [
-				'@type'         => 'Offer',
-				'price'         => $tuition_num,
-				'priceCurrency' => 'VND',
-				'availability'  => 'https://schema.org/InStock',
-				'url'           => get_permalink( $program_id ),
-			];
-		}
 	}
 
 	// 3. Schema BreadcrumbList

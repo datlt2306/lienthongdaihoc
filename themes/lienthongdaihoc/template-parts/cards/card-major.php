@@ -57,20 +57,20 @@ $excerpt = wp_trim_words( $excerpt, 45, '...' );
 	<!-- Card Body -->
 	<div class="p-4 sm:p-5 md:p-6 flex-1 flex flex-col justify-between">
 		<div>
-			<div class="text-xs sm:text-sm font-extrabold text-[#00308b] tracking-wider uppercase mb-1.5 sm:mb-2 line-clamp-1">
+			<div class="text-xs font-extrabold text-[#00308b] tracking-wider uppercase mb-1.5 line-clamp-1">
 				<?php echo esc_html( $cat_name ); ?>
 			</div>
 			<h3 class="font-bold text-slate-900 text-base sm:text-xl md:text-2xl hover:text-brand-primary transition-colors mb-2.5 sm:mb-3 line-clamp-2 leading-snug">
 				<a href="<?php the_permalink(); ?>"><?php echo esc_html( $display_title ); ?></a>
 			</h3>
-			<p class="card-major-excerpt text-sm sm:text-base text-slate-600 leading-relaxed mb-4 sm:mb-5 font-normal">
+			<p class="card-major-excerpt text-xs sm:text-sm text-slate-600 line-clamp-4 leading-relaxed mb-4 sm:mb-5 font-normal">
 				<?php echo esc_html( $excerpt ); ?>
 			</p>
 		</div>
 
 		<!-- Action Footer -->
 		<div class="pt-3 sm:pt-4 border-t border-slate-100/90 mt-auto">
-			<a href="<?php the_permalink(); ?>" class="w-full inline-flex items-center justify-center gap-2 bg-[#f0f4f9] hover:bg-blue-50 hover:text-[#00308b] text-[#324158] font-bold py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-xl sm:rounded-2xl text-sm sm:text-base transition-all duration-200 group/btn whitespace-nowrap active:scale-[0.98] border border-transparent hover:border-blue-200/60">
+			<a href="<?php the_permalink(); ?>" class="w-full inline-flex items-center justify-center gap-2 bg-[#f0f4f9] hover:bg-blue-50 hover:text-[#00308b] text-[#324158] font-bold py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-xl sm:rounded-2xl text-sm sm:text-[15px] transition-all duration-200 group/btn whitespace-nowrap active:scale-[0.98] border border-transparent hover:border-blue-200/60">
 				<span class="sm:hidden">Khám phá</span>
 				<span class="hidden sm:inline">Khám phá ngành học</span>
 				<svg class="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

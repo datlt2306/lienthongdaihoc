@@ -16,13 +16,8 @@ $post_id    = get_the_ID();
 $post_url   = get_permalink( $post_id );
 $post_title = get_the_title( $post_id );
 
-// Social crawlers (Facebook, Zalo) cannot reach localhost/private test domains.
-// Map local host to canonical production domain for external sharer queries.
-$social_share_url = $post_url;
-$host             = wp_parse_url( home_url(), PHP_URL_HOST );
-if ( in_array( $host, [ 'localhost', '127.0.0.1' ], true ) || ( is_string( $host ) && str_ends_with( $host, '.local' ) ) ) {
-	$social_share_url = str_replace( home_url(), 'https://lienthongdaihoc.edu.vn', $post_url );
-}
+// Share the exact canonical URL of this post
+$social_share_url = apply_filters( 'ltdh_social_share_url', $post_url, $post_id );
 
 $fb_share_url   = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode( $social_share_url );
 ?>
@@ -44,8 +39,9 @@ $fb_share_url   = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode
 		   target="_blank"
 		   rel="noopener noreferrer"
 		   data-share-type="facebook"
-		   onclick="if(window.ltdhOpenSharePopup){return window.ltdhOpenSharePopup(event, this.href, 'Facebook');}"
-		   class="ltdh-share-btn inline-flex items-center gap-2 px-3.5 py-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs md:text-sm font-bold rounded-xl shadow-2xs hover:shadow-xs active:scale-95 transition-all select-none"
+		   data-url="<?php echo esc_url( $post_url ); ?>"
+		   onclick="if(window.ltdhOpenFacebookShare){return window.ltdhOpenFacebookShare(event, this);}else if(window.ltdhOpenSharePopup){return window.ltdhOpenSharePopup(event, this.href, 'Facebook');}"
+		   class="ltdh-share-btn inline-flex items-center gap-2 px-3.5 py-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs md:text-sm font-bold rounded-xl shadow-2xs hover:shadow-xs active:scale-95 transition-all select-none cursor-pointer"
 		   title="Chia sẻ lên Facebook">
 			<svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
 				<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>

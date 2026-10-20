@@ -1215,37 +1215,79 @@ function ltdh_get_school_admission_forms( int $school_id ): array {
 // 2. Form Shortcode Helper
 // ----------------------------------------------------
 
+// Disable Contact Form 7 automatic paragraph formatting for pixel-perfect Tailwind grid layouts
+add_filter( 'wpcf7_autop_or_not', '__return_false' );
+
+// Bridge contextual hidden fields (school_id, program_id, major_id, referral_source, etc.) into CF7 hidden container
+add_filter( 'wpcf7_form_hidden_fields', function( $hidden_fields ) {
+	if ( ! empty( $GLOBALS['ltdh_cf7_context_hidden_fields'] ) && is_array( $GLOBALS['ltdh_cf7_context_hidden_fields'] ) ) {
+		$hidden_fields = array_merge( $hidden_fields, $GLOBALS['ltdh_cf7_context_hidden_fields'] );
+	}
+	return $hidden_fields;
+} );
+
 /**
  * Get the CF7 shortcode for a given context.
  *
  * Contexts: 'consultation', 'contact', 'program'.
- * Falls back to the default form if the specific one is not configured.
+ * Falls back to default options, centralized defaults, or auto-detects active CF7 form.
  *
  * @param string $context
  * @return string Raw shortcode string, or empty if no form configured.
  */
-function ltdh_get_form_shortcode(string $context = 'consultation'): string {
-	if (! function_exists('get_field')) {
-		return '';
-	}
-
+function ltdh_get_form_shortcode( string $context = 'consultation' ): string {
 	$option_map = [
 		'consultation' => 'cf7_consultation_form_id',
 		'contact'      => 'cf7_contact_form_id',
 		'program'      => 'cf7_program_form_id',
 	];
 
-	$field_name = $option_map[$context] ?? '';
-	if ($field_name) {
-		$form_id = get_field($field_name, 'options');
-		if (! empty($form_id)) {
-			return do_shortcode('[contact-form-7 id="' . esc_attr($form_id) . '"]');
+	$form_id    = '';
+	$field_name = $option_map[ $context ] ?? '';
+
+	// 1. Check ACF Options Page
+	if ( $field_name && function_exists( 'get_field' ) ) {
+		$form_id = get_field( $field_name, 'options' );
+	}
+	// Fallback to direct get_option if ACF function is unavailable
+	if ( empty( $form_id ) && $field_name ) {
+		$form_id = get_option( 'options_' . $field_name ) ?: get_option( $field_name );
+	}
+
+	// 2. Check defaults configuration
+	if ( empty( $form_id ) && function_exists( 'ltdh_default' ) ) {
+		$form_id = ltdh_default( 'forms', $context . '_form_id' );
+	}
+
+	// 3. Fallback to cf7_default_form_id
+	if ( empty( $form_id ) ) {
+		if ( function_exists( 'get_field' ) ) {
+			$form_id = get_field( 'cf7_default_form_id', 'options' );
+		}
+		if ( empty( $form_id ) ) {
+			$form_id = get_option( 'options_cf7_default_form_id' ) ?: get_option( 'cf7_default_form_id' );
 		}
 	}
 
-	$default_id = get_field('cf7_default_form_id', 'options');
-	if (! empty($default_id)) {
-		return do_shortcode('[contact-form-7 id="' . esc_attr($default_id) . '"]');
+	// 4. Auto-detect published CF7 form by slug/title if still empty
+	if ( empty( $form_id ) && post_type_exists( 'wpcf7_contact_form' ) ) {
+		$slugs = [
+			'contact'      => [ 'form-lien-he', 'lien-he', 'contact-form-1' ],
+			'consultation' => [ 'form-tu-van', 'tu-van', 'consultation-form' ],
+			'program'      => [ 'form-tu-van', 'form-chuong-trinh', 'consultation-form' ],
+		];
+		$candidates = $slugs[ $context ] ?? [ 'form-tu-van', 'form-lien-he' ];
+		foreach ( $candidates as $candidate_slug ) {
+			$found = get_page_by_path( $candidate_slug, OBJECT, 'wpcf7_contact_form' );
+			if ( $found && 'publish' === $found->post_status ) {
+				$form_id = $found->ID;
+				break;
+			}
+		}
+	}
+
+	if ( ! empty( $form_id ) ) {
+		return do_shortcode( '[contact-form-7 id="' . esc_attr( $form_id ) . '"]' );
 	}
 
 	return '';
@@ -1256,25 +1298,35 @@ function ltdh_get_form_shortcode(string $context = 'consultation'): string {
  *
  * @param array $context_hidden_fields Optional hidden fields to inject.
  */
-function ltdh_render_consultation_form(array $context_hidden_fields = []): void {
-	$shortcode = ltdh_get_form_shortcode('consultation');
-	if (! empty($shortcode)) {
+function ltdh_render_consultation_form( array $context_hidden_fields = [] ): void {
+	$GLOBALS['ltdh_cf7_context_hidden_fields'] = $context_hidden_fields;
+
+	$shortcode = ltdh_get_form_shortcode( 'consultation' );
+	if ( ! empty( $shortcode ) ) {
 		echo $shortcode; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$GLOBALS['ltdh_cf7_context_hidden_fields'] = [];
 		return;
 	}
-	ltdh_render_native_form('consultation', $context_hidden_fields);
+	$GLOBALS['ltdh_cf7_context_hidden_fields'] = [];
+	ltdh_render_native_form( 'consultation', $context_hidden_fields );
 }
 
 /**
  * Render a contact form with automatic fallback.
+ *
+ * @param array $context_hidden_fields Optional hidden fields to inject.
  */
-function ltdh_render_contact_form(): void {
-	$shortcode = ltdh_get_form_shortcode('contact');
-	if (! empty($shortcode)) {
+function ltdh_render_contact_form( array $context_hidden_fields = [] ): void {
+	$GLOBALS['ltdh_cf7_context_hidden_fields'] = $context_hidden_fields;
+
+	$shortcode = ltdh_get_form_shortcode( 'contact' );
+	if ( ! empty( $shortcode ) ) {
 		echo $shortcode; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$GLOBALS['ltdh_cf7_context_hidden_fields'] = [];
 		return;
 	}
-	ltdh_render_native_form('contact');
+	$GLOBALS['ltdh_cf7_context_hidden_fields'] = [];
+	ltdh_render_native_form( 'contact', $context_hidden_fields );
 }
 
 /**
@@ -2423,7 +2475,13 @@ function ltdh_get_program_learning_details(int $program_id): array {
 
 function ltdh_cf7_dynamic_programs($tag, $replace) {
 	if ('current_program_id' === $tag['name']) {
-		$programs = get_posts(['post_type' => LTDH_CPT_PROGRAM, 'numberposts' => -1]);
+		$programs = get_posts([
+			'post_type'   => defined('LTDH_CPT_PROGRAM') ? LTDH_CPT_PROGRAM : 'program',
+			'post_status' => 'publish',
+			'numberposts' => -1,
+			'orderby'     => 'title',
+			'order'       => 'ASC',
+		]);
 		$tag['raw_values'] = [];
 		$tag['values']     = [];
 		$tag['labels']     = [];
@@ -2433,8 +2491,8 @@ function ltdh_cf7_dynamic_programs($tag, $replace) {
 		$tag['labels'][]     = '-- Chọn ngành hoặc hệ học --';
 
 		foreach ($programs as $p) {
-			$tag['raw_values'][] = $p->post_title;
-			$tag['values'][]     = $p->post_title;
+			$tag['raw_values'][] = (string) $p->ID;
+			$tag['values'][]     = (string) $p->ID;
 			$tag['labels'][]     = $p->post_title;
 		}
 	}

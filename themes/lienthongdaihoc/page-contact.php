@@ -49,18 +49,18 @@ $address = ltdh_get_address();
 			<div class="lg:col-span-7 p-6 md:p-10 flex flex-col justify-center">
 				<div class="mb-6">
 					<span class="inline-block bg-blue-50 text-[#00308b] text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">
-						ĐĂNG KÝ TRỰC TUYẾN
+						LIÊN HỆ TRỰC TUYẾN
 					</span>
 					<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
-						Đăng ký nhận tư vấn tuyển sinh miễn phí
+						Gửi thông tin liên hệ & tư vấn
 					</h2>
 					<p class="text-sm text-slate-500 leading-relaxed">
-						Vui lòng cung cấp thông tin liên hệ, đội ngũ tuyển sinh của chúng tôi sẽ chủ động gọi lại hỗ trợ giải đáp lộ trình cho bạn sớm nhất.
+						Vui lòng để lại thông tin hoặc câu hỏi cần giải đáp, đội ngũ ban tuyển sinh sẽ phản hồi và chủ động gọi lại hỗ trợ bạn sớm nhất.
 					</p>
 				</div>
 
 				<div class="ltdh-contact-form-wrapper">
-					<?php ltdh_render_consultation_form(); ?>
+					<?php ltdh_render_contact_form(); ?>
 				</div>
 			</div>
 		</div>

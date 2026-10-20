@@ -795,6 +795,46 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     margin-bottom: 0 !important;
 }
 
+/* Contact Form 7 Validation and Status Feedback */
+.wpcf7 form .wpcf7-response-output {
+    margin: 1rem 0 0 0 !important;
+    padding: 0.875rem 1.25rem !important;
+    border-radius: 0.75rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+}
+.wpcf7 form.sent .wpcf7-response-output {
+    background-color: #f0fdf4 !important;
+    border: 1px solid #86efac !important;
+    color: #166534 !important;
+}
+.wpcf7 form.invalid .wpcf7-response-output,
+.wpcf7 form.unaccepted .wpcf7-response-output,
+.wpcf7 form.spam .wpcf7-response-output,
+.wpcf7 form.aborted .wpcf7-response-output,
+.wpcf7 form.failed .wpcf7-response-output {
+    background-color: #fef2f2 !important;
+    border: 1px solid #fecaca !important;
+    color: #991b1b !important;
+}
+.wpcf7-not-valid-tip {
+    color: #dc2626 !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    margin-top: 0.25rem !important;
+    display: block !important;
+}
+.ltdh-cf7-form .wpcf7-not-valid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 1px #ef4444 !important;
+}
+.wpcf7-spinner {
+    margin-left: 0.5rem !important;
+    vertical-align: middle !important;
+}
+
 /* Footer mobile CTA padding */
 @media (max-width: 767px) {
     body {
@@ -1324,33 +1364,6 @@ div#ez-toc-container.toc_close nav {
 	}
 }
 
-/* Overview Content Typography Enhancement for Single Major and Single Program */
-#major-intro-content.prose,
-#major-intro-content.prose p,
-#major-intro-content.prose li,
-#tong-quan .prose,
-#tong-quan .prose p,
-#tong-quan .prose li {
-	font-size: 1rem;
-	line-height: 1.75;
-}
-
-#major-intro-content.prose p,
-#tong-quan .prose p {
-	margin-bottom: 1.25em;
-}
-
-@media (min-width: 768px) {
-	#major-intro-content.prose,
-	#major-intro-content.prose p,
-	#major-intro-content.prose li,
-	#tong-quan .prose,
-	#tong-quan .prose p,
-	#tong-quan .prose li {
-		font-size: 1.125rem;
-		line-height: 1.8;
-	}
-}
 
 /* Rank Math Breadcrumbs styling */
 .rank-math-breadcrumb {

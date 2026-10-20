@@ -575,7 +575,7 @@ $has_active_filters  = $active_filter_count > 0;
 			</div>
 
 			<!-- Drawer Sticky Footer -->
-			<div class="p-3.5 border-t border-slate-100 bg-white flex items-center gap-2.5 shrink-0 shadow-lg touch-none" style="touch-action: none;">
+			<div class="p-3.5 border-t border-slate-100 bg-white flex items-center gap-2.5 shrink-0 shadow-lg" style="touch-action: manipulation;">
 				<button type="button" 
 						id="ltdh-drawer-reset-btn"
 						class="js-ltdh-reset-filter flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs text-center transition-all cursor-pointer">
@@ -598,6 +598,7 @@ $has_active_filters  = $active_filter_count > 0;
 				var drawer = document.getElementById('ltdh-filter-drawer');
 				var overlay = document.getElementById('ltdh-filter-drawer-overlay');
 				var applyBtn = document.getElementById('ltdh-drawer-apply-btn');
+				var resetBtn = document.getElementById('ltdh-drawer-reset-btn');
 				var desktopWrapper = document.getElementById('catalog-desktop-filter-wrapper');
 				var drawerWrapper = document.getElementById('catalog-drawer-filter-wrapper');
 				var filterBody = document.getElementById('catalog-filter-body');
@@ -610,6 +611,7 @@ $has_active_filters  = $active_filter_count > 0;
 				}
 
 				function onTouchMoveLock(e) {
+					if (e.target.closest('button, a, input, select, label')) return;
 					var scrollable = e.target.closest('#catalog-drawer-filter-wrapper');
 					if (!scrollable) {
 						if (e.cancelable) e.preventDefault();
@@ -698,6 +700,10 @@ $has_active_filters  = $active_filter_count > 0;
 				if (applyBtn && !applyBtn._drawerBound) {
 					applyBtn._drawerBound = true;
 					applyBtn.addEventListener('click', closeDrawer);
+				}
+				if (resetBtn && !resetBtn._drawerBound) {
+					resetBtn._drawerBound = true;
+					resetBtn.addEventListener('click', closeDrawer);
 				}
 				document.addEventListener('keydown', function(e) {
 					if (e.key === 'Escape') closeDrawer();
@@ -881,7 +887,7 @@ $has_active_filters  = $active_filter_count > 0;
 									Tìm hiểu
 								</a>
 								<button type="button"
-										class="ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap"
+										class="ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap cursor-pointer"
 										data-compare-type="program"
 										data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 										data-compare-title="<?php echo esc_attr( $card_headline ); ?>"
@@ -891,6 +897,17 @@ $has_active_filters  = $active_filter_count > 0;
 										data-compare-major-name="<?php echo esc_attr( $clean_major_name ); ?>"
 										data-compare-school-name="<?php echo esc_attr( $school_name ); ?>">
 									So sánh
+								</button>
+								<button type="button"
+										class="ltdh-card-share-btn text-slate-400 hover:text-[#00308b] hover:bg-blue-50 border border-slate-200/90 hover:border-blue-200 rounded-lg sm:rounded-xl p-1.5 sm:p-2 transition-all min-h-[36px] sm:min-h-[38px] w-9 sm:w-10 flex items-center justify-center shrink-0 cursor-pointer select-none"
+										data-url="<?php echo esc_url( get_permalink( $prog_id ) ); ?>"
+										data-title="<?php echo esc_attr( $card_headline ); ?>"
+										data-type="program"
+										title="Chia sẻ chương trình <?php echo esc_attr( $card_headline ); ?>"
+										aria-label="Chia sẻ chương trình">
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+									</svg>
 								</button>
 							</div>
 						</div>
@@ -906,7 +923,7 @@ $has_active_filters  = $active_filter_count > 0;
 					<h3 class="font-extrabold text-slate-900 text-lg mb-2">Không tìm thấy chương trình phù hợp</h3>
 					<p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Không có chương trình nào khớp với các tiêu chí lọc bạn đang chọn. Hãy thử chọn lại hoặc đặt lại bộ lọc.</p>
 					<div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-brand-darkBlue shadow-md min-h-[44px] flex items-center justify-center">
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="js-ltdh-reset-filter cursor-pointer bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-brand-darkBlue shadow-md min-h-[44px] flex items-center justify-center">
 							✕ Đặt lại tất cả bộ lọc
 						</a>
 					</div>

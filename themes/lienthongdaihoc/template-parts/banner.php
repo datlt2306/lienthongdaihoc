@@ -414,9 +414,14 @@ if ( empty( $banner_image ) ) {
 if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url' ) ) {
 	$banner_image = ltdh_get_optimized_image_url( $banner_image );
 }
+
+$banner_verif = ( is_singular( 'program' ) && function_exists( 'ltdh_get_program_verification' ) ) 
+	? ltdh_get_program_verification( get_the_ID() ) 
+	: null;
+$source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source_title'] : 'Nguồn chính thức';
 ?>
 
-	<section class="relative w-full bg-gradient-to-tr from-[#0F172A] via-[#1E293B] to-brand-primary text-white py-5 sm:py-8 md:py-16 overflow-hidden">
+	<section class="relative w-full bg-gradient-to-tr from-[#0F172A] via-[#1E293B] to-brand-primary text-white py-6 sm:py-8 md:py-14 overflow-hidden">
 	<!-- Ambient Grid Pattern & Glow -->
 	<div class="absolute inset-0 opacity-15 pointer-events-none z-0" style="background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 24px 24px;"></div>
 	<div class="absolute -right-32 -bottom-32 w-96 h-96 bg-brand-primary/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -440,30 +445,45 @@ if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url'
 					<?php endif; ?>
 				</div>
 			<?php endif; ?>
-		<?php elseif ( ! empty( $banner_eyebrow ) ) : ?>
-			<div class="mb-2 sm:mb-4">
-				<?php if ( ! empty( $banner_eyebrow['url'] ) ) : ?>
-					<a href="<?php echo esc_url( $banner_eyebrow['url'] ); ?>" 
-					   title="<?php echo esc_attr( $banner_eyebrow['text'] ); ?>"
-					   class="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md transition-all duration-200 no-underline shadow-xs hover:border-white/30 group">
-						<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
-						<span class="truncate max-w-[240px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
-						<span class="text-white/60 group-hover:text-white transition-colors text-xs font-normal shrink-0">→</span>
-					</a>
-				<?php else : ?>
-					<span class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md shadow-xs">
-						<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
-						<span class="truncate max-w-[240px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
+		<?php elseif ( ! empty( $banner_eyebrow ) || ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) ) : ?>
+			<div class="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-2.5 sm:mb-4">
+				<?php if ( ! empty( $banner_eyebrow ) ) : ?>
+					<?php if ( ! empty( $banner_eyebrow['url'] ) ) : ?>
+						<a href="<?php echo esc_url( $banner_eyebrow['url'] ); ?>" 
+						   title="<?php echo esc_attr( $banner_eyebrow['text'] ); ?>"
+						   class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md transition-all duration-200 no-underline shadow-xs hover:border-white/30 group">
+							<svg class="w-3.5 h-3.5 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
+							<span class="truncate max-w-[210px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
+							<span class="text-white/60 group-hover:text-white transition-colors text-xs font-normal shrink-0">→</span>
+						</a>
+					<?php else : ?>
+						<span class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md shadow-xs">
+							<svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
+							<span class="truncate max-w-[210px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
+						</span>
+					<?php endif; ?>
+				<?php endif; ?>
+
+				<?php if ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) : ?>
+					<!-- Compact Verified Pill on Mobile -->
+					<span class="inline-flex sm:hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[11px] font-semibold backdrop-blur-xs select-none">
+						<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white text-[9px] font-black shrink-0">✓</span>
+						<span>Đã xác minh</span>
+						<?php if ( ! empty( $banner_verif['source_url'] ) ) : ?>
+							<a href="<?php echo esc_url( $banner_verif['source_url'] ); ?>" target="_blank" rel="noopener noreferrer nofollow" class="text-emerald-200 hover:text-white underline inline-flex items-center ml-0.5" title="<?php echo esc_attr( $source_label ); ?>">
+								<svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+							</a>
+						<?php endif; ?>
 					</span>
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 
-		<h1 class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
+		<h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight leading-snug sm:leading-tight text-white drop-shadow-sm">
 			<?php echo esc_html( $banner_title ); ?>
 		</h1>
 		<?php if ( ! empty( $banner_subtitle ) ) : ?>
-			<p class="text-slate-200/90 text-xs sm:text-sm md:text-base font-medium max-w-2xl mt-1.5 sm:mt-2.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
+			<p class="<?php echo is_singular( 'program' ) ? 'hidden sm:block ' : ''; ?>text-slate-200/90 text-xs sm:text-sm md:text-base font-medium max-w-2xl mt-1.5 sm:mt-2.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
 				<?php echo esc_html( $banner_subtitle ); ?>
 			</p>
 		<?php endif; ?>
@@ -486,12 +506,9 @@ if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url'
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>
-		<?php if ( is_singular( 'program' ) ) :
-			$banner_verif = function_exists( 'ltdh_get_program_verification' ) ? ltdh_get_program_verification( get_the_ID() ) : null;
-			if ( ! empty( $banner_verif['is_verified'] ) ) :
-				$source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source_title'] : 'Nguồn chính thức';
-		?>
-			<div class="mt-3.5 inline-flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-semibold backdrop-blur-xs select-none">
+		<?php if ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) : ?>
+			<!-- Rich Verification Row for Tablet & Desktop -->
+			<div class="mt-3 hidden sm:inline-flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-semibold backdrop-blur-xs select-none">
 				<span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] font-black shrink-0">✓</span>
 				<span>Thông tin tuyển sinh đã được xác minh</span>
 				<?php if ( ! empty( $banner_verif['last_verified_at'] ) ) : ?>
@@ -505,6 +522,6 @@ if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url'
 					</a>
 				<?php endif; ?>
 			</div>
-		<?php endif; endif; ?>
+		<?php endif; ?>
 	</div>
 </section>

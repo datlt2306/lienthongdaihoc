@@ -83,6 +83,24 @@ window.ltdhOpenSharePopup = window.ltdhOpenSharePopup || function(e, url, title)
     return false;
 };
 
+window.ltdhOpenFacebookShare = window.ltdhOpenFacebookShare || function(e, btn) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!btn) return false;
+
+    // Determine the exact URL of the post/program to share
+    const rawDataUrl = btn.getAttribute('data-url');
+    let targetUrl = rawDataUrl;
+
+    if (!targetUrl && window.location.protocol.startsWith('http')) {
+        targetUrl = window.location.href;
+    } else if (targetUrl && !targetUrl.startsWith('http')) {
+        targetUrl = window.location.origin + targetUrl;
+    }
+
+    const shareEndpoint = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(targetUrl || window.location.href);
+    return window.ltdhOpenSharePopup(e, shareEndpoint, 'Facebook');
+};
+
 window.ltdhCopyPostLink = window.ltdhCopyPostLink || function(btn) {
     if (!btn) return;
     const rawUrl = btn.getAttribute('data-url') || window.location.href;
@@ -106,6 +124,11 @@ window.ltdhCopyPostLink = window.ltdhCopyPostLink || function(btn) {
         btn._origHtml = btn.innerHTML;
     }
 
+    const type = btn.getAttribute('data-type') || 'post';
+    const successMsg = type === 'program'
+        ? '✓ Đã sao chép liên kết chương trình vào bộ nhớ tạm!'
+        : '✓ Đã sao chép liên kết bài viết vào bộ nhớ tạm!';
+
     window.ltdhCopyToClipboard(shareUrl, function() {
         btn.innerHTML = `
             <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +137,7 @@ window.ltdhCopyPostLink = window.ltdhCopyPostLink || function(btn) {
             <span class="text-emerald-700 font-bold">Đã sao chép link!</span>
         `;
         btn.classList.add('bg-emerald-50', 'border-emerald-300');
-        triggerToast('✓ Đã sao chép liên kết bài viết vào bộ nhớ tạm!');
+        triggerToast(successMsg);
 
         clearTimeout(btn._resetTimer);
         btn._resetTimer = setTimeout(function() {
@@ -124,6 +147,13 @@ window.ltdhCopyPostLink = window.ltdhCopyPostLink || function(btn) {
     }, function() {
         triggerToast('Không thể tự động sao chép. Vui lòng copy URL từ thanh địa chỉ.');
     });
+};
+
+window.ltdhCopyProgramLink = window.ltdhCopyProgramLink || function(btn) {
+    if (btn && !btn.getAttribute('data-type')) {
+        btn.setAttribute('data-type', 'program');
+    }
+    return window.ltdhCopyPostLink(btn);
 };
 
 function ltdhInitTheme() {
@@ -612,6 +642,7 @@ function ltdhInitTheme() {
     }
 
     function ltdhDrawerTouchMoveLock(e) {
+        if (e.target.closest('button, a, input, select, label')) return;
         const scrollable = e.target.closest('#catalog-drawer-major-filter-wrapper, #catalog-drawer-filter-wrapper, #home-drawer-filter-wrapper');
         if (!scrollable) {
             if (e.cancelable) e.preventDefault();
@@ -742,6 +773,21 @@ function ltdhInitTheme() {
         if (drawerApplyBtn && !drawerApplyBtn._boundDrawer) {
             drawerApplyBtn._boundDrawer = true;
             drawerApplyBtn.addEventListener('click', closeFilterDrawer);
+        }
+        const drawerResetBtn = document.getElementById('ltdh-drawer-reset-btn');
+        if (drawerResetBtn && !drawerResetBtn._boundProgramReset) {
+            drawerResetBtn._boundProgramReset = true;
+            drawerResetBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (searchInput) searchInput.value = '';
+                if (regionSelect) regionSelect.value = '';
+                if (schoolSelect) schoolSelect.value = '';
+                if (majorSelect) majorSelect.value = '';
+                if (sortSelect) sortSelect.value = '';
+                if (heInput) heInput.value = '';
+                triggerFilter({ paged: 1, pushUrl: true });
+                closeFilterDrawer();
+            });
         }
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeFilterDrawer();
@@ -1030,6 +1076,7 @@ function ltdhInitTheme() {
             if (!container || !document.body.contains(container)) return;
             const resetBtn = e.target.closest('#catalog-desktop-reset .js-ltdh-reset-filter, #catalog-mobile-reset .js-ltdh-reset-filter, #ltdh-drawer-reset-btn, .js-ltdh-reset-filter');
             if (!resetBtn) return;
+            if (resetBtn.closest('#ltdh-major-filter-drawer, #catalog-desktop-major-filter-wrapper, #major-results-wrapper, #major-mobile-chips, #major-mobile-reset, #major-desktop-reset')) return;
             e.preventDefault();
 
             if (searchInput) searchInput.value = '';
@@ -1040,6 +1087,7 @@ function ltdhInitTheme() {
             if (heInput) heInput.value = '';
 
             triggerFilter({ paged: 1, pushUrl: true });
+            closeFilterDrawer();
         });
 
         // 7. Chip Remove Click (Delegated for catalog)
@@ -1292,6 +1340,19 @@ function ltdhInitTheme() {
         if (drawerApplyBtn && !drawerApplyBtn._boundMajorDrawer) {
             drawerApplyBtn._boundMajorDrawer = true;
             drawerApplyBtn.addEventListener('click', () => {
+                triggerFilter({ paged: 1, pushUrl: true });
+                closeMajorFilterDrawer();
+            });
+        }
+        const drawerResetBtn = document.getElementById('ltdh-major-drawer-reset-btn');
+        if (drawerResetBtn && !drawerResetBtn._boundMajorReset) {
+            drawerResetBtn._boundMajorReset = true;
+            drawerResetBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (searchInput) searchInput.value = '';
+                if (catSelect) catSelect.value = '';
+                if (sortSelect) sortSelect.value = '';
+                if (limitSelect) limitSelect.value = '12';
                 triggerFilter({ paged: 1, pushUrl: true });
                 closeMajorFilterDrawer();
             });
@@ -1551,8 +1612,10 @@ function ltdhInitTheme() {
 
         // 6. Reset Filters (Delegated)
         document.addEventListener('click', (e) => {
-            const resetBtn = e.target.closest('.js-ltdh-reset-filter');
+            if (!container || !document.body.contains(container)) return;
+            const resetBtn = e.target.closest('#major-desktop-reset .js-ltdh-reset-filter, #major-mobile-reset .js-ltdh-reset-filter, #ltdh-major-drawer-reset-btn, .js-ltdh-reset-filter');
             if (!resetBtn) return;
+            if (resetBtn.closest('#ltdh-filter-drawer, #catalog-desktop-filter-wrapper, #program-results-wrapper, #catalog-mobile-chips, #catalog-mobile-reset, #catalog-desktop-reset')) return;
             e.preventDefault();
 
             if (searchInput) searchInput.value = '';
@@ -1561,12 +1624,15 @@ function ltdhInitTheme() {
             if (limitSelect) limitSelect.value = '12';
 
             triggerFilter({ paged: 1, pushUrl: true });
+            closeMajorFilterDrawer();
         });
 
         // 7. Chip Remove Click (Delegated)
         document.addEventListener('click', (e) => {
-            const chip = e.target.closest('.js-ltdh-chip-remove');
+            if (!container || !document.body.contains(container)) return;
+            const chip = e.target.closest('#major-mobile-chips .js-ltdh-chip-remove, .js-ltdh-chip-remove');
             if (!chip) return;
+            if (chip.closest('#catalog-mobile-chips')) return;
             e.preventDefault();
 
             const key = chip.getAttribute('data-filter-key');
@@ -1723,13 +1789,38 @@ function ltdhInitTheme() {
             }
         }
 
-        // Delegate popup handler to social share buttons
-        document.querySelectorAll('.ltdh-post-share-section .ltdh-share-btn[data-share-type]').forEach(btn => {
+        // Support native share for program sharing and class-based buttons
+        document.querySelectorAll('#ltdh-native-program-share-btn, .ltdh-native-share-btn').forEach(btn => {
+            if (typeof navigator.share === 'function') {
+                btn.classList.remove('hidden');
+                if (!btn._bound) {
+                    btn._bound = true;
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const title = btn.getAttribute('data-title') || document.title;
+                        const url = btn.getAttribute('data-url') || window.location.href;
+                        navigator.share({
+                            title: title,
+                            text: title,
+                            url: url
+                        }).catch(() => {});
+                    });
+                }
+            }
+        });
+
+        // Delegate popup handler to social share buttons (posts and programs)
+        document.querySelectorAll('.ltdh-post-share-section .ltdh-share-btn[data-share-type], .ltdh-program-share-section .ltdh-share-btn[data-share-type]').forEach(btn => {
             if (btn._boundPopup) return;
             btn._boundPopup = true;
             btn.addEventListener('click', (e) => {
-                const url = btn.getAttribute('href');
                 const type = btn.getAttribute('data-share-type') || 'Social';
+                if (type.toLowerCase() === 'facebook') {
+                    if (window.ltdhOpenFacebookShare) {
+                        return window.ltdhOpenFacebookShare(e, btn);
+                    }
+                }
+                const url = btn.getAttribute('href');
                 if (url && url !== '#' && !url.startsWith('javascript:')) {
                     window.ltdhOpenSharePopup(e, url, type);
                 }
@@ -1745,6 +1836,45 @@ function ltdhInitTheme() {
                 window.ltdhCopyPostLink(copyBtn);
             });
         }
+
+        // Delegate copy program link button
+        document.querySelectorAll('#ltdh-copy-program-btn, .ltdh-copy-program-btn').forEach(progCopyBtn => {
+            if (!progCopyBtn._bound) {
+                progCopyBtn._bound = true;
+                progCopyBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (window.ltdhCopyProgramLink) {
+                        window.ltdhCopyProgramLink(progCopyBtn);
+                    } else {
+                        window.ltdhCopyPostLink(progCopyBtn);
+                    }
+                });
+            }
+        });
+
+        // Delegate quick share buttons (Sticky Nav, Sidebar, Cards)
+        document.querySelectorAll('.ltdh-quick-share-btn, .ltdh-program-sidebar-share-btn, .ltdh-card-share-btn').forEach(btn => {
+            if (btn._bound) return;
+            btn._bound = true;
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = btn.getAttribute('data-url') || window.location.href;
+                const title = btn.getAttribute('data-title') || document.title;
+                if (typeof navigator.share === 'function') {
+                    navigator.share({
+                        title: title,
+                        text: title,
+                        url: url
+                    }).catch(() => {});
+                } else {
+                    if (window.ltdhCopyProgramLink) {
+                        window.ltdhCopyProgramLink(btn);
+                    } else if (window.ltdhCopyPostLink) {
+                        window.ltdhCopyPostLink(btn);
+                    }
+                }
+            });
+        });
     }
 
     initPostSharing();

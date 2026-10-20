@@ -546,13 +546,31 @@ add_action( 'wpcf7_before_send_mail', 'ltdh_capture_cf7_lead', 10, 3 );
 function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	$posted_data = $submission->get_posted_data();
 
-	$name    = isset( $posted_data['your-name'] ) ? sanitize_text_field( $posted_data['your-name'] ) : '';
-	$phone   = isset( $posted_data['your-phone'] ) ? sanitize_text_field( $posted_data['your-phone'] ) : '';
-	$email   = isset( $posted_data['your-email'] ) ? sanitize_email( $posted_data['your-email'] ) : '';
-	$message = isset( $posted_data['your-message'] ) ? sanitize_textarea_field( $posted_data['your-message'] ) : '';
+	// 1. Invisible Honeypot check
+	$hp_val = $posted_data['hp_website'] ?? $posted_data['website_url_hp'] ?? '';
+	if ( ! empty( $hp_val ) ) {
+		$abort = true;
+		return;
+	}
+
+	$name_val  = is_array( $posted_data['your-name'] ?? '' ) ? reset( $posted_data['your-name'] ) : ( $posted_data['your-name'] ?? '' );
+	$phone_val = is_array( $posted_data['your-phone'] ?? '' ) ? reset( $posted_data['your-phone'] ) : ( $posted_data['your-phone'] ?? '' );
+	$email_val = is_array( $posted_data['your-email'] ?? '' ) ? reset( $posted_data['your-email'] ) : ( $posted_data['your-email'] ?? '' );
+	$subj_val  = is_array( $posted_data['your-subject'] ?? '' ) ? reset( $posted_data['your-subject'] ) : ( $posted_data['your-subject'] ?? '' );
+	$msg_val   = is_array( $posted_data['your-message'] ?? '' ) ? reset( $posted_data['your-message'] ) : ( $posted_data['your-message'] ?? '' );
+
+	$name    = sanitize_text_field( $name_val );
+	$phone   = sanitize_text_field( $phone_val );
+	$email   = sanitize_email( $email_val );
+	$subject = sanitize_text_field( $subj_val );
+	$message = sanitize_textarea_field( $msg_val );
+
+	if ( ! empty( $subject ) && '-- Chọn chủ đề liên hệ --' !== $subject ) {
+		$message = "[Chủ đề: " . $subject . "]\n" . $message;
+	}
 
 	// Perform spam check
-	if ( ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $message ] ) ) {
+	if ( ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $message, 'hp_website' => $hp_val ] ) ) {
 		$abort = true;
 		return;
 	}
@@ -570,9 +588,32 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 		return;
 	}
 
-	$program_id      = isset( $posted_data['current_program_id'] ) ? intval( $posted_data['current_program_id'] ) : 0;
-	$school_id       = isset( $posted_data['current_school_id'] ) ? intval( $posted_data['current_school_id'] ) : 0;
-	$major_id        = isset( $posted_data['current_major_id'] ) ? intval( $posted_data['current_major_id'] ) : 0;
+	// Resolve program ID (accepts numeric ID or title string, supports array from CF7 select)
+	$program_id = 0;
+	if ( isset( $posted_data['current_program_id'] ) ) {
+		$raw_prog = is_array( $posted_data['current_program_id'] ) ? reset( $posted_data['current_program_id'] ) : $posted_data['current_program_id'];
+		if ( is_numeric( $raw_prog ) && (int) $raw_prog > 0 ) {
+			$program_id = intval( $raw_prog );
+		} elseif ( is_string( $raw_prog ) && ! empty( $raw_prog ) && '-- Chọn ngành hoặc hệ học --' !== $raw_prog ) {
+			$cpt_prog   = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
+			$found_prog = get_page_by_title( $raw_prog, OBJECT, $cpt_prog );
+			if ( $found_prog ) {
+				$program_id = $found_prog->ID;
+			} else {
+				$message = "[Nguyện vọng/Ngành: " . sanitize_text_field( $raw_prog ) . "]\n" . $message;
+			}
+		}
+	} elseif ( isset( $posted_data['program_id'] ) ) {
+		$raw_prog   = is_array( $posted_data['program_id'] ) ? reset( $posted_data['program_id'] ) : $posted_data['program_id'];
+		$program_id = absint( $raw_prog );
+	}
+
+	$school_raw    = is_array( $posted_data['current_school_id'] ?? ( $posted_data['school_id'] ?? 0 ) ) ? reset( $posted_data['current_school_id'] ?? ( $posted_data['school_id'] ?? 0 ) ) : ( $posted_data['current_school_id'] ?? ( $posted_data['school_id'] ?? 0 ) );
+	$major_raw     = is_array( $posted_data['current_major_id'] ?? ( $posted_data['major_id'] ?? 0 ) ) ? reset( $posted_data['current_major_id'] ?? ( $posted_data['major_id'] ?? 0 ) ) : ( $posted_data['current_major_id'] ?? ( $posted_data['major_id'] ?? 0 ) );
+	$school_id     = absint( $school_raw );
+	$major_id      = absint( $major_raw );
+	$training_type = isset( $posted_data['training_type'] ) ? sanitize_text_field( is_array( $posted_data['training_type'] ) ? reset( $posted_data['training_type'] ) : $posted_data['training_type'] ) : '';
+	$campus        = isset( $posted_data['campus'] ) ? sanitize_text_field( is_array( $posted_data['campus'] ) ? reset( $posted_data['campus'] ) : $posted_data['campus'] ) : '';
 
 	$referral_source = isset( $posted_data['referral_source'] ) ? esc_url_raw( $posted_data['referral_source'] ) : '';
 	if ( empty( $referral_source ) ) {
@@ -588,6 +629,8 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 		'program_id'      => $program_id,
 		'school_id'       => $school_id,
 		'major_id'        => $major_id,
+		'training_type'   => $training_type,
+		'campus'          => $campus,
 		'referral_source' => $referral_source,
 		'message'         => $message,
 		'is_group_reg'    => $is_group_reg,

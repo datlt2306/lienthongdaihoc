@@ -1123,45 +1123,14 @@ function ltdh_render_default_guide_sidebar() {
 			</div>
 		<?php endif; ?>
 		<?php 
-		if ( function_exists( 'wpcf7_contact_form_html' ) ) :
-			echo do_shortcode( '[contact-form-7 id="consultation-form" title="Form Tư vấn"]' );
-		else :
+		if ( function_exists( 'ltdh_render_consultation_form' ) ) {
+			ltdh_render_consultation_form( [
+				'referral_source' => get_permalink(),
+			] );
+		} elseif ( function_exists( 'ltdh_render_recaptcha_field' ) ) {
+			ltdh_render_recaptcha_field( 'sidebar_lead' );
+		}
 		?>
-			<form action="" method="POST" class="space-y-4">
-				<?php wp_nonce_field( 'ltdh_native_lead_submit_action', 'ltdh_native_lead_nonce' ); ?>
-				<input type="hidden" name="referral_source" value="<?php echo esc_attr( get_permalink() ); ?>">
-				<div class="hidden" style="display:none !important;" aria-hidden="true">
-					<label for="hp_website_guide">Website</label>
-					<input type="text" name="hp_website" id="hp_website_guide" tabindex="-1" autocomplete="off" value="">
-				</div>
-
-				<div>
-					<label class="block text-sm font-semibold text-slate-600 mb-1">Họ và tên *</label>
-					<input type="text" name="your-name" required class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:border-brand-primary focus:outline-none" placeholder="Họ và tên của bạn">
-				</div>
-				<div>
-					<label class="block text-sm font-semibold text-slate-600 mb-1">Số điện thoại *</label>
-					<input type="tel" name="your-phone" required class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:border-brand-primary focus:outline-none" placeholder="Số điện thoại liên hệ">
-				</div>
-
-				<div class="pt-0.5">
-					<label class="flex items-start gap-2 p-2 rounded-lg bg-amber-50/90 border border-amber-200 cursor-pointer hover:bg-amber-100/60 transition-colors select-none">
-						<input type="checkbox" name="is_group_reg" value="1" class="mt-0.5 w-4 h-4 rounded border-amber-300 text-brand-primary focus:ring-brand-primary">
-						<span class="text-xs text-slate-700 leading-snug">
-							🎁 <strong class="font-bold text-amber-900">Đăng ký nhóm:</strong> Nhận học bổng đồng hành (từ 2 bạn)
-						</span>
-					</label>
-				</div>
-
-				<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
-					<?php ltdh_render_recaptcha_field( 'sidebar_lead' ); ?>
-				<?php endif; ?>
-				
-				<button type="submit" class="w-full bg-brand-accent text-white py-3 rounded-lg text-sm font-bold shadow-md hover:bg-[#e06e00] transition-all">
-					Gửi Thông Tin Yêu Cầu
-				</button>
-			</form>
-		<?php endif; ?>
 	</section>
 
 	<!-- Zalo / Call Card -->
@@ -1409,6 +1378,19 @@ function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
 			data-compare-major-name="<?php echo esc_attr( preg_replace( '/^ngành\s+/iu', '', trim( $major_name ) ) ); ?>"
 			data-compare-school-name="<?php echo esc_attr( $school_title ); ?>">
 		<span>📊</span> <span>Thêm vào so sánh</span>
+	</button>
+
+	<!-- SHARE PROGRAM BUTTON (Desktop Sidebar) -->
+	<button type="button"
+			class="hidden lg:flex w-full text-center bg-blue-50/80 hover:bg-blue-100 text-[#00308b] py-3.5 rounded-xl font-bold transition-all ltdh-program-sidebar-share-btn text-sm items-center justify-center gap-2 mt-3 min-h-[44px] cursor-pointer border border-blue-200/70 select-none shadow-2xs"
+			data-url="<?php echo esc_url( get_permalink( $program_id ) ); ?>"
+			data-title="<?php echo esc_attr( get_the_title( $program_id ) ); ?>"
+			data-type="program"
+			title="Chia sẻ chương trình đào tạo này">
+		<svg class="w-4 h-4 text-[#00308b] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+		</svg>
+		<span>Chia sẻ chương trình</span>
 	</button>
 <?php
 }

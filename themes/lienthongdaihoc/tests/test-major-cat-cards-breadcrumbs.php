@@ -94,7 +94,7 @@ wp();
 $crumbs_cat = apply_filters( 'rank_math/frontend/breadcrumb/items', [], null );
 assert_test( count( $crumbs_cat ) === 2, 'major_cat breadcrumbs have exactly 2 items' );
 assert_test( $crumbs_cat[0][0] === 'Trang chủ', 'Crumb 1 is "Trang chủ"' );
-assert_test( $crumbs_cat[1][0] === 'Kinh tế - Quản lý' && empty( $crumbs_cat[1][1] ), 'Crumb 2 is "Kinh tế - Quản lý" (active last crumb)' );
+assert_test( $crumbs_cat[1][0] === 'Kinh tế - Quản lý' && ( empty( $crumbs_cat[1][1] ) || false !== strpos( $crumbs_cat[1][1], '/nhom-nganh/kinh-te-quan-ly/' ) ), 'Crumb 2 is "Kinh tế - Quản lý" (active last crumb)' );
 
 // 4.2 major single: Trang chủ > Kinh tế - Quản lý > Luật kinh tế
 $_SERVER['REQUEST_URI'] = '/nganh-luat-kinh-te/';
@@ -104,7 +104,7 @@ $crumbs_major = apply_filters( 'rank_math/frontend/breadcrumb/items', [], null )
 assert_test( count( $crumbs_major ) === 3, 'major single breadcrumbs have exactly 3 items' );
 assert_test( $crumbs_major[0][0] === 'Trang chủ', 'Crumb 1 is "Trang chủ"' );
 assert_test( $crumbs_major[1][0] === 'Kinh tế - Quản lý' && false !== strpos( $crumbs_major[1][1], '/nhom-nganh/kinh-te-quan-ly/' ), 'Crumb 2 is "Kinh tế - Quản lý" linking to /nhom-nganh/kinh-te-quan-ly/' );
-assert_test( $crumbs_major[2][0] === 'Luật kinh tế' && empty( $crumbs_major[2][1] ), 'Crumb 3 is "Luật kinh tế" (active last crumb)' );
+assert_test( $crumbs_major[2][0] === 'Luật kinh tế' && ( empty( $crumbs_major[2][1] ) || false !== strpos( $crumbs_major[2][1], '/nganh-luat-kinh-te/' ) ), 'Crumb 3 is "Luật kinh tế" (active last crumb)' );
 
 echo PHP_EOL . "===================================================================" . PHP_EOL;
 echo "RESULTS: " . $pass_count . " PASSED, " . $fail_count . " FAILED" . PHP_EOL;

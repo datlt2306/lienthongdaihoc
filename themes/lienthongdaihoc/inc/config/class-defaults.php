@@ -70,9 +70,13 @@ function ltdh_get_defaults( string $group ): array {
 			],
 		],
 		'forms' => [
-			'consultation_shortcode' => '',
-			'contact_shortcode'      => '',
-			'program_shortcode'      => '',
+			'consultation_shortcode' => '[contact-form-7 id="1804" title="Form Tư vấn"]',
+			'contact_shortcode'      => '[contact-form-7 id="321" title="Form Liên hệ"]',
+			'program_shortcode'      => '[contact-form-7 id="1804" title="Form Tư vấn"]',
+			'consultation_form_id'   => 1804,
+			'contact_form_id'        => 321,
+			'program_form_id'        => 1804,
+			'default_form_id'        => 1804,
 		],
 		'homepage' => [
 			'hero_year_label' => 'TUYỂN SINH ' . date( 'Y' ),
