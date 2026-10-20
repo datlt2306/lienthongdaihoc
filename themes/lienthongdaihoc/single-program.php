@@ -572,7 +572,7 @@ $program_tabs[] = [
 								$req_step++;
 							?>
 								<!-- BLOCK 1: ADMISSION REQUIREMENTS & TARGET APPLICANTS (Collapsible Details) -->
-								<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors" open>
+								<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
 									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
 										<div class="flex items-center gap-3 min-w-0">
 											<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">

@@ -208,9 +208,6 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 	?>
 	<a href="<?php echo esc_url( $register_link ); ?>" 
 	   class="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#00308b] via-[#004bb5] to-[#00a2f4] hover:brightness-110 active:scale-[0.97] text-white font-bold text-xs sm:text-sm h-10 px-3.5 rounded-full shadow-md shadow-[#00308b]/20 transition-all min-w-0">
-		<svg class="w-4 h-4 fill-current text-cyan-200 shrink-0" viewBox="0 0 20 20">
-			<path fill-rule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.259-.966zM2.429 4.74a1 1 0 10-.518 1.932l.966.259a1 1 0 00.518-1.932l-.966-.259zm8.839 2.517a1 1 0 00-1.042-.018l-7 4a1 1 0 00-.086 1.707l3.183 2.122 2.122 3.183a1 1 0 001.707-.086l4-7a1 1 0 00-.018-1.042l-3.866-3.866zM7.17 11.232l4.896-2.797 2.797 4.896-4.896 2.797-2.797-4.896z" clip-rule="evenodd" />
-		</svg>
 		<span class="truncate font-display font-bold">Đăng ký tư vấn ngay</span>
 	</a>
 
