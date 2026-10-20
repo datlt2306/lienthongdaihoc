@@ -1297,7 +1297,7 @@ $zalo    = ltdh_get_zalo_url();
 						[
 							'name'         => 'Hoàng Thị Độ',
 							'workplace'    => 'Product Owner',
-							'role' => 'Liên thông Công nghệ thông tin',
+							'role' => 'Liên thông ngành CNTT',
 							'graduation'   => 'Khóa 29.1 - UTC',
 							'status'       => 'graduated',
 							'status_label' => 'Đã tốt nghiệp',

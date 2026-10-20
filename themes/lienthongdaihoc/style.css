@@ -1366,14 +1366,63 @@ body.admin-bar #ltdh-program-sticky-nav {
    WordPress Widgets & Sidebar Styling
    ========================================================================== */
 
-/* Remove card wrapper styling for special full-width gradient widgets */
+/* Remove card wrapper styling for special full-width gradient widgets & image/banner widgets */
 .widget.widget_ltdh_cta,
 .widget.widget_ltdh_hotline,
-.widget.widget_ltdh_zalo_community {
+.widget.widget_ltdh_zalo_community,
+.widget.widget_ltdh_advisor_banner,
+.widget.widget_media_image,
+.widget.widget_block:has(.wp-block-image),
+.widget:has(.wp-block-image) {
 	background: transparent !important;
 	border: none !important;
 	padding: 0 !important;
 	box-shadow: none !important;
+}
+
+/* Ensure banner images in widgets are seamless, full-width, zero bottom margin */
+.widget.widget_ltdh_advisor_banner a,
+.widget.widget_media_image a,
+.widget.widget_block .wp-block-image a {
+	display: block !important;
+	line-height: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border-radius: 1rem !important;
+	overflow: hidden !important;
+	text-decoration: none !important;
+	position: relative;
+	transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.widget.widget_ltdh_advisor_banner a:hover,
+.widget.widget_media_image a:hover,
+.widget.widget_block .wp-block-image a:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.15), 0 8px 16px -6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.widget.widget_ltdh_advisor_banner img,
+.widget.widget_media_image img,
+.widget.widget_block .wp-block-image img,
+.widget .wp-block-image img {
+	display: block !important;
+	width: 100% !important;
+	height: auto !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	border-radius: 1rem !important;
+	vertical-align: middle !important;
+	box-sizing: border-box !important;
+}
+
+.widget_media_image figure,
+.widget_block figure.wp-block-image,
+.widget figure.wp-block-image {
+	margin: 0 !important;
+	padding: 0 !important;
+	line-height: 0 !important;
 }
 
 /* Base Widget Styling */

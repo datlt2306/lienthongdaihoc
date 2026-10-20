@@ -84,7 +84,7 @@ $steps = [
 		<?php foreach ( $steps as $index => $step_item ) : 
 			$is_last = ( $index === count( $steps ) - 1 );
 		?>
-			<div class="group relative flex flex-col justify-between bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-3.5 sm:p-4 md:p-5 transition-all duration-200 border border-slate-100/80 hover:border-blue-200/60 shadow-2xs hover:shadow-xs">
+			<div class="group relative flex flex-col justify-between bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-3.5 sm:p-4 transition-all duration-200 border border-slate-100/80 hover:border-blue-200/60 shadow-2xs hover:shadow-xs">
 				
 				<!-- Top Content -->
 				<div>
@@ -96,7 +96,7 @@ $steps = [
 							</div>
 
 							<!-- Step Title -->
-							<h3 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base group-hover:text-[#00308b] transition-colors leading-snug truncate">
+							<h3 class="font-bold text-slate-900 text-xs sm:text-sm group-hover:text-[#00308b] transition-colors leading-snug truncate">
 								<?php echo esc_html( $step_item['title'] ); ?>
 							</h3>
 						</div>
