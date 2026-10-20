@@ -1852,9 +1852,46 @@ function ltdhInitTheme() {
             }
         });
 
+        // Program share dropdown menu toggle
+        const progShareBtn = document.getElementById('ltdh-quick-share-btn');
+        const progShareDropdown = document.getElementById('ltdh-share-dropdown-menu');
+        if (progShareBtn && progShareDropdown && !progShareBtn._dropdownBound) {
+            progShareBtn._dropdownBound = true;
+            progShareBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isHidden = progShareDropdown.classList.contains('hidden');
+                if (isHidden) {
+                    progShareDropdown.classList.remove('hidden');
+                    progShareBtn.setAttribute('aria-expanded', 'true');
+                } else {
+                    progShareDropdown.classList.add('hidden');
+                    progShareBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!progShareDropdown.contains(e.target) && !progShareBtn.contains(e.target)) {
+                    progShareDropdown.classList.add('hidden');
+                    progShareBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !progShareDropdown.classList.contains('hidden')) {
+                    progShareDropdown.classList.add('hidden');
+                    progShareBtn.setAttribute('aria-expanded', 'false');
+                    progShareBtn.focus();
+                }
+            });
+        }
+
         // Delegate quick share buttons (Sticky Nav, Sidebar, Cards)
         document.querySelectorAll('.ltdh-quick-share-btn, .ltdh-program-sidebar-share-btn, .ltdh-card-share-btn').forEach(btn => {
             if (btn._bound) return;
+            if (btn.getAttribute('data-has-dropdown') === 'true' || btn.getAttribute('aria-haspopup') === 'true') {
+                return;
+            }
             btn._bound = true;
             btn.addEventListener('click', (e) => {
                 e.preventDefault();

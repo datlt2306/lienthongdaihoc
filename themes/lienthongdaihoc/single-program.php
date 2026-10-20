@@ -172,18 +172,9 @@ $program_tabs[] = [
 			</nav>
 
 			<!-- Quick Share Trigger in Sticky Bar -->
-			<div class="shrink-0 flex items-center py-2">
-				<button type="button"
-				        class="ltdh-quick-share-btn inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#00308b] border border-slate-200/80 hover:border-blue-200 text-xs sm:text-[13px] font-bold transition-all shadow-2xs active:scale-95 cursor-pointer select-none"
-				        data-url="<?php echo esc_url( get_permalink( $program_id ) ); ?>"
-				        data-title="<?php echo esc_attr( get_the_title( $program_id ) ); ?>"
-				        data-type="program"
-				        title="Chia sẻ chương trình này">
-					<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00308b] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-					</svg>
-					<span class="hidden sm:inline">Chia sẻ</span>
-				</button>
+			<div class="shrink-0 flex items-center py-2 relative">
+				<!-- ltdh-quick-share-btn dropdown trigger loaded via template-parts/program-share -->
+				<?php get_template_part( 'template-parts/program-share', null, [ 'program_id' => $program_id ] ); ?>
 			</div>
 		</div>
 	</div>
@@ -1142,8 +1133,7 @@ $program_tabs[] = [
 				<!-- SECTION 10: PROGRAM STUDENT REVIEWS & RATINGS (Shopee & CellphoneS Style) -->
 				<?php get_template_part( 'template-parts/program-reviews' ); ?>
 
-				<!-- PROGRAM SOCIAL & DIRECT SHARING COMPONENT -->
-				<?php get_template_part( 'template-parts/program-share', null, [ 'program_id' => $program_id ] ); ?>
+
 
 			</div>
 
