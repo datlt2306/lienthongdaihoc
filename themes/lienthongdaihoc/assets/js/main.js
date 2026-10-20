@@ -1855,18 +1855,22 @@ function ltdhInitTheme() {
         // Program share dropdown menu toggle
         const progShareBtn = document.getElementById('ltdh-quick-share-btn');
         const progShareDropdown = document.getElementById('ltdh-share-dropdown-menu');
-        if (progShareBtn && progShareDropdown && !progShareBtn._dropdownBound) {
-            progShareBtn._dropdownBound = true;
+        if (progShareBtn && progShareDropdown && !progShareBtn._ltdhDropdownBound) {
+            progShareBtn._ltdhDropdownBound = true;
             progShareBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const isHidden = progShareDropdown.classList.contains('hidden');
-                if (isHidden) {
-                    progShareDropdown.classList.remove('hidden');
-                    progShareBtn.setAttribute('aria-expanded', 'true');
+                if (typeof window.ltdhToggleProgramShareDropdown === 'function') {
+                    window.ltdhToggleProgramShareDropdown(e);
                 } else {
-                    progShareDropdown.classList.add('hidden');
-                    progShareBtn.setAttribute('aria-expanded', 'false');
+                    const isHidden = progShareDropdown.classList.contains('hidden');
+                    if (isHidden) {
+                        progShareDropdown.classList.remove('hidden');
+                        progShareBtn.setAttribute('aria-expanded', 'true');
+                    } else {
+                        progShareDropdown.classList.add('hidden');
+                        progShareBtn.setAttribute('aria-expanded', 'false');
+                    }
                 }
             });
 

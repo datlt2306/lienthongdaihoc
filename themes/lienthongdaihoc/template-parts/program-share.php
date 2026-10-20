@@ -46,7 +46,6 @@ $zalo_share_url   = 'https://sp.zalo.me/plugins/share?url=' . rawurlencode( $soc
 	        aria-expanded="false"
 	        aria-haspopup="true"
 	        aria-controls="ltdh-share-dropdown-menu"
-	        onclick="if(window.ltdhToggleProgramShareDropdown){window.ltdhToggleProgramShareDropdown(this, event);}"
 	        title="Chia sẻ chương trình đào tạo này">
 		<span class="w-5 h-5 rounded-md bg-white/20 flex items-center justify-center shrink-0 text-white shadow-2xs">
 			<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -176,44 +175,55 @@ $zalo_share_url   = 'https://sp.zalo.me/plugins/share?url=' . rawurlencode( $soc
 <?php endif; ?>
 
 <script data-no-defer="1">
-function ltdhToggleProgramShareDropdown(btn, e) {
-	if (e) {
-		e.preventDefault();
-		e.stopPropagation();
-	}
-	var menu = document.getElementById('ltdh-share-dropdown-menu');
-	if (!menu || !btn) return;
-	var isHidden = menu.classList.contains('hidden');
-	if (isHidden) {
-		menu.classList.remove('hidden');
-		btn.setAttribute('aria-expanded', 'true');
-	} else {
-		menu.classList.add('hidden');
-		btn.setAttribute('aria-expanded', 'false');
-	}
-}
-
-document.addEventListener('click', function(e) {
-	var menu = document.getElementById('ltdh-share-dropdown-menu');
-	var btn = document.getElementById('ltdh-quick-share-btn');
-	if (!menu || !btn) return;
-	if (!menu.contains(e.target) && !btn.contains(e.target)) {
-		menu.classList.add('hidden');
-		btn.setAttribute('aria-expanded', 'false');
-	}
-});
-
-document.addEventListener('keydown', function(e) {
-	if (e.key === 'Escape') {
+(function() {
+	function ltdhToggleProgramShare(e) {
+		if (e) {
+			if (typeof e.preventDefault === 'function') e.preventDefault();
+			if (typeof e.stopPropagation === 'function') e.stopPropagation();
+		}
 		var menu = document.getElementById('ltdh-share-dropdown-menu');
 		var btn = document.getElementById('ltdh-quick-share-btn');
-		if (menu && !menu.classList.contains('hidden')) {
+		if (!menu || !btn) return;
+		var isHidden = menu.classList.contains('hidden');
+		if (isHidden) {
+			menu.classList.remove('hidden');
+			btn.setAttribute('aria-expanded', 'true');
+		} else {
 			menu.classList.add('hidden');
-			if (btn) {
+			btn.setAttribute('aria-expanded', 'false');
+		}
+	}
+
+	window.ltdhToggleProgramShareDropdown = ltdhToggleProgramShare;
+
+	function initProgramShareDropdown() {
+		var btn = document.getElementById('ltdh-quick-share-btn');
+		var menu = document.getElementById('ltdh-share-dropdown-menu');
+		if (!btn || !menu || btn._ltdhDropdownBound) return;
+		btn._ltdhDropdownBound = true;
+
+		btn.addEventListener('click', ltdhToggleProgramShare);
+
+		document.addEventListener('click', function(e) {
+			if (!menu.classList.contains('hidden') && !menu.contains(e.target) && !btn.contains(e.target)) {
+				menu.classList.add('hidden');
+				btn.setAttribute('aria-expanded', 'false');
+			}
+		});
+
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape' && !menu.classList.contains('hidden')) {
+				menu.classList.add('hidden');
 				btn.setAttribute('aria-expanded', 'false');
 				btn.focus();
 			}
-		}
+		});
 	}
-});
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initProgramShareDropdown);
+	} else {
+		initProgramShareDropdown();
+	}
+})();
 </script>
