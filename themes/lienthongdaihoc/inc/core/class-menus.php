@@ -633,11 +633,11 @@ function ltdh_menu_add_active_classes( $menu_items, $args = null ) {
 						}
 
 						$is_major_match = false;
-						if ( (int) $item->object_id === $route_info['major_id'] ) {
+						if ( (int) $item->object_id === (int) $route_info['major_id'] ) {
 							$is_major_match = true;
 						} else {
-							$item_path = untrailingslashit( parse_url( $item->url, PHP_URL_PATH ) );
-							if ( $item_path === $route_info['path'] || ( ! empty( $route_info['path'] ) && strpos( $route_info['path'], $item_path ) === 0 ) ) {
+							$item_path = untrailingslashit( parse_url( (string) $item->url, PHP_URL_PATH ) );
+							if ( ! empty( $item_path ) && $item_path === $route_info['path'] ) {
 								$is_major_match = true;
 							}
 						}
