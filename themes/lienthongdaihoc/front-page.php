@@ -1199,7 +1199,7 @@ $zalo    = ltdh_get_zalo_url();
 			// Replace legacy 200+ / 1.200+ student enrollment claims with verified 500+ registration support
 			if ( str_contains( $val, '1.200' ) || str_contains( $val, '200+' ) || str_contains( $val, '1200' ) ) {
 				$sanitized_metrics[] = [
-					'value'   => '500+',
+					'value'   => '1500+',
 					'label'   => 'Người học được hỗ trợ đăng ký liên thông',
 					'subtext' => 'Trong 4 năm qua',
 				];

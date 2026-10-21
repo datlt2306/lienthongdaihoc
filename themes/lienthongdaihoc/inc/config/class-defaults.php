@@ -91,7 +91,7 @@ function ltdh_get_defaults( string $group ): array {
 			],
 			'kpi_metrics' => [
 				[
-					'value'   => '500+',
+					'value'   => '1500+',
 					'label'   => 'Người học được hỗ trợ đăng ký liên thông',
 					'subtext' => 'Trong 4 năm qua',
 				],
