@@ -69,12 +69,23 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 		</div>
 
 		<!-- Open Modal CTA Button -->
-		<button type="button" 
-		        id="ltdh-open-review-modal-btn"
-		        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#EA580C] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all duration-200 cursor-pointer shrink-0 self-start sm:self-auto">
-			<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
-			<span>Viết đánh giá chương trình</span>
-		</button>
+		<?php 
+		$has_reviewed_cookie = ! empty( $_COOKIE[ 'ltdh_rev_done_' . $program_id ] );
+		if ( $has_reviewed_cookie ) : ?>
+			<button type="button" 
+			        disabled
+			        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 text-slate-500 border border-slate-200 text-xs sm:text-sm font-semibold cursor-not-allowed shadow-none shrink-0 self-start sm:self-auto">
+				<svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+				<span>Bạn đã đánh giá chương trình này</span>
+			</button>
+		<?php else : ?>
+			<button type="button" 
+			        id="ltdh-open-review-modal-btn"
+			        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#EA580C] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all duration-200 cursor-pointer shrink-0 self-start sm:self-auto">
+				<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+				<span>Viết đánh giá chương trình</span>
+			</button>
+		<?php endif; ?>
 	</div>
 
 	<!-- SCOREBOARD (CellphoneS Style Rating Box) -->
@@ -310,16 +321,7 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 		<div class="p-5 sm:p-7 overflow-y-auto flex-1">
 			<form id="ltdh-program-review-form" method="POST" action="javascript:void(0);" onsubmit="return ltdhSubmitReviewForm(event);" enctype="multipart/form-data">
 				
-				<!-- Hidden Security Fields -->
-				<input type="hidden" name="action" value="ltdh_submit_program_review">
-				<input type="hidden" name="nonce" value="<?php echo esc_attr( $nonce ); ?>">
-				<input type="hidden" name="program_id" value="<?php echo esc_attr( $program_id ); ?>">
-				<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
-					<?php ltdh_render_recaptcha_field( 'program_review' ); ?>
-				<?php endif; ?>
-				<!-- Honeypot anti-spam (invisible to humans) -->
-				<input type="text" name="website_url_hp" value="" tabindex="-1" autocomplete="off" style="display:none !important; visibility:hidden !important;" aria-hidden="true">
-
+				
 				<!-- 2-COLUMN DESKTOP GRID -->
 				<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
 					
@@ -491,6 +493,15 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 								<span>Số điện thoại chỉ dùng để xác thực học viên, tuyệt đối không công khai trên website.</span>
 							</p>
 						</div>
+<!-- Hidden Security Fields -->
+				<input type="hidden" name="action" value="ltdh_submit_program_review">
+				<input type="hidden" name="nonce" value="<?php echo esc_attr( $nonce ); ?>">
+				<input type="hidden" name="program_id" value="<?php echo esc_attr( $program_id ); ?>">
+				<?php if ( function_exists( 'ltdh_render_recaptcha_field' ) ) : ?>
+					<?php ltdh_render_recaptcha_field( 'program_review' ); ?>
+				<?php endif; ?>
+				<!-- Honeypot anti-spam (invisible to humans) -->
+				<input type="text" name="website_url_hp" value="" tabindex="-1" autocomplete="off" style="display:none !important; visibility:hidden !important;" aria-hidden="true">
 
 					</div>
 
@@ -520,6 +531,7 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 							<span id="ltdh-submit-btn-text">Gửi đánh giá chương trình</span>
 						</button>
 					</div>
+					
 				</div>
 
 			</form>
@@ -559,8 +571,29 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 		var successCloseBtn = document.getElementById('ltdh-close-success-btn');
 		var form = document.getElementById('ltdh-program-review-form');
 
+		// Enforce 1 review per person per program on Client-Side
+		var reviewedKey = 'ltdh_reviewed_' + programId;
+		var hasReviewed = (localStorage.getItem(reviewedKey) === '1') || (document.cookie.indexOf('ltdh_rev_done_' + programId + '=1') !== -1);
+
+		function lockReviewedButtons() {
+			openBtns.forEach(function(btn) {
+				btn.disabled = true;
+				btn.classList.remove('bg-[#EA580C]', 'hover:bg-[#c2410c]', 'cursor-pointer');
+				btn.classList.add('bg-slate-100', 'text-slate-500', 'border', 'border-slate-200', 'cursor-not-allowed', 'shadow-none');
+				btn.innerHTML = '<svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>Bạn đã đánh giá chương trình này</span>';
+			});
+		}
+
+		if (hasReviewed) {
+			lockReviewedButtons();
+		}
+
 		// Open Modal
 		function openModal() {
+			if (hasReviewed) {
+				alert('Bạn đã gửi đánh giá cho chương trình này rồi. Mỗi học viên chỉ được đánh giá 1 lần.');
+				return;
+			}
 			if (modal) {
 				modal.classList.remove('hidden');
 				document.body.style.overflow = 'hidden';
@@ -808,6 +841,10 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 					try {
 						var res = JSON.parse(xhr.responseText);
 						if (res.success) {
+							localStorage.setItem(reviewedKey, '1');
+							hasReviewed = true;
+							lockReviewedButtons();
+
 							var successBox = document.getElementById('ltdh-review-success');
 							var successMsg = document.getElementById('ltdh-success-msg');
 							if (successMsg && res.data && res.data.message) {

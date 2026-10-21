@@ -63,6 +63,9 @@ class LTDH_Performance {
 		add_filter( 'googlesitekit_analytics-4_tag_blocked', [ __CLASS__, 'block_sitekit_tags' ] );
 		add_action( 'wp_head', [ __CLASS__, 'render_delayed_analytics_loader' ], 2 );
 
+		// 11. Cloudflare R2 Theme Asset Offloader (Rewrites all static theme assets to R2 CDN)
+		add_action( 'template_redirect', [ __CLASS__, 'start_r2_assets_buffer' ], 1 );
+
 		// 11. Async Non-Critical Styles (Eliminates Render-Blocking CSS)
 		add_filter( 'style_loader_tag', [ __CLASS__, 'async_non_critical_styles' ], 10, 4 );
 	}
@@ -546,6 +549,26 @@ class LTDH_Performance {
 		}
 
 		return $html;
+	}
+	/**
+	 * 12. Offload theme static images to Cloudflare R2 CDN globally.
+	 */
+	public static function start_r2_assets_buffer() {
+		if ( is_admin() || wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return;
+		}
+
+		ob_start( function( $html ) {
+			if ( empty( $html ) || ! is_string( $html ) ) {
+				return $html;
+			}
+			$r2_cdn_base = 'https://pub-f075baadfe3743948b6fe0a4828c9880.r2.dev/assets/images/';
+			return preg_replace(
+				'#https?://[^/]+/wp-content/themes/lienthongdaihoc/assets/images/([^"\'\)\s]+)#i',
+				$r2_cdn_base . '$1',
+				$html
+			);
+		} );
 	}
 }
 

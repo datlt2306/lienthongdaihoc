@@ -45,18 +45,40 @@ function ltdh_register_program_review_cpt() {
 		'public'             => false,
 		'publicly_queryable' => false,
 		'show_ui'            => true,
-		'show_in_menu'       => 'edit.php?post_type=program', // Submenu under Program CPT
+		'show_in_menu'       => true, // Independent Top-Level Admin Menu
+		'menu_icon'          => 'dashicons-star-filled',
 		'query_var'          => false,
 		'rewrite'            => false,
 		'capability_type'    => 'post',
 		'has_archive'        => false,
 		'hierarchical'       => false,
-		'menu_position'      => 25,
+		'menu_position'      => 23, // Right below Programs (22)
 		'supports'           => [ 'title', 'editor' ],
 		'show_in_rest'       => false,
 	];
 
 	register_post_type( 'program_review', $args );
+}
+
+/**
+ * Add pending review count badge to the admin sidebar menu
+ */
+add_action( 'admin_menu', 'ltdh_add_pending_review_bubble_to_menu', 999 );
+function ltdh_add_pending_review_bubble_to_menu() {
+	global $menu;
+	$counts = wp_count_posts( 'program_review' );
+	$pending = ! empty( $counts->pending ) ? (int) $counts->pending : 0;
+	if ( $pending > 0 && is_array( $menu ) ) {
+		foreach ( $menu as $key => $item ) {
+			if ( isset( $item[2] ) && $item[2] === 'edit.php?post_type=program_review' ) {
+				$menu[ $key ][0] .= sprintf(
+					' <span class="awaiting-mod update-plugins count-%1$d"><span class="pending-count">%1$d</span></span>',
+					$pending
+				);
+				break;
+			}
+		}
+	}
 }
 
 // ----------------------------------------------------
@@ -417,6 +439,12 @@ function ltdh_handle_submit_program_review() {
 		wp_send_json_error( [ 'message' => 'Chương trình đào tạo không hợp lệ.' ] );
 	}
 
+	// 4.1 Check browser submission cookie
+	$cookie_key = 'ltdh_rev_done_' . $program_id;
+	if ( isset( $_COOKIE[ $cookie_key ] ) ) {
+		wp_send_json_error( [ 'message' => 'Bạn đã gửi đánh giá cho chương trình này rồi. Mỗi học viên chỉ được đánh giá 1 lần.' ] );
+	}
+
 	$user_ip      = sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' );
 	$rate_key     = 'ltdh_rev_rate_' . md5( $user_ip . '_' . $program_id );
 	if ( get_transient( $rate_key ) ) {
@@ -439,6 +467,27 @@ function ltdh_handle_submit_program_review() {
 	// Validate Vietnamese Phone: 10 digits starting with 03, 05, 07, 08, 09
 	if ( ! preg_match( '/^(0[3|5|7|8|9])[0-9]{8}$/', $phone ) ) {
 		wp_send_json_error( [ 'message' => 'Số điện thoại không đúng định dạng. Vui lòng nhập số điện thoại 10 chữ số.' ] );
+	}
+
+	// 5.1 Enforce strict 1 review per person per program (Database lookup by phone & program)
+	global $wpdb;
+	$existing_review_id = $wpdb->get_var( $wpdb->prepare(
+		"SELECT p.ID FROM {$wpdb->posts} p
+		 INNER JOIN {$wpdb->postmeta} pm_prog ON (p.ID = pm_prog.post_id AND pm_prog.meta_key = '_review_program_id')
+		 INNER JOIN {$wpdb->postmeta} pm_phone ON (p.ID = pm_phone.post_id AND pm_phone.meta_key = '_review_phone')
+		 WHERE p.post_type = 'program_review'
+		   AND p.post_status IN ('publish', 'pending', 'draft')
+		   AND pm_prog.meta_value = %d
+		   AND pm_phone.meta_value = %s
+		 LIMIT 1",
+		$program_id,
+		$phone
+	) );
+
+	if ( $existing_review_id ) {
+		wp_send_json_error( [
+			'message' => 'Số điện thoại này đã gửi đánh giá cho chương trình này rồi. Mỗi học viên chỉ được gửi đánh giá 1 lần.',
+		] );
 	}
 
 	if ( $rating < 1 || $rating > 5 ) {
@@ -523,6 +572,9 @@ function ltdh_handle_submit_program_review() {
 
 	// Set rate limit (1 hour)
 	set_transient( $rate_key, 1, HOUR_IN_SECONDS );
+
+	// Set 1-year cookie to remember user already submitted for this program
+	setcookie( $cookie_key, '1', time() + ( 86400 * 365 ), COOKIEPATH ?: '/', COOKIE_DOMAIN );
 
 	// Trigger rating stats and schema recalculation
 	ltdh_recalculate_program_rating_stats( $program_id );

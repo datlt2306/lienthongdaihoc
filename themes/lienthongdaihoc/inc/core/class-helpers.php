@@ -1488,21 +1488,21 @@ function ltdh_get_optimized_image_url( string $url, $variant = false ): string {
 	$is_mobile = ( true === $variant || 'mobile' === $variant );
 	$is_1400w  = ( '1400w' === $variant );
 
-	$theme_dir = get_template_directory();
-	$theme_uri = get_template_directory_uri();
+	$theme_dir   = get_template_directory();
+	$theme_uri   = 'https://pub-f075baadfe3743948b6fe0a4828c9880.r2.dev/assets/images';
 
 	// 1. Check for specific variant in theme assets/images/
 	if ( $is_1400w && file_exists( $theme_dir . '/assets/images/' . $name_without_ext . '-1400w.webp' ) ) {
-		return $theme_uri . '/assets/images/' . $name_without_ext . '-1400w.webp';
+		return $theme_uri . '/' . $name_without_ext . '-1400w.webp';
 	}
 
 	if ( $is_mobile && file_exists( $theme_dir . '/assets/images/' . $name_without_ext . '-mobile.webp' ) ) {
-		return $theme_uri . '/assets/images/' . $name_without_ext . '-mobile.webp';
+		return $theme_uri . '/' . $name_without_ext . '-mobile.webp';
 	}
 
 	// 2. Check for standard .webp in theme assets/images/
 	if ( file_exists( $theme_dir . '/assets/images/' . $name_without_ext . '.webp' ) ) {
-		return $theme_uri . '/assets/images/' . $name_without_ext . '.webp';
+		return $theme_uri . '/' . $name_without_ext . '.webp';
 	}
 
 	// 3. If image is in wp-content/uploads/, check for sibling .webp
