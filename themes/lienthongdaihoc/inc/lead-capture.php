@@ -442,7 +442,7 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 	if ( $is_group ) {
 		$msg_text .= "👉 <i>Gợi ý Telesale: Khách có nhu cầu học cùng bạn bè, mở lời theo gói học bổng nhóm để chốt đôi!</i>\n";
 	}
-	$msg_text .= "📅 <b>Thời gian:</b> " . current_time( 'd/m/Y H:i:s' ) . "\n";
+	$msg_text .= "📅 <b>Thời gian:</b> " . wp_date( 'd/m/Y H:i:s', null, new DateTimeZone( 'Asia/Ho_Chi_Minh' ) ) . "\n";
 
 	// Split chat IDs by comma, semicolon, or space to support multiple recipients
 	$chat_ids = preg_split( '/[\s,;]+/', $chat_id );

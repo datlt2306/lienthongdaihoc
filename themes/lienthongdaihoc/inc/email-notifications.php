@@ -380,7 +380,7 @@ function ltdh_build_student_email_html( array $data, int $lead_id ): string {
 	$site_name     = ltdh_get_mailer_from_name();
 	$site_url      = home_url( '/' );
 	$lead_code     = '#LTDH-' . str_pad( (string) $lead_id, 5, '0', STR_PAD_LEFT );
-	$created_time  = current_time( 'd/m/Y - H:i' );
+	$created_time  = wp_date( 'd/m/Y - H:i', null, new DateTimeZone( 'Asia/Ho_Chi_Minh' ) );
 
 	ob_start();
 	?>
@@ -574,7 +574,7 @@ function ltdh_build_admin_email_html( array $data, int $lead_id ): string {
 
 	$clean_phone   = preg_replace( '/\D/', '', $phone );
 	$lead_code     = '#LTDH-' . str_pad( (string) $lead_id, 5, '0', STR_PAD_LEFT );
-	$created_time  = current_time( 'd/m/Y H:i:s' );
+	$created_time  = wp_date( 'd/m/Y H:i:s', null, new DateTimeZone( 'Asia/Ho_Chi_Minh' ) );
 	$admin_leads_url = admin_url( 'admin.php?page=ltdh_elig_leads_menu' );
 
 	ob_start();
