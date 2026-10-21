@@ -636,37 +636,71 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 		return;
 	}
 
-	// Resolve program ID (accepts numeric ID or title string, supports array from CF7 select)
+	// Resolve program ID and major ID (accepts numeric ID or title string, supports array from CF7 select)
 	$program_id = 0;
 	$raw_prog   = '';
 	if ( ! empty( $posted_data['current_program_id'] ) ) {
 		$raw_prog = is_array( $posted_data['current_program_id'] ) ? reset( $posted_data['current_program_id'] ) : $posted_data['current_program_id'];
 	}
-	if ( ( empty( $raw_prog ) || '-- Chọn ngành hoặc hệ học --' === $raw_prog ) && ! empty( $posted_data['program_id'] ) ) {
+
+	$ignored_placeholders = [
+		'-- Chọn ngành hoặc hệ học --',
+		'-- Chọn ngành học --',
+		'-- Chọn ngành học quan tâm --',
+		'-- Chọn ngành quan tâm --',
+	];
+
+	if ( ( empty( $raw_prog ) || in_array( $raw_prog, $ignored_placeholders, true ) ) && ! empty( $posted_data['program_id'] ) ) {
 		$raw_prog = is_array( $posted_data['program_id'] ) ? reset( $posted_data['program_id'] ) : $posted_data['program_id'];
 	}
-	if ( ( empty( $raw_prog ) || '-- Chọn ngành hoặc hệ học --' === $raw_prog ) && ! empty( $posted_data['elig_program_id'] ) ) {
+	if ( ( empty( $raw_prog ) || in_array( $raw_prog, $ignored_placeholders, true ) ) && ! empty( $posted_data['elig_program_id'] ) ) {
 		$raw_prog = is_array( $posted_data['elig_program_id'] ) ? reset( $posted_data['elig_program_id'] ) : $posted_data['elig_program_id'];
-	}
-
-	if ( ! empty( $raw_prog ) ) {
-		if ( is_numeric( $raw_prog ) && (int) $raw_prog > 0 ) {
-			$program_id = intval( $raw_prog );
-		} elseif ( is_string( $raw_prog ) && '-- Chọn ngành hoặc hệ học --' !== $raw_prog ) {
-			$cpt_prog   = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
-			$found_prog = get_page_by_title( $raw_prog, OBJECT, $cpt_prog );
-			if ( $found_prog ) {
-				$program_id = $found_prog->ID;
-			} else {
-				$message = "[Nguyện vọng/Ngành: " . sanitize_text_field( $raw_prog ) . "]\n" . $message;
-			}
-		}
 	}
 
 	$school_raw    = is_array( $posted_data['current_school_id'] ?? ( $posted_data['school_id'] ?? 0 ) ) ? reset( $posted_data['current_school_id'] ?? ( $posted_data['school_id'] ?? 0 ) ) : ( $posted_data['current_school_id'] ?? ( $posted_data['school_id'] ?? 0 ) );
 	$major_raw     = is_array( $posted_data['current_major_id'] ?? ( $posted_data['major_id'] ?? 0 ) ) ? reset( $posted_data['current_major_id'] ?? ( $posted_data['major_id'] ?? 0 ) ) : ( $posted_data['current_major_id'] ?? ( $posted_data['major_id'] ?? 0 ) );
 	$school_id     = absint( $school_raw );
 	$major_id      = absint( $major_raw );
+
+	if ( ! empty( $raw_prog ) && ! in_array( $raw_prog, $ignored_placeholders, true ) ) {
+		if ( is_numeric( $raw_prog ) && (int) $raw_prog > 0 ) {
+			$raw_id = intval( $raw_prog );
+			$ptype  = get_post_type( $raw_id );
+			if ( 'major' === $ptype ) {
+				if ( ! $major_id ) {
+					$major_id = $raw_id;
+				}
+			} elseif ( 'program' === $ptype ) {
+				$program_id = $raw_id;
+				if ( ! $major_id ) {
+					$major_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : (int) get_post_meta( $program_id, 'major_relationship', true );
+				}
+			} else {
+				if ( ! $major_id ) {
+					$major_id = $raw_id;
+				}
+			}
+		} elseif ( is_string( $raw_prog ) ) {
+			$cpt_major  = defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major';
+			$found_maj  = get_page_by_title( $raw_prog, OBJECT, $cpt_major );
+			if ( $found_maj ) {
+				if ( ! $major_id ) {
+					$major_id = $found_maj->ID;
+				}
+			} else {
+				$cpt_prog   = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
+				$found_prog = get_page_by_title( $raw_prog, OBJECT, $cpt_prog );
+				if ( $found_prog ) {
+					$program_id = $found_prog->ID;
+					if ( ! $major_id ) {
+						$major_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : (int) get_post_meta( $program_id, 'major_relationship', true );
+					}
+				} else {
+					$message = "[Nguyện vọng/Ngành: " . sanitize_text_field( $raw_prog ) . "]\n" . $message;
+				}
+			}
+		}
+	}
 	$training_type = isset( $posted_data['training_type'] ) ? sanitize_text_field( is_array( $posted_data['training_type'] ) ? reset( $posted_data['training_type'] ) : $posted_data['training_type'] ) : '';
 	$campus        = isset( $posted_data['campus'] ) ? sanitize_text_field( is_array( $posted_data['campus'] ) ? reset( $posted_data['campus'] ) : $posted_data['campus'] ) : '';
 

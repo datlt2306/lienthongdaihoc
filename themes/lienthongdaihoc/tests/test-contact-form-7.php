@@ -244,7 +244,7 @@ run_test( 'wpcf7_form_tag filter populates numerical program IDs and formatted l
 	];
 
 	$filtered_tag = apply_filters( 'wpcf7_form_tag', $dummy_tag, false );
-	return ! empty( $filtered_tag['values'] ) && ! empty( $filtered_tag['labels'] ) && in_array( '-- Chọn ngành hoặc hệ học --', $filtered_tag['labels'], true );
+	return ! empty( $filtered_tag['values'] ) && ! empty( $filtered_tag['labels'] ) && ( in_array( '-- Chọn ngành hoặc hệ học --', $filtered_tag['labels'], true ) || in_array( '-- Chọn ngành học --', $filtered_tag['labels'], true ) );
 } );
 
 // ----------------------------------------------------

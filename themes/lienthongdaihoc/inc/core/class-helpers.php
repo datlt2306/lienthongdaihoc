@@ -2605,11 +2605,13 @@ function ltdh_format_program_select_label( $program ): string {
 }
 
 function ltdh_cf7_dynamic_programs($tag, $replace) {
-	if ('current_program_id' === $tag['name'] || 'program_id' === $tag['name']) {
-		$programs = get_posts([
-			'post_type'   => defined('LTDH_CPT_PROGRAM') ? LTDH_CPT_PROGRAM : 'program',
+	if ('current_program_id' === $tag['name'] || 'program_id' === $tag['name'] || 'current_major_id' === $tag['name'] || 'major_id' === $tag['name']) {
+		$majors = get_posts([
+			'post_type'   => defined('LTDH_CPT_MAJOR') ? LTDH_CPT_MAJOR : 'major',
 			'post_status' => 'publish',
 			'numberposts' => -1,
+			'orderby'     => 'title',
+			'order'       => 'ASC',
 		]);
 		$tag['raw_values'] = [];
 		$tag['values']     = [];
@@ -2617,30 +2619,35 @@ function ltdh_cf7_dynamic_programs($tag, $replace) {
 
 		$tag['raw_values'][] = '';
 		$tag['values'][]     = '';
-		$tag['labels'][]     = '-- Chọn ngành hoặc hệ học --';
+		$tag['labels'][]     = '-- Chọn ngành học --';
 
 		$curr_id = 0;
-		if ( ! empty( $GLOBALS['ltdh_cf7_context_hidden_fields']['current_program_id'] ) ) {
-			$curr_id = (int) $GLOBALS['ltdh_cf7_context_hidden_fields']['current_program_id'];
+		if ( ! empty( $GLOBALS['ltdh_cf7_context_hidden_fields']['current_major_id'] ) ) {
+			$curr_id = (int) $GLOBALS['ltdh_cf7_context_hidden_fields']['current_major_id'];
+		} elseif ( ! empty( $GLOBALS['ltdh_cf7_context_hidden_fields']['major_id'] ) ) {
+			$curr_id = (int) $GLOBALS['ltdh_cf7_context_hidden_fields']['major_id'];
+		} elseif ( ! empty( $GLOBALS['ltdh_cf7_context_hidden_fields']['current_program_id'] ) ) {
+			$prog_id = (int) $GLOBALS['ltdh_cf7_context_hidden_fields']['current_program_id'];
+			$curr_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $prog_id ) : (int) get_post_meta( $prog_id, 'major_relationship', true );
 		} elseif ( ! empty( $GLOBALS['ltdh_cf7_context_hidden_fields']['program_id'] ) ) {
-			$curr_id = (int) $GLOBALS['ltdh_cf7_context_hidden_fields']['program_id'];
-		} elseif ( function_exists( 'is_singular' ) && is_singular( 'program' ) ) {
+			$prog_id = (int) $GLOBALS['ltdh_cf7_context_hidden_fields']['program_id'];
+			$curr_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $prog_id ) : (int) get_post_meta( $prog_id, 'major_relationship', true );
+		} elseif ( function_exists( 'is_singular' ) && is_singular( 'major' ) ) {
 			$curr_id = get_the_ID();
+		} elseif ( function_exists( 'is_singular' ) && is_singular( 'program' ) ) {
+			$prog_id = get_the_ID();
+			$curr_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $prog_id ) : (int) get_post_meta( $prog_id, 'major_relationship', true );
 		}
 
 		$items = [];
-		foreach ($programs as $p) {
-			$label = function_exists( 'ltdh_format_program_select_label' )
-				? ltdh_format_program_select_label( $p->ID )
-				: $p->post_title;
-
+		foreach ($majors as $m) {
 			$items[] = [
-				'id'    => (string) $p->ID,
-				'label' => $label,
+				'id'    => (string) $m->ID,
+				'label' => $m->post_title,
 			];
 		}
 
-		// Sắp xếp danh sách chương trình theo thứ tự chữ cái của tên hiển thị
+		// Sắp xếp danh sách ngành theo thứ tự chữ cái của tên hiển thị
 		usort( $items, function( $a, $b ) {
 			return strcmp( mb_strtolower( $a['label'], 'UTF-8' ), mb_strtolower( $b['label'], 'UTF-8' ) );
 		} );
@@ -2668,6 +2675,16 @@ function ltdh_cf7_dynamic_programs($tag, $replace) {
 	return $tag;
 }
 add_filter('wpcf7_form_tag', 'ltdh_cf7_dynamic_programs', 10, 2);
+
+/**
+ * Ensure CF7 consultation form displays "Ngành học quan tâm" label consistently.
+ */
+add_filter( 'wpcf7_form_elements', function( $content ) {
+	if ( false !== strpos( $content, 'consult-program' ) ) {
+		$content = str_replace( 'Chương trình quan tâm', 'Ngành học quan tâm', $content );
+	}
+	return $content;
+} );
 
 // ----------------------------------------------------
 // 13. Fallback Image Helper
