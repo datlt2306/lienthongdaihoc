@@ -353,21 +353,20 @@ function ltdh_send_html_mail( $to, string $subject, string $message_html, array 
 
 /**
  * Build responsive HTML confirmation email for candidate.
+ * Clean, concise layout resilient to mobile Dark Mode.
  */
 function ltdh_build_student_email_html( array $data, int $lead_id ): string {
 	$name          = ! empty( $data['name'] ) ? esc_html( $data['name'] ) : 'Bạn';
-	$phone         = ! empty( $data['phone'] ) ? esc_html( $data['phone'] ) : 'N/A';
-	$email         = ! empty( $data['email'] ) ? esc_html( $data['email'] ) : 'N/A';
+	$phone         = ! empty( $data['phone'] ) ? esc_html( $data['phone'] ) : '';
+	$email         = ! empty( $data['email'] ) ? esc_html( $data['email'] ) : '';
 	$message       = ! empty( $data['message'] ) ? esc_html( $data['message'] ) : '';
 	$is_group_reg  = ! empty( $data['is_group_reg'] );
-	$training_type = ! empty( $data['training_type'] ) && 'N/A' !== $data['training_type'] ? esc_html( $data['training_type'] ) : 'Liên thông Đại học';
-	$campus        = ! empty( $data['campus'] ) && 'N/A' !== $data['campus'] ? esc_html( $data['campus'] ) : 'Trực tuyến / Linh hoạt';
 
-	$school_title = 'Chưa chọn';
+	$school_title = '';
 	if ( ! empty( $data['school_id'] ) ) {
 		$school_title = get_the_title( (int) $data['school_id'] );
 	}
-	$major_title = 'Chưa chọn';
+	$major_title = '';
 	if ( ! empty( $data['major_id'] ) ) {
 		$major_title = get_the_title( (int) $data['major_id'] );
 	}
@@ -389,151 +388,130 @@ function ltdh_build_student_email_html( array $data, int $lead_id ): string {
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="color-scheme" content="light dark">
+		<meta name="supported-color-schemes" content="light dark">
 		<title>Xác nhận đăng ký tư vấn tuyển sinh</title>
+		<style>
+			:root {
+				color-scheme: light dark;
+				supported-color-schemes: light dark;
+			}
+			@media (prefers-color-scheme: dark) {
+				.email-bg { background-color: #0f172a !important; }
+				.card-box { background-color: #1e293b !important; border-color: #334155 !important; }
+				.text-heading { color: #f8fafc !important; }
+				.text-body { color: #cbd5e1 !important; }
+				.info-table { background-color: #0f172a !important; border-color: #334155 !important; }
+				.info-label { color: #94a3b8 !important; }
+				.info-value { color: #f1f5f9 !important; }
+				.footer-box { background-color: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
+			}
+		</style>
 	</head>
-	<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;line-height:1.6;">
-		<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f1f5f9;padding:24px 12px;">
+	<body class="email-bg" style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;line-height:1.5;">
+		<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="email-bg" style="background-color:#f8fafc;padding:20px 12px;">
 			<tr>
 				<td align="center">
-					<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:620px;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.06);border:1px solid #e2e8f0;">
+					<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="card-box" style="max-width:520px;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;border-top:4px solid #2563eb;box-shadow:0 2px 10px rgba(0,0,0,0.04);">
 						
-						<!-- Header Banner -->
+						<!-- Header: Site Name & Lead Code -->
 						<tr>
-							<td style="background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%);padding:36px 32px 30px;text-align:center;color:#ffffff;">
-								<div style="display:inline-block;background:rgba(255,255,255,0.15);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:#93c5fd;margin-bottom:12px;">
-									Cổng Tuyển Sinh Liên Thông & Từ Xa Đại Học
-								</div>
-								<h1 style="margin:0 0 8px;font-size:24px;font-weight:700;line-height:1.3;color:#ffffff;">
-									XÁC NHẬN ĐĂNG KÝ TƯ VẤN
-								</h1>
-								<p style="margin:0;font-size:14px;color:#cbd5e1;">
-									Mã hồ sơ tiếp nhận: <strong style="color:#fbbf24;"><?php echo esc_html( $lead_code ); ?></strong>
-								</p>
-							</td>
-						</tr>
-
-						<!-- Body Content -->
-						<tr>
-							<td style="padding:32px 32px 24px;">
-								<p style="margin:0 0 16px;font-size:16px;line-height:1.6;">
-									Chào bạn <strong><?php echo $name; ?></strong>,
-								</p>
-								<p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.6;">
-									Cảm ơn bạn đã tin tưởng và đăng ký nhận tư vấn tuyển sinh tại <strong><?php echo esc_html( $site_name ); ?></strong>. Hệ thống đã tiếp nhận thông tin của bạn vào lúc <strong><?php echo esc_html( $created_time ); ?></strong>.
-								</p>
-
-								<?php if ( $is_group_reg ) : ?>
-								<!-- Group Registration Badge -->
-								<div style="background-color:#fef3c7;border-left:4px solid:#f59e0b;padding:14px 16px;border-radius:8px;margin-bottom:24px;color:#92400e;">
-									<strong style="font-size:14px;">👥 GÓI ĐĂNG KÝ THEO NHÓM - HỌC BỔNG ĐỒNG HÀNH</strong>
-									<p style="margin:4px 0 0;font-size:13px;color:#78350f;">
-										Bạn đã đăng ký theo chương trình nhóm bạn cùng tiến. Chuyên viên sẽ tư vấn cụ thể mức chiết khấu học phí và ưu đãi học bổng đồng hành dành cho bạn và bạn bè!
-									</p>
-								</div>
-								<?php endif; ?>
-
-								<!-- Information Card Table -->
-								<div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:28px;">
-									<h2 style="margin:0 0 16px;font-size:15px;text-transform:uppercase;color:#0f172a;letter-spacing:0.5px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;">
-										📋 Thông tin hồ sơ đăng ký
-									</h2>
-									<table width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size:14px;color:#334155;">
-										<tr>
-											<td width="38%" style="padding:8px 0;color:#64748b;">Họ và tên:</td>
-											<td width="62%" style="padding:8px 0;font-weight:600;color:#0f172a;"><?php echo $name; ?></td>
-										</tr>
-										<tr>
-											<td style="padding:8px 0;color:#64748b;">Số điện thoại:</td>
-											<td style="padding:8px 0;font-weight:600;color:#0f172a;"><?php echo $phone; ?></td>
-										</tr>
-										<?php if ( ! empty( $email ) && 'N/A' !== $email ) : ?>
-										<tr>
-											<td style="padding:8px 0;color:#64748b;">Email:</td>
-											<td style="padding:8px 0;color:#0f172a;"><?php echo $email; ?></td>
-										</tr>
-										<?php endif; ?>
-										<tr>
-											<td style="padding:8px 0;color:#64748b;">Ngành học quan tâm:</td>
-											<td style="padding:8px 0;font-weight:600;color:#1e3a8a;"><?php echo esc_html( $major_title ); ?></td>
-										</tr>
-										<tr>
-											<td style="padding:8px 0;color:#64748b;">Trường đại học:</td>
-											<td style="padding:8px 0;font-weight:600;color:#1e3a8a;"><?php echo esc_html( $school_title ); ?></td>
-										</tr>
-										<tr>
-											<td style="padding:8px 0;color:#64748b;">Hệ đào tạo:</td>
-											<td style="padding:8px 0;color:#0f172a;"><?php echo $training_type; ?></td>
-										</tr>
-										<tr>
-											<td style="padding:8px 0;color:#64748b;">Cơ sở / Khu vực:</td>
-											<td style="padding:8px 0;color:#0f172a;"><?php echo $campus; ?></td>
-										</tr>
-										<?php if ( ! empty( $message ) ) : ?>
-										<tr>
-											<td style="padding:8px 0;color:#64748b;vertical-align:top;">Lời nhắn / Yêu cầu:</td>
-											<td style="padding:8px 0;color:#0f172a;line-height:1.5;"><?php echo nl2br( $message ); ?></td>
-										</tr>
-										<?php endif; ?>
-									</table>
-								</div>
-
-								<!-- Next Steps Section -->
-								<h2 style="margin:0 0 16px;font-size:16px;font-weight:700;color:#0f172a;">
-									🚀 Quy trình hỗ trợ tiếp theo dành cho bạn:
-								</h2>
-								<div style="margin-bottom:28px;">
-									<div style="display:flex;margin-bottom:12px;">
-										<div style="background-color:#eff6ff;color:#2563eb;font-weight:700;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-size:14px;display:inline-block;margin-right:12px;vertical-align:top;">1</div>
-										<div style="display:inline-block;width:calc(100% - 44px);vertical-align:top;font-size:14px;color:#475569;">
-											<strong style="color:#0f172a;">Tiếp nhận & đối chiếu hồ sơ:</strong> Chuyên viên tuyển sinh sẽ rà soát điều kiện đầu vào và phương án miễn giảm môn học/tín chỉ theo văn bằng hiện tại của bạn.
-										</div>
-									</div>
-									<div style="display:flex;margin-bottom:12px;">
-										<div style="background-color:#eff6ff;color:#2563eb;font-weight:700;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-size:14px;display:inline-block;margin-right:12px;vertical-align:top;">2</div>
-										<div style="display:inline-block;width:calc(100% - 44px);vertical-align:top;font-size:14px;color:#475569;">
-											<strong style="color:#0f172a;">Tư vấn trực tiếp 1-1:</strong> Trong vòng <strong>15 - 30 phút</strong> (trong giờ làm việc), chuyên viên sẽ liên hệ với bạn qua số điện thoại/Zalo <strong><?php echo $phone; ?></strong> để cung cấp đầy đủ thông tin học phí, lịch khai giảng và hình thức học.
-										</div>
-									</div>
-									<div style="display:flex;">
-										<div style="background-color:#eff6ff;color:#2563eb;font-weight:700;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-size:14px;display:inline-block;margin-right:12px;vertical-align:top;">3</div>
-										<div style="display:inline-block;width:calc(100% - 44px);vertical-align:top;font-size:14px;color:#475569;">
-											<strong style="color:#0f172a;">Hoàn thiện thủ tục nhập học:</strong> Hướng dẫn đăng ký xét tuyển trực tuyến tiện lợi, an toàn, chuẩn quy chế của Bộ Giáo dục và Đào tạo.
-										</div>
-									</div>
-								</div>
-
-								<!-- Support Hotline Box -->
-								<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%);border-radius:12px;padding:20px;text-align:center;border:1px solid #bfdbfe;">
+							<td style="padding:22px 24px 14px;">
+								<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:14px;">
 									<tr>
-										<td>
-											<p style="margin:0 0 6px;font-size:13px;color:#1e40af;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">
-												Cần giải đáp thắc mắc khẩn cấp?
-											</p>
-											<p style="margin:0 0 14px;font-size:14px;color:#1e293b;">
-												Hotline Ban Tuyển Sinh hỗ trợ 24/7:
-											</p>
-											<a href="tel:<?php echo esc_attr( $clean_hotline ); ?>" style="display:inline-block;background-color:#2563eb;color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;padding:10px 24px;border-radius:8px;box-shadow:0 2px 8px rgba(37,99,235,0.3);">
-												📞 Gọi Hotline: <?php echo esc_html( $hotline ); ?>
-											</a>
+										<td align="left" style="font-size:12px;font-weight:700;letter-spacing:0.5px;color:#2563eb;text-transform:uppercase;">
+											<?php echo esc_html( $site_name ); ?>
+										</td>
+										<td align="right">
+											<span style="font-size:12px;font-weight:600;color:#64748b;background:#f1f5f9;padding:3px 8px;border-radius:6px;display:inline-block;">
+												Mã: <strong style="color:#0f172a;"><?php echo esc_html( $lead_code ); ?></strong>
+											</span>
 										</td>
 									</tr>
 								</table>
 
+								<h1 class="text-heading" style="margin:0 0 8px;font-size:19px;font-weight:700;color:#0f172a;line-height:1.35;">
+									Xác nhận đăng ký tư vấn tuyển sinh
+								</h1>
+								<p class="text-body" style="margin:0;font-size:14px;color:#475569;line-height:1.5;">
+									Chào bạn <strong><?php echo $name; ?></strong>, hệ thống đã tiếp nhận thông tin đăng ký của bạn lúc <strong><?php echo esc_html( $created_time ); ?></strong>.
+								</p>
 							</td>
 						</tr>
 
-						<!-- Footer -->
+						<?php if ( $is_group_reg ) : ?>
+						<!-- Group Registration Note -->
 						<tr>
-							<td style="background-color:#f8fafc;padding:24px 32px;text-align:center;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b;line-height:1.6;">
-								<p style="margin:0 0 6px;">
-									© <?php echo esc_html( date( 'Y' ) ); ?> <strong><?php echo esc_html( $site_name ); ?></strong>. Toàn bộ quyền được bảo lưu.
+							<td style="padding:0 24px 14px;">
+								<div style="background-color:#fef3c7;border-left:3px solid #f59e0b;padding:8px 12px;border-radius:6px;font-size:13px;color:#92400e;line-height:1.4;">
+									👥 <strong>Ưu đãi:</strong> Đăng ký theo nhóm bạn cùng tiến (học bổng đồng hành).
+								</div>
+							</td>
+						</tr>
+						<?php endif; ?>
+
+						<!-- Concise Information Box -->
+						<tr>
+							<td style="padding:0 24px 16px;">
+								<div class="info-table" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;">
+									<table width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size:13px;line-height:1.6;">
+										<tr>
+											<td class="info-label" width="34%" style="padding:4px 0;color:#64748b;">Họ và tên:</td>
+											<td class="info-value" width="66%" style="padding:4px 0;font-weight:600;color:#0f172a;"><?php echo $name; ?></td>
+										</tr>
+										<?php if ( ! empty( $phone ) ) : ?>
+										<tr>
+											<td class="info-label" style="padding:4px 0;color:#64748b;">Số điện thoại:</td>
+											<td class="info-value" style="padding:4px 0;font-weight:600;color:#0f172a;"><?php echo $phone; ?></td>
+										</tr>
+										<?php endif; ?>
+										<?php if ( ! empty( $email ) && 'N/A' !== $email ) : ?>
+										<tr>
+											<td class="info-label" style="padding:4px 0;color:#64748b;">Email:</td>
+											<td class="info-value" style="padding:4px 0;color:#0f172a;"><?php echo $email; ?></td>
+										</tr>
+										<?php endif; ?>
+										<tr>
+											<td class="info-label" style="padding:4px 0;color:#64748b;">Ngành học:</td>
+											<td class="info-value" style="padding:4px 0;font-weight:600;color:#2563eb;"><?php echo esc_html( $major_title ?: 'Tư vấn chọn ngành' ); ?></td>
+										</tr>
+										<?php if ( ! empty( $school_title ) && 'Chưa chọn' !== $school_title ) : ?>
+										<tr>
+											<td class="info-label" style="padding:4px 0;color:#64748b;">Trường đăng ký:</td>
+											<td class="info-value" style="padding:4px 0;font-weight:600;color:#0f172a;"><?php echo esc_html( $school_title ); ?></td>
+										</tr>
+										<?php endif; ?>
+										<?php if ( ! empty( $message ) ) : ?>
+										<tr>
+											<td class="info-label" style="padding:4px 0;color:#64748b;vertical-align:top;">Ghi chú:</td>
+											<td class="info-value" style="padding:4px 0;color:#334155;line-height:1.4;"><?php echo nl2br( $message ); ?></td>
+										</tr>
+										<?php endif; ?>
+									</table>
+								</div>
+							</td>
+						</tr>
+
+						<!-- Short Next Step & Hotline -->
+						<tr>
+							<td style="padding:0 24px 20px;">
+								<p class="text-body" style="margin:0 0 16px;font-size:14px;color:#475569;line-height:1.5;">
+									Chuyên viên tuyển sinh sẽ sớm liên hệ qua SĐT / Zalo (<strong><?php echo $phone; ?></strong>) để tư vấn chi tiết về hồ sơ, lịch khai giảng và học phí.
 								</p>
-								<p style="margin:0 0 8px;">
-									Website: <a href="<?php echo esc_url( $site_url ); ?>" style="color:#2563eb;text-decoration:none;"><?php echo esc_html( $site_url ); ?></a>
-								</p>
-								<p style="margin:0;font-size:11px;color:#94a3b8;">
-									🛡 Cam kết bảo mật thông tin cá nhân của ứng viên theo Nghị định 13/2023/NĐ-CP. Thư điện tử này được tạo tự động từ hệ thống tiếp nhận hồ sơ.
-								</p>
+
+								<div style="text-align:center;">
+									<a href="tel:<?php echo esc_attr( $clean_hotline ); ?>" style="display:inline-block;background-color:#2563eb;color:#ffffff !important;text-decoration:none;font-size:14px;font-weight:700;padding:10px 22px;border-radius:8px;box-shadow:0 2px 6px rgba(37,99,235,0.25);">
+										📞 Hotline tư vấn: <?php echo esc_html( $hotline ); ?>
+									</a>
+								</div>
+							</td>
+						</tr>
+
+						<!-- Minimal Footer -->
+						<tr>
+							<td class="footer-box" style="background-color:#f8fafc;padding:12px 24px;text-align:center;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8;line-height:1.5;">
+								<span style="color:#64748b;font-weight:600;"><?php echo esc_html( $site_name ); ?></span> • Hỗ trợ tuyển sinh trực tuyến<br>
+								Email gửi tự động từ hệ thống tiếp nhận hồ sơ.
 							</td>
 						</tr>
 
@@ -584,7 +562,15 @@ function ltdh_build_admin_email_html( array $data, int $lead_id ): string {
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="color-scheme" content="light dark">
+		<meta name="supported-color-schemes" content="light dark">
 		<title>Thông báo Lead Tuyển Sinh Mới</title>
+		<style>
+			:root {
+				color-scheme: light dark;
+				supported-color-schemes: light dark;
+			}
+		</style>
 	</head>
 	<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;line-height:1.5;">
 		<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f8fafc;padding:24px 12px;">
