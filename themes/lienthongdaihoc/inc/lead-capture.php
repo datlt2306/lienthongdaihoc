@@ -15,6 +15,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'after_switch_theme', 'ltdh_create_leads_table' );
 add_action( 'admin_init', 'ltdh_check_leads_table_schema' );
 
+/**
+ * Whitelist Contact Form 7 and theme REST API endpoints in AIOS (All-In-One Security)
+ * to prevent 403 Forbidden errors on visitor form submissions and AJAX tools.
+ */
+add_filter( 'aios_whitelisted_rest_routes', 'ltdh_whitelist_security_rest_routes' );
+function ltdh_whitelist_security_rest_routes( $routes ) {
+	if ( ! is_array( $routes ) ) {
+		$routes = [];
+	}
+	$essential = [ 'contact-form-7', 'ltdh' ];
+	foreach ( $essential as $route ) {
+		if ( ! in_array( $route, $routes, true ) ) {
+			$routes[] = $route;
+		}
+	}
+	return $routes;
+}
+
 function ltdh_create_leads_table() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . LTDH_TABLE_LEADS;
@@ -561,8 +579,10 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	if ( empty( $phone_val ) ) {
 		$phone_val = is_array( $posted_data['cf_phone'] ?? '' ) ? reset( $posted_data['cf_phone'] ) : ( $posted_data['cf_phone'] ?? '' );
 	}
-	$email_raw = $posted_data['your-email'] ?? ( $posted_data['your_email'] ?? ( $posted_data['cf_email'] ?? ( $posted_data['email'] ?? '' ) ) );
-	$email_val = is_array( $email_raw ) ? reset( $email_raw ) : $email_raw;
+	$email_val = is_array( $posted_data['your-email'] ?? '' ) ? reset( $posted_data['your-email'] ) : ( $posted_data['your-email'] ?? '' );
+	if ( empty( $email_val ) ) {
+		$email_val = is_array( $posted_data['cf_email'] ?? '' ) ? reset( $posted_data['cf_email'] ) : ( $posted_data['cf_email'] ?? '' );
+	}
 	$subj_val  = is_array( $posted_data['your-subject'] ?? '' ) ? reset( $posted_data['your-subject'] ) : ( $posted_data['your-subject'] ?? '' );
 	$msg_val   = is_array( $posted_data['your-message'] ?? '' ) ? reset( $posted_data['your-message'] ) : ( $posted_data['your-message'] ?? '' );
 	if ( empty( $msg_val ) ) {
