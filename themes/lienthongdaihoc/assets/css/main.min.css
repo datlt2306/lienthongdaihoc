@@ -7511,21 +7511,6 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
   transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box !important;
 }
-.ltdh-cf7-form select {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  max-width: 100%;
-}
-@media (max-width: 640px) {
-  .ltdh-cf7-form input[type="text"],
-    .ltdh-cf7-form input[type="tel"],
-    .ltdh-cf7-form input[type="email"],
-    .ltdh-cf7-form select,
-    .ltdh-cf7-form textarea {
-    font-size: 16px !important;
-  }
-}
 .ltdh-cf7-form input[type="text"]:focus,
 .ltdh-cf7-form input[type="tel"]:focus,
 .ltdh-cf7-form input[type="email"]:focus,
