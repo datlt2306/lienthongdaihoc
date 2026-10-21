@@ -156,8 +156,8 @@ function ltdh_get_mailer_from_name(): string {
 	}
 
 	// Respect WP Mail SMTP settings if configured
-	if ( function_exists( 'wp_mail_smtp' ) ) {
-		$smtp_name = wp_mail_smtp()->get_options()->get( 'mail', 'from_name' );
+	if ( class_exists( '\WPMailSMTP\Options' ) ) {
+		$smtp_name = \WPMailSMTP\Options::init()->get( 'mail', 'from_name' );
 		if ( ! empty( $smtp_name ) ) {
 			return sanitize_text_field( $smtp_name );
 		}
@@ -187,8 +187,8 @@ function ltdh_get_mailer_from_address(): string {
 	}
 
 	// Respect WP Mail SMTP settings if configured
-	if ( function_exists( 'wp_mail_smtp' ) ) {
-		$smtp_email = wp_mail_smtp()->get_options()->get( 'mail', 'from_email' );
+	if ( class_exists( '\WPMailSMTP\Options' ) ) {
+		$smtp_email = \WPMailSMTP\Options::init()->get( 'mail', 'from_email' );
 		if ( ! empty( $smtp_email ) && is_email( $smtp_email ) ) {
 			return sanitize_email( $smtp_email );
 		}
