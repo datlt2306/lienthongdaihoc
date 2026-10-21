@@ -561,10 +561,8 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	if ( empty( $phone_val ) ) {
 		$phone_val = is_array( $posted_data['cf_phone'] ?? '' ) ? reset( $posted_data['cf_phone'] ) : ( $posted_data['cf_phone'] ?? '' );
 	}
-	$email_val = is_array( $posted_data['your-email'] ?? '' ) ? reset( $posted_data['your-email'] ) : ( $posted_data['your-email'] ?? '' );
-	if ( empty( $email_val ) ) {
-		$email_val = is_array( $posted_data['cf_email'] ?? '' ) ? reset( $posted_data['cf_email'] ) : ( $posted_data['cf_email'] ?? '' );
-	}
+	$email_raw = $posted_data['your-email'] ?? ( $posted_data['your_email'] ?? ( $posted_data['cf_email'] ?? ( $posted_data['email'] ?? '' ) ) );
+	$email_val = is_array( $email_raw ) ? reset( $email_raw ) : $email_raw;
 	$subj_val  = is_array( $posted_data['your-subject'] ?? '' ) ? reset( $posted_data['your-subject'] ) : ( $posted_data['your-subject'] ?? '' );
 	$msg_val   = is_array( $posted_data['your-message'] ?? '' ) ? reset( $posted_data['your-message'] ) : ( $posted_data['your-message'] ?? '' );
 	if ( empty( $msg_val ) ) {

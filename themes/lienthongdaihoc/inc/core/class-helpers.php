@@ -1388,6 +1388,16 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 			<input type="tel" id="<?php echo esc_attr( $prefix . '-phone' ); ?>" name="your-phone" required autocomplete="tel" aria-required="true" pattern="^(0|\+84)(3|5|7|8|9)[0-9]{8}$" title="Vui lòng nhập số điện thoại Việt Nam hợp lệ (10 chữ số)" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="<?php esc_attr_e('Số điện thoại liên hệ (10 số)'); ?>">
 		</div>
 
+		<?php if ( 'consultation' === $type || 'contact' === $type ) : ?>
+			<div>
+				<div class="flex items-center justify-between mb-1">
+					<label for="<?php echo esc_attr( $prefix . '-email' ); ?>" class="block text-xs lg:text-sm font-semibold text-slate-700 lg:text-slate-600"><?php esc_html_e('Địa chỉ Email', 'ltdh'); ?></label>
+					<span class="text-[10px] text-slate-400"><?php esc_html_e('Nhận lộ trình & xác nhận', 'ltdh'); ?></span>
+				</div>
+				<input type="email" id="<?php echo esc_attr( $prefix . '-email' ); ?>" name="your-email" autocomplete="email" class="w-full border border-slate-200 rounded-xl lg:rounded-lg px-3.5 py-2.5 lg:py-3 text-sm focus:border-brand-primary focus:outline-none transition-all" placeholder="Ví dụ: hoten@gmail.com">
+			</div>
+		<?php endif; ?>
+
 		<?php if ( 'evaluation' === $type ) : ?>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
 				<div>

@@ -21,14 +21,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Check if automated email notifications are globally enabled.
  */
 function ltdh_is_email_notifications_enabled(): bool {
-	if ( defined( 'LTDH_EMAIL_NOTIFICATIONS_ENABLED' ) && ! LTDH_EMAIL_NOTIFICATIONS_ENABLED ) {
-		return false;
+	if ( defined( 'LTDH_EMAIL_NOTIFICATIONS_ENABLED' ) ) {
+		return (bool) LTDH_EMAIL_NOTIFICATIONS_ENABLED;
+	}
+
+	$opt_val = get_option( 'options_email_notifications_enabled', null );
+	if ( null !== $opt_val && '' !== $opt_val ) {
+		return ! empty( $opt_val );
 	}
 
 	if ( function_exists( 'get_field' ) ) {
 		$enabled = get_field( 'email_notifications_enabled', 'options' );
-		if ( null !== $enabled && false === (bool) $enabled ) {
-			return false;
+		if ( null !== $enabled && false !== $enabled && '' !== $enabled ) {
+			return (bool) $enabled;
 		}
 	}
 
@@ -43,14 +48,19 @@ function ltdh_is_student_email_enabled(): bool {
 		return false;
 	}
 
-	if ( defined( 'LTDH_EMAIL_STUDENT_CONFIRMATION' ) && ! LTDH_EMAIL_STUDENT_CONFIRMATION ) {
-		return false;
+	if ( defined( 'LTDH_EMAIL_STUDENT_CONFIRMATION' ) ) {
+		return (bool) LTDH_EMAIL_STUDENT_CONFIRMATION;
+	}
+
+	$opt_val = get_option( 'options_email_student_enabled', null );
+	if ( null !== $opt_val && '' !== $opt_val ) {
+		return ! empty( $opt_val );
 	}
 
 	if ( function_exists( 'get_field' ) ) {
 		$enabled = get_field( 'email_student_enabled', 'options' );
-		if ( null !== $enabled && false === (bool) $enabled ) {
-			return false;
+		if ( null !== $enabled && false !== $enabled && '' !== $enabled ) {
+			return (bool) $enabled;
 		}
 	}
 
@@ -65,14 +75,19 @@ function ltdh_is_admin_email_enabled(): bool {
 		return false;
 	}
 
-	if ( defined( 'LTDH_EMAIL_ADMIN_NOTIFICATION' ) && ! LTDH_EMAIL_ADMIN_NOTIFICATION ) {
-		return false;
+	if ( defined( 'LTDH_EMAIL_ADMIN_NOTIFICATION' ) ) {
+		return (bool) LTDH_EMAIL_ADMIN_NOTIFICATION;
+	}
+
+	$opt_val = get_option( 'options_email_admin_enabled', null );
+	if ( null !== $opt_val && '' !== $opt_val ) {
+		return ! empty( $opt_val );
 	}
 
 	if ( function_exists( 'get_field' ) ) {
 		$enabled = get_field( 'email_admin_enabled', 'options' );
-		if ( null !== $enabled && false === (bool) $enabled ) {
-			return false;
+		if ( null !== $enabled && false !== $enabled && '' !== $enabled ) {
+			return (bool) $enabled;
 		}
 	}
 
@@ -89,8 +104,13 @@ function ltdh_get_admin_notification_emails(): array {
 
 	if ( defined( 'LTDH_EMAIL_ADMIN_RECIPIENT' ) && ! empty( LTDH_EMAIL_ADMIN_RECIPIENT ) ) {
 		$recipients_str = LTDH_EMAIL_ADMIN_RECIPIENT;
-	} elseif ( function_exists( 'get_field' ) ) {
-		$recipients_str = (string) get_field( 'email_admin_recipients', 'options' );
+	} else {
+		$opt_recipients = get_option( 'options_email_admin_recipients', null );
+		if ( ! empty( $opt_recipients ) ) {
+			$recipients_str = (string) $opt_recipients;
+		} elseif ( function_exists( 'get_field' ) ) {
+			$recipients_str = (string) get_field( 'email_admin_recipients', 'options' );
+		}
 	}
 
 	$emails = [];
@@ -106,11 +126,14 @@ function ltdh_get_admin_notification_emails(): array {
 		}
 	}
 
-	// Fallback to WordPress admin email if no custom recipients are configured
+	// Fallback to WordPress admin email and master Gmail recipient
 	if ( empty( $emails ) ) {
 		$wp_admin = sanitize_email( get_option( 'admin_email' ) );
 		if ( is_email( $wp_admin ) ) {
 			$emails[] = $wp_admin;
+		}
+		if ( ! in_array( 'datlt2306@gmail.com', $emails, true ) ) {
+			$emails[] = 'datlt2306@gmail.com';
 		}
 	}
 
@@ -215,6 +238,11 @@ add_action( 'phpmailer_init', 'ltdh_configure_custom_smtp', 999 );
  * @param PHPMailer\PHPMailer\PHPMailer $phpmailer
  */
 function ltdh_configure_custom_smtp( $phpmailer ) {
+	// If WP Mail SMTP, FluentSMTP or any dedicated mailer is active, DO NOT override
+	if ( function_exists( 'wp_mail_smtp' ) || class_exists( '\WPMailSMTP\Options' ) || defined( 'WPMSE_DIR' ) ) {
+		return;
+	}
+
 	if ( ! function_exists( 'get_field' ) ) {
 		return;
 	}
@@ -293,13 +321,26 @@ function ltdh_send_html_mail( $to, string $subject, string $message_html, array 
 	add_filter( 'wp_mail_from_name', $name_filter, 999 );
 	add_filter( 'wp_mail_from', $email_filter, 999 );
 
+	$mail_error = '';
+	$failed_handler = static function ( $wp_error ) use ( &$mail_error ) {
+		if ( is_wp_error( $wp_error ) ) {
+			$mail_error = $wp_error->get_error_message();
+			error_log( '[LTDH wp_mail_failed] ' . $mail_error );
+		}
+	};
+	add_action( 'wp_mail_failed', $failed_handler );
+
 	try {
 		$sent = wp_mail( $to, $subject, $message_html, $headers );
+		if ( ! $sent && empty( $mail_error ) ) {
+			error_log( '[LTDH wp_mail] wp_mail returned false without WP_Error.' );
+		}
 	} catch ( \Throwable $e ) {
 		error_log( '[LTDH wp_mail Exception] ' . $e->getMessage() );
 		$sent = false;
 	}
 
+	remove_action( 'wp_mail_failed', $failed_handler );
 	remove_filter( 'wp_mail_from_name', $name_filter, 999 );
 	remove_filter( 'wp_mail_from', $email_filter, 999 );
 
@@ -724,12 +765,15 @@ function ltdh_trigger_email_notifications( array $data, int $lead_id = 0 ): arra
 	];
 
 	if ( ! ltdh_is_email_notifications_enabled() ) {
+		error_log( '[LTDH Email] Notification aborted: email notifications are globally disabled.' );
 		return $result;
 	}
 
 	$name         = ! empty( $data['name'] ) ? sanitize_text_field( $data['name'] ) : 'Học viên';
 	$student_mail = ! empty( $data['email'] ) ? sanitize_email( $data['email'] ) : '';
 	$is_group_reg = ! empty( $data['is_group_reg'] );
+
+	error_log( sprintf( '[LTDH Email] Triggering notifications for Lead #%d (%s, phone: %s, email: %s)', $lead_id, $name, $data['phone'] ?? 'N/A', $student_mail ?: 'none' ) );
 
 	$school_title = '';
 	if ( ! empty( $data['school_id'] ) ) {
@@ -760,6 +804,14 @@ function ltdh_trigger_email_notifications( array $data, int $lead_id = 0 ): arra
 		if ( ! $student_sent ) {
 			$result['student_error'] = 'Failed to deliver confirmation email to student (' . $student_mail . ').';
 			error_log( '[LTDH Email] ' . $result['student_error'] );
+		} else {
+			error_log( '[LTDH Email] Student confirmation email dispatched successfully to ' . $student_mail );
+		}
+	} else {
+		if ( empty( $student_mail ) ) {
+			error_log( '[LTDH Email] No student email provided; skipping student confirmation.' );
+		} elseif ( ! is_email( $student_mail ) ) {
+			error_log( '[LTDH Email] Invalid student email (' . $student_mail . '); skipping student confirmation.' );
 		}
 	}
 
@@ -785,9 +837,13 @@ function ltdh_trigger_email_notifications( array $data, int $lead_id = 0 ): arra
 			$result['admin_sent'] = $admin_sent;
 
 			if ( ! $admin_sent ) {
-				$result['admin_error'] = 'Failed to deliver notification email to admin recipients.';
+				$result['admin_error'] = 'Failed to deliver notification email to admin recipients: ' . implode( ', ', $admin_recipients );
 				error_log( '[LTDH Email] ' . $result['admin_error'] );
+			} else {
+				error_log( '[LTDH Email] Admin alert email dispatched successfully to ' . implode( ', ', $admin_recipients ) );
 			}
+		} else {
+			error_log( '[LTDH Email] No admin recipient emails resolved; skipping admin alert.' );
 		}
 	}
 
