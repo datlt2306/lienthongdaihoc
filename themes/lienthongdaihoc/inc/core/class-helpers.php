@@ -1471,6 +1471,11 @@ function ltdh_get_optimized_image_url( string $url, $variant = false ): string {
 		return '';
 	}
 
+	// Preserve offloaded Cloudflare R2 / S3 / external CDN URLs
+	if ( strpos( $url, 'r2.dev' ) !== false || strpos( $url, 'cloudflarestorage.com' ) !== false || ( function_exists( 'advmo_get_provider_credential' ) && ( $cdn_domain = advmo_get_provider_credential( 'cloudflare_r2', 'domain' ) ) && strpos( $url, parse_url( $cdn_domain, PHP_URL_HOST ) ?: $cdn_domain ) !== false ) ) {
+		return $url;
+	}
+
 	$parsed_path = parse_url( $url, PHP_URL_PATH );
 	if ( empty( $parsed_path ) ) {
 		return $url;
@@ -2518,17 +2523,80 @@ function ltdh_get_program_learning_details(int $program_id): array {
 }
 
 // ----------------------------------------------------
-// 12. Dynamic CF7 Program Selector
+// 12. Dynamic CF7 Program Selector & Option Label Formatter
 // ----------------------------------------------------
 
+/**
+ * Format standard label for program select dropdowns in consultation and registration forms.
+ * Format: "Tên chương trình - Hệ - Mã trường" (VD: "Công nghệ thông tin - Đào tạo từ xa - UTC")
+ *
+ * @param int|WP_Post $program Program ID or post object.
+ * @return string Formatted program label.
+ */
+function ltdh_format_program_select_label( $program ): string {
+	$prog_id = is_object( $program ) ? $program->ID : absint( $program );
+	if ( ! $prog_id ) {
+		return '';
+	}
+
+	$prog_name = '';
+
+	// 1. Chuyên ngành đào tạo cụ thể (nếu có)
+	$spec_title = function_exists( 'get_field' ) ? get_field( 'specialization_title', $prog_id ) : '';
+	if ( empty( $spec_title ) ) {
+		$spec_title = get_post_meta( $prog_id, 'specialization_title', true );
+	}
+	if ( empty( $spec_title ) ) {
+		$spec_title = function_exists( 'get_field' ) ? get_field( 'chuyen_nganh', $prog_id ) : '';
+		if ( empty( $spec_title ) ) {
+			$spec_title = get_post_meta( $prog_id, 'chuyen_nganh', true );
+		}
+	}
+	if ( ! empty( $spec_title ) && is_string( $spec_title ) ) {
+		$prog_name = $spec_title;
+	}
+
+	// 2. Tên ngành đào tạo liên kết (major_relationship)
+	if ( empty( $prog_name ) ) {
+		$major_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $prog_id ) : 0;
+		if ( $major_id ) {
+			$prog_name = get_the_title( $major_id );
+		}
+	}
+
+	// 3. Fallback: Tiêu đề chương trình đã làm sạch qua helper chuẩn
+	if ( empty( $prog_name ) ) {
+		$prog_name = function_exists( 'ltdh_get_program_discipline_name' ) ? ltdh_get_program_discipline_name( $prog_id ) : get_the_title( $prog_id );
+	}
+
+	$prog_name = preg_replace( '/^(?:ngành|chuyên ngành|cử nhân|kỹ sư)\s+/iu', '', trim( (string) $prog_name ) );
+	$prog_name = preg_replace( '/\s*\([^)]*\)$/u', '', $prog_name );
+	$prog_name = trim( $prog_name, " -–—\t\n\r\0\x0B" );
+	if ( ! empty( $prog_name ) ) {
+		$prog_name = mb_strtoupper( mb_substr( $prog_name, 0, 1, 'UTF-8' ), 'UTF-8' ) . mb_substr( $prog_name, 1, null, 'UTF-8' );
+	}
+
+	$terms      = wp_get_post_terms( $prog_id, 'training_type' );
+	$type_name  = ( ! empty( $terms ) && ! is_wp_error( $terms ) ) ? trim( (string) $terms[0]->name ) : '';
+	$clean_type = preg_replace( '/^hệ\s+/iu', '', $type_name );
+
+	$school_id   = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $prog_id ) : 0;
+	$school_code = $school_id ? ( function_exists( 'ltdh_get_school_code' ) ? ltdh_get_school_code( $school_id ) : get_post_meta( $school_id, 'school_code', true ) ) : '';
+	if ( empty( $school_code ) && $school_id ) {
+		$school_title = get_the_title( $school_id );
+		$school_code  = preg_replace( '/^trường\s+đại\s+học\s+/iu', 'ĐH ', trim( (string) $school_title ) );
+	}
+
+	$parts = array_filter( [ $prog_name, $clean_type, $school_code ] );
+	return ! empty( $parts ) ? implode( ' - ', $parts ) : get_the_title( $prog_id );
+}
+
 function ltdh_cf7_dynamic_programs($tag, $replace) {
-	if ('current_program_id' === $tag['name']) {
+	if ('current_program_id' === $tag['name'] || 'program_id' === $tag['name']) {
 		$programs = get_posts([
 			'post_type'   => defined('LTDH_CPT_PROGRAM') ? LTDH_CPT_PROGRAM : 'program',
 			'post_status' => 'publish',
 			'numberposts' => -1,
-			'orderby'     => 'title',
-			'order'       => 'ASC',
 		]);
 		$tag['raw_values'] = [];
 		$tag['values']     = [];
@@ -2547,15 +2615,32 @@ function ltdh_cf7_dynamic_programs($tag, $replace) {
 			$curr_id = get_the_ID();
 		}
 
+		$items = [];
+		foreach ($programs as $p) {
+			$label = function_exists( 'ltdh_format_program_select_label' )
+				? ltdh_format_program_select_label( $p->ID )
+				: $p->post_title;
+
+			$items[] = [
+				'id'    => (string) $p->ID,
+				'label' => $label,
+			];
+		}
+
+		// Sắp xếp danh sách chương trình theo thứ tự chữ cái của tên hiển thị
+		usort( $items, function( $a, $b ) {
+			return strcmp( mb_strtolower( $a['label'], 'UTF-8' ), mb_strtolower( $b['label'], 'UTF-8' ) );
+		} );
+
 		$selected_idx = 0;
 		$idx = 1;
-		foreach ($programs as $p) {
+		foreach ($items as $item) {
 			$idx++;
-			$tag['raw_values'][] = (string) $p->ID;
-			$tag['values'][]     = (string) $p->ID;
-			$tag['labels'][]     = $p->post_title;
+			$tag['raw_values'][] = $item['id'];
+			$tag['values'][]     = $item['id'];
+			$tag['labels'][]     = $item['label'];
 
-			if ( $curr_id && (int) $p->ID === $curr_id ) {
+			if ( $curr_id && (int) $item['id'] === $curr_id ) {
 				$selected_idx = $idx;
 			}
 		}

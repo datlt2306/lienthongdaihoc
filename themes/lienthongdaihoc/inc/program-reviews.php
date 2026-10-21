@@ -1223,7 +1223,7 @@ function ltdh_render_review_metabox_html( $post ) {
 						<option value="">-- Chọn chương trình --</option>
 						<?php foreach ( $programs as $p ) : ?>
 							<option value="<?php echo esc_attr( $p->ID ); ?>" <?php selected( $program_id, $p->ID ); ?>>
-								<?php echo esc_html( $p->post_title ); ?>
+								<?php echo esc_html( function_exists( 'ltdh_format_program_select_label' ) ? ltdh_format_program_select_label( $p->ID ) : $p->post_title ); ?>
 							</option>
 						<?php endforeach; ?>
 					</select>

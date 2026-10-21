@@ -210,7 +210,32 @@ run_test( 'Hidden fields filter successfully merges context into CF7 hidden fiel
 // ----------------------------------------------------
 echo "\n--- SUITE 8: DYNAMIC PROGRAM SELECTOR ---\n";
 
-run_test( 'wpcf7_form_tag filter populates numerical program IDs for current_program_id', function() {
+run_test( 'Function ltdh_format_program_select_label exists and formats program labels as "Tên chương trình - Hệ - Mã trường"', function() {
+	if ( ! function_exists( 'ltdh_format_program_select_label' ) ) {
+		return false;
+	}
+
+	$programs = get_posts( [
+		'post_type'   => 'program',
+		'post_status' => 'publish',
+		'numberposts' => 10,
+	] );
+	if ( empty( $programs ) ) {
+		return true;
+	}
+
+	$checked = false;
+	foreach ( $programs as $p ) {
+		$label = ltdh_format_program_select_label( $p->ID );
+		if ( ! empty( $label ) && strpos( $label, ' - ' ) !== false ) {
+			$checked = true;
+			break;
+		}
+	}
+	return $checked;
+} );
+
+run_test( 'wpcf7_form_tag filter populates numerical program IDs and formatted labels for current_program_id', function() {
 	$dummy_tag = [
 		'name'       => 'current_program_id',
 		'raw_values' => [],
@@ -219,7 +244,7 @@ run_test( 'wpcf7_form_tag filter populates numerical program IDs for current_pro
 	];
 
 	$filtered_tag = apply_filters( 'wpcf7_form_tag', $dummy_tag, false );
-	return ! empty( $filtered_tag['values'] ) && ! empty( $filtered_tag['labels'] );
+	return ! empty( $filtered_tag['values'] ) && ! empty( $filtered_tag['labels'] ) && in_array( '-- Chọn ngành hoặc hệ học --', $filtered_tag['labels'], true );
 } );
 
 // ----------------------------------------------------
