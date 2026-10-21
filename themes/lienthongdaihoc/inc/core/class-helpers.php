@@ -2588,13 +2588,16 @@ function ltdh_format_program_select_label( $program ): string {
 
 	$terms      = wp_get_post_terms( $prog_id, 'training_type' );
 	$type_name  = ( ! empty( $terms ) && ! is_wp_error( $terms ) ) ? trim( (string) $terms[0]->name ) : '';
-	$clean_type = preg_replace( '/^hệ\s+/iu', '', $type_name );
+	$clean_type = preg_replace( '/^(?:hệ\s+|đào\s+tạo\s+)/iu', '', $type_name );
+	if ( ! empty( $clean_type ) ) {
+		$clean_type = mb_strtoupper( mb_substr( $clean_type, 0, 1, 'UTF-8' ), 'UTF-8' ) . mb_substr( $clean_type, 1, null, 'UTF-8' );
+	}
 
 	$school_id   = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $prog_id ) : 0;
 	$school_code = $school_id ? ( function_exists( 'ltdh_get_school_code' ) ? ltdh_get_school_code( $school_id ) : get_post_meta( $school_id, 'school_code', true ) ) : '';
 	if ( empty( $school_code ) && $school_id ) {
 		$school_title = get_the_title( $school_id );
-		$school_code  = preg_replace( '/^trường\s+đại\s+học\s+/iu', 'ĐH ', trim( (string) $school_title ) );
+		$school_code  = preg_replace( '/^(?:trường\s+)?đại\s+học\s+/iu', 'ĐH ', trim( (string) $school_title ) );
 	}
 
 	$parts = array_filter( [ $prog_name, $clean_type, $school_code ] );
