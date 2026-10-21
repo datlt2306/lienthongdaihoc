@@ -344,7 +344,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 /* Active Category Column in Mega Menu */
 .nav-primary-menu li.menu-item-category.current-menu-ancestor > a.mega-cat-header-link,
 .nav-primary-menu li.menu-item-category.current-menu-item > a.mega-cat-header-link {
-    background: #f0f7ff;
+    background: #fff;
     border-color: #bfdbfe;
 }
 .nav-primary-menu li.menu-item-category.current-menu-ancestor > a.mega-cat-header-link .mega-cat-name,
@@ -738,8 +738,8 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 
 /* Level 2: Category Row */
 .nav-mobile-menu li.menu-item-category > .mobile-menu-item-row {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: #fff;
+    border: 1px solid #fff;
     border-radius: 0.625rem;
     margin: 0.25rem 0;
     transition: all 0.15s ease;
@@ -761,8 +761,8 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-mobile-menu li.menu-item-category.is-open > .mobile-menu-item-row,
 .nav-mobile-menu li.menu-item-category.current-menu-ancestor > .mobile-menu-item-row {
     background: #ffffff;
-    border-color: #cbd5e1;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+    border-color: #fff;
+    box-shadow: none;
 }
 .nav-mobile-menu li.menu-item-category.is-open > .mobile-menu-item-row a,
 .nav-mobile-menu li.menu-item-category.current-menu-ancestor > .mobile-menu-item-row a {
