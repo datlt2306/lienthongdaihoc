@@ -334,8 +334,45 @@ function ltdh_get_current_route_info( string $uri = '' ): array {
 	$cpt_school  = defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school';
 	$cpt_major   = defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major';
 
-	// 1. Check WordPress native conditional tags
-	if ( function_exists( 'is_singular' ) ) {
+	// 1. Taxonomy & Archive route matching (Run first to establish archive vs singular context)
+	if ( preg_match( '#^(?:hinh-thuc-dao-tao|he-dao-tao)(?:/([^/]+))?#i', $path, $t_match ) ) {
+		$info['is_training_archive'] = true;
+		if ( ! empty( $t_match[1] ) && 'page' !== $t_match[1] ) {
+			$info['training_type_slug'] = $t_match[1];
+		}
+	}
+
+	if ( preg_match( '#^(?:nhom-nganh|nganh-hoc)(?:/([^/]+))?#i', $path, $c_match ) ) {
+		$info['is_major_archive'] = true;
+		if ( ! empty( $c_match[1] ) && 'page' !== $c_match[1] ) {
+			$info['major_cat_slug'] = $c_match[1];
+		}
+	}
+
+	if ( preg_match( '#^(?:truong-doi-tac|truong-dao-tao|danh-sach-truong)#i', $path ) ) {
+		$info['is_school_archive'] = true;
+	}
+
+	if ( function_exists( 'is_post_type_archive' ) ) {
+		if ( is_post_type_archive( $cpt_major ) || ( function_exists( 'is_tax' ) && is_tax( defined( 'LTDH_TAX_MAJOR_CAT' ) ? LTDH_TAX_MAJOR_CAT : 'major_cat' ) ) ) {
+			$info['is_major_archive'] = true;
+		}
+		if ( is_post_type_archive( $cpt_school ) ) {
+			$info['is_school_archive'] = true;
+		}
+		if ( is_post_type_archive( $cpt_program ) || ( function_exists( 'is_tax' ) && is_tax( defined( 'LTDH_TAX_TRAINING_TYPE' ) ? LTDH_TAX_TRAINING_TYPE : 'training_type' ) ) ) {
+			$info['is_training_archive'] = true;
+		}
+	}
+
+	// 2. Check WordPress native conditional tags (Only for singular views)
+	$is_any_archive = $info['is_major_archive'] || $info['is_school_archive'] || $info['is_training_archive']
+		|| ( function_exists( 'is_archive' ) && is_archive() )
+		|| ( function_exists( 'is_home' ) && is_home() )
+		|| ( function_exists( 'is_front_page' ) && is_front_page() )
+		|| ( function_exists( 'is_search' ) && is_search() );
+
+	if ( ! $is_any_archive && function_exists( 'is_singular' ) ) {
 		if ( is_singular( $cpt_program ) ) {
 			$info['is_program'] = true;
 			$info['program_id'] = (int) get_the_ID();
@@ -348,8 +385,8 @@ function ltdh_get_current_route_info( string $uri = '' ): array {
 		}
 	}
 
-	// 2. Check global $post if conditional tags did not fire
-	if ( ! $info['is_program'] && ! $info['is_school'] && ! $info['is_major'] ) {
+	// 3. Check global $post ONLY if NOT in an archive/tax/home context and singular tags did not fire
+	if ( ! $is_any_archive && ! $info['is_program'] && ! $info['is_school'] && ! $info['is_major'] ) {
 		global $post;
 		if ( ! empty( $post->post_type ) ) {
 			if ( $post->post_type === $cpt_program ) {
@@ -365,8 +402,8 @@ function ltdh_get_current_route_info( string $uri = '' ): array {
 		}
 	}
 
-	// 3. Fallback resolution via URL slug for testing/simulated environments
-	if ( ! $info['is_program'] && ! $info['is_school'] && ! $info['is_major'] && ! empty( $path ) ) {
+	// 4. Fallback resolution via URL slug for testing/simulated environments (Only if NOT archive)
+	if ( ! $is_any_archive && ! $info['is_program'] && ! $info['is_school'] && ! $info['is_major'] && ! empty( $path ) ) {
 		if ( preg_match( '#^(?:nganh-|nganh/)([^/]+)$#i', $path, $m_match ) ) {
 			if ( function_exists( 'get_posts' ) ) {
 				$pts = get_posts( [
@@ -409,7 +446,21 @@ function ltdh_get_current_route_info( string $uri = '' ): array {
 		}
 	}
 
-	// 4. Retrieve associated taxonomies for matched items
+	// 5. Clean up archive guarantees
+	if ( $info['is_major_archive'] ) {
+		$info['is_major'] = false;
+		$info['major_id'] = 0;
+	}
+	if ( $info['is_training_archive'] ) {
+		$info['is_program'] = false;
+		$info['program_id'] = 0;
+	}
+	if ( $info['is_school_archive'] ) {
+		$info['is_school'] = false;
+		$info['school_id'] = 0;
+	}
+
+	// 6. Retrieve associated taxonomies for matched singular items
 	if ( $info['is_program'] && $info['program_id'] && function_exists( 'get_the_terms' ) ) {
 		$tax_tt = defined( 'LTDH_TAX_TRAINING_TYPE' ) ? LTDH_TAX_TRAINING_TYPE : 'training_type';
 		$terms  = get_the_terms( $info['program_id'], $tax_tt );
@@ -424,25 +475,6 @@ function ltdh_get_current_route_info( string $uri = '' ): array {
 		if ( ! empty( $cats ) && ! is_wp_error( $cats ) ) {
 			$info['major_cat_slug'] = $cats[0]->slug;
 		}
-	}
-
-	// 5. Taxonomy & Archive route matching
-	if ( preg_match( '#^(?:hinh-thuc-dao-tao|he-dao-tao)(?:/([^/]+))?#i', $path, $t_match ) ) {
-		$info['is_training_archive'] = true;
-		if ( ! empty( $t_match[1] ) && 'page' !== $t_match[1] ) {
-			$info['training_type_slug'] = $t_match[1];
-		}
-	}
-
-	if ( preg_match( '#^(?:nhom-nganh|nganh-hoc)(?:/([^/]+))?#i', $path, $c_match ) ) {
-		$info['is_major_archive'] = true;
-		if ( ! empty( $c_match[1] ) && 'page' !== $c_match[1] ) {
-			$info['major_cat_slug'] = $c_match[1];
-		}
-	}
-
-	if ( preg_match( '#^(?:truong-doi-tac|truong-dao-tao|danh-sach-truong)#i', $path ) ) {
-		$info['is_school_archive'] = true;
 	}
 
 	$cache[ $uri ] = $info;
