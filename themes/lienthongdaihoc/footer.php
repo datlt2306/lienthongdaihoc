@@ -12,8 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 $hotline   = ltdh_get_hotline();
 $zalo      = ltdh_get_zalo_url();
 $messenger = ltdh_get_messenger_url();
-$address   = function_exists( 'ltdh_get_address' ) ? ltdh_get_address() : 'Tầng 2 – Khu Hiệu bộ, 306B Kim Mã, phường Giảng Võ, Hà Nội';
-$email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'hotro@lienthongdaihoc.com';
+$address   = function_exists( 'ltdh_get_address' ) ? ltdh_get_address() : 'Số 71 ngõ 32/84 Đỗ Đức Dục, Nam Từ Liêm, HN';
+$email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lienthongdaihoc.com';
 ?>
 
 	<footer id="colophon" class="site-footer text-slate-400 pt-10 pb-28 md:py-16 border-t border-slate-800/80" style="background-color: #0d192d;">
@@ -29,7 +29,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'hotro@lie
 					</div>
 					
 					<p class="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
-    Kênh thông tin tuyển sinh Liên thông đại học các hệ Chính Quy, Vừa học vừa làm và Đào tạo từ xa. Hỗ trợ bạn tìm hiểu ngành học, điều kiện tuyển sinh và lựa chọn chương trình phù hợp với công việc, thời gian của mình.
+    Kênh thông tin tuyển sinh Liên thông Đại học, Vừa học vừa làm và Đào tạo từ xa. Hỗ trợ bạn tìm hiểu ngành học, điều kiện tuyển sinh và lựa chọn chương trình phù hợp với công việc, thời gian của mình.
 					</p>
 
 					<!-- Social Links Circles (Thumb-friendly 40x40px touch targets) -->
@@ -148,6 +148,8 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'hotro@lie
 							<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
 						</a>
 					</div>
+						<a href="//www.dmca.com/Protection/Status.aspx?ID=3639cda6-dc5f-4f9a-ada9-7f14ca3a390d" title="DMCA.com Protection Status" class="dmca-badge mt-5 block"> <img src ="https://images.dmca.com/Badges/dmca_protected_sml_120d.png?ID=3639cda6-dc5f-4f9a-ada9-7f14ca3a390d"  alt="DMCA.com Protection Status" /></a>  <script src="https://images.dmca.com/Badges/DMCABadgeHelper.min.js"> </script>
+
 				</div>
 			</div>
 
@@ -451,7 +453,6 @@ if ( is_singular( 'program' ) ) {
 	});
 })();
 </script>
-
 <?php wp_footer(); ?>
 </body>
 </html>
