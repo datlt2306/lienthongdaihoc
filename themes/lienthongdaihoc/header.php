@@ -63,6 +63,7 @@
 	<link rel="preload" as="style" href="<?php echo esc_url( get_template_directory_uri() . '/assets/css/main.min.css?ver=' . filemtime( $ltdh_css_file ) ); ?>" fetchpriority="high">
 	<?php endif; ?>
 
+	<meta name='dmca-site-verification' content='QWRCRnhPdmkwVTZVK0tJVHhpMUpJaFRKb0NPRG5ZU3JOKzRISTR5Nm5Icz01' />
 	<?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>

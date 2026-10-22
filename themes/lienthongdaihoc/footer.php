@@ -12,8 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 $hotline   = ltdh_get_hotline();
 $zalo      = ltdh_get_zalo_url();
 $messenger = ltdh_get_messenger_url();
-$address   = function_exists( 'ltdh_get_address' ) ? ltdh_get_address() : 'Số 71 ngõ 32/84 Đỗ Đức Dục, Nam Từ Liêm, HN';
-$email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lienthongdaihoc.com';
+$address   = function_exists( 'ltdh_get_address' ) ? ltdh_get_address() : 'Tầng 2 – Khu Hiệu bộ, 306B Kim Mã, phường Giảng Võ, Hà Nội';
+$email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'hotro@lienthongdaihoc.com';
 ?>
 
 	<footer id="colophon" class="site-footer text-slate-400 pt-10 pb-28 md:py-16 border-t border-slate-800/80" style="background-color: #0d192d;">
@@ -29,7 +29,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 					</div>
 					
 					<p class="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
-    Kênh thông tin tuyển sinh Liên thông Đại học, Vừa học vừa làm và Đào tạo từ xa. Hỗ trợ bạn tìm hiểu ngành học, điều kiện tuyển sinh và lựa chọn chương trình phù hợp với công việc, thời gian của mình.
+    Kênh thông tin tuyển sinh Liên thông đại học các hệ Chính Quy, Vừa học vừa làm và Đào tạo từ xa. Hỗ trợ bạn tìm hiểu ngành học, điều kiện tuyển sinh và lựa chọn chương trình phù hợp với công việc, thời gian của mình.
 					</p>
 
 					<!-- Social Links Circles (Thumb-friendly 40x40px touch targets) -->
