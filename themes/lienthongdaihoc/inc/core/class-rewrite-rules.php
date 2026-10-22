@@ -280,6 +280,13 @@ add_filter( 'request', 'ltdh_program_request_guard' );
  */
 function ltdh_program_permalink( $url, $post ) {
 	if ( $post instanceof WP_Post ) {
+		// Keep WordPress' placeholder while building the admin sample permalink.
+		// Otherwise get_sample_permalink_html() sees only a concrete URL and
+		// intentionally omits the Edit slug button.
+		if ( 'sample' === $post->filter ) {
+			return $url;
+		}
+
 		if ( in_array( $post->post_type, [ 'program', 'school' ], true ) ) {
 			return home_url( '/' . $post->post_name . '/' );
 		}
@@ -290,6 +297,79 @@ function ltdh_program_permalink( $url, $post ) {
 	return $url;
 }
 add_filter( 'post_type_link', 'ltdh_program_permalink', 10, 2 );
+
+/**
+ * Keep the slug editable in the classic admin editor even when the site's
+ * global permalink structure is plain or the post is still a draft.
+ *
+ * @param array   $permalink Sample permalink and editable slug.
+ * @param int     $post_id   Post ID.
+ * @param string  $title     Optional replacement title.
+ * @param string  $name      Optional replacement slug.
+ * @param WP_Post $post      Post object.
+ * @return array
+ */
+function ltdh_editable_cpt_sample_permalink( $permalink, $post_id, $title, $name, $post ) {
+	if ( ! $post instanceof WP_Post || ! in_array( $post->post_type, [ 'program', 'school', 'major' ], true ) ) {
+		return $permalink;
+	}
+
+	$placeholder = 'major' === $post->post_type ? '%pagename%' : '%postname%';
+	$prefix      = 'major' === $post->post_type ? '/nganh-' : '/';
+
+	$permalink[0] = home_url( $prefix . $placeholder . '/' );
+
+	return $permalink;
+}
+add_filter( 'get_sample_permalink', 'ltdh_editable_cpt_sample_permalink', 99, 5 );
+
+/**
+ * Auto-size the admin slug input to its current value instead of WordPress'
+ * fixed 16em width.
+ */
+function ltdh_admin_slug_autosize_script() {
+	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+	if ( ! $screen || ! in_array( $screen->post_type, [ 'program', 'school', 'major' ], true ) ) {
+		return;
+	}
+	?>
+	<style>
+		#editable-post-name input {
+			width: auto;
+			min-width: 16em;
+			max-width: min( 60vw, 800px );
+		}
+	</style>
+	<script>
+		jQuery(function($) {
+			function sizeSlugInput() {
+				var input = $('#editable-post-name input')[0];
+				if (!input) {
+					return;
+				}
+
+				var style = window.getComputedStyle(input);
+				var canvas = sizeSlugInput.canvas || (sizeSlugInput.canvas = document.createElement('canvas'));
+				var context = canvas.getContext('2d');
+				context.font = style.font;
+
+				var textWidth = context.measureText(input.value || '').width;
+				var extraWidth = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight) + 10;
+				var maxWidth = Math.min(window.innerWidth * 0.6, 800);
+				input.style.width = Math.min(Math.max(textWidth + extraWidth, 160), maxWidth) + 'px';
+			}
+
+			$(document).on('click', '.edit-slug', function() {
+				window.setTimeout(sizeSlugInput, 0);
+			});
+			$(document).on('input', '#editable-post-name input', sizeSlugInput);
+			sizeSlugInput();
+		});
+	</script>
+	<?php
+}
+add_action( 'admin_footer-post.php', 'ltdh_admin_slug_autosize_script' );
+add_action( 'admin_footer-post-new.php', 'ltdh_admin_slug_autosize_script' );
 
 /**
  * Serve single-program.php when WordPress resolves a program post.
