@@ -238,6 +238,14 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 				<svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
 				<span>Đang học</span>
 			</button>
+
+			<button type="button" 
+			        data-filter-type="status" 
+			        data-filter-value="interested" 
+			        class="ltdh-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer shrink-0 bg-white text-slate-700 border-slate-200 hover:border-slate-300 flex items-center gap-1.5">
+				<svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+				<span>Mới đăng ký</span>
+			</button>
 		</div>
 
 		<!-- Aspect Tag Chips -->

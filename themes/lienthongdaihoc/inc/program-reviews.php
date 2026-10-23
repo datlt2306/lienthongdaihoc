@@ -621,7 +621,7 @@ function ltdh_handle_get_program_reviews() {
 		];
 	}
 
-	if ( ! empty( $status ) && in_array( $status, [ 'graduated', 'studying' ], true ) ) {
+	if ( ! empty( $status ) && in_array( $status, [ 'graduated', 'studying', 'interested' ], true ) ) {
 		$meta_query[] = [
 			'key'     => '_review_student_status',
 			'value'   => $status,
@@ -736,6 +736,8 @@ function ltdh_render_review_card( int $review_id ) {
 		$status_label = 'Cựu sinh viên đã tốt nghiệp';
 	} elseif ( $status_type === 'studying' ) {
 		$status_label = 'Học viên đang theo học';
+	} elseif ( $status_type === 'interested' ) {
+		$status_label = 'Học viên mới đăng ký';
 	}
 
 	$all_aspect_labels = ltdh_get_review_aspect_tags();
