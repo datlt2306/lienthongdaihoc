@@ -884,21 +884,7 @@ function ltdh_render_review_card( int $review_id ) {
  * @return string
  */
 function ltdh_mask_student_name( string $name ): string {
-	$parts = explode( ' ', trim( $name ) );
-	$count = count( $parts );
-	if ( $count <= 1 ) {
-		return $name;
-	}
-	if ( $count === 2 ) {
-		return $parts[0] . ' ' . mb_substr( $parts[1], 0, 1, 'UTF-8' ) . '***';
-	}
-	// 3 or more words: mask middle word(s)
-	$masked = $parts[0] . ' ';
-	for ( $i = 1; $i < $count - 1; $i++ ) {
-		$masked .= mb_substr( $parts[ $i ], 0, 1, 'UTF-8' ) . '*** ';
-	}
-	$masked .= $parts[ $count - 1 ];
-	return $masked;
+	return trim( $name );
 }
 
 // ----------------------------------------------------
