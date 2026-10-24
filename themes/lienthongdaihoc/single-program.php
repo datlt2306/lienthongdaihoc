@@ -102,13 +102,6 @@ if ( ! empty( $curriculum_url ) ) {
 	];
 }
 
-$program_tabs[] = [
-	'id'       => 'quy-trinh-tuyen-sinh',
-	'title'    => 'Quy trình',
-	'subtitle' => 'Lộ trình 4 bước',
-	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
-];
-
 if ( ! empty( $faqs ) ) {
 	$program_tabs[] = [
 		'id'       => 'hoi-dap',
@@ -117,6 +110,13 @@ if ( ! empty( $faqs ) ) {
 		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>',
 	];
 }
+
+$program_tabs[] = [
+	'id'       => 'quy-trinh-tuyen-sinh',
+	'title'    => 'Quy trình',
+	'subtitle' => 'Lộ trình 4 bước',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+];
 
 $program_rating_stats = function_exists( 'ltdh_get_program_rating_stats' ) ? ltdh_get_program_rating_stats( $program_id ) : [ 'total' => 0 ];
 $program_tabs[] = [
@@ -761,21 +761,6 @@ $program_tabs[] = [
 				<?php endif; ?>
 
 
-				<!-- SECTION 8.5: ADMISSION PROCESS -->
-				<?php
-				get_template_part(
-					'template-parts/admission-process',
-					null,
-					[
-						'title'      => 'Quy trình tuyển sinh & Nhập học',
-						'subtitle'   => 'Lộ trình 4 bước từ đăng ký hồ sơ đến khi chính thức nhập học tại ' . ( $program_school_name ?: 'nhà trường' ),
-						'section_id' => 'quy-trinh-tuyen-sinh',
-						'cta_text'   => 'Đăng ký tư vấn lộ trình ngay',
-						'cta_link'   => '#register',
-					]
-				);
-				?>
-
 				<!-- SECTION 9: FAQ (Collapsible Accordion with UI/UX Pro Max) -->
 				<?php if ( ! empty( $faqs ) ) : ?>
 					<section class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-8" id="hoi-dap">
@@ -826,6 +811,21 @@ $program_tabs[] = [
 						</div>
 					</section>
 				<?php endif; ?>
+
+				<!-- SECTION 8.5: ADMISSION PROCESS -->
+				<?php
+				get_template_part(
+					'template-parts/admission-process',
+					null,
+					[
+						'title'      => 'Quy trình tuyển sinh & Nhập học',
+						'subtitle'   => 'Lộ trình 4 bước từ đăng ký hồ sơ đến khi chính thức nhập học tại ' . ( $program_school_name ?: 'nhà trường' ),
+						'section_id' => 'quy-trinh-tuyen-sinh',
+						'cta_text'   => 'Đăng ký tư vấn lộ trình ngay',
+						'cta_link'   => '#register',
+					]
+				);
+				?>
 
 				<!-- SECTION 10: PROGRAM STUDENT REVIEWS & RATINGS (Shopee & CellphoneS Style) -->
 				<?php get_template_part( 'template-parts/program-reviews' ); ?>
