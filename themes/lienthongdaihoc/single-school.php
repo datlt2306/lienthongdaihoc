@@ -1087,7 +1087,7 @@ $school_tabs[] = [
 					<!-- Collapsible Accordion Group (UI/UX Pro Max) -->
 					<div class="divide-y divide-slate-100" id="ltdh-school-req-docs-accordion">
 						<!-- BLOCK 1: ADMISSION REQUIREMENTS -->
-						<details id="details-dieu-kien" open class="group py-3.5 sm:py-4 transition-colors">
+						<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
 							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
 									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
@@ -1112,7 +1112,7 @@ $school_tabs[] = [
 						</details>
 
 						<!-- BLOCK 2: REQUIRED DOCUMENTS & GOOGLE DRIVE PACKAGE -->
-						<details id="details-ho-so" open class="group py-3.5 sm:py-4 transition-colors">
+						<details id="details-ho-so" class="group py-3.5 sm:py-4 transition-colors">
 							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
 									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
@@ -1169,18 +1169,34 @@ $school_tabs[] = [
 												</p>
 
 												<!-- Action Buttons Row -->
-												<div class="mt-3.5 flex flex-wrap items-center gap-2.5">
+												<div class="mt-3 flex flex-wrap items-center gap-2">
 													<?php if ( ! empty( $school_forms ) ) : ?>
-														<?php foreach ( $school_forms as $form_idx => $s_form ) : ?>
-															<a href="<?php echo esc_url( $s_form['url'] ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 <?php echo 0 === $form_idx ? 'bg-[#00308b] hover:bg-[#002266] text-white shadow-2xs' : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200/80'; ?> text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $s_form['url'] ); ?>" data-file-title="<?php echo esc_attr( $s_form['title'] ); ?>">
-																<span><?php echo esc_html( $s_form['label'] ); ?></span>
-																<svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+														<?php foreach ( $school_forms as $form_idx => $s_form ) : 
+															$is_folder = ( $s_form['type'] ?? '' ) === 'drive_folder';
+															$clean_label = str_replace( 'Thư mục Google Drive hồ sơ trường', 'Thư mục Drive chung', $s_form['label'] );
+															$clean_label = str_replace( 'Hồ sơ Google Drive hệ ', 'Hồ sơ hệ ', $clean_label );
+														?>
+															<a href="<?php echo esc_url( $s_form['url'] ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center gap-1.5 px-3 py-1.5 <?php echo 0 === $form_idx ? 'bg-blue-50/80 hover:bg-blue-100/90 text-[#00308b] border border-blue-200/80 font-bold' : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-medium'; ?> text-xs rounded-lg transition-all cursor-pointer group shadow-2xs hover:shadow-xs" data-file-url="<?php echo esc_url( $s_form['url'] ); ?>" data-file-title="<?php echo esc_attr( $s_form['title'] ); ?>">
+																<?php if ( $is_folder ) : ?>
+																	<svg class="w-3.5 h-3.5 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+																		<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
+																	</svg>
+																<?php else : ?>
+																	<svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#00308b] shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+																		<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+																	</svg>
+																<?php endif; ?>
+																<span><?php echo esc_html( $clean_label ); ?></span>
+																<svg class="w-3 h-3 text-slate-400 group-hover:text-[#00308b] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
 															</a>
 														<?php endforeach; ?>
 													<?php elseif ( ! empty( $primary_drive ) ) : ?>
-														<a href="<?php echo esc_url( $primary_drive ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#00308b] hover:bg-[#002266] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $primary_drive ); ?>" data-file-title="Thư mục hồ sơ: <?php echo esc_attr( $school_title ); ?>">
+														<a href="<?php echo esc_url( $primary_drive ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50/80 hover:bg-blue-100/90 text-[#00308b] border border-blue-200/80 text-xs font-bold rounded-lg shadow-2xs hover:shadow-xs transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $primary_drive ); ?>" data-file-title="Thư mục hồ sơ: <?php echo esc_attr( $school_title ); ?>">
+															<svg class="w-3.5 h-3.5 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+																<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
+															</svg>
 															<span>Mở thư mục trên Google Drive</span>
-															<svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+															<svg class="w-3 h-3 text-[#00308b] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
 														</a>
 													<?php endif; ?>
 												</div>
@@ -1551,6 +1567,7 @@ $school_tabs[] = [
 			}
 			window.addEventListener('hashchange', checkSchoolReqDocsHash);
 			checkSchoolReqDocsHash();
+			updateSchoolReqDocsState();
 		}
 
 		// Handle initial hash in URL

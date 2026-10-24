@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Suite for Single Program Collapsible Requirements & Documents
+ * Test Suite for Single School & Major Collapsible Requirements & Documents
  */
 
 if ( php_sapi_name() !== 'cli' ) {
@@ -25,54 +25,50 @@ class CollapsibleTestSuite {
 }
 
 echo "===================================================================\n";
-echo "TEST SUITE: SINGLE PROGRAM COLLAPSIBLE REQUIREMENTS & DOCUMENTS\n";
+echo "TEST SUITE: COLLAPSIBLE REQUIREMENTS & DOCUMENTS (SCHOOL & MAJOR)\n";
 echo "===================================================================\n\n";
 
-$prog_content = file_get_contents( ABSPATH . 'single-program.php' );
+$school_content = file_get_contents( ABSPATH . 'single-school.php' );
+$major_content  = file_get_contents( ABSPATH . 'single-major.php' );
 
 CollapsibleTestSuite::assert(
-	false !== strpos( $prog_content, 'id="dieu-kien-ho-so"' ),
-	"single-program.php: Contains section id 'dieu-kien-ho-so'"
+	false !== strpos( $school_content, 'id="dieu-kien-ho-so"' ),
+	"single-school.php: Contains section id 'dieu-kien-ho-so'"
 );
 
 CollapsibleTestSuite::assert(
-	false !== strpos( $prog_content, 'id="details-dieu-kien"' ),
-	"single-program.php: Admission requirements wrapped in collapsible <details id=\"details-dieu-kien\">"
+	false !== strpos( $school_content, 'id="details-dieu-kien"' ) && false === strpos( $school_content, '<details id="details-dieu-kien" open' ),
+	"single-school.php: Admission requirements wrapped in collapsible <details id=\"details-dieu-kien\"> and closed by default"
 );
 
 CollapsibleTestSuite::assert(
-	false !== strpos( $prog_content, 'id="details-ho-so"' ),
-	"single-program.php: Admission documents wrapped in collapsible <details id=\"details-ho-so\">"
+	false !== strpos( $school_content, 'id="details-ho-so"' ) && false === strpos( $school_content, '<details id="details-ho-so" open' ),
+	"single-school.php: Admission documents wrapped in collapsible <details id=\"details-ho-so\"> and closed by default"
 );
 
 CollapsibleTestSuite::assert(
-	false !== strpos( $prog_content, 'id="details-lien-he"' ),
-	"single-program.php: Contact & admission office wrapped in collapsible <details id=\"details-lien-he\">"
+	false !== strpos( $school_content, 'id="details-lien-he"' ) && false === strpos( $school_content, '<details id="details-lien-he" open' ),
+	"single-school.php: Contact & admission office wrapped in collapsible <details id=\"details-lien-he\"> and closed by default"
 );
 
 CollapsibleTestSuite::assert(
-	false !== strpos( $prog_content, 'id="ltdh-toggle-req-docs-btn"' ),
-	"single-program.php: Has 'Mở tất cả' / 'Thu gọn' bulk toggle button"
+	false !== strpos( $school_content, 'id="ltdh-toggle-school-req-docs-btn"' ),
+	"single-school.php: Has 'Mở tất cả' / 'Thu gọn' bulk toggle button"
 );
 
 CollapsibleTestSuite::assert(
-	false !== strpos( $prog_content, 'divide-y divide-slate-100' ),
-	"single-program.php: Uses borderless 'divide-y divide-slate-100' layout"
+	false !== strpos( $major_content, 'id="details-doi-tuong"' ) && false === strpos( $major_content, '<details id="details-doi-tuong" open' ),
+	"single-major.php: Target applicants wrapped in collapsible <details id=\"details-doi-tuong\"> and closed by default"
 );
 
 CollapsibleTestSuite::assert(
-	false !== strpos( $prog_content, 'id="dieu-kien-xet-tuyen"' ) && false !== strpos( $prog_content, 'id="ho-so-can-nop"' ) && false !== strpos( $prog_content, 'id="thong-tin-lien-he"' ),
-	"single-program.php: Preserves backward-compatible anchor spans (including thong-tin-lien-he)"
+	false !== strpos( $school_content, 'id="dieu-kien-xet-tuyen"' ) && false !== strpos( $school_content, 'id="ho-so-can-nop"' ) && false !== strpos( $school_content, 'id="thong-tin-lien-he"' ),
+	"single-school.php: Preserves backward-compatible anchor spans"
 );
 
 CollapsibleTestSuite::assert(
-	false === strpos( $prog_content, '<section id="thong-tin-lien-he"' ),
-	"single-program.php: Standalone section #thong-tin-lien-he is removed in favor of accordion item"
-);
-
-CollapsibleTestSuite::assert(
-	false !== strpos( $prog_content, 'checkReqDocsHash' ) && false !== strpos( $prog_content, '#details-lien-he' ),
-	"single-program.php: Auto-opens target accordion when URL hash points to specific subsection"
+	false !== strpos( $school_content, 'checkSchoolReqDocsHash' ) && false !== strpos( $school_content, '#details-lien-he' ),
+	"single-school.php: Auto-opens target accordion when URL hash points to specific subsection"
 );
 
 echo "\n===================================================================\n";
