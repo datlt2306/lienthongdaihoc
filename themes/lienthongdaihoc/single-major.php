@@ -130,6 +130,13 @@ $major_tabs[] = [
 ];
 
 $major_tabs[] = [
+	'id'       => 'dieu-kien-doi-tuong',
+	'title'    => 'Điều kiện & Đối tượng',
+	'subtitle' => 'Đúng ngành & Ngành gần',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>',
+];
+
+$major_tabs[] = [
 	'id'       => 'quy-trinh-tuyen-sinh',
 	'title'    => 'Quy trình',
 	'subtitle' => 'Lộ trình 4 bước',
@@ -497,6 +504,306 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 							$initial_count = ltdh_render_major_programs_list( $major_id, $selected_he, $selected_school_slug ); 
 							?>
 						</div>
+					</div>
+				</section>
+
+				<!-- SECTION: ADMISSION REQUIREMENTS & TARGET APPLICANTS (ĐÚNG NGÀNH & NGÀNH GẦN) -->
+				<?php 
+				$major_target_admissions = function_exists( 'ltdh_get_major_target_admissions' ) ? ltdh_get_major_target_admissions( (int) $major_id ) : [];
+				$major_req               = function_exists( 'ltdh_get_major_admission_requirements' ) ? ltdh_get_major_admission_requirements( (int) $major_id, $context_school ? $context_school->ID : null ) : '';
+				$major_docs              = function_exists( 'ltdh_get_major_required_documents' ) ? ltdh_get_major_required_documents( (int) $major_id, $context_school ? $context_school->ID : null ) : '';
+				$clean_title             = get_the_title( $major_id );
+				?>
+				<section id="dieu-kien-doi-tuong" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
+					<!-- Hidden anchor targets for backward compatibility -->
+					<span id="dieu-kien-xet-tuyen" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+					<span id="doi-tuong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+					<span id="nganh-dung-nganh-gan" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+					<span id="ho-so-can-nop" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+
+					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-2">
+						<div>
+							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Điều kiện &amp; Đối tượng tuyển sinh</h2>
+							<p class="text-xs md:text-sm text-slate-500 mt-0.5">Quy định nhóm Đúng ngành &amp; Ngành gần, tiêu chuẩn đầu vào và hồ sơ cần chuẩn bị ngành <?php echo esc_html( $clean_m_name ); ?></p>
+						</div>
+						<div class="flex items-center gap-2 shrink-0 self-start sm:self-center">
+							<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#00308b] text-xs font-bold rounded-full border border-blue-100/80">
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+								Quy định tuyển sinh
+							</span>
+							<button type="button" 
+									id="ltdh-toggle-major-req-docs-btn" 
+									class="inline-flex items-center gap-1 text-xs font-bold text-[#00308b] hover:text-blue-900 hover:bg-blue-50/80 px-2.5 py-1 rounded-lg transition-all cursor-pointer select-none"
+									title="Mở hoặc thu gọn toàn bộ nội dung">
+								<span id="ltdh-toggle-major-req-docs-text">Mở tất cả</span>
+								<svg id="ltdh-toggle-major-req-docs-icon" class="w-3.5 h-3.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+								</svg>
+							</button>
+						</div>
+					</div>
+
+					<!-- Collapsible Accordion Group (UI/UX Pro Max) -->
+					<div class="divide-y divide-slate-100" id="ltdh-major-req-docs-accordion">
+						
+						<!-- BLOCK 1: ĐỐI TƯỢNG TUYỂN SINH (ĐÚNG NGÀNH & NGÀNH GẦN) - HIGHLIGHTED -->
+						<details id="details-doi-tuong" open class="group py-3.5 sm:py-4 transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+								<div class="flex items-center gap-3 min-w-0">
+									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+										1
+									</span>
+									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+										Quy định đối tượng tuyển sinh: Đúng ngành &amp; Ngành gần
+									</span>
+								</div>
+								<div class="flex items-center gap-2 shrink-0">
+									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+									</svg>
+								</div>
+							</summary>
+							<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed space-y-4">
+								
+								<?php if ( ! empty( $major_target_admissions ) ) : ?>
+									<?php 
+									// If context school exists, sort it to the top
+									if ( $context_school ) {
+										usort( $major_target_admissions, function( $a, $b ) use ( $context_school ) {
+											if ( (int) ( $a['school_id'] ?? 0 ) === (int) $context_school->ID ) return -1;
+											if ( (int) ( $b['school_id'] ?? 0 ) === (int) $context_school->ID ) return 1;
+											return 0;
+										} );
+									}
+									?>
+
+									<?php foreach ( $major_target_admissions as $target_idx => $t_item ) : 
+										$bridge_count = (int) ( $t_item['bridge_count'] ?: 3 );
+										$is_ctx_match = $context_school && ( (int) ( $t_item['school_id'] ?? 0 ) === (int) $context_school->ID );
+									?>
+										<div class="rounded-xl <?php echo $is_ctx_match ? 'bg-blue-50/40 p-3 sm:p-4 border border-blue-200/80' : ''; ?>">
+											<!-- School Header & Regulation Title -->
+											<div class="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-100">
+												<div class="flex items-center gap-2 min-w-0">
+													<?php if ( ! empty( $t_item['school_badge'] ) ) : ?>
+														<span class="px-2 py-0.5 rounded text-[11px] font-black bg-[#00308b] text-white shrink-0 shadow-2xs">
+															<?php echo esc_html( $t_item['school_badge'] ); ?>
+														</span>
+													<?php endif; ?>
+													<h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug">
+														<?php echo esc_html( $t_item['regulation_title'] ?: $t_item['school_title'] ); ?>
+													</h3>
+												</div>
+												<?php if ( $is_ctx_match ) : ?>
+													<span class="inline-flex items-center gap-1 text-[11px] font-bold text-[#00308b] bg-white px-2.5 py-1 rounded-full border border-blue-200 shadow-2xs">
+														<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+														Trường đang chọn
+													</span>
+												<?php endif; ?>
+											</div>
+
+											<!-- 2 Nhóm ngành: Đúng ngành & Ngành gần -->
+											<div class="space-y-3 min-w-0">
+												<!-- KHỐI 1: NHÓM NGÀNH ĐÚNG -->
+												<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
+													<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+														<div class="flex items-center gap-2 min-w-0">
+															<div class="w-6 h-6 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center shrink-0 border border-blue-100">
+																<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+																</svg>
+															</div>
+															<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm ngành đúng</h4>
+														</div>
+														<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-[#00308b] border border-blue-200/70 shrink-0">
+															Vào học thẳng (Không học bổ sung)
+														</span>
+													</div>
+
+													<?php if ( ! empty( $t_item['proper_majors'] ) ) : ?>
+														<div class="pt-3">
+															<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs sm:text-[13px] text-slate-700">
+																<?php foreach ( $t_item['proper_majors'] as $p_major ) : ?>
+																	<li class="flex items-center gap-2 py-0.5">
+																		<span class="w-1.5 h-1.5 rounded-full bg-[#00308b] shrink-0"></span>
+																		<span class="font-medium text-slate-800 leading-snug"><?php echo esc_html( $p_major ); ?></span>
+																	</li>
+																<?php endforeach; ?>
+															</ul>
+														</div>
+													<?php endif; ?>
+												</div>
+
+												<!-- KHỐI 2: NHÓM NGÀNH GẦN -->
+												<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
+													<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+														<div class="flex items-center gap-2 min-w-0">
+															<div class="w-6 h-6 rounded-lg bg-orange-50 text-brand-accent flex items-center justify-center shrink-0 border border-orange-100">
+																<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+																	<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+																</svg>
+															</div>
+															<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm ngành gần</h4>
+														</div>
+														<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-orange-50 text-brand-accent border border-orange-200/80 shrink-0">
+															Học bổ sung <?php echo sprintf( '%02d', $bridge_count ); ?> học phần
+														</span>
+													</div>
+
+													<?php if ( ! empty( $t_item['near_majors'] ) ) : ?>
+														<div class="pt-3">
+															<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs sm:text-[13px] text-slate-700">
+																<?php foreach ( $t_item['near_majors'] as $n_major ) : ?>
+																	<li class="flex items-center gap-2 py-0.5">
+																		<span class="w-1.5 h-1.5 rounded-full bg-brand-accent shrink-0"></span>
+																		<span class="font-medium text-slate-800 leading-snug"><?php echo esc_html( $n_major ); ?></span>
+																	</li>
+																<?php endforeach; ?>
+															</ul>
+														</div>
+													<?php endif; ?>
+
+													<?php if ( ! empty( $t_item['bridge_note'] ) ) : ?>
+														<div class="mt-3 pt-2.5 border-t border-slate-100 text-xs text-slate-500 flex items-start gap-1.5">
+															<svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+															<span><?php echo esc_html( $t_item['bridge_note'] ); ?></span>
+														</div>
+													<?php endif; ?>
+												</div>
+											</div>
+										</div>
+									<?php endforeach; ?>
+
+								<?php else : ?>
+									<!-- CHUẨN ĐỐI TƯỢNG TUYỂN SINH LIÊN THÔNG BỘ GD&ĐT -->
+									<div class="space-y-3 min-w-0">
+										<!-- NHÓM 1: ĐÚNG NGÀNH -->
+										<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
+											<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+												<div class="flex items-center gap-2 min-w-0">
+													<div class="w-6 h-6 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center shrink-0 border border-blue-100">
+														<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+													</div>
+													<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm 1: Thí sinh tốt nghiệp đúng ngành</h4>
+												</div>
+												<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-[#00308b] border border-blue-200/70 shrink-0">
+													Vào học thẳng (0 học phần bổ sung)
+												</span>
+											</div>
+											<p class="text-xs sm:text-[13px] text-slate-600 mt-2.5 leading-relaxed">
+												Thí sinh đã tốt nghiệp Trung cấp hoặc Cao đẳng đúng chuyên ngành <strong><?php echo esc_html( $clean_m_name ); ?></strong> được tuyển thẳng vào chương trình liên thông Đại học mà không phải học bổ sung bất kỳ học phần nào.
+											</p>
+										</div>
+
+										<!-- NHÓM 2: NGÀNH GẦN -->
+										<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
+											<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+												<div class="flex items-center gap-2 min-w-0">
+													<div class="w-6 h-6 rounded-lg bg-orange-50 text-brand-accent flex items-center justify-center shrink-0 border border-orange-100">
+														<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+													</div>
+													<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm 2: Thí sinh tốt nghiệp ngành gần</h4>
+												</div>
+												<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-orange-50 text-brand-accent border border-orange-200/80 shrink-0">
+													Học bổ sung 2 - 4 học phần
+												</span>
+											</div>
+											<p class="text-xs sm:text-[13px] text-slate-600 mt-2.5 leading-relaxed">
+												Thí sinh đã tốt nghiệp Trung cấp hoặc Cao đẳng các ngành thuộc cùng khối ngành có liên quan được xét tuyển và hoàn thành từ <strong>2 đến 4 môn học chuyển đổi kiến thức</strong> trong thời gian theo học.
+											</p>
+										</div>
+
+										<!-- NHÓM 3: VĂN BẰNG 2 -->
+										<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
+											<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+												<div class="flex items-center gap-2 min-w-0">
+													<div class="w-6 h-6 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center shrink-0 border border-purple-100">
+														<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+													</div>
+													<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm 3: Thí sinh học Văn bằng 2 Đại học</h4>
+												</div>
+												<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200/70 shrink-0">
+													Miễn môn đại cương
+												</span>
+											</div>
+											<p class="text-xs sm:text-[13px] text-slate-600 mt-2.5 leading-relaxed">
+												Thí sinh đã có 01 bằng Đại học ở ngành khác được đăng ký học văn bằng 2 và được xét <strong>công nhận miễn giảm các môn học đại cương</strong>, rút ngắn thời gian đào tạo còn 1.5 - 2 năm.
+											</p>
+										</div>
+									</div>
+								<?php endif; ?>
+
+								<!-- INTERACTIVE CHECK CTA BANNER -->
+								<div class="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-blue-50/90 to-slate-50 border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
+									<div class="flex items-start gap-2.5">
+										<div class="w-8 h-8 rounded-lg bg-[#00308b] text-white flex items-center justify-center shrink-0">
+											<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+										</div>
+										<div>
+											<p class="font-bold text-slate-900 text-xs sm:text-sm">Bạn chưa rõ bằng của mình thuộc nhóm Đúng ngành hay Ngành gần?</p>
+											<p class="text-xs text-slate-500 mt-0.5">Gửi thông tin văn bằng để ban tuyển sinh kiểm tra và tính toán lộ trình bổ sung môn chính xác nhất.</p>
+										</div>
+									</div>
+									<a href="/kiem-tra-dieu-kien?nganh=<?php echo esc_attr( get_post_field( 'post_name', $major_id ) ); ?><?php echo $context_school ? '&truong=' . esc_attr( get_post_field( 'post_name', $context_school->ID ) ) : ''; ?>" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shrink-0 shadow-2xs transition-colors no-underline">
+										<span>Kiểm tra điều kiện ngay</span>
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+									</a>
+								</div>
+
+							</div>
+						</details>
+
+						<!-- BLOCK 2: ĐIỀU KIỆN XÉT TUYỂN CHUNG -->
+						<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+								<div class="flex items-center gap-3 min-w-0">
+									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+										2
+									</span>
+									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+										Tiêu chuẩn &amp; Điều kiện xét tuyển
+									</span>
+								</div>
+								<div class="flex items-center gap-2 shrink-0">
+									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+									</svg>
+								</div>
+							</summary>
+							<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed">
+								<div class="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed bg-slate-50/70 p-4 md:p-5 rounded-xl border border-slate-100/80">
+									<?php echo wp_kses_post( $major_req ); ?>
+								</div>
+							</div>
+						</details>
+
+						<!-- BLOCK 3: HỒ SƠ XÉT TUYỂN CẦN CHUẨN BỊ -->
+						<details id="details-ho-so" class="group py-3.5 sm:py-4 transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+								<div class="flex items-center gap-3 min-w-0">
+									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+										3
+									</span>
+									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+										Hồ sơ xét tuyển cần chuẩn bị
+									</span>
+								</div>
+								<div class="flex items-center gap-2 shrink-0">
+									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+									</svg>
+								</div>
+							</summary>
+							<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed">
+								<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-slate-50/70 p-4 rounded-xl border border-slate-100/80">
+									<?php echo wp_kses_post( $major_docs ); ?>
+								</div>
+							</div>
+						</details>
+
 					</div>
 				</section>
 
@@ -912,6 +1219,53 @@ body.admin-bar #ltdh-major-sticky-nav {
 				ticking = true;
 			}
 		}, { passive: true });
+
+		// Toggle All / Collapse All for Major Requirements & Target Applicants
+		var toggleMajorReqDocsBtn = document.getElementById('ltdh-toggle-major-req-docs-btn');
+		var majorReqDocsDetails = document.querySelectorAll('#ltdh-major-req-docs-accordion details');
+		if (toggleMajorReqDocsBtn && majorReqDocsDetails.length) {
+			var toggleMajorText = document.getElementById('ltdh-toggle-major-req-docs-text');
+			var toggleMajorIcon = document.getElementById('ltdh-toggle-major-req-docs-icon');
+
+			function updateMajorReqDocsState() {
+				var allOpen = Array.prototype.slice.call(majorReqDocsDetails).every(function(d) { return d.open; });
+				if (toggleMajorText) {
+					toggleMajorText.textContent = allOpen ? 'Thu gọn' : 'Mở tất cả';
+				}
+				if (toggleMajorIcon) {
+					if (allOpen) {
+						toggleMajorIcon.classList.add('rotate-180');
+					} else {
+						toggleMajorIcon.classList.remove('rotate-180');
+					}
+				}
+			}
+
+			toggleMajorReqDocsBtn.addEventListener('click', function() {
+				var hasClosed = Array.prototype.slice.call(majorReqDocsDetails).some(function(d) { return !d.open; });
+				majorReqDocsDetails.forEach(function(d) {
+					d.open = hasClosed;
+				});
+				updateMajorReqDocsState();
+			});
+
+			majorReqDocsDetails.forEach(function(d) {
+				d.addEventListener('toggle', updateMajorReqDocsState);
+			});
+
+			function checkMajorReqDocsHash() {
+				var h = window.location.hash;
+				if (h === '#dieu-kien-xet-tuyen' || h === '#details-dieu-kien' || h === '#doi-tuong-tuyen-sinh' || h === '#details-doi-tuong' || h === '#nganh-dung-nganh-gan') {
+					var item1 = document.getElementById('details-doi-tuong') || document.getElementById('details-dieu-kien');
+					if (item1) { item1.open = true; }
+				} else if (h === '#ho-so-can-nop' || h === '#details-ho-so') {
+					var item2 = document.getElementById('details-ho-so');
+					if (item2) { item2.open = true; }
+				}
+			}
+			window.addEventListener('hashchange', checkMajorReqDocsHash);
+			checkMajorReqDocsHash();
+		}
 
 		// Handle initial hash in URL
 		if (window.location.hash) {

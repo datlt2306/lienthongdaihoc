@@ -3793,6 +3793,100 @@ function ltdh_get_program_required_documents( int $program_id ): string {
 }
 
 /**
+ * Lấy điều kiện xét tuyển chung của trường (CPT school).
+ *
+ * @param int $school_id ID của trường.
+ * @return string HTML/text điều kiện xét tuyển.
+ */
+function ltdh_get_school_admission_requirements( int $school_id ): string {
+	if ( ! $school_id ) {
+		return '';
+	}
+
+	$req = function_exists( 'get_field' ) ? ( get_field( 'default_admission_requirements', $school_id ) ?: get_field( 'admission_requirements', $school_id ) ) : '';
+	if ( empty( $req ) ) {
+		$req = get_post_meta( $school_id, 'default_admission_requirements', true ) ?: get_post_meta( $school_id, 'admission_requirements', true );
+	}
+
+	if ( ! empty( $req ) && ! empty( trim( strip_tags( (string) $req ) ) ) ) {
+		return (string) $req;
+	}
+
+	return '<p>Thí sinh đã tốt nghiệp <strong>Trung cấp, Cao đẳng hoặc Đại học</strong> các chuyên ngành đúng hoặc ngành gần theo quy định của Bộ Giáo dục & Đào tạo.</p><p><strong>Hình thức tuyển sinh:</strong> Xét tuyển hồ sơ văn bằng và kết quả học tập (không phải thi tuyển các môn văn hóa).</p>';
+}
+
+/**
+ * Lấy danh mục hồ sơ xét tuyển cần chuẩn bị của trường (CPT school).
+ *
+ * @param int $school_id ID của trường.
+ * @return string HTML/text danh mục hồ sơ.
+ */
+function ltdh_get_school_required_documents( int $school_id ): string {
+	if ( ! $school_id ) {
+		return '';
+	}
+
+	$docs = function_exists( 'get_field' ) ? ( get_field( 'default_required_documents', $school_id ) ?: get_field( 'required_documents', $school_id ) ) : '';
+	if ( empty( $docs ) ) {
+		$docs = get_post_meta( $school_id, 'default_required_documents', true ) ?: get_post_meta( $school_id, 'required_documents', true );
+	}
+
+	if ( ! empty( $docs ) && ! empty( trim( strip_tags( (string) $docs ) ) ) ) {
+		return (string) $docs;
+	}
+
+	return '<ul>
+		<li>01 Phiếu đăng ký dự tuyển theo mẫu của nhà trường.</li>
+		<li>02 bản sao công chứng Bằng tốt nghiệp Trung cấp / Cao đẳng / Đại học (hoặc Giấy chứng nhận tốt nghiệp tạm thời).</li>
+		<li>02 bản sao công chứng Bảng điểm toàn khóa học tương ứng.</li>
+		<li>01 bản sao công chứng Căn cước công dân hoặc Hộ chiếu (còn hiệu lực).</li>
+		<li>01 bản sao Giấy khai sinh (bản sao trích lục hoặc có công chứng).</li>
+		<li>04 ảnh thẻ kích thước 3x4 (chụp trong vòng 6 tháng, ghi rõ họ tên và ngày sinh ở mặt sau).</li>
+		<li>Đơn đề nghị xét miễn giảm học phần / chuyển đổi tín chỉ (nếu có).</li>
+	</ul>';
+}
+
+/**
+ * Lấy điều kiện xét tuyển chung của ngành đào tạo (CPT major).
+ *
+ * @param int $major_id ID của ngành.
+ * @param int|null $school_id ID của trường context (nếu có).
+ * @return string HTML/text điều kiện xét tuyển.
+ */
+function ltdh_get_major_admission_requirements( int $major_id, ?int $school_id = null ): string {
+	if ( $school_id && $school_id > 0 ) {
+		return ltdh_get_school_admission_requirements( $school_id );
+	}
+
+	$major_title = $major_id ? get_the_title( $major_id ) : 'ngành đào tạo';
+
+	return '<p>Thí sinh đã tốt nghiệp <strong>Trung cấp, Cao đẳng</strong> khối ngành đúng hoặc ngành gần với ngành <strong>' . esc_html( $major_title ) . '</strong> theo quy định tuyển sinh liên thông của Bộ Giáo dục & Đào tạo.</p><p>Thí sinh đã có bằng <strong>Đại học</strong> các chuyên ngành khác có thể đăng ký học theo diện <strong>Văn bằng 2</strong> để được xét miễn giảm các học phần đại cương tương đương.</p><p><strong>Phương thức tuyển sinh:</strong> Xét tuyển thẳng dựa trên văn bằng và kết quả học tập (bảng điểm toàn khóa).</p>';
+}
+
+/**
+ * Lấy danh mục hồ sơ cần chuẩn bị của ngành đào tạo (CPT major).
+ *
+ * @param int $major_id ID của ngành.
+ * @param int|null $school_id ID của trường context (nếu có).
+ * @return string HTML/text danh mục hồ sơ.
+ */
+function ltdh_get_major_required_documents( int $major_id, ?int $school_id = null ): string {
+	if ( $school_id && $school_id > 0 ) {
+		return ltdh_get_school_required_documents( $school_id );
+	}
+
+	return '<ul>
+		<li>01 Phiếu đăng ký xét tuyển liên thông theo mẫu của trường đào tạo.</li>
+		<li>02 bản sao công chứng Bằng tốt nghiệp TC/CĐ/ĐH (hoặc Giấy chứng nhận tốt nghiệp tạm thời).</li>
+		<li>02 bản sao công chứng Bảng điểm / Kết quả học tập toàn khóa.</li>
+		<li>01 bản sao công chứng Căn cước công dân hoặc Hộ chiếu.</li>
+		<li>01 bản sao Giấy khai sinh (bản sao trích lục hoặc công chứng).</li>
+		<li>04 ảnh thẻ 3x4 (chụp trong 6 tháng gần nhất).</li>
+		<li>Giấy xác nhận ưu tiên hoặc đơn xét miễn giảm môn học (nếu có).</li>
+	</ul>';
+}
+
+/**
  * Lấy thời gian học của chương trình với cơ chế DRY fallback về trường.
  *
  * @param int $program_id ID của chương trình (CPT program).

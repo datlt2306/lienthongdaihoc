@@ -83,20 +83,20 @@ foreach ( $items as $it ) {
 	if ( (int) $it->ID === 404 && in_array( 'current-menu-item', $classes, true ) && in_array( 'current-menu-ancestor', $classes, true ) ) {
 		$major_parent_active = true;
 	}
-	if ( (int) $it->ID === 3354 && in_array( 'current-menu-ancestor', $classes, true ) ) {
+	if ( (int) $it->ID === 3316 && in_array( 'current-menu-ancestor', $classes, true ) ) {
 		$cat_col_active = true;
 	}
-	if ( (int) $it->ID === 3355 && in_array( 'current-menu-item', $classes, true ) ) {
+	if ( (int) $it->ID === 3317 && in_array( 'current-menu-item', $classes, true ) ) {
 		$major_item_active = true;
 	}
-	if ( (int) $it->ID === 3358 && ( in_array( 'current-menu-item', $classes, true ) || in_array( 'current-menu-ancestor', $classes, true ) ) ) {
+	if ( (int) $it->ID === 3323 && ( in_array( 'current-menu-item', $classes, true ) || in_array( 'current-menu-ancestor', $classes, true ) ) ) {
 		$view_all_inactive = false;
 	}
 }
 ltdh_assert_active( $major_parent_active, 'Item 404 (Nhóm Ngành) has current-menu-item and current-menu-ancestor' );
-ltdh_assert_active( $cat_col_active, 'Category Header 3354 (Kỹ thuật - Công nghệ) has current-menu-ancestor' );
-ltdh_assert_active( $major_item_active, 'Major Item 3355 (Công nghệ thông tin) has current-menu-item' );
-ltdh_assert_active( $view_all_inactive, 'View all link 3358 is not marked active' );
+ltdh_assert_active( ! empty( $cat_col_active ), 'Category Header 3316 (Kỹ thuật - Công nghệ) has current-menu-ancestor' );
+ltdh_assert_active( $major_item_active, 'Major Item 3317 (Công nghệ thông tin) has current-menu-item' );
+ltdh_assert_active( $view_all_inactive, 'View all link 3323 is not marked active' );
 
 // -------------------------------------------------------------------
 // TEST 4: Mobile Drawer Auto-Expand (is-open Class & aria-expanded)

@@ -63,6 +63,13 @@ $school_tabs[] = [
 ];
 
 $school_tabs[] = [
+	'id'       => 'dieu-kien-ho-so',
+	'title'    => 'Điều kiện & Hồ sơ',
+	'subtitle' => 'Tiêu chuẩn & Biểu mẫu',
+	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>',
+];
+
+$school_tabs[] = [
 	'id'       => 'quy-trinh-tuyen-sinh',
 	'title'    => 'Quy trình',
 	'subtitle' => 'Lộ trình & Hồ sơ',
@@ -1039,6 +1046,180 @@ if ( ! empty( $school_faqs ) ) {
 				</section>
 
 				
+				<!-- SECTION: ADMISSION REQUIREMENTS & DOCUMENTS FOR SCHOOL -->
+				<?php 
+				$school_requirements = function_exists( 'ltdh_get_school_admission_requirements' ) ? ltdh_get_school_admission_requirements( $school_id ) : '';
+				$school_documents    = function_exists( 'ltdh_get_school_required_documents' ) ? ltdh_get_school_required_documents( $school_id ) : '';
+				$school_forms        = function_exists( 'ltdh_get_school_admission_forms' ) ? ltdh_get_school_admission_forms( $school_id ) : [];
+				$school_drive_url    = get_post_meta( $school_id, 'admission_drive_folder_url', true ) ?: ( get_field( 'admission_drive_folder_url', $school_id ) ?: '' );
+				$school_contact_raw  = get_field( 'contact_info', $school_id ) ?: get_post_meta( $school_id, 'contact_info', true );
+				$contact_formatted   = function_exists( 'ltdh_format_contact_info' ) ? ltdh_format_contact_info( (string) $school_contact_raw, (int) $school_id ) : (string) $school_contact_raw;
+				?>
+				<section id="dieu-kien-ho-so" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
+					<!-- Hidden anchor targets for backward compatibility -->
+					<span id="dieu-kien-xet-tuyen" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+					<span id="doi-tuong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+					<span id="ho-so-can-nop" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+					<span id="thong-tin-lien-he" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
+
+					<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-2">
+						<div>
+							<h2 class="text-lg md:text-2xl font-bold text-slate-900">Điều kiện &amp; Hồ sơ xét tuyển</h2>
+							<p class="text-xs md:text-sm text-slate-500 mt-0.5">Tiêu chuẩn tuyển sinh, hồ sơ cần chuẩn bị và biểu mẫu đăng ký chính thức của <?php echo esc_html( $school_title ); ?></p>
+						</div>
+						<div class="flex items-center gap-2 shrink-0 self-start sm:self-center">
+							<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#00308b] text-xs font-bold rounded-full border border-blue-100/80">
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+								Xét tuyển hồ sơ
+							</span>
+							<button type="button" 
+									id="ltdh-toggle-school-req-docs-btn" 
+									class="inline-flex items-center gap-1 text-xs font-bold text-[#00308b] hover:text-blue-900 hover:bg-blue-50/80 px-2.5 py-1 rounded-lg transition-all cursor-pointer select-none"
+									title="Mở hoặc thu gọn toàn bộ nội dung">
+								<span id="ltdh-toggle-school-req-docs-text">Mở tất cả</span>
+								<svg id="ltdh-toggle-school-req-docs-icon" class="w-3.5 h-3.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+								</svg>
+							</button>
+						</div>
+					</div>
+
+					<!-- Collapsible Accordion Group (UI/UX Pro Max) -->
+					<div class="divide-y divide-slate-100" id="ltdh-school-req-docs-accordion">
+						<!-- BLOCK 1: ADMISSION REQUIREMENTS -->
+						<details id="details-dieu-kien" open class="group py-3.5 sm:py-4 transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+								<div class="flex items-center gap-3 min-w-0">
+									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+										1
+									</span>
+									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+										Tiêu chuẩn &amp; Điều kiện xét tuyển
+									</span>
+								</div>
+								<div class="flex items-center gap-2 shrink-0">
+									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+									</svg>
+								</div>
+							</summary>
+							<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed">
+								<div class="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed bg-slate-50/70 p-4 md:p-5 rounded-xl border border-slate-100/80">
+									<?php echo wp_kses_post( $school_requirements ); ?>
+								</div>
+							</div>
+						</details>
+
+						<!-- BLOCK 2: REQUIRED DOCUMENTS & GOOGLE DRIVE PACKAGE -->
+						<details id="details-ho-so" open class="group py-3.5 sm:py-4 transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+								<div class="flex items-center gap-3 min-w-0">
+									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+										2
+									</span>
+									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+										Hồ sơ xét tuyển cần chuẩn bị &amp; Biểu mẫu
+									</span>
+								</div>
+								<div class="flex items-center gap-2 shrink-0">
+									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+									</svg>
+								</div>
+							</summary>
+							<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed space-y-3.5">
+								<?php if ( ! empty( $school_documents ) ) : ?>
+									<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-slate-50/70 p-4 rounded-xl border border-slate-100/80">
+										<?php echo wp_kses_post( $school_documents ); ?>
+									</div>
+								<?php endif; ?>
+
+								<?php if ( ! empty( $school_forms ) || ! empty( $school_drive_url ) ) : 
+									$primary_drive = ! empty( $school_drive_url ) ? $school_drive_url : ( $school_forms[0]['url'] ?? '' );
+								?>
+									<!-- GOOGLE DRIVE ADMISSION PACKAGE CARD (UI/UX Pro Max) -->
+									<div class="bg-slate-50/70 rounded-xl border border-slate-100/90 p-4 sm:p-5 mt-3.5 transition-colors">
+										<div class="flex items-start gap-3.5">
+											<!-- Google Drive Brand Icon -->
+											<div class="w-10 h-10 rounded-xl bg-white border border-slate-200/60 shadow-2xs flex items-center justify-center shrink-0">
+												<svg class="w-5 h-5" viewBox="0 0 24 24">
+													<path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm3.43 6l3.43 6h8.28l-3.43-6h-8.28zm8.71 7.5l3.43-6-6.57-11.5h-6.86l6.57 11.5 3.43 6z" opacity="0.25"/>
+													<path d="M19.85 13.5L16.42 7.5H9.57l3.43 6h6.85z" fill="#FFC107"/>
+													<path d="M7.71 3.5L1.15 15l3.43 6 3.43-6-3.43-6h3.13z" fill="#0066DA"/>
+													<path d="M8.28 17.5l-3.43 3.5h14.57l3.43-3.5H8.28z" fill="#00AC47"/>
+													<path d="M14.71 14.5l-3.43-6-3.43 6h6.86z" fill="#EA4335"/>
+												</svg>
+											</div>
+
+											<!-- Content & Actions Column -->
+											<div class="min-w-0 flex-1">
+												<div class="flex flex-wrap items-center gap-2">
+													<h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug">
+														Bộ biểu mẫu &amp; Thư mục hồ sơ tuyển sinh chính thức
+													</h3>
+													<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-white border border-slate-200/70 text-slate-600">
+														Hồ sơ nhà trường
+													</span>
+												</div>
+
+												<p class="text-xs sm:text-[13px] text-slate-500 mt-1 leading-relaxed">
+													Bao gồm phiếu đăng ký dự thi, sơ yếu lý lịch và các đơn xét miễn giảm môn. Xem trước, tải về hoặc in trực tiếp trên Google Drive của <?php echo esc_html( $school_title ); ?>.
+												</p>
+
+												<!-- Action Buttons Row -->
+												<div class="mt-3.5 flex flex-wrap items-center gap-2.5">
+													<?php if ( ! empty( $school_forms ) ) : ?>
+														<?php foreach ( $school_forms as $form_idx => $s_form ) : ?>
+															<a href="<?php echo esc_url( $s_form['url'] ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 <?php echo 0 === $form_idx ? 'bg-[#00308b] hover:bg-[#002266] text-white shadow-2xs' : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200/80'; ?> text-xs sm:text-sm font-semibold rounded-lg transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $s_form['url'] ); ?>" data-file-title="<?php echo esc_attr( $s_form['title'] ); ?>">
+																<span><?php echo esc_html( $s_form['label'] ); ?></span>
+																<svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+															</a>
+														<?php endforeach; ?>
+													<?php elseif ( ! empty( $primary_drive ) ) : ?>
+														<a href="<?php echo esc_url( $primary_drive ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#00308b] hover:bg-[#002266] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer group" data-file-url="<?php echo esc_url( $primary_drive ); ?>" data-file-title="Thư mục hồ sơ: <?php echo esc_attr( $school_title ); ?>">
+															<span>Mở thư mục trên Google Drive</span>
+															<svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+														</a>
+													<?php endif; ?>
+												</div>
+											</div>
+										</div>
+									</div>
+								<?php endif; ?>
+							</div>
+						</details>
+
+						<!-- BLOCK 3: CONTACT & ADMISSION VENUE -->
+						<?php if ( ! empty( $contact_formatted ) ) : ?>
+							<details id="details-lien-he" class="group py-3.5 sm:py-4 transition-colors">
+								<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-amber-700 transition-colors">
+									<div class="flex items-center gap-3 min-w-0">
+										<span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-800 group-open:bg-amber-600 group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+											3
+										</span>
+										<span class="leading-snug text-slate-800 group-open:text-amber-700 transition-colors font-bold">
+											Thông tin liên hệ &amp; Tiếp nhận hồ sơ
+										</span>
+									</div>
+									<div class="flex items-center gap-2 shrink-0">
+										<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
+										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-amber-700 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+										</svg>
+									</div>
+								</summary>
+								<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed">
+									<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list bg-slate-50/70 p-4 md:p-5 rounded-xl border border-slate-100/80">
+										<?php echo wp_kses_post( $contact_formatted ); ?>
+									</div>
+								</div>
+							</details>
+						<?php endif; ?>
+					</div>
+				</section>
+
 				<!-- ADMISSION PROCESS -->
 				<?php
 				get_template_part(
@@ -1321,6 +1502,56 @@ if ( ! empty( $school_faqs ) ) {
 				}
 			});
 		});
+
+		// Toggle All / Collapse All for School Requirements & Documents
+		var toggleSchoolReqDocsBtn = document.getElementById('ltdh-toggle-school-req-docs-btn');
+		var schoolReqDocsDetails = document.querySelectorAll('#ltdh-school-req-docs-accordion details');
+		if (toggleSchoolReqDocsBtn && schoolReqDocsDetails.length) {
+			var toggleSchoolText = document.getElementById('ltdh-toggle-school-req-docs-text');
+			var toggleSchoolIcon = document.getElementById('ltdh-toggle-school-req-docs-icon');
+
+			function updateSchoolReqDocsState() {
+				var allOpen = Array.prototype.slice.call(schoolReqDocsDetails).every(function(d) { return d.open; });
+				if (toggleSchoolText) {
+					toggleSchoolText.textContent = allOpen ? 'Thu gọn' : 'Mở tất cả';
+				}
+				if (toggleSchoolIcon) {
+					if (allOpen) {
+						toggleSchoolIcon.classList.add('rotate-180');
+					} else {
+						toggleSchoolIcon.classList.remove('rotate-180');
+					}
+				}
+			}
+
+			toggleSchoolReqDocsBtn.addEventListener('click', function() {
+				var hasClosed = Array.prototype.slice.call(schoolReqDocsDetails).some(function(d) { return !d.open; });
+				schoolReqDocsDetails.forEach(function(d) {
+					d.open = hasClosed;
+				});
+				updateSchoolReqDocsState();
+			});
+
+			schoolReqDocsDetails.forEach(function(d) {
+				d.addEventListener('toggle', updateSchoolReqDocsState);
+			});
+
+			function checkSchoolReqDocsHash() {
+				var h = window.location.hash;
+				if (h === '#dieu-kien-xet-tuyen' || h === '#details-dieu-kien' || h === '#doi-tuong-tuyen-sinh') {
+					var item1 = document.getElementById('details-dieu-kien');
+					if (item1) { item1.open = true; }
+				} else if (h === '#ho-so-can-nop' || h === '#details-ho-so') {
+					var item2 = document.getElementById('details-ho-so');
+					if (item2) { item2.open = true; }
+				} else if (h === '#thong-tin-lien-he' || h === '#details-lien-he') {
+					var item3 = document.getElementById('details-lien-he');
+					if (item3) { item3.open = true; }
+				}
+			}
+			window.addEventListener('hashchange', checkSchoolReqDocsHash);
+			checkSchoolReqDocsHash();
+		}
 
 		// Handle initial hash in URL
 		if (window.location.hash) {
