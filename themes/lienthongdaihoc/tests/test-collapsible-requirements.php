@@ -28,12 +28,38 @@ echo "===================================================================\n";
 echo "TEST SUITE: COLLAPSIBLE REQUIREMENTS & DOCUMENTS (SCHOOL & MAJOR)\n";
 echo "===================================================================\n\n";
 
-$school_content = file_get_contents( ABSPATH . 'single-school.php' );
-$major_content  = file_get_contents( ABSPATH . 'single-major.php' );
+$school_content  = file_get_contents( ABSPATH . 'single-school.php' );
+$major_content   = file_get_contents( ABSPATH . 'single-major.php' );
+$program_content = file_get_contents( ABSPATH . 'single-program.php' );
 
 CollapsibleTestSuite::assert(
 	false !== strpos( $school_content, 'id="dieu-kien-ho-so"' ),
 	"single-school.php: Contains section id 'dieu-kien-ho-so'"
+);
+
+CollapsibleTestSuite::assert(
+	false !== strpos( $program_content, 'id="dieu-kien-ho-so"' ),
+	"single-program.php: Contains section id 'dieu-kien-ho-so'"
+);
+
+CollapsibleTestSuite::assert(
+	false !== strpos( $program_content, 'id="details-dieu-kien"' ) && false === strpos( $program_content, '<details id="details-dieu-kien" open' ),
+	"single-program.php: Admission requirements wrapped in collapsible <details id=\"details-dieu-kien\"> and closed by default"
+);
+
+CollapsibleTestSuite::assert(
+	false !== strpos( $program_content, 'id="details-ho-so"' ) && false === strpos( $program_content, '<details id="details-ho-so" open' ),
+	"single-program.php: Admission documents wrapped in collapsible <details id=\"details-ho-so\"> and closed by default"
+);
+
+CollapsibleTestSuite::assert(
+	false !== strpos( $program_content, 'id="details-lien-he"' ) && false === strpos( $program_content, '<details id="details-lien-he" open' ),
+	"single-program.php: Contact & admission office wrapped in collapsible <details id=\"details-lien-he\"> and closed by default"
+);
+
+CollapsibleTestSuite::assert(
+	false !== strpos( $program_content, 'id="ltdh-toggle-program-req-docs-btn"' ),
+	"single-program.php: Has 'Mở tất cả' / 'Thu gọn' bulk toggle button"
 );
 
 CollapsibleTestSuite::assert(

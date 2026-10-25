@@ -746,7 +746,7 @@ $school_tabs[] = [
 									
 									<!-- Thumbnail Area (16:9 ratio, smooth zoom on hover) -->
 									<div class="relative h-44 sm:h-48 bg-slate-100 overflow-hidden">
-										<a href="<?php echo esc_url( $primary_link ); ?>" class="block w-full h-full">
+										<a href="<?php echo esc_url( $major_link ?: $primary_link ); ?>" class="block w-full h-full" title="Xem chi tiết ngành <?php echo esc_attr( $major['name'] ); ?>">
 											<img src="<?php echo esc_url( $major['thumb'] ); ?>" 
 												 alt="Ngành <?php echo esc_attr( $major['name'] ); ?>" 
 												 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
@@ -797,7 +797,7 @@ $school_tabs[] = [
 
 											<!-- Major Name -->
 											<h3 class="font-extrabold text-slate-900 text-base sm:text-lg group-hover:text-[#00308b] transition-colors leading-snug mb-1">
-												<a href="<?php echo esc_url( $primary_link ); ?>">
+												<a href="<?php echo esc_url( $major_link ?: $primary_link ); ?>">
 													Ngành <?php echo esc_html( $major['name'] ); ?>
 												</a>
 											</h3>
