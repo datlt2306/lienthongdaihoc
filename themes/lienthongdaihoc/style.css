@@ -101,22 +101,31 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-primary-menu {
 	display: flex;
 	align-items: center;
-	gap: 2rem;
+	gap: 1.5rem;
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	flex-shrink: 0;
 }
-.nav-primary-menu li {
+@media (min-width: 1280px) {
+	.nav-primary-menu {
+		gap: 2rem;
+	}
+}
+.nav-primary-menu > li {
 	position: relative;
+	white-space: nowrap;
+	flex-shrink: 0;
 }
-.nav-primary-menu a {
+.nav-primary-menu > li > a {
 	color: #475569;
 	transition: all 0.2s;
 	padding: 0.5rem 0;
 	border-bottom: 2px solid transparent;
-	font-weight: 600;
+	font-weight: 500;
 	font-size: 0.875rem;
 	display: inline-block;
+	white-space: nowrap;
 }
 .nav-primary-menu a:hover,
 .nav-primary-menu .current-menu-item > a,

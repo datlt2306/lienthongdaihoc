@@ -88,19 +88,19 @@
 	?>
 	<!-- HEADER NAVIGATION (Apple Cupertino Aesthetic: Frosted Glass Navbar & Floating Mobile Island) -->
 	<header id="masthead" class="site-header sticky top-0 z-[60] w-full pt-2 px-2.5 lg:pt-0 lg:px-0 lg:bg-white/80 lg:backdrop-blur-xl lg:border-b lg:border-black/[0.08] lg:shadow-xs pointer-events-none lg:pointer-events-auto transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:transform-none lg:opacity-100 translate-y-0 opacity-100">
-		<div class="ltdh-header-island pointer-events-auto relative bg-white/85 backdrop-blur-xl border border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.06)] rounded-full px-3.5 h-12 flex items-center justify-between gap-2.5 transition-all duration-300 lg:bg-transparent lg:backdrop-blur-none lg:border-0 lg:shadow-none lg:rounded-none lg:h-16 lg:max-w-7xl lg:mx-auto lg:px-6 lg:gap-4">
+		<div class="ltdh-header-island pointer-events-auto relative bg-white/85 backdrop-blur-xl border border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.06)] rounded-full px-3.5 h-12 flex items-center justify-between gap-2.5 transition-all duration-300 lg:bg-transparent lg:backdrop-blur-none lg:border-0 lg:shadow-none lg:rounded-none lg:h-20 lg:max-w-7xl lg:mx-auto lg:px-6 lg:gap-6">
 			<!-- Logo Section -->
 			<div class="site-branding flex items-center shrink-0">
 				<div class="hidden lg:block">
-					<?php ltdh_site_logo( 38 ); ?>
+					<?php ltdh_site_logo( 42 ); ?>
 				</div>
 				<div class="lg:hidden">
-					<?php ltdh_site_logo_mobile( 30 ); ?>
+					<?php ltdh_site_logo_mobile( 32 ); ?>
 				</div>
 			</div>
 
 			<!-- Desktop Menu System (Apple Cupertino Typography & Pill CTA) -->
-			<nav id="site-navigation" class="hidden lg:flex items-center gap-7">
+			<nav id="site-navigation" class="hidden lg:flex items-center gap-6 xl:gap-8 shrink-0">
 				<?php
 				wp_nav_menu( [
 					'theme_location' => 'primary-menu',
@@ -109,7 +109,7 @@
 					'fallback_cb'    => 'ltdh_default_primary_menu',
 				] );
 				?>
-				<a href="tel:<?php echo esc_attr( $header_clean_phone ); ?>" class="flex items-center gap-1.5 bg-[#0071E3] hover:bg-[#0077ED] text-white px-4 py-1.5 rounded-full font-medium text-xs tracking-tight transition-all shadow-none hover:shadow-xs active:scale-98" aria-label="Gọi hotline <?php echo esc_attr( $header_hotline ); ?>">
+				<a href="tel:<?php echo esc_attr( $header_clean_phone ); ?>" class="flex items-center gap-2 bg-[#0071E3] hover:bg-[#0077ED] text-white px-5 py-2.5 rounded-full font-medium text-xs tracking-tight transition-all shadow-none hover:shadow-xs active:scale-98 shrink-0 whitespace-nowrap" aria-label="Gọi hotline <?php echo esc_attr( $header_hotline ); ?>">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
 						<path fill-rule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 0 0 6.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clip-rule="evenodd" />
 					</svg>

@@ -650,14 +650,12 @@ $zalo    = ltdh_get_zalo_url();
 												<?php endif; ?>
 											</div>
 
-											<!-- Nút Tìm hiểu chi tiết -->
-											<div class="mt-3.5 pt-3 border-t border-slate-100">
+											<!-- Nút Tìm hiểu chi tiết (Cupertino Pill) -->
+											<div class="mt-3.5 pt-3 border-t border-black/[0.06]">
 												<a href="<?php echo esc_url($school['permalink']); ?>" 
-												   class="w-full text-center py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs group-hover:shadow-sm">
+												   class="w-full text-center py-2 px-3 rounded-full text-xs sm:text-sm font-medium text-white bg-[#0071E3] hover:bg-[#0077ED] active:scale-98 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-none">
 													<span>Tìm hiểu chi tiết</span>
-													<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-														<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-													</svg>
+													<span class="text-xs transition-transform duration-200 group-hover:translate-x-1 font-bold">›</span>
 												</a>
 											</div>
 										</div>
@@ -816,7 +814,7 @@ $zalo    = ltdh_get_zalo_url();
 						?>
 					</h2>
 
-					<div class="space-y-2 sm:space-y-3 text-[#6E6E73] text-xs sm:text-sm md:text-base leading-relaxed">
+					<div class="space-y-2 sm:space-y-3 text-xs sm:text-sm md:text-base leading-relaxed">
 						<p>Từ ngày <strong>01/03/2020</strong>, bằng tốt nghiệp đại học sẽ không còn phân biệt hình thức đào tạo như chính quy, tại chức, từ xa...</p>
 						<p>Theo <strong>Thông tư 27/2019/TT-BGDĐT</strong>, trên văn bằng sẽ vẫn ghi các nội dung cũ nhưng không ghi thông tin về hình thức đào tạo.</p>
 					</div>
@@ -1008,7 +1006,7 @@ $zalo    = ltdh_get_zalo_url();
 							?>
 						</h2>
 
-						<div class="space-y-2 sm:space-y-3 text-[#6E6E73] text-xs sm:text-sm md:text-base leading-relaxed">
+						<div class="space-y-2 sm:space-y-3  text-xs sm:text-sm md:text-base leading-relaxed">
 							<p>Sau khi tốt nghiệp, người học được cấp văn bằng theo quy định hiện hành và có thể sử dụng để phục vụ các mục tiêu học tập, nghề nghiệp theo điều kiện của từng đơn vị tiếp nhận.</p>
 						</div>
 

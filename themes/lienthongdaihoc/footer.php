@@ -170,14 +170,14 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 <!-- Floating/Sticky CTAs for Desktop/Tablet (Apple Squircle Style) -->
 <div class="hidden md:flex fixed bottom-4 left-4 z-40 flex-col gap-2.5 md:bottom-6 md:left-6">
 	<!-- Phone Hotline Float -->
-	<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '',  ) ); ?>" class="flex h-11 w-11 items-center justify-center rounded-full bg-[#FF9500] hover:bg-[#E08500] text-white shadow-[0_4px_16px_rgba(255,149,0,0.3)] transition-all hover:scale-105 active:scale-95" aria-label="Gọi ngay">
+	<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex h-11 w-11 items-center justify-center rounded-full bg-[#FF9500] hover:bg-[#E08500] text-white shadow-[0_4px_16px_rgba(255,149,0,0.3)] transition-all hover:scale-105 active:scale-95" aria-label="Gọi ngay">
 		<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
 		</svg>
 	</a>
 
 	<!-- Zalo OA Float -->
-	<a href="<?php echo esc_url(  ); ?>" target="_blank" rel="noopener noreferrer" class="flex h-11 w-11 items-center justify-center rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-[0_4px_16px_rgba(0,113,227,0.3)] transition-all hover:scale-105 active:scale-95" aria-label="Chat Zalo">
+	<a href="<?php echo esc_url( $zalo ); ?>" target="_blank" rel="noopener noreferrer" class="flex h-11 w-11 items-center justify-center rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-[0_4px_16px_rgba(0,113,227,0.3)] transition-all hover:scale-105 active:scale-95" aria-label="Chat Zalo">
 		<span class="font-display font-bold text-xs">Za</span>
 	</a>
 </div>
@@ -189,7 +189,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
      style="bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));">
 	
 	<!-- Zalo Button (Left Circle) -->
-	<a href="<?php echo esc_url(  ); ?>" 
+	<a href="<?php echo esc_url( $zalo ); ?>" 
 	   target="_blank" 
 	   rel="noopener noreferrer" 
 	   class="flex items-center justify-center h-10 w-10 bg-[#0071E3] hover:bg-[#0077ED] active:scale-90 rounded-full shrink-0 transition-all text-white" 

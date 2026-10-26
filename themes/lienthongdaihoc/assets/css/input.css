@@ -128,7 +128,6 @@ h1 .font-extrabold, h2 .font-extrabold, h3 .font-extrabold, h4 .font-extrabold, 
 h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, h6 .font-black {
     font-weight: 600 !important;
     letter-spacing: -0.022em;
-    color: #1D1D1F;
 }
 
 h1 {
@@ -288,22 +287,26 @@ h1 {
     color: #1D1D1F !important;
 }
 
-/* Universal mapping for arbitrary legacy utility classes to Apple design tokens */
-[class*="bg-[#00308b]"] { background-color: #0071E3 !important; }
-[class*="text-[#00308b]"] { color: #0071E3 !important; }
-[class*="border-[#00308b]"] { border-color: #0071E3 !important; }
-[class*="hover:bg-[#00308b]"]:hover { background-color: #0077ED !important; }
-[class*="hover:text-[#00308b]"]:hover { color: #0077ED !important; }
+/* Mapping for arbitrary legacy utility classes to Apple design tokens */
+.bg-\[\#00308b\] { background-color: #0071E3 !important; }
+.text-\[\#00308b\] { color: #0071E3 !important; }
+.border-\[\#00308b\] { border-color: #0071E3 !important; }
+.hover\:bg-\[\#00308b\]:hover { background-color: #0077ED !important; }
+.hover\:text-\[\#00308b\]:hover { color: #0077ED !important; }
+.hover\:border-\[\#00308b\]:hover { border-color: #0077ED !important; }
 
-[class*="bg-[#fe8100]"] { background-color: #FF9500 !important; }
-[class*="text-[#fe8100]"] { color: #FF9500 !important; }
-[class*="border-[#fe8100]"] { border-color: #FF9500 !important; }
-[class*="hover:bg-[#e06e00]"]:hover { background-color: #E08500 !important; }
+.bg-\[\#fe8100\] { background-color: #FF9500 !important; }
+.text-\[\#fe8100\] { color: #FF9500 !important; }
+.border-\[\#fe8100\] { border-color: #FF9500 !important; }
+.hover\:bg-\[\#e06e00\]:hover { background-color: #E08500 !important; }
+.hover\:text-\[\#fe8100\]:hover { color: #FF9500 !important; }
 
-/* Refined squircle border radiuses */
-.rounded-xl { border-radius: 1rem !important; }
-.rounded-2xl { border-radius: 1.25rem !important; }
-.rounded-3xl { border-radius: 1.75rem !important; }
+/* Enforce crisp text-white contrast inside dark sections */
+.text-white,
+[class*="text-white"],
+.text-white h1, .text-white h2, .text-white h3, .text-white h4, .text-white h5, .text-white h6 {
+    color: #FFFFFF !important;
+}
 
 /* Cupertino Sticky Subnavigation Bars */
 .ltdh-sticky-nav {
@@ -360,22 +363,31 @@ h1 {
 .nav-primary-menu {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
     list-style: none;
     margin: 0;
     padding: 0;
+    flex-shrink: 0;
 }
-.nav-primary-menu li {
+@media (min-width: 1280px) {
+    .nav-primary-menu {
+        gap: 2rem;
+    }
+}
+.nav-primary-menu > li {
     position: relative;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
-.nav-primary-menu a {
+.nav-primary-menu > li > a {
     color: #475569;
     transition: all 0.2s;
     padding: 0.5rem 0;
     border-bottom: 2px solid transparent;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.875rem;
     display: inline-block;
+    white-space: nowrap;
 }
 .nav-primary-menu a:hover,
 .nav-primary-menu .current-menu-item > a,
