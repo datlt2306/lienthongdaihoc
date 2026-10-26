@@ -267,31 +267,6 @@ h1 {
     color: #C96800;
 }
 
-/* Apple Dark Directory Footer */
-#colophon.apple-footer {
-    background-color: #161617 !important;
-    color: #86868B !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-#colophon.apple-footer h3,
-#colophon.apple-footer .footer-title {
-    color: #F5F5F7 !important;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-}
-#colophon.apple-footer a {
-    color: #A1A1A6;
-    transition: color 0.2s ease;
-}
-#colophon.apple-footer a:hover {
-    color: #FFFFFF !important;
-}
-#colophon.apple-footer a.text-white,
-#colophon.apple-footer a .text-white,
-#colophon.apple-footer .text-white {
-    color: #FFFFFF !important;
-}
-
 /* Mapping for arbitrary legacy utility classes to Apple design tokens */
 .bg-\[\#00308b\] { background-color: #0071E3 !important; }
 .text-\[\#00308b\] { color: #0071E3 !important; }
