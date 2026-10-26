@@ -108,44 +108,6 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 		}
 	}
 
-	// If no query param, check if all programs of this major belong to a SINGLE school
-	if ( ! $school ) {
-		$offered_pids = get_post_meta( $major_id, defined( 'LTDH_META_OFFERED_PROGRAMS' ) ? LTDH_META_OFFERED_PROGRAMS : 'offered_programs', true );
-		$direct_pids  = get_posts( [
-			'post_type'   => defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program',
-			'post_status' => 'publish',
-			'numberposts' => -1,
-			'meta_query'  => [
-				[
-					'key'     => defined( 'LTDH_META_MAJOR_REL' ) ? LTDH_META_MAJOR_REL : 'major_relationship',
-					'value'   => $major_id,
-					'compare' => '=',
-				],
-			],
-			'fields'      => 'ids',
-		] );
-		$all_pids = array_unique( array_filter( array_merge(
-			is_array( $offered_pids ) ? $offered_pids : [],
-			is_array( $direct_pids ) ? $direct_pids : []
-		) ) );
-
-		if ( ! empty( $all_pids ) ) {
-			$distinct_schools = [];
-			foreach ( $all_pids as $pid ) {
-				$sid = get_field( defined( 'LTDH_META_SCHOOL_REL' ) ? LTDH_META_SCHOOL_REL : 'school_relationship', $pid ) ?: get_post_meta( $pid, 'school_relationship', true );
-				if ( is_array( $sid ) ) $sid = $sid[0] ?? 0;
-				if ( is_object( $sid ) ) $sid = $sid->ID;
-				$sid = intval( $sid );
-				if ( $sid > 0 ) {
-					$distinct_schools[ $sid ] = $sid;
-				}
-			}
-			if ( count( $distinct_schools ) === 1 ) {
-				$school = get_post( reset( $distinct_schools ) );
-			}
-		}
-	}
-
 	// 2. Training type context (e.g. ?he=tu-xa or from $args)
 	$selected_he = $args['selected_he'] ?? ( isset( $_GET['he'] ) ? sanitize_text_field( wp_unslash( $_GET['he'] ) ) : '' );
 	$clean_type  = '';
@@ -211,12 +173,13 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 			$banner_subtitle = 'Danh sách các trường đại học tuyển sinh, lộ trình công nhận tín chỉ và học phí năm ' . $year;
 		}
 
-		$banner_image    = get_the_post_thumbnail_url( $major_id, 'full' ) ?: '';
-		$banner_logo_url = get_the_post_thumbnail_url( $major_id, 'thumbnail' ) ?: '';
+		$banner_image    = ( get_field( 'major_banner', $major_id ) ?: '' ) ?: ( get_the_post_thumbnail_url( $major_id, 'full' ) ?: '' );
+		$banner_logo_url = ( get_field( 'major_icon', $major_id ) ?: '' ) ?: ( get_field( 'major_logo', $major_id ) ?: '' );
 		$banner_logo_alt = $clean_major;
 
-		$words = explode( ' ', $clean_major );
-		foreach ( array_slice( $words, -2 ) as $w ) {
+		$words = preg_split( '/\s+/u', $clean_major );
+		$banner_initials = '';
+		foreach ( $words as $w ) {
 			$banner_initials .= mb_substr( $w, 0, 1 );
 		}
 		$banner_initials = mb_strtoupper( $banner_initials );
