@@ -150,29 +150,29 @@ $zalo    = ltdh_get_zalo_url();
 	</style>
 
 
-	<!-- Search & Filters Container (Compact Mobile Trigger + Desktop Bar) -->
-	<section class="bg-slate-50">
+	<!-- Search & Filters Container (Apple Cupertino Search Pod & Compact Mobile Trigger) -->
+	<section class="bg-[#F5F5F7] py-4 sm:py-0">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 sm:-mt-8 relative z-30">
 			
 			<!-- MOBILE COMPACT SEARCH TRIGGER BAR (Visible only on < md) -->
-			<div class="md:hidden pt-3 sm:pt-0">
+			<div class="md:hidden pt-1 sm:pt-0">
 				<button type="button" 
 				        id="ltdh-mobile-home-filter-btn"
 				        aria-expanded="false"
 				        aria-controls="ltdh-home-filter-drawer"
-				        class="w-full bg-white rounded-2xl shadow-md hover:shadow-lg border border-slate-200/90 p-3 flex items-center justify-between gap-3 text-left transition-all active:scale-[0.99] cursor-pointer">
+				        class="w-full bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-md border border-black/[0.08] p-3 flex items-center justify-between gap-3 text-left transition-all active:scale-[0.99] cursor-pointer">
 					<div class="flex items-center gap-2.5 min-w-0">
-						<div class="w-9 h-9 rounded-xl bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
+						<div class="w-9 h-9 rounded-full bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center shrink-0">
 							<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
 							</svg>
 						</div>
 						<div class="min-w-0">
-							<span class="block text-xs sm:text-sm font-bold text-slate-800 truncate">Tìm kiếm ngành &amp; trường học</span>
-							<span class="block text-[11px] text-slate-400 truncate">Chọn trường, ngành, hình thức đào tạo...</span>
+							<span class="block text-xs sm:text-sm font-semibold text-[#1D1D1F] truncate">Tìm kiếm ngành &amp; trường học</span>
+							<span class="block text-[11px] text-[#86868B] truncate">Chọn trường, ngành, hình thức đào tạo...</span>
 						</div>
 					</div>
-					<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-primary text-white text-xs font-bold shrink-0 shadow-xs">
+					<div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0071E3] text-white text-xs font-medium shrink-0">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
 						</svg>
@@ -181,8 +181,8 @@ $zalo    = ltdh_get_zalo_url();
 				</button>
 			</div>
 
-			<!-- DESKTOP FILTER BAR (Visible only on >= md) -->
-			<div id="home-desktop-filter-wrapper" class="hidden md:block bg-white rounded-2xl shadow-xl border border-slate-100 p-4 sm:p-5">
+			<!-- DESKTOP FILTER BAR (Apple Cupertino Pill Pod) -->
+			<div id="home-desktop-filter-wrapper" class="hidden md:block bg-white rounded-3xl shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-black/[0.08] p-4 sm:p-5">
 				<?php
 				$filter_opts = ltdh_get_cached_filter_options();
 				$schools     = $filter_opts['schools'] ?? [];
@@ -192,19 +192,19 @@ $zalo    = ltdh_get_zalo_url();
 				<form id="home-filter-form" action="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" method="GET" class="space-y-4 md:space-y-0 md:grid md:grid-cols-5 md:gap-3 md:items-center">
 					<!-- Keyword -->
 					<div class="w-full">
-						<label for="home-search-keyword" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5"><?php esc_html_e( 'Từ khóa tìm kiếm', 'ltdh' ); ?></label>
+						<label for="home-search-keyword" class="block md:sr-only text-xs font-semibold uppercase text-[#86868B] mb-1.5"><?php esc_html_e( 'Từ khóa tìm kiếm', 'ltdh' ); ?></label>
 						<div class="relative">
-							<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+							<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#86868B]">
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 							</span>
-							<input type="text" id="home-search-keyword" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-xl text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none placeholder-slate-400 min-h-[44px] transition-all bg-slate-50/50 focus:bg-white" />
+							<input type="text" id="home-search-keyword" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full pl-10 pr-4 py-2.5 border border-black/[0.08] rounded-full text-sm focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 focus:outline-none placeholder-[#86868B] min-h-[44px] transition-all bg-[#F5F5F7] focus:bg-white text-[#1D1D1F]" />
 						</div>
 					</div>
 
 					<!-- School Select -->
 					<div class="w-full">
-						<label for="home-filter-truong" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5"><?php esc_html_e( 'Chọn trường', 'ltdh' ); ?></label>
-						<select id="home-filter-truong" name="truong" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+						<label for="home-filter-truong" class="block md:sr-only text-xs font-semibold uppercase text-[#86868B] mb-1.5"><?php esc_html_e( 'Chọn trường', 'ltdh' ); ?></label>
+						<select id="home-filter-truong" name="truong" class="w-full py-2.5 px-3.5 border border-black/[0.08] rounded-full text-sm font-medium bg-[#F5F5F7] focus:bg-white text-[#1D1D1F] focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 focus:outline-none cursor-pointer min-h-[44px]">
 							<option value="">-- Chọn trường --</option>
 							<?php foreach ($schools as $sc) : ?>
 								<option value="<?php echo esc_attr($sc['slug']); ?>"><?php echo esc_html($sc['title']); ?></option>
@@ -214,8 +214,8 @@ $zalo    = ltdh_get_zalo_url();
 
 					<!-- Major Select -->
 					<div class="w-full">
-						<label for="home-filter-nganh" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5"><?php esc_html_e( 'Chọn ngành học', 'ltdh' ); ?></label>
-						<select id="home-filter-nganh" name="nganh" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+						<label for="home-filter-nganh" class="block md:sr-only text-xs font-semibold uppercase text-[#86868B] mb-1.5"><?php esc_html_e( 'Chọn ngành học', 'ltdh' ); ?></label>
+						<select id="home-filter-nganh" name="nganh" class="w-full py-2.5 px-3.5 border border-black/[0.08] rounded-full text-sm font-medium bg-[#F5F5F7] focus:bg-white text-[#1D1D1F] focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 focus:outline-none cursor-pointer min-h-[44px]">
 							<option value="">-- Chọn ngành học --</option>
 							<?php foreach ($majors as $mj) : ?>
 								<option value="<?php echo esc_attr($mj['slug']); ?>"><?php echo esc_html($mj['title']); ?></option>
@@ -225,8 +225,8 @@ $zalo    = ltdh_get_zalo_url();
 
 					<!-- Training Mode Select -->
 					<div class="w-full">
-						<label for="home-filter-he" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5"><?php esc_html_e( 'Hình thức đào tạo', 'ltdh' ); ?></label>
-						<select name="he" id="home-filter-he" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+						<label for="home-filter-he" class="block md:sr-only text-xs font-semibold uppercase text-[#86868B] mb-1.5"><?php esc_html_e( 'Hình thức đào tạo', 'ltdh' ); ?></label>
+						<select name="he" id="home-filter-he" class="w-full py-2.5 px-3.5 border border-black/[0.08] rounded-full text-sm font-medium bg-[#F5F5F7] focus:bg-white text-[#1D1D1F] focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 focus:outline-none cursor-pointer min-h-[44px]">
 							<option value="">-- Chọn hình thức đào tạo --</option>
 							<?php foreach ($types as $tp) : ?>
 								<option value="<?php echo esc_attr($tp['slug']); ?>"><?php echo esc_html($tp['name']); ?></option>
@@ -234,12 +234,12 @@ $zalo    = ltdh_get_zalo_url();
 						</select>
 					</div>
 
-					<!-- Submit Buttons (Visible on desktop) -->
+					<!-- Submit Buttons (Apple Pill Action) -->
 					<div class="hidden md:flex gap-2 w-full">
-						<button type="submit" class="flex-1 bg-brand-primary hover:bg-brand-darkBlue active:scale-95 text-white font-extrabold text-sm px-5 py-2.5 rounded-xl transition-all uppercase tracking-wider min-h-[44px] shadow-sm cursor-pointer">
-							Tìm kiếm
+						<button type="submit" class="flex-1 bg-[#0071E3] hover:bg-[#0077ED] active:scale-98 text-white font-medium text-sm px-5 py-2.5 rounded-full transition-all tracking-tight min-h-[44px] shadow-none hover:shadow-xs cursor-pointer flex items-center justify-center gap-1.5">
+							<span>Tìm kiếm</span>
 						</button>
-						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="p-2.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-500 rounded-xl transition-all flex items-center justify-center min-h-[44px] w-11 shrink-0" title="Reset bộ lọc">
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="p-2.5 bg-[#F5F5F7] hover:bg-[#E8E8ED] active:scale-95 text-[#6E6E73] rounded-full transition-all flex items-center justify-center min-h-[44px] w-11 shrink-0" title="Reset bộ lọc">
 							🔄
 						</a>
 					</div>
@@ -427,13 +427,13 @@ $zalo    = ltdh_get_zalo_url();
 	</section>
 	
 
-	<!-- 2. HOT PROGRAMS SECTION -->
-	<section class="py-8 sm:py-12 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
+	<!-- 2. HOT PROGRAMS SECTION (Apple Cupertino Bento Tiles) -->
+	<section class="py-10 sm:py-14 bg-[#F5F5F7] border-y border-black/[0.06] relative overflow-hidden">
 		<div class="max-w-7xl mx-auto relative z-10 px-4 sm:px-6 lg:px-8">
 			<div class="text-center max-w-2xl mx-auto mb-6 sm:mb-8 space-y-2">
-				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">KHÁM PHÁ NGÀNH HỌC</span>
-				<h2 class="text-xl md:text-4xl font-black text-slate-900">5 ngành đào tạo hot nhất</h2>
-				<p class="text-slate-500 text-sm">Top ngành được yêu thích nhất, phù hợp xu hướng thị trường lao động.</p>
+				<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">KHÁM PHÁ NGÀNH HỌC</span>
+				<h2 class="text-2xl md:text-3xl font-semibold tracking-tight text-[#1D1D1F]">5 ngành đào tạo hot nhất</h2>
+				<p class="text-[#86868B] text-sm leading-relaxed">Top ngành được quan tâm nhất, đón đầu xu hướng thị trường lao động số.</p>
 			</div>
 
 			<!-- Swiper Carousel Container (Mobile swipeable, Desktop 5 columns) -->
@@ -443,11 +443,11 @@ $zalo    = ltdh_get_zalo_url();
 						<?php
 						$hot_majors = ltdh_get_hot_majors();
 						$card_colors = [
-							['bg' => 'bg-blue-50',   'icon_bg' => 'bg-blue-100',   'icon_text' => 'text-blue-600',   'border' => 'border-blue-100',   'hover' => 'hover:border-blue-300'],
-							['bg' => 'bg-violet-50', 'icon_bg' => 'bg-violet-100', 'icon_text' => 'text-violet-600', 'border' => 'border-violet-100', 'hover' => 'hover:border-violet-300'],
-							['bg' => 'bg-emerald-50', 'icon_bg' => 'bg-emerald-100', 'icon_text' => 'text-emerald-600', 'border' => 'border-emerald-100', 'hover' => 'hover:border-emerald-300'],
-							['bg' => 'bg-amber-50',  'icon_bg' => 'bg-amber-100',  'icon_text' => 'text-amber-600',  'border' => 'border-amber-100',  'hover' => 'hover:border-amber-300'],
-							['bg' => 'bg-rose-50',   'icon_bg' => 'bg-rose-100',   'icon_text' => 'text-rose-600',   'border' => 'border-rose-100',   'hover' => 'hover:border-rose-300'],
+							['bg' => 'bg-white', 'icon_bg' => 'bg-[#0071E3]/10', 'icon_text' => 'text-[#0071E3]', 'border' => 'border-black/[0.06]', 'hover' => 'hover:border-[#0071E3]/30'],
+							['bg' => 'bg-white', 'icon_bg' => 'bg-violet-50',     'icon_text' => 'text-violet-600', 'border' => 'border-black/[0.06]', 'hover' => 'hover:border-violet-300'],
+							['bg' => 'bg-white', 'icon_bg' => 'bg-emerald-50',    'icon_text' => 'text-emerald-600', 'border' => 'border-black/[0.06]', 'hover' => 'hover:border-emerald-300'],
+							['bg' => 'bg-white', 'icon_bg' => 'bg-amber-50',      'icon_text' => 'text-amber-600',  'border' => 'border-black/[0.06]', 'hover' => 'hover:border-amber-300'],
+							['bg' => 'bg-white', 'icon_bg' => 'bg-rose-50',       'icon_text' => 'text-rose-600',   'border' => 'border-black/[0.06]', 'hover' => 'hover:border-rose-300'],
 						];
 
 						$major_icons = [
@@ -468,11 +468,15 @@ $zalo    = ltdh_get_zalo_url();
 						?>
 								<div class="swiper-slide h-auto">
 									<a href="<?php echo esc_url(get_permalink($maj->ID)); ?>"
-										class="group flex flex-col items-center text-center p-4 sm:p-5 bg-white border <?php echo $c['border']; ?> rounded-2xl <?php echo $c['hover']; ?> hover:shadow-md active:scale-95 transition-all h-full">
-										<div class="h-12 w-12 <?php echo $c['icon_bg']; ?> <?php echo $c['icon_text']; ?> rounded-xl flex items-center justify-center mb-3 text-xl group-hover:scale-110 transition-transform">
+										class="group flex flex-col items-center text-center p-5 sm:p-6 bg-white border border-black/[0.06] rounded-2xl sm:rounded-3xl hover:border-black/[0.12] hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] hover:-translate-y-1 active:scale-[0.98] transition-all duration-300 h-full">
+										<div class="h-12 w-12 <?php echo $c['icon_bg']; ?> <?php echo $c['icon_text']; ?> rounded-2xl flex items-center justify-center mb-3 text-xl group-hover:scale-110 transition-transform">
 											<?php echo $icon; ?>
 										</div>
-										<h3 class="font-bold text-slate-800 text-sm sm:text-base leading-snug line-clamp-2"><?php echo esc_html($maj->post_title); ?></h3>
+										<h3 class="font-semibold text-[#1D1D1F] text-sm sm:text-base leading-snug line-clamp-2"><?php echo esc_html($maj->post_title); ?></h3>
+										<span class="mt-2 text-xs text-[#0071E3] font-normal inline-flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+											<span>Khám phá</span>
+											<span class="transition-transform group-hover:translate-x-0.5">›</span>
+										</span>
 									</a>
 								</div>
 						<?php
@@ -489,34 +493,35 @@ $zalo    = ltdh_get_zalo_url();
 
 			<div class="text-center mt-6 sm:mt-8">
 				<a href="<?php echo esc_url(home_url('/nhom-nganh/')); ?>"
-					class="inline-flex items-center gap-2 text-[#00308b] font-bold text-sm hover:underline">
-					Xem tất cả ngành học <span>→</span>
+					class="apple-link text-[#0071E3] font-normal text-sm hover:underline inline-flex items-center gap-1 group">
+					<span>Xem tất cả ngành học</span>
+					<span class="transition-transform group-hover:translate-x-0.5">›</span>
 				</a>
 			</div>
 		</div>
 	</section>
 
-	<!-- 3. NATIONAL SCHOOLS SECTION (CAROUSEL SLIDER) -->
-	<section id="program-section" class="py-8 sm:py-12 md:py-16 bg-white overflow-hidden">
+	<!-- 3. NATIONAL SCHOOLS SECTION (Apple Cupertino Carousel Slider) -->
+	<section id="program-section" class="py-10 sm:py-16 bg-white overflow-hidden">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 sm:mb-8">
 				<div class="space-y-2">
-					<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">ĐỐI TÁC ĐẠI HỌC</span>
-					<h2 class="text-xl md:text-3xl font-black text-slate-900">Trường đối tác đào tạo</h2>
+					<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">ĐỐI TÁC ĐẠI HỌC</span>
+					<h2 class="text-2xl md:text-3xl font-semibold text-[#1D1D1F] tracking-tight">Trường đối tác đào tạo</h2>
 				</div>
 				<div class="flex items-center gap-3 mt-4 sm:mt-0">
-					<a href="<?php echo esc_url(home_url('/truong-doi-tac/')); ?>" class="text-sm text-brand-primary font-bold hover:underline flex items-center gap-1">
-						Xem tất cả
-						<span>→</span>
+					<a href="<?php echo esc_url(home_url('/truong-doi-tac/')); ?>" class="apple-link text-sm text-[#0071E3] font-normal hover:underline inline-flex items-center gap-1 group">
+						<span>Xem tất cả</span>
+						<span class="transition-transform group-hover:translate-x-0.5">›</span>
 					</a>
-					<div class="hidden sm:flex items-center gap-2 pl-2 border-l border-slate-200">
-						<button type="button" class="school-slider-prev w-9 h-9 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-xs" aria-label="Trường trước đó">
-							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+					<div class="hidden sm:flex items-center gap-2 pl-3 border-l border-black/[0.08]">
+						<button type="button" class="school-slider-prev w-9 h-9 rounded-full border border-black/[0.08] bg-[#F5F5F7] hover:bg-[#E8E8ED] text-[#1D1D1F] flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-none" aria-label="Trường trước đó">
+							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
 							</svg>
 						</button>
-						<button type="button" class="school-slider-next w-9 h-9 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-xs" aria-label="Trường tiếp theo">
-							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+						<button type="button" class="school-slider-next w-9 h-9 rounded-full border border-black/[0.08] bg-[#F5F5F7] hover:bg-[#E8E8ED] text-[#1D1D1F] flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-none" aria-label="Trường tiếp theo">
+							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
 							</svg>
 						</button>
@@ -560,9 +565,9 @@ $zalo    = ltdh_get_zalo_url();
 								}
 						?>
 								<div class="swiper-slide h-auto flex">
-									<div class="w-full bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+									<div class="w-full bg-white border border-black/[0.07] rounded-3xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
 										<!-- Ảnh trường & Vị trí -->
-										<div class="relative h-36 sm:h-40 bg-slate-200 overflow-hidden">
+										<div class="relative h-36 sm:h-40 bg-slate-100 overflow-hidden">
 											<img src="<?php echo esc_url( $thumb_url ); ?>"
 												 alt="<?php echo esc_attr( $school['title'] ?? 'Ảnh trường' ); ?>"
 												 loading="lazy"
@@ -572,8 +577,8 @@ $zalo    = ltdh_get_zalo_url();
 												 class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
 											<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent pointer-events-none"></div>
 											<?php if ( ! empty( $school_region ) ) : ?>
-												<span class="absolute top-3 right-3 bg-slate-900/60 backdrop-blur-md text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full z-10 flex items-center gap-1 border border-white/20 shadow-xs">
-													<svg class="w-3 h-3 text-white/80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+												<span class="absolute top-3 right-3 bg-white/80 backdrop-blur-md text-[#1D1D1F] text-[11px] font-medium px-2.5 py-0.5 rounded-full z-10 flex items-center gap-1 border border-black/[0.08] shadow-2xs">
+													<svg class="w-3 h-3 text-[#0071E3] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 														<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
 														<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 													</svg>
@@ -582,8 +587,8 @@ $zalo    = ltdh_get_zalo_url();
 											<?php endif; ?>
 										</div>
 
-										<!-- Logo trường -->
-										<div class="h-14 w-14 sm:h-16 sm:w-16 bg-white rounded-2xl border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.12)] -mt-7 sm:-mt-8 ml-4 sm:ml-5 z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105">
+										<!-- Logo trường (Apple Squircle) -->
+										<div class="h-14 w-14 sm:h-16 sm:w-16 bg-white rounded-2xl border border-black/[0.08] shadow-[0_4px_16px_rgba(0,0,0,0.08)] -mt-7 sm:-mt-8 ml-4 sm:ml-5 z-10 relative flex items-center justify-center overflow-hidden p-1.5 transition-transform duration-300 group-hover:scale-105">
 											<?php if ($logo_id) : 
 												$logo_alt = get_post_meta( $logo_id, '_wp_attachment_image_alt', true ) ?: ( 'Logo ' . ( $school['title'] ?? '' ) );
 											?>
@@ -597,7 +602,7 @@ $zalo    = ltdh_get_zalo_url();
 													'decoding' => 'async',
 												]); ?>
 											<?php else : ?>
-												<span class="font-display font-extrabold text-[#00308b] text-sm">UNI</span>
+												<span class="font-display font-semibold text-[#0071E3] text-sm">UNI</span>
 											<?php endif; ?>
 										</div>
 
@@ -607,7 +612,7 @@ $zalo    = ltdh_get_zalo_url();
 												<!-- Mã trường & Địa điểm -->
 												<div class="flex items-center gap-2 mb-1.5 min-h-[20px]">
 													<?php if ( ! empty( $school_code ) ) : ?>
-														<span class="font-bold text-[#00308b] bg-blue-50 px-2 py-0.5 rounded text-[11px] border border-blue-100">Mã: <?php echo esc_html( $school_code ); ?></span>
+														<span class="font-medium text-[#0071E3] bg-[#0071E3]/10 px-2.5 py-0.5 rounded-full text-[11px]">Mã: <?php echo esc_html( $school_code ); ?></span>
 													<?php endif; ?>
 													<?php if ( ! empty( $school_location ) ) : ?>
 														<span class="text-xs text-slate-500 font-medium truncate"><?php echo esc_html( $school_location ); ?></span>
@@ -699,8 +704,8 @@ $zalo    = ltdh_get_zalo_url();
 	}
 	</style>
 
-	<!-- 4. ELIGIBILITY QUICK CHECK SECTION -->
-	<section class="py-8 sm:py-12 md:py-16 bg-slate-50 border-t border-slate-100">
+	<!-- 4. ELIGIBILITY QUICK CHECK SECTION (Apple Cupertino Bento) -->
+	<section class="py-10 sm:py-16 bg-[#F5F5F7] border-t border-black/[0.06]">
 		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 			<div class="space-y-4">
 				<?php
@@ -723,13 +728,13 @@ $zalo    = ltdh_get_zalo_url();
 				$e_cta_url = ( preg_match( '#^(https?:)?//#i', $e_cta_raw ) ) ? $e_cta_raw : home_url( $e_cta_raw );
 				$e_heading = str_replace('\n', '<br>', $e_heading);
 				?>
-				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">
+				<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
 					<?php echo esc_html($e_badge ?: 'Điều kiện tuyển sinh'); ?>
 				</span>
-				<h2 class="text-2xl sm:text-3xl lg:text-4xl font-black font-display text-slate-900 leading-tight">
+				<h2 class="text-2xl sm:text-3xl lg:text-4xl font-semibold text-[#1D1D1F] tracking-tight leading-tight">
 					<?php echo $e_heading ?: 'Bạn có đủ điều kiện học<br>Liên thông Đại học?'; ?>
 				</h2>
-				<p class="text-slate-500 text-sm leading-relaxed max-w-2xl mx-auto">
+				<p class="text-[#86868B] text-sm leading-relaxed max-w-2xl mx-auto">
 					<?php echo esc_html($e_desc ?: 'Chương trình tuyển sinh mở rộng cho người tốt nghiệp Trung cấp hoặc Cao đẳng. Chỉ mất 1 phút để kiểm tra tự động.'); ?>
 				</p>
 				<?php
@@ -740,19 +745,20 @@ $zalo    = ltdh_get_zalo_url();
 				];
 				$e_items_render = !empty($e_items) ? $e_items : $e_items_default;
 				?>
-				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 max-w-3xl mx-auto text-left">
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-4 max-w-3xl mx-auto text-left">
 					<?php foreach ($e_items_render as $item) : ?>
-						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-							<span class="block text-sm font-bold text-slate-800 mb-0.5"><?php echo esc_html($item['title'] ?? ''); ?></span>
-							<span class="text-sm text-slate-500"><?php echo esc_html($item['desc'] ?? ''); ?></span>
+						<div class="bg-white p-5 rounded-2xl sm:rounded-3xl border border-black/[0.06] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-all">
+							<span class="block text-sm font-semibold text-[#1D1D1F] mb-1"><?php echo esc_html($item['title'] ?? ''); ?></span>
+							<span class="text-xs text-[#86868B] leading-relaxed block"><?php echo esc_html($item['desc'] ?? ''); ?></span>
 						</div>
 					<?php endforeach; ?>
 				</div>
 				<div class="flex flex-wrap justify-center gap-3 pt-6">
-					<a href="<?php echo esc_url($e_cta_url); ?>" class="bg-brand-accent text-white px-6 py-3.5 rounded-lg font-bold text-sm hover:bg-[#e06e00] transition-all shadow-md shadow-brand-primary/10">
-						<?php echo esc_html($e_cta_text ?: 'Bắt đầu kiểm tra ngay ➔'); ?>
+					<a href="<?php echo esc_url($e_cta_url); ?>" class="bg-[#0071E3] hover:bg-[#0077ED] active:scale-98 text-white px-7 py-3 rounded-full font-medium text-sm tracking-tight transition-all shadow-none hover:shadow-xs inline-flex items-center gap-1.5">
+						<span><?php echo esc_html($e_cta_text ?: 'Bắt đầu kiểm tra ngay'); ?></span>
+						<span>›</span>
 					</a>
-					<a href="#register-section" class="bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all">
+					<a href="#register-section" class="bg-white hover:bg-slate-50 active:scale-98 border border-black/[0.08] text-[#1D1D1F] px-7 py-3 rounded-full font-medium text-sm tracking-tight transition-all">
 						Tư vấn tiêu chuẩn tuyển sinh
 					</a>
 				</div>
@@ -787,59 +793,59 @@ $zalo    = ltdh_get_zalo_url();
 		$c_right_content = get_field('hp_cert_right_content', 'options') ?: '';
 	}
 	?>
-	<section class="py-8 sm:py-12 md:py-16 bg-white overflow-hidden">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 lg:space-y-20">
+	<section class="py-10 sm:py-16 md:py-20 bg-white overflow-hidden">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-16 lg:space-y-24">
 			
 			<!-- Row 1: [Text Content] [Slider] -->
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 lg:items-stretch items-center">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-14 lg:items-stretch items-center">
 				<!-- Left column: Text Content -->
 				<div class="space-y-4 sm:space-y-6 flex flex-col justify-center">
-					<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg uppercase tracking-wider self-start"><?php echo esc_html($c_left_badge ?: 'BẰNG CẤP TƯƠNG ĐƯƠNG'); ?></span>
+					<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider self-start"><?php echo esc_html($c_left_badge ?: 'BẰNG CẤP TƯƠNG ĐƯƠNG'); ?></span>
 					
-					<h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+					<h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1D1D1F] tracking-tight leading-tight">
 						<?php 
 						$heading = $c_left_heading ?: 'Không ghi hình thức đào tạo';
 						$words = explode(' ', $heading);
 						if ( count($words) > 2 ) {
 							$last_words = implode(' ', array_slice($words, -3));
 							$first_words = implode(' ', array_slice($words, 0, count($words) - 3));
-							echo esc_html($first_words) . ' <span class="text-brand-primary inline">' . esc_html($last_words) . '</span>';
+							echo esc_html($first_words) . ' <span class="text-[#0071E3] inline">' . esc_html($last_words) . '</span>';
 						} else {
 							echo esc_html($heading);
 						}
 						?>
 					</h2>
 
-					<div class="space-y-2 sm:space-y-3 text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed">
+					<div class="space-y-2 sm:space-y-3 text-[#6E6E73] text-xs sm:text-sm md:text-base leading-relaxed">
 						<p>Từ ngày <strong>01/03/2020</strong>, bằng tốt nghiệp đại học sẽ không còn phân biệt hình thức đào tạo như chính quy, tại chức, từ xa...</p>
 						<p>Theo <strong>Thông tư 27/2019/TT-BGDĐT</strong>, trên văn bằng sẽ vẫn ghi các nội dung cũ nhưng không ghi thông tin về hình thức đào tạo.</p>
 					</div>
 
-					<div class="pt-3 sm:pt-4 border-t border-slate-100">
-						<h3 class="font-bold text-slate-800 text-sm sm:text-base md:text-lg mb-2.5 sm:mb-4">Có Giá Trị Sử Dụng Suốt Đời Trên Toàn Quốc</h3>
+					<div class="pt-4 border-t border-black/[0.08]">
+						<h3 class="font-semibold text-[#1D1D1F] text-sm sm:text-base md:text-lg mb-3">Có Giá Trị Sử Dụng Suốt Đời Trên Toàn Quốc</h3>
 						
-						<div class="space-y-2.5 sm:space-y-3.5">
-							<div class="flex items-start gap-2.5 sm:gap-3.5">
-								<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-									<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+						<div class="space-y-3">
+							<div class="flex items-start gap-3">
+								<div class="w-5 h-5 rounded-full bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center shrink-0 mt-0.5">
+									<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 									</svg>
 								</div>
 								<div>
-									<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Bằng Cử nhân / Kỹ sư chính thức</h4>
-									<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Sau khi hoàn thành chương trình, học viên sẽ được trường Đại học cấp bằng Cử nhân/Kỹ sư theo quy định của Bộ GD&ĐT, có giá trị pháp lý trên toàn quốc.</p>
+									<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Bằng Cử nhân / Kỹ sư chính thức</h4>
+									<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Sau khi hoàn thành chương trình, học viên sẽ được trường Đại học cấp bằng Cử nhân/Kỹ sư theo quy định của Bộ GD&ĐT, có giá trị pháp lý trên toàn quốc.</p>
 								</div>
 							</div>
 
-							<div class="flex items-start gap-2.5 sm:gap-3.5">
-								<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-									<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+							<div class="flex items-start gap-3">
+								<div class="w-5 h-5 rounded-full bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center shrink-0 mt-0.5">
+									<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 									</svg>
 								</div>
 								<div>
-									<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Có Thể Dùng Để Học Lên Các Bậc Cao Hơn</h4>
-									<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Thi công chức nhà nước, xét nâng bậc lương, đi du học.</p>
+									<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Có Thể Dùng Để Học Lên Các Bậc Cao Hơn</h4>
+									<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Thi công chức nhà nước, xét nâng bậc lương, đi du học.</p>
 								</div>
 							</div>
 						</div>
@@ -854,15 +860,16 @@ $zalo    = ltdh_get_zalo_url();
 							width: 100%;
 							max-width: 32rem; /* max-w-lg */
 							aspect-ratio: 1.4; /* Perfect aspect ratio for certificate documents */
-							border-radius: 1.5rem; /* rounded-3xl */
+							border-radius: 1.75rem; /* rounded-3xl */
 							overflow: hidden;
-							box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
-							background-color: #ffffff; /* match white degree background */
+							box-shadow: 0 20px 48px -15px rgba(0, 0, 0, 0.08);
+							background-color: #ffffff;
+							border: 1px solid rgba(0, 0, 0, 0.08);
 						}
 						@media (max-width: 640px) {
 							.cert-slider-wrapper {
-								border-radius: 1rem;
-								box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+								border-radius: 1.25rem;
+								box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06);
 							}
 						}
 						@media (min-width: 1024px) {
@@ -893,18 +900,19 @@ $zalo    = ltdh_get_zalo_url();
 							background-color: #ffffff;
 						}
 						.cert-swiper .swiper-pagination-bullet {
-							background: rgba(0, 48, 139, 0.3) !important;
+							background: rgba(0, 0, 0, 0.2) !important;
 							opacity: 1 !important;
 							width: 8px;
 							height: 8px;
 							transition: all 0.3s ease;
 						}
 						.cert-swiper .swiper-pagination-bullet-active {
-							background: #0284c7 !important;
-							transform: scale(1.2);
+							background: #0071E3 !important;
+							width: 20px;
+							border-radius: 9999px;
 						}
 					</style>
-					<div class="cert-slider-wrapper border border-slate-100">
+					<div class="cert-slider-wrapper">
 						<!-- Slider Container -->
 						<div class="swiper cert-swiper">
 							<div class="swiper-wrapper">
@@ -944,19 +952,19 @@ $zalo    = ltdh_get_zalo_url();
 							<?php endif; ?>
 						</div>
 
-						<!-- Orange badge -->
-						<div class="absolute bottom-2.5 left-2.5 sm:bottom-5 sm:left-5 bg-[#f97316] text-white p-2.5 sm:p-4 md:p-5 rounded-xl sm:rounded-2xl shadow-lg flex flex-col justify-center max-w-[115px] sm:max-w-[160px] z-20 hover:scale-105 transition-transform duration-300 pointer-events-none">
-							<span class="text-lg sm:text-2xl md:text-3xl font-black leading-none">100%</span>
-							<span class="text-[9px] sm:text-xs font-extrabold tracking-wider uppercase mt-1 sm:mt-2 leading-tight">VĂN BẰNG CHUẨN<br>BỘ GD&ĐT</span>
+						<!-- Orange badge (Apple Ember Pill Pod) -->
+						<div class="absolute bottom-2.5 left-2.5 sm:bottom-5 sm:left-5 bg-[#FF9500] text-white p-3 sm:p-4 rounded-2xl shadow-lg flex flex-col justify-center max-w-[125px] sm:max-w-[160px] z-20 pointer-events-none">
+							<span class="text-xl sm:text-2xl md:text-3xl font-bold leading-none">100%</span>
+							<span class="text-[9px] sm:text-xs font-semibold tracking-wider uppercase mt-1 leading-tight">VĂN BẰNG CHUẨN<br>BỘ GD&ĐT</span>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- Row 2: [Video Card] [Text Content] -->
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 lg:items-stretch items-center">
-				<!-- Video Card (Mobile: 2nd after Text; Desktop: Left col) -->
-				<div class="w-full rounded-2xl sm:rounded-3xl relative overflow-hidden shadow-xl aspect-video lg:aspect-auto lg:h-full lg:min-h-full group bg-slate-900 flex items-center justify-center order-2 lg:order-1 <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-14 lg:items-stretch items-center">
+				<!-- Video Card -->
+				<div class="w-full rounded-2xl sm:rounded-3xl relative overflow-hidden border border-black/[0.08] shadow-[0_16px_40px_rgba(0,0,0,0.06)] aspect-video lg:aspect-auto lg:h-full lg:min-h-full group bg-[#161617] flex items-center justify-center order-2 lg:order-1 <?php echo !empty($c_left_youtube) ? 'cursor-pointer' : ''; ?>" <?php echo !empty($c_left_youtube) ? 'data-youtube="' . esc_url($c_left_youtube) . '"' : ''; ?>>
 					<?php
 					$video_raw_thumb = $c_left_image ?: home_url('wp-content/uploads/2026/07/vtv-news-thumb.png');
 					$video_opt_thumb = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $video_raw_thumb ) : $video_raw_thumb;
@@ -964,10 +972,10 @@ $zalo    = ltdh_get_zalo_url();
 					<img src="<?php echo esc_url($video_opt_thumb); ?>" alt="VTV24 Video Thumbnail" loading="lazy" decoding="async" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
 					
 					<?php if (!empty($c_left_youtube)): ?>
-						<!-- Play button overlay -->
-						<div class="absolute inset-0 bg-slate-950/20 flex items-center justify-center">
-							<div class="w-12 h-12 sm:w-16 sm:h-16 bg-[#e11d48] text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
-								<svg class="w-6 h-6 sm:w-8 sm:h-8 fill-current translate-x-0.5" viewBox="0 0 24 24">
+						<!-- Play button overlay (Cupertino Frosted Pill) -->
+						<div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+							<div class="w-14 h-14 sm:w-16 sm:h-16 bg-white/90 backdrop-blur-md text-[#1D1D1F] rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 active:scale-95 transition-transform duration-300">
+								<svg class="w-6 h-6 sm:w-7 sm:h-7 fill-current translate-x-0.5 text-[#0071E3]" viewBox="0 0 24 24">
 									<path d="M8 5v14l11-7z"/>
 								</svg>
 							</div>
@@ -975,72 +983,72 @@ $zalo    = ltdh_get_zalo_url();
 					<?php endif; ?>
 				</div>
 
-				<!-- Text Content (Mobile: 1st before Video; Desktop: Right col) -->
+				<!-- Text Content -->
 				<div class="space-y-4 sm:space-y-6 order-1 lg:order-2 flex flex-col justify-center">
 					<?php if (!empty($c_right_content)): ?>
-						<div class="prose max-w-none text-slate-700 text-xs sm:text-sm md:text-base leading-relaxed">
+						<div class="prose max-w-none text-[#6E6E73] text-xs sm:text-sm md:text-base leading-relaxed">
 							<?php echo wp_kses_post($c_right_content); ?>
 						</div>
 					<?php else: ?>
-						<span class="inline-block bg-emerald-50 text-emerald-600 text-xs font-extrabold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg uppercase tracking-wider">
+						<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider self-start">
 							Bạn có thể sử dụng văn bằng để làm gì?
 						</span>
 						
-						<h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-tight">
+						<h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1D1D1F] tracking-tight leading-tight">
 							<?php 
 							$right_heading = 'Văn bằng sau tốt nghiệp';
 							$words_right = explode(' ', $right_heading);
 							if ( count($words_right) > 2 ) {
 								$last_words_right = implode(' ', array_slice($words_right, -3));
 								$first_words_right = implode(' ', array_slice($words_right, 0, count($words_right) - 3));
-								echo esc_html($first_words_right) . ' <span class="text-brand-primary inline">' . esc_html($last_words_right) . '</span>';
+								echo esc_html($first_words_right) . ' <span class="text-[#0071E3] inline">' . esc_html($last_words_right) . '</span>';
 							} else {
 								echo esc_html($right_heading);
 							}
 							?>
 						</h2>
 
-						<div class="space-y-2 sm:space-y-3 text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed">
+						<div class="space-y-2 sm:space-y-3 text-[#6E6E73] text-xs sm:text-sm md:text-base leading-relaxed">
 							<p>Sau khi tốt nghiệp, người học được cấp văn bằng theo quy định hiện hành và có thể sử dụng để phục vụ các mục tiêu học tập, nghề nghiệp theo điều kiện của từng đơn vị tiếp nhận.</p>
 						</div>
 
-						<div class="pt-3 sm:pt-4 border-t border-slate-100">
-							<h3 class="font-bold text-slate-800 text-sm sm:text-base md:text-lg mb-2.5 sm:mb-4">Giá trị sử dụng của văn bằng</h3>
+						<div class="pt-4 border-t border-black/[0.08]">
+							<h3 class="font-semibold text-[#1D1D1F] text-sm sm:text-base md:text-lg mb-3">Giá trị sử dụng của văn bằng</h3>
 							
-							<div class="space-y-2.5 sm:space-y-3.5">
-								<div class="flex items-start gap-2.5 sm:gap-3.5">
-									<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-										<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+							<div class="space-y-3">
+								<div class="flex items-start gap-3">
+									<div class="w-5 h-5 rounded-full bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center shrink-0 mt-0.5">
+										<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 										</svg>
 									</div>
 									<div>
-										<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Học tiếp lên trình độ cao hơn</h4>
-										<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.</p>
+										<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Học tiếp lên trình độ cao hơn</h4>
+										<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.</p>
 									</div>
 								</div>
 
-								<div class="flex items-start gap-2.5 sm:gap-3.5">
-									<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-										<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+								<div class="flex items-start gap-3">
+									<div class="w-5 h-5 rounded-full bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center shrink-0 mt-0.5">
+										<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 										</svg>
 									</div>
 									<div>
-										<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Bổ sung và hoàn thiện hồ sơ nghề nghiệp</h4>
-										<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.</p>
+										<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Bổ sung và hoàn thiện hồ sơ nghề nghiệp</h4>
+										<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.</p>
 									</div>
 								</div>
 
-								<div class="flex items-start gap-2.5 sm:gap-3.5">
-									<div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-										<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="3">
+								<div class="flex items-start gap-3">
+									<div class="w-5 h-5 rounded-full bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center shrink-0 mt-0.5">
+										<svg class="w-3 h-3 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 										</svg>
 									</div>
 									<div>
-										<h4 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base leading-snug">Tham gia tuyển dụng, thi tuyển</h4>
-										<p class="text-slate-500 text-[11px] sm:text-xs md:text-sm leading-relaxed mt-0.5">Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.</p>
+										<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Tham gia tuyển dụng, thi tuyển</h4>
+										<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.</p>
 									</div>
 								</div>
 							</div>
@@ -1222,29 +1230,29 @@ $zalo    = ltdh_get_zalo_url();
 		$sanitized_metrics = ltdh_default( 'homepage', 'kpi_metrics' );
 	}
 	?>
-	<section class="py-8 sm:py-10 md:py-12 bg-gradient-to-br from-[#0c192c] via-[#0E2038] to-[#002b7a] text-white relative overflow-hidden">
-		<div class="absolute -right-20 -top-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-		<div class="absolute -left-20 -bottom-20 w-80 h-80 bg-[#f5bf23]/10 rounded-full blur-3xl pointer-events-none"></div>
+	<section class="py-12 sm:py-16 md:py-20 bg-[#161617] text-white relative overflow-hidden">
+		<div class="absolute -right-20 -top-20 w-80 h-80 bg-[#0071E3]/15 rounded-full blur-3xl pointer-events-none"></div>
+		<div class="absolute -left-20 -bottom-20 w-80 h-80 bg-[#FF9500]/10 rounded-full blur-3xl pointer-events-none"></div>
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-			<div class="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-12">
+			<div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-14">
 				<div class="w-full lg:w-1/3 text-center lg:text-left">
-					<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-xs text-[#f5bf23] text-[11px] font-extrabold uppercase tracking-wider mb-2.5 border border-white/10">
+					<div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md text-[#FF9500] text-[11px] font-semibold uppercase tracking-wider mb-3 border border-white/10">
 						<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
 						<span>Thông tin xác thực</span>
 					</div>
-					<h2 class="text-xl md:text-2xl font-black font-display tracking-tight text-white uppercase leading-tight">
+					<h2 class="text-2xl md:text-3xl font-semibold tracking-tight text-white leading-tight">
 						<?php echo esc_html( $w_heading ); ?>
 					</h2>
-					<p class="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed">
+					<p class="text-[#86868B] text-xs sm:text-sm mt-2.5 leading-relaxed">
 						<?php echo esc_html( $w_desc ); ?>
 					</p>
 				</div>
-				<div id="ltdh-kpi-metrics-grid" class="w-full lg:w-2/3 grid grid-cols-2 gap-3 sm:gap-6 text-center">
+				<div id="ltdh-kpi-metrics-grid" class="w-full lg:w-2/3 grid grid-cols-2 gap-3.5 sm:gap-6 text-center">
 					<?php foreach ( $sanitized_metrics as $idx => $metric ) : 
 						$is_first = ( 0 === $idx );
 					?>
-						<div class="group bg-white/[0.07] hover:bg-white/[0.12] border border-white/10 hover:border-white/20 rounded-2xl p-3.5 sm:p-6 flex flex-col items-center text-center backdrop-blur-xs transition-all duration-300 shadow-sm hover:shadow-lg h-full">
-							<div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-[#f5bf23] mb-2 sm:mb-3 group-hover:bg-[#f5bf23]/20 group-hover:border-[#f5bf23]/30 transition-colors shrink-0">
+						<div class="group bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-3xl p-4 sm:p-7 flex flex-col items-center text-center backdrop-blur-md transition-all duration-300 shadow-sm hover:shadow-lg h-full">
+							<div class="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center text-[#FF9500] mb-2 sm:mb-3 group-hover:bg-[#FF9500]/20 transition-colors shrink-0">
 								<?php if ( $is_first ) : ?>
 									<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
@@ -1256,14 +1264,14 @@ $zalo    = ltdh_get_zalo_url();
 								<?php endif; ?>
 							</div>
 
-							<span class="ltdh-counter tabular-nums block font-display font-black text-2xl sm:text-4xl lg:text-5xl text-[#f5bf23] leading-none tracking-tight mb-1.5 sm:mb-2" data-target="<?php echo esc_attr( $metric['value'] ?? '' ); ?>">
+							<span class="ltdh-counter tabular-nums block font-semibold text-3xl sm:text-5xl text-white leading-none tracking-tight mb-1.5 sm:mb-2" data-target="<?php echo esc_attr( $metric['value'] ?? '' ); ?>">
 								<?php echo esc_html( $metric['value'] ?? '' ); ?>
 							</span>
-							<span class="text-xs sm:text-base text-white font-bold block leading-snug sm:leading-snug mb-auto">
+							<span class="text-xs sm:text-base text-white/90 font-medium block leading-snug sm:leading-snug mb-auto">
 								<?php echo esc_html( $metric['label'] ?? '' ); ?>
 							</span>
 							<?php if ( ! empty( $metric['subtext'] ) ) : ?>
-								<span class="text-[11px] sm:text-xs text-slate-300 font-medium block mt-1.5 sm:mt-2 leading-tight sm:leading-relaxed pt-1.5 border-t border-white/5 w-full">
+								<span class="text-[11px] sm:text-xs text-[#86868B] font-normal block mt-1.5 sm:mt-2 leading-tight sm:leading-relaxed pt-1.5 border-t border-white/5 w-full">
 									<?php echo esc_html( $metric['subtext'] ); ?>
 								</span>
 							<?php endif; ?>
@@ -1274,15 +1282,13 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<!-- 7. STUDENT TESTIMONIALS -->
-	<section class="py-8 sm:py-12 md:py-16 bg-white relative overflow-hidden">
-		<div class="absolute -left-16 -top-16 w-64 h-64 bg-brand-accent/10 rounded-full blur-3xl pointer-events-none z-0"></div>
-		<div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-accent/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+	<!-- 7. STUDENT TESTIMONIALS (Apple Cupertino Review Cards) -->
+	<section class="py-10 sm:py-16 md:py-20 bg-white relative overflow-hidden">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-			<div class="text-center max-w-2xl mx-auto mb-6 sm:mb-8 space-y-2 sm:space-y-3">
-				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">CẢM NHẬN HỌC VIÊN</span>
-				<h2 class="text-xl md:text-3xl font-black text-slate-900">Đánh giá của học viên</h2>
-				<p class="text-slate-500 text-sm">Chia sẻ thực tế từ người học đã được tư vấn và hỗ trợ chuẩn bị hồ sơ xét tuyển liên thông đại học.</p>
+			<div class="text-center max-w-2xl mx-auto mb-8 sm:mb-10 space-y-2">
+				<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">CẢM NHẬN HỌC VIÊN</span>
+				<h2 class="text-2xl md:text-3xl font-semibold text-[#1D1D1F] tracking-tight">Đánh giá của học viên</h2>
+				<p class="text-[#86868B] text-sm leading-relaxed">Chia sẻ thực tế từ người học đã được tư vấn và hỗ trợ chuẩn bị hồ sơ xét tuyển liên thông đại học.</p>
 			</div>
 
 			<div class="flex md:grid overflow-x-auto md:overflow-x-visible snap-x snap-mandatory md:snap-none gap-6 pb-4 md:pb-0 no-scrollbar md:grid-cols-3">
@@ -1349,25 +1355,25 @@ $zalo    = ltdh_get_zalo_url();
 					$is_studying  = in_array($status, ['studying', 'new', 'enrolled'], true);
 					$status_label = $t['status_label'] ?? ($is_studying ? 'Đang theo học' : 'Đã tốt nghiệp');
 				?>
-					<div class="shrink-0 w-[85vw] sm:w-[360px] md:w-auto snap-center bg-slate-50/80 hover:bg-white border border-slate-200/80 hover:border-blue-300 rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+					<div class="shrink-0 w-[85vw] sm:w-[360px] md:w-auto snap-center bg-white border border-black/[0.07] rounded-3xl p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
 						<div>
 							<!-- Student Profile Header with Large Photo (96px) -->
 							<div class="flex items-start gap-4 mb-4">
 								<div class="relative shrink-0">
 									<?php if ($avatar_url) : ?>
-										<img class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-2 ring-slate-100 shadow-md group-hover:ring-brand-primary/20 transition-all duration-300" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>" loading="lazy" width="96" height="96">
+										<img class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-1 ring-black/[0.08] shadow-sm group-hover:scale-105 transition-all duration-300" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>" loading="lazy" width="96" height="96">
 									<?php else : ?>
-										<div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-brand-primary to-blue-700 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-md ring-2 ring-slate-100"><?php echo esc_html($initials); ?></div>
+										<div class="w-20 h-20 sm:w-24 sm:h-24 bg-[#0071E3] text-white rounded-2xl flex items-center justify-center font-semibold text-xl shadow-sm"><?php echo esc_html($initials); ?></div>
 									<?php endif; ?>
 
 									<?php if ($is_studying) : ?>
-										<span class="absolute -bottom-1 -right-1 bg-blue-600 text-white p-1 rounded-full ring-2 ring-white shadow-xs" title="<?php echo esc_attr($status_label); ?>">
+										<span class="absolute -bottom-1 -right-1 bg-[#0071E3] text-white p-1 rounded-full ring-2 ring-white shadow-2xs" title="<?php echo esc_attr($status_label); ?>">
 											<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
 												<path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a10.993 10.993 0 00-.25 2.302c0 1.109.2 2.16.564 3.125a1 1 0 00.916.622h7.04a1 1 0 00.916-.622c.364-.965.564-2.016.564-3.125 0-.796-.09-1.57-.25-2.302l2.644-1.131a1 1 0 000-1.84l-7-3zM10 4.218l4.157 1.782L10 7.782 5.843 6 10 4.218z"/>
 											</svg>
 										</span>
 									<?php else : ?>
-										<span class="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-full ring-2 ring-white shadow-xs" title="Học viên đã tốt nghiệp">
+										<span class="absolute -bottom-1 -right-1 bg-[#34C759] text-white p-1 rounded-full ring-2 ring-white shadow-2xs" title="Học viên đã tốt nghiệp">
 											<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
 												<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
 											</svg>
@@ -1383,23 +1389,22 @@ $zalo    = ltdh_get_zalo_url();
 										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
 										<span class="text-xs font-bold text-amber-600 ml-1">5.0</span>
 									</div>
-									<h3 class="font-bold text-base sm:text-lg text-slate-900 group-hover:text-brand-primary transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
+									<h3 class="font-semibold text-base sm:text-lg text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
 									<?php if (!empty($workplace)) : ?>
-										<p class="text-xs sm:text-[13px] font-semibold text-slate-700 flex items-center gap-1 my-1.5 truncate" title="<?php echo esc_attr($workplace); ?>">
-											<svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<p class="text-xs sm:text-[13px] font-medium text-[#6E6E73] flex items-center gap-1 my-1.5 truncate" title="<?php echo esc_attr($workplace); ?>">
+											<svg class="w-3.5 h-3.5 text-[#0071E3] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
 											</svg>
 											<span class="truncate"><?php echo esc_html($workplace); ?></span>
 										</p>
 									<?php endif; ?>
-									<p class="text-xs text-brand-primary font-medium mt-0.5 line-clamp-1"><?php echo esc_html($t['role'] ?? ''); ?></p>
+									<p class="text-xs text-[#0071E3] font-normal mt-0.5 line-clamp-1"><?php echo esc_html($t['role'] ?? ''); ?></p>
 								</div>
 							</div>
 
 							<!-- Quote Body with decorative quote mark -->
 							<div class="relative pt-2">
-								<svg class="w-8 h-8 text-blue-100 mb-2 -mt-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
-								<p class="text-sm sm:text-[15px] text-slate-600 leading-relaxed italic">"<?php echo esc_html($t['content'] ?? ''); ?>"</p>
+								<p class="text-sm sm:text-[15px] text-[#6E6E73] leading-relaxed">"<?php echo esc_html($t['content'] ?? ''); ?>"</p>
 							</div>
 						</div>
 
@@ -1454,12 +1459,12 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<!-- 9. DYNAMIC CONSULTATION FORM SECTION (Hidden on mobile per UX specification) -->
+	<!-- 9. DYNAMIC CONSULTATION FORM SECTION (Apple Cupertino Bento Form) -->
 	<section id="register-section" class="hidden md:block scroll-mt-20 md:scroll-mt-24 py-8 sm:py-12 md:py-16 bg-white">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-20">
-			<div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden grid grid-cols-1 lg:grid-cols-12 mb-12">
+			<div class="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-black/[0.08] overflow-hidden grid grid-cols-1 lg:grid-cols-12 mb-12">
 			
-			<!-- Left Side Graphic (Uses the banner-contact image from homepage) -->
+			<!-- Left Side Graphic -->
 			<div class="lg:col-span-5 relative min-h-[350px] md:min-h-[450px] lg:min-h-[550px] bg-slate-50">
 					<?php
 					$raw_contact_banner = home_url( '/wp-content/uploads/2026/07/banner-contact.png' );
@@ -1468,16 +1473,16 @@ $zalo    = ltdh_get_zalo_url();
 					<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo esc_url( $opt_contact_banner ); ?>');"></div>
 			</div>
 
-			<!-- Right Side Form (Matches Mockup exact copy and style) -->
+			<!-- Right Side Form -->
 			<div class="lg:col-span-7 p-6 md:p-10 flex flex-col justify-center">
 				<div class="mb-6">
-					<span class="inline-block bg-blue-50 text-[#00308b] text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3">
+					<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3.5 py-1 rounded-full uppercase tracking-wider mb-3">
 						ĐĂNG KÝ TRỰC TUYẾN
 					</span>
-					<h2 class="text-2xl md:text-3xl font-black text-slate-900 mb-2">
+					<h2 class="text-2xl md:text-3xl font-semibold text-[#1D1D1F] tracking-tight mb-2">
 						Đăng ký nhận tư vấn tuyển sinh miễn phí
 					</h2>
-					<p class="text-sm text-slate-500 leading-relaxed">
+					<p class="text-sm text-[#86868B] leading-relaxed">
 						Vui lòng cung cấp thông tin liên hệ, đội ngũ tuyển sinh của chúng tôi sẽ chủ động gọi lại hỗ trợ giải đáp lộ trình cho bạn sớm nhất.
 					</p>
 				</div>
@@ -1490,17 +1495,17 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<!-- 10. NEWS RECENT SECTION -->
-	<section class="py-8 sm:py-12 md:py-16 bg-slate-50 border-t border-slate-100">
+	<!-- 10. NEWS RECENT SECTION (Apple Cupertino Editorial Grid) -->
+	<section class="py-10 sm:py-16 md:py-20 bg-[#F5F5F7] border-t border-black/[0.06]">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex justify-between items-end mb-6 sm:mb-8 lg:mb-10">
 				<div class="space-y-2">
-					<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">THÔNG TIN TUYỂN SINH</span>
-					<h2 class="text-2xl md:text-3xl font-black text-slate-900">Tin tức mới nhất</h2>
+					<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">THÔNG TIN TUYỂN SINH</span>
+					<h2 class="text-2xl md:text-3xl font-semibold text-[#1D1D1F] tracking-tight">Tin tức mới nhất</h2>
 				</div>
-				<a href="<?php echo esc_url(home_url('/tin-tuc/')); ?>" class="text-sm text-[#00308b] font-bold hover:underline flex items-center gap-1">
-					Xem tất cả
-					<span>→</span>
+				<a href="<?php echo esc_url(home_url('/tin-tuc/')); ?>" class="apple-link text-sm text-[#0071E3] font-normal hover:underline inline-flex items-center gap-1 group">
+					<span>Xem tất cả</span>
+					<span class="transition-transform group-hover:translate-x-0.5">›</span>
 				</a>
 			</div>
 
@@ -1563,7 +1568,7 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<!-- 11. FAQ SECTION (SECTION CUỐI TRANG CHỦ) -->
+	<!-- 11. FAQ SECTION (Apple Cupertino Accordion) -->
 	<?php
 	$homepage_faqs = [];
 	if ( function_exists( 'get_field' ) ) {
@@ -1572,34 +1577,34 @@ $zalo    = ltdh_get_zalo_url();
 
 	if ( ! empty( $homepage_faqs ) && is_array( $homepage_faqs ) ) :
 	?>
-	<section id="faq-section" class="py-8 sm:py-12 md:py-16 bg-white border-t border-slate-100">
+	<section id="faq-section" class="py-10 sm:py-16 md:py-20 bg-white border-t border-black/[0.06]">
 		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 			<!-- Section Header -->
-			<div class="text-center max-w-3xl mx-auto mb-6 sm:mb-8 space-y-2 sm:space-y-3">
-				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">HỎI ĐÁP TUYỂN SINH</span>
-				<h2 class="text-2xl md:text-4xl font-black text-slate-900 tracking-tight">Câu hỏi thường gặp</h2>
-				<p class="text-slate-500 text-sm md:text-base">Giải đáp thắc mắc về điều kiện tuyển sinh liên thông, hình thức học trực tuyến, bằng cấp và học phí.</p>
+			<div class="text-center max-w-3xl mx-auto mb-8 sm:mb-10 space-y-2">
+				<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">HỎI ĐÁP TUYỂN SINH</span>
+				<h2 class="text-2xl md:text-3xl font-semibold text-[#1D1D1F] tracking-tight">Câu hỏi thường gặp</h2>
+				<p class="text-[#86868B] text-sm md:text-base leading-relaxed">Giải đáp thắc mắc về điều kiện tuyển sinh liên thông, hình thức học trực tuyến, bằng cấp và học phí.</p>
 			</div>
 
 			<!-- FAQ Accordion List -->
-			<div class="space-y-3 md:space-y-4">
+			<div class="space-y-3">
 				<?php
 				foreach ( $homepage_faqs as $faq ) :
 					$q_text = $faq['question'] ?? '';
 					$a_text = $faq['answer'] ?? '';
 					if ( empty( $q_text ) || empty( $a_text ) ) continue;
 				?>
-					<details class="bg-slate-50/70 border border-slate-100/90 rounded-2xl overflow-hidden group transition-all hover:bg-slate-50 hover:border-slate-200/60 shadow-2xs">
-						<summary class="flex justify-between items-center font-bold text-slate-900 p-4 sm:p-5 md:p-6 cursor-pointer list-none select-none text-sm sm:text-base md:text-lg [&::-webkit-details-marker]:hidden gap-3 sm:gap-4">
-							<span class="flex items-center gap-2.5 sm:gap-3">
-								<span class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-50 text-brand-primary font-black text-xs flex items-center justify-center shrink-0">?</span>
+					<details class="bg-[#F5F5F7] border border-black/[0.04] rounded-2xl overflow-hidden group transition-all hover:bg-[#EEEEF0]">
+						<summary class="flex justify-between items-center font-semibold text-[#1D1D1F] p-4 sm:p-5 md:p-6 cursor-pointer list-none select-none text-sm sm:text-base [&::-webkit-details-marker]:hidden gap-3 sm:gap-4">
+							<span class="flex items-center gap-3">
+								<span class="w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] font-semibold text-xs flex items-center justify-center shrink-0">?</span>
 								<span><?php echo esc_html( $q_text ); ?></span>
 							</span>
-							<span class="text-slate-400 group-open:rotate-180 transition-transform duration-300 shrink-0">
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+							<span class="text-[#86868B] group-open:rotate-180 transition-transform duration-300 shrink-0">
+								<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
 							</span>
 						</summary>
-						<div class="px-4 sm:px-5 md:px-6 pb-4 sm:pb-6 pt-2 text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed border-t border-slate-100/60 bg-white">
+						<div class="px-4 sm:px-5 md:px-6 pb-5 pt-3 text-[#6E6E73] text-xs sm:text-sm md:text-base leading-relaxed border-t border-black/[0.04] bg-white">
 							<p><?php echo esc_html( $a_text ); ?></p>
 						</div>
 					</details>
@@ -1607,10 +1612,10 @@ $zalo    = ltdh_get_zalo_url();
 			</div>
 
 			<!-- View All FAQs Button -->
-			<div class="mt-6 sm:mt-8 text-center">
-				<a href="<?php echo esc_url( home_url( '/cau-hoi-thuong-gap/' ) ); ?>" class="inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-darkBlue bg-blue-50 hover:bg-blue-100 px-5 py-3 rounded-xl transition-colors min-h-[44px]">
+			<div class="mt-8 text-center">
+				<a href="<?php echo esc_url( home_url( '/cau-hoi-thuong-gap/' ) ); ?>" class="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-[#0071E3] hover:bg-[#0077ED] px-6 py-2.5 rounded-full transition-all active:scale-98 shadow-none">
 					<span>Xem tất cả câu hỏi thường gặp</span>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+					<span class="text-xs">›</span>
 				</a>
 			</div>
 		</div>

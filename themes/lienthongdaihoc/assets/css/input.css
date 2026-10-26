@@ -4,15 +4,22 @@
 @source "../../**/*.js";
 
 @theme {
-    --color-brand-primary: #00308b;
-    --color-brand-secondary: #0F172A;
-    --color-brand-accent: #fe8100;
-    --color-brand-darkBlue: #002266;
-    --color-brand-light: #F8FAFC;
-    --font-sans: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --font-display: Montserrat, "Be Vietnam Pro", sans-serif;
-    --font-family-sans: "Be Vietnam Pro", sans-serif;
-    --font-family-display: Montserrat, "Be Vietnam Pro", sans-serif;
+    --color-brand-primary: #0071E3;
+    --color-brand-secondary: #1D1D1F;
+    --color-brand-accent: #FF9500;
+    --color-brand-darkBlue: #161617;
+    --color-brand-light: #F5F5F7;
+    --color-apple-blue: #0071E3;
+    --color-apple-blue-hover: #0077ED;
+    --color-apple-dark: #1D1D1F;
+    --color-apple-gray: #86868B;
+    --color-apple-subgray: #6E6E73;
+    --color-apple-bg: #F5F5F7;
+    --color-apple-border: rgba(0, 0, 0, 0.08);
+    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Be Vietnam Pro", system-ui, sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Be Vietnam Pro", system-ui, sans-serif;
+    --font-family-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Be Vietnam Pro", system-ui, sans-serif;
+    --font-family-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Be Vietnam Pro", system-ui, sans-serif;
 }
 
 html, body {
@@ -89,8 +96,29 @@ html {
 
 
 /*
-  Prevent Montserrat font weights from being too heavy - Make all headings font-semibold (font-weight: 600)
+  Apple Design System / Cupertino Aesthetic - Typographic Hierarchy & Precision
 */
+:root {
+    --apple-ink: #1D1D1F;
+    --apple-gray: #86868B;
+    --apple-subgray: #6E6E73;
+    --apple-bg: #F5F5F7;
+    --apple-surface: #FFFFFF;
+    --apple-blue: #0071E3;
+    --apple-blue-hover: #0077ED;
+    --apple-blue-active: #0062C4;
+    --apple-orange: #FF9500;
+    --apple-hairline: rgba(0, 0, 0, 0.08);
+}
+
+body {
+    color: #1D1D1F;
+    background-color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+}
+
 h1, h2, h3, h4, h5, h6,
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
 h1 strong, h2 strong, h3 strong, h4 strong, h5 strong, h6 strong,
@@ -98,6 +126,199 @@ h1 b, h2 b, h3 b, h4 b, h5 b, h6 b,
 h1 .font-bold, h2 .font-bold, h3 .font-bold, h4 .font-bold, h5 .font-bold, h6 .font-bold,
 h1 .font-extrabold, h2 .font-extrabold, h3 .font-extrabold, h4 .font-extrabold, h5 .font-extrabold, h6 .font-extrabold,
 h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, h6 .font-black {
+    font-weight: 600 !important;
+    letter-spacing: -0.022em;
+    color: #1D1D1F;
+}
+
+h1 {
+    letter-spacing: -0.03em;
+}
+
+/* Apple Glassmorphism Navbar (Desktop & Mobile) */
+.apple-glass-nav {
+    background-color: rgba(255, 255, 255, 0.82) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Apple Bento Pod & Squircle Cards */
+.apple-card {
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.25s ease;
+}
+.apple-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* Apple Gray Pod (Bento on White) */
+.apple-pod-gray {
+    background-color: #F5F5F7;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.apple-pod-gray:hover {
+    background-color: #EEEEF0;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Apple Pill CTA Buttons */
+.apple-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0071E3;
+    color: #FFFFFF !important;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: -0.01em;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    text-decoration: none !important;
+}
+.apple-btn-primary:hover {
+    background-color: #0077ED;
+    transform: scale(1.01);
+}
+.apple-btn-primary:active {
+    background-color: #0062C4;
+    transform: scale(0.98);
+}
+
+.apple-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #1D1D1F !important;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: -0.01em;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    text-decoration: none !important;
+}
+.apple-btn-secondary:hover {
+    background-color: rgba(0, 0, 0, 0.09);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+.apple-btn-secondary:active {
+    transform: scale(0.98);
+}
+
+/* Apple Text Link with Animated Chevron */
+.apple-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #0071E3;
+    font-weight: 400;
+    font-size: 0.875rem;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.apple-link:hover {
+    text-decoration: underline;
+    color: #0077ED;
+}
+.apple-link .chevron,
+.apple-link span:last-child {
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.apple-link:hover .chevron,
+.apple-link:hover span:last-child {
+    transform: translateX(3px);
+}
+
+/* Apple Badge Pill */
+.apple-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+.apple-badge-blue {
+    background-color: rgba(0, 113, 227, 0.09);
+    color: #0071E3;
+}
+.apple-badge-gray {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #1D1D1F;
+}
+.apple-badge-orange {
+    background-color: rgba(255, 149, 0, 0.12);
+    color: #C96800;
+}
+
+/* Apple Directory Footer */
+#colophon.apple-footer {
+    background-color: #F5F5F7 !important;
+    color: #86868B !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+#colophon.apple-footer h3,
+#colophon.apple-footer .footer-title {
+    color: #1D1D1F !important;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+#colophon.apple-footer a {
+    color: #6E6E73 !important;
+    transition: color 0.2s ease;
+}
+#colophon.apple-footer a:hover {
+    color: #1D1D1F !important;
+}
+
+/* Universal mapping for arbitrary legacy utility classes to Apple design tokens */
+[class*="bg-[#00308b]"] { background-color: #0071E3 !important; }
+[class*="text-[#00308b]"] { color: #0071E3 !important; }
+[class*="border-[#00308b]"] { border-color: #0071E3 !important; }
+[class*="hover:bg-[#00308b]"]:hover { background-color: #0077ED !important; }
+[class*="hover:text-[#00308b]"]:hover { color: #0077ED !important; }
+
+[class*="bg-[#fe8100]"] { background-color: #FF9500 !important; }
+[class*="text-[#fe8100]"] { color: #FF9500 !important; }
+[class*="border-[#fe8100]"] { border-color: #FF9500 !important; }
+[class*="hover:bg-[#e06e00]"]:hover { background-color: #E08500 !important; }
+
+/* Refined squircle border radiuses */
+.rounded-xl { border-radius: 1rem !important; }
+.rounded-2xl { border-radius: 1.25rem !important; }
+.rounded-3xl { border-radius: 1.75rem !important; }
+
+/* Cupertino Sticky Subnavigation Bars */
+.ltdh-sticky-nav {
+    background-color: rgba(255, 255, 255, 0.82) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+.ltdh-section-tab-link.is-active,
+.ltdh-section-tab-link.active,
+.ltdh-major-tab-link.is-active,
+.ltdh-major-tab-link.active {
+    background-color: rgba(0, 113, 227, 0.1) !important;
+    color: #0071E3 !important;
     font-weight: 600 !important;
 }
 /* Dropdown animation */
@@ -119,7 +340,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     border-bottom: 1px solid #e2e8f0;
 }
 .ltdh-breadcrumb a {
-    color: #00308b;
+    color: #0071E3;
     text-decoration: none;
     font-weight: 500;
 }
@@ -160,8 +381,8 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-primary-menu .current-menu-item > a,
 .nav-primary-menu .current_page_item > a,
 .nav-primary-menu .current-menu-ancestor > a {
-    color: #00308b;
-    border-bottom-color: #00308b;
+    color: #0071E3;
+    border-bottom-color: #0071E3;
 }
 .nav-primary-menu ul.sub-menu {
     position: absolute;
@@ -199,7 +420,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-primary-menu ul.sub-menu a:hover,
 .nav-primary-menu ul.sub-menu .current-menu-item > a {
     background: #f8fafc;
-    color: #00308b;
+    color: #0071E3;
 }
 
 /* ============================================================
@@ -282,7 +503,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     border-right: none !important;
 }
 .mega-cat-header-link:hover {
-    border-bottom-color: #00308b !important;
+    border-bottom-color: #0071E3 !important;
 }
 
 .mega-cat-icon {
@@ -293,12 +514,12 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     height: 2rem;
     border-radius: 0.5rem;
     background: #eff6ff;
-    color: #00308b;
+    color: #0071E3;
     flex-shrink: 0;
     transition: all 0.2s ease;
 }
 .mega-cat-header-link:hover .mega-cat-icon {
-    background: #00308b;
+    background: #0071E3;
     color: #ffffff;
     transform: scale(1.05);
 }
@@ -318,7 +539,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     transition: color 0.15s ease;
 }
 .mega-cat-header-link:hover .mega-cat-name {
-    color: #00308b !important;
+    color: #0071E3 !important;
 }
 
 .mega-cat-badge {
@@ -337,7 +558,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 }
 .mega-cat-header-link:hover .mega-cat-arrow {
     opacity: 1;
-    color: #00308b;
+    color: #0071E3;
     transform: translateX(0);
 }
 
@@ -349,11 +570,11 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 }
 .nav-primary-menu li.menu-item-category.current-menu-ancestor > a.mega-cat-header-link .mega-cat-name,
 .nav-primary-menu li.menu-item-category.current-menu-item > a.mega-cat-header-link .mega-cat-name {
-    color: #00308b !important;
+    color: #0071E3 !important;
 }
 .nav-primary-menu li.menu-item-category.current-menu-ancestor > a.mega-cat-header-link .mega-cat-icon,
 .nav-primary-menu li.menu-item-category.current-menu-item > a.mega-cat-header-link .mega-cat-icon {
-    background: #00308b;
+    background: #0071E3;
     color: #ffffff;
 }
 
@@ -400,7 +621,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 }
 .mega-major-link:hover {
     background: #f8fafc !important;
-    color: #00308b !important;
+    color: #0071E3 !important;
     transform: translateX(2px);
 }
 
@@ -409,13 +630,13 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-primary-menu li.current-menu-item > a.mega-major-link,
 .mega-major-link.is-active {
     background: #eff6ff !important;
-    color: #00308b !important;
+    color: #0071E3 !important;
     font-weight: 700 !important;
 }
 .nav-primary-menu li.menu-item-object-major.current-menu-item > a.mega-major-link .mega-major-bullet,
 .nav-primary-menu li.current-menu-item > a.mega-major-link .mega-major-bullet,
 .mega-major-link.is-active .mega-major-bullet {
-    background: #00308b !important;
+    background: #0071E3 !important;
     transform: scale(1.4);
 }
 
@@ -435,7 +656,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     transition: all 0.15s ease;
 }
 .mega-major-link:hover .mega-major-bullet {
-    background: #00308b;
+    background: #0071E3;
     transform: scale(1.3);
 }
 
@@ -467,7 +688,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     padding: 0.375rem 0.625rem !important;
     margin-top: 0.25rem;
     border-radius: 0.5rem;
-    color: #00308b !important;
+    color: #0071E3 !important;
     font-size: 0.8125rem !important;
     font-weight: 700 !important;
     text-decoration: none !important;
@@ -483,7 +704,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .mega-cat-more-link .mega-cat-more-icon {
     width: 0.875rem;
     height: 0.875rem;
-    color: #00308b;
+    color: #0071E3;
     transition: transform 0.15s ease;
     flex-shrink: 0;
 }
@@ -537,7 +758,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .mega-footer-btn {
     display: inline-flex !important;
     align-items: center;
-    background: #00308b !important;
+    background: #0071E3 !important;
     color: #ffffff !important;
     font-weight: 700 !important;
     font-size: 0.75rem !important;
@@ -594,7 +815,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-mobile-menu a:hover,
 .nav-mobile-menu a:active {
     background-color: #f1f5f9;
-    color: #00308b;
+    color: #0071E3;
 }
 
 /* Level 1: Ancestor State (Parent of open submenu, e.g. 'Nhóm Ngành' while viewing a major)
@@ -603,7 +824,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-mobile-menu > li.current-menu-ancestor > a,
 .nav-mobile-menu > li.menu-item-has-children.is-open > .mobile-menu-item-row > a,
 .nav-mobile-menu > li.menu-item-has-children.is-open > a {
-    color: #00308b;
+    color: #0071E3;
     font-weight: 700;
     background-color: transparent;
 }
@@ -613,17 +834,17 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-mobile-menu > li:not(.menu-item-has-children).current-menu-item > a,
 .nav-mobile-menu > li:not(.menu-item-has-children).current_page_item > .mobile-menu-item-row > a,
 .nav-mobile-menu > li:not(.menu-item-has-children).current_page_item > a {
-    color: #00308b;
+    color: #0071E3;
     background-color: #eff6ff;
     font-weight: 700;
-    border-left: 3px solid #00308b;
+    border-left: 3px solid #0071E3;
     border-top-left-radius: 0.25rem;
     border-bottom-left-radius: 0.25rem;
 }
 
 /* Level 1: Archive Root Item (When user is directly on /nhom-nganh/ archive itself) */
 .nav-mobile-menu > li.menu-item-has-children.current-menu-item:not(.current-menu-ancestor) > .mobile-menu-item-row > a {
-    color: #00308b;
+    color: #0071E3;
     background-color: #eff6ff;
     font-weight: 700;
 }
@@ -651,7 +872,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 }
 .mobile-submenu-toggle:hover {
     background-color: rgba(148, 163, 184, 0.15);
-    color: #00308b;
+    color: #0071E3;
 }
 .mobile-submenu-toggle:active {
     transform: scale(0.92);
@@ -665,7 +886,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-menu-item-row .mobile-submenu-toggle,
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-submenu-toggle {
     background-color: transparent;
-    color: #00308b;
+    color: #0071E3;
 }
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-menu-item-row .mobile-submenu-toggle svg,
 .nav-mobile-menu li.menu-item-has-children.is-open > .mobile-submenu-toggle svg {
@@ -707,14 +928,14 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     transition: all 0.15s ease;
 }
 .nav-mobile-menu ul.sub-menu a:hover {
-    color: #00308b;
+    color: #0071E3;
     background-color: #f1f5f9;
 }
 
 /* Standard Sub-menu Active Leaf (for 2-level menus like 'Hình thức đào tạo') */
 .nav-mobile-menu ul.sub-menu > li:not(.menu-item-category).current-menu-item > a,
 .nav-mobile-menu ul.sub-menu > li:not(.menu-item-category).current-menu-item > .mobile-menu-item-row > a {
-    background-color: #00308b !important;
+    background-color: #0071E3 !important;
     color: #ffffff !important;
     font-weight: 700 !important;
     border-radius: 0.5rem !important;
@@ -752,7 +973,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     min-height: 38px;
 }
 .nav-mobile-menu li.menu-item-category > .mobile-menu-item-row a:hover {
-    color: #00308b;
+    color: #0071E3;
     background: transparent;
 }
 
@@ -771,7 +992,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 }
 .nav-mobile-menu li.menu-item-category.is-open > .mobile-menu-item-row .mobile-submenu-toggle,
 .nav-mobile-menu li.menu-item-category.current-menu-ancestor > .mobile-menu-item-row .mobile-submenu-toggle {
-    color: #00308b;
+    color: #0071E3;
 }
 
 /* Level 2: Direct Category Archive Selected (When visiting /nhom-nganh/ky-thuat-cong-nghe/ directly) */
@@ -780,7 +1001,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     border-color: #93c5fd;
 }
 .nav-mobile-menu li.menu-item-category.current-menu-item:not(.current-menu-ancestor) > .mobile-menu-item-row a {
-    color: #00308b;
+    color: #0071E3;
     font-weight: 700;
 }
 
@@ -801,7 +1022,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     transition: all 0.15s ease;
 }
 .nav-mobile-menu li.menu-item-category > ul.sub-menu a:hover {
-    color: #00308b;
+    color: #0071E3;
     background-color: #f1f5f9;
 }
 
@@ -811,7 +1032,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .nav-mobile-menu li.menu-item-category > ul.sub-menu li.current-menu-item > .mobile-menu-item-row > a,
 .nav-mobile-menu li.menu-item-object-major.current-menu-item > a,
 .nav-mobile-menu li.menu-item-object-major.current-menu-item > .mobile-menu-item-row > a {
-    background-color: #00308b !important;
+    background-color: #0071E3 !important;
     color: #ffffff !important;
     font-weight: 700 !important;
     border-radius: 0.5rem !important;
@@ -834,7 +1055,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 
 /* Category 'Xem tất cả' within category */
 .nav-mobile-menu .mega-cat-more-mobile {
-    color: #00308b;
+    color: #0071E3;
     font-size: 0.75rem;
     font-weight: 700;
     padding: 0.35rem 0.625rem;
@@ -870,7 +1091,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
     gap: 0.375rem;
 }
 .nav-mobile-menu li.ltdh-view-all-link > .mobile-menu-item-row:hover a {
-    color: #00308b;
+    color: #0071E3;
     background: transparent;
 }
 
@@ -926,7 +1147,7 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .hot-majors-pagination .swiper-pagination-bullet-active {
     width: 20px;
     border-radius: 9999px;
-    background-color: #00308b;
+    background-color: #0071E3;
     opacity: 1;
 }
 
@@ -995,13 +1216,13 @@ h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, 
 .ltdh-cf7-form input[type="email"]:focus,
 .ltdh-cf7-form select:focus,
 .ltdh-cf7-form textarea:focus {
-    border-color: #00308b !important;
+    border-color: #0071E3 !important;
     outline: none !important;
     box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15) !important;
 }
 .ltdh-cf7-form input[type="submit"] {
     width: 100% !important;
-    background-color: #00308b !important;
+    background-color: #0071E3 !important;
     color: #ffffff !important;
     padding: 0.875rem 2rem !important;
     border-radius: 0.5rem !important;
@@ -1130,7 +1351,7 @@ aside .ltdh-cf7-form .sm\:inline,
 }
 .elig-evaluation-cf7 .wpcf7-checkbox input[type="checkbox"],
 .elig-evaluation-cf7 .wpcf7-acceptance input[type="checkbox"] {
-    accent-color: #00308b;
+    accent-color: #0071E3;
     width: 1rem;
     height: 1rem;
     margin-top: 0.125rem;
@@ -1201,13 +1422,13 @@ aside .ltdh-cf7-form .sm\:inline,
     transition: all 0.15s;
 }
 .theme-pagination .page-numbers.current {
-    background-color: #00308b;
+    background-color: #0071E3;
     color: white;
-    border-color: #00308b;
+    border-color: #0071E3;
 }
 .theme-pagination a.page-numbers:hover {
     background-color: #f1f5f9;
-    border-color: #00308b;
+    border-color: #0071E3;
 }
 
 /* Hide scrollbar */
@@ -1455,7 +1676,7 @@ div#ez-toc-container {
 	box-sizing: border-box !important;
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
 	border: 1px solid #e2e8f0 !important;
-	border-left: 4px solid #00308b !important;
+	border-left: 4px solid #0071E3 !important;
 	border-radius: 1rem !important;
 	padding: 1.25rem 1.5rem !important;
 	margin: 1.5rem 0 2rem 0 !important;
@@ -1559,7 +1780,7 @@ div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle {
 div#ez-toc-container .ez-toc-title-toggle a.ez-toc-toggle:hover {
 	background-color: #f0f7ff !important;
 	border-color: #93c5fd !important;
-	color: #00308b !important;
+	color: #0071E3 !important;
 	box-shadow: 0 2px 6px -1px rgba(0, 48, 139, 0.12) !important;
 }
 
@@ -1654,7 +1875,7 @@ div#ez-toc-container.toc_close nav {
 }
 
 #ez-toc-container a.ez-toc-link:hover {
-	color: #00308b !important;
+	color: #0071E3 !important;
 	background: rgba(255, 255, 255, 0.85) !important;
 	transform: translateX(4px) !important;
 }
@@ -1679,7 +1900,7 @@ div#ez-toc-container.toc_close nav {
 }
 
 #ez-toc-container li.ez-toc-heading-level-3 a.ez-toc-link:hover {
-	color: #00308b !important;
+	color: #0071E3 !important;
 	background: rgba(255, 255, 255, 0.85) !important;
 }
 
@@ -1733,7 +1954,7 @@ div#ez-toc-container.toc_close nav {
 	transition: color 0.15s ease;
 }
 .rank-math-breadcrumb a:hover {
-	color: #00308b;
+	color: #0071E3;
 }
 .rank-math-breadcrumb .separator {
 	color: #cbd5e1;
