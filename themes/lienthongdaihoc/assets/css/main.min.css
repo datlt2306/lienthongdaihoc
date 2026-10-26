@@ -563,6 +563,9 @@
   .z-\[9999\] {
     z-index: 9999;
   }
+  .z-\[10000\] {
+    z-index: 10000;
+  }
   .order-1 {
     order: 1;
   }
@@ -4318,6 +4321,10 @@
   }
   .shadow-\[0_20px_50px_rgba\(0\,0\,0\,0\.06\)\] {
     --tw-shadow: 0 20px 50px var(--tw-shadow-color, rgba(0,0,0,0.06));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-\[0_20px_50px_rgba\(0\,0\,0\,0\.18\)\] {
+    --tw-shadow: 0 20px 50px var(--tw-shadow-color, rgba(0,0,0,0.18));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .shadow-inner {

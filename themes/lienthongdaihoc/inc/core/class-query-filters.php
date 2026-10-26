@@ -596,7 +596,7 @@ function ltdh_ajax_filter_programs() {
 							Tìm hiểu
 						</a>
 						<button type="button"
-								class="ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap"
+								class="rounded-full ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap cursor-pointer"
 								data-compare-type="program"
 								data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 								data-compare-title="<?php echo esc_attr( $card_headline ); ?>"
@@ -606,6 +606,20 @@ function ltdh_ajax_filter_programs() {
 								data-compare-major-name="<?php echo esc_attr( $clean_major_name ); ?>"
 								data-compare-school-name="<?php echo esc_attr( $school_name ); ?>">
 							So sánh
+						</button>
+						<button type="button"
+								class="ltdh-card-share-btn text-slate-400 hover:text-[#0071E3] hover:bg-blue-50 border border-slate-200/90 hover:border-blue-200 rounded-full p-1.5 sm:p-2 transition-all min-h-[36px] sm:min-h-[38px] w-9 sm:w-10 flex items-center justify-center shrink-0 cursor-pointer select-none"
+								data-url="<?php echo esc_url( get_permalink( $prog_id ) ); ?>"
+								data-title="<?php echo esc_attr( $card_headline ); ?>"
+								data-subtitle="<?php echo esc_attr( $school_name ); ?>"
+								data-type="program"
+								title="Chia sẻ chương trình <?php echo esc_attr( $card_headline ); ?>"
+								aria-label="Chia sẻ chương trình"
+								aria-haspopup="true"
+								aria-expanded="false">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+							</svg>
 						</button>
 					</div>
 				</div>

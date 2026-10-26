@@ -929,9 +929,9 @@ $has_active_filters  = $active_filter_count > 0;
 						<!-- Card Footer Action Buttons -->
 						<div class="p-3 sm:p-4 pt-0 pb-3 sm:pb-3.5">
 							<div class="pt-2 sm:pt-2.5 sm:border-t sm:border-slate-100 flex items-stretch gap-1.5 sm:gap-2">
-								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-2 px-2 rounded-full font-bold ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
-									<span class="text-[10px] sm:text-xs md:text-sm">Tìm hiểu</span>
-									<svg class="ml-2 w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-2 px-2 gap-1 rounded-full font-bold ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
+									<span class="text-[10px] sm:text-xs md:text-sm inline-block">Tìm hiểu</span>
+									<svg class="hidden sm:block w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
 									</svg>
 								</a>
@@ -948,7 +948,7 @@ $has_active_filters  = $active_filter_count > 0;
 									So sánh
 								</button>
 								<button type="button"
-										class="ltdh-card-share-btn text-slate-400 hover:text-[#00308b] hover:bg-blue-50 border border-slate-200/90 hover:border-blue-200 rounded-lg sm:rounded-xl p-1.5 sm:p-2 transition-all min-h-[36px] sm:min-h-[38px] w-9 sm:w-10 flex items-center justify-center shrink-0 cursor-pointer select-none"
+										class="ltdh-card-share-btn text-slate-400 hover:text-[#0071E3] hover:bg-blue-50 border border-slate-200/90 hover:border-blue-200 rounded-full p-1.5 sm:p-2 transition-all min-h-[36px] sm:min-h-[38px] w-9 sm:w-10 flex items-center justify-center shrink-0 cursor-pointer select-none"
 										data-url="<?php echo esc_url( get_permalink( $prog_id ) ); ?>"
 										data-title="<?php echo esc_attr( $card_headline ); ?>"
 										data-type="program"
