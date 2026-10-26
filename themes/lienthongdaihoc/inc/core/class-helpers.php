@@ -2842,25 +2842,43 @@ function ltdh_get_program_image_url( int $program_id, string $size = 'full' ): s
 		return '';
 	}
 
-	// 1. Ảnh riêng của chương trình (featured image hoặc custom field)
 	$prog_img = '';
-	if ( has_post_thumbnail( $program_id ) ) {
-		$prog_img = get_the_post_thumbnail_url( $program_id, $size ) ?: '';
-	}
-	if ( empty( $prog_img ) && function_exists( 'get_field' ) ) {
-		$prog_img = get_field( 'program_banner', $program_id )
+
+	// 1. Upload riêng: ACF program_banner (hoặc page_banner, banner_image)
+	if ( function_exists( 'get_field' ) ) {
+		$raw = get_field( 'program_banner', $program_id )
 			?: get_field( 'page_banner', $program_id )
-			?: get_field( 'banner_image', $program_id )
-			?: '';
-		if ( is_array( $prog_img ) ) {
-			$prog_img = $prog_img['url'] ?? '';
+			?: get_field( 'banner_image', $program_id );
+		if ( is_array( $raw ) ) {
+			$prog_img = $raw['url'] ?? '';
+		} elseif ( is_numeric( $raw ) && (int) $raw > 0 ) {
+			$prog_img = wp_get_attachment_image_url( (int) $raw, $size ) ?: '';
+		} elseif ( is_string( $raw ) && ! empty( $raw ) ) {
+			$prog_img = $raw;
 		}
 	}
+
+	if ( empty( $prog_img ) ) {
+		$raw_meta = get_post_meta( $program_id, 'program_banner', true )
+			?: get_post_meta( $program_id, 'page_banner', true )
+			?: get_post_meta( $program_id, 'banner_image', true );
+		if ( is_numeric( $raw_meta ) && (int) $raw_meta > 0 ) {
+			$prog_img = wp_get_attachment_image_url( (int) $raw_meta, $size ) ?: '';
+		} elseif ( is_string( $raw_meta ) && ! empty( $raw_meta ) ) {
+			$prog_img = $raw_meta;
+		}
+	}
+
+	// 2. Fallback: Ảnh đại diện (Featured Image / Thumbnail) của chương trình
+	if ( empty( $prog_img ) && has_post_thumbnail( $program_id ) ) {
+		$prog_img = get_the_post_thumbnail_url( $program_id, $size ) ?: '';
+	}
+
 	if ( ! empty( $prog_img ) ) {
 		return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $prog_img ) : $prog_img;
 	}
 
-	// 2. Mặc định lấy ảnh ngành của chương trình đấy
+	// 3. Fallback: Kế thừa ảnh ngành của chương trình đấy
 	$major_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : 0;
 	if ( $major_id ) {
 		$major_img = function_exists( 'ltdh_get_major_banner_url' )
@@ -2871,12 +2889,19 @@ function ltdh_get_program_image_url( int $program_id, string $size = 'full' ): s
 		}
 	}
 
-	// 3. Fallback cấp 3: Banner của trường đối tác (nếu có)
+	// 4. Fallback: Banner của trường đối tác (nếu có)
 	$school_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
 	if ( $school_id ) {
-		$school_img = function_exists( 'get_field' ) ? get_field( 'school_banner', $school_id ) : '';
-		if ( is_array( $school_img ) ) {
-			$school_img = $school_img['url'] ?? '';
+		$school_img = '';
+		if ( function_exists( 'get_field' ) ) {
+			$raw_school = get_field( 'school_banner', $school_id );
+			if ( is_array( $raw_school ) ) {
+				$school_img = $raw_school['url'] ?? '';
+			} elseif ( is_numeric( $raw_school ) && (int) $raw_school > 0 ) {
+				$school_img = wp_get_attachment_image_url( (int) $raw_school, $size ) ?: '';
+			} elseif ( is_string( $raw_school ) && ! empty( $raw_school ) ) {
+				$school_img = $raw_school;
+			}
 		}
 		if ( empty( $school_img ) && has_post_thumbnail( $school_id ) ) {
 			$school_img = get_the_post_thumbnail_url( $school_id, $size ) ?: '';
