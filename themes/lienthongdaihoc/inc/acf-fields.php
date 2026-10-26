@@ -88,6 +88,53 @@ function ltdh_register_program_specialization_acf_fields() {
 }
 
 /**
+ * Register link and school picker fields for page banner and school banner.
+ */
+add_action( 'acf/init', 'ltdh_register_banner_link_acf_fields', 11 );
+function ltdh_register_banner_link_acf_fields() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	acf_add_local_field( [
+		'key'          => 'field_page_banner_school',
+		'label'        => 'Chọn trường liên kết (Tự động lấy link trường)',
+		'name'         => 'page_banner_school',
+		'type'         => 'post_object',
+		'post_type'    => [ 'school' ],
+		'parent'       => 'group_page_banner',
+		'allow_null'   => 1,
+		'multiple'     => 0,
+		'return_format'=> 'id',
+		'ui'           => 1,
+		'instructions' => 'Chọn một trường đại học. Banner sẽ tự động dẫn tới trang chi tiết của trường này khi người dùng click.',
+		'menu_order'   => 2,
+	] );
+
+	acf_add_local_field( [
+		'key'          => 'field_page_banner_link',
+		'label'        => 'Hoặc điền link tùy chỉnh',
+		'name'         => 'page_banner_link',
+		'type'         => 'text',
+		'parent'       => 'group_page_banner',
+		'instructions' => 'Nếu không chọn trường hoặc muốn trỏ tới trang khác (form đăng ký, landing page...), hãy điền link vào đây (Ví dụ: /lien-he/ hoặc https://...).',
+		'placeholder'  => 'https://... hoặc /duong-dan/',
+		'menu_order'   => 3,
+	] );
+
+	acf_add_local_field( [
+		'key'          => 'field_school_banner_link',
+		'label'        => 'Đường dẫn khi click banner trường (Link)',
+		'name'         => 'school_banner_link',
+		'type'         => 'text',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Nhập link khi click vào banner trường (Ví dụ: https://... hoặc /duong-dan/)',
+		'placeholder'  => 'https://... hoặc /duong-dan/',
+		'menu_order'   => 5,
+	] );
+}
+
+/**
  * Register category thumbnail field for major_cat taxonomy.
  */
 add_action( 'acf/init', 'ltdh_register_major_cat_acf_fields', 12 );

@@ -43,6 +43,14 @@
         "library": "all"
       },
       {
+        "key": "field_school_banner_link",
+        "label": "Đường dẫn khi click banner trường (Link)",
+        "name": "school_banner_link",
+        "type": "text",
+        "instructions": "Nhập link khi click vào banner trường (Ví dụ: https://... hoặc /duong-dan/)",
+        "placeholder": "https://... hoặc /duong-dan/"
+      },
+      {
         "key": "field_school_hotline",
         "label": "Hotline tuyển sinh",
         "name": "hotline",
@@ -1738,6 +1746,28 @@
         "type": "text"
       },
       {
+        "key": "field_page_banner_school",
+        "label": "Chọn trường liên kết (Tự động lấy link trường)",
+        "name": "page_banner_school",
+        "type": "post_object",
+        "post_type": [
+          "school"
+        ],
+        "allow_null": 1,
+        "multiple": 0,
+        "return_format": "id",
+        "ui": 1,
+        "instructions": "Chọn một trường đại học. Banner sẽ tự động dẫn tới trang chi tiết của trường này khi người dùng click."
+      },
+      {
+        "key": "field_page_banner_link",
+        "label": "Hoặc điền link tùy chỉnh",
+        "name": "page_banner_link",
+        "type": "text",
+        "instructions": "Nếu không chọn trường hoặc muốn trỏ tới trang khác (form đăng ký, landing page...), hãy điền link vào đây (Ví dụ: /lien-he/ hoặc https://...).",
+        "placeholder": "https://... hoặc /duong-dan/"
+      },
+      {
         "key": "field_page_banner_slides",
         "label": "Danh sách Banner Slide (Slider Swiper)",
         "name": "banner_slides",
@@ -1765,11 +1795,25 @@
             "instructions": "Nếu để trống sẽ tự động dùng ảnh Desktop trên mobile. Khuyến nghị: 800×600px"
           },
           {
+            "key": "field_page_banner_slide_school",
+            "label": "Chọn trường liên kết (Tự động lấy link)",
+            "name": "school",
+            "type": "post_object",
+            "post_type": [
+              "school"
+            ],
+            "allow_null": 1,
+            "multiple": 0,
+            "return_format": "id",
+            "ui": 1,
+            "instructions": "Chọn trường để slide tự động dẫn tới trang trường đó."
+          },
+          {
             "key": "field_page_banner_slide_link",
-            "label": "Đường dẫn khi click (tùy chọn)",
+            "label": "Hoặc điền link tùy chỉnh",
             "name": "link",
-            "type": "url",
-            "instructions": "Nếu để trống, slide sẽ không có liên kết"
+            "type": "text",
+            "instructions": "Nếu để trống, slide sẽ không có liên kết (hoặc lấy từ trường được chọn ở trên)"
           },
           {
             "key": "field_page_banner_slide_title",

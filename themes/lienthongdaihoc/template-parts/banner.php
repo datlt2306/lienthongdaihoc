@@ -25,6 +25,7 @@ $banner_initials = '';
 $banner_address  = '';
 $banner_website  = '';
 $banner_map_url  = '';
+$banner_link     = '';
 
 $type = get_query_var( 'ltdh_compare' );
 $request_path = parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH );
@@ -70,6 +71,7 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 	$banner_address  = get_field( 'address', $school_id ) ?: '';
 	$banner_website  = get_field( 'website', $school_id ) ?: '';
 	$banner_map_url  = get_field( 'google_map_url', $school_id ) ?: get_field( 'map_url', $school_id );
+	$banner_link     = get_field( 'school_banner_link', $school_id ) ?: ( get_post_meta( $school_id, 'school_banner_link', true ) ?: '' );
 } elseif ( is_singular( 'major' ) ) {
 	$major_id    = get_the_ID();
 	$raw_title   = get_the_title( $major_id );
@@ -451,6 +453,23 @@ if ( $is_pure_banner_page ) {
 				$banner_image = $page_img;
 			}
 		}
+
+		// Resolve banner link: Custom link OR Selected School link
+		$custom_link       = get_field( 'page_banner_link', $page_id ) ?: ( get_post_meta( $page_id, 'page_banner_link', true ) ?: '' );
+		$banner_school_raw = get_field( 'page_banner_school', $page_id ) ?: ( get_post_meta( $page_id, 'page_banner_school', true ) ?: 0 );
+		if ( is_array( $banner_school_raw ) ) {
+			$banner_school_raw = ! empty( $banner_school_raw ) ? reset( $banner_school_raw ) : 0;
+		}
+		if ( is_object( $banner_school_raw ) ) {
+			$banner_school_raw = $banner_school_raw->ID;
+		}
+		$banner_school_id = intval( $banner_school_raw );
+
+		if ( ! empty( $custom_link ) ) {
+			$banner_link = $custom_link;
+		} elseif ( $banner_school_id > 0 ) {
+			$banner_link = get_permalink( $banner_school_id ) ?: '';
+		}
 	}
 	// Strictly NO default image fallback if user has not uploaded any image or slides
 }
@@ -512,7 +531,13 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 										$s_mobile = ltdh_get_optimized_image_url( $s_mobile );
 									}
 								}
-								$s_link   = $slide['link'] ?? '';
+								$s_link = $slide['link'] ?? '';
+								if ( empty( $s_link ) && ! empty( $slide['school'] ) ) {
+									$sl_school_id = is_object( $slide['school'] ) ? $slide['school']->ID : intval( is_array( $slide['school'] ) ? reset( $slide['school'] ) : $slide['school'] );
+									if ( $sl_school_id > 0 ) {
+										$s_link = get_permalink( $sl_school_id ) ?: '';
+									}
+								}
 								$s_alt    = ! empty( $slide['title'] ) ? $slide['title'] : $banner_title;
 								$is_lcp   = ( 0 === $s_idx );
 								$loading  = $is_lcp ? 'loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1"' : 'loading="lazy" fetchpriority="low" decoding="async"';
@@ -566,12 +591,29 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 					if ( function_exists( 'ltdh_get_optimized_image_url' ) && ! empty( $single_img ) ) {
 						$single_img = ltdh_get_optimized_image_url( $single_img );
 					}
+					$single_link = ! empty( $banner_link ) ? $banner_link : '';
+					if ( empty( $single_link ) && ! empty( $hub_slides[0] ) ) {
+						$first_slide = $hub_slides[0];
+						$single_link = ! empty( $first_slide['link'] ) ? $first_slide['link'] : '';
+						if ( empty( $single_link ) && ! empty( $first_slide['school'] ) ) {
+							$f_school_id = is_object( $first_slide['school'] ) ? $first_slide['school']->ID : intval( is_array( $first_slide['school'] ) ? reset( $first_slide['school'] ) : $first_slide['school'] );
+							if ( $f_school_id > 0 ) {
+								$single_link = get_permalink( $f_school_id ) ?: '';
+							}
+						}
+					}
 					?>
 					<?php if ( ! empty( $single_img ) ) : ?>
 						<div class="relative w-full h-auto min-h-[180px] sm:min-h-[280px] md:min-h-[380px] max-h-[700px] overflow-hidden bg-[#f8fafc]">
+							<?php if ( ! empty( $single_link ) ) : ?>
+								<a href="<?php echo esc_url( $single_link ); ?>" class="block w-full h-full cursor-pointer group" title="<?php echo esc_attr( $banner_title ); ?>">
+							<?php endif; ?>
 							<picture class="relative z-10 block w-full h-auto aspect-[1942/809]" style="aspect-ratio: 1942/809;">
-								<img src="<?php echo esc_url( $single_img ); ?>" alt="<?php echo esc_attr( $banner_title ); ?>" width="1942" height="809" class="hero-banner hero-img skip-lazy no-lazy w-full h-auto aspect-[1942/809] object-cover object-center pointer-events-none" style="aspect-ratio: 1942/809;" loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
+								<img src="<?php echo esc_url( $single_img ); ?>" alt="<?php echo esc_attr( $banner_title ); ?>" width="1942" height="809" class="hero-banner hero-img skip-lazy no-lazy w-full h-auto aspect-[1942/809] object-cover object-center pointer-events-none group-hover:scale-[1.01] transition-transform duration-300" style="aspect-ratio: 1942/809;" loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
 							</picture>
+							<?php if ( ! empty( $single_link ) ) : ?>
+								</a>
+							<?php endif; ?>
 						</div>
 					<?php endif; ?>
 				<?php endif; ?>
@@ -583,11 +625,13 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 		<!-- GRAND HERO BANNER (CONTAINERIZED, SOFT SCRIM OVERLAY, BOTTOM-ANCHORED CONTENT) -->
 		<section class="relative bg-slate-100 border border-slate-200/90 rounded-2xl sm:rounded-3xl overflow-hidden mb-6 shadow-lg min-h-[320px] sm:min-h-[380px] md:min-h-[440px] lg:min-h-[530px] flex flex-col justify-end">
 			<?php if ( ! empty( $banner_image ) ) : ?>
+				<?php if ( ! empty( $banner_link ) ) : ?><a href="<?php echo esc_url( $banner_link ); ?>" class="absolute inset-0 z-0 block cursor-pointer group/bg" title="<?php echo esc_attr( $banner_title ); ?>"><?php endif; ?>
 				<!-- Background Banner Image (Bright, natural display) -->
 				<img src="<?php echo esc_url( $banner_image ); ?>" 
-				     class="hero-banner skip-lazy no-lazy absolute inset-0 w-full h-full object-cover object-center pointer-events-none" 
+				     class="hero-banner skip-lazy no-lazy absolute inset-0 w-full h-full object-cover object-center pointer-events-none group-hover/bg:scale-[1.01] transition-transform duration-300" 
 				     alt="<?php echo esc_attr( $banner_title ); ?>" 
 				     loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
+				<?php if ( ! empty( $banner_link ) ) : ?></a><?php endif; ?>
 				
 				<!-- Ultra-Soft Scrim Gradient: Upper 60% is 100% clear & bright; bottom has gentle fade only for text contrast -->
 				<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 via-35% to-transparent pointer-events-none"></div>

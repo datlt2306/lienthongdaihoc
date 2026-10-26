@@ -4655,6 +4655,9 @@
         --tw-ring-color: color-mix(in oklab, var(--color-brand-primary) 20%, transparent);
       }
     }
+    .group-hover\/bg\:scale-\[1\.01\]:is(:where(.group\/bg):hover *) {
+      scale: 1.01;
+    }
     .group-hover\/btn\:translate-x-0\.5:is(:where(.group\/btn):hover *) {
       --tw-translate-x: calc(var(--spacing) * 0.5);
       translate: var(--tw-translate-x) var(--tw-translate-y);
