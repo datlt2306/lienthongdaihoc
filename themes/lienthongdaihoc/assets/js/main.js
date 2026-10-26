@@ -1984,57 +1984,6 @@ function ltdhInitTheme() {
     }
 
     initSeoArticleToggle();
-
-    // Desktop Catalog Sticky Bar Enhancer (Elevated shadow & compact state on scroll)
-    function initCatalogDesktopSticky() {
-        const filterWrapper = document.getElementById('catalog-desktop-filter-wrapper');
-        if (!filterWrapper) return;
-
-        let isStuck = false;
-        let ticking = false;
-
-        const checkSticky = () => {
-            if (window.innerWidth < 768) {
-                if (isStuck) {
-                    filterWrapper.classList.remove('is-stuck');
-                    isStuck = false;
-                }
-                ticking = false;
-                return;
-            }
-
-            const headerOffset = window.innerWidth >= 1024 ? 80 : 64;
-            const adminBarOffset = document.body.classList.contains('admin-bar') ? (window.innerWidth >= 782 ? 32 : 46) : 0;
-            const targetTop = headerOffset + adminBarOffset;
-
-            const rect = filterWrapper.getBoundingClientRect();
-            // Sticky triggers when element reaches target top threshold
-            const currentlyStuck = rect.top <= targetTop + 1;
-
-            if (currentlyStuck !== isStuck) {
-                isStuck = currentlyStuck;
-                if (isStuck) {
-                    filterWrapper.classList.add('is-stuck');
-                } else {
-                    filterWrapper.classList.remove('is-stuck');
-                }
-            }
-            ticking = false;
-        };
-
-        const onScrollOrResize = () => {
-            if (!ticking) {
-                window.requestAnimationFrame(checkSticky);
-                ticking = true;
-            }
-        };
-
-        window.addEventListener('scroll', onScrollOrResize, { passive: true });
-        window.addEventListener('resize', onScrollOrResize, { passive: true });
-        checkSticky();
-    }
-
-    initCatalogDesktopSticky();
 }
 
 if (document.readyState === 'loading') {
