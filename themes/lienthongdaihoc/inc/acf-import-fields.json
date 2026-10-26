@@ -29,6 +29,7 @@
         "label": "Logo Trường",
         "name": "logo",
         "type": "image",
+        "instructions": "Tỉ lệ chuẩn vuông 1:1 (Khuyến nghị: 300×300px hoặc 500×500px, định dạng PNG nền trong suốt hoặc WebP tối ưu).",
         "return_format": "id",
         "preview_size": "thumbnail",
         "library": "all"
@@ -38,6 +39,7 @@
         "label": "Banner Trường",
         "name": "school_banner",
         "type": "image",
+        "instructions": "Tỉ lệ chuẩn ~2.4:1 (Khuyến nghị: 1942×809px hoặc 1920×800px, định dạng WebP hoặc JPG). Banner hiển thị toàn chiều rộng ở đầu trang chi tiết trường.",
         "return_format": "url",
         "preview_size": "medium",
         "library": "all"
@@ -473,6 +475,17 @@
         "endpoint": 0
       },
       {
+        "key": "field_major_banner",
+        "label": "Ảnh Banner Ngành (Tùy chọn)",
+        "name": "major_banner",
+        "type": "image",
+        "instructions": "Tỉ lệ chuẩn ~2.4:1 (Khuyến nghị: 1942×809px hoặc 1920×800px, WebP/JPG). Nếu để trống, hệ thống sẽ tự động sử dụng Ảnh đại diện (Featured Image - tỉ lệ 16:9 hoặc 1200×675px) của ngành làm banner.",
+        "required": 0,
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all"
+      },
+      {
         "key": "field_major_degree_type",
         "label": "Loại văn bằng tốt nghiệp chuẩn của ngành",
         "name": "degree_type",
@@ -772,6 +785,17 @@
         "type": "tab",
         "placement": "top",
         "endpoint": 0
+      },
+      {
+        "key": "field_program_banner",
+        "label": "Ảnh Banner Chương trình (Tùy chọn ghi đè)",
+        "name": "program_banner",
+        "type": "image",
+        "instructions": "Tỉ lệ chuẩn ~2.4:1 (Khuyến nghị: 1942×809px hoặc 1920×800px, WebP/JPG). Nếu để trống, hệ thống sẽ tự động kế thừa từ Banner / Ảnh đại diện của Ngành đào tạo (Chuẩn DRY).",
+        "required": 0,
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all"
       },
       {
         "key": "field_program_school",
@@ -1149,7 +1173,7 @@
         "return_format": "id",
         "preview_size": "thumbnail",
         "library": "all",
-        "instructions": "Upload ảnh logo của trang web (thay thế cho logo trong Customizer)"
+        "instructions": "Tỉ lệ chuẩn ngang ~3:1 hoặc 4:1 (Khuyến nghị: 300×80px hoặc 400×100px, PNG nền trong suốt hoặc SVG). Ảnh hiển thị ở thanh điều hướng header và chân trang."
       },
       {
         "key": "field_global_favicon",
@@ -1159,7 +1183,7 @@
         "return_format": "url",
         "preview_size": "thumbnail",
         "library": "all",
-        "instructions": "Kích thước đề nghị: 512x512px, định dạng PNG hoặc ICO. Ảnh sẽ hiển thị trên tab trình duyệt."
+        "instructions": "Tỉ lệ vuông chuẩn 1:1 (Khuyến nghị: 512×512px, định dạng PNG nền trong suốt hoặc ICO). Ảnh hiển thị trên tab trình duyệt."
       },
       {
         "key": "field_global_share_image",
@@ -1169,7 +1193,7 @@
         "return_format": "url",
         "preview_size": "medium",
         "library": "all",
-        "instructions": "Kích thước khuyên dùng: 1200x630px. Sẽ được dùng làm ảnh đại diện khi chia sẻ liên kết (Facebook, Zalo) hoặc banner mặc định khi bài viết/chương trình không có ảnh đại diện."
+        "instructions": "Tỉ lệ chuẩn 1.91:1 (Khuyến nghị chuẩn SEO: 1200×630px, định dạng JPG hoặc PNG). Dùng làm ảnh đại diện khi chia sẻ mạng xã hội (Facebook, Zalo) hoặc banner mặc định khi bài viết/ngành/chương trình chưa có ảnh riêng."
       },
       {
         "key": "field_global_hotline",
@@ -1737,7 +1761,7 @@
         "return_format": "url",
         "preview_size": "large",
         "library": "all",
-        "instructions": "Kích thước đề nghị: 1920x400px"
+        "instructions": "Tỉ lệ chuẩn ~2.4:1 (Khuyến nghị: 1942×809px hoặc 1920×800px, WebP/JPG). Banner hiển thị toàn chiều rộng ở đầu trang."
       },
       {
         "key": "field_page_banner_subtitle",
@@ -1783,7 +1807,7 @@
             "type": "image",
             "return_format": "url",
             "preview_size": "large",
-            "instructions": "Khuyến nghị 1942×809px hoặc 2400×800px (WebP / JPG)"
+            "instructions": "Tỉ lệ chuẩn ~2.4:1 (Khuyến nghị: 1942×809px hoặc 2400×1000px, định dạng WebP/JPG tối ưu)."
           },
           {
             "key": "field_page_banner_slide_image_mobile",
@@ -1792,7 +1816,7 @@
             "type": "image",
             "return_format": "url",
             "preview_size": "medium",
-            "instructions": "Nếu để trống sẽ tự động dùng ảnh Desktop trên mobile. Khuyến nghị: 800×600px"
+            "instructions": "Tỉ lệ chuẩn 4:3 hoặc 16:9 (Khuyến nghị: 800×600px hoặc 750×420px, WebP/JPG). Nếu để trống, hệ thống sẽ tự động dùng ảnh Desktop trên mobile."
           },
           {
             "key": "field_page_banner_slide_school",
@@ -2035,7 +2059,7 @@
             "type": "image",
             "return_format": "url",
             "preview_size": "large",
-            "instructions": "Khuyến nghị: 2400×800px hoặc tỉ lệ 21:7"
+            "instructions": "Tỉ lệ chuẩn ~2.4:1 hoặc 21:7 (Khuyến nghị: 1942×809px hoặc 2400×800px, định dạng WebP/JPG tối ưu dung lượng)."
           },
           {
             "key": "field_hero_slide_image_mobile",
@@ -2044,7 +2068,7 @@
             "type": "image",
             "return_format": "url",
             "preview_size": "medium",
-            "instructions": "Nếu để trống, sẽ dùng ảnh Desktop. Khuyến nghị: 800×600px"
+            "instructions": "Tỉ lệ chuẩn 4:3 hoặc 1:1 (Khuyến nghị: 800×600px hoặc 750×750px, WebP/JPG). Nếu để trống, hệ thống sẽ tự động dùng ảnh Desktop trên mobile."
           },
           {
             "key": "field_hero_slide_link",
@@ -2185,7 +2209,8 @@
             "name": "image",
             "type": "image",
             "return_format": "url",
-            "preview_size": "medium"
+            "preview_size": "medium",
+            "instructions": "Tỉ lệ chuẩn 4:3 hoặc 3:2 (Khuyến nghị: 800×600px hoặc 900×600px, định dạng WebP/JPG)."
           }
         ]
       },
@@ -2196,7 +2221,7 @@
         "type": "image",
         "return_format": "url",
         "preview_size": "medium",
-        "instructions": "Chọn hoặc upload ảnh đại diện cho video."
+        "instructions": "Tỉ lệ chuẩn 16:9 (Khuyến nghị: 1280×720px hoặc 800×450px, WebP/JPG). Ảnh dùng làm bìa video."
       },
       {
         "key": "field_hp_cert_left_youtube",
@@ -2319,7 +2344,8 @@
             "name": "image",
             "type": "image",
             "return_format": "url",
-            "preview_size": "thumbnail"
+            "preview_size": "thumbnail",
+            "instructions": "Tỉ lệ chuẩn vuông 1:1 hoặc 4:3 (Khuyến nghị: 400×400px hoặc 600×450px, WebP/JPG)."
           },
           {
             "key": "field_hp_seg_title",

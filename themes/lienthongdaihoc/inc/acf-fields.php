@@ -152,7 +152,7 @@ function ltdh_register_major_cat_acf_fields() {
 				'label'        => 'Ảnh đại diện nhóm ngành (Thumbnail)',
 				'name'         => 'category_thumbnail',
 				'type'         => 'image',
-				'instructions' => 'Ảnh đại diện cho nhóm ngành, dùng hiển thị trên trang danh mục nhóm ngành hoặc làm ảnh mặc định cho các ngành bên trong khi chưa upload ảnh riêng.',
+				'instructions' => 'Tỉ lệ chuẩn 16:9 (Khuyến nghị: 1200×675px hoặc 800×450px, WebP/JPG). Dùng hiển thị trên trang danh mục nhóm ngành hoặc làm ảnh mặc định cho các ngành bên trong khi chưa upload ảnh riêng.',
 				'required'     => 0,
 				'return_format'=> 'id',
 				'preview_size' => 'medium',
@@ -760,6 +760,76 @@ function ltdh_register_major_overview_acf_field() {
 		'media_upload' => 1,
 		'delay'        => 0,
 	] );
+}
+
+/**
+ * Ensure Major Banner ACF Field is registered directly to group_major_details.
+ */
+add_action( 'acf/init', 'ltdh_register_major_banner_acf_field', 20 );
+function ltdh_register_major_banner_acf_field() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	acf_add_local_field( [
+		'key'           => 'field_major_banner',
+		'label'         => 'Ảnh Banner Ngành (Tùy chọn)',
+		'name'          => 'major_banner',
+		'type'          => 'image',
+		'parent'        => 'group_major_details',
+		'instructions'  => 'Tỉ lệ chuẩn ~2.4:1 (Khuyến nghị: 1942×809px hoặc 1920×800px, WebP/JPG). Nếu để trống, hệ thống sẽ tự động sử dụng Ảnh đại diện (Featured Image - tỉ lệ 16:9 hoặc 1200×675px) của ngành làm banner.',
+		'required'      => 0,
+		'return_format' => 'url',
+		'preview_size'  => 'medium',
+		'library'       => 'all',
+	] );
+}
+
+/**
+ * Ensure Program Banner ACF Field is registered directly to group_program_details.
+ */
+add_action( 'acf/init', 'ltdh_register_program_banner_acf_field', 20 );
+function ltdh_register_program_banner_acf_field() {
+	if ( ! function_exists( 'acf_add_local_field' ) ) {
+		return;
+	}
+
+	acf_add_local_field( [
+		'key'           => 'field_program_banner',
+		'label'         => 'Ảnh Banner Chương trình (Tùy chọn ghi đè)',
+		'name'          => 'program_banner',
+		'type'          => 'image',
+		'parent'        => 'group_program_details',
+		'instructions'  => 'Tỉ lệ chuẩn ~2.4:1 (Khuyến nghị: 1942×809px hoặc 1920×800px, WebP/JPG). Nếu để trống, hệ thống sẽ tự động kế thừa từ Banner / Ảnh đại diện của Ngành đào tạo (Chuẩn DRY).',
+		'required'      => 0,
+		'return_format' => 'url',
+		'preview_size'  => 'medium',
+		'library'       => 'all',
+	] );
+}
+
+/**
+ * Hiển thị gợi ý tỉ lệ & kích thước chuẩn trực tiếp dưới metabox Ảnh đại diện (Featured Image) trong trang quản trị.
+ */
+add_filter( 'admin_post_thumbnail_html', 'ltdh_admin_post_thumbnail_instructions', 10, 3 );
+function ltdh_admin_post_thumbnail_instructions( $content, $post_id, $thumbnail_id ) {
+	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+	$post_type = $screen ? $screen->post_type : get_post_type( $post_id );
+
+	$notes = [
+		'major'   => '💡 <strong>Tỉ lệ chuẩn 16:9</strong> (Khuyến nghị: <strong>1200×675px</strong> hoặc <strong>1000×600px</strong>, định dạng WebP/JPG tối ưu). Ảnh dùng hiển thị thẻ ngành và tự động làm banner nếu chưa upload banner riêng.',
+		'school'  => '💡 <strong>Tỉ lệ chuẩn 16:9 hoặc ~2.4:1</strong> (Khuyến nghị: <strong>1200×675px</strong> hoặc <strong>1942×809px</strong>, định dạng WebP/JPG). Ảnh dùng làm đại diện nhận diện cho trường.',
+		'program' => '💡 <strong>Tỉ lệ chuẩn 16:9</strong> (Khuyến nghị: <strong>1200×675px</strong>, định dạng WebP/JPG). Nếu để trống, hệ thống sẽ tự động lấy từ Ngành đào tạo tương ứng.',
+		'post'    => '💡 <strong>Tỉ lệ chuẩn 16:9</strong> (Khuyến nghị: <strong>1200×675px</strong> hoặc <strong>800×450px</strong>, định dạng WebP/JPG). Ảnh dùng làm thumbnail bài viết & chia sẻ Facebook/Zalo.',
+		'page'    => '💡 <strong>Tỉ lệ chuẩn 16:9</strong> (Khuyến nghị: <strong>1200×675px</strong>, định dạng WebP/JPG). Dùng làm ảnh chia sẻ đại diện cho trang.',
+	];
+
+	if ( $post_type && isset( $notes[ $post_type ] ) ) {
+		$tip = '<div class="ltdh-thumb-guide" style="margin-top:10px;padding:8px 10px;font-size:12px;line-height:1.45;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;">' . $notes[ $post_type ] . '</div>';
+		return $content . $tip;
+	}
+
+	return $content;
 }
 
 // Ensure ACF local JSON load points include inc directory

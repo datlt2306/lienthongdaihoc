@@ -149,7 +149,7 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 			);
 		}
 
-		$banner_image = ( get_field( 'school_banner', $school->ID ) ?: '' ) ?: ( get_the_post_thumbnail_url( $school->ID, 'full' ) ?: ( get_the_post_thumbnail_url( $major_id, 'full' ) ?: '' ) );
+		$banner_image = ( get_field( 'school_banner', $school->ID ) ?: '' ) ?: ( get_the_post_thumbnail_url( $school->ID, 'full' ) ?: ( function_exists( 'ltdh_get_major_banner_url' ) ? ltdh_get_major_banner_url( $major_id, 'full' ) : ( get_the_post_thumbnail_url( $major_id, 'full' ) ?: '' ) ) );
 
 		$banner_logo_url = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school->ID, 'medium' ) : ( get_the_post_thumbnail_url( $school->ID, 'thumbnail' ) ?: '' );
 		$banner_logo_alt = $school_name;
@@ -175,7 +175,7 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 			$banner_subtitle = 'Danh sách các trường đại học tuyển sinh, lộ trình công nhận tín chỉ và học phí năm ' . $year;
 		}
 
-		$banner_image    = ( get_field( 'major_banner', $major_id ) ?: '' ) ?: ( get_the_post_thumbnail_url( $major_id, 'full' ) ?: '' );
+		$banner_image    = function_exists( 'ltdh_get_major_banner_url' ) ? ltdh_get_major_banner_url( $major_id, 'full' ) : ( ( get_field( 'major_banner', $major_id ) ?: '' ) ?: ( get_the_post_thumbnail_url( $major_id, 'full' ) ?: '' ) );
 		$banner_logo_url = ( get_field( 'major_icon', $major_id ) ?: '' ) ?: ( get_field( 'major_logo', $major_id ) ?: '' );
 		$banner_logo_alt = $clean_major;
 
