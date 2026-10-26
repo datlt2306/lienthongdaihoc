@@ -48,7 +48,7 @@ function ltdh_enqueue_assets() {
 	$main_version = file_exists( $main_css_path ) ? filemtime( $main_css_path ) : LTDH_VERSION;
 	wp_enqueue_style( 'ltdh-main-style', get_template_directory_uri() . '/style.css', [], $main_version );
 
-	if ( is_front_page() ) {
+	if ( is_front_page() || is_post_type_archive( 'school' ) || is_post_type_archive( 'major' ) || is_tax( 'major_cat' ) || is_post_type_archive( 'program' ) || is_tax( 'training_type' ) ) {
 		if ( file_exists( get_template_directory() . '/assets/css/swiper-bundle.min.css' ) ) {
 			wp_enqueue_style( 'swiper-css', get_template_directory_uri() . '/assets/css/swiper-bundle.min.css', [], '11.0.0' );
 		}

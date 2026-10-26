@@ -1736,6 +1736,49 @@
         "label": "Mô tả ngắn banner",
         "name": "page_banner_subtitle",
         "type": "text"
+      },
+      {
+        "key": "field_page_banner_slides",
+        "label": "Danh sách Banner Slide (Slider Swiper)",
+        "name": "banner_slides",
+        "type": "repeater",
+        "instructions": "Thêm các slide ảnh banner cho trang. Khuyến nghị tỉ lệ 1942×809px hoặc 21:9.",
+        "layout": "block",
+        "button_label": "Thêm slide banner",
+        "sub_fields": [
+          {
+            "key": "field_page_banner_slide_image",
+            "label": "Ảnh Banner Desktop",
+            "name": "image",
+            "type": "image",
+            "return_format": "url",
+            "preview_size": "large",
+            "instructions": "Khuyến nghị 1942×809px hoặc 2400×800px (WebP / JPG)"
+          },
+          {
+            "key": "field_page_banner_slide_image_mobile",
+            "label": "Ảnh Mobile (tùy chọn)",
+            "name": "image_mobile",
+            "type": "image",
+            "return_format": "url",
+            "preview_size": "medium",
+            "instructions": "Nếu để trống sẽ tự động dùng ảnh Desktop trên mobile. Khuyến nghị: 800×600px"
+          },
+          {
+            "key": "field_page_banner_slide_link",
+            "label": "Đường dẫn khi click (tùy chọn)",
+            "name": "link",
+            "type": "url",
+            "instructions": "Nếu để trống, slide sẽ không có liên kết"
+          },
+          {
+            "key": "field_page_banner_slide_title",
+            "label": "Tiêu đề / Alt text (tùy chọn)",
+            "name": "title",
+            "type": "text",
+            "instructions": "Dùng làm tiêu đề chú thích và thẻ alt ảnh SEO"
+          }
+        ]
       }
     ],
     "location": [

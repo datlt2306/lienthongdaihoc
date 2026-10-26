@@ -750,7 +750,7 @@ function ltdh_force_field_prefix_acf( $field ) {
 // Ensure Program & Major field groups always use the structured layout from JSON in WP Admin
 add_filter( 'acf/load_field_group', 'ltdh_filter_json_field_groups' );
 function ltdh_filter_json_field_groups( $field_group ) {
-	$target_groups = [ 'group_program_details', 'group_major_details' ];
+	$target_groups = [ 'group_program_details', 'group_major_details', 'group_page_banner' ];
 	if ( isset( $field_group['key'] ) && in_array( $field_group['key'], $target_groups, true ) ) {
 		$json_path = get_template_directory() . '/inc/acf-import-fields.json';
 		if ( file_exists( $json_path ) ) {
@@ -770,7 +770,7 @@ function ltdh_filter_json_field_groups( $field_group ) {
 
 add_filter( 'acf/load_fields', 'ltdh_filter_json_fields', 10, 2 );
 function ltdh_filter_json_fields( $fields, $parent ) {
-	$target_groups = [ 'group_program_details', 'group_major_details' ];
+	$target_groups = [ 'group_program_details', 'group_major_details', 'group_page_banner' ];
 	if ( isset( $parent['key'] ) && in_array( $parent['key'], $target_groups, true ) ) {
 		$json_path = get_template_directory() . '/inc/acf-import-fields.json';
 		if ( file_exists( $json_path ) ) {

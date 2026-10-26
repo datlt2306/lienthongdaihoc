@@ -16,7 +16,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 <main id="primary" class="site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
 		<?php
 		// Query featured schools (Cached for performance)
