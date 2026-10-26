@@ -929,11 +929,14 @@ $has_active_filters  = $active_filter_count > 0;
 						<!-- Card Footer Action Buttons -->
 						<div class="p-3 sm:p-4 pt-0 pb-3 sm:pb-3.5">
 							<div class="pt-2 sm:pt-2.5 sm:border-t sm:border-slate-100 flex items-stretch gap-1.5 sm:gap-2">
-								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-1.5 sm:py-2 px-1 sm:px-3 rounded-lg sm:rounded-xl font-bold ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
-									Tìm hiểu
+								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-2 px-2 rounded-full font-bold ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
+									<span class="text-[10px] sm:text-xs md:text-sm">Tìm hiểu</span>
+									<svg class="ml-2 w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+									</svg>
 								</a>
 								<button type="button"
-										class="ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap cursor-pointer"
+										class="rounded-full ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap cursor-pointer"
 										data-compare-type="program"
 										data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 										data-compare-title="<?php echo esc_attr( $card_headline ); ?>"
@@ -969,7 +972,7 @@ $has_active_filters  = $active_filter_count > 0;
 					<h3 class="font-extrabold text-slate-900 text-lg mb-2">Không tìm thấy chương trình phù hợp</h3>
 					<p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Không có chương trình nào khớp với các tiêu chí lọc bạn đang chọn. Hãy thử chọn lại hoặc đặt lại bộ lọc.</p>
 					<div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="js-ltdh-reset-filter cursor-pointer bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-brand-darkBlue shadow-md min-h-[44px] flex items-center justify-center">
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="js-ltdh-reset-filter cursor-pointer bg-[#0071E3] hover:bg-[#0077ED] text-white px-6 py-2.5 rounded-full font-medium text-xs sm:text-sm tracking-tight transition-all shadow-none hover:shadow-xs active:scale-98 min-h-[44px] flex items-center justify-center">
 							✕ Đặt lại tất cả bộ lọc
 						</a>
 					</div>

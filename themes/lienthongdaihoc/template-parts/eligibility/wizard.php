@@ -105,7 +105,7 @@ $majors = get_posts( [ 'post_type' => 'major', 'post_status' => 'publish', 'post
 
 		<!-- Submit Button -->
 		<div class="pt-5 border-t border-slate-100 flex justify-end">
-			<button type="button" id="elig-unified-submit" class="elig-btn elig-btn-primary px-8 py-3.5 text-sm sm:text-base font-black w-full sm:w-auto rounded-xl shadow-xs hover:shadow-md transition-all">
+			<button type="button" id="elig-unified-submit" class="elig-btn elig-btn-primary px-8 py-3.5 text-sm sm:text-base font-semibold tracking-tight w-full sm:w-auto rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-none hover:shadow-xs active:scale-98 transition-all cursor-pointer">
 				<span class="elig-btn-text flex items-center gap-2 justify-center">
 					<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>

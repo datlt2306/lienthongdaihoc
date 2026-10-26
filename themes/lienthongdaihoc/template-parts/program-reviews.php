@@ -527,14 +527,14 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 					<div class="flex items-center gap-2.5 ml-auto">
 						<button type="button" 
 						        id="ltdh-cancel-review-btn" 
-						        class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
+						        class="px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
 							Hủy bỏ
 						</button>
 
 						<button type="submit" 
 						        id="ltdh-submit-review-btn" 
 						        onclick="return ltdhSubmitReviewForm(event);"
-						        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#EA580C] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50">
+						        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-medium tracking-tight shadow-none hover:shadow-xs active:scale-98 transition-all cursor-pointer disabled:opacity-50">
 							<svg id="ltdh-submit-spinner" class="hidden w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
 							<span id="ltdh-submit-btn-text">Gửi đánh giá chương trình</span>
 						</button>

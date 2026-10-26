@@ -192,7 +192,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								<!-- Nút Tìm hiểu chi tiết -->
 								<div class="mt-2.5 pt-2 sm:mt-3.5 sm:pt-3 border-t border-slate-100">
 									<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" 
-									   class="w-full text-center py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center justify-center gap-1 sm:gap-1.5 shadow-2xs group-hover:shadow-sm whitespace-nowrap">
+									   class="w-full text-center py-2 px-3 rounded-full text-xs sm:text-sm font-medium text-white bg-[#0071E3] hover:bg-[#0077ED] active:scale-98 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-none">
 										<span class="sm:hidden">Xem trường</span>
 										<span class="hidden sm:inline">Tìm hiểu chi tiết</span>
 										<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -469,7 +469,7 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 								<?php endif; ?>
 							</div>
 							<div class="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
-								<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-[#00308b] bg-blue-50/90 hover:bg-[#00308b] hover:text-white border border-blue-200/80 hover:border-[#00308b] transition-all duration-200 flex items-center shadow-2xs">
+								<a href="<?php the_permalink(); ?>" class="w-full sm:w-auto text-center justify-center gap-1.5 px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-tight text-white bg-[#0071E3] hover:bg-[#0077ED] active:scale-98 transition-all duration-200 flex items-center shadow-none hover:shadow-xs">
 									<span>Tìm hiểu chi tiết</span>
 									<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />

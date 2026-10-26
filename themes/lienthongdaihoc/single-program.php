@@ -229,7 +229,7 @@ $program_tabs[] = [
 									<p class="font-extrabold text-slate-800 text-xs truncate leading-tight"><?php echo esc_html( $school_title ); ?></p>
 								</div>
 							</div>
-							<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-lg transition-all shrink-0">
+							<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="px-3 py-1.5 bg-[#F5F5F7] hover:bg-[#E8E8ED] text-[#1D1D1F] text-[11px] font-medium tracking-tight rounded-full transition-all shrink-0">
 								Chi tiết →
 							</a>
 						</div>
@@ -965,7 +965,7 @@ $program_tabs[] = [
 										<p class="text-xs text-slate-500">Bản PDF chính thức từ nhà trường liệt kê lộ trình các học kỳ và danh sách môn học</p>
 									</div>
 								</div>
-								<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $curriculum_url ); ?>" data-file-title="Khung chương trình: <?php echo esc_attr( get_the_title() ); ?>">
+								<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight rounded-full shadow-none hover:shadow-xs active:scale-98 transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $curriculum_url ); ?>" data-file-title="Khung chương trình: <?php echo esc_attr( get_the_title() ); ?>">
 									<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 									<span>Tải Khung Chương Trình (PDF)</span>
 								</a>
@@ -1117,7 +1117,7 @@ $program_tabs[] = [
 				<?php ltdh_render_recaptcha_field( 'lead_magnet' ); ?>
 			<?php endif; ?>
 
-			<button type="submit" id="ltdh-lm-submit-btn" class="w-full bg-[#00308b] hover:bg-[#002266] text-white py-3 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+			<button type="submit" id="ltdh-lm-submit-btn" class="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white py-3 rounded-full text-sm font-semibold tracking-tight shadow-none hover:shadow-xs active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer">
 				<span>Tải Tài Liệu Miễn Phí</span>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 			</button>

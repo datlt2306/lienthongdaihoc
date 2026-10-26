@@ -34,13 +34,13 @@ $extra_class = ! empty( $args['extra_class'] ) ? $args['extra_class'] : '';
 	</a>
 	<div class="flex gap-2 relative z-10">
 		<a href="tel:<?php echo esc_attr( $clean_phone ); ?>"
-		   class="flex-1 bg-brand-accent text-white py-3.5 rounded-lg font-bold text-sm hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center shadow-sm shadow-brand-accent/20 active:scale-95">
+		   class="flex-1 bg-brand-accent text-white py-3 px-3 rounded-full font-medium text-xs sm:text-sm hover:bg-[#e06e00] transition-all min-h-[44px] flex items-center justify-center shadow-none hover:shadow-xs active:scale-95 tracking-tight">
 			Gọi Ngay
 		</a>
 		<a href="<?php echo esc_url( $box_zalo ); ?>"
 		   target="_blank"
 		   rel="noopener noreferrer"
-		   class="flex-1 bg-white/10 text-white border border-white/20 py-3.5 rounded-lg font-bold text-sm hover:bg-white/20 transition-all min-h-[44px] flex items-center justify-center active:scale-95">
+		   class="flex-1 bg-white/10 text-white border border-white/20 py-3 px-3 rounded-full font-medium text-xs sm:text-sm hover:bg-white/20 transition-all min-h-[44px] flex items-center justify-center active:scale-95 tracking-tight">
 			Chat Zalo
 		</a>
 	</div>

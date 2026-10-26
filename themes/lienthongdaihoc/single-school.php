@@ -440,10 +440,10 @@ $school_tabs[] = [
 						Hỗ trợ tư vấn chọn ngành, miễn giảm học phần và thông tin tuyển sinh mới nhất hoàn toàn miễn phí.
 					</p>
 					<div class="flex items-center gap-2">
-						<a href="#register" class="flex-1 bg-[#EA580C] hover:bg-orange-600 text-white font-extrabold text-xs py-2.5 px-3 rounded-xl shadow-xs text-center transition-all">
+						<a href="#register" class="flex-1 bg-[#0071E3] hover:bg-[#0077ED] text-white font-medium text-xs py-2.5 px-4 rounded-full shadow-none hover:shadow-xs text-center transition-all active:scale-98 tracking-tight">
 							📝 Đăng ký tư vấn ngay
 						</a>
-						<a href="<?php echo esc_url( $zalo_group ); ?>" target="_blank" rel="noopener noreferrer" class="bg-white/15 hover:bg-white/25 text-white font-bold text-xs py-2.5 px-3 rounded-xl text-center transition-all border border-white/20 shrink-0">
+						<a href="<?php echo esc_url( $zalo_group ); ?>" target="_blank" rel="noopener noreferrer" class="bg-white/15 hover:bg-white/25 text-white font-medium text-xs py-2.5 px-4 rounded-full text-center transition-all border border-white/20 shrink-0 active:scale-98 tracking-tight">
 							💬 Group Zalo
 						</a>
 					</div>
@@ -931,7 +931,7 @@ $school_tabs[] = [
 								<div class="w-12 h-12 bg-blue-50 text-[#00308b] rounded-full flex items-center justify-center mx-auto mb-3 text-xl">🔍</div>
 								<h3 class="text-base font-bold text-slate-800 mb-1">Không tìm thấy ngành đào tạo phù hợp</h3>
 								<p class="text-xs text-slate-500 mb-4">Vui lòng thử tìm với từ khóa khác hoặc xóa bộ lọc.</p>
-								<button type="button" id="ltdh-major-reset-search" class="px-4 py-2 bg-[#00308b] text-white rounded-xl text-xs font-bold hover:bg-blue-800 transition-colors cursor-pointer">
+								<button type="button" id="ltdh-major-reset-search" class="px-5 py-2 bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-full text-xs font-medium tracking-tight shadow-none hover:shadow-xs active:scale-98 transition-all cursor-pointer">
 									Xem tất cả ngành
 								</button>
 							</div>
@@ -1288,7 +1288,7 @@ $school_tabs[] = [
 									<p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Đội ngũ cán bộ tuyển sinh luôn sẵn sàng hỗ trợ kiểm tra bằng cấp và tư vấn lộ trình học phù hợp nhất.</p>
 								</div>
 							</div>
-							<a href="#register" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#00308b] hover:bg-blue-900 text-white text-xs font-bold shrink-0 transition-all shadow-2xs hover:shadow-xs active:scale-95 no-underline">
+							<a href="#register" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight shrink-0 transition-all shadow-none hover:shadow-xs active:scale-98 no-underline">
 								<span>Hỏi tư vấn viên</span>
 								<span>&rarr;</span>
 							</a>

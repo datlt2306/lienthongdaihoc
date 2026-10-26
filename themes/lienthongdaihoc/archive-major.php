@@ -463,7 +463,7 @@ $has_active_filters  = $active_filter_count > 0;
 					</div>
 					<h3 class="text-lg font-bold text-slate-800 mb-1">Không tìm thấy ngành học phù hợp</h3>
 					<p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Vui lòng thử thay đổi từ khóa tìm kiếm hoặc chọn lại nhóm ngành khác.</p>
-					<a href="<?php echo esc_url( $archive_link ); ?>" class="js-ltdh-reset-filter inline-flex items-center gap-2 bg-brand-primary text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-brand-primary-dark transition-colors cursor-pointer">
+					<a href="<?php echo esc_url( $archive_link ); ?>" class="js-ltdh-reset-filter inline-flex items-center gap-2 bg-[#0071E3] hover:bg-[#0077ED] text-white px-6 py-2.5 rounded-full font-medium text-xs sm:text-sm tracking-tight transition-all shadow-none hover:shadow-xs active:scale-98 cursor-pointer">
 						Xóa tất cả bộ lọc
 					</a>
 				</div>

@@ -38,7 +38,7 @@ $zalo_share_url   = 'https://sp.zalo.me/plugins/share?url=' . rawurlencode( $soc
 	<!-- PROMINENT SHARE BUTTON (Eye-catching brand styling with gradient & shadow) -->
 	<button type="button"
 	        id="ltdh-quick-share-btn"
-	        class="ltdh-quick-share-btn ltdh-program-share-toggle-btn group inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-[#00308b] via-[#003ca6] to-[#004dc7] hover:from-[#002266] hover:to-[#00308b] text-white text-xs sm:text-[13px] font-bold shadow-md shadow-blue-900/25 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 border border-blue-400/30 cursor-pointer select-none"
+	        class="ltdh-quick-share-btn ltdh-program-share-toggle-btn rounded-full group inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EA580C] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all duration-200 cursor-pointer shrink-0 self-start sm:self-auto cursor-pointer select-none"
 	        data-has-dropdown="true"
 	        data-url="<?php echo esc_url( $program_url ); ?>"
 	        data-title="<?php echo esc_attr( $clean_title ); ?>"

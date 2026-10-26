@@ -1446,7 +1446,7 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 			<?php ltdh_render_recaptcha_field( 'native_lead' ); ?>
 		<?php endif; ?>
 
-		<button type="submit" class="w-full bg-brand-primary text-white py-3 lg:py-3.5 rounded-xl lg:rounded-lg text-sm font-bold shadow-md shadow-brand-primary/10 hover:bg-brand-darkBlue active:scale-[0.98] transition-all mt-1 lg:mt-2 min-h-[44px] flex items-center justify-center gap-2">
+		<button type="submit" class="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white py-3 lg:py-3.5 rounded-full text-sm font-semibold tracking-tight shadow-none hover:shadow-xs active:scale-[0.98] transition-all mt-1 lg:mt-2 min-h-[44px] flex items-center justify-center gap-2 cursor-pointer">
 			<span><?php echo 'contact' === $type ? esc_html__('Gửi Liên Hệ') : ( 'evaluation' === $type ? esc_html__('GỬI YÊU CẦU ĐỐI CHIẾU HỒ SƠ & TƯ VẤN') : esc_html__('Gửi Thông Tin Ngay') ); ?></span>
 		</button>
 

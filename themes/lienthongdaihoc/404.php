@@ -68,7 +68,7 @@ get_header();
 					/>
 					<button
 						type="submit"
-						class="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-brand-primary text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-brand-darkBlue active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
+						class="absolute right-1.5 top-1.5 bottom-1.5 px-5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-medium tracking-tight rounded-full active:scale-98 transition-all flex items-center justify-center cursor-pointer shadow-none hover:shadow-xs"
 					>
 						Tìm kiếm
 					</button>

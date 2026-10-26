@@ -128,7 +128,7 @@ $steps = [
 				</div>
 			</div>
 			
-			<a href="<?php echo esc_url( $args['cta_link'] ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer min-h-[40px] whitespace-nowrap">
+			<a href="<?php echo esc_url( $args['cta_link'] ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-6 py-2.5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-medium tracking-tight rounded-full shadow-none hover:shadow-xs active:scale-98 transition-all shrink-0 cursor-pointer min-h-[40px] whitespace-nowrap">
 				<span><?php echo esc_html( $args['cta_text'] ); ?></span>
 				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
 			</a>

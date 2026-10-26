@@ -1220,12 +1220,14 @@ h1 {
     background-color: #0071E3 !important;
     color: #ffffff !important;
     padding: 0.875rem 2rem !important;
-    border-radius: 0.5rem !important;
-    font-weight: 700 !important;
+    border-radius: 9999px !important;
+    font-weight: 600 !important;
     font-size: 0.875rem !important;
+    letter-spacing: -0.01em !important;
     cursor: pointer !important;
-    transition: background-color 0.2s, box-shadow 0.2s !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     border: none !important;
+    box-shadow: none !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1237,7 +1239,12 @@ h1 {
     }
 }
 .ltdh-cf7-form input[type="submit"]:hover {
-    background-color: #B45309 !important;
+    background-color: #0077ED !important;
+    box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25) !important;
+    transform: translateY(-0.5px) !important;
+}
+.ltdh-cf7-form input[type="submit"]:active {
+    transform: scale(0.98) !important;
 }
 .ltdh-cf7-form .wpcf7-form-control-wrap {
     display: block !important;
@@ -1329,13 +1336,22 @@ aside .ltdh-cf7-form .sm\:inline,
     padding-top: 0.875rem !important;
     padding-bottom: 0.875rem !important;
     font-size: 0.9375rem !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.025em !important;
-    border-radius: 0.75rem !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 48, 139, 0.2), 0 2px 4px -2px rgba(0, 48, 139, 0.1) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    border-radius: 9999px !important;
+    background-color: #0071E3 !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 .elig-evaluation-cf7 input[type="submit"]:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 48, 139, 0.3), 0 4px 6px -4px rgba(0, 48, 139, 0.15) !important;
+    background-color: #0077ED !important;
+    box-shadow: 0 2px 8px rgba(0, 113, 227, 0.25) !important;
+    transform: translateY(-0.5px) !important;
+}
+.elig-evaluation-cf7 input[type="submit"]:active {
+    transform: scale(0.98) !important;
 }
 .elig-evaluation-cf7 .wpcf7-checkbox label,
 .elig-evaluation-cf7 .wpcf7-acceptance label {
