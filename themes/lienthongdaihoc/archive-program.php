@@ -1068,7 +1068,7 @@ $has_active_filters  = $active_filter_count > 0;
 						<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors">
 							<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-base list-none select-none hover:text-brand-primary transition-colors">
 								<div class="flex items-start gap-2.5 min-w-0">
-									<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-brand-primary text-xs font-black shrink-0 mt-0.5 group-open:bg-brand-primary group-open:text-white transition-colors">
+									<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold shrink-0 mt-0.5 group-open:bg-[#0071E3] group-open:text-white transition-colors">
 										?
 									</span>
 									<span class="leading-snug text-slate-800 group-open:text-brand-primary transition-colors">

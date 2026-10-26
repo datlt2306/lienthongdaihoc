@@ -559,18 +559,18 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 						
 						<!-- BLOCK 1: ĐỐI TƯỢNG TUYỂN SINH (ĐÚNG NGÀNH & NGÀNH GẦN) - HIGHLIGHTED -->
 						<details id="details-doi-tuong" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 										1
 									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 										Quy định đối tượng tuyển sinh: Đúng ngành &amp; Ngành gần
 									</span>
 								</div>
 								<div class="flex items-center gap-2 shrink-0">
 									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 									</svg>
 								</div>
@@ -767,18 +767,18 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 
 						<!-- BLOCK 2: ĐIỀU KIỆN XÉT TUYỂN CHUNG -->
 						<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 										2
 									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 										Tiêu chuẩn &amp; Điều kiện xét tuyển
 									</span>
 								</div>
 								<div class="flex items-center gap-2 shrink-0">
 									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 									</svg>
 								</div>
@@ -792,18 +792,18 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 
 						<!-- BLOCK 3: HỒ SƠ XÉT TUYỂN CẦN CHUẨN BỊ -->
 						<details id="details-ho-so" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 										3
 									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 										Hồ sơ xét tuyển cần chuẩn bị
 									</span>
 								</div>
 								<div class="flex items-center gap-2 shrink-0">
 									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 									</svg>
 								</div>
@@ -910,16 +910,16 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 								$is_first_open = ( 0 === $f_idx ) ? '' : '';
 							?>
 								<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-[15px] list-none select-none hover:text-[#00308b] transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-[15px] list-none select-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-start gap-2.5 min-w-0">
-											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-[#00308b] text-xs font-black shrink-0 mt-0.5 group-open:bg-[#00308b] group-open:text-white transition-colors">
+											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold shrink-0 mt-0.5 group-open:bg-[#0071E3] group-open:text-white transition-colors">
 												?
 											</span>
-											<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors">
+											<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors">
 												<?php echo esc_html( $faq_item['question'] ); ?>
 											</span>
 										</div>
-										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 										</svg>
 									</summary>

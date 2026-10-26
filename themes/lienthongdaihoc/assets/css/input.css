@@ -267,24 +267,29 @@ h1 {
     color: #C96800;
 }
 
-/* Apple Directory Footer */
+/* Apple Dark Directory Footer */
 #colophon.apple-footer {
-    background-color: #F5F5F7 !important;
+    background-color: #161617 !important;
     color: #86868B !important;
-    border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 #colophon.apple-footer h3,
 #colophon.apple-footer .footer-title {
-    color: #1D1D1F !important;
+    color: #F5F5F7 !important;
     font-weight: 600;
     letter-spacing: -0.01em;
 }
 #colophon.apple-footer a {
-    color: #6E6E73 !important;
+    color: #A1A1A6;
     transition: color 0.2s ease;
 }
 #colophon.apple-footer a:hover {
-    color: #1D1D1F !important;
+    color: #FFFFFF !important;
+}
+#colophon.apple-footer a.text-white,
+#colophon.apple-footer a .text-white,
+#colophon.apple-footer .text-white {
+    color: #FFFFFF !important;
 }
 
 /* Mapping for arbitrary legacy utility classes to Apple design tokens */
@@ -294,6 +299,10 @@ h1 {
 .hover\:bg-\[\#00308b\]:hover { background-color: #0077ED !important; }
 .hover\:text-\[\#00308b\]:hover { color: #0077ED !important; }
 .hover\:border-\[\#00308b\]:hover { border-color: #0077ED !important; }
+.group-open\:bg-\[\#00308b\]:is(:where(.group):is([open],:popover-open,:open) *) { background-color: #0071E3 !important; }
+.group-open\:text-\[\#00308b\]:is(:where(.group):is([open],:popover-open,:open) *) { color: #0071E3 !important; }
+.group-hover\:text-\[\#00308b\]:is(:where(.group):hover *) { color: #0071E3 !important; }
+.group-hover\:bg-\[\#00308b\]:is(:where(.group):hover *) { background-color: #0071E3 !important; }
 
 .bg-\[\#fe8100\] { background-color: #FF9500 !important; }
 .text-\[\#fe8100\] { color: #FF9500 !important; }
@@ -303,7 +312,6 @@ h1 {
 
 /* Enforce crisp text-white contrast inside dark sections */
 .text-white,
-[class*="text-white"],
 .text-white h1, .text-white h2, .text-white h3, .text-white h4, .text-white h5, .text-white h6 {
     color: #FFFFFF !important;
 }

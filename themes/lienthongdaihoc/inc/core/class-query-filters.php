@@ -1083,15 +1083,15 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 							$type_name_lower = mb_strtolower( trim( $prog['type_name'] ), 'UTF-8' );
 							
 							// Defaults (Chính quy hoặc khác)
-							$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
-							$btn_style = 'bg-indigo-50/70 hover:bg-indigo-600 text-indigo-900 hover:text-white border-indigo-200/90 hover:border-indigo-600';
+							$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#5856D6] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
+							$btn_style = 'bg-[#5856D6]/10 hover:bg-[#5856D6] text-[#5856D6] hover:text-white border border-[#5856D6]/20 hover:border-transparent rounded-full';
 
 							if ( false !== strpos( $type_name_lower, 'từ xa' ) ) {
-								$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
-								$btn_style = 'bg-blue-50/80 hover:bg-[#00308b] text-[#00308b] hover:text-white border-blue-200/90 hover:border-[#00308b]';
+								$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#0071E3] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+								$btn_style = 'bg-[#0071E3]/10 hover:bg-[#0071E3] text-[#0071E3] hover:text-white border border-[#0071E3]/20 hover:border-transparent rounded-full';
 							} elseif ( false !== strpos( $type_name_lower, 'vừa học vừa làm' ) || false !== strpos( $type_name_lower, 'vừa làm vừa học' ) || false !== strpos( $type_name_lower, 'vhvl' ) ) {
-								$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-								$btn_style = 'bg-amber-50/50 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-200/80 hover:border-amber-600';
+								$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#D97706] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+								$btn_style = 'bg-[#FF9500]/10 hover:bg-[#FF9500] text-[#D97706] hover:text-white border border-[#FF9500]/25 hover:border-transparent rounded-full';
 							}
 
 							$raw_label     = $prog['type_name'] ? $prog['type_name'] : 'Xem chương trình';
@@ -1101,13 +1101,13 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 							}
 						?>
 							<?php if ( 'tam-ngung' === $prog['status'] ) : ?>
-								<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed">
+								<span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed">
 									<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
 									<span><?php echo esc_html( $display_label ); ?> (Tạm ngưng)</span>
 								</span>
 							<?php else : ?>
 								<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
-								   class="group/btn inline-flex items-center gap-2 px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all border shadow-2xs hover:shadow-xs no-underline active:scale-[0.98] <?php echo esc_attr( $btn_style ); ?>" 
+								   class="group/btn inline-flex items-center gap-2 px-3.5 py-1.5 sm:py-2 rounded-full text-xs font-semibold transition-all border shadow-none hover:shadow-xs no-underline active:scale-[0.98] <?php echo esc_attr( $btn_style ); ?>" 
 								   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
 									<?php echo $icon_svg; ?>
 									<span><?php echo esc_html( $display_label ); ?></span>

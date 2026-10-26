@@ -604,18 +604,18 @@ $program_tabs[] = [
 							<!-- BLOCK 1: ADMISSION REQUIREMENTS -->
 							<?php if ( ! empty( $requirements ) ) : ?>
 								<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-center gap-3 min-w-0">
-											<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+											<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 												1
 											</span>
-											<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+											<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 												Tiêu chuẩn &amp; Điều kiện xét tuyển
 											</span>
 										</div>
 										<div class="flex items-center gap-2 shrink-0">
 											<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 											</svg>
 										</div>
@@ -628,10 +628,10 @@ $program_tabs[] = [
 										<?php if ( ! empty( $major_school_link ) ) : ?>
 											<div class="mt-3.5 p-3 sm:p-3.5 rounded-xl bg-blue-50/70 border border-blue-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
 												<div class="flex items-center gap-2 text-xs text-slate-700">
-													<span class="w-2 h-2 rounded-full bg-[#00308b] shrink-0"></span>
+													<span class="w-2 h-2 rounded-full bg-[#0071E3] shrink-0"></span>
 													<span>Bạn cần tra cứu quy định <strong>Đúng ngành</strong> hoặc <strong>Ngành gần</strong> để biết môn học chuyển đổi?</span>
 												</div>
-												<a href="<?php echo esc_url( $major_school_link ); ?>#dieu-kien-doi-tuong" class="inline-flex items-center gap-1 text-xs font-bold text-[#00308b] hover:underline shrink-0">
+												<a href="<?php echo esc_url( $major_school_link ); ?>#dieu-kien-doi-tuong" class="inline-flex items-center gap-1 text-xs font-bold text-[#0071E3] hover:underline shrink-0">
 													<span>Xem quy định ngành</span>
 													<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
 												</a>
@@ -644,18 +644,18 @@ $program_tabs[] = [
 							<!-- BLOCK 2: REQUIRED DOCUMENTS & GOOGLE DRIVE PACKAGE -->
 							<?php if ( ! empty( $documents ) || ! empty( $prog_admission_forms ) || ! empty( $primary_drive ) ) : ?>
 								<details id="details-ho-so" class="group py-3.5 sm:py-4 transition-colors">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-center gap-3 min-w-0">
-											<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+											<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 												2
 											</span>
-											<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+											<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 												Hồ sơ xét tuyển cần chuẩn bị &amp; Biểu mẫu
 											</span>
 										</div>
 										<div class="flex items-center gap-2 shrink-0">
 											<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 											</svg>
 										</div>
@@ -740,18 +740,18 @@ $program_tabs[] = [
 							<!-- BLOCK 3: CONTACT & ADMISSION VENUE -->
 							<?php if ( ! empty( $contact_formatted ) ) : ?>
 								<details id="details-lien-he" class="group py-3.5 sm:py-4 transition-colors">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-amber-700 transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#D97706] transition-colors">
 										<div class="flex items-center gap-3 min-w-0">
-											<span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-800 group-open:bg-amber-600 group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+											<span class="w-7 h-7 rounded-full bg-[#FF9500]/15 text-[#D97706] group-open:bg-[#FF9500] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 												3
 											</span>
-											<span class="leading-snug text-slate-800 group-open:text-amber-700 transition-colors font-bold">
+											<span class="leading-snug text-slate-800 group-open:text-[#D97706] transition-colors font-bold">
 												Thông tin liên hệ &amp; Tiếp nhận hồ sơ
 											</span>
 										</div>
 										<div class="flex items-center gap-2 shrink-0">
 											<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-amber-700 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#D97706] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 											</svg>
 										</div>
@@ -1004,16 +1004,16 @@ $program_tabs[] = [
 						<div class="divide-y divide-slate-100" id="ltdh-program-faq-accordion">
 							<?php foreach ( $faqs as $index => $item ) : ?>
 								<details class="group py-3.5 sm:py-4 transition-colors">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-start gap-2.5 sm:gap-3 min-w-0">
-											<span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-teal-50 text-teal-800 group-open:bg-teal-700 group-open:text-white text-xs font-black shrink-0 mt-0.5 transition-colors shadow-2xs">
+											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white text-xs font-semibold shrink-0 mt-0.5 transition-colors">
 												Q
 											</span>
-											<h3 class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold text-sm md:text-base m-0">
+											<h3 class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold text-sm md:text-base m-0">
 												<?php echo esc_html( $item['question'] ); ?>
 											</h3>
 										</div>
-										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 										</svg>
 									</summary>

@@ -16,7 +16,7 @@ $address   = function_exists( 'ltdh_get_address' ) ? ltdh_get_address() : 'Số 
 $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lienthongdaihoc.com';
 ?>
 
-	<footer id="colophon" class="site-footer apple-footer text-[#86868B] pt-12 pb-28 md:py-16 border-t border-black/[0.08] bg-[#F5F5F7]">
+	<footer id="colophon" class="site-footer apple-footer text-[#86868B] pt-12 pb-28 md:py-16 border-t border-white/10 bg-[#161617]">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-12">
 				
@@ -24,7 +24,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 				<div class="space-y-4">
 					<div class="flex items-center justify-between md:block">
 						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="inline-block group">
-							<span class="font-display font-bold text-xl text-[#1D1D1F] tracking-tight group-hover:text-[#0071E3] transition-colors">lienthongdaihoc<span class="text-[#0071E3]">.com</span></span>
+							<span class="font-display font-bold text-xl text-white tracking-tight group-hover:text-[#0071E3] transition-colors">lienthongdaihoc<span class="text-[#0071E3]">.com</span></span>
 						</a>
 					</div>
 					
@@ -36,10 +36,10 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 					<div class="pt-2">
 						<span class="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-2.5">Kênh thông tin chính thức</span>
 						<div class="flex items-center gap-2">
-							<a href="https://www.facebook.com/groups/lienthongdh" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full bg-white border border-black/[0.08] hover:bg-[#1877f2] hover:border-[#1877f2] hover:text-white active:scale-95 transition-all flex items-center justify-center text-[#1D1D1F] shadow-2xs" aria-label="Facebook">
+							<a href="https://www.facebook.com/groups/lienthongdh" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full bg-white/[0.08] border border-white/10 hover:bg-[#1877f2] hover:border-[#1877f2] hover:text-white active:scale-95 transition-all flex items-center justify-center text-white shadow-2xs" aria-label="Facebook">
 								<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
 							</a>
-							<a href="<?php echo esc_url( $zalo ); ?>" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full bg-white border border-black/[0.08] hover:bg-[#0068ff] hover:border-[#0068ff] hover:text-white active:scale-95 transition-all flex items-center justify-center text-[#1D1D1F] shadow-2xs" aria-label="Zalo">
+							<a href="<?php echo esc_url( $zalo ); ?>" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full bg-white/[0.08] border border-white/10 hover:bg-[#0068ff] hover:border-[#0068ff] hover:text-white active:scale-95 transition-all flex items-center justify-center text-white shadow-2xs" aria-label="Zalo">
 								<span class="text-xs font-bold">Za</span>
 							</a>
 						</div>
@@ -48,38 +48,38 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 
 				<!-- Column 2: Contact Info -->
 				<div>
-					<h3 class="font-display font-semibold text-[#1D1D1F] mb-4 md:mb-5 text-xs uppercase tracking-wider flex items-center gap-2">
+					<h3 class="font-display font-semibold text-white mb-4 md:mb-5 text-xs uppercase tracking-wider flex items-center gap-2">
 						<span class="w-1.5 h-3.5 rounded-full bg-[#0071E3]"></span>Thông tin liên hệ
 					</h3>
 					
 					<!-- 1-Tap Hotline Call Card (Apple Squircle) -->
 					<div class="space-y-3">
-						<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex items-center justify-between p-3.5 rounded-2xl bg-white border border-black/[0.08] hover:border-[#0071E3]/50 hover:shadow-sm active:scale-[0.99] transition-all group">
+						<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-white/20 hover:bg-white/[0.07] active:scale-[0.99] transition-all group">
 							<div class="flex items-center gap-3">
-								<div class="w-8 h-8 rounded-full bg-[#0071E3]/10 flex items-center justify-center text-[#0071E3] shrink-0 group-hover:bg-[#0071E3] group-hover:text-white transition-colors">
+								<div class="w-8 h-8 rounded-full bg-[#0071E3]/20 flex items-center justify-center text-[#0071E3] shrink-0 group-hover:bg-[#0071E3] group-hover:text-white transition-colors">
 									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
 								</div>
 								<div>
 									<span class="text-[10px] uppercase font-semibold text-[#86868B] block tracking-wider">Hotline Tư Vấn</span>
-									<span class="text-sm font-semibold text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors"><?php echo esc_html( $hotline ?: '0988 991 496' ); ?></span>
+									<span class="text-sm font-semibold text-white group-hover:text-[#0071E3] transition-colors"><?php echo esc_html( $hotline ?: '0988 991 496' ); ?></span>
 								</div>
 							</div>
 							<span class="px-3 py-1 rounded-full bg-[#0071E3] text-white text-[11px] font-medium shadow-none group-hover:bg-[#0077ED] shrink-0 transition-colors">Gọi ngay</span>
 						</a>
 
 						<ul class="space-y-2.5 text-xs">
-							<li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-white/60 border border-black/[0.05]">
+							<li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
 								<svg class="w-4 h-4 text-[#0071E3] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
 								<div class="min-w-0">
-									<strong class="text-[#1D1D1F] block font-semibold text-[11px] uppercase tracking-wider">Trụ sở Hà Nội</strong>
+									<strong class="text-white block font-semibold text-[11px] uppercase tracking-wider">Trụ sở Hà Nội</strong>
 									<span class="text-[#86868B]"><?php echo esc_html( $address ); ?></span>
 								</div>
 							</li>
-							<li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-white/60 border border-black/[0.05]">
+							<li class="flex items-start gap-2.5 p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
 								<svg class="w-4 h-4 text-[#0071E3] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
 								<div class="min-w-0">
-									<strong class="text-[#1D1D1F] block font-semibold text-[11px] uppercase tracking-wider">Email Tuyển sinh</strong>
-									<!--email_off--><a href="mailto:<?php echo esc_attr( $email ); ?>" class="text-[#86868B] hover:text-[#0071E3] transition-colors truncate block"><?php echo esc_html( $email ); ?></a><!--/email_off-->
+									<strong class="text-white block font-semibold text-[11px] uppercase tracking-wider">Email Tuyển sinh</strong>
+									<!--email_off--><a href="mailto:<?php echo esc_attr( $email ); ?>" class="text-[#A1A1A6] hover:text-[#0071E3] transition-colors truncate block"><?php echo esc_html( $email ); ?></a><!--/email_off-->
 								</div>
 							</li>
 						</ul>
@@ -88,37 +88,37 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 
 				<!-- Column 3: Training Programs (Apple Cupertino Link List) -->
 				<div>
-					<h3 class="font-display font-semibold text-[#1D1D1F] mb-4 md:mb-5 text-xs uppercase tracking-wider flex items-center gap-2">
+					<h3 class="font-display font-semibold text-white mb-4 md:mb-5 text-xs uppercase tracking-wider flex items-center gap-2">
 						<span class="w-1.5 h-3.5 rounded-full bg-[#0071E3]"></span>Chương trình đào tạo
 					</h3>
 					<div class="grid grid-cols-2 gap-2 md:flex md:flex-col md:space-y-2">
 						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/chinh-quy/' ) ); ?>" 
-						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white md:bg-transparent border border-black/[0.06] md:border-none text-[#6E6E73] hover:text-[#0071E3] active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
+						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white/[0.04] md:bg-transparent border border-white/10 md:border-none text-[#A1A1A6] hover:text-white active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
 							<span>Liên thông Chính quy</span>
 							<span class="text-[#0071E3] text-xs transition-transform group-hover:translate-x-0.5">›</span>
 						</a>
 						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/dao-tao-tu-xa/' ) ); ?>" 
-						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white md:bg-transparent border border-black/[0.06] md:border-none text-[#6E6E73] hover:text-[#0071E3] active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
+						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white/[0.04] md:bg-transparent border border-white/10 md:border-none text-[#A1A1A6] hover:text-white active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
 							<span>Đại học Từ xa</span>
 							<span class="text-[#0071E3] text-xs transition-transform group-hover:translate-x-0.5">›</span>
 						</a>
 						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/vua-hoc-vua-lam/' ) ); ?>" 
-						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white md:bg-transparent border border-black/[0.06] md:border-none text-[#6E6E73] hover:text-[#0071E3] active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
+						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white/[0.04] md:bg-transparent border border-white/10 md:border-none text-[#A1A1A6] hover:text-white active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
 							<span>Vừa học vừa làm</span>
 							<span class="text-[#0071E3] text-xs transition-transform group-hover:translate-x-0.5">›</span>
 						</a>
 						<a href="<?php echo esc_url( home_url( '/truong-doi-tac/' ) ); ?>" 
-						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white md:bg-transparent border border-black/[0.06] md:border-none text-[#6E6E73] hover:text-[#0071E3] active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
+						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white/[0.04] md:bg-transparent border border-white/10 md:border-none text-[#A1A1A6] hover:text-white active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
 							<span>Trường đối tác</span>
 							<span class="text-[#0071E3] text-xs transition-transform group-hover:translate-x-0.5">›</span>
 						</a>
 						<a href="<?php echo esc_url( home_url( '/nhom-nganh/' ) ); ?>" 
-						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white md:bg-transparent border border-black/[0.06] md:border-none text-[#6E6E73] hover:text-[#0071E3] active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
+						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white/[0.04] md:bg-transparent border border-white/10 md:border-none text-[#A1A1A6] hover:text-white active:scale-[0.98] md:active:scale-100 transition-all text-xs font-normal group">
 							<span>Ngành liên thông</span>
 							<span class="text-[#0071E3] text-xs transition-transform group-hover:translate-x-0.5">›</span>
 						</a>
 						<a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>" 
-						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white md:bg-transparent border border-black/[0.06] md:border-none text-[#FF9500] hover:text-[#e08500] active:scale-[0.98] md:active:scale-100 transition-all text-xs font-medium group">
+						   class="flex items-center justify-between p-2.5 md:p-0 rounded-xl md:rounded-none bg-white/[0.04] md:bg-transparent border border-white/10 md:border-none text-[#FF9500] hover:text-[#e08500] active:scale-[0.98] md:active:scale-100 transition-all text-xs font-medium group">
 							<span>Kiểm tra điều kiện</span>
 							<span class="text-[#FF9500] text-xs transition-transform group-hover:translate-x-0.5">›</span>
 						</a>
@@ -127,17 +127,17 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 
 				<!-- Column 4: Community & Fanpage -->
 				<div>
-					<h3 class="font-display font-semibold text-[#1D1D1F] mb-4 md:mb-5 text-xs uppercase tracking-wider flex items-center gap-2">
+					<h3 class="font-display font-semibold text-white mb-4 md:mb-5 text-xs uppercase tracking-wider flex items-center gap-2">
 						<span class="w-1.5 h-3.5 rounded-full bg-[#0071E3]"></span>Kết nối cộng đồng
 					</h3>
 					<!-- Apple Squircle Community Card -->
-					<div class="border border-black/[0.08] p-4 rounded-2xl bg-white flex flex-col gap-3 shadow-2xs">
+					<div class="border border-white/10 p-4 rounded-2xl bg-white/[0.04] flex flex-col gap-3 shadow-2xs">
 						<div class="flex items-center gap-3">
-							<div class="w-9 h-9 rounded-full bg-[#1877f2]/10 flex items-center justify-center text-[#1877f2] shrink-0 p-2">
+							<div class="w-9 h-9 rounded-full bg-[#1877f2]/20 flex items-center justify-center text-[#1877f2] shrink-0 p-2">
 								<svg class="w-full h-full fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
 							</div>
 							<div class="min-w-0">
-								<p class="font-semibold text-[#1D1D1F] text-xs sm:text-sm truncate">Group Tuyển Sinh</p>
+								<p class="font-semibold text-white text-xs sm:text-sm truncate">Group Tuyển Sinh</p>
 								<p class="text-[11px] text-[#86868B] truncate">Trao đổi kinh nghiệm học tập</p>
 							</div>
 						</div>
@@ -155,12 +155,12 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 			</div>
 
 			<!-- Footer Bottom (Apple Directory Style) -->
-			<div class="mt-10 md:mt-12 pt-6 md:pt-8 border-t border-black/[0.08] flex flex-col md:flex-row items-center justify-between text-xs text-[#86868B] gap-3 text-center md:text-left">
+			<div class="mt-10 md:mt-12 pt-6 md:pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between text-xs text-[#86868B] gap-3 text-center md:text-left">
 				<p>© 2026 lienthongdaihoc.com. Tất cả các quyền được bảo hộ.</p>
 				<div class="flex items-center justify-center gap-4 sm:gap-6 text-xs">
-					<a href="<?php echo esc_url( home_url( '/chinh-sach-bao-mat/' ) ); ?>" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors py-1">Chính sách bảo mật</a>
-					<span class="text-black/20">•</span>
-					<a href="<?php echo esc_url( home_url( '/dieu-khoan/' ) ); ?>" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors py-1">Điều khoản dịch vụ</a>
+					<a href="<?php echo esc_url( home_url( '/chinh-sach-bao-mat/' ) ); ?>" class="text-[#86868B] hover:text-white transition-colors py-1">Chính sách bảo mật</a>
+					<span class="text-white/20">•</span>
+					<a href="<?php echo esc_url( home_url( '/dieu-khoan/' ) ); ?>" class="text-[#86868B] hover:text-white transition-colors py-1">Điều khoản dịch vụ</a>
 				</div>
 			</div>
 		</div>
@@ -185,7 +185,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 <!-- FLOATING DYNAMIC ISLAND MOBILE CTA BAR (CUPERTINO FROSTED GLASS) -->
 <nav id="ltdh-global-mobile-bar" 
      aria-label="Thanh liên hệ nhanh"
-     class="fixed inset-x-3.5 max-w-md mx-auto z-40 bg-white/85 backdrop-blur-2xl border border-black/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.12)] p-1.5 rounded-full flex items-center justify-between gap-2 md:hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform translate-y-0 opacity-100 will-change-transform"
+     class="fixed inset-x-3.5 max-w-md mx-auto z-40 bg-[#1D1D1F]/90 backdrop-blur-2xl border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-1.5 rounded-full flex items-center justify-between gap-2 md:hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform translate-y-0 opacity-100 will-change-transform"
      style="bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));">
 	
 	<!-- Zalo Button (Left Circle) -->
