@@ -2764,8 +2764,89 @@ function ltdh_get_post_thumbnail_url( $post = null, string $size = 'medium' ): s
 			return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $thumb ) : $thumb;
 		}
 	}
+
+	// Nếu là chương trình đào tạo mà không có ảnh, mặc định lấy ảnh của ngành thuộc chương trình đó
+	if ( $post_id && 'program' === get_post_type( $post_id ) ) {
+		$major_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $post_id ) : 0;
+		if ( $major_id ) {
+			$major_thumb = get_the_post_thumbnail_url( $major_id, $size );
+			if ( ! empty( $major_thumb ) ) {
+				return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $major_thumb ) : $major_thumb;
+			}
+		}
+	}
+
 	$fallback = ltdh_get_fallback_image( 'post' );
 	return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $fallback ) : $fallback;
+}
+
+/**
+ * Lấy URL ảnh đại diện / ảnh banner của chương trình tuyển sinh.
+ * Nguyên tắc: Nếu chương trình không có ảnh thì mặc định sẽ lấy ảnh ngành của chương trình đó.
+ *
+ * @param int    $program_id ID chương trình (post_type = program).
+ * @param string $size       Kích thước ảnh (full, medium, large,...). Default 'full'.
+ * @return string URL ảnh hoặc chuỗi rỗng nếu không có.
+ */
+function ltdh_get_program_image_url( int $program_id, string $size = 'full' ): string {
+	if ( ! $program_id ) {
+		return '';
+	}
+
+	// 1. Ảnh riêng của chương trình (featured image hoặc custom field)
+	$prog_img = '';
+	if ( has_post_thumbnail( $program_id ) ) {
+		$prog_img = get_the_post_thumbnail_url( $program_id, $size ) ?: '';
+	}
+	if ( empty( $prog_img ) && function_exists( 'get_field' ) ) {
+		$prog_img = get_field( 'program_banner', $program_id )
+			?: get_field( 'page_banner', $program_id )
+			?: get_field( 'banner_image', $program_id )
+			?: '';
+		if ( is_array( $prog_img ) ) {
+			$prog_img = $prog_img['url'] ?? '';
+		}
+	}
+	if ( ! empty( $prog_img ) ) {
+		return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $prog_img ) : $prog_img;
+	}
+
+	// 2. Mặc định lấy ảnh ngành của chương trình đấy
+	$major_id = function_exists( 'ltdh_get_program_major_id' ) ? ltdh_get_program_major_id( $program_id ) : 0;
+	if ( $major_id ) {
+		$major_img = '';
+		if ( function_exists( 'get_field' ) ) {
+			$major_img = get_field( 'major_banner', $major_id )
+				?: get_field( 'page_banner', $major_id )
+				?: '';
+			if ( is_array( $major_img ) ) {
+				$major_img = $major_img['url'] ?? '';
+			}
+		}
+		if ( empty( $major_img ) && has_post_thumbnail( $major_id ) ) {
+			$major_img = get_the_post_thumbnail_url( $major_id, $size ) ?: '';
+		}
+		if ( ! empty( $major_img ) ) {
+			return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $major_img ) : $major_img;
+		}
+	}
+
+	// 3. Fallback cấp 3: Banner của trường đối tác (nếu có)
+	$school_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : 0;
+	if ( $school_id ) {
+		$school_img = function_exists( 'get_field' ) ? get_field( 'school_banner', $school_id ) : '';
+		if ( is_array( $school_img ) ) {
+			$school_img = $school_img['url'] ?? '';
+		}
+		if ( empty( $school_img ) && has_post_thumbnail( $school_id ) ) {
+			$school_img = get_the_post_thumbnail_url( $school_id, $size ) ?: '';
+		}
+		if ( ! empty( $school_img ) ) {
+			return function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $school_img ) : $school_img;
+		}
+	}
+
+	return '';
 }
 
 /**

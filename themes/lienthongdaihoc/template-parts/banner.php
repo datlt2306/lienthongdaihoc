@@ -242,7 +242,10 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 		'Chương trình đào tạo Liên thông Đại học (%s). Chuẩn quy chế tuyển sinh & công nhận tín chỉ của Bộ GD&ĐT.',
 		$clean_type ?: 'Chính quy & Từ xa'
 	);
-	$banner_image    = ( $school_id ? get_field( 'school_banner', $school_id ) : '' ) ?: ( get_the_post_thumbnail_url( $program_id, 'full' ) ?: '' );
+	// Banner Image: Lấy ảnh riêng của chương trình, nếu không có thì mặc định lấy ảnh của ngành thuộc chương trình đó
+	$banner_image    = function_exists( 'ltdh_get_program_image_url' )
+		? ltdh_get_program_image_url( $program_id, 'full' )
+		: ( ( get_the_post_thumbnail_url( $program_id, 'full' ) ?: '' ) ?: ( $major_id ? ( get_the_post_thumbnail_url( $major_id, 'full' ) ?: '' ) : ( ( $school_id ? get_field( 'school_banner', $school_id ) : '' ) ?: '' ) ) );
 
 	if ( ! empty( $school_id ) ) {
 		$banner_logo_url = function_exists( 'ltdh_get_school_logo_url' ) ? ltdh_get_school_logo_url( $school_id, 'medium' ) : ( get_the_post_thumbnail_url( $school_id, 'thumbnail' ) ?: '' );
@@ -578,7 +581,7 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 <?php else : ?>
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 sm:pb-3">
 		<!-- GRAND HERO BANNER (CONTAINERIZED, SOFT SCRIM OVERLAY, BOTTOM-ANCHORED CONTENT) -->
-		<section class="relative bg-slate-100 border border-slate-200/90 rounded-2xl sm:rounded-3xl overflow-hidden mb-6 shadow-lg min-h-[320px] sm:min-h-[380px] md:min-h-[440px] lg:min-h-[480px] flex flex-col justify-end">
+		<section class="relative bg-slate-100 border border-slate-200/90 rounded-2xl sm:rounded-3xl overflow-hidden mb-6 shadow-lg min-h-[320px] sm:min-h-[380px] md:min-h-[440px] lg:min-h-[530px] flex flex-col justify-end">
 			<?php if ( ! empty( $banner_image ) ) : ?>
 				<!-- Background Banner Image (Bright, natural display) -->
 				<img src="<?php echo esc_url( $banner_image ); ?>" 
@@ -598,22 +601,12 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 
 			<!-- Main Brand Info Content (Anchored to Bottom of Grand Banner) -->
 			<div class="relative z-10 p-5 sm:p-7 md:p-8 lg:p-10 flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
-				<!-- School Logo / Brand Avatar Container -->
-				<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl sm:rounded-3xl bg-white p-2 sm:p-2.5 shadow-2xl ring-4 ring-white/15 flex items-center justify-center shrink-0 overflow-hidden">
-					<?php if ( ! empty( $banner_logo_url ) ) : ?>
+				<!-- School Logo Container (Only displayed when official logo is present) -->
+				<?php if ( ! empty( $banner_logo_url ) ) : ?>
+					<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl sm:rounded-3xl bg-white p-2 sm:p-2.5 shadow-2xl ring-4 ring-white/15 flex items-center justify-center shrink-0 overflow-hidden">
 						<img src="<?php echo esc_url( $banner_logo_url ); ?>" alt="<?php echo esc_attr( $banner_logo_alt ?: $banner_title ); ?>" class="max-w-full max-h-full object-contain">
-					<?php elseif ( ! empty( $banner_initials ) ) : ?>
-						<div class="w-full h-full bg-[#00308b] text-white flex items-center justify-center rounded-xl font-black shadow-inner">
-							<span class="text-xl sm:text-2xl md:text-3xl uppercase tracking-wider"><?php echo esc_html( $banner_initials ); ?></span>
-						</div>
-					<?php else : ?>
-						<div class="w-full h-full bg-[#00308b] text-white flex items-center justify-center rounded-xl">
-							<svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 1-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 1-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342" />
-							</svg>
-						</div>
-					<?php endif; ?>
-				</div>
+					</div>
+				<?php endif; ?>
 
 				<!-- Title & Meta Details -->
 				<div class="min-w-0 flex-1">
