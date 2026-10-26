@@ -603,11 +603,8 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 					<?php if ( ! empty( $banner_logo_url ) ) : ?>
 						<img src="<?php echo esc_url( $banner_logo_url ); ?>" alt="<?php echo esc_attr( $banner_logo_alt ?: $banner_title ); ?>" class="max-w-full max-h-full object-contain">
 					<?php elseif ( ! empty( $banner_initials ) ) : ?>
-						<div class="w-full h-full bg-[#00308b] text-white flex flex-col items-center justify-center rounded-xl font-black shadow-inner">
-							<span class="text-xl sm:text-2xl uppercase tracking-wider"><?php echo esc_html( $banner_initials ); ?></span>
-							<?php if ( ! empty( $major_code ) ) : ?>
-								<span class="text-[9px] sm:text-[10px] text-blue-200 font-mono tracking-tight mt-0.5"><?php echo esc_html( $major_code ); ?></span>
-							<?php endif; ?>
+						<div class="w-full h-full bg-[#00308b] text-white flex items-center justify-center rounded-xl font-black shadow-inner">
+							<span class="text-xl sm:text-2xl md:text-3xl uppercase tracking-wider"><?php echo esc_html( $banner_initials ); ?></span>
 						</div>
 					<?php else : ?>
 						<div class="w-full h-full bg-[#00308b] text-white flex items-center justify-center rounded-xl">
