@@ -5259,3 +5259,127 @@ add_filter( 'the_content', function( $content ) {
 
 	return $content;
 }, 99 );
+
+/**
+ * Retrieve FAQ items for a Training Type taxonomy term.
+ * Checks for custom FAQs via ACF or term meta, then falls back to expertly authored default FAQs.
+ *
+ * @param WP_Term|int|string|null $term
+ * @return array
+ */
+function ltdh_get_training_type_faqs( $term = null ): array {
+	if ( empty( $term ) ) {
+		return [];
+	}
+
+	if ( is_numeric( $term ) ) {
+		$term = get_term( (int) $term, 'training_type' );
+	} elseif ( is_string( $term ) ) {
+		$term = get_term_by( 'slug', $term, 'training_type' );
+	}
+
+	if ( ! ( $term instanceof WP_Term ) ) {
+		return [];
+	}
+
+	// 1. Check custom ACF or term meta
+	$custom_faqs = function_exists( 'get_field' ) ? get_field( 'faqs', $term ) : [];
+	if ( empty( $custom_faqs ) ) {
+		$custom_faqs = get_term_meta( $term->term_id, 'faqs', true );
+	}
+	if ( ! empty( $custom_faqs ) && is_array( $custom_faqs ) ) {
+		$valid = [];
+		foreach ( $custom_faqs as $item ) {
+			if ( ! empty( $item['question'] ) && ! empty( $item['answer'] ) ) {
+				$valid[] = [
+					'question' => trim( (string) $item['question'] ),
+					'answer'   => trim( (string) $item['answer'] ),
+				];
+			}
+		}
+		if ( ! empty( $valid ) ) {
+			return $valid;
+		}
+	}
+
+	// 2. Default expert FAQs based on slug
+	$slug = $term->slug;
+	if ( 'tu-xa' === $slug || 'dao-tao-tu-xa' === $slug ) {
+		return [
+			[
+				'question' => 'Bằng tốt nghiệp Đại học từ xa có ghi chữ "Từ xa" trên văn bằng không?',
+				'answer'   => '<p><strong>Không.</strong> Theo <strong>Thông tư 27/2019/TT-BGDĐT</strong> của Bộ Giáo dục và Đào tạo có hiệu lực từ ngày 01/03/2020, mẫu bằng tốt nghiệp đại học <strong>không còn ghi hình thức đào tạo</strong> (chính quy, vừa làm vừa học hay từ xa). Bằng chỉ ghi danh hiệu Cử nhân/Kỹ sư, ngành học, xếp loại tốt nghiệp và tên cơ sở giáo dục đại học cấp bằng.</p>',
+			],
+			[
+				'question' => 'Học đại học từ xa có được thi tuyển công chức, viên chức và học lên Thạc sĩ không?',
+				'answer'   => '<p><strong>Hoàn toàn được.</strong> Luật Giáo dục Đại học sửa đổi quy định văn bằng tốt nghiệp các hình thức đào tạo có giá trị pháp lý tương đương nhau. Học viên tốt nghiệp đại học từ xa hoàn toàn đủ điều kiện dự thi công chức, xét nâng ngạch, chuyển bậc lương và nộp hồ sơ xét tuyển Thạc sĩ, Tiến sĩ tại các trường đại học trong và ngoài nước.</p>',
+			],
+			[
+				'question' => 'Thời gian đào tạo liên thông từ xa mất bao lâu?',
+				'answer'   => '<p>Thời gian học liên thông thường kéo dài từ <strong>1.5 đến 2 năm</strong> tùy theo số lượng tín chỉ bạn được xét công nhận và miễn trừ từ bằng Trung cấp hoặc Cao đẳng trước đó. Học viên học vượt hoặc tích lũy tín chỉ nhanh có thể hoàn thành chương trình và tốt nghiệp sớm.</p>',
+			],
+			[
+				'question' => 'Học trực tuyến 100% thì thi kết thúc học phần ở đâu?',
+				'answer'   => '<p>Quá trình nghe giảng, làm bài tập và trao đổi với giảng viên diễn ra 100% online trên hệ thống LMS. Đối với các kỳ thi kết thúc học phần, các trường đại học tổ chức thi tập trung vào dịp Thứ 7, Chủ nhật tại các trạm đào tạo ở Hà Nội, Đà Nẵng, TP.HCM... hoặc hỗ trợ thi online có camera giám sát theo quy chế đào tạo của từng trường.</p>',
+			],
+			[
+				'question' => 'Đăng ký xét tuyển đại học từ xa cần những hồ sơ gì?',
+				'answer'   => '<p>Hình thức tuyển sinh là <strong>xét tuyển hồ sơ</strong> (không cần thi tuyển). Hồ sơ gồm: Bản sao công chứng bằng và bảng điểm tốt nghiệp Trung cấp/Cao đẳng, bản sao CCCD, giấy khai sinh và phiếu đăng ký tuyển sinh theo mẫu. Ban tư vấn của chúng tôi sẽ hướng dẫn bạn chuẩn bị hồ sơ nhanh gọn và hoàn toàn miễn phí.</p>',
+			],
+		];
+	}
+
+	if ( 'vua-hoc-vua-lam' === $slug ) {
+		return [
+			[
+				'question' => 'Lịch học hệ Vừa học vừa làm (Tại chức) được sắp xếp vào thời gian nào?',
+				'answer'   => '<p>Lịch học được thiết kế linh hoạt ngoài giờ hành chính: học vào các <strong>buổi tối trong tuần</strong> hoặc <strong>trọn vẹn Thứ 7 và Chủ nhật</strong>. Khung giờ này giúp người đi làm hoàn toàn yên tâm duy trì công việc cơ quan mà vẫn nâng cao được trình độ chuyên môn.</p>',
+			],
+			[
+				'question' => 'Bằng đại học Vừa học vừa làm có giá trị như thế nào so với chính quy?',
+				'answer'   => '<p>Theo quy định hiện hành của Bộ GD&ĐT (Thông tư 27/2019/TT-BGDĐT), văn bằng đại học không còn ghi hình thức đào tạo. Bằng hệ Vừa học vừa làm có <strong>giá trị pháp lý bình đẳng</strong> với bằng chính quy, được công nhận để thi công chức, xét nâng lương và học tiếp lên bậc Thạc sĩ, Tiến sĩ.</p>',
+			],
+			[
+				'question' => 'Thời gian đào tạo liên thông hệ Vừa học vừa làm là bao lâu?',
+				'answer'   => '<p>Thời gian đào tạo liên thông từ Cao đẳng lên Đại học thường từ <strong>1.5 đến 2 năm</strong> (từ Trung cấp lên Đại học từ 2.5 đến 3 năm). Thời gian cụ thể phụ thuộc vào số tín chỉ đại cương và cơ sở ngành được đối chiếu miễn giảm theo bảng điểm của học viên.</p>',
+			],
+			[
+				'question' => 'Điều kiện đăng ký xét tuyển liên thông vừa học vừa làm?',
+				'answer'   => '<p>Học viên chỉ cần có bằng tốt nghiệp Trung cấp hoặc Cao đẳng đúng ngành hoặc ngành gần. Trường hợp tốt nghiệp trái ngành, học viên chỉ cần học bổ sung một số học phần chuyển đổi theo quy định của trường trước khi vào học chuyên ngành.</p>',
+			],
+		];
+	}
+
+	if ( 'chinh-quy' === $slug ) {
+		return [
+			[
+				'question' => 'Thời gian học liên thông chính quy diễn ra vào khung giờ nào?',
+				'answer'   => '<p>Hệ liên thông chính quy học <strong>tập trung ban ngày</strong> theo thời khóa biểu tại khuôn viên chính của trường đại học. Hình thức này rất phù hợp với các bạn trẻ vừa tốt nghiệp CĐ/TC có thể dành toàn thời gian học tập và nghiên cứu tại trường.</p>',
+			],
+			[
+				'question' => 'Bằng tốt nghiệp liên thông chính quy có khác bằng chính quy 4 năm không?',
+				'answer'   => '<p><strong>Không khác nhau.</strong> Sau khi hoàn thành đủ số tín chỉ theo khung chương trình đào tạo, sinh viên được cấp bằng Cử nhân hoặc Kỹ sư đại học <strong>Chính quy</strong> chuẩn quốc gia do Hiệu trưởng nhà trường ký duyệt.</p>',
+			],
+			[
+				'question' => 'Sinh viên liên thông chính quy có được hưởng học bổng và vay vốn chính sách không?',
+				'answer'   => '<p><strong>Có.</strong> Sinh viên liên thông chính quy được hưởng đầy đủ các chính sách của Nhà nước và nhà trường: xét học bổng khuyến khích học tập theo kỳ, hỗ trợ vay vốn sinh viên tại Ngân hàng Chính sách xã hội, đăng ký ký túc xá và sinh hoạt Đoàn - Hội.</p>',
+			],
+			[
+				'question' => 'Phương thức xét tuyển liên thông chính quy gồm những gì?',
+				'answer'   => '<p>Hầu hết các trường đại học hiện nay áp dụng phương thức xét tuyển học bạ hoặc điểm tốt nghiệp Cao đẳng/Trung cấp; một số trường kết hợp điểm thi đánh giá năng lực hoặc điểm thi tốt nghiệp THPT theo đề án tuyển sinh cụ thể hàng năm.</p>',
+			],
+		];
+	}
+
+	// Generic fallback
+	return [
+		[
+			'question' => 'Giá trị pháp lý của bằng Đại học liên thông?',
+			'answer'   => '<p>Bằng Đại học liên thông do các trường Đại học công lập và ngoài công lập cấp đều nằm trong hệ thống văn bằng quốc gia, được Bộ Giáo dục và Đào tạo công nhận có giá trị pháp lý để thi tuyển công chức, xét nâng lương và học tiếp lên Thạc sĩ, Tiến sĩ.</p>',
+		],
+		[
+			'question' => 'Làm sao để biết tôi được miễn giảm bao nhiêu tín chỉ?',
+			'answer'   => '<p>Hội đồng tuyển sinh nhà trường sẽ căn cứ vào bảng điểm tốt nghiệp Cao đẳng hoặc Trung cấp của bạn để đối chiếu với khung chương trình đào tạo đại học, từ đó ra quyết định miễn giảm các học phần tương đương nhằm rút ngắn thời gian học tối đa.</p>',
+		],
+	];
+}

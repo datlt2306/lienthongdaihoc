@@ -1000,6 +1000,77 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		}
 	}
 
+	// 3.6 Training Type Archive FAQs (/hinh-thuc-dao-tao/)
+	if ( is_tax( LTDH_TAX_TRAINING_TYPE ) || ( ! empty( $request_path ) && preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)/([^/]+)/?#i', $request_path, $m ) && 'page' !== $m[1] ) ) {
+		if ( ! ltdh_seo_has_user_schema( $data, 'FAQPage' ) && function_exists( 'ltdh_get_training_type_faqs' ) ) {
+			$t_slug = is_tax( LTDH_TAX_TRAINING_TYPE ) ? ( get_queried_object()->slug ?? '' ) : ( $m[1] ?? '' );
+			$t_term = $t_slug ? get_term_by( 'slug', $t_slug, LTDH_TAX_TRAINING_TYPE ) : null;
+			if ( ! $t_term && ( 'tu-xa' === $t_slug || 'dao-tao-tu-xa' === $t_slug ) ) {
+				$t_term = get_term_by( 'slug', 'dao-tao-tu-xa', LTDH_TAX_TRAINING_TYPE );
+			}
+			if ( $t_term ) {
+				$t_faqs = ltdh_get_training_type_faqs( $t_term );
+				if ( ! empty( $t_faqs ) && is_array( $t_faqs ) ) {
+					$faq_elements = [];
+					foreach ( $t_faqs as $item ) {
+						$q = trim( $item['question'] ?? '' );
+						$a = trim( $item['answer'] ?? '' );
+						if ( $q && $a ) {
+							$faq_elements[] = [
+								'@type'          => 'Question',
+								'name'           => $q,
+								'acceptedAnswer' => [
+									'@type' => 'Answer',
+									'text'  => wp_strip_all_tags( $a ),
+								],
+							];
+						}
+					}
+					if ( ! empty( $faq_elements ) ) {
+						$data['ltdh_training_type_faq'] = [
+							'@type'      => 'FAQPage',
+							'mainEntity' => $faq_elements,
+						];
+					}
+				}
+
+				// 3.7 Add ItemList schema of programs for this training type
+				$progs = get_posts( [
+					'post_type'      => LTDH_CPT_PROGRAM,
+					'posts_per_page' => 12,
+					'post_status'    => 'publish',
+					'tax_query'      => [
+						[
+							'taxonomy' => LTDH_TAX_TRAINING_TYPE,
+							'field'    => 'slug',
+							'terms'    => ( 'tu-xa' === $t_term->slug || 'dao-tao-tu-xa' === $t_term->slug ) ? [ 'dao-tao-tu-xa', 'tu-xa' ] : $t_term->slug,
+						],
+					],
+				] );
+				if ( ! empty( $progs ) ) {
+					$item_elements = [];
+					$pos = 1;
+					foreach ( $progs as $prog ) {
+						$item_elements[] = [
+							'@type'    => 'ListItem',
+							'position' => $pos++,
+							'name'     => get_the_title( $prog->ID ),
+							'url'      => get_permalink( $prog->ID ),
+						];
+					}
+					$t_link = get_term_link( $t_term );
+					$clean_type_title = preg_replace( '/^(hệ|liên\s+thông)\s+/iu', '', $t_term->name );
+					$data['ltdh_training_type_item_list'] = [
+						'@type'           => 'ItemList',
+						'@id'             => ( ! is_wp_error( $t_link ) ? $t_link : '' ) . '#itemlist',
+						'name'            => sprintf( 'Chương trình tuyển sinh Liên thông %s', $clean_type_title ),
+						'itemListElement' => $item_elements,
+					];
+				}
+			}
+		}
+	}
+
 	// 4. Enhance Organization / Publisher with Admin Settings (Rank Math + ACF Options)
 	$rm_titles = get_option( 'rank-math-options-titles', [] );
 	$kg_name   = ! empty( $rm_titles['knowledgegraph_name'] )

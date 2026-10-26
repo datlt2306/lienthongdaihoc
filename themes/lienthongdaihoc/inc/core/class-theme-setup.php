@@ -183,3 +183,11 @@ add_action( 'init', function() {
  * ACF fields (global_logo, global_favicon) are kept only as fallback
  * when Customizer values are not set.
  */
+
+/**
+ * Allow standard post HTML tags (h2, h3, ul, ol, li, img, table, etc.) in taxonomy descriptions
+ * so Rich Text Editors (Rank Math, TinyMCE) can save formatted SEO content without stripping tags.
+ */
+remove_filter( 'pre_term_description', 'wp_filter_kses' );
+add_filter( 'pre_term_description', 'wp_filter_post_kses' );
+remove_filter( 'term_description', 'wp_kses_data' );

@@ -168,6 +168,16 @@ if ( ! is_wp_error( $all_types ) && is_array( $all_types ) ) {
 }
 $total_programs   = wp_count_posts( 'program' )->publish;
 $active_type_term = $selected_type ? get_term_by( 'slug', $selected_type, 'training_type' ) : null;
+if ( ! $active_type_term && ( 'tu-xa' === $selected_type || 'dao-tao-tu-xa' === $selected_type ) ) {
+	$active_type_term = get_term_by( 'slug', 'dao-tao-tu-xa', 'training_type' );
+}
+$active_term_description = '';
+if ( $active_type_term && ! empty( $active_type_term->description ) ) {
+	$active_term_description = $active_type_term->description;
+}
+$training_type_faqs = ( $active_type_term && function_exists( 'ltdh_get_training_type_faqs' ) )
+	? ltdh_get_training_type_faqs( $active_type_term )
+	: [];
 
 // School list for dropdown
 $schools_list = get_posts( [
@@ -290,9 +300,32 @@ $has_active_filters  = $active_filter_count > 0;
 					<h2 id="catalog-heading-title" class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
 						<?php echo $active_type_term ? 'Liên thông ' . esc_html( preg_replace( '/^(hệ|liên\s+thông)\s+/iu', '', $active_type_term->name ) ) : 'Chương trình tuyển sinh Liên thông Đại học'; ?>
 					</h2>
-					<p class="text-xs md:text-sm text-slate-500 mt-1">
-						Tìm thấy <strong id="catalog-count-display" class="text-brand-primary font-extrabold text-sm md:text-base"><?php echo esc_html( $query->found_posts ); ?></strong> chương trình phù hợp.
-					</p>
+					<div class="flex flex-wrap items-center gap-2 mt-1">
+						<p class="text-xs md:text-sm text-slate-500">
+							Tìm thấy <strong id="catalog-count-display" class="text-brand-primary font-extrabold text-sm md:text-base"><?php echo esc_html( $query->found_posts ); ?></strong> chương trình phù hợp.
+						</p>
+						<?php if ( ! empty( $active_term_description ) ) : ?>
+							<span class="text-slate-300 hidden sm:inline">•</span>
+							<a href="#he-dao-tao-seo-content" class="inline-flex items-center gap-1 text-xs font-bold text-brand-primary hover:text-brand-darkBlue hover:underline transition-all">
+								<span>Quy chế & Bằng cấp</span>
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+							</a>
+						<?php endif; ?>
+						<?php if ( ! empty( $training_type_faqs ) ) : ?>
+							<span class="text-slate-300 hidden sm:inline">•</span>
+							<a href="#he-dao-tao-faq-section" class="inline-flex items-center gap-1 text-xs font-bold text-brand-primary hover:text-brand-darkBlue hover:underline transition-all">
+								<span>Hỏi đáp (FAQ)</span>
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+							</a>
+						<?php endif; ?>
+						<?php if ( $active_type_term ) : ?>
+							<span class="text-slate-300 hidden sm:inline">•</span>
+							<a href="#he-dao-tao-cta-box" class="inline-flex items-center gap-1 text-xs font-bold text-brand-accent hover:text-orange-700 hover:underline transition-all">
+								<span>Nhận tư vấn</span>
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+							</a>
+						<?php endif; ?>
+					</div>
 				</div>
 				<div id="catalog-desktop-reset">
 					<?php if ( $has_active_filters ) : ?>
@@ -489,6 +522,19 @@ $has_active_filters  = $active_filter_count > 0;
 				<p class="text-xs font-bold text-slate-500 truncate">
 					Tìm thấy <strong id="catalog-count-display-mobile" class="text-brand-primary font-black text-sm"><?php echo esc_html( $query->found_posts ); ?></strong> chương trình
 				</p>
+				<?php if ( ! empty( $active_term_description ) || ! empty( $training_type_faqs ) ) : ?>
+					<div class="flex items-center gap-1.5 mt-0.5 text-[11px] font-bold">
+						<?php if ( ! empty( $active_term_description ) ) : ?>
+							<a href="#he-dao-tao-seo-content" class="text-brand-primary hover:underline">Quy chế</a>
+						<?php endif; ?>
+						<?php if ( ! empty( $training_type_faqs ) ) : ?>
+							<span class="text-slate-300">•</span>
+							<a href="#he-dao-tao-faq-section" class="text-brand-primary hover:underline">Hỏi đáp</a>
+						<?php endif; ?>
+						<span class="text-slate-300">•</span>
+						<a href="#he-dao-tao-cta-box" class="text-brand-accent hover:underline">Tư vấn</a>
+					</div>
+				<?php endif; ?>
 			</div>
 
 			<div class="flex items-center gap-2 shrink-0">
@@ -949,6 +995,215 @@ $has_active_filters  = $active_filter_count > 0;
 				?>
 			<?php endif; ?>
 		</div>
+
+		<?php if ( ! empty( $active_term_description ) ) : ?>
+			<!-- ============ SEO INTRO / DESCRIPTION SECTION (EDTECH DIRECTORY STANDARD) ============ -->
+			<section id="he-dao-tao-seo-content" class="mt-12 md:mt-16 bg-white border border-slate-200/90 rounded-2xl md:rounded-3xl p-5 sm:p-7 md:p-9 shadow-xs transition-all relative overflow-hidden" aria-labelledby="seo-content-heading">
+				
+				<!-- Header with clean icon badge & title -->
+				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 sm:pb-5 border-b border-slate-100">
+					<div>
+						<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-brand-primary border border-blue-100/80 mb-2">
+							<svg class="w-3.5 h-3.5 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+							<span>Thông tin & Quy chế đào tạo</span>
+						</div>
+						<h2 id="seo-content-heading" class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+							<?php echo esc_html( 'Quy chế & Giới thiệu ' . ( $active_type_term ? $active_type_term->name : 'hình thức đào tạo' ) ); ?>
+						</h2>
+					</div>
+					<div class="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100/80">
+						<svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+						<span>Chuẩn Bộ GD&ĐT</span>
+					</div>
+				</div>
+
+				<!-- Content Body (Rich formatted with prose) -->
+				<div class="relative mt-5 sm:mt-6">
+					<div id="ltdh-seo-article-body" class="prose prose-slate max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight prose-h2:text-lg sm:prose-h2:text-xl md:prose-h2:text-2xl prose-h2:mt-6 prose-h2:mb-3 prose-p:text-slate-600 prose-p:leading-relaxed prose-strong:text-slate-900 prose-a:text-brand-primary prose-a:font-semibold hover:prose-a:underline prose-li:text-slate-600 prose-ul:my-3 prose-ol:my-3 prose-img:rounded-xl relative transition-all duration-300 max-h-[380px] overflow-hidden">
+						<?php echo wpautop( $active_term_description ); ?>
+						<div id="ltdh-seo-article-gradient" class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none transition-opacity duration-300"></div>
+					</div>
+
+					<!-- Expand / Collapse Action Button -->
+					<div id="ltdh-seo-toggle-wrapper" class="mt-4 pt-2 flex justify-center relative z-10">
+						<button type="button" 
+						        id="ltdh-seo-toggle-btn" 
+						        aria-expanded="false" 
+						        aria-controls="ltdh-seo-article-body" 
+						        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-brand-primary bg-slate-50 hover:bg-blue-50/80 border border-slate-200/90 hover:border-blue-200 transition-all cursor-pointer shadow-2xs group focus:outline-none focus:ring-2 focus:ring-brand-primary/20">
+							<span id="ltdh-seo-toggle-text">Đọc toàn bộ giới thiệu & quy chế</span>
+							<svg id="ltdh-seo-toggle-icon" class="w-4 h-4 text-brand-primary transition-transform duration-300 group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+						</button>
+					</div>
+				</div>
+
+			</section>
+		<?php endif; ?>
+
+		<?php if ( ! empty( $training_type_faqs ) ) : ?>
+			<!-- ============ FAQ ACCORDION SECTION (SEO & USER QUERY RESOLUTION) ============ -->
+			<section id="he-dao-tao-faq-section" class="mt-8 md:mt-10 bg-white border border-slate-200/90 rounded-2xl md:rounded-3xl p-5 sm:p-7 md:p-9 shadow-xs transition-all relative overflow-hidden" aria-labelledby="faq-section-heading">
+				
+				<!-- Section Header -->
+				<div class="mb-5 pb-4 border-b border-slate-100">
+					<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-brand-primary border border-blue-100/80 mb-2">
+						<svg class="w-3.5 h-3.5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+						</svg>
+						<span>Hỏi đáp tuyển sinh & Bằng cấp</span>
+					</div>
+					<h2 id="faq-section-heading" class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+						Câu hỏi thường gặp về Liên thông <?php echo esc_html( $active_type_term ? preg_replace( '/^(hệ|liên\s+thông)\s+/iu', '', $active_type_term->name ) : '' ); ?>
+					</h2>
+					<p class="text-xs sm:text-sm text-slate-500 mt-1.5">
+						Giải đáp nhanh các thắc mắc phổ biến về giá trị văn bằng theo Thông tư 27/2019/TT-BGDĐT, điều kiện miễn giảm môn và thời gian đào tạo.
+					</p>
+				</div>
+
+				<!-- FAQ Accordion List -->
+				<div class="divide-y divide-slate-100">
+					<?php foreach ( $training_type_faqs as $f_idx => $faq_item ) : 
+						$is_first_open = ( 0 === $f_idx ) ? 'open' : '';
+					?>
+						<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-base list-none select-none hover:text-brand-primary transition-colors">
+								<div class="flex items-start gap-2.5 min-w-0">
+									<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-brand-primary text-xs font-black shrink-0 mt-0.5 group-open:bg-brand-primary group-open:text-white transition-colors">
+										?
+									</span>
+									<span class="leading-snug text-slate-800 group-open:text-brand-primary transition-colors">
+										<?php echo esc_html( $faq_item['question'] ); ?>
+									</span>
+								</div>
+								<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-brand-primary transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+								</svg>
+							</summary>
+							<div class="mt-2.5 sm:mt-3 pl-8 sm:pl-8 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+								<?php echo wp_kses_post( $faq_item['answer'] ); ?>
+							</div>
+						</details>
+					<?php endforeach; ?>
+				</div>
+
+			</section>
+
+			<!-- Fallback JSON-LD Schema (Rendered for Google Rich Snippets if Rank Math hasn't output it) -->
+			<?php if ( ! function_exists( 'rank_math' ) || ! class_exists( 'RankMath' ) ) : ?>
+				<script type="application/ld+json">
+				{
+					"@context": "https://schema.org",
+					"@type": "FAQPage",
+					"mainEntity": [
+						<?php
+						$faq_json = [];
+						foreach ( $training_type_faqs as $item ) {
+							$faq_json[] = json_encode( [
+								'@type'          => 'Question',
+								'name'           => $item['question'],
+								'acceptedAnswer' => [
+									'@type' => 'Answer',
+									'text'  => wp_strip_all_tags( $item['answer'] ),
+								],
+							], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+						}
+						echo implode( ",\n\t\t\t\t\t\t", $faq_json );
+						?>
+					]
+				}
+				</script>
+			<?php endif; ?>
+		<?php endif; ?>
+
+		<?php if ( $active_type_term ) : ?>
+			<!-- ============ CTA CONSULTATION FORM SECTION (HIGH-CONVERTING BOTTOM LEAD MAGNET) ============ -->
+			<section id="he-dao-tao-cta-box" class="mt-8 md:mt-12 bg-gradient-to-br from-brand-primary via-[#002770] to-slate-900 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 text-white shadow-xl relative overflow-hidden" aria-labelledby="cta-box-heading">
+				
+				<!-- Decorative Background Elements -->
+				<div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-accent/20 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+				<div class="absolute -left-20 -bottom-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+
+				<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
+					
+					<!-- Left Info Column -->
+					<div class="lg:col-span-5 space-y-4 sm:space-y-5">
+						<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/10 text-brand-accent border border-white/10 backdrop-blur-xs">
+							<span>TƯ VẤN XÉT TUYỂN MIỄN PHÍ</span>
+						</div>
+						
+						<h2 id="cta-box-heading" class="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">
+							Chưa rõ lộ trình học Liên thông <?php echo esc_html( preg_replace( '/^(hệ|liên\s+thông)\s+/iu', '', $active_type_term->name ) ); ?> phù hợp?
+						</h2>
+						
+						<p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+							Vui lòng để lại số điện thoại, đội ngũ chuyên viên tuyển sinh của chúng tôi sẽ liên hệ rà soát bảng điểm Cao đẳng/Trung cấp và tư vấn lộ trình học phù hợp nhất hoàn toàn miễn phí.
+						</p>
+
+						<!-- Trust Value Points -->
+						<div class="space-y-2.5 pt-2">
+							<div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-200 font-medium">
+								<span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+								</span>
+								<span>Rà soát bảng điểm & tư vấn miễn trừ tín chỉ</span>
+							</div>
+							<div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-200 font-medium">
+								<span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+								</span>
+								<span>Hỗ trợ chuẩn bị hồ sơ xét tuyển nhanh chóng</span>
+							</div>
+							<div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-200 font-medium">
+								<span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+								</span>
+								<span>Cam kết bảo mật thông tin thí sinh 100%</span>
+							</div>
+						</div>
+
+						<!-- Quick Contacts -->
+						<div class="pt-3 border-t border-white/10 flex flex-wrap items-center gap-4 text-xs text-slate-300">
+							<?php
+							$global_hotline = function_exists( 'get_field' ) ? ( get_field( 'global_hotline', 'option' ) ?: '0988.991.496' ) : '0988.991.496';
+							$global_zalo    = function_exists( 'get_field' ) ? ( get_field( 'global_zalo_url', 'option' ) ?: 'https://zalo.me/0988991496' ) : 'https://zalo.me/0988991496';
+							?>
+							<a href="tel:<?php echo esc_attr( preg_replace( '/[^\d+]/', '', $global_hotline ) ); ?>" class="inline-flex items-center gap-1.5 hover:text-white transition-colors">
+								<svg class="w-4 h-4 text-brand-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+								<span>Hotline: <strong class="text-white"><?php echo esc_html( $global_hotline ); ?></strong></span>
+							</a>
+							<span class="text-white/20">|</span>
+							<a href="<?php echo esc_url( $global_zalo ); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 hover:text-white transition-colors">
+								<span>Chat Zalo tư vấn 24/7 →</span>
+							</a>
+						</div>
+					</div>
+
+					<!-- Right Form Column -->
+					<div class="lg:col-span-7">
+						<div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 text-slate-900 shadow-2xl border border-white/20">
+							<div class="mb-5 pb-3 border-b border-slate-100">
+								<h3 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+									Đăng ký tư vấn trực tuyến
+								</h3>
+								<p class="text-xs text-slate-500 mt-1">
+									Điền thông tin bên dưới, chuyên viên tuyển sinh sẽ gọi lại hỗ trợ ngay.
+								</p>
+							</div>
+
+							<div class="ltdh-contact-form-wrapper">
+								<?php
+								ltdh_render_consultation_form( [
+									'training_type' => $active_type_term ? $active_type_term->name : '',
+								] );
+								?>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</section>
+		<?php endif; ?>
 
 	</div>
 </main>

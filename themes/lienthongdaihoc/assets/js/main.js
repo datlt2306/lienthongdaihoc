@@ -1927,6 +1927,63 @@ function ltdhInitTheme() {
     }
 
     initPostSharing();
+
+    // SEO Training Type / Taxonomy Article Expand-Collapse
+    function initSeoArticleToggle() {
+        const articleBody = document.getElementById('ltdh-seo-article-body');
+        const toggleBtn = document.getElementById('ltdh-seo-toggle-btn');
+        const toggleWrapper = document.getElementById('ltdh-seo-toggle-wrapper');
+        const gradient = document.getElementById('ltdh-seo-article-gradient');
+        const toggleText = document.getElementById('ltdh-seo-toggle-text');
+        const toggleIcon = document.getElementById('ltdh-seo-toggle-icon');
+
+        if (!articleBody || !toggleBtn) return;
+
+        // Auto-detect: if content is short, no need for collapsible button
+        if (articleBody.scrollHeight <= 420) {
+            articleBody.classList.remove('max-h-[380px]', 'overflow-hidden');
+            if (gradient) gradient.style.display = 'none';
+            if (toggleWrapper) toggleWrapper.style.display = 'none';
+            return;
+        }
+
+        toggleBtn.addEventListener('click', function() {
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+
+            if (isExpanded) {
+                // Collapse
+                articleBody.classList.add('max-h-[380px]', 'overflow-hidden');
+                if (gradient) {
+                    gradient.style.opacity = '1';
+                    gradient.style.pointerEvents = 'none';
+                }
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                if (toggleText) toggleText.textContent = 'Đọc toàn bộ giới thiệu & quy chế';
+                if (toggleIcon) toggleIcon.style.transform = 'rotate(0deg)';
+
+                // Smooth scroll back to section top if scrolled past
+                const section = document.getElementById('he-dao-tao-seo-content');
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top < 80) {
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            } else {
+                // Expand
+                articleBody.classList.remove('max-h-[380px]', 'overflow-hidden');
+                if (gradient) {
+                    gradient.style.opacity = '0';
+                    gradient.style.pointerEvents = 'none';
+                }
+                toggleBtn.setAttribute('aria-expanded', 'true');
+                if (toggleText) toggleText.textContent = 'Thu gọn nội dung';
+                if (toggleIcon) toggleIcon.style.transform = 'rotate(180deg)';
+            }
+        });
+    }
+
+    initSeoArticleToggle();
 }
 
 if (document.readyState === 'loading') {

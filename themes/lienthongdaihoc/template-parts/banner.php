@@ -317,10 +317,10 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 } elseif ( is_tax( 'training_type' ) ) {
 	$term            = get_queried_object();
 	$clean_term_name = ( $term && ! empty( $term->name ) ) ? preg_replace( '/^hệ\s+/iu', '', $term->name ) : '';
-	$banner_title    = 'Hình thức đào tạo: ' . $clean_term_name;
-	$banner_subtitle = ( $term && ! empty( $term->description ) ) ? $term->description : ( 'Danh sách chương trình thuộc hình thức đào tạo ' . $clean_term_name );
+	$banner_title    = 'Liên thông ' . $clean_term_name;
+	$banner_subtitle = 'Danh sách chương trình tuyển sinh Liên thông Đại học ' . $clean_term_name . ' mới nhất ' . date( 'Y' );
 	$banner_eyebrow  = [
-		'text' => 'Hình thức đào tạo liên thông ' . date( 'Y' ),
+		'text' => 'Tuyển sinh Liên thông ' . date( 'Y' ),
 	];
 } elseif ( is_tax( 'campus' ) ) {
 	$term = get_queried_object();
@@ -396,10 +396,10 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 		$slug_lookup     = ( 'tu-xa' === $m[1] ) ? 'dao-tao-tu-xa' : $m[1];
 		$he_term         = get_term_by( 'slug', $slug_lookup, 'training_type' ) ?: get_term_by( 'slug', $m[1], 'training_type' );
 		$clean_he_name   = $he_term ? preg_replace( '/^hệ\s+/iu', '', $he_term->name ) : '';
-		$banner_title    = $he_term ? 'Hình thức đào tạo: ' . $clean_he_name : 'Chương Trình Tuyển Sinh Liên Thông Đại Học';
-		$banner_subtitle = $he_term ? ( $he_term->description ?: 'Danh sách chương trình thuộc hình thức đào tạo ' . $clean_he_name ) : 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
+		$banner_title    = $he_term ? 'Liên thông ' . $clean_he_name : 'Chương Trình Tuyển Sinh Liên Thông Đại Học';
+		$banner_subtitle = $he_term ? ( 'Danh sách chương trình tuyển sinh Liên thông Đại học ' . $clean_he_name . ' mới nhất ' . date( 'Y' ) ) : 'Tổng hợp các chương trình tuyển sinh Liên thông Đại học hệ Chính quy, Vừa học vừa làm và Đào tạo từ xa';
 		$banner_eyebrow  = [
-			'text' => 'Hình thức đào tạo liên thông ' . date( 'Y' ),
+			'text' => 'Tuyển sinh Liên thông ' . date( 'Y' ),
 		];
 	} else {
 		$banner_title    = get_the_title() ?: wp_title( '', false );
