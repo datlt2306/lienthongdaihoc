@@ -998,7 +998,7 @@ $has_active_filters  = $active_filter_count > 0;
 
 		<?php if ( ! empty( $active_term_description ) ) : ?>
 			<!-- ============ SEO INTRO / DESCRIPTION SECTION (EDTECH DIRECTORY STANDARD) ============ -->
-			<section id="he-dao-tao-seo-content" class="mt-12 md:mt-16 bg-white border border-slate-200/90 rounded-2xl md:rounded-3xl p-5 sm:p-7 md:p-9 shadow-xs transition-all relative overflow-hidden" aria-labelledby="seo-content-heading">
+			<section id="he-dao-tao-seo-content" class="mt-12 md:mt-16 scroll-mt-48 lg:scroll-mt-72 bg-white border border-slate-200/90 rounded-2xl md:rounded-3xl p-5 sm:p-7 md:p-9 shadow-xs transition-all relative overflow-hidden" aria-labelledby="seo-content-heading">
 				
 				<!-- Header with clean icon badge & title -->
 				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 sm:pb-5 border-b border-slate-100">
@@ -1042,7 +1042,7 @@ $has_active_filters  = $active_filter_count > 0;
 
 		<?php if ( ! empty( $training_type_faqs ) ) : ?>
 			<!-- ============ FAQ ACCORDION SECTION (SEO & USER QUERY RESOLUTION) ============ -->
-			<section id="he-dao-tao-faq-section" class="mt-8 md:mt-10 bg-white border border-slate-200/90 rounded-2xl md:rounded-3xl p-5 sm:p-7 md:p-9 shadow-xs transition-all relative overflow-hidden" aria-labelledby="faq-section-heading">
+			<section id="he-dao-tao-faq-section" class="mt-8 md:mt-10 scroll-mt-48 lg:scroll-mt-72 bg-white border border-slate-200/90 rounded-2xl md:rounded-3xl p-5 sm:p-7 md:p-9 shadow-xs transition-all relative overflow-hidden" aria-labelledby="faq-section-heading">
 				
 				<!-- Section Header -->
 				<div class="mb-5 pb-4 border-b border-slate-100">
@@ -1117,7 +1117,7 @@ $has_active_filters  = $active_filter_count > 0;
 
 		<?php if ( $active_type_term ) : ?>
 			<!-- ============ CTA CONSULTATION FORM SECTION (HIGH-CONVERTING BOTTOM LEAD MAGNET) ============ -->
-			<section id="he-dao-tao-cta-box" class="mt-8 md:mt-12 bg-gradient-to-br from-brand-primary via-[#002770] to-slate-900 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 text-white shadow-xl relative overflow-hidden" aria-labelledby="cta-box-heading">
+			<section id="he-dao-tao-cta-box" class="mt-8 md:mt-12 scroll-mt-48 lg:scroll-mt-72 bg-gradient-to-br from-brand-primary via-[#002770] to-slate-900 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 text-white shadow-xl relative overflow-hidden" aria-labelledby="cta-box-heading">
 				
 				<!-- Decorative Background Elements -->
 				<div class="absolute -right-20 -top-20 w-80 h-80 bg-brand-accent/20 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>

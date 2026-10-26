@@ -70,6 +70,57 @@ body.overflow-hidden {
     }
 }
 
+/* Catalog Desktop Sticky Top Filter Bar */
+@media (min-width: 1024px) {
+    #catalog-desktop-filter-wrapper {
+        position: sticky !important;
+        top: 80px !important;
+        z-index: 35 !important;
+        transition: box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    body.admin-bar #catalog-desktop-filter-wrapper {
+        top: calc(80px + 32px) !important;
+    }
+
+    #catalog-desktop-filter-wrapper.is-stuck {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-color: rgba(226, 232, 240, 0.95) !important;
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03) !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    #catalog-desktop-filter-wrapper {
+        position: sticky !important;
+        top: 64px !important;
+        z-index: 35 !important;
+        transition: box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    body.admin-bar #catalog-desktop-filter-wrapper {
+        top: calc(64px + 46px) !important;
+    }
+
+    html.ltdh-header-hidden #catalog-desktop-filter-wrapper {
+        top: 0.5rem !important;
+    }
+
+    body.admin-bar html.ltdh-header-hidden #catalog-desktop-filter-wrapper {
+        top: calc(46px + 0.5rem) !important;
+    }
+
+    #catalog-desktop-filter-wrapper.is-stuck {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-color: rgba(226, 232, 240, 0.95) !important;
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08) !important;
+    }
+}
+
 /* Custom text-md utility alias (equivalent to text-base 16px) */
 @utility text-md {
     font-size: 1rem;
