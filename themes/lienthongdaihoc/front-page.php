@@ -1280,13 +1280,14 @@ $zalo    = ltdh_get_zalo_url();
 		</div>
 	</section>
 
-	<!-- 7. STUDENT TESTIMONIALS (Apple Cupertino Review Cards) -->
-	<section class="py-10 sm:py-16 md:py-20 bg-white relative overflow-hidden">
+	<!-- 7. STUDENT TESTIMONIALS (Đã kiểm chứng thực tế) -->
+	<section class="py-10 sm:py-16 bg-white relative overflow-hidden">
+		<div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-accent/10 rounded-full blur-3xl pointer-events-none z-0"></div>
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-			<div class="text-center max-w-2xl mx-auto mb-8 sm:mb-10 space-y-2">
-				<span class="inline-block bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">CẢM NHẬN HỌC VIÊN</span>
-				<h2 class="text-2xl md:text-3xl font-semibold text-[#1D1D1F] tracking-tight">Đánh giá của học viên</h2>
-				<p class="text-[#86868B] text-sm leading-relaxed">Chia sẻ thực tế từ người học đã được tư vấn và hỗ trợ chuẩn bị hồ sơ xét tuyển liên thông đại học.</p>
+			<div class="text-center max-w-2xl mx-auto mb-6 sm:mb-8 space-y-2 sm:space-y-3">
+				<span class="inline-block bg-blue-50 text-brand-primary text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wider">CẢM NHẬN HỌC VIÊN</span>
+				<h2 class="text-xl md:text-3xl font-black text-slate-900">Đánh giá của học viên</h2>
+				<p class="text-slate-500 text-sm">Chia sẻ thực tế từ người học đã được tư vấn và hỗ trợ chuẩn bị hồ sơ xét tuyển liên thông đại học.</p>
 			</div>
 
 			<div class="flex md:grid overflow-x-auto md:overflow-x-visible snap-x snap-mandatory md:snap-none gap-6 pb-4 md:pb-0 no-scrollbar md:grid-cols-3">
@@ -1353,25 +1354,25 @@ $zalo    = ltdh_get_zalo_url();
 					$is_studying  = in_array($status, ['studying', 'new', 'enrolled'], true);
 					$status_label = $t['status_label'] ?? ($is_studying ? 'Đang theo học' : 'Đã tốt nghiệp');
 				?>
-					<div class="shrink-0 w-[85vw] sm:w-[360px] md:w-auto snap-center bg-white border border-black/[0.07] rounded-3xl p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+					<div class="shrink-0 w-[85vw] sm:w-[360px] md:w-auto snap-center bg-white border border-slate-200/90 hover:border-blue-200 rounded-2xl p-5 sm:p-6 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
 						<div>
 							<!-- Student Profile Header with Large Photo (96px) -->
 							<div class="flex items-start gap-4 mb-4">
 								<div class="relative shrink-0">
 									<?php if ($avatar_url) : ?>
-										<img class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-1 ring-black/[0.08] shadow-sm group-hover:scale-105 transition-all duration-300" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>" loading="lazy" width="96" height="96">
+										<img class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-2 ring-slate-100 shadow-sm group-hover:scale-105 transition-all duration-200" src="<?php echo esc_url($avatar_url); ?>" alt="<?php echo esc_attr($t['name'] ?? ''); ?>" loading="lazy" width="96" height="96">
 									<?php else : ?>
-										<div class="w-20 h-20 sm:w-24 sm:h-24 bg-[#0071E3] text-white rounded-2xl flex items-center justify-center font-semibold text-xl shadow-sm"><?php echo esc_html($initials); ?></div>
+										<div class="w-20 h-20 sm:w-24 sm:h-24 bg-brand-primary text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-sm"><?php echo esc_html($initials); ?></div>
 									<?php endif; ?>
 
 									<?php if ($is_studying) : ?>
-										<span class="absolute -bottom-1 -right-1 bg-[#0071E3] text-white p-1 rounded-full ring-2 ring-white shadow-2xs" title="<?php echo esc_attr($status_label); ?>">
+										<span class="absolute -bottom-1 -right-1 bg-blue-600 text-white p-1 rounded-full ring-2 ring-white shadow-2xs" title="<?php echo esc_attr($status_label); ?>">
 											<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
 												<path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a10.993 10.993 0 00-.25 2.302c0 1.109.2 2.16.564 3.125a1 1 0 00.916.622h7.04a1 1 0 00.916-.622c.364-.965.564-2.016.564-3.125 0-.796-.09-1.57-.25-2.302l2.644-1.131a1 1 0 000-1.84l-7-3zM10 4.218l4.157 1.782L10 7.782 5.843 6 10 4.218z"/>
 											</svg>
 										</span>
 									<?php else : ?>
-										<span class="absolute -bottom-1 -right-1 bg-[#34C759] text-white p-1 rounded-full ring-2 ring-white shadow-2xs" title="Học viên đã tốt nghiệp">
+										<span class="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-full ring-2 ring-white shadow-2xs" title="Học viên đã tốt nghiệp">
 											<svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
 												<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
 											</svg>
@@ -1387,22 +1388,23 @@ $zalo    = ltdh_get_zalo_url();
 										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
 										<span class="text-xs font-bold text-amber-600 ml-1">5.0</span>
 									</div>
-									<h3 class="font-semibold text-base sm:text-lg text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
+									<h3 class="font-bold text-base sm:text-lg text-slate-900 group-hover:text-brand-primary transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
 									<?php if (!empty($workplace)) : ?>
-										<p class="text-xs sm:text-[13px] font-medium text-[#6E6E73] flex items-center gap-1 my-1.5 truncate" title="<?php echo esc_attr($workplace); ?>">
-											<svg class="w-3.5 h-3.5 text-[#0071E3] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<p class="text-xs sm:text-[13px] font-semibold text-slate-700 flex items-center gap-1 my-1.5 truncate" title="<?php echo esc_attr($workplace); ?>">
+											<svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
 											</svg>
 											<span class="truncate"><?php echo esc_html($workplace); ?></span>
 										</p>
 									<?php endif; ?>
-									<p class="text-xs text-[#0071E3] font-normal mt-0.5 line-clamp-1"><?php echo esc_html($t['role'] ?? ''); ?></p>
+									<p class="text-xs text-brand-primary font-medium mt-0.5 line-clamp-1"><?php echo esc_html($t['role'] ?? ''); ?></p>
 								</div>
 							</div>
 
 							<!-- Quote Body with decorative quote mark -->
 							<div class="relative pt-2">
-								<p class="text-sm sm:text-[15px] text-[#6E6E73] leading-relaxed">"<?php echo esc_html($t['content'] ?? ''); ?>"</p>
+								<svg class="w-8 h-8 text-blue-100 mb-2 -mt-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+								<p class="text-sm sm:text-[15px] text-slate-600 leading-relaxed italic">"<?php echo esc_html($t['content'] ?? ''); ?>"</p>
 							</div>
 						</div>
 
