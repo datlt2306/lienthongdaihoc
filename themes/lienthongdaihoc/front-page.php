@@ -1228,20 +1228,20 @@ $zalo    = ltdh_get_zalo_url();
 		$sanitized_metrics = ltdh_default( 'homepage', 'kpi_metrics' );
 	}
 	?>
-	<section class="py-12 sm:py-16 md:py-20 bg-[#161617] text-white relative overflow-hidden">
-		<div class="absolute -right-20 -top-20 w-80 h-80 bg-[#0071E3]/15 rounded-full blur-3xl pointer-events-none"></div>
-		<div class="absolute -left-20 -bottom-20 w-80 h-80 bg-[#FF9500]/10 rounded-full blur-3xl pointer-events-none"></div>
+	<section class="py-8 sm:py-10 md:py-14 bg-gradient-to-br from-[#0c192c] via-[#0E2038] to-[#002b7a] text-white relative overflow-hidden">
+		<div class="absolute -right-20 -top-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+		<div class="absolute -left-20 -bottom-20 w-80 h-80 bg-[#f5bf23]/10 rounded-full blur-3xl pointer-events-none"></div>
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-			<div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-14">
+			<div class="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-12">
 				<div class="w-full lg:w-1/3 text-center lg:text-left">
-					<div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md text-[#FF9500] text-[11px] font-semibold uppercase tracking-wider mb-3 border border-white/10">
+					<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-xs text-[#f5bf23] text-[11px] font-extrabold uppercase tracking-wider mb-2.5 border border-white/10">
 						<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
 						<span>Thông tin xác thực</span>
 					</div>
-					<h2 class="text-2xl md:text-3xl font-semibold tracking-tight text-white leading-tight">
+					<h2 class="text-xl md:text-2xl font-black font-display tracking-tight text-white uppercase leading-tight">
 						<?php echo esc_html( $w_heading ); ?>
 					</h2>
-					<p class="text-[#86868B] text-xs sm:text-sm mt-2.5 leading-relaxed">
+					<p class="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed">
 						<?php echo esc_html( $w_desc ); ?>
 					</p>
 				</div>
@@ -1249,8 +1249,8 @@ $zalo    = ltdh_get_zalo_url();
 					<?php foreach ( $sanitized_metrics as $idx => $metric ) : 
 						$is_first = ( 0 === $idx );
 					?>
-						<div class="group bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 rounded-3xl p-4 sm:p-7 flex flex-col items-center text-center backdrop-blur-md transition-all duration-300 shadow-sm hover:shadow-lg h-full">
-							<div class="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center text-[#FF9500] mb-2 sm:mb-3 group-hover:bg-[#FF9500]/20 transition-colors shrink-0">
+						<div class="group bg-white/[0.07] hover:bg-white/[0.12] border border-white/10 hover:border-white/20 rounded-2xl p-4 sm:p-7 flex flex-col items-center text-center backdrop-blur-xs transition-all duration-300 shadow-sm hover:shadow-lg h-full">
+							<div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-[#f5bf23] mb-2 sm:mb-3 group-hover:bg-[#f5bf23]/20 group-hover:border-[#f5bf23]/30 transition-colors shrink-0">
 								<?php if ( $is_first ) : ?>
 									<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
@@ -1262,14 +1262,14 @@ $zalo    = ltdh_get_zalo_url();
 								<?php endif; ?>
 							</div>
 
-							<span class="ltdh-counter tabular-nums block font-semibold text-3xl sm:text-5xl text-white leading-none tracking-tight mb-1.5 sm:mb-2" data-target="<?php echo esc_attr( $metric['value'] ?? '' ); ?>">
+							<span class="ltdh-counter tabular-nums block font-display font-black text-2xl sm:text-4xl lg:text-5xl text-[#f5bf23] leading-none tracking-tight mb-1.5 sm:mb-2" data-target="<?php echo esc_attr( $metric['value'] ?? '' ); ?>">
 								<?php echo esc_html( $metric['value'] ?? '' ); ?>
 							</span>
-							<span class="text-xs sm:text-base text-white/90 font-medium block leading-snug sm:leading-snug mb-auto">
+							<span class="text-xs sm:text-base text-white font-bold block leading-snug sm:leading-snug mb-auto">
 								<?php echo esc_html( $metric['label'] ?? '' ); ?>
 							</span>
 							<?php if ( ! empty( $metric['subtext'] ) ) : ?>
-								<span class="text-[11px] sm:text-xs text-[#86868B] font-normal block mt-1.5 sm:mt-2 leading-tight sm:leading-relaxed pt-1.5 border-t border-white/5 w-full">
+								<span class="text-[11px] sm:text-xs text-slate-300 font-medium block mt-1.5 sm:mt-2 leading-tight sm:leading-relaxed pt-1.5 border-t border-white/5 w-full">
 									<?php echo esc_html( $metric['subtext'] ); ?>
 								</span>
 							<?php endif; ?>
