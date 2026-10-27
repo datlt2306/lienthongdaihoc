@@ -575,7 +575,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 									</svg>
 								</div>
 							</summary>
-							<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed space-y-4">
+							<div class="mt-3 pl-0 sm:pl-10 text-sm md:text-base text-slate-700 leading-relaxed space-y-4">
 								
 								<?php if ( ! empty( $major_target_admissions ) ) : ?>
 									<?php 
@@ -634,7 +634,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 
 													<?php if ( ! empty( $t_item['proper_majors'] ) ) : ?>
 														<div class="pt-3">
-															<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs sm:text-[13px] text-slate-700">
+															<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-sm sm:text-base text-slate-700">
 																<?php foreach ( $t_item['proper_majors'] as $p_major ) : ?>
 																	<li class="flex items-center gap-2 py-0.5">
 																		<span class="w-1.5 h-1.5 rounded-full bg-[#00308b] shrink-0"></span>
@@ -664,7 +664,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 
 													<?php if ( ! empty( $t_item['near_majors'] ) ) : ?>
 														<div class="pt-3">
-															<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs sm:text-[13px] text-slate-700">
+															<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-sm sm:text-base text-slate-700">
 																<?php foreach ( $t_item['near_majors'] as $n_major ) : ?>
 																	<li class="flex items-center gap-2 py-0.5">
 																		<span class="w-1.5 h-1.5 rounded-full bg-brand-accent shrink-0"></span>
@@ -676,7 +676,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 													<?php endif; ?>
 
 													<?php if ( ! empty( $t_item['bridge_note'] ) ) : ?>
-														<div class="mt-3 pt-2.5 border-t border-slate-100 text-xs text-slate-500 flex items-start gap-1.5">
+														<div class="mt-3 pt-2.5 border-t border-slate-100 text-xs sm:text-sm text-slate-500 flex items-start gap-1.5">
 															<svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 															<span><?php echo esc_html( $t_item['bridge_note'] ); ?></span>
 														</div>
@@ -702,7 +702,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 													Vào học thẳng (0 học phần bổ sung)
 												</span>
 											</div>
-											<p class="text-xs sm:text-[13px] text-slate-600 mt-2.5 leading-relaxed">
+											<p class="text-sm sm:text-base text-slate-600 mt-2.5 leading-relaxed">
 												Thí sinh đã tốt nghiệp Trung cấp hoặc Cao đẳng đúng chuyên ngành <strong><?php echo esc_html( $clean_m_name ); ?></strong> được tuyển thẳng vào chương trình liên thông Đại học mà không phải học bổ sung bất kỳ học phần nào.
 											</p>
 										</div>
@@ -720,7 +720,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 													Học bổ sung 2 - 4 học phần
 												</span>
 											</div>
-											<p class="text-xs sm:text-[13px] text-slate-600 mt-2.5 leading-relaxed">
+											<p class="text-sm sm:text-base text-slate-600 mt-2.5 leading-relaxed">
 												Thí sinh đã tốt nghiệp Trung cấp hoặc Cao đẳng các ngành thuộc cùng khối ngành có liên quan được xét tuyển và hoàn thành từ <strong>2 đến 4 môn học chuyển đổi kiến thức</strong> trong thời gian theo học.
 											</p>
 										</div>
@@ -738,7 +738,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 													Miễn môn đại cương
 												</span>
 											</div>
-											<p class="text-xs sm:text-[13px] text-slate-600 mt-2.5 leading-relaxed">
+											<p class="text-sm sm:text-base text-slate-600 mt-2.5 leading-relaxed">
 												Thí sinh đã có 01 bằng Đại học ở ngành khác được đăng ký học văn bằng 2 và được xét <strong>công nhận miễn giảm các môn học đại cương</strong>, rút ngắn thời gian đào tạo còn 1.5 - 2 năm.
 											</p>
 										</div>
@@ -752,11 +752,11 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 											<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 										</div>
 										<div>
-											<p class="font-bold text-slate-900 text-xs sm:text-sm">Bạn chưa rõ bằng của mình thuộc nhóm Đúng ngành hay Ngành gần?</p>
-											<p class="text-xs text-slate-500 mt-0.5">Gửi thông tin văn bằng để ban tuyển sinh kiểm tra và tính toán lộ trình bổ sung môn chính xác nhất.</p>
+											<p class="font-bold text-slate-900 text-sm sm:text-base">Bạn chưa rõ bằng của mình thuộc nhóm Đúng ngành hay Ngành gần?</p>
+											<p class="text-xs sm:text-sm text-slate-500 mt-0.5">Gửi thông tin văn bằng để ban tuyển sinh kiểm tra và tính toán lộ trình bổ sung môn chính xác nhất.</p>
 										</div>
 									</div>
-									<a href="/kiem-tra-dieu-kien?nganh=<?php echo esc_attr( get_post_field( 'post_name', $major_id ) ); ?><?php echo $context_school ? '&truong=' . esc_attr( get_post_field( 'post_name', $context_school->ID ) ) : ''; ?>" class="inline-flex items-center justify-center gap-1.5 px-5 py-2 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight rounded-full shrink-0 shadow-none hover:shadow-xs active:scale-98 transition-all no-underline">
+									<a href="/kiem-tra-dieu-kien?nganh=<?php echo esc_attr( get_post_field( 'post_name', $major_id ) ); ?><?php echo $context_school ? '&truong=' . esc_attr( get_post_field( 'post_name', $context_school->ID ) ) : ''; ?>" class="inline-flex items-center justify-center gap-1.5 px-5 py-2 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-medium tracking-tight rounded-full shrink-0 shadow-none hover:shadow-xs active:scale-98 transition-all no-underline">
 										<span>Kiểm tra điều kiện ngay</span>
 										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
 									</a>
@@ -783,7 +783,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 									</svg>
 								</div>
 							</summary>
-							<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed">
+							<div class="mt-3 pl-0 sm:pl-10 text-sm md:text-base text-slate-700 leading-relaxed">
 								<div class="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed bg-slate-50/70 p-4 md:p-5 rounded-xl border border-slate-100/80">
 									<?php echo wp_kses_post( $major_req ); ?>
 								</div>
@@ -808,7 +808,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 									</svg>
 								</div>
 							</summary>
-							<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed">
+							<div class="mt-3 pl-0 sm:pl-10 text-sm md:text-base text-slate-700 leading-relaxed">
 								<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-slate-50/70 p-4 rounded-xl border border-slate-100/80">
 									<?php echo wp_kses_post( $major_docs ); ?>
 								</div>

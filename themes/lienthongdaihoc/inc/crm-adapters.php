@@ -47,7 +47,12 @@ function ltdh_process_lead_queue() {
 	$leads = $wpdb->get_results( "
 		SELECT * FROM $table_name 
 		WHERE sync_status = 'pending' 
-		   OR (sync_status = 'failed' AND retry_count < 5)
+		   OR (sync_status = 'failed' AND (
+		        (retry_count < 5) OR 
+		        (retry_count >= 5 AND retry_count < 15 AND created_at < DATE_SUB(NOW(), INTERVAL 1 HOUR))
+		      ))
+		   OR (sync_status = 'processing' AND created_at < DATE_SUB(NOW(), INTERVAL 15 MINUTE))
+		ORDER BY id ASC
 		LIMIT 10
 	" );
 
@@ -62,15 +67,20 @@ function ltdh_process_lead_queue() {
 		$result = ltdh_sync_lead_to_crm( $lead );
 
 		if ( is_wp_error( $result ) ) {
+			$new_retry_count = (int) $lead->retry_count + 1;
+			$new_status      = ( $new_retry_count >= 15 ) ? 'failed_permanent' : 'failed';
 			$wpdb->update(
 				$table_name,
 				[
-					'sync_status'   => 'failed',
-					'retry_count'   => $lead->retry_count + 1,
+					'sync_status'   => $new_status,
+					'retry_count'   => $new_retry_count,
 					'error_message' => $result->get_error_message(),
 				],
 				[ 'id' => $lead->id ]
 			);
+			if ( 'failed_permanent' === $new_status ) {
+				error_log( sprintf( '[LTDH CRM Alert] Lead #%d (%s - %s) reached max retries. Error: %s', $lead->id, $lead->name, $lead->phone, $result->get_error_message() ) );
+			}
 		} else {
 			$wpdb->update(
 				$table_name,

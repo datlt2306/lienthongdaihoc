@@ -739,7 +739,7 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 
 	$is_group_reg = ! empty( $posted_data['is_group_reg'] ) || ! empty( $posted_data['group_reg'] ) || ! empty( $posted_data['dang-ky-nhom'] );
 
-	ltdh_insert_lead( [
+	$lead_id = ltdh_insert_lead( [
 		'name'            => $name,
 		'phone'           => $phone,
 		'email'           => $email,
@@ -753,10 +753,14 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 		'is_group_reg'    => $is_group_reg,
 	] );
 
-	// Suppress duplicate plain-text emails from Contact Form 7.
+	// Suppress duplicate plain-text emails from Contact Form 7 ONLY when DB insert succeeds.
 	// The theme's HTML notification system (ltdh_trigger_email_notifications)
 	// handles sending branded HTML confirmation to the student and lead alert to the admin.
-	add_filter( 'wpcf7_skip_mail', '__return_true' );
+	if ( ! empty( $lead_id ) && $lead_id > 0 ) {
+		add_filter( 'wpcf7_skip_mail', '__return_true' );
+	} else {
+		error_log( '[LTDH Lead Loss Alert] Failed to insert CF7 lead into DB for phone: ' . $phone );
+	}
 }
 
 // ----------------------------------------------------

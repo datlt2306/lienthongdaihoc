@@ -744,7 +744,7 @@ $zalo    = ltdh_get_zalo_url();
 					<?php foreach ($e_items_render as $item) : ?>
 						<div class="bg-white p-5 rounded-2xl sm:rounded-3xl border border-black/[0.06] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-all">
 							<span class="block text-sm font-semibold text-[#1D1D1F] mb-1"><?php echo esc_html($item['title'] ?? ''); ?></span>
-							<span class="text-xs text-[#86868B] leading-relaxed block"><?php echo esc_html($item['desc'] ?? ''); ?></span>
+							<span class="text-sm text-[#86868B] leading-relaxed block"><?php echo esc_html($item['desc'] ?? ''); ?></span>
 						</div>
 					<?php endforeach; ?>
 				</div>
@@ -811,13 +811,13 @@ $zalo    = ltdh_get_zalo_url();
 						?>
 					</h2>
 
-					<div class="space-y-2 sm:space-y-3 text-xs sm:text-sm md:text-base leading-relaxed">
+					<div class="space-y-2 sm:space-y-3 text-sm sm:text-base leading-relaxed">
 						<p>Từ ngày <strong>01/03/2020</strong>, bằng tốt nghiệp đại học sẽ không còn phân biệt hình thức đào tạo như chính quy, tại chức, từ xa...</p>
 						<p>Theo <strong>Thông tư 27/2019/TT-BGDĐT</strong>, trên văn bằng sẽ vẫn ghi các nội dung cũ nhưng không ghi thông tin về hình thức đào tạo.</p>
 					</div>
 
 					<div class="pt-4 border-t border-black/[0.08]">
-						<h3 class="font-semibold text-[#1D1D1F] text-sm sm:text-base md:text-lg mb-3">Có Giá Trị Sử Dụng Suốt Đời Trên Toàn Quốc</h3>
+						<h3 class="font-semibold text-[#1D1D1F] text-base sm:text-lg mb-3">Có Giá Trị Sử Dụng Suốt Đời Trên Toàn Quốc</h3>
 						
 						<div class="space-y-3">
 							<div class="flex items-start gap-3">
@@ -827,8 +827,8 @@ $zalo    = ltdh_get_zalo_url();
 									</svg>
 								</div>
 								<div>
-									<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Bằng Cử nhân / Kỹ sư chính thức</h4>
-									<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Sau khi hoàn thành chương trình, học viên sẽ được trường Đại học cấp bằng Cử nhân/Kỹ sư theo quy định của Bộ GD&ĐT, có giá trị pháp lý trên toàn quốc.</p>
+									<h4 class="font-semibold text-[#1D1D1F] text-sm sm:text-base leading-snug">Bằng Cử nhân / Kỹ sư chính thức</h4>
+									<p class="text-[#86868B] text-sm sm:text-base leading-relaxed mt-0.5">Sau khi hoàn thành chương trình, học viên sẽ được trường Đại học cấp bằng Cử nhân/Kỹ sư theo quy định của Bộ GD&ĐT, có giá trị pháp lý trên toàn quốc.</p>
 								</div>
 							</div>
 
@@ -839,8 +839,8 @@ $zalo    = ltdh_get_zalo_url();
 									</svg>
 								</div>
 								<div>
-									<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Có Thể Dùng Để Học Lên Các Bậc Cao Hơn</h4>
-									<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Thi công chức nhà nước, xét nâng bậc lương, đi du học.</p>
+									<h4 class="font-semibold text-[#1D1D1F] text-sm sm:text-base leading-snug">Có Thể Dùng Để Học Lên Các Bậc Cao Hơn</h4>
+									<p class="text-[#86868B] text-sm sm:text-base leading-relaxed mt-0.5">Thi công chức nhà nước, xét nâng bậc lương, đi du học.</p>
 								</div>
 							</div>
 						</div>
@@ -981,7 +981,7 @@ $zalo    = ltdh_get_zalo_url();
 				<!-- Text Content -->
 				<div class="space-y-4 sm:space-y-6 order-1 lg:order-2 flex flex-col justify-center">
 					<?php if (!empty($c_right_content)): ?>
-						<div class="prose max-w-none text-[#6E6E73] text-xs sm:text-sm md:text-base leading-relaxed">
+						<div class="prose max-w-none text-[#6E6E73] text-sm sm:text-base leading-relaxed">
 							<?php echo wp_kses_post($c_right_content); ?>
 						</div>
 					<?php else: ?>
@@ -1003,12 +1003,12 @@ $zalo    = ltdh_get_zalo_url();
 							?>
 						</h2>
 
-						<div class="space-y-2 sm:space-y-3  text-xs sm:text-sm md:text-base leading-relaxed">
+						<div class="space-y-2 sm:space-y-3 text-sm sm:text-base leading-relaxed">
 							<p>Sau khi tốt nghiệp, người học được cấp văn bằng theo quy định hiện hành và có thể sử dụng để phục vụ các mục tiêu học tập, nghề nghiệp theo điều kiện của từng đơn vị tiếp nhận.</p>
 						</div>
 
 						<div class="pt-4 border-t border-black/[0.08]">
-							<h3 class="font-semibold text-[#1D1D1F] text-sm sm:text-base md:text-lg mb-3">Giá trị sử dụng của văn bằng</h3>
+							<h3 class="font-semibold text-[#1D1D1F] text-base sm:text-lg mb-3">Giá trị sử dụng của văn bằng</h3>
 							
 							<div class="space-y-3">
 								<div class="flex items-start gap-3">
@@ -1018,8 +1018,8 @@ $zalo    = ltdh_get_zalo_url();
 										</svg>
 									</div>
 									<div>
-										<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Học tiếp lên trình độ cao hơn</h4>
-										<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.</p>
+										<h4 class="font-semibold text-[#1D1D1F] text-sm sm:text-base leading-snug">Học tiếp lên trình độ cao hơn</h4>
+										<p class="text-[#86868B] text-sm sm:text-base leading-relaxed mt-0.5">Có thể đăng ký dự tuyển chương trình sau đại học khi đáp ứng điều kiện tuyển sinh.</p>
 									</div>
 								</div>
 
@@ -1030,8 +1030,8 @@ $zalo    = ltdh_get_zalo_url();
 										</svg>
 									</div>
 									<div>
-										<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Bổ sung và hoàn thiện hồ sơ nghề nghiệp</h4>
-										<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.</p>
+										<h4 class="font-semibold text-[#1D1D1F] text-sm sm:text-base leading-snug">Bổ sung và hoàn thiện hồ sơ nghề nghiệp</h4>
+										<p class="text-[#86868B] text-sm sm:text-base leading-relaxed mt-0.5">Phục vụ yêu cầu về trình độ chuyên môn đối với vị trí việc làm phù hợp.</p>
 									</div>
 								</div>
 
@@ -1042,8 +1042,8 @@ $zalo    = ltdh_get_zalo_url();
 										</svg>
 									</div>
 									<div>
-										<h4 class="font-semibold text-[#1D1D1F] text-xs sm:text-sm md:text-base leading-snug">Tham gia tuyển dụng, thi tuyển</h4>
-										<p class="text-[#86868B] text-xs sm:text-sm leading-relaxed mt-0.5">Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.</p>
+										<h4 class="font-semibold text-[#1D1D1F] text-sm sm:text-base leading-snug">Tham gia tuyển dụng, thi tuyển</h4>
+										<p class="text-[#86868B] text-sm sm:text-base leading-relaxed mt-0.5">Sử dụng văn bằng trong hồ sơ dự tuyển theo yêu cầu cụ thể của cơ quan, đơn vị tuyển dụng.</p>
 									</div>
 								</div>
 							</div>
@@ -1238,7 +1238,7 @@ $zalo    = ltdh_get_zalo_url();
 					<h2 class="text-xl md:text-2xl font-black font-display tracking-tight text-white uppercase leading-tight">
 						<?php echo esc_html( $w_heading ); ?>
 					</h2>
-					<p class="text-slate-300 text-xs sm:text-sm mt-2 leading-relaxed">
+					<p class="text-slate-300 text-sm sm:text-base mt-2 leading-relaxed">
 						<?php echo esc_html( $w_desc ); ?>
 					</p>
 				</div>
@@ -1262,11 +1262,11 @@ $zalo    = ltdh_get_zalo_url();
 							<span class="ltdh-counter tabular-nums block font-display font-black text-2xl sm:text-4xl lg:text-5xl text-[#f5bf23] leading-none tracking-tight mb-1.5 sm:mb-2" data-target="<?php echo esc_attr( $metric['value'] ?? '' ); ?>">
 								<?php echo esc_html( $metric['value'] ?? '' ); ?>
 							</span>
-							<span class="text-xs sm:text-base text-white font-bold block leading-snug sm:leading-snug mb-auto">
+							<span class="text-sm sm:text-base text-white font-bold block leading-snug sm:leading-snug mb-auto">
 								<?php echo esc_html( $metric['label'] ?? '' ); ?>
 							</span>
 							<?php if ( ! empty( $metric['subtext'] ) ) : ?>
-								<span class="text-[11px] sm:text-xs text-slate-300 font-medium block mt-1.5 sm:mt-2 leading-tight sm:leading-relaxed pt-1.5 border-t border-white/5 w-full">
+								<span class="text-xs sm:text-sm text-slate-300 font-medium block mt-1.5 sm:mt-2 leading-tight sm:leading-relaxed pt-1.5 border-t border-white/5 w-full">
 									<?php echo esc_html( $metric['subtext'] ); ?>
 								</span>
 							<?php endif; ?>

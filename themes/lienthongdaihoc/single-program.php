@@ -226,11 +226,11 @@ $program_tabs[] = [
 									<?php endif; ?>
 								</div>
 								<div class="min-w-0">
-									<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block leading-none mb-0.5">Trường đào tạo</span>
-									<p class="font-extrabold text-slate-800 text-xs truncate leading-tight"><?php echo esc_html( $school_title ); ?></p>
+									<span class="text-xs font-bold text-slate-400 uppercase tracking-wider block leading-none mb-1">Trường đào tạo</span>
+									<p class="font-extrabold text-slate-800 text-sm truncate leading-tight"><?php echo esc_html( $school_title ); ?></p>
 								</div>
 							</div>
-							<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="px-3 py-1.5 bg-[#F5F5F7] hover:bg-[#E8E8ED] text-[#1D1D1F] text-[11px] font-medium tracking-tight rounded-full transition-all shrink-0">
+							<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="px-3 py-1.5 bg-[#F5F5F7] hover:bg-[#E8E8ED] text-[#1D1D1F] text-xs font-medium tracking-tight rounded-full transition-all shrink-0">
 								Chi tiết →
 							</a>
 						</div>
@@ -272,35 +272,35 @@ $program_tabs[] = [
 
 					<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Học phí</span>
-							<span class="font-bold text-[#00308b] text-xs sm:text-sm leading-snug">
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Học phí</span>
+							<span class="font-bold text-[#00308b] text-sm sm:text-base leading-snug">
 								<?php 
 								echo esc_html( $tuition ?: 'Liên hệ' ); 
 								if ( $tuition_year ) {
-									echo ' <span class="text-[9px] font-normal text-slate-400 block sm:inline">(' . esc_html( $tuition_year ) . ')</span>';
+									echo ' <span class="text-[10px] font-normal text-slate-400 block sm:inline">(' . esc_html( $tuition_year ) . ')</span>';
 								}
 								?>
 							</span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Thời gian học</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Thời gian học</span>
+							<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Danh hiệu văn bằng</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $degree_val ); ?></span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Danh hiệu văn bằng</span>
+							<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $degree_val ); ?></span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Căn cứ pháp lý</span>
-							<span class="font-bold text-emerald-700 text-xs sm:text-sm leading-snug">Thông tư 27/2019/TT-BGDĐT</span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Căn cứ pháp lý</span>
+							<span class="font-bold text-emerald-700 text-sm sm:text-base leading-snug">Thông tư 27/2019/TT-BGDĐT</span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hình thức học</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Hình thức học</span>
+							<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 						</div>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Cơ sở học</span>
-							<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php 
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Cơ sở học</span>
+							<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php 
 								$display_campus = $learning_details['campus'] ?? '';
 								if ( empty( $display_campus ) || 'online' === strtolower( trim( $display_campus ) ) ) {
 									$display_campus = 'Toàn quốc';
@@ -310,13 +310,13 @@ $program_tabs[] = [
 						</div>
 						<?php if ( $quota ) : ?>
 							<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-								<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
-								<span class="font-bold text-slate-800 text-xs sm:text-sm leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
+								<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
+								<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
 							</div>
 						<?php endif; ?>
 						<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-							<span class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
-							<span class="font-bold text-[#EA580C] text-xs sm:text-sm leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
+							<span class="font-bold text-[#EA580C] text-sm sm:text-base leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 						</div>
 					</div>
 
@@ -338,7 +338,7 @@ $program_tabs[] = [
 					</div>
 
 					<!-- Thông tin pháp lý văn bằng & Giá trị toàn quốc (Thông tư 27/2019/TT-BGDĐT) -->
-					<div class="mt-4 bg-emerald-50/50 rounded-xl p-4 text-xs md:text-sm text-slate-700 space-y-2 leading-relaxed border border-emerald-100/50">
+					<div class="mt-4 bg-emerald-50/50 rounded-xl p-4 text-sm md:text-base text-slate-700 space-y-2 leading-relaxed border border-emerald-100/50">
 						<?php if ( ! empty( $diploma_val ) ) : ?>
 							<p class="flex items-start gap-2">
 								<span class="text-emerald-600 font-bold shrink-0 mt-0.5">✓</span>
@@ -621,7 +621,7 @@ $program_tabs[] = [
 											</svg>
 										</div>
 									</summary>
-									<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed">
+									<div class="mt-3 pl-0 sm:pl-10 text-sm md:text-base text-slate-700 leading-relaxed">
 										<div class="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed bg-slate-50/70 p-4 md:p-5 rounded-xl border border-slate-100/80">
 											<?php echo wp_kses_post( $requirements ); ?>
 										</div>
@@ -694,7 +694,7 @@ $program_tabs[] = [
 															</span>
 														</div>
 
-														<p class="text-xs sm:text-[13px] text-slate-500 mt-1 leading-relaxed">
+														<p class="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
 															Bao gồm phiếu đăng ký dự thi, sơ yếu lý lịch và các đơn xét miễn giảm môn. Xem trước, tải về hoặc in trực tiếp trên Google Drive của <?php echo esc_html( $program_school_name ?: 'nhà trường' ); ?>.
 														</p>
 
@@ -757,7 +757,7 @@ $program_tabs[] = [
 											</svg>
 										</div>
 									</summary>
-									<div class="mt-3 pl-0 sm:pl-10 text-xs md:text-sm text-slate-700 leading-relaxed">
+									<div class="mt-3 pl-0 sm:pl-10 text-sm md:text-base text-slate-700 leading-relaxed">
 										<div class="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-card-list bg-slate-50/70 p-4 md:p-5 rounded-xl border border-slate-100/80">
 											<?php echo wp_kses_post( $contact_formatted ); ?>
 										</div>

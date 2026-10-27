@@ -63,7 +63,7 @@ $excerpt = wp_trim_words( $excerpt, 45, '...' );
 			<h3 class="font-bold text-slate-900 text-base sm:text-xl md:text-2xl hover:text-brand-primary transition-colors mb-2.5 sm:mb-3 line-clamp-2 leading-snug">
 				<a href="<?php the_permalink(); ?>"><?php echo esc_html( $display_title ); ?></a>
 			</h3>
-			<p class="card-major-excerpt text-xs sm:text-sm text-slate-600 line-clamp-4 leading-relaxed mb-4 sm:mb-5 font-normal">
+			<p class="card-major-excerpt text-sm text-slate-600 line-clamp-3 sm:line-clamp-4 leading-relaxed mb-4 sm:mb-5 font-normal">
 				<?php echo esc_html( $excerpt ); ?>
 			</p>
 		</div>

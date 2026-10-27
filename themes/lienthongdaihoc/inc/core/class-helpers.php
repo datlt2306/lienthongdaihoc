@@ -1291,7 +1291,10 @@ function ltdh_get_form_shortcode( string $context = 'consultation' ): string {
 	}
 
 	if ( ! empty( $form_id ) ) {
-		return do_shortcode( '[contact-form-7 id="' . esc_attr( $form_id ) . '"]' );
+		$form_post = get_post( $form_id );
+		if ( $form_post && 'wpcf7_contact_form' === $form_post->post_type && 'publish' === $form_post->post_status ) {
+			return do_shortcode( '[contact-form-7 id="' . esc_attr( $form_id ) . '"]' );
+		}
 	}
 
 	return '';
@@ -1306,7 +1309,7 @@ function ltdh_render_evaluation_form( array $context_hidden_fields = [] ): void 
 	$GLOBALS['ltdh_cf7_context_hidden_fields'] = $context_hidden_fields;
 
 	$shortcode = ltdh_get_form_shortcode( 'evaluation' );
-	if ( ! empty( $shortcode ) ) {
+	if ( ! empty( $shortcode ) && strpos( $shortcode, 'wpcf7-contact-form-not-found' ) === false ) {
 		echo $shortcode; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		$GLOBALS['ltdh_cf7_context_hidden_fields'] = [];
 		return;
@@ -2342,7 +2345,20 @@ function ltdh_get_school_cover_id( $school_id ): int {
 		return 0;
 	}
 
+	static $runtime_cache = [];
+	if ( isset( $runtime_cache[ $school_id ] ) ) {
+		return $runtime_cache[ $school_id ];
+	}
+
+	// 0. Tra cứu bộ nhớ đệm postmeta đã phân giải trước đó (triệt tiêu N+1 Query Storm)
+	$cached_cover_id = get_post_meta( $school_id, '_ltdh_cover_id_cache', true );
+	if ( '' !== $cached_cover_id && false !== $cached_cover_id && is_numeric( $cached_cover_id ) ) {
+		$runtime_cache[ $school_id ] = (int) $cached_cover_id;
+		return (int) $cached_cover_id;
+	}
+
 	$logo_id = function_exists( 'ltdh_get_school_image_id' ) ? ltdh_get_school_image_id( $school_id ) : 0;
+	$cover_id = 0;
 
 	// 1. Kiểm tra ACF trường school_banner (không format để lấy Attachment ID)
 	if ( function_exists( 'get_field' ) ) {
@@ -2353,39 +2369,51 @@ function ltdh_get_school_cover_id( $school_id ): int {
 
 		if ( ! empty( $banner ) ) {
 			if ( is_numeric( $banner ) && (int) $banner !== (int) $logo_id ) {
-				return (int) $banner;
-			}
-			if ( is_array( $banner ) && ! empty( $banner['ID'] ) && (int) $banner['ID'] !== (int) $logo_id ) {
-				return (int) $banner['ID'];
+				$cover_id = (int) $banner;
+			} elseif ( is_array( $banner ) && ! empty( $banner['ID'] ) && (int) $banner['ID'] !== (int) $logo_id ) {
+				$cover_id = (int) $banner['ID'];
 			}
 		}
 	}
 
 	// 2. Kiểm tra postmeta trực tiếp
-	$meta_banner = get_post_meta( $school_id, 'school_banner', true );
-	if ( ! empty( $meta_banner ) && is_numeric( $meta_banner ) && (int) $meta_banner !== (int) $logo_id ) {
-		return (int) $meta_banner;
+	if ( ! $cover_id ) {
+		$meta_banner = get_post_meta( $school_id, 'school_banner', true );
+		if ( ! empty( $meta_banner ) && is_numeric( $meta_banner ) && (int) $meta_banner !== (int) $logo_id ) {
+			$cover_id = (int) $meta_banner;
+		}
 	}
 
 	// 3. Featured Image (ảnh đại diện post)
-	$thumb_id = get_post_thumbnail_id( $school_id );
-	if ( $thumb_id && (int) $thumb_id !== (int) $logo_id ) {
-		return (int) $thumb_id;
+	if ( ! $cover_id ) {
+		$thumb_id = get_post_thumbnail_id( $school_id );
+		if ( $thumb_id && (int) $thumb_id !== (int) $logo_id ) {
+			$cover_id = (int) $thumb_id;
+		}
 	}
 
 	// 4. Nếu lưu chuỗi URL, tra cứu ngược ID qua attachment_url_to_postid
-	if ( function_exists( 'get_field' ) ) {
+	if ( ! $cover_id && function_exists( 'get_field' ) ) {
 		$banner_url = get_field( 'school_banner', $school_id, true );
 		if ( is_string( $banner_url ) && ! empty( $banner_url ) ) {
 			$att_id = attachment_url_to_postid( $banner_url );
 			if ( $att_id && (int) $att_id !== (int) $logo_id ) {
-				return (int) $att_id;
+				$cover_id = (int) $att_id;
 			}
 		}
 	}
 
-	return 0;
+	// Lưu cache vào postmeta và runtime cache
+	update_post_meta( $school_id, '_ltdh_cover_id_cache', $cover_id );
+	$runtime_cache[ $school_id ] = $cover_id;
+
+	return $cover_id;
 }
+
+// Xóa cache cover ID khi bài viết trường được cập nhật
+add_action( 'save_post_school', function( $post_id ) {
+	delete_post_meta( $post_id, '_ltdh_cover_id_cache' );
+} );
 
 /**
  * Get school cover / banner photo URL (e.g. for card top backgrounds or school page banners).

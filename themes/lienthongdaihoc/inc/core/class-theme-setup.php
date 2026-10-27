@@ -37,6 +37,13 @@ function ltdh_theme_setup() {
 		'primary-menu' => 'Header Navigation Menu',
 		'footer-menu'  => 'Footer Navigation Menu',
 	] );
+
+	// Ngăn chặn AIOS firewall chuyển hướng 302 sang 127.0.0.1 (gây lỗi 404 / rớt kết nối)
+	add_filter( 'aios_blocked_request_redirect_url', function() {
+		status_header( 403 );
+		nocache_headers();
+		wp_die( 'Truy cập bị từ chối do chính sách bảo mật (Firewall Rule).', 'Truy Cập Bị Chặn', [ 'response' => 403 ] );
+	} );
 }
 add_action( 'after_setup_theme', 'ltdh_theme_setup' );
 

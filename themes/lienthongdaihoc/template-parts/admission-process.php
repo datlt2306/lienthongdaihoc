@@ -73,7 +73,7 @@ $steps = [
 			<h2 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 leading-tight">
 				<?php echo esc_html( $args['title'] ); ?>
 			</h2>
-			<p class="text-xs md:text-sm text-slate-500 mt-1 max-w-2xl leading-relaxed">
+			<p class="text-sm md:text-base text-slate-500 mt-1 max-w-2xl leading-relaxed">
 				<?php echo esc_html( $args['subtitle'] ); ?>
 			</p>
 		</div>
@@ -96,7 +96,7 @@ $steps = [
 							</div>
 
 							<!-- Step Title -->
-							<h3 class="font-bold text-slate-900 text-xs sm:text-sm group-hover:text-[#00308b] transition-colors leading-snug truncate">
+							<h3 class="font-bold text-slate-900 text-sm sm:text-base group-hover:text-[#00308b] transition-colors leading-snug truncate">
 								<?php echo esc_html( $step_item['title'] ); ?>
 							</h3>
 						</div>
@@ -104,7 +104,7 @@ $steps = [
 					</div>
 
 					<!-- Step Description -->
-					<p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal mt-1 sm:mt-1.5">
+					<p class="text-sm sm:text-base text-slate-600 leading-relaxed font-normal mt-1 sm:mt-1.5">
 						<?php echo esc_html( $step_item['desc'] ); ?>
 					</p>
 				</div>
@@ -123,8 +123,8 @@ $steps = [
 					<svg class="w-4.5 h-4.5 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
 				</div>
 				<div class="min-w-0">
-					<p class="font-bold text-slate-900 text-xs sm:text-sm mb-0.5 leading-snug">Kiểm tra điều kiện & dự kiến số tín chỉ miễn giảm?</p>
-					<p class="text-[11px] sm:text-xs text-slate-500 leading-normal">Chuyên viên tư vấn sẽ liên hệ hướng dẫn lộ trình miễn phí.</p>
+					<p class="font-bold text-slate-900 text-sm sm:text-base mb-0.5 leading-snug">Kiểm tra điều kiện & dự kiến số tín chỉ miễn giảm?</p>
+					<p class="text-xs sm:text-sm text-slate-500 leading-normal">Chuyên viên tư vấn sẽ liên hệ hướng dẫn lộ trình miễn phí.</p>
 				</div>
 			</div>
 			

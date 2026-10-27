@@ -845,17 +845,17 @@ $has_active_filters  = $active_filter_count > 0;
 								<div class="absolute top-2 left-2 right-2 md:top-2.5 md:left-2.5 md:right-2.5 z-10 pointer-events-none flex items-center justify-between gap-1.5 min-w-0">
 									<div class="flex items-center shrink-0">
 										<?php if ( 'tam-ngung' === $admission_status ) : ?>
-											<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-slate-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Tạm dừng tuyển sinh" aria-label="Tạm dừng tuyển sinh">
+											<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-slate-600/95 text-white text-[11px] sm:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Tạm dừng tuyển sinh" aria-label="Tạm dừng tuyển sinh">
 												<span class="w-2.5 h-2.5 sm:w-2 sm:h-2 rounded-full bg-slate-400 shadow-sm ring-1 ring-white/80"></span>
 												<span class="hidden sm:inline uppercase tracking-wider">Tạm dừng</span>
 											</span>
 										<?php elseif ( 'sap-mo' === $admission_status ) : ?>
-											<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-amber-500/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Sắp mở đợt mới" aria-label="Sắp mở đợt mới">
+											<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-amber-500/95 text-white text-[11px] sm:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Sắp mở đợt mới" aria-label="Sắp mở đợt mới">
 												<span class="w-2.5 h-2.5 sm:w-2 sm:h-2 rounded-full bg-amber-400 shadow-sm ring-1 ring-white/80"></span>
 												<span class="hidden sm:inline uppercase tracking-wider">Sắp mở</span>
 											</span>
 										<?php else : ?>
-											<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-emerald-600/95 text-white text-[10px] sm:text-[11px] md:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Đang tuyển sinh" aria-label="Đang tuyển sinh">
+											<span class="inline-flex items-center gap-1.5 sm:px-2.5 sm:py-1 sm:rounded-full sm:bg-emerald-600/95 text-white text-[11px] sm:text-xs font-bold sm:shadow-md sm:backdrop-blur-md shrink-0" title="Đang tuyển sinh" aria-label="Đang tuyển sinh">
 												<span class="relative flex h-2.5 w-2.5 sm:h-2 sm:w-2">
 													<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
 													<span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-2 sm:w-2 bg-emerald-500 sm:bg-white shadow-sm ring-1 ring-white/80"></span>
@@ -866,7 +866,7 @@ $has_active_filters  = $active_filter_count > 0;
 									</div>
 
 									<?php if ( ! empty( $clean_type_name ) ) : ?>
-										<span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] md:text-xs font-bold shrink-0 tracking-wide truncate max-w-[calc(100%-32px)] sm:max-w-none <?php echo esc_attr( $badge_class ); ?>">
+										<span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold shrink-0 tracking-wide truncate max-w-[calc(100%-32px)] sm:max-w-none <?php echo esc_attr( $badge_class ); ?>">
 											<?php echo esc_html( $clean_type_name ); ?>
 										</span>
 									<?php endif; ?>
@@ -887,7 +887,7 @@ $has_active_filters  = $active_filter_count > 0;
 										<?php endif; ?>
 									</div>
 									<div class="min-w-0 flex-1">
-										<span class="text-[10px] sm:text-xs font-bold text-slate-500 group-hover/school:text-brand-primary uppercase tracking-tight sm:tracking-wide block truncate transition-colors" title="<?php echo esc_attr( $school_name ); ?>">
+										<span class="text-xs font-bold text-slate-500 group-hover/school:text-brand-primary uppercase tracking-tight sm:tracking-wide block truncate transition-colors" title="<?php echo esc_attr( $school_name ); ?>">
 											<?php echo esc_html( $school_name ); ?>
 										</span>
 									</div>
@@ -895,24 +895,24 @@ $has_active_filters  = $active_filter_count > 0;
 
 								<!-- Program Name (Primary Hero Headline) -->
 								<div class="mb-1.5 sm:mb-2">
-									<h3 class="font-black text-slate-900 text-xs sm:text-base md:text-lg hover:text-brand-primary leading-tight sm:leading-snug line-clamp-2 min-h-[28px] sm:min-h-[40px] transition-colors">
+									<h3 class="font-black text-slate-900 text-sm sm:text-base md:text-lg hover:text-brand-primary leading-snug line-clamp-2 min-h-[36px] sm:min-h-[44px] transition-colors">
 										<a href="<?php the_permalink(); ?>"><?php echo esc_html( $card_headline ); ?></a>
 									</h3>
 								</div>
 
 								<!-- Key Information List (Hidden on mobile for Apple-minimal compact card UX, visible on sm+) -->
-								<div class="hidden sm:block space-y-1 sm:space-y-1.5 text-[11px] sm:text-xs md:text-sm text-slate-600 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2 border-t border-slate-100">
+								<div class="hidden sm:block space-y-1 sm:space-y-1.5 text-xs md:text-sm text-slate-600 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2 border-t border-slate-100">
 									<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5 sm:gap-1">
-										<span class="text-slate-400 text-[10px] sm:text-xs">Học phí:</span>
-										<span class="font-extrabold text-brand-primary text-xs sm:text-sm md:text-base leading-none truncate"><?php echo esc_html( $tuition ); ?></span>
+										<span class="text-slate-400 text-xs">Học phí:</span>
+										<span class="font-extrabold text-brand-primary text-sm md:text-base leading-none truncate"><?php echo esc_html( $tuition ); ?></span>
 									</div>
 									<div class="flex items-center justify-between gap-1">
-										<span class="text-slate-400 text-[10px] sm:text-xs">Thời gian:</span>
-										<span class="font-bold text-slate-700 text-[11px] sm:text-xs truncate"><?php echo esc_html( $duration ); ?></span>
+										<span class="text-slate-400 text-xs">Thời gian:</span>
+										<span class="font-bold text-slate-700 text-xs truncate"><?php echo esc_html( $duration ); ?></span>
 									</div>
 									<div class="flex items-center justify-between gap-1">
-										<span class="text-slate-400 text-[10px] sm:text-xs">Hình thức:</span>
-										<span class="font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded text-[10px] sm:text-xs truncate max-w-[90px] sm:max-w-none"><?php echo esc_html( $learning_details['mode'] ); ?></span>
+										<span class="text-slate-400 text-xs">Hình thức:</span>
+										<span class="font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded text-xs truncate max-w-[90px] sm:max-w-none"><?php echo esc_html( $learning_details['mode'] ); ?></span>
 									</div>
 								</div>
 							</div>
@@ -921,12 +921,12 @@ $has_active_filters  = $active_filter_count > 0;
 						<!-- Card Footer Action Buttons -->
 						<div class="p-3 sm:p-4 pt-0 pb-3 sm:pb-3.5">
 							<div class="pt-2 sm:pt-2.5 sm:border-t sm:border-slate-100 flex items-stretch gap-1.5 sm:gap-2">
-								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-2 px-2 gap-1 rounded-full font-bold ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
-									<span class="text-[10px] sm:text-xs md:text-sm inline-block">Tìm hiểu</span>
+								<a href="<?php the_permalink(); ?>" class="text-xs sm:text-sm py-2 px-2.5 gap-1 rounded-full font-bold ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
+									<span class="text-xs sm:text-sm inline-block">Tìm hiểu</span>
 									<?php ltdh_icon( 'arrow-right', 'hidden sm:block w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0' ); ?>
 								</a>
 								<button type="button"
-										class="rounded-full ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap cursor-pointer"
+										class="rounded-full ltdh-compare-toggle text-xs sm:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap cursor-pointer"
 										data-compare-type="program"
 										data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 										data-compare-title="<?php echo esc_attr( $card_headline ); ?>"

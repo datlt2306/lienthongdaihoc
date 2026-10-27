@@ -74,11 +74,11 @@ function ltdh_get_defaults( string $group ): array {
 			'consultation_shortcode' => '[contact-form-7 id="1804" title="Form Tư vấn"]',
 			'contact_shortcode'      => '[contact-form-7 id="321" title="Form Liên hệ"]',
 			'program_shortcode'      => '[contact-form-7 id="1804" title="Form Tư vấn"]',
-			'evaluation_shortcode'   => '[contact-form-7 id="3632" title="Form Thẩm định Hồ sơ"]',
+			'evaluation_shortcode'   => '',
 			'consultation_form_id'   => 1804,
 			'contact_form_id'        => 321,
 			'program_form_id'        => 1804,
-			'evaluation_form_id'     => 3632,
+			'evaluation_form_id'     => 1804,
 			'default_form_id'        => 1804,
 		],
 		'homepage' => [
