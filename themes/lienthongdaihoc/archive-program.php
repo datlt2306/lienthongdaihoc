@@ -344,13 +344,13 @@ $has_active_filters  = $active_filter_count > 0;
 					</div>
 
 					<!-- Right: Apple Segmented Pill Track for Training Types -->
-					<div class="flex items-center gap-2 shrink-0">
-						<span class="text-xs font-semibold text-slate-400 select-none hidden xl:inline-flex items-center gap-1">
+					<div class="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2 w-full md:w-auto shrink-0">
+						<span class="text-xs font-bold text-slate-500 uppercase tracking-wider md:normal-case md:font-semibold md:text-slate-400 select-none flex items-center gap-1">
 							<?php ltdh_icon( 'graduationcap', 'w-3.5 h-3.5 text-slate-400 shrink-0' ); ?>
 							<span>Hình thức:</span>
 						</span>
 						
-						<div id="catalog-pills-container" class="inline-flex items-center p-0.5 bg-slate-100/90 rounded-xl border border-slate-200/60 overflow-x-auto max-w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+						<div id="catalog-pills-container" class="inline-flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200/60 overflow-x-auto w-full md:w-auto max-w-full flex-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="-webkit-overflow-scrolling: touch;">
 							<!-- All Systems Tab -->
 							<?php
 							$is_all_active = empty( $selected_type );
@@ -366,9 +366,9 @@ $has_active_filters  = $active_filter_count > 0;
 							?>
 							<a href="<?php echo esc_url( $all_url ); ?>"
 							   data-type=""
-							   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none <?php echo $is_all_active ? 'bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
-								<span>Tất cả</span>
-								<span class="pill-badge text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo $is_all_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+							   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none shrink-0 whitespace-nowrap <?php echo $is_all_active ? 'bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
+								<span class="whitespace-nowrap">Tất cả</span>
+								<span class="pill-badge shrink-0 text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo $is_all_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
 									<?php echo esc_html( $total_programs ); ?>
 								</span>
 							</a>
@@ -393,9 +393,9 @@ $has_active_filters  = $active_filter_count > 0;
 									?>
 									<a href="<?php echo esc_url( $type_url ); ?>"
 									   data-type="<?php echo esc_attr( $t_term->slug ); ?>"
-									   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none <?php echo $is_active ? 'bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
-										<span><?php echo esc_html( $t_term->name ); ?></span>
-										<span class="pill-badge text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+									   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none shrink-0 whitespace-nowrap <?php echo $is_active ? 'bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
+										<span class="whitespace-nowrap"><?php echo esc_html( $t_term->name ); ?></span>
+										<span class="pill-badge shrink-0 text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
 											<?php echo esc_html( $t_count ); ?>
 										</span>
 									</a>
@@ -742,6 +742,9 @@ $has_active_filters  = $active_filter_count > 0;
 				if (resetBtn && !resetBtn._drawerBound) {
 					resetBtn._drawerBound = true;
 					resetBtn.addEventListener('click', closeDrawer);
+				}
+				if (window.location.search.indexOf('open_drawer=1') !== -1 || window.location.hash === '#open-filter') {
+					setTimeout(openDrawer, 150);
 				}
 				document.addEventListener('keydown', function(e) {
 					if (e.key === 'Escape') closeDrawer();

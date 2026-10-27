@@ -134,19 +134,19 @@ $has_active_filters  = $active_filter_count > 0;
 						</div>
 
 						<!-- Right: Apple Segmented Pill Track for Nhóm ngành -->
-						<div class="flex items-center gap-2 min-w-0 overflow-hidden">
-							<span class="text-xs font-semibold text-slate-400 select-none hidden xl:inline-flex items-center gap-1 shrink-0">
+						<div class="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2 w-full md:w-auto shrink-0">
+							<span class="text-xs font-bold text-slate-500 uppercase tracking-wider md:normal-case md:font-semibold md:text-slate-400 select-none flex items-center gap-1">
 								<?php ltdh_icon( 'graduationcap', 'w-3.5 h-3.5 text-slate-400 shrink-0' ); ?>
 								<span>Nhóm ngành:</span>
 							</span>
 							
-							<div id="major-pills-container" class="inline-flex items-center p-0.5 bg-slate-100/90 rounded-xl border border-slate-200/60 overflow-x-auto max-w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+							<div id="major-pills-container" class="inline-flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200/60 overflow-x-auto w-full md:w-auto max-w-full flex-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="-webkit-overflow-scrolling: touch;">
 								<!-- All Majors Tab -->
 								<a href="<?php echo esc_url( $all_tab_url ); ?>"
 								   data-cat=""
-								   class="js-ltdh-major-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none shrink-0 <?php echo empty( $selected_cat ) ? 'is-active bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
-									<span>Tất cả</span>
-									<span class="pill-badge text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo empty( $selected_cat ) ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+								   class="js-ltdh-major-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none shrink-0 whitespace-nowrap <?php echo empty( $selected_cat ) ? 'is-active bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
+									<span class="whitespace-nowrap">Tất cả</span>
+									<span class="pill-badge shrink-0 text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo empty( $selected_cat ) ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
 										<?php echo esc_html( $total_majors ); ?>
 									</span>
 								</a>
@@ -164,9 +164,9 @@ $has_active_filters  = $active_filter_count > 0;
 										?>
 										<a href="<?php echo esc_url( $cat_tab_url ); ?>"
 										   data-cat="<?php echo esc_attr( $cat->slug ); ?>"
-										   class="js-ltdh-major-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none shrink-0 <?php echo $is_cat_active ? 'is-active bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
-											<span><?php echo esc_html( $cat->name ); ?></span>
-											<span class="pill-badge text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo $is_cat_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+										   class="js-ltdh-major-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none shrink-0 whitespace-nowrap <?php echo $is_cat_active ? 'is-active bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
+											<span class="whitespace-nowrap"><?php echo esc_html( $cat->name ); ?></span>
+											<span class="pill-badge shrink-0 text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo $is_cat_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
 												<?php echo esc_html( $cat->count ); ?>
 											</span>
 										</a>
@@ -444,6 +444,9 @@ $has_active_filters  = $active_filter_count > 0;
 
 				relocate();
 				window.addEventListener('resize', relocate);
+				if (window.location.search.indexOf('open_drawer=1') !== -1 || window.location.hash === '#open-filter') {
+					setTimeout(openDrawer, 150);
+				}
 			}
 
 			if (document.readyState === 'loading') {
