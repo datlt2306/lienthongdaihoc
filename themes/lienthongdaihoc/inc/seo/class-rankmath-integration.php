@@ -79,6 +79,123 @@ function ltdh_seo_has_user_schema( array $data, string $type ): bool {
 	return false;
 }
 
+/**
+ * Build enhanced, high-authority FAQPage schema elements adhering strictly to Google Search Central guidelines.
+ *
+ * @param array       $raw_faqs     Array of array['question' => ..., 'answer' => ...]
+ * @param string      $context_url  Canonical or permalink URL of the page hosting these FAQs.
+ * @param int|null    $post_id      Optional post ID to derive publication / modification timestamps.
+ * @return array                    FAQPage schema structure or empty array if no valid questions found.
+ */
+function ltdh_build_enhanced_faq_schema( array $raw_faqs, string $context_url, ?int $post_id = null ): array {
+	if ( empty( $raw_faqs ) ) {
+		return [];
+	}
+
+	$site_name = get_bloginfo( 'name' ) ?: 'Liên Thông Đại Học';
+	$site_url  = home_url( '/' );
+
+	// Determine publication & modification dates (ISO 8601)
+	$date_published = '';
+	$date_modified  = '';
+	if ( $post_id && function_exists( 'get_the_date' ) ) {
+		$date_published = get_the_date( 'c', $post_id );
+		$date_modified  = get_the_modified_date( 'c', $post_id );
+	}
+	if ( empty( $date_published ) ) {
+		$date_published = gmdate( 'c' );
+	}
+	if ( empty( $date_modified ) ) {
+		$date_modified = $date_published;
+	}
+
+	$faq_elements = [];
+	$idx          = 0;
+
+	foreach ( $raw_faqs as $item ) {
+		if ( ! is_array( $item ) ) {
+			continue;
+		}
+		$q = trim( (string) ( $item['question'] ?? '' ) );
+		$a = trim( (string) ( $item['answer'] ?? '' ) );
+
+		if ( empty( $q ) || empty( $a ) ) {
+			continue;
+		}
+
+		$idx++;
+		$clean_q = wp_strip_all_tags( html_entity_decode( $q, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
+		$clean_a = wp_strip_all_tags( $a );
+		$clean_a = html_entity_decode( $clean_a, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+
+		// Clean up extra whitespace/newlines
+		$clean_q = preg_replace( '/\s+/u', ' ', $clean_q );
+		$clean_a = preg_replace( '/\n{3,}/', "\n\n", $clean_a );
+
+		$q_anchor = '#faq-' . $idx;
+		$a_anchor = '#faq-' . $idx . '-answer';
+
+		if ( ! empty( $context_url ) ) {
+			$base_url = explode( '#', $context_url )[0];
+			if ( str_contains( $base_url, '?' ) ) {
+				$parts    = explode( '?', $base_url, 2 );
+				$item_url = trailingslashit( $parts[0] ) . '?' . $parts[1] . $q_anchor;
+				$ans_url  = trailingslashit( $parts[0] ) . '?' . $parts[1] . $a_anchor;
+			} else {
+				$item_url = trailingslashit( $base_url ) . $q_anchor;
+				$ans_url  = trailingslashit( $base_url ) . $a_anchor;
+			}
+		} else {
+			$item_url = $q_anchor;
+			$ans_url  = $a_anchor;
+		}
+
+		$question_schema = [
+			'@type'          => 'Question',
+			'name'           => $clean_q,
+			'text'           => $clean_q,
+			'url'            => $item_url,
+			'datePublished'  => $date_published,
+			'dateModified'   => $date_modified,
+			'author'         => [
+				'@type' => 'Organization',
+				'name'  => $site_name,
+				'url'   => $site_url,
+			],
+			'acceptedAnswer' => [
+				'@type'         => 'Answer',
+				'text'          => $clean_a,
+				'url'           => $ans_url,
+				'datePublished' => $date_published,
+				'dateModified'  => $date_modified,
+				'author'        => [
+					'@type' => 'Organization',
+					'name'  => 'Ban Tuyển Sinh ' . $site_name,
+					'url'   => $site_url,
+				],
+			],
+		];
+
+		$faq_elements[] = $question_schema;
+	}
+
+	if ( empty( $faq_elements ) ) {
+		return [];
+	}
+
+	$schema_id = '#faq';
+	if ( ! empty( $context_url ) ) {
+		$base_url  = explode( '#', $context_url )[0];
+		$schema_id = trailingslashit( explode( '?', $base_url, 2 )[0] ) . '#faq';
+	}
+
+	return [
+		'@type'      => 'FAQPage',
+		'@id'        => $schema_id,
+		'mainEntity' => $faq_elements,
+	];
+}
+
 // ----------------------------------------------------
 // 1. Dynamic Title for Programs (Fallback only when Rank Math custom title is empty)
 // ----------------------------------------------------
@@ -797,27 +914,9 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				: ( get_field( 'faq', $program_id ) ?: [] );
 
 			if ( ! empty( $faqs ) && is_array( $faqs ) ) {
-				$faq_elements = [];
-				foreach ( $faqs as $item ) {
-					$q = trim( $item['question'] ?? '' );
-					$a = trim( $item['answer'] ?? '' );
-					if ( empty( $q ) || empty( $a ) ) {
-						continue;
-					}
-					$faq_elements[] = [
-						'@type'          => 'Question',
-						'name'           => $q,
-						'acceptedAnswer' => [
-							'@type' => 'Answer',
-							'text'  => wp_strip_all_tags( $a ),
-						],
-					];
-				}
-				if ( ! empty( $faq_elements ) ) {
-					$data['ltdh_faq'] = [
-						'@type'      => 'FAQPage',
-						'mainEntity' => $faq_elements,
-					];
+				$faq_schema = ltdh_build_enhanced_faq_schema( $faqs, (string) get_permalink( $program_id ), (int) $program_id );
+				if ( ! empty( $faq_schema ) ) {
+					$data['ltdh_faq'] = $faq_schema;
 				}
 			}
 		}
@@ -888,27 +987,9 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		if ( ! ltdh_seo_has_user_schema( $data, 'FAQPage' ) && function_exists( 'ltdh_get_school_faqs' ) ) {
 			$school_faqs = ltdh_get_school_faqs( $school_id );
 			if ( ! empty( $school_faqs ) && is_array( $school_faqs ) ) {
-				$faq_elements = [];
-				foreach ( $school_faqs as $item ) {
-					$q = trim( $item['question'] ?? '' );
-					$a = trim( $item['answer'] ?? '' );
-					if ( empty( $q ) || empty( $a ) ) {
-						continue;
-					}
-					$faq_elements[] = [
-						'@type'          => 'Question',
-						'name'           => $q,
-						'acceptedAnswer' => [
-							'@type' => 'Answer',
-							'text'  => wp_strip_all_tags( $a ),
-						],
-					];
-				}
-				if ( ! empty( $faq_elements ) ) {
-					$data['ltdh_school_faq'] = [
-						'@type'      => 'FAQPage',
-						'mainEntity' => $faq_elements,
-					];
+				$faq_schema = ltdh_build_enhanced_faq_schema( $school_faqs, (string) get_permalink( $school_id ), (int) $school_id );
+				if ( ! empty( $faq_schema ) ) {
+					$data['ltdh_school_faq'] = $faq_schema;
 				}
 			}
 		}
@@ -941,27 +1022,13 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 		if ( ! ltdh_seo_has_user_schema( $data, 'FAQPage' ) && function_exists( 'ltdh_get_major_faqs' ) ) {
 			$major_faqs = ltdh_get_major_faqs( $major_id, $school_id );
 			if ( ! empty( $major_faqs ) && is_array( $major_faqs ) ) {
-				$faq_elements = [];
-				foreach ( $major_faqs as $item ) {
-					$q = trim( $item['question'] ?? '' );
-					$a = trim( $item['answer'] ?? '' );
-					if ( empty( $q ) || empty( $a ) ) {
-						continue;
-					}
-					$faq_elements[] = [
-						'@type'          => 'Question',
-						'name'           => $q,
-						'acceptedAnswer' => [
-							'@type' => 'Answer',
-							'text'  => wp_strip_all_tags( $a ),
-						],
-					];
+				$major_url = (string) get_permalink( $major_id );
+				if ( ! empty( $school_slug ) ) {
+					$major_url = add_query_arg( 'truong', $school_slug, $major_url );
 				}
-				if ( ! empty( $faq_elements ) ) {
-					$data['ltdh_major_faq'] = [
-						'@type'      => 'FAQPage',
-						'mainEntity' => $faq_elements,
-					];
+				$faq_schema = ltdh_build_enhanced_faq_schema( $major_faqs, $major_url, (int) $major_id );
+				if ( ! empty( $faq_schema ) ) {
+					$data['ltdh_major_faq'] = $faq_schema;
 				}
 			}
 		}
@@ -973,29 +1040,33 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			if ( function_exists( 'get_field' ) ) {
 				$faq_items = get_field( 'faq_items', 'options' ) ?: get_field( 'faq_items', 'option' ) ?: [];
 			}
-			if ( ! empty( $faq_items ) && is_array( $faq_items ) ) {
-				$faq_elements = [];
-				foreach ( $faq_items as $item ) {
-					$q = trim( $item['question'] ?? '' );
-					$a = trim( $item['answer'] ?? '' );
-					if ( empty( $q ) || empty( $a ) ) {
-						continue;
-					}
-					$faq_elements[] = [
-						'@type'          => 'Question',
-						'name'           => $q,
-						'acceptedAnswer' => [
-							'@type' => 'Answer',
-							'text'  => wp_strip_all_tags( $a ),
-						],
-					];
-				}
-				if ( ! empty( $faq_elements ) ) {
-					$data['ltdh_faq_page'] = [
-						'@type'      => 'FAQPage',
-						'mainEntity' => $faq_elements,
-					];
-				}
+			if ( empty( $faq_items ) || ! is_array( $faq_items ) ) {
+				$faq_items = [
+					[
+						'question' => 'Bằng tốt nghiệp Đại học Liên thông / Từ xa có ghi hình thức đào tạo không?',
+						'answer'   => 'Theo Thông tư 27/2019/TT-BGDĐT của Bộ Giáo dục và Đào tạo, từ ngày 01/03/2020 trên bằng tốt nghiệp Đại học không còn ghi hình thức đào tạo (như Từ xa hay Vừa học vừa làm). Tấm bằng do các trường đại học đối tác cấp có giá trị pháp lý tương đương bằng cử nhân/kỹ sư chính quy, được thi cao học, công chức và nâng bậc lương.',
+					],
+					[
+						'question' => 'Thời gian đào tạo Liên thông Đại học mất bao lâu?',
+						'answer'   => 'Thời gian đào tạo trung bình từ 1.5 đến 2 năm tùy theo khối ngành. Đặc biệt, học viên đã có bằng Trung cấp hoặc Cao đẳng đúng ngành sẽ được xét miễn giảm các học phần tương đương để rút ngắn thời gian hoàn thành chương trình.',
+					],
+					[
+						'question' => 'Hình thức học trực tuyến (Online/Từ xa) diễn ra như thế nào?',
+						'answer'   => 'Học viên học hoàn toàn qua hệ thống E-Learning trực tuyến của nhà trường. Bạn có thể tự chủ thời gian học mọi lúc mọi nơi qua bài giảng video, slide và tham gia trao đổi trực tiếp với giảng viên qua các buổi ôn tập online cuối tuần.',
+					],
+					[
+						'question' => 'Hồ sơ xét tuyển Liên thông Đại học bao gồm những gì?',
+						'answer'   => 'Hồ sơ xét tuyển cơ bản gồm: 01 Phiếu đăng ký theo mẫu của trường, 02 bản sao công chứng Bằng + Bảng điểm tốt nghiệp Cao đẳng/Trung cấp, 01 bản sao CCCD và 02 ảnh 3x4. Chuyên viên tuyển sinh sẽ hỗ trợ gửi mẫu và hướng dẫn chuẩn bị chi tiết.',
+					],
+					[
+						'question' => 'Bằng Đại học Liên thông có đủ điều kiện đăng ký học Cao học / Thạc sĩ không?',
+						'answer'   => 'Hoàn toàn đủ điều kiện. Tấm bằng đại học sau khi tốt nghiệp có đầy đủ tư cách pháp lý để bạn tiếp tục đăng ký thi tuyển Thạc sĩ, Cao học tại tất cả các trường Đại học trên toàn quốc hoặc du học nước ngoài.',
+					],
+				];
+			}
+			$faq_schema = ltdh_build_enhanced_faq_schema( $faq_items, (string) get_permalink(), (int) get_the_ID() );
+			if ( ! empty( $faq_schema ) ) {
+				$data['ltdh_faq_page'] = $faq_schema;
 			}
 		}
 	}
@@ -1011,26 +1082,11 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			if ( $t_term ) {
 				$t_faqs = ltdh_get_training_type_faqs( $t_term );
 				if ( ! empty( $t_faqs ) && is_array( $t_faqs ) ) {
-					$faq_elements = [];
-					foreach ( $t_faqs as $item ) {
-						$q = trim( $item['question'] ?? '' );
-						$a = trim( $item['answer'] ?? '' );
-						if ( $q && $a ) {
-							$faq_elements[] = [
-								'@type'          => 'Question',
-								'name'           => $q,
-								'acceptedAnswer' => [
-									'@type' => 'Answer',
-									'text'  => wp_strip_all_tags( $a ),
-								],
-							];
-						}
-					}
-					if ( ! empty( $faq_elements ) ) {
-						$data['ltdh_training_type_faq'] = [
-							'@type'      => 'FAQPage',
-							'mainEntity' => $faq_elements,
-						];
+					$t_term_url = get_term_link( $t_term, LTDH_TAX_TRAINING_TYPE );
+					$t_url      = ( ! is_wp_error( $t_term_url ) && ! empty( $t_term_url ) ) ? $t_term_url : home_url( $request_path );
+					$faq_schema = ltdh_build_enhanced_faq_schema( $t_faqs, (string) $t_url, null );
+					if ( ! empty( $faq_schema ) ) {
+						$data['ltdh_training_type_faq'] = $faq_schema;
 					}
 				}
 
