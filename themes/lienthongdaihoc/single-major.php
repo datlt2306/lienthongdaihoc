@@ -559,18 +559,18 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 						
 						<!-- BLOCK 1: ĐỐI TƯỢNG TUYỂN SINH (ĐÚNG NGÀNH & NGÀNH GẦN) - HIGHLIGHTED -->
 						<details id="details-doi-tuong" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 										1
 									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 										Quy định đối tượng tuyển sinh: Đúng ngành &amp; Ngành gần
 									</span>
 								</div>
 								<div class="flex items-center gap-2 shrink-0">
 									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 									</svg>
 								</div>
@@ -756,7 +756,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 											<p class="text-xs text-slate-500 mt-0.5">Gửi thông tin văn bằng để ban tuyển sinh kiểm tra và tính toán lộ trình bổ sung môn chính xác nhất.</p>
 										</div>
 									</div>
-									<a href="/kiem-tra-dieu-kien?nganh=<?php echo esc_attr( get_post_field( 'post_name', $major_id ) ); ?><?php echo $context_school ? '&truong=' . esc_attr( get_post_field( 'post_name', $context_school->ID ) ) : ''; ?>" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shrink-0 shadow-2xs transition-colors no-underline">
+									<a href="/kiem-tra-dieu-kien?nganh=<?php echo esc_attr( get_post_field( 'post_name', $major_id ) ); ?><?php echo $context_school ? '&truong=' . esc_attr( get_post_field( 'post_name', $context_school->ID ) ) : ''; ?>" class="inline-flex items-center justify-center gap-1.5 px-5 py-2 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight rounded-full shrink-0 shadow-none hover:shadow-xs active:scale-98 transition-all no-underline">
 										<span>Kiểm tra điều kiện ngay</span>
 										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
 									</a>
@@ -767,18 +767,18 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 
 						<!-- BLOCK 2: ĐIỀU KIỆN XÉT TUYỂN CHUNG -->
 						<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 										2
 									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 										Tiêu chuẩn &amp; Điều kiện xét tuyển
 									</span>
 								</div>
 								<div class="flex items-center gap-2 shrink-0">
 									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 									</svg>
 								</div>
@@ -792,18 +792,18 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 
 						<!-- BLOCK 3: HỒ SƠ XÉT TUYỂN CẦN CHUẨN BỊ -->
 						<details id="details-ho-so" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 										3
 									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 										Hồ sơ xét tuyển cần chuẩn bị
 									</span>
 								</div>
 								<div class="flex items-center gap-2 shrink-0">
 									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 									</svg>
 								</div>
@@ -871,7 +871,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 										<p class="text-xs text-slate-500">Tệp PDF chính thức liệt kê lộ trình các học kỳ, khối lượng tín chỉ và môn học</p>
 									</div>
 								</div>
-								<a href="<?php echo esc_url( $major_curriculum['url'] ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $major_curriculum['url'] ); ?>" data-file-title="<?php echo esc_attr( $major_curriculum['title'] ); ?>">
+								<a href="<?php echo esc_url( $major_curriculum['url'] ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight rounded-full shadow-none hover:shadow-xs active:scale-98 transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $major_curriculum['url'] ); ?>" data-file-title="<?php echo esc_attr( $major_curriculum['title'] ); ?>">
 									<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 									<span>Tải Khung Chương Trình (PDF)</span>
 								</a>
@@ -911,16 +911,16 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 								$faq_num       = $f_idx + 1;
 							?>
 								<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors" id="faq-<?php echo esc_attr( $faq_num ); ?>">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-[15px] list-none select-none hover:text-[#00308b] transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-[15px] list-none select-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-start gap-2.5 min-w-0">
-											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-[#00308b] text-xs font-black shrink-0 mt-0.5 group-open:bg-[#00308b] group-open:text-white transition-colors">
+											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold shrink-0 mt-0.5 group-open:bg-[#0071E3] group-open:text-white transition-colors">
 												?
 											</span>
-											<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors">
+											<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors">
 												<?php echo esc_html( $faq_item['question'] ); ?>
 											</span>
 										</div>
-										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 										</svg>
 									</summary>
@@ -944,7 +944,7 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 									</p>
 								</div>
 							</div>
-							<a href="/kiem-tra-dieu-kien?nganh=<?php echo esc_attr( get_post_field( 'post_name', $major_id ) ); ?><?php echo $context_school ? '&truong=' . esc_attr( get_post_field( 'post_name', $context_school->ID ) ) : ''; ?>" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#00308b] hover:bg-blue-900 text-white text-xs font-bold shrink-0 transition-all shadow-2xs hover:shadow-xs active:scale-95 no-underline">
+							<a href="/kiem-tra-dieu-kien?nganh=<?php echo esc_attr( get_post_field( 'post_name', $major_id ) ); ?><?php echo $context_school ? '&truong=' . esc_attr( get_post_field( 'post_name', $context_school->ID ) ) : ''; ?>" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight shrink-0 transition-all shadow-none hover:shadow-xs active:scale-98 no-underline">
 								<span>Kiểm tra hồ sơ ngay</span>
 								<span>&rarr;</span>
 							</a>

@@ -70,12 +70,10 @@ $excerpt = wp_trim_words( $excerpt, 45, '...' );
 
 		<!-- Action Footer -->
 		<div class="pt-3 sm:pt-4 border-t border-slate-100/90 mt-auto">
-			<a href="<?php the_permalink(); ?>" class="w-full inline-flex items-center justify-center gap-2 bg-[#f0f4f9] hover:bg-blue-50 hover:text-[#00308b] text-[#324158] font-bold py-2.5 sm:py-3.5 px-4 sm:px-5 rounded-xl sm:rounded-2xl text-sm sm:text-[15px] transition-all duration-200 group/btn whitespace-nowrap active:scale-[0.98] border border-transparent hover:border-blue-200/60">
+			<a href="<?php the_permalink(); ?>" class="w-full inline-flex items-center justify-center gap-2 bg-[#0071E3] hover:bg-[#0077ED] text-white font-medium py-2.5 sm:py-3 px-5 rounded-full text-sm transition-all duration-200 group/btn whitespace-nowrap active:scale-[0.98] shadow-none hover:shadow-xs tracking-tight">
 				<span class="sm:hidden">Khám phá</span>
 				<span class="hidden sm:inline">Khám phá ngành học</span>
-				<svg class="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M5 12h14M12 5l7 7-7 7" />
-				</svg>
+				<?php ltdh_icon( 'arrow-right', 'w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1 shrink-0' ); ?>
 			</a>
 		</div>
 	</div>

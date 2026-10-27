@@ -289,55 +289,13 @@ $has_active_filters  = $active_filter_count > 0;
 <main id="primary" class="site-main bg-slate-50 min-h-screen">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-8 sm:py-8 md:py-12">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-8 sm:py-6 md:py-8">
 
 		<!-- ============ DESKTOP TOP FILTER BAR (FULL-WIDTH, VISIBLE ONLY ON >= MD) ============ -->
-		<div id="catalog-desktop-filter-wrapper" class="hidden md:block bg-white border border-slate-100 rounded-2xl p-5 md:p-6 shadow-sm mb-8 transition-all">
+		<div id="catalog-desktop-filter-wrapper" class="hidden md:block bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl p-3.5 sm:p-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] mb-6 transition-all">
 			
-			<!-- Header inside Filter: Page Title, Found Counter & Desktop Reset Action -->
-			<div class="flex flex-row items-center justify-between pb-4 border-b border-slate-100 gap-3">
-				<div>
-					<h2 id="catalog-heading-title" class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-						<?php echo $active_type_term ? 'Liên thông ' . esc_html( preg_replace( '/^(hệ|liên\s+thông)\s+/iu', '', $active_type_term->name ) ) : 'Chương trình tuyển sinh Liên thông Đại học'; ?>
-					</h2>
-					<div class="flex flex-wrap items-center gap-2 mt-1">
-						<p class="text-xs md:text-sm text-slate-500">
-							Tìm thấy <strong id="catalog-count-display" class="text-brand-primary font-extrabold text-sm md:text-base"><?php echo esc_html( $query->found_posts ); ?></strong> chương trình phù hợp.
-						</p>
-						<?php if ( ! empty( $active_term_description ) ) : ?>
-							<span class="text-slate-300 hidden sm:inline">•</span>
-							<a href="#he-dao-tao-seo-content" class="inline-flex items-center gap-1 text-xs font-bold text-brand-primary hover:text-brand-darkBlue hover:underline transition-all">
-								<span>Quy chế & Bằng cấp</span>
-								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-							</a>
-						<?php endif; ?>
-						<?php if ( ! empty( $training_type_faqs ) ) : ?>
-							<span class="text-slate-300 hidden sm:inline">•</span>
-							<a href="#he-dao-tao-faq-section" class="inline-flex items-center gap-1 text-xs font-bold text-brand-primary hover:text-brand-darkBlue hover:underline transition-all">
-								<span>Hỏi đáp (FAQ)</span>
-								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-							</a>
-						<?php endif; ?>
-						<?php if ( $active_type_term ) : ?>
-							<span class="text-slate-300 hidden sm:inline">•</span>
-							<a href="#he-dao-tao-cta-box" class="inline-flex items-center gap-1 text-xs font-bold text-brand-accent hover:text-orange-700 hover:underline transition-all">
-								<span>Nhận tư vấn</span>
-								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-							</a>
-						<?php endif; ?>
-					</div>
-				</div>
-				<div id="catalog-desktop-reset">
-					<?php if ( $has_active_filters ) : ?>
-						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 border border-rose-100 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]">
-							<span>✕</span> <span>Xóa tất cả bộ lọc</span>
-						</a>
-					<?php endif; ?>
-				</div>
-			</div>
-
 			<!-- Filter Form Controls (Rendered here initially on desktop SSR) -->
-			<div id="catalog-filter-body" class="pt-4 md:pt-0">
+			<div id="catalog-filter-body">
 				<?php
 				$form_action = home_url( '/hinh-thuc-dao-tao/' );
 				if ( $active_type_term ) {
@@ -349,32 +307,127 @@ $has_active_filters  = $active_filter_count > 0;
 					}
 				}
 				?>
-				<form id="catalog-filter-form" action="<?php echo esc_url( $form_action ); ?>" method="GET" class="space-y-4">
+				<form id="catalog-filter-form" action="<?php echo esc_url( $form_action ); ?>" method="GET" class="space-y-3">
 					<input type="hidden" name="he" value="<?php echo esc_attr( $selected_type ); ?>">
 				
-				<!-- Row 1: Search keyword + Region dropdown + School dropdown + Major dropdown + Sorting -->
-				<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+				<!-- Row 1: Title & Count on Left + Apple Segmented Control on Right -->
+				<div class="flex flex-col lg:flex-row lg:items-center justify-between pb-3 border-b border-slate-100/90 gap-2.5">
+					<!-- Left: Title, Counter Badge & Reset Link -->
+					<div class="flex flex-wrap items-center gap-2 sm:gap-2.5 min-w-0 max-md:hidden">
+						<h2 id="catalog-heading-title" class="text-base sm:text-lg font-bold text-slate-900 tracking-tight whitespace-nowrap">
+							<?php echo $active_type_term ? 'Liên thông ' . esc_html( preg_replace( '/^(hệ|liên\s+thông)\s+/iu', '', $active_type_term->name ) ) : 'Chương trình tuyển sinh Liên thông Đại học'; ?>
+						</h2>
+						<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-brand-primary border border-blue-200/70 shadow-2xs">
+							<strong id="catalog-count-display" class="font-extrabold"><?php echo esc_html( $query->found_posts ); ?></strong>
+							<span class="text-slate-500 font-medium">chương trình</span>
+						</span>
+						<?php if ( ! empty( $active_term_description ) ) : ?>
+							<span class="text-slate-300 hidden sm:inline">•</span>
+							<a href="#he-dao-tao-seo-content" class="text-xs font-semibold text-slate-500 hover:text-brand-primary hover:underline transition-colors">Quy chế & Bằng cấp</a>
+						<?php endif; ?>
+						<?php if ( ! empty( $training_type_faqs ) ) : ?>
+							<span class="text-slate-300 hidden sm:inline">•</span>
+							<a href="#he-dao-tao-faq-section" class="text-xs font-semibold text-slate-500 hover:text-brand-primary hover:underline transition-colors">Hỏi đáp</a>
+						<?php endif; ?>
+						<?php if ( $active_type_term ) : ?>
+							<span class="text-slate-300 hidden sm:inline">•</span>
+							<a href="#he-dao-tao-cta-box" class="text-xs font-bold text-brand-accent hover:underline transition-colors">Tư vấn</a>
+						<?php endif; ?>
+						<div id="catalog-desktop-reset" class="inline-flex items-center ml-1">
+							<?php if ( $has_active_filters ) : ?>
+								<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="js-ltdh-reset-filter inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 bg-slate-100/90 hover:bg-slate-200/80 border border-slate-200/60 px-2 py-0.5 rounded-lg transition-all shadow-2xs" title="Đặt lại bộ lọc">
+									<svg class="w-3 h-3 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+									<span>Đặt lại</span>
+								</a>
+							<?php endif; ?>
+						</div>
+					</div>
+
+					<!-- Right: Apple Segmented Pill Track for Training Types -->
+					<div class="flex items-center gap-2 shrink-0">
+						<span class="text-xs font-semibold text-slate-400 select-none hidden xl:inline-flex items-center gap-1">
+							<?php ltdh_icon( 'graduationcap', 'w-3.5 h-3.5 text-slate-400 shrink-0' ); ?>
+							<span>Hình thức:</span>
+						</span>
+						
+						<div id="catalog-pills-container" class="inline-flex items-center p-0.5 bg-slate-100/90 rounded-xl border border-slate-200/60 overflow-x-auto max-w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+							<!-- All Systems Tab -->
+							<?php
+							$is_all_active = empty( $selected_type );
+							$all_url = home_url( '/hinh-thuc-dao-tao/' );
+							$preserved_args = [];
+							if ( $selected_school ) $preserved_args['truong'] = $selected_school;
+							if ( $selected_nhom )   $preserved_args['nganh']  = $selected_nhom;
+							if ( $selected_search ) $preserved_args['s']      = $selected_search;
+							if ( $selected_sort )   $preserved_args['sort']   = $selected_sort;
+							if ( ! empty( $preserved_args ) ) {
+								$all_url = add_query_arg( $preserved_args, $all_url );
+							}
+							?>
+							<a href="<?php echo esc_url( $all_url ); ?>"
+							   data-type=""
+							   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none <?php echo $is_all_active ? 'bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
+								<span>Tất cả</span>
+								<span class="pill-badge text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo $is_all_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+									<?php echo esc_html( $total_programs ); ?>
+								</span>
+							</a>
+
+							<!-- Dynamic Training Types Tabs (Hides systems with 0 count) -->
+							<?php if ( ! is_wp_error( $all_types ) && ! empty( $all_types ) ) : ?>
+								<?php foreach ( $all_types as $t_term ) : ?>
+									<?php
+									$t_count = $t_counts[ $t_term->slug ] ?? ( $t_counts['tu-xa'] ?? 0 );
+									$is_active = ( $selected_type === $t_term->slug || ( ( 'tu-xa' === $selected_type || 'dao-tao-tu-xa' === $selected_type ) && ( 'tu-xa' === $t_term->slug || 'dao-tao-tu-xa' === $t_term->slug ) ) );
+
+									// Hide training types with 0 programs unless currently active
+									if ( $t_count === 0 && ! $is_active ) {
+										continue;
+									}
+
+									$t_link   = get_term_link( $t_term );
+									$type_url = ( ! is_wp_error( $t_link ) && ! empty( $t_link ) ) ? $t_link : home_url( '/hinh-thuc-dao-tao/' . $t_term->slug . '/' );
+									if ( ! empty( $preserved_args ) ) {
+										$type_url = add_query_arg( $preserved_args, $type_url );
+									}
+									?>
+									<a href="<?php echo esc_url( $type_url ); ?>"
+									   data-type="<?php echo esc_attr( $t_term->slug ); ?>"
+									   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none <?php echo $is_active ? 'bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
+										<span><?php echo esc_html( $t_term->name ); ?></span>
+										<span class="pill-badge text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+											<?php echo esc_html( $t_count ); ?>
+										</span>
+									</a>
+								<?php endforeach; ?>
+							<?php endif; ?>
+						</div>
+					</div>
+				</div>
+
+				<!-- Row 2: Apple Toolbar (Search Box + 4 Dropdowns on 12-col grid) -->
+				<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2 md:gap-2.5 items-center">
 					
-					<!-- 1. Search Box -->
-					<div class="relative sm:col-span-2 md:col-span-1">
-						<label for="program-search-keyword" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Tìm kiếm</label>
+					<!-- 1. Search Box (Col 4) -->
+					<div class="relative sm:col-span-2 md:col-span-4">
+						<label for="program-search-keyword" class="sr-only">Tìm kiếm</label>
 						<div class="relative">
-							<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+							<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+								<?php ltdh_icon( 'magnifyingglass', 'w-3.5 h-3.5' ); ?>
 							</span>
 							<input type="text" 
 								   id="program-search-keyword"
 								   name="s" 
 								   value="<?php echo esc_attr( $selected_search ); ?>" 
 								   placeholder="Tìm tên ngành, trường..." 
-								   class="w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-xl text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none placeholder-slate-400 min-h-[44px] transition-all bg-slate-50/50 focus:bg-white">
+								   class="w-full pl-9 pr-3.5 h-9 md:h-10 border border-slate-200/80 rounded-xl text-xs sm:text-sm bg-slate-50/70 hover:bg-slate-100/70 focus:bg-white focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 focus:outline-none placeholder-slate-400 transition-all">
 						</div>
 					</div>
 
-					<!-- 2. Region / Location Select -->
-					<div>
-						<label for="program-region-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Khu vực</label>
-						<select id="program-region-select" name="khu_vuc" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+					<!-- 2. Region / Location Select (Col 2) -->
+					<div class="md:col-span-2">
+						<label for="program-region-select" class="sr-only">Khu vực</label>
+						<select id="program-region-select" name="khu_vuc" class="w-full h-9 md:h-10 px-3 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-medium bg-slate-50/70 hover:bg-slate-100/70 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 focus:outline-none cursor-pointer transition-all shadow-2xs">
 							<option value="">Tất cả khu vực</option>
 							<?php
 							$default_regions = [
@@ -407,10 +460,10 @@ $has_active_filters  = $active_filter_count > 0;
 						</select>
 					</div>
 
-					<!-- 3. School Select -->
-					<div>
-						<label for="program-school-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Trường đối tác</label>
-						<select id="program-school-select" name="truong" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+					<!-- 3. School Select (Col 2) -->
+					<div class="md:col-span-2">
+						<label for="program-school-select" class="sr-only">Trường đối tác</label>
+						<select id="program-school-select" name="truong" class="w-full h-9 md:h-10 px-3 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-medium bg-slate-50/70 hover:bg-slate-100/70 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 focus:outline-none cursor-pointer transition-all shadow-2xs">
 							<option value="">Tất cả trường đối tác</option>
 							<?php if ( ! empty( $schools_list ) ) : ?>
 								<?php foreach ( $schools_list as $sch ) : ?>
@@ -425,10 +478,10 @@ $has_active_filters  = $active_filter_count > 0;
 						</select>
 					</div>
 
-					<!-- 4. Major Select -->
-					<div>
-						<label for="program-major-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Chuyên ngành</label>
-						<select id="program-major-select" name="nganh" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+					<!-- 4. Major Select (Col 2) -->
+					<div class="md:col-span-2">
+						<label for="program-major-select" class="sr-only">Chuyên ngành</label>
+						<select id="program-major-select" name="nganh" class="w-full h-9 md:h-10 px-3 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-medium bg-slate-50/70 hover:bg-slate-100/70 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 focus:outline-none cursor-pointer transition-all shadow-2xs">
 							<option value="">Tất cả chuyên ngành</option>
 							<?php if ( ! empty( $majors_list ) ) : ?>
 								<?php foreach ( $majors_list as $maj ) : ?>
@@ -440,10 +493,10 @@ $has_active_filters  = $active_filter_count > 0;
 						</select>
 					</div>
 
-					<!-- 5. Sorting Select -->
-					<div>
-						<label for="program-sort-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Sắp xếp</label>
-						<select id="program-sort-select" name="sort" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
+					<!-- 5. Sorting Select (Col 2) -->
+					<div class="md:col-span-2">
+						<label for="program-sort-select" class="sr-only">Sắp xếp</label>
+						<select id="program-sort-select" name="sort" class="w-full h-9 md:h-10 px-3 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-medium bg-slate-50/70 hover:bg-slate-100/70 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 focus:outline-none cursor-pointer transition-all shadow-2xs">
 							<option value="" <?php selected( $selected_sort, '' ); ?>>Sắp xếp: Mặc định</option>
 							<option value="title_asc" <?php selected( $selected_sort, 'title_asc' ); ?>>Tên chương trình (A-Z)</option>
 							<option value="title_desc" <?php selected( $selected_sort, 'title_desc' ); ?>>Tên chương trình (Z-A)</option>
@@ -451,64 +504,6 @@ $has_active_filters  = $active_filter_count > 0;
 						</select>
 					</div>
 
-				</div>
-
-				<!-- Row 2: Quick Pill Tabs for Training Types -->
-				<div id="catalog-pills-container" class="pt-3 border-t border-slate-100">
-					<span class="block md:inline-block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2 md:mb-0 md:mr-2 shrink-0">Hình thức đào tạo:</span>
-					
-					<div class="inline-flex flex-wrap items-center gap-1.5 sm:gap-2">
-						<!-- All Systems Tab -->
-						<?php
-						$is_all_active = empty( $selected_type );
-						$all_url = home_url( '/hinh-thuc-dao-tao/' );
-						$preserved_args = [];
-						if ( $selected_school ) $preserved_args['truong'] = $selected_school;
-						if ( $selected_nhom )   $preserved_args['nganh']  = $selected_nhom;
-						if ( $selected_search ) $preserved_args['s']      = $selected_search;
-						if ( $selected_sort )   $preserved_args['sort']   = $selected_sort;
-						if ( ! empty( $preserved_args ) ) {
-							$all_url = add_query_arg( $preserved_args, $all_url );
-						}
-						?>
-						<a href="<?php echo esc_url( $all_url ); ?>"
-						   data-type=""
-						   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold transition-all min-h-[34px] <?php echo $is_all_active ? 'bg-brand-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'; ?>">
-							<span>Tất cả</span>
-							<span class="pill-badge text-[11px] px-1.5 py-0.2 rounded-full font-black <?php echo $is_all_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
-								<?php echo esc_html( $total_programs ); ?>
-							</span>
-						</a>
-
-						<!-- Dynamic Training Types Tabs (Hides systems with 0 count) -->
-						<?php if ( ! is_wp_error( $all_types ) && ! empty( $all_types ) ) : ?>
-							<?php foreach ( $all_types as $t_term ) : ?>
-								<?php
-								$t_count = $t_counts[ $t_term->slug ] ?? ( $t_counts['tu-xa'] ?? 0 );
-								$is_active = ( $selected_type === $t_term->slug || ( ( 'tu-xa' === $selected_type || 'dao-tao-tu-xa' === $selected_type ) && ( 'tu-xa' === $t_term->slug || 'dao-tao-tu-xa' === $t_term->slug ) ) );
-
-								// Hide training types with 0 programs unless currently active
-								if ( $t_count === 0 && ! $is_active ) {
-									continue;
-								}
-
-								$t_link   = get_term_link( $t_term );
-								$type_url = ( ! is_wp_error( $t_link ) && ! empty( $t_link ) ) ? $t_link : home_url( '/hinh-thuc-dao-tao/' . $t_term->slug . '/' );
-								if ( ! empty( $preserved_args ) ) {
-									$type_url = add_query_arg( $preserved_args, $type_url );
-								}
-								?>
-								<a href="<?php echo esc_url( $type_url ); ?>"
-								   data-type="<?php echo esc_attr( $t_term->slug ); ?>"
-								   class="js-ltdh-type-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold transition-all min-h-[34px] <?php echo $is_active ? 'bg-brand-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'; ?>">
-									<span><?php echo esc_html( $t_term->name ); ?></span>
-									<span class="pill-badge text-[11px] px-1.5 py-0.2 rounded-full font-black <?php echo $is_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
-										<?php echo esc_html( $t_count ); ?>
-									</span>
-								</a>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</div>
 				</div>
 
 				</form>
@@ -541,9 +536,10 @@ $has_active_filters  = $active_filter_count > 0;
 				<div id="catalog-mobile-reset">
 					<?php if ( $has_active_filters ) : ?>
 						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" 
-						   class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 min-h-[38px] transition-colors"
-						   title="Xóa tất cả bộ lọc">
-							<span>✕ Xóa lọc</span>
+						   class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200 hover:bg-slate-200 min-h-[38px] transition-colors"
+						   title="Đặt lại bộ lọc">
+							<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+							<span>Đặt lại</span>
 						</a>
 					<?php endif; ?>
 				</div>
@@ -553,9 +549,7 @@ $has_active_filters  = $active_filter_count > 0;
 						aria-expanded="false" 
 						aria-controls="ltdh-filter-drawer"
 						class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border font-bold text-xs transition-all duration-200 min-h-[38px] cursor-pointer shadow-2xs <?php echo $has_active_filters ? 'bg-blue-50 border-blue-200 text-[#00308b]' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'; ?>">
-					<svg class="w-4 h-4 text-current shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-					</svg>
+					<?php ltdh_icon( 'slider.horizontal.3', 'w-4 h-4 text-current shrink-0' ); ?>
 					<span id="ltdh-mobile-filter-btn-text">Bộ lọc</span>
 					<span id="catalog-mobile-filter-badge">
 						<?php if ( $active_filter_count > 0 ) : ?>
@@ -602,16 +596,14 @@ $has_active_filters  = $active_filter_count > 0;
 			<!-- Drawer Top Header -->
 			<div class="px-4 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/90 shrink-0 touch-none" style="touch-action: none;">
 				<div class="flex items-center gap-2">
-					<svg class="w-5 h-5 text-brand-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-					</svg>
+					<?php ltdh_icon( 'slider.horizontal.3', 'w-5 h-5 text-brand-primary shrink-0' ); ?>
 					<h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Bộ lọc chương trình</h3>
 				</div>
 				<button type="button" 
 						id="ltdh-filter-drawer-close" 
 						class="p-2 -mr-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
 						aria-label="Đóng bộ lọc">
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+					<?php ltdh_icon( 'xmark', 'w-5 h-5' ); ?>
 				</button>
 			</div>
 
@@ -929,11 +921,12 @@ $has_active_filters  = $active_filter_count > 0;
 						<!-- Card Footer Action Buttons -->
 						<div class="p-3 sm:p-4 pt-0 pb-3 sm:pb-3.5">
 							<div class="pt-2 sm:pt-2.5 sm:border-t sm:border-slate-100 flex items-stretch gap-1.5 sm:gap-2">
-								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-1.5 sm:py-2 px-1 sm:px-3 rounded-lg sm:rounded-xl font-bold ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
-									Tìm hiểu
+								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-2 px-2 gap-1 rounded-full font-bold ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
+									<span class="text-[10px] sm:text-xs md:text-sm inline-block">Tìm hiểu</span>
+									<?php ltdh_icon( 'arrow-right', 'hidden sm:block w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0' ); ?>
 								</a>
 								<button type="button"
-										class="ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary rounded-lg sm:rounded-xl py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap cursor-pointer"
+										class="rounded-full ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap cursor-pointer"
 										data-compare-type="program"
 										data-compare-id="<?php echo esc_attr( $prog_id ); ?>"
 										data-compare-title="<?php echo esc_attr( $card_headline ); ?>"
@@ -945,15 +938,13 @@ $has_active_filters  = $active_filter_count > 0;
 									So sánh
 								</button>
 								<button type="button"
-										class="ltdh-card-share-btn text-slate-400 hover:text-[#00308b] hover:bg-blue-50 border border-slate-200/90 hover:border-blue-200 rounded-lg sm:rounded-xl p-1.5 sm:p-2 transition-all min-h-[36px] sm:min-h-[38px] w-9 sm:w-10 flex items-center justify-center shrink-0 cursor-pointer select-none"
+										class="ltdh-card-share-btn text-slate-400 hover:text-[#0071E3] hover:bg-blue-50 border border-slate-200/90 hover:border-blue-200 rounded-full p-1.5 sm:p-2 transition-all min-h-[36px] sm:min-h-[38px] w-9 sm:w-10 flex items-center justify-center shrink-0 cursor-pointer select-none"
 										data-url="<?php echo esc_url( get_permalink( $prog_id ) ); ?>"
 										data-title="<?php echo esc_attr( $card_headline ); ?>"
 										data-type="program"
 										title="Chia sẻ chương trình <?php echo esc_attr( $card_headline ); ?>"
 										aria-label="Chia sẻ chương trình">
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-									</svg>
+									<?php ltdh_icon( 'share', 'w-4 h-4' ); ?>
 								</button>
 							</div>
 						</div>
@@ -969,7 +960,7 @@ $has_active_filters  = $active_filter_count > 0;
 					<h3 class="font-extrabold text-slate-900 text-lg mb-2">Không tìm thấy chương trình phù hợp</h3>
 					<p class="text-slate-500 text-sm max-w-md mx-auto mb-6">Không có chương trình nào khớp với các tiêu chí lọc bạn đang chọn. Hãy thử chọn lại hoặc đặt lại bộ lọc.</p>
 					<div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="js-ltdh-reset-filter cursor-pointer bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-brand-darkBlue shadow-md min-h-[44px] flex items-center justify-center">
+						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="js-ltdh-reset-filter cursor-pointer bg-[#0071E3] hover:bg-[#0077ED] text-white px-6 py-2.5 rounded-full font-medium text-xs sm:text-sm tracking-tight transition-all shadow-none hover:shadow-xs active:scale-98 min-h-[44px] flex items-center justify-center">
 							✕ Đặt lại tất cả bộ lọc
 						</a>
 					</div>
@@ -1032,7 +1023,7 @@ $has_active_filters  = $active_filter_count > 0;
 						        aria-controls="ltdh-seo-article-body" 
 						        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-brand-primary bg-slate-50 hover:bg-blue-50/80 border border-slate-200/90 hover:border-blue-200 transition-all cursor-pointer shadow-2xs group focus:outline-none focus:ring-2 focus:ring-brand-primary/20">
 							<span id="ltdh-seo-toggle-text">Đọc toàn bộ giới thiệu & quy chế</span>
-							<svg id="ltdh-seo-toggle-icon" class="w-4 h-4 text-brand-primary transition-transform duration-300 group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+							<?php ltdh_icon( 'chevron-down', 'w-4 h-4 text-brand-primary transition-transform duration-300 group-hover:translate-y-0.5', [ 'id' => 'ltdh-seo-toggle-icon' ] ); ?>
 						</button>
 					</div>
 				</div>
@@ -1047,9 +1038,7 @@ $has_active_filters  = $active_filter_count > 0;
 				<!-- Section Header -->
 				<div class="mb-5 pb-4 border-b border-slate-100">
 					<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-brand-primary border border-blue-100/80 mb-2">
-						<svg class="w-3.5 h-3.5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-						</svg>
+						<?php ltdh_icon( 'question-mark-circle', 'w-3.5 h-3.5 text-brand-primary' ); ?>
 						<span>Hỏi đáp tuyển sinh & Bằng cấp</span>
 					</div>
 					<h2 id="faq-section-heading" class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
@@ -1068,16 +1057,14 @@ $has_active_filters  = $active_filter_count > 0;
 						<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors">
 							<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-base list-none select-none hover:text-brand-primary transition-colors">
 								<div class="flex items-start gap-2.5 min-w-0">
-									<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-brand-primary text-xs font-black shrink-0 mt-0.5 group-open:bg-brand-primary group-open:text-white transition-colors">
+									<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold shrink-0 mt-0.5 group-open:bg-[#0071E3] group-open:text-white transition-colors">
 										?
 									</span>
 									<span class="leading-snug text-slate-800 group-open:text-brand-primary transition-colors">
 										<?php echo esc_html( $faq_item['question'] ); ?>
 									</span>
 								</div>
-								<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-brand-primary transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-								</svg>
+								<?php ltdh_icon( 'chevron-down', 'w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-brand-primary transition-transform shrink-0' ); ?>
 							</summary>
 							<div class="mt-2.5 sm:mt-3 pl-8 sm:pl-8 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
 								<?php echo wp_kses_post( $faq_item['answer'] ); ?>
@@ -1143,19 +1130,19 @@ $has_active_filters  = $active_filter_count > 0;
 						<div class="space-y-2.5 pt-2">
 							<div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-200 font-medium">
 								<span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+									<?php ltdh_icon( 'checkmark', 'w-3.5 h-3.5' ); ?>
 								</span>
 								<span>Rà soát bảng điểm & tư vấn miễn trừ tín chỉ</span>
 							</div>
 							<div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-200 font-medium">
 								<span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+									<?php ltdh_icon( 'checkmark', 'w-3.5 h-3.5' ); ?>
 								</span>
 								<span>Hỗ trợ chuẩn bị hồ sơ xét tuyển nhanh chóng</span>
 							</div>
 							<div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-200 font-medium">
 								<span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+									<?php ltdh_icon( 'checkmark', 'w-3.5 h-3.5' ); ?>
 								</span>
 								<span>Cam kết bảo mật thông tin thí sinh 100%</span>
 							</div>
@@ -1168,7 +1155,7 @@ $has_active_filters  = $active_filter_count > 0;
 							$global_zalo    = function_exists( 'get_field' ) ? ( get_field( 'global_zalo_url', 'option' ) ?: 'https://zalo.me/0988991496' ) : 'https://zalo.me/0988991496';
 							?>
 							<a href="tel:<?php echo esc_attr( preg_replace( '/[^\d+]/', '', $global_hotline ) ); ?>" class="inline-flex items-center gap-1.5 hover:text-white transition-colors">
-								<svg class="w-4 h-4 text-brand-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+								<?php ltdh_icon( 'phone.fill', 'w-4 h-4 text-brand-accent shrink-0' ); ?>
 								<span>Hotline: <strong class="text-white"><?php echo esc_html( $global_hotline ); ?></strong></span>
 							</a>
 							<span class="text-white/20">|</span>

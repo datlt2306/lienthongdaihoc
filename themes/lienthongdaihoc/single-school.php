@@ -52,21 +52,21 @@ $school_tabs[] = [
 	'id'       => 'gioi-thieu',
 	'title'    => 'Giới thiệu',
 	'subtitle' => 'Thông tin về trường',
-	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
+	'icon'     => ltdh_get_icon( 'book-open', 'w-4 h-4' ),
 ];
 
 $school_tabs[] = [
 	'id'       => 'chuong-trinh-tuyen-sinh',
 	'title'    => 'Ngành & Chương trình',
 	'subtitle' => 'Hình thức học tuyển sinh',
-	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>',
+	'icon'     => ltdh_get_icon( 'school', 'w-4 h-4' ),
 ];
 
 $school_tabs[] = [
 	'id'       => 'dieu-kien-ho-so',
 	'title'    => 'Điều kiện & Hồ sơ',
 	'subtitle' => 'Tiêu chuẩn & Biểu mẫu',
-	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>',
+	'icon'     => ltdh_get_icon( 'document-text', 'w-4 h-4' ),
 ];
 
 if ( ! empty( $school_faqs ) ) {
@@ -74,7 +74,7 @@ if ( ! empty( $school_faqs ) ) {
 		'id'       => 'hoi-dap-tuyen-sinh',
 		'title'    => 'Hỏi đáp (FAQ)',
 		'subtitle' => 'Giải đáp thắc mắc',
-		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>',
+		'icon'     => ltdh_get_icon( 'question-mark-circle', 'w-4 h-4' ),
 	];
 }
 
@@ -82,7 +82,7 @@ $school_tabs[] = [
 	'id'       => 'quy-trinh-tuyen-sinh',
 	'title'    => 'Quy trình',
 	'subtitle' => 'Lộ trình 4 bước',
-	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+	'icon'     => ltdh_get_icon( 'checkmark-circle', 'w-4 h-4' ),
 ];
 ?>
 
@@ -440,10 +440,10 @@ $school_tabs[] = [
 						Hỗ trợ tư vấn chọn ngành, miễn giảm học phần và thông tin tuyển sinh mới nhất hoàn toàn miễn phí.
 					</p>
 					<div class="flex items-center gap-2">
-						<a href="#register" class="flex-1 bg-[#EA580C] hover:bg-orange-600 text-white font-extrabold text-xs py-2.5 px-3 rounded-xl shadow-xs text-center transition-all">
+						<a href="#register" class="flex-1 bg-[#0071E3] hover:bg-[#0077ED] text-white font-medium text-xs py-2.5 px-4 rounded-full shadow-none hover:shadow-xs text-center transition-all active:scale-98 tracking-tight">
 							📝 Đăng ký tư vấn ngay
 						</a>
-						<a href="<?php echo esc_url( $zalo_group ); ?>" target="_blank" rel="noopener noreferrer" class="bg-white/15 hover:bg-white/25 text-white font-bold text-xs py-2.5 px-3 rounded-xl text-center transition-all border border-white/20 shrink-0">
+						<a href="<?php echo esc_url( $zalo_group ); ?>" target="_blank" rel="noopener noreferrer" class="bg-white/15 hover:bg-white/25 text-white font-medium text-xs py-2.5 px-4 rounded-full text-center transition-all border border-white/20 shrink-0 active:scale-98 tracking-tight">
 							💬 Group Zalo
 						</a>
 					</div>
@@ -851,19 +851,19 @@ $school_tabs[] = [
 												$label     = ( 0 !== stripos( $raw_type, 'hệ' ) ) ? 'Hệ ' . $raw_type : $raw_type;
 												$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
 
-												$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
-												$btn_style = 'bg-indigo-50/70 hover:bg-indigo-600 text-indigo-900 hover:text-white border-indigo-200/90 hover:border-indigo-600';
+												$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#5856D6] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
+												$btn_style = 'bg-[#5856D6]/10 hover:bg-[#5856D6] text-[#5856D6] hover:text-white border border-[#5856D6]/20 hover:border-transparent rounded-full';
 
 												if ( false !== strpos( $t_lower, 'từ xa' ) ) {
-													$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
-													$btn_style = 'bg-blue-50/80 hover:bg-[#00308b] text-[#00308b] hover:text-white border-blue-200/90 hover:border-[#00308b]';
+													$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#0071E3] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+													$btn_style = 'bg-[#0071E3]/10 hover:bg-[#0071E3] text-[#0071E3] hover:text-white border border-[#0071E3]/20 hover:border-transparent rounded-full';
 												} elseif ( false !== strpos( $t_lower, 'vừa học vừa làm' ) || false !== strpos( $t_lower, 'vừa làm vừa học' ) || false !== strpos( $t_lower, 'vhvl' ) ) {
-													$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-													$btn_style = 'bg-amber-50/70 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-300/80 hover:border-amber-600';
+													$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#D97706] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+													$btn_style = 'bg-[#FF9500]/10 hover:bg-[#FF9500] text-[#D97706] hover:text-white border border-[#FF9500]/25 hover:border-transparent rounded-full';
 												}
 											?>
 												<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
-												   class="group/btn w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-bold border transition-all flex items-center justify-between no-underline shadow-2xs hover:shadow-md active:scale-[0.99] <?php echo esc_attr( $btn_style ); ?>"
+												   class="group/btn w-full py-2.5 px-3.5 rounded-full text-xs sm:text-sm font-semibold border transition-all flex items-center justify-between no-underline shadow-none hover:shadow-xs active:scale-[0.99] <?php echo esc_attr( $btn_style ); ?>"
 												   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
 													<span class="flex items-center gap-2 min-w-0 mr-2">
 														<?php echo $icon_svg; ?>
@@ -885,15 +885,15 @@ $school_tabs[] = [
 														$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
 														$spec_name = ! empty( $prog['specialization'] ) ? $prog['specialization'] : '';
 
-														$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-indigo-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
-														$btn_style = 'bg-slate-50 hover:bg-[#00308b] text-slate-800 hover:text-white border-slate-200/90 hover:border-[#00308b]';
+														$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#5856D6] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
+														$btn_style = 'bg-slate-100 hover:bg-[#5856D6] text-slate-700 hover:text-white border border-slate-200/80 hover:border-transparent rounded-full';
 
 														if ( false !== strpos( $t_lower, 'từ xa' ) ) {
-															$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
-															$btn_style = 'bg-blue-50/70 hover:bg-[#00308b] text-[#00308b] hover:text-white border-blue-200/90 hover:border-[#00308b]';
+															$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#0071E3] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+															$btn_style = 'bg-[#0071E3]/10 hover:bg-[#0071E3] text-[#0071E3] hover:text-white border border-[#0071E3]/20 hover:border-transparent rounded-full';
 														} elseif ( false !== strpos( $t_lower, 'vừa học vừa làm' ) || false !== strpos( $t_lower, 'vừa làm vừa học' ) || false !== strpos( $t_lower, 'vhvl' ) ) {
-															$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-amber-600 group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-															$btn_style = 'bg-amber-50/60 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-200/90 hover:border-amber-600';
+															$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#D97706] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+															$btn_style = 'bg-[#FF9500]/10 hover:bg-[#FF9500] text-[#D97706] hover:text-white border border-[#FF9500]/25 hover:border-transparent rounded-full';
 														}
 
 														$prog_real_spec = ! empty( $spec_name )
@@ -901,7 +901,7 @@ $school_tabs[] = [
 															&& mb_strtolower( trim( $spec_name ), 'UTF-8' ) !== mb_strtolower( trim( preg_replace( '/^ngành\s+/iu', '', $major['name'] ) ), 'UTF-8' );
 													?>
 														<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
-														   class="group/btn py-2 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-between no-underline shadow-2xs hover:shadow-xs active:scale-[0.98] <?php echo esc_attr( $btn_style ); ?>"
+														   class="group/btn py-2 px-3.5 rounded-full text-xs font-semibold border transition-all flex items-center justify-between no-underline shadow-none hover:shadow-xs active:scale-[0.98] <?php echo esc_attr( $btn_style ); ?>"
 														   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
 															<span class="flex items-center gap-1.5 min-w-0 mr-1.5">
 																<?php echo $icon_svg; ?>
@@ -931,7 +931,7 @@ $school_tabs[] = [
 								<div class="w-12 h-12 bg-blue-50 text-[#00308b] rounded-full flex items-center justify-center mx-auto mb-3 text-xl">🔍</div>
 								<h3 class="text-base font-bold text-slate-800 mb-1">Không tìm thấy ngành đào tạo phù hợp</h3>
 								<p class="text-xs text-slate-500 mb-4">Vui lòng thử tìm với từ khóa khác hoặc xóa bộ lọc.</p>
-								<button type="button" id="ltdh-major-reset-search" class="px-4 py-2 bg-[#00308b] text-white rounded-xl text-xs font-bold hover:bg-blue-800 transition-colors cursor-pointer">
+								<button type="button" id="ltdh-major-reset-search" class="px-5 py-2 bg-[#0071E3] hover:bg-[#0077ED] text-white rounded-full text-xs font-medium tracking-tight shadow-none hover:shadow-xs active:scale-98 transition-all cursor-pointer">
 									Xem tất cả ngành
 								</button>
 							</div>
@@ -1088,18 +1088,18 @@ $school_tabs[] = [
 					<div class="divide-y divide-slate-100" id="ltdh-school-req-docs-accordion">
 						<!-- BLOCK 1: ADMISSION REQUIREMENTS -->
 						<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 										1
 									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 										Tiêu chuẩn &amp; Điều kiện xét tuyển
 									</span>
 								</div>
 								<div class="flex items-center gap-2 shrink-0">
 									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 									</svg>
 								</div>
@@ -1113,18 +1113,18 @@ $school_tabs[] = [
 
 						<!-- BLOCK 2: REQUIRED DOCUMENTS & GOOGLE DRIVE PACKAGE -->
 						<details id="details-ho-so" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 										2
 									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 										Hồ sơ xét tuyển cần chuẩn bị &amp; Biểu mẫu
 									</span>
 								</div>
 								<div class="flex items-center gap-2 shrink-0">
 									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 									</svg>
 								</div>
@@ -1210,18 +1210,18 @@ $school_tabs[] = [
 						<!-- BLOCK 3: CONTACT & ADMISSION VENUE -->
 						<?php if ( ! empty( $contact_formatted ) ) : ?>
 							<details id="details-lien-he" class="group py-3.5 sm:py-4 transition-colors">
-								<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-amber-700 transition-colors">
+								<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#D97706] transition-colors">
 									<div class="flex items-center gap-3 min-w-0">
-										<span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-800 group-open:bg-amber-600 group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+										<span class="w-7 h-7 rounded-full bg-[#FF9500]/15 text-[#D97706] group-open:bg-[#FF9500] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 											3
 										</span>
-										<span class="leading-snug text-slate-800 group-open:text-amber-700 transition-colors font-bold">
+										<span class="leading-snug text-slate-800 group-open:text-[#D97706] transition-colors font-bold">
 											Thông tin liên hệ &amp; Tiếp nhận hồ sơ
 										</span>
 									</div>
 									<div class="flex items-center gap-2 shrink-0">
 										<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-amber-700 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#D97706] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 										</svg>
 									</div>
@@ -1260,16 +1260,16 @@ $school_tabs[] = [
 								$faq_num       = $f_idx + 1;
 							?>
 								<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors" id="faq-<?php echo esc_attr( $faq_num ); ?>">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-[15px] list-none select-none hover:text-[#00308b] transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-[15px] list-none select-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-start gap-2.5 min-w-0">
-											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-[#00308b] text-xs font-black shrink-0 mt-0.5 group-open:bg-[#00308b] group-open:text-white transition-colors">
+											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold shrink-0 mt-0.5 group-open:bg-[#0071E3] group-open:text-white transition-colors">
 												?
 											</span>
-											<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors">
+											<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors">
 												<?php echo esc_html( $faq_item['question'] ); ?>
 											</span>
 										</div>
-										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 										</svg>
 									</summary>
@@ -1289,7 +1289,7 @@ $school_tabs[] = [
 									<p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Đội ngũ cán bộ tuyển sinh luôn sẵn sàng hỗ trợ kiểm tra bằng cấp và tư vấn lộ trình học phù hợp nhất.</p>
 								</div>
 							</div>
-							<a href="#register" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#00308b] hover:bg-blue-900 text-white text-xs font-bold shrink-0 transition-all shadow-2xs hover:shadow-xs active:scale-95 no-underline">
+							<a href="#register" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight shrink-0 transition-all shadow-none hover:shadow-xs active:scale-98 no-underline">
 								<span>Hỏi tư vấn viên</span>
 								<span>&rarr;</span>
 							</a>

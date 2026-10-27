@@ -38,7 +38,7 @@ $zalo_share_url   = 'https://sp.zalo.me/plugins/share?url=' . rawurlencode( $soc
 	<!-- PROMINENT SHARE BUTTON (Eye-catching brand styling with gradient & shadow) -->
 	<button type="button"
 	        id="ltdh-quick-share-btn"
-	        class="ltdh-quick-share-btn ltdh-program-share-toggle-btn group inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-[#00308b] via-[#003ca6] to-[#004dc7] hover:from-[#002266] hover:to-[#00308b] text-white text-xs sm:text-[13px] font-bold shadow-md shadow-blue-900/25 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 border border-blue-400/30 cursor-pointer select-none"
+	        class="ltdh-quick-share-btn ltdh-program-share-toggle-btn rounded-full group inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EA580C] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all duration-200 cursor-pointer shrink-0 self-start sm:self-auto cursor-pointer select-none"
 	        data-has-dropdown="true"
 	        data-url="<?php echo esc_url( $program_url ); ?>"
 	        data-title="<?php echo esc_attr( $clean_title ); ?>"
@@ -48,14 +48,10 @@ $zalo_share_url   = 'https://sp.zalo.me/plugins/share?url=' . rawurlencode( $soc
 	        aria-controls="ltdh-share-dropdown-menu"
 	        title="Chia sẻ chương trình đào tạo này">
 		<span class="w-5 h-5 rounded-md bg-white/20 flex items-center justify-center shrink-0 text-white shadow-2xs">
-			<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-			</svg>
+			<?php ltdh_icon( 'share', 'w-3.5 h-3.5' ); ?>
 		</span>
 		<span class="tracking-wide">Chia sẻ</span>
-		<svg class="w-3.5 h-3.5 text-white/80 transition-transform duration-200 group-aria-expanded:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-		</svg>
+		<?php ltdh_icon( 'chevron-down', 'w-3.5 h-3.5 text-white/80 transition-transform duration-200 group-aria-expanded:rotate-180' ); ?>
 	</button>
 
 	<!-- DROPDOWN POPOVER MENU -->
@@ -84,9 +80,7 @@ $zalo_share_url   = 'https://sp.zalo.me/plugins/share?url=' . rawurlencode( $soc
 			        role="menuitem"
 			        title="Sao chép liên kết chương trình">
 				<span class="w-9 h-9 rounded-xl bg-blue-50 text-[#00308b] flex items-center justify-center shrink-0 border border-blue-100/60 group-hover:scale-105 transition-transform shadow-2xs">
-					<svg class="w-4 h-4 text-[#00308b] ltdh-copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-					</svg>
+					<?php ltdh_icon( 'link', 'w-4 h-4 text-[#00308b] ltdh-copy-icon' ); ?>
 				</span>
 				<div class="flex-1 min-w-0">
 					<span class="block text-xs sm:text-sm font-bold text-slate-800 ltdh-copy-text">Sao chép liên kết</span>

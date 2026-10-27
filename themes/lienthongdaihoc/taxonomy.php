@@ -76,8 +76,8 @@ $is_base_archive = ! isset( $term->term_id );
 									</div>
 								</div>
 								<div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-									<a href="<?php the_permalink(); ?>" class="text-sm text-brand-primary font-bold hover:underline">Chi tiết</a>
-									<a href="<?php the_permalink(); ?>" class="bg-brand-primary text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-brand-darkBlue transition-all">Đăng ký học</a>
+									<a href="<?php the_permalink(); ?>" class="text-sm text-[#0071E3] font-medium hover:underline">Chi tiết</a>
+									<a href="<?php the_permalink(); ?>" class="bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-medium px-5 py-2 rounded-full tracking-tight transition-all active:scale-98 shadow-none hover:shadow-xs">Đăng ký học</a>
 								</div>
 							</div>
 						</div>
@@ -141,7 +141,7 @@ $is_base_archive = ! isset( $term->term_id );
 								</div>
 								
 								<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600">
-									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-slate-50 hover:bg-brand-primary hover:text-white py-2 rounded-lg font-bold transition-all text-sm uppercase text-brand-primary">Tìm hiểu thêm</a>
+									<a href="<?php the_permalink(); ?>" class="w-full text-center bg-[#F5F5F7] hover:bg-[#0071E3] hover:text-white py-2 rounded-full font-medium transition-all text-xs uppercase tracking-tight text-[#0071E3]">Tìm hiểu thêm</a>
 								</div>
 							</div>
 						</div>
@@ -252,7 +252,7 @@ $is_base_archive = ! isset( $term->term_id );
 										So sánh
 									</button>
 								</div>
-								<a href="<?php the_permalink(); ?>" class="bg-brand-accent text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-[#e06e00] shadow-sm shadow-brand-accent/10 transition-all">Đăng ký học</a>
+								<a href="<?php the_permalink(); ?>" class="bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-medium px-5 py-2 rounded-full tracking-tight transition-all active:scale-98 shadow-none hover:shadow-xs">Đăng ký học</a>
 							</div>
 						</div>
 					</div>

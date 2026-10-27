@@ -74,7 +74,7 @@ $program_tabs[] = [
 	'id'       => 'tong-quan',
 	'title'    => 'Tổng quan',
 	'subtitle' => 'Thông tin chương trình',
-	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
+	'icon'     => ltdh_get_icon( 'book-open', 'w-4 h-4' ),
 ];
 
 if ( ! empty( $admission_batches_list ) && is_array( $admission_batches_list ) ) {
@@ -82,7 +82,7 @@ if ( ! empty( $admission_batches_list ) && is_array( $admission_batches_list ) )
 		'id'       => 'lich-tuyen-sinh',
 		'title'    => 'Lịch tuyển sinh',
 		'subtitle' => 'Các đợt nhận hồ sơ',
-		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.253M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" /></svg>',
+		'icon'     => ltdh_get_icon( 'calendar', 'w-4 h-4' ),
 	];
 }
 
@@ -91,7 +91,7 @@ if ( ! empty( $requirements ) || ! empty( $documents ) || ! empty( $contact_form
 		'id'       => 'dieu-kien-ho-so',
 		'title'    => 'Điều kiện & Hồ sơ',
 		'subtitle' => 'Tiêu chuẩn & Biểu mẫu',
-		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>',
+		'icon'     => ltdh_get_icon( 'document-text', 'w-4 h-4' ),
 	];
 }
 
@@ -100,7 +100,7 @@ $program_tabs[] = [
 	'id'       => 'hoc-phi-thoi-gian',
 	'title'    => 'Học phí',
 	'subtitle' => 'Chi phí & thời gian',
-	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+	'icon'     => ltdh_get_icon( 'creditcard', 'w-4 h-4' ),
 ];
 
 if ( ! empty( $curriculum_url ) ) {
@@ -108,7 +108,7 @@ if ( ! empty( $curriculum_url ) ) {
 		'id'       => 'lo-trinh-hoc',
 		'title'    => 'Lộ trình học',
 		'subtitle' => 'Khung chương trình',
-		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /></svg>',
+		'icon'     => ltdh_get_icon( 'menu', 'w-4 h-4' ),
 	];
 }
 
@@ -117,7 +117,7 @@ if ( ! empty( $faqs ) ) {
 		'id'       => 'hoi-dap',
 		'title'    => 'Hỏi đáp',
 		'subtitle' => 'Thắc mắc thường gặp',
-		'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>',
+		'icon'     => ltdh_get_icon( 'question-mark-circle', 'w-4 h-4' ),
 	];
 }
 
@@ -125,7 +125,7 @@ $program_tabs[] = [
 	'id'       => 'quy-trinh-tuyen-sinh',
 	'title'    => 'Quy trình',
 	'subtitle' => 'Lộ trình 4 bước',
-	'icon'     => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+	'icon'     => ltdh_get_icon( 'checkmark-circle', 'w-4 h-4' ),
 ];
 
 $program_rating_stats = function_exists( 'ltdh_get_program_rating_stats' ) ? ltdh_get_program_rating_stats( $program_id ) : [ 'total' => 0 ];
@@ -133,7 +133,7 @@ $program_tabs[] = [
 	'id'       => 'danh-gia',
 	'title'    => 'Đánh giá (' . ( $program_rating_stats['total'] ?? 0 ) . ')',
 	'subtitle' => 'Cảm nhận học viên',
-	'icon'     => '<svg class="w-4 h-4 text-amber-500 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>',
+	'icon'     => ltdh_get_icon( 'star-fill', 'w-4 h-4 text-amber-500 fill-amber-400' ),
 ];
 
 ?>
@@ -230,7 +230,7 @@ $program_tabs[] = [
 									<p class="font-extrabold text-slate-800 text-xs truncate leading-tight"><?php echo esc_html( $school_title ); ?></p>
 								</div>
 							</div>
-							<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold rounded-lg transition-all shrink-0">
+							<a href="<?php echo esc_url( get_permalink( $school_id ) ); ?>" class="px-3 py-1.5 bg-[#F5F5F7] hover:bg-[#E8E8ED] text-[#1D1D1F] text-[11px] font-medium tracking-tight rounded-full transition-all shrink-0">
 								Chi tiết →
 							</a>
 						</div>
@@ -605,18 +605,18 @@ $program_tabs[] = [
 							<!-- BLOCK 1: ADMISSION REQUIREMENTS -->
 							<?php if ( ! empty( $requirements ) ) : ?>
 								<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-center gap-3 min-w-0">
-											<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+											<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 												1
 											</span>
-											<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+											<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 												Tiêu chuẩn &amp; Điều kiện xét tuyển
 											</span>
 										</div>
 										<div class="flex items-center gap-2 shrink-0">
 											<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 											</svg>
 										</div>
@@ -629,10 +629,10 @@ $program_tabs[] = [
 										<?php if ( ! empty( $major_school_link ) ) : ?>
 											<div class="mt-3.5 p-3 sm:p-3.5 rounded-xl bg-blue-50/70 border border-blue-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
 												<div class="flex items-center gap-2 text-xs text-slate-700">
-													<span class="w-2 h-2 rounded-full bg-[#00308b] shrink-0"></span>
+													<span class="w-2 h-2 rounded-full bg-[#0071E3] shrink-0"></span>
 													<span>Bạn cần tra cứu quy định <strong>Đúng ngành</strong> hoặc <strong>Ngành gần</strong> để biết môn học chuyển đổi?</span>
 												</div>
-												<a href="<?php echo esc_url( $major_school_link ); ?>#dieu-kien-doi-tuong" class="inline-flex items-center gap-1 text-xs font-bold text-[#00308b] hover:underline shrink-0">
+												<a href="<?php echo esc_url( $major_school_link ); ?>#dieu-kien-doi-tuong" class="inline-flex items-center gap-1 text-xs font-bold text-[#0071E3] hover:underline shrink-0">
 													<span>Xem quy định ngành</span>
 													<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
 												</a>
@@ -645,18 +645,18 @@ $program_tabs[] = [
 							<!-- BLOCK 2: REQUIRED DOCUMENTS & GOOGLE DRIVE PACKAGE -->
 							<?php if ( ! empty( $documents ) || ! empty( $prog_admission_forms ) || ! empty( $primary_drive ) ) : ?>
 								<details id="details-ho-so" class="group py-3.5 sm:py-4 transition-colors">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-center gap-3 min-w-0">
-											<span class="w-7 h-7 rounded-lg bg-blue-50 text-[#00308b] group-open:bg-[#00308b] group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+											<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 												2
 											</span>
-											<span class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold">
+											<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
 												Hồ sơ xét tuyển cần chuẩn bị &amp; Biểu mẫu
 											</span>
 										</div>
 										<div class="flex items-center gap-2 shrink-0">
 											<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 											</svg>
 										</div>
@@ -741,18 +741,18 @@ $program_tabs[] = [
 							<!-- BLOCK 3: CONTACT & ADMISSION VENUE -->
 							<?php if ( ! empty( $contact_formatted ) ) : ?>
 								<details id="details-lien-he" class="group py-3.5 sm:py-4 transition-colors">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-amber-700 transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#D97706] transition-colors">
 										<div class="flex items-center gap-3 min-w-0">
-											<span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-800 group-open:bg-amber-600 group-open:text-white flex items-center justify-center text-xs font-black shrink-0 transition-colors shadow-2xs">
+											<span class="w-7 h-7 rounded-full bg-[#FF9500]/15 text-[#D97706] group-open:bg-[#FF9500] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
 												3
 											</span>
-											<span class="leading-snug text-slate-800 group-open:text-amber-700 transition-colors font-bold">
+											<span class="leading-snug text-slate-800 group-open:text-[#D97706] transition-colors font-bold">
 												Thông tin liên hệ &amp; Tiếp nhận hồ sơ
 											</span>
 										</div>
 										<div class="flex items-center gap-2 shrink-0">
 											<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-amber-700 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+											<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#D97706] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 											</svg>
 										</div>
@@ -966,7 +966,7 @@ $program_tabs[] = [
 										<p class="text-xs text-slate-500">Bản PDF chính thức từ nhà trường liệt kê lộ trình các học kỳ và danh sách môn học</p>
 									</div>
 								</div>
-								<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00308b] hover:bg-[#002266] text-white text-xs font-bold rounded-lg shadow-xs hover:shadow-sm transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $curriculum_url ); ?>" data-file-title="Khung chương trình: <?php echo esc_attr( get_the_title() ); ?>">
+								<a href="<?php echo esc_url( $curriculum_url ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight rounded-full shadow-none hover:shadow-xs active:scale-98 transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $curriculum_url ); ?>" data-file-title="Khung chương trình: <?php echo esc_attr( get_the_title() ); ?>">
 									<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 									<span>Tải Khung Chương Trình (PDF)</span>
 								</a>
@@ -1007,16 +1007,16 @@ $program_tabs[] = [
 								$faq_num = $index + 1;
 							?>
 								<details class="group py-3.5 sm:py-4 transition-colors">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#00308b] transition-colors">
+									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-start gap-2.5 sm:gap-3 min-w-0" id="faq-<?php echo esc_attr( $faq_num ); ?>">
-											<span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-teal-50 text-teal-800 group-open:bg-teal-700 group-open:text-white text-xs font-black shrink-0 mt-0.5 transition-colors shadow-2xs">
+											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white text-xs font-semibold shrink-0 mt-0.5 transition-colors">
 												Q
 											</span>
-											<h3 class="leading-snug text-slate-800 group-open:text-[#00308b] transition-colors font-bold text-sm md:text-base m-0">
+											<h3 class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold text-sm md:text-base m-0">
 												<?php echo esc_html( $item['question'] ); ?>
 											</h3>
 										</div>
-										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#00308b] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 										</svg>
 									</summary>
@@ -1120,7 +1120,7 @@ $program_tabs[] = [
 				<?php ltdh_render_recaptcha_field( 'lead_magnet' ); ?>
 			<?php endif; ?>
 
-			<button type="submit" id="ltdh-lm-submit-btn" class="w-full bg-[#00308b] hover:bg-[#002266] text-white py-3 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+			<button type="submit" id="ltdh-lm-submit-btn" class="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white py-3 rounded-full text-sm font-semibold tracking-tight shadow-none hover:shadow-xs active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer">
 				<span>Tải Tài Liệu Miễn Phí</span>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
 			</button>

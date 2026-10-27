@@ -101,24 +101,33 @@ window.ltdhOpenFacebookShare = window.ltdhOpenFacebookShare || function(e, btn) 
     return window.ltdhOpenSharePopup(e, shareEndpoint, 'Facebook');
 };
 
+window.ltdhTriggerShareToast = window.ltdhTriggerShareToast || function(msg) {
+    let toast = document.getElementById('ltdh-share-toast');
+    let toastMsg = document.getElementById('ltdh-share-toast-msg');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'ltdh-share-toast';
+        toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-[10000] px-4 py-2.5 bg-slate-900/95 text-white text-xs md:text-sm font-bold rounded-2xl shadow-2xl border border-slate-700/80 backdrop-blur-md transition-all duration-300 opacity-0 translate-y-4 pointer-events-none flex items-center gap-2';
+        toast.setAttribute('role', 'status');
+        toast.setAttribute('aria-live', 'polite');
+        toast.innerHTML = '<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m4.5 12.75 6 6 9-13.5"/></svg><span id="ltdh-share-toast-msg">' + (msg || 'Đã sao chép liên kết vào bộ nhớ tạm!') + '</span>';
+        document.body.appendChild(toast);
+        toastMsg = toast.querySelector('#ltdh-share-toast-msg');
+    }
+    if (toastMsg && msg) toastMsg.textContent = msg;
+    toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+    toast.classList.add('opacity-100', 'translate-y-0');
+    clearTimeout(window._ltdhToastTimer);
+    window._ltdhToastTimer = setTimeout(function() {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+    }, 2500);
+};
+
 window.ltdhCopyPostLink = window.ltdhCopyPostLink || function(btn) {
     if (!btn) return;
     const rawUrl = btn.getAttribute('data-url') || window.location.href;
     const shareUrl = (window.location.protocol.startsWith('http') && window.location.href) ? window.location.href : rawUrl;
-    const toast = document.getElementById('ltdh-share-toast');
-    const toastMsg = document.getElementById('ltdh-share-toast-msg');
-
-    function triggerToast(msg) {
-        if (!toast) return;
-        if (toastMsg && msg) toastMsg.textContent = msg;
-        toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
-        toast.classList.add('opacity-100', 'translate-y-0');
-        clearTimeout(btn._toastTimer);
-        btn._toastTimer = setTimeout(function() {
-            toast.classList.remove('opacity-100', 'translate-y-0');
-            toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
-        }, 2500);
-    }
 
     if (!btn._origHtml) {
         btn._origHtml = btn.innerHTML;
@@ -132,12 +141,12 @@ window.ltdhCopyPostLink = window.ltdhCopyPostLink || function(btn) {
     window.ltdhCopyToClipboard(shareUrl, function() {
         btn.innerHTML = `
             <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m4.5 12.75 6 6 9-13.5"/>
             </svg>
             <span class="text-emerald-700 font-bold">Đã sao chép link!</span>
         `;
         btn.classList.add('bg-emerald-50', 'border-emerald-300');
-        triggerToast(successMsg);
+        window.ltdhTriggerShareToast(successMsg);
 
         clearTimeout(btn._resetTimer);
         btn._resetTimer = setTimeout(function() {
@@ -145,7 +154,7 @@ window.ltdhCopyPostLink = window.ltdhCopyPostLink || function(btn) {
             btn.classList.remove('bg-emerald-50', 'border-emerald-300');
         }, 2500);
     }, function() {
-        triggerToast('Không thể tự động sao chép. Vui lòng copy URL từ thanh địa chỉ.');
+        window.ltdhTriggerShareToast('Không thể tự động sao chép. Vui lòng copy URL từ thanh địa chỉ.');
     });
 };
 
@@ -847,15 +856,15 @@ function ltdhInitTheme() {
                 const isMatch = (pillType === (activeTypeSlug || '')) ||
                     ((activeTypeSlug === 'tu-xa' || activeTypeSlug === 'dao-tao-tu-xa') && (pillType === 'tu-xa' || pillType === 'dao-tao-tu-xa'));
                 if (isMatch) {
-                    pill.classList.add('bg-brand-primary', 'text-white', 'shadow-xs');
-                    pill.classList.remove('bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
+                    pill.classList.add('bg-brand-primary', 'text-white', 'shadow-xs', 'font-bold');
+                    pill.classList.remove('text-slate-600', 'hover:text-slate-900', 'hover:bg-white/60', 'bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
                     if (badge) {
                         badge.classList.add('bg-white/20', 'text-white');
                         badge.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200/60');
                     }
                 } else {
-                    pill.classList.remove('bg-brand-primary', 'text-white', 'shadow-xs');
-                    pill.classList.add('bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
+                    pill.classList.remove('bg-brand-primary', 'text-white', 'shadow-xs', 'font-bold');
+                    pill.classList.add('text-slate-600', 'hover:text-slate-900', 'hover:bg-white/60');
                     if (badge) {
                         badge.classList.remove('bg-white/20', 'text-white');
                         badge.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200/60');
@@ -966,8 +975,8 @@ function ltdhInitTheme() {
                         mobileChipsWrapper.innerHTML = data.chips_html || '';
                     }
 
-                    const resetBtnHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 border border-rose-100 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]"><span>✕</span> <span>Xóa tất cả bộ lọc</span></a>`;
-                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 min-h-[38px] transition-colors" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
+                    const resetBtnHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 bg-slate-100/90 hover:bg-slate-200/80 border border-slate-200/60 px-2 py-0.5 rounded-lg transition-all shadow-2xs" title="Đặt lại bộ lọc"><svg class="w-3 h-3 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg><span>Đặt lại</span></a>`;
+                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200 hover:bg-slate-200 min-h-[38px] transition-colors" title="Đặt lại bộ lọc"><svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg><span>Đặt lại</span></a>`;
 
                     if (desktopResetWrapper) {
                         desktopResetWrapper.innerHTML = data.has_active_filters ? resetBtnHtml : '';
@@ -1396,15 +1405,15 @@ function ltdhInitTheme() {
                 const cat = pill.getAttribute('data-cat') || '';
                 const badge = pill.querySelector('.pill-badge');
                 if (cat === (activeCatSlug || '')) {
-                    pill.classList.add('is-active', 'bg-brand-primary', 'text-white', 'shadow-xs');
-                    pill.classList.remove('bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
+                    pill.classList.add('is-active', 'bg-brand-primary', 'text-white', 'shadow-xs', 'font-bold');
+                    pill.classList.remove('text-slate-600', 'hover:text-slate-900', 'hover:bg-white/60', 'bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
                     if (badge) {
                         badge.classList.add('bg-white/20', 'text-white');
                         badge.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200/60');
                     }
                 } else {
-                    pill.classList.remove('is-active', 'bg-brand-primary', 'text-white', 'shadow-xs');
-                    pill.classList.add('bg-slate-100', 'hover:bg-slate-200', 'text-slate-700');
+                    pill.classList.remove('is-active', 'bg-brand-primary', 'text-white', 'shadow-xs', 'font-bold');
+                    pill.classList.add('text-slate-600', 'hover:text-slate-900', 'hover:bg-white/60');
                     if (badge) {
                         badge.classList.remove('bg-white/20', 'text-white');
                         badge.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200/60');
@@ -1510,8 +1519,8 @@ function ltdhInitTheme() {
                         mobileChipsWrapper.innerHTML = data.chips_html || '';
                     }
 
-                    const resetBtnHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 border border-rose-100 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]"><span>✕</span> <span>Xóa tất cả bộ lọc</span></a>`;
-                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 min-h-[38px] transition-colors" title="Xóa tất cả bộ lọc"><span>✕ Xóa lọc</span></a>`;
+                    const resetBtnHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 bg-slate-100/90 hover:bg-slate-200/80 border border-slate-200/60 px-2 py-0.5 rounded-lg transition-all shadow-2xs" title="Đặt lại bộ lọc"><svg class="w-3 h-3 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg><span>Đặt lại</span></a>`;
+                    const mobileResetHtml = `<a href="${rootArchiveUrl}" class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200 hover:bg-slate-200 min-h-[38px] transition-colors" title="Đặt lại bộ lọc"><svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg><span>Đặt lại</span></a>`;
 
                     if (desktopResetWrapper) {
                         desktopResetWrapper.innerHTML = data.has_active_filters ? resetBtnHtml : '';
@@ -1898,8 +1907,194 @@ function ltdhInitTheme() {
             });
         }
 
-        // Delegate quick share buttons (Sticky Nav, Sidebar, Cards)
-        document.querySelectorAll('.ltdh-quick-share-btn, .ltdh-program-sidebar-share-btn, .ltdh-card-share-btn').forEach(btn => {
+        // Card Share Dropdown Popover (Identical to Image 2 specification)
+        function getOrCreateCardSharePopover() {
+            let popover = document.getElementById('ltdh-card-share-popover');
+            if (!popover) {
+                popover = document.createElement('div');
+                popover.id = 'ltdh-card-share-popover';
+                popover.className = 'hidden fixed z-[9999] w-72 sm:w-80 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-slate-200/90 p-2.5 transition-all duration-150 origin-top-right focus:outline-none select-none';
+                popover.setAttribute('role', 'menu');
+                popover.setAttribute('aria-orientation', 'vertical');
+                popover.innerHTML = `
+                    <div class="px-3 py-2 border-b border-slate-100 mb-1">
+                        <h3 class="text-xs font-bold text-slate-900 leading-tight">Chia sẻ chương trình đào tạo</h3>
+                        <p class="ltdh-card-share-popover-title text-[11px] text-slate-500 mt-0.5 truncate font-medium"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <button type="button" class="ltdh-card-share-copy-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors cursor-pointer group" role="menuitem" title="Sao chép liên kết">
+                            <span class="w-9 h-9 rounded-xl bg-blue-50 text-[#0071E3] flex items-center justify-center shrink-0 border border-blue-100/60 group-hover:scale-105 transition-transform shadow-2xs">
+                                <svg class="w-4 h-4 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/>
+                                </svg>
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <span class="block text-xs sm:text-sm font-bold text-slate-800 ltdh-card-copy-label">Sao chép liên kết</span>
+                                <span class="block text-[11px] text-slate-500">Copy URL gửi qua Zalo, Messenger</span>
+                            </div>
+                        </button>
+                        <a href="#" target="_blank" rel="noopener noreferrer" class="ltdh-card-share-fb-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors cursor-pointer group no-underline" role="menuitem" title="Chia sẻ lên Facebook">
+                            <span class="w-9 h-9 rounded-xl bg-[#1877F2]/10 text-[#1877F2] flex items-center justify-center shrink-0 border border-[#1877F2]/20 group-hover:scale-105 transition-transform shadow-2xs">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <span class="block text-xs sm:text-sm font-bold text-slate-800">Chia sẻ Facebook</span>
+                                <span class="block text-[11px] text-slate-500">Đăng lên trang cá nhân hoặc nhóm</span>
+                            </div>
+                        </a>
+                        <a href="#" target="_blank" rel="noopener noreferrer" class="ltdh-card-share-zalo-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors cursor-pointer group no-underline" role="menuitem" title="Chia sẻ qua Zalo">
+                            <span class="w-9 h-9 rounded-xl bg-[#0068FF]/10 text-[#0068FF] flex items-center justify-center shrink-0 border border-[#0068FF]/20 group-hover:scale-105 transition-transform shadow-2xs font-black text-xs">
+                                Zalo
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <span class="block text-xs sm:text-sm font-bold text-slate-800">Chia sẻ qua Zalo</span>
+                                <span class="block text-[11px] text-slate-500">Gửi trực tiếp cho bạn bè, nhóm Zalo</span>
+                            </div>
+                        </a>
+                    </div>
+                `;
+                document.body.appendChild(popover);
+
+                // Bind actions inside popover
+                const copyBtn = popover.querySelector('.ltdh-card-share-copy-btn');
+                const fbLink = popover.querySelector('.ltdh-card-share-fb-link');
+                const zaloLink = popover.querySelector('.ltdh-card-share-zalo-link');
+
+                copyBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = copyBtn.getAttribute('data-url') || window.location.href;
+                    window.ltdhCopyToClipboard(url, function() {
+                        const copyLabel = popover.querySelector('.ltdh-card-copy-label');
+                        if (copyLabel) {
+                            copyLabel.innerHTML = '<span class="text-emerald-600 font-bold">✓ Đã sao chép link!</span>';
+                        }
+                        if (window.ltdhTriggerShareToast) {
+                            window.ltdhTriggerShareToast('✓ Đã sao chép liên kết chương trình vào bộ nhớ tạm!');
+                        }
+                        setTimeout(function() {
+                            closeCardSharePopover();
+                        }, 1200);
+                    }, function() {
+                        if (window.ltdhTriggerShareToast) {
+                            window.ltdhTriggerShareToast('Không thể tự động sao chép. Vui lòng copy URL từ thanh địa chỉ.');
+                        }
+                    });
+                });
+
+                fbLink.addEventListener('click', function(e) {
+                    if (window.ltdhOpenFacebookShare) {
+                        return window.ltdhOpenFacebookShare(e, fbLink);
+                    } else if (window.ltdhOpenSharePopup) {
+                        return window.ltdhOpenSharePopup(e, fbLink.href, 'Facebook');
+                    }
+                });
+
+                zaloLink.addEventListener('click', function(e) {
+                    if (window.ltdhOpenSharePopup) {
+                        return window.ltdhOpenSharePopup(e, zaloLink.href, 'Zalo');
+                    }
+                });
+            }
+            return popover;
+        }
+
+        function closeCardSharePopover() {
+            const popover = document.getElementById('ltdh-card-share-popover');
+            if (!popover || popover.classList.contains('hidden')) return;
+            popover.classList.add('hidden');
+            if (popover._activeBtn) {
+                popover._activeBtn.setAttribute('aria-expanded', 'false');
+                popover._activeBtn = null;
+            }
+        }
+
+        function toggleCardSharePopover(btn) {
+            const popover = getOrCreateCardSharePopover();
+            if (!popover.classList.contains('hidden') && popover._activeBtn === btn) {
+                closeCardSharePopover();
+                return;
+            }
+
+            popover._activeBtn = btn;
+            btn.setAttribute('aria-expanded', 'true');
+
+            const url = btn.getAttribute('data-url') || window.location.href;
+            const title = btn.getAttribute('data-title') || document.title;
+
+            popover.querySelector('.ltdh-card-share-popover-title').textContent = title;
+            const copyBtn = popover.querySelector('.ltdh-card-share-copy-btn');
+            copyBtn.setAttribute('data-url', url);
+            copyBtn.setAttribute('data-type', 'program');
+
+            const copyLabel = popover.querySelector('.ltdh-card-copy-label');
+            if (copyLabel) copyLabel.textContent = 'Sao chép liên kết';
+
+            const fbLink = popover.querySelector('.ltdh-card-share-fb-link');
+            fbLink.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+            fbLink.setAttribute('data-url', url);
+
+            const zaloLink = popover.querySelector('.ltdh-card-share-zalo-link');
+            zaloLink.href = 'https://sp.zalo.me/plugins/share?url=' + encodeURIComponent(url);
+
+            popover.classList.remove('hidden');
+
+            const rect = btn.getBoundingClientRect();
+            const popWidth = Math.min(320, window.innerWidth - 24);
+            popover.style.width = popWidth + 'px';
+            const popHeight = popover.offsetHeight || 220;
+
+            let left = rect.right - popWidth;
+            if (left < 12) left = 12;
+            if (left + popWidth > window.innerWidth - 12) {
+                left = window.innerWidth - popWidth - 12;
+            }
+
+            const spaceBelow = window.innerHeight - rect.bottom;
+            let top;
+            if (spaceBelow < popHeight + 12 && rect.top > popHeight + 12) {
+                top = rect.top - popHeight - 8;
+                popover.style.transformOrigin = 'bottom right';
+            } else {
+                top = rect.bottom + 8;
+                popover.style.transformOrigin = 'top right';
+            }
+
+            popover.style.left = left + 'px';
+            popover.style.top = top + 'px';
+        }
+
+        // Delegated click handler for all Card Share buttons (initial and AJAX loaded)
+        document.addEventListener('click', function(e) {
+            const cardShareBtn = e.target.closest('.ltdh-card-share-btn');
+            if (cardShareBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleCardSharePopover(cardShareBtn);
+                return;
+            }
+
+            const popover = document.getElementById('ltdh-card-share-popover');
+            if (popover && !popover.classList.contains('hidden')) {
+                if (!popover.contains(e.target)) {
+                    closeCardSharePopover();
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeCardSharePopover();
+            }
+        });
+
+        window.addEventListener('scroll', function() {
+            closeCardSharePopover();
+        }, { passive: true });
+
+        // Delegate remaining quick share buttons (Sticky Nav, Sidebar)
+        document.querySelectorAll('.ltdh-quick-share-btn, .ltdh-program-sidebar-share-btn').forEach(btn => {
             if (btn._bound) return;
             if (btn.getAttribute('data-has-dropdown') === 'true' || btn.getAttribute('aria-haspopup') === 'true') {
                 return;
