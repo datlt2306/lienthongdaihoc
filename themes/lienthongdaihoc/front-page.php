@@ -235,9 +235,11 @@ $zalo    = ltdh_get_zalo_url();
 						<button type="submit" class="flex-1 bg-[#0071E3] hover:bg-[#0077ED] active:scale-98 text-white font-medium text-sm px-5 py-2.5 rounded-full transition-all tracking-tight min-h-[44px] shadow-none hover:shadow-xs cursor-pointer flex items-center justify-center gap-1.5">
 							<span>Tìm kiếm</span>
 						</button>
-						<a href="<?php echo esc_url( home_url( '/hinh-thuc-dao-tao/' ) ); ?>" class="p-2.5 bg-[#F5F5F7] hover:bg-[#E8E8ED] active:scale-95 text-[#6E6E73] rounded-full transition-all flex items-center justify-center min-h-[44px] w-11 shrink-0" title="Reset bộ lọc">
-							🔄
-						</a>
+						<button type="button" id="home-filter-reset-desktop" class="p-2.5 bg-[#F5F5F7] hover:bg-[#E8E8ED] active:scale-95 text-[#6E6E73] hover:text-[#1D1D1F] rounded-full transition-all flex items-center justify-center min-h-[44px] w-11 shrink-0 cursor-pointer group" title="Đặt lại bộ lọc" aria-label="Đặt lại bộ lọc">
+							<svg class="w-4 h-4 text-[#86868B] group-hover:text-[#1D1D1F] transition-transform duration-300 group-hover:-rotate-90" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15" />
+							</svg>
+						</button>
 					</div>
 				</form>
 			</div>
@@ -388,16 +390,28 @@ $zalo    = ltdh_get_zalo_url();
 					};
 				}
 
-				if (resetBtn && filterForm) {
+				var desktopResetBtn = document.getElementById('home-filter-reset-desktop');
+				function clearHomeFilters() {
+					var keyword = document.getElementById('home-search-keyword');
+					var truong = document.getElementById('home-filter-truong');
+					var nganh = document.getElementById('home-filter-nganh');
+					var he = document.getElementById('home-filter-he');
+					if (keyword) keyword.value = '';
+					if (truong) truong.value = '';
+					if (nganh) nganh.value = '';
+					if (he) he.value = '';
+				}
+
+				if (desktopResetBtn) {
+					desktopResetBtn.onclick = function(e) {
+						e.preventDefault();
+						clearHomeFilters();
+					};
+				}
+
+				if (resetBtn) {
 					resetBtn.onclick = function() {
-						var keyword = document.getElementById('home-search-keyword');
-						var truong = document.getElementById('home-filter-truong');
-						var nganh = document.getElementById('home-filter-nganh');
-						var he = document.getElementById('home-filter-he');
-						if (keyword) keyword.value = '';
-						if (truong) truong.value = '';
-						if (nganh) nganh.value = '';
-						if (he) he.value = '';
+						clearHomeFilters();
 					};
 				}
 

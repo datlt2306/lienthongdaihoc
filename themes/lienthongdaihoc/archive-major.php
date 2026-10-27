@@ -103,127 +103,136 @@ $has_active_filters  = $active_filter_count > 0;
 <main id="primary" class="site-main bg-slate-50 min-h-screen">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-8 sm:py-8 md:py-12">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-8 sm:py-6 md:py-8">
 
 		<!-- ============ DESKTOP TOP FILTER BAR (FULL-WIDTH, VISIBLE ONLY ON >= MD) ============ -->
-		<div id="catalog-desktop-major-filter-wrapper" class="hidden md:block bg-white border border-slate-100 rounded-2xl p-5 md:p-6 shadow-sm mb-8 transition-all">
+		<div id="catalog-desktop-major-filter-wrapper" class="hidden md:block bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl p-3.5 sm:p-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] mb-6 transition-all">
 			
-			<!-- Header inside Filter: Title, Found Counter & Desktop Reset Action -->
-			<div class="flex flex-row items-center justify-between pb-4 border-b border-slate-100 gap-3">
-				<div>
-					<h2 id="major-heading-title" class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-						<?php echo $active_cat_term ? 'Nhóm ngành: ' . esc_html( $active_cat_term->name ) : 'Danh sách Ngành đào tạo Liên thông Đại học'; ?>
-					</h2>
-					<p class="text-xs md:text-sm text-slate-500 mt-1">
-						Tìm thấy <strong id="major-count-display" class="text-brand-primary font-extrabold text-sm md:text-base"><?php echo esc_html( $wp_query->found_posts ); ?></strong> ngành học phù hợp.
-					</p>
-				</div>
-				<div id="major-desktop-reset">
-					<?php if ( $has_active_filters ) : ?>
-						<a href="<?php echo esc_url( $archive_link ); ?>" class="js-ltdh-reset-filter inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-rose-600 hover:text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 border border-rose-100 px-3.5 py-2 rounded-lg transition-colors min-h-[40px]">
-							<span>✕</span> <span>Xóa tất cả bộ lọc</span>
-						</a>
-					<?php endif; ?>
-				</div>
-			</div>
-
 			<!-- Filter Form Controls (Rendered here initially on desktop SSR) -->
-			<div id="major-filter-body" class="pt-4 md:pt-0">
-				<form id="major-filter-form" action="<?php echo esc_url( $archive_link ); ?>" method="GET" class="space-y-4">
+			<div id="major-filter-body">
+				<form id="major-filter-form" action="<?php echo esc_url( $archive_link ); ?>" method="GET" class="space-y-3">
 					
-					<!-- Row 1: Search + Nhóm ngành Dropdown + Sort Dropdown + Limit Dropdown -->
-					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-					
-					<!-- 1. Search Box -->
-					<div class="relative">
-						<label for="major-search-keyword" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Tìm kiếm</label>
-						<div class="relative">
-							<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+					<!-- Row 1: Title & Count on Left + Apple Segmented Control for Nhóm ngành on Right -->
+					<div class="flex flex-col lg:flex-row lg:items-center justify-between pb-3 border-b border-slate-100/90 gap-2.5">
+						<!-- Left: Title, Counter Badge & Reset Link -->
+						<div class="flex flex-wrap items-center gap-2 sm:gap-2.5 min-w-0 max-md:hidden shrink-0">
+							<h2 id="major-heading-title" class="text-base sm:text-lg font-bold text-slate-900 tracking-tight whitespace-nowrap">
+								<?php echo $active_cat_term ? 'Nhóm ngành: ' . esc_html( $active_cat_term->name ) : 'Ngành đào tạo Liên thông Đại học'; ?>
+							</h2>
+							<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-brand-primary border border-blue-200/70 shadow-2xs">
+								<strong id="major-count-display" class="font-extrabold"><?php echo esc_html( $wp_query->found_posts ); ?></strong>
+								<span class="text-slate-500 font-medium">ngành</span>
 							</span>
-							<input type="text" 
-								   id="major-search-keyword"
-								   name="s" 
-								   value="<?php echo esc_attr( $selected_search ); ?>" 
-								   placeholder="Tìm tên ngành học..." 
-								   class="w-full pl-10 pr-4 py-2.5 border border-slate-200/80 rounded-xl text-sm focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none placeholder-slate-400 min-h-[44px] transition-all bg-slate-50/50 focus:bg-white">
+							<div id="major-desktop-reset" class="inline-flex items-center ml-1">
+								<?php if ( $has_active_filters ) : ?>
+									<a href="<?php echo esc_url( $archive_link ); ?>" class="js-ltdh-reset-filter inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 bg-slate-100/90 hover:bg-slate-200/80 border border-slate-200/60 px-2 py-0.5 rounded-lg transition-all shadow-2xs" title="Đặt lại bộ lọc">
+										<svg class="w-3 h-3 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+										<span>Đặt lại</span>
+									</a>
+								<?php endif; ?>
+							</div>
+						</div>
+
+						<!-- Right: Apple Segmented Pill Track for Nhóm ngành -->
+						<div class="flex items-center gap-2 min-w-0 overflow-hidden">
+							<span class="text-xs font-semibold text-slate-400 select-none hidden xl:inline-flex items-center gap-1 shrink-0">
+								<?php ltdh_icon( 'graduationcap', 'w-3.5 h-3.5 text-slate-400 shrink-0' ); ?>
+								<span>Nhóm ngành:</span>
+							</span>
+							
+							<div id="major-pills-container" class="inline-flex items-center p-0.5 bg-slate-100/90 rounded-xl border border-slate-200/60 overflow-x-auto max-w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+								<!-- All Majors Tab -->
+								<a href="<?php echo esc_url( $all_tab_url ); ?>"
+								   data-cat=""
+								   class="js-ltdh-major-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none shrink-0 <?php echo empty( $selected_cat ) ? 'is-active bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
+									<span>Tất cả</span>
+									<span class="pill-badge text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo empty( $selected_cat ) ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+										<?php echo esc_html( $total_majors ); ?>
+									</span>
+								</a>
+
+								<!-- Dynamic Nhóm ngành Tabs -->
+								<?php if ( ! empty( $major_cats ) ) : ?>
+									<?php foreach ( $major_cats as $cat ) : ?>
+										<?php
+										$is_cat_active = ( $selected_cat === $cat->slug );
+										if ( 0 === (int) $cat->count && ! $is_cat_active ) {
+											continue;
+										}
+										$cat_base_url  = home_url( '/nhom-nganh/' . $cat->slug . '/' );
+										$cat_tab_url   = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $cat_base_url ) : $cat_base_url;
+										?>
+										<a href="<?php echo esc_url( $cat_tab_url ); ?>"
+										   data-cat="<?php echo esc_attr( $cat->slug ); ?>"
+										   class="js-ltdh-major-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all min-h-[30px] select-none shrink-0 <?php echo $is_cat_active ? 'is-active bg-brand-primary text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
+											<span><?php echo esc_html( $cat->name ); ?></span>
+											<span class="pill-badge text-[10px] px-1.5 py-0.2 rounded-md font-bold <?php echo $is_cat_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
+												<?php echo esc_html( $cat->count ); ?>
+											</span>
+										</a>
+									<?php endforeach; ?>
+								<?php endif; ?>
+							</div>
 						</div>
 					</div>
 
-					<!-- 2. Nhóm ngành Select -->
-					<div>
-						<label for="major-cat-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Nhóm ngành</label>
-						<select id="major-cat-select" name="nhom_nganh" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
-							<option value="">Tất cả nhóm ngành</option>
-							<?php if ( ! empty( $major_cats ) ) : ?>
-								<?php foreach ( $major_cats as $cat ) : ?>
-									<option value="<?php echo esc_attr( $cat->slug ); ?>" <?php selected( $selected_cat, $cat->slug ); ?>>
-										<?php echo esc_html( $cat->name ); ?> (<?php echo esc_html( $cat->count ); ?>)
-									</option>
-								<?php endforeach; ?>
-							<?php endif; ?>
-						</select>
+					<!-- Row 2: Apple Toolbar (Search Box + 3 Dropdowns on 12-col grid) -->
+					<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2 md:gap-2.5 items-center">
+						
+						<!-- 1. Search Box (Col 5) -->
+						<div class="relative sm:col-span-2 md:col-span-5">
+							<label for="major-search-keyword" class="sr-only">Tìm kiếm</label>
+							<div class="relative">
+								<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+									<?php ltdh_icon( 'magnifyingglass', 'w-3.5 h-3.5' ); ?>
+								</span>
+								<input type="text" 
+									   id="major-search-keyword"
+									   name="s" 
+									   value="<?php echo esc_attr( $selected_search ); ?>" 
+									   placeholder="Tìm tên ngành học..." 
+									   class="w-full pl-9 pr-3.5 h-9 md:h-10 border border-slate-200/80 rounded-xl text-xs sm:text-sm bg-slate-50/70 hover:bg-slate-100/70 focus:bg-white focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 focus:outline-none placeholder-slate-400 transition-all">
+							</div>
+						</div>
+
+						<!-- 2. Nhóm ngành Select (Col 3) -->
+						<div class="md:col-span-3">
+							<label for="major-cat-select" class="sr-only">Nhóm ngành</label>
+							<select id="major-cat-select" name="nhom_nganh" class="w-full h-9 md:h-10 px-3 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-medium bg-slate-50/70 hover:bg-slate-100/70 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 focus:outline-none cursor-pointer transition-all shadow-2xs">
+								<option value="">Tất cả nhóm ngành</option>
+								<?php if ( ! empty( $major_cats ) ) : ?>
+									<?php foreach ( $major_cats as $cat ) : ?>
+										<option value="<?php echo esc_attr( $cat->slug ); ?>" <?php selected( $selected_cat, $cat->slug ); ?>>
+											<?php echo esc_html( $cat->name ); ?> (<?php echo esc_html( $cat->count ); ?>)
+										</option>
+									<?php endforeach; ?>
+								<?php endif; ?>
+							</select>
+						</div>
+
+						<!-- 3. Sorting Select (Col 2) -->
+						<div class="md:col-span-2">
+							<label for="major-sort-select" class="sr-only">Sắp xếp</label>
+							<select id="major-sort-select" name="sort" class="w-full h-9 md:h-10 px-3 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-medium bg-slate-50/70 hover:bg-slate-100/70 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 focus:outline-none cursor-pointer transition-all shadow-2xs">
+								<option value="" <?php selected( $selected_sort, '' ); ?>>Sắp xếp: Mặc định</option>
+								<option value="title_asc" <?php selected( $selected_sort, 'title_asc' ); ?>>Tên ngành (A-Z)</option>
+								<option value="title_desc" <?php selected( $selected_sort, 'title_desc' ); ?>>Tên ngành (Z-A)</option>
+								<option value="date_desc" <?php selected( $selected_sort, 'date_desc' ); ?>>Mới nhất</option>
+							</select>
+						</div>
+
+						<!-- 4. Limit Select (Col 2) -->
+						<div class="md:col-span-2">
+							<label for="major-limit-select" class="sr-only">Hiển thị</label>
+							<select id="major-limit-select" name="limit" class="w-full h-9 md:h-10 px-3 border border-slate-200/80 rounded-xl text-xs sm:text-sm font-medium bg-slate-50/70 hover:bg-slate-100/70 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 focus:outline-none cursor-pointer transition-all shadow-2xs">
+								<option value="12" <?php selected( $selected_limit, 12 ); ?>>Hiển thị: 12 ngành</option>
+								<option value="24" <?php selected( $selected_limit, 24 ); ?>>Hiển thị: 24 ngành</option>
+								<option value="36" <?php selected( $selected_limit, 36 ); ?>>Hiển thị: 36 ngành</option>
+								<option value="50" <?php selected( $selected_limit, 50 ); ?>>Hiển thị: 50 ngành</option>
+							</select>
+						</div>
+
 					</div>
-
-					<!-- 3. Sorting Select -->
-					<div>
-						<label for="major-sort-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Sắp xếp</label>
-						<select id="major-sort-select" name="sort" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
-							<option value="" <?php selected( $selected_sort, '' ); ?>>Sắp xếp: Mặc định</option>
-							<option value="title_asc" <?php selected( $selected_sort, 'title_asc' ); ?>>Tên ngành (A-Z)</option>
-							<option value="title_desc" <?php selected( $selected_sort, 'title_desc' ); ?>>Tên ngành (Z-A)</option>
-							<option value="date_desc" <?php selected( $selected_sort, 'date_desc' ); ?>>Mới nhất</option>
-						</select>
-					</div>
-
-					<!-- 4. Limit Select -->
-					<div>
-						<label for="major-limit-select" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Hiển thị</label>
-						<select id="major-limit-select" name="limit" class="w-full py-2.5 px-3.5 border border-slate-200/80 rounded-xl text-sm font-medium bg-slate-50/50 focus:bg-white text-slate-700 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none cursor-pointer min-h-[44px] shadow-2xs">
-							<option value="12" <?php selected( $selected_limit, 12 ); ?>>Hiển thị: 12 ngành</option>
-							<option value="24" <?php selected( $selected_limit, 24 ); ?>>Hiển thị: 24 ngành</option>
-							<option value="36" <?php selected( $selected_limit, 36 ); ?>>Hiển thị: 36 ngành</option>
-							<option value="50" <?php selected( $selected_limit, 50 ); ?>>Hiển thị: 50 ngành</option>
-						</select>
-					</div>
-
-				</div>
-
-				<!-- Row 2: Quick Pill Tabs for Nhóm ngành -->
-				<div id="major-pills-container" class="pt-3 border-t border-slate-100">
-					<span class="block md:inline-block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2 md:mb-0 md:mr-2 shrink-0">Nhóm ngành:</span>
-					
-					<div class="inline-flex flex-wrap items-center gap-1.5 sm:gap-2">
-						<!-- All Majors Tab -->
-						<a href="<?php echo esc_url( $all_tab_url ); ?>"
-						   data-cat=""
-						   class="js-ltdh-major-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold transition-all min-h-[34px] <?php echo empty( $selected_cat ) ? 'is-active bg-brand-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'; ?>">
-							<span>Tất cả</span>
-							<span class="pill-badge text-[11px] px-1.5 py-0.2 rounded-full font-black <?php echo empty( $selected_cat ) ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
-								<?php echo esc_html( $total_majors ); ?>
-							</span>
-						</a>
-
-						<!-- Dynamic Nhóm ngành Tabs -->
-						<?php if ( ! empty( $major_cats ) ) : ?>
-							<?php foreach ( $major_cats as $cat ) : ?>
-								<?php
-								$is_cat_active = ( $selected_cat === $cat->slug );
-								$cat_base_url  = home_url( '/nhom-nganh/' . $cat->slug . '/' );
-								$cat_tab_url   = ! empty( $preserved_args ) ? add_query_arg( $preserved_args, $cat_base_url ) : $cat_base_url;
-								?>
-								<a href="<?php echo esc_url( $cat_tab_url ); ?>"
-								   data-cat="<?php echo esc_attr( $cat->slug ); ?>"
-								   class="js-ltdh-major-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold transition-all min-h-[34px] <?php echo $is_cat_active ? 'is-active bg-brand-primary text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'; ?>">
-									<span><?php echo esc_html( $cat->name ); ?></span>
-									<span class="pill-badge text-[11px] px-1.5 py-0.2 rounded-full font-black <?php echo $is_cat_active ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200/60'; ?>">
-										<?php echo esc_html( $cat->count ); ?>
-									</span>
-								</a>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</div>
-				</div>
 
 				</form>
 			</div><!-- #major-filter-body -->
@@ -242,9 +251,10 @@ $has_active_filters  = $active_filter_count > 0;
 				<div id="major-mobile-reset">
 					<?php if ( $has_active_filters ) : ?>
 						<a href="<?php echo esc_url( $archive_link ); ?>" 
-						   class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 min-h-[38px] transition-colors"
-						   title="Xóa tất cả bộ lọc">
-							<span>✕ Xóa lọc</span>
+						   class="js-ltdh-reset-filter inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200 hover:bg-slate-200 min-h-[38px] transition-colors"
+						   title="Đặt lại bộ lọc">
+							<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+							<span>Đặt lại</span>
 						</a>
 					<?php endif; ?>
 				</div>
