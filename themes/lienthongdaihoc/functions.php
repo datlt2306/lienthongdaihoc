@@ -21,6 +21,7 @@ require_once __DIR__ . '/inc/config/class-defaults.php';
 // 2. Core: Setup, Helpers, Rewrites, Queries
 // ----------------------------------------------------
 require_once __DIR__ . '/inc/core/class-theme-setup.php';
+require_once __DIR__ . '/inc/core/class-icons.php';
 require_once __DIR__ . '/inc/core/class-helpers.php';
 require_once __DIR__ . '/inc/core/class-menus.php';
 require_once __DIR__ . '/inc/core/class-rewrite-rules.php';

@@ -110,7 +110,7 @@ window.ltdhTriggerShareToast = window.ltdhTriggerShareToast || function(msg) {
         toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-[10000] px-4 py-2.5 bg-slate-900/95 text-white text-xs md:text-sm font-bold rounded-2xl shadow-2xl border border-slate-700/80 backdrop-blur-md transition-all duration-300 opacity-0 translate-y-4 pointer-events-none flex items-center gap-2';
         toast.setAttribute('role', 'status');
         toast.setAttribute('aria-live', 'polite');
-        toast.innerHTML = '<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg><span id="ltdh-share-toast-msg">' + (msg || 'Đã sao chép liên kết vào bộ nhớ tạm!') + '</span>';
+        toast.innerHTML = '<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m4.5 12.75 6 6 9-13.5"/></svg><span id="ltdh-share-toast-msg">' + (msg || 'Đã sao chép liên kết vào bộ nhớ tạm!') + '</span>';
         document.body.appendChild(toast);
         toastMsg = toast.querySelector('#ltdh-share-toast-msg');
     }
@@ -141,7 +141,7 @@ window.ltdhCopyPostLink = window.ltdhCopyPostLink || function(btn) {
     window.ltdhCopyToClipboard(shareUrl, function() {
         btn.innerHTML = `
             <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m4.5 12.75 6 6 9-13.5"/>
             </svg>
             <span class="text-emerald-700 font-bold">Đã sao chép link!</span>
         `;
@@ -1925,7 +1925,7 @@ function ltdhInitTheme() {
                         <button type="button" class="ltdh-card-share-copy-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors cursor-pointer group" role="menuitem" title="Sao chép liên kết">
                             <span class="w-9 h-9 rounded-xl bg-blue-50 text-[#0071E3] flex items-center justify-center shrink-0 border border-blue-100/60 group-hover:scale-105 transition-transform shadow-2xs">
                                 <svg class="w-4 h-4 text-[#0071E3]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/>
                                 </svg>
                             </span>
                             <div class="flex-1 min-w-0">

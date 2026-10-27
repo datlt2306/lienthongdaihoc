@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 			<button type="button" onclick="window.ltdhCompare && window.ltdhCompare.clearAll();"
 				class="text-[11px] text-slate-400 hover:text-red-500 font-semibold whitespace-nowrap px-1.5 py-1 min-h-[32px] flex items-center gap-1 shrink-0 transition-colors">
-				<svg class="w-3.5 h-3.5 text-slate-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+				<?php ltdh_icon( 'trash', 'w-3.5 h-3.5 text-slate-400 hover:text-red-500' ); ?>
 				<span>Xóa tất cả</span>
 			</button>
 		</div>
@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<a href="#"
 				   class="ltdh-tray-link inline-flex items-center justify-center gap-1.5 bg-brand-accent text-white text-xs sm:text-sm font-bold px-3.5 sm:px-5 py-2.5 sm:py-3 min-h-[40px] sm:min-h-[44px] rounded-xl shadow-md shadow-brand-accent/25 hover:bg-[#e06e00] transition-all opacity-50 pointer-events-none whitespace-nowrap">
 					<span>So sánh ngay</span>
-					<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+					<?php ltdh_icon( 'arrow-right', 'w-4 h-4 text-white' ); ?>
 				</a>
 			</div>
 

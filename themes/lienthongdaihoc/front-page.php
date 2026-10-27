@@ -163,9 +163,7 @@ $zalo    = ltdh_get_zalo_url();
 				        class="w-full bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-md border border-black/[0.08] p-3 flex items-center justify-between gap-3 text-left transition-all active:scale-[0.99] cursor-pointer">
 					<div class="flex items-center gap-2.5 min-w-0">
 						<div class="w-9 h-9 rounded-full bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center shrink-0">
-							<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-							</svg>
+							<?php ltdh_icon( 'magnifyingglass', 'w-4.5 h-4.5' ); ?>
 						</div>
 						<div class="min-w-0">
 							<span class="block text-xs sm:text-sm font-semibold text-[#1D1D1F] truncate">Tìm kiếm ngành &amp; trường học</span>
@@ -173,9 +171,7 @@ $zalo    = ltdh_get_zalo_url();
 						</div>
 					</div>
 					<div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0071E3] text-white text-xs font-medium shrink-0">
-						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-						</svg>
+						<?php ltdh_icon( 'slider.horizontal.3', 'w-3.5 h-3.5' ); ?>
 						<span>Bộ lọc</span>
 					</div>
 				</button>
@@ -195,7 +191,7 @@ $zalo    = ltdh_get_zalo_url();
 						<label for="home-search-keyword" class="block md:sr-only text-xs font-semibold uppercase text-[#86868B] mb-1.5"><?php esc_html_e( 'Từ khóa tìm kiếm', 'ltdh' ); ?></label>
 						<div class="relative">
 							<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#86868B]">
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+								<?php ltdh_icon( 'magnifyingglass', 'w-4 h-4' ); ?>
 							</span>
 							<input type="text" id="home-search-keyword" name="s" placeholder="Từ khóa tìm kiếm..." class="w-full pl-10 pr-4 py-2.5 border border-black/[0.08] rounded-full text-sm focus:border-[#0071E3] focus:ring-2 focus:ring-[#0071E3]/20 focus:outline-none placeholder-[#86868B] min-h-[44px] transition-all bg-[#F5F5F7] focus:bg-white text-[#1D1D1F]" />
 						</div>
@@ -259,16 +255,14 @@ $zalo    = ltdh_get_zalo_url();
 			<!-- Drawer Top Header -->
 			<div class="px-4 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/90 shrink-0 touch-none" style="touch-action: none;">
 				<div class="flex items-center gap-2">
-					<svg class="w-5 h-5 text-brand-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-					</svg>
+					<?php ltdh_icon( 'slider.horizontal.3', 'w-5 h-5 text-brand-primary shrink-0' ); ?>
 					<h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Bộ lọc tìm kiếm</h3>
 				</div>
 				<button type="button" 
 						id="ltdh-home-filter-drawer-close" 
 						class="p-2 -mr-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
 						aria-label="Đóng bộ lọc">
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+					<?php ltdh_icon( 'xmark', 'w-5 h-5' ); ?>
 				</button>
 			</div>
 
@@ -287,9 +281,7 @@ $zalo    = ltdh_get_zalo_url();
 				<button type="button" 
 						id="ltdh-home-drawer-submit-btn" 
 						class="flex-2 py-2.5 px-4 rounded-xl bg-[#00308b] hover:bg-blue-900 active:scale-95 text-white font-extrabold text-xs text-center shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-					<svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-					</svg>
+					<?php ltdh_icon( 'magnifyingglass', 'w-4 h-4 text-white shrink-0' ); ?>
 					<span>Tìm kiếm ngay</span>
 				</button>
 			</div>
@@ -516,14 +508,10 @@ $zalo    = ltdh_get_zalo_url();
 					</a>
 					<div class="hidden sm:flex items-center gap-2 pl-3 border-l border-black/[0.08]">
 						<button type="button" class="school-slider-prev w-9 h-9 rounded-full border border-black/[0.08] bg-[#F5F5F7] hover:bg-[#E8E8ED] text-[#1D1D1F] flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-none" aria-label="Trường trước đó">
-							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-							</svg>
+							<?php ltdh_icon( 'chevron-left', 'w-4 h-4' ); ?>
 						</button>
 						<button type="button" class="school-slider-next w-9 h-9 rounded-full border border-black/[0.08] bg-[#F5F5F7] hover:bg-[#E8E8ED] text-[#1D1D1F] flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-none" aria-label="Trường tiếp theo">
-							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-							</svg>
+							<?php ltdh_icon( 'chevron-right', 'w-4 h-4' ); ?>
 						</button>
 					</div>
 				</div>
@@ -578,10 +566,7 @@ $zalo    = ltdh_get_zalo_url();
 											<div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent pointer-events-none"></div>
 											<?php if ( ! empty( $school_region ) ) : ?>
 												<span class="absolute top-3 right-3 bg-white/80 backdrop-blur-md text-[#1D1D1F] text-[11px] font-medium px-2.5 py-0.5 rounded-full z-10 flex items-center gap-1 border border-black/[0.08] shadow-2xs">
-													<svg class="w-3 h-3 text-[#0071E3] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-														<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-														<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-													</svg>
+													<?php ltdh_icon( 'location', 'w-3 h-3 text-[#0071E3] shrink-0' ); ?>
 													<span><?php echo esc_html( $school_region ); ?></span>
 												</span>
 											<?php endif; ?>
@@ -639,10 +624,7 @@ $zalo    = ltdh_get_zalo_url();
 												if ( ! empty( $display_address ) ) :
 												?>
 													<div class="mt-3 pt-2.5 border-t border-slate-100 flex items-start gap-1.5 text-xs text-slate-500 min-h-[36px]">
-														<svg class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-															<path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-															<path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-														</svg>
+														<?php ltdh_icon( 'location', 'w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5' ); ?>
 														<span class="line-clamp-2 leading-relaxed" title="<?php echo esc_attr( $display_address ); ?>">
 															<?php echo esc_html( $display_address ); ?>
 														</span>
@@ -656,9 +638,7 @@ $zalo    = ltdh_get_zalo_url();
 												   class="w-full text-center py-2 px-3 rounded-full text-xs sm:text-sm font-medium text-white bg-[#0071E3] hover:bg-[#0077ED] active:scale-98 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-none">
 													<span class="sm:hidden">Xem trường</span>
 													<span class="hidden sm:inline">Tìm hiểu chi tiết</span>
-													<svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-														<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-													</svg>
+													<?php ltdh_icon( 'arrow-right', 'w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0' ); ?>
 												</a>
 											</div>
 										</div>
@@ -1384,11 +1364,9 @@ $zalo    = ltdh_get_zalo_url();
 								</div>
 								<div class="min-w-0 flex-1">
 									<div class="flex items-center gap-0.5 text-amber-400 mb-1" aria-label="5 trên 5 sao">
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-										<svg class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+										<?php for ( $s = 0; $s < 5; $s++ ) : ?>
+											<?php ltdh_icon( 'star-fill', 'w-4 h-4 fill-amber-400 text-amber-400 shrink-0' ); ?>
+										<?php endfor; ?>
 										<span class="text-xs font-bold text-amber-600 ml-1">5.0</span>
 									</div>
 									<h3 class="font-bold text-base sm:text-lg text-slate-900 group-hover:text-brand-primary transition-colors leading-snug truncate"><?php echo esc_html($t['name'] ?? ''); ?></h3>
@@ -1420,17 +1398,12 @@ $zalo    = ltdh_get_zalo_url();
 								</span>
 							<?php else : ?>
 								<span class="inline-flex items-center gap-1.5 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md shrink-0">
-									<svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-									</svg>
+									<?php ltdh_icon( 'checkmark-circle', 'w-3.5 h-3.5 text-emerald-600 shrink-0' ); ?>
 									Đã tốt nghiệp
 								</span>
 							<?php endif; ?>
 							<span class="text-slate-600 font-medium flex items-center gap-1 truncate" title="<?php echo esc_attr($graduation); ?>">
-								<svg class="w-3.5 h-3.5 text-brand-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
-								</svg>
+								<?php ltdh_icon( 'academic-cap', 'w-3.5 h-3.5 text-brand-primary shrink-0' ); ?>
 								<span class="truncate"><?php echo esc_html($graduation); ?></span>
 							</span>
 						</div>
@@ -1604,7 +1577,7 @@ $zalo    = ltdh_get_zalo_url();
 								<span><?php echo esc_html( $q_text ); ?></span>
 							</span>
 							<span class="text-[#86868B] group-open:rotate-180 transition-transform duration-300 shrink-0">
-								<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+								<?php ltdh_icon( 'chevron-down', 'w-4.5 h-4.5' ); ?>
 							</span>
 						</summary>
 						<div class="px-4 sm:px-5 md:px-6 pb-5 pt-3 text-[#6E6E73] text-xs sm:text-sm md:text-base leading-relaxed border-t border-black/[0.04] bg-white">

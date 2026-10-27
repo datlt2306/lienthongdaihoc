@@ -34,7 +34,7 @@ $steps = [
 		'desc'        => 'Điền thông tin bằng cấp hiện tại (Trung cấp / Cao đẳng) để thẩm định điều kiện dự tuyển, xác định phương thức xét tuyển hoặc thi tuyển và dự kiến số tín chỉ được miễn giảm.',
 		'tag'         => '1 phút online',
 		'detail_meta' => 'Miễn phí 100%',
-		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
+		'icon_svg'    => ltdh_get_icon( 'document-text', 'w-4 h-4' ),
 	],
 	[
 		'step'        => '02',
@@ -42,7 +42,7 @@ $steps = [
 		'desc'        => 'Chuyên viên tuyển sinh hỗ trợ chọn ngành phù hợp, giải đáp học phí, thời gian học; hướng dẫn chuẩn bị hồ sơ hoặc kế hoạch ôn tập đối với ngành có thi tuyển.',
 		'tag'         => 'Tư vấn miễn phí',
 		'detail_meta' => 'Phản hồi trong 15p',
-		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>',
+		'icon_svg'    => ltdh_get_icon( 'phone', 'w-4 h-4' ),
 	],
 	[
 		'step'        => '03',
@@ -50,7 +50,7 @@ $steps = [
 		'desc'        => 'Hoàn thiện bộ hồ sơ công chứng theo hướng dẫn. Nhà trường tiến hành xét duyệt văn bằng hoặc tổ chức ôn tập & thi tuyển đối với ngành có kỳ thi riêng.',
 		'tag'         => 'Thủ tục đơn giản',
 		'detail_meta' => 'Linh hoạt hình thức',
-		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>',
+		'icon_svg'    => ltdh_get_icon( 'checkmark-circle', 'w-4 h-4' ),
 	],
 	[
 		'step'        => '04',
@@ -58,7 +58,7 @@ $steps = [
 		'desc'        => 'Nhận Giấy báo trúng tuyển chính thức từ nhà trường, hoàn tất thủ tục nhập học và bắt đầu học tập (trực tuyến qua LMS hoặc học tập trung theo quy định).',
 		'tag'         => 'Bằng chuẩn Bộ GD&ĐT',
 		'detail_meta' => 'Học tập linh hoạt',
-		'icon_svg'    => '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>',
+		'icon_svg'    => ltdh_get_icon( 'academic-cap', 'w-4 h-4' ),
 	],
 ];
 ?>
@@ -130,7 +130,7 @@ $steps = [
 			
 			<a href="<?php echo esc_url( $args['cta_link'] ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-6 py-2.5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-medium tracking-tight rounded-full shadow-none hover:shadow-xs active:scale-98 transition-all shrink-0 cursor-pointer min-h-[40px] whitespace-nowrap">
 				<span><?php echo esc_html( $args['cta_text'] ); ?></span>
-				<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+				<?php ltdh_icon( 'arrow-right', 'w-3.5 h-3.5' ); ?>
 			</a>
 		</div>
 	<?php endif; ?>

@@ -360,7 +360,7 @@ $has_active_filters  = $active_filter_count > 0;
 						<label for="program-search-keyword" class="block md:sr-only text-xs font-extrabold uppercase text-slate-500 mb-1.5">Tìm kiếm</label>
 						<div class="relative">
 							<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+								<?php ltdh_icon( 'magnifyingglass', 'w-4 h-4' ); ?>
 							</span>
 							<input type="text" 
 								   id="program-search-keyword"
@@ -553,9 +553,7 @@ $has_active_filters  = $active_filter_count > 0;
 						aria-expanded="false" 
 						aria-controls="ltdh-filter-drawer"
 						class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border font-bold text-xs transition-all duration-200 min-h-[38px] cursor-pointer shadow-2xs <?php echo $has_active_filters ? 'bg-blue-50 border-blue-200 text-[#00308b]' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'; ?>">
-					<svg class="w-4 h-4 text-current shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-					</svg>
+					<?php ltdh_icon( 'slider.horizontal.3', 'w-4 h-4 text-current shrink-0' ); ?>
 					<span id="ltdh-mobile-filter-btn-text">Bộ lọc</span>
 					<span id="catalog-mobile-filter-badge">
 						<?php if ( $active_filter_count > 0 ) : ?>
@@ -602,16 +600,14 @@ $has_active_filters  = $active_filter_count > 0;
 			<!-- Drawer Top Header -->
 			<div class="px-4 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/90 shrink-0 touch-none" style="touch-action: none;">
 				<div class="flex items-center gap-2">
-					<svg class="w-5 h-5 text-brand-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-					</svg>
+					<?php ltdh_icon( 'slider.horizontal.3', 'w-5 h-5 text-brand-primary shrink-0' ); ?>
 					<h3 class="font-extrabold text-slate-900 text-sm sm:text-base">Bộ lọc chương trình</h3>
 				</div>
 				<button type="button" 
 						id="ltdh-filter-drawer-close" 
 						class="p-2 -mr-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
 						aria-label="Đóng bộ lọc">
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+					<?php ltdh_icon( 'xmark', 'w-5 h-5' ); ?>
 				</button>
 			</div>
 
@@ -931,9 +927,7 @@ $has_active_filters  = $active_filter_count > 0;
 							<div class="pt-2 sm:pt-2.5 sm:border-t sm:border-slate-100 flex items-stretch gap-1.5 sm:gap-2">
 								<a href="<?php the_permalink(); ?>" class="text-[10px] sm:text-xs md:text-sm py-2 px-2 gap-1 rounded-full font-bold ltdh-btn-details min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 shadow-2xs hover:shadow-md transition-all text-center whitespace-nowrap">
 									<span class="text-[10px] sm:text-xs md:text-sm inline-block">Tìm hiểu</span>
-									<svg class="hidden sm:block w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-									</svg>
+									<?php ltdh_icon( 'arrow-right', 'hidden sm:block w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1 shrink-0' ); ?>
 								</a>
 								<button type="button"
 										class="rounded-full ltdh-compare-toggle text-[10px] sm:text-xs md:text-sm text-slate-600 hover:text-brand-primary font-bold border border-slate-200 hover:border-brand-primary py-1.5 sm:py-2 px-1 sm:px-3 transition-all min-h-[36px] sm:min-h-[38px] flex items-center justify-center flex-1 bg-white hover:bg-slate-50 text-center whitespace-nowrap cursor-pointer"
@@ -954,9 +948,7 @@ $has_active_filters  = $active_filter_count > 0;
 										data-type="program"
 										title="Chia sẻ chương trình <?php echo esc_attr( $card_headline ); ?>"
 										aria-label="Chia sẻ chương trình">
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-									</svg>
+									<?php ltdh_icon( 'share', 'w-4 h-4' ); ?>
 								</button>
 							</div>
 						</div>
@@ -1035,7 +1027,7 @@ $has_active_filters  = $active_filter_count > 0;
 						        aria-controls="ltdh-seo-article-body" 
 						        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-brand-primary bg-slate-50 hover:bg-blue-50/80 border border-slate-200/90 hover:border-blue-200 transition-all cursor-pointer shadow-2xs group focus:outline-none focus:ring-2 focus:ring-brand-primary/20">
 							<span id="ltdh-seo-toggle-text">Đọc toàn bộ giới thiệu & quy chế</span>
-							<svg id="ltdh-seo-toggle-icon" class="w-4 h-4 text-brand-primary transition-transform duration-300 group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+							<?php ltdh_icon( 'chevron-down', 'w-4 h-4 text-brand-primary transition-transform duration-300 group-hover:translate-y-0.5', [ 'id' => 'ltdh-seo-toggle-icon' ] ); ?>
 						</button>
 					</div>
 				</div>
@@ -1050,9 +1042,7 @@ $has_active_filters  = $active_filter_count > 0;
 				<!-- Section Header -->
 				<div class="mb-5 pb-4 border-b border-slate-100">
 					<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-brand-primary border border-blue-100/80 mb-2">
-						<svg class="w-3.5 h-3.5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-						</svg>
+						<?php ltdh_icon( 'question-mark-circle', 'w-3.5 h-3.5 text-brand-primary' ); ?>
 						<span>Hỏi đáp tuyển sinh & Bằng cấp</span>
 					</div>
 					<h2 id="faq-section-heading" class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
@@ -1078,9 +1068,7 @@ $has_active_filters  = $active_filter_count > 0;
 										<?php echo esc_html( $faq_item['question'] ); ?>
 									</span>
 								</div>
-								<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-brand-primary transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-								</svg>
+								<?php ltdh_icon( 'chevron-down', 'w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-brand-primary transition-transform shrink-0' ); ?>
 							</summary>
 							<div class="mt-2.5 sm:mt-3 pl-8 sm:pl-8 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
 								<?php echo wp_kses_post( $faq_item['answer'] ); ?>
@@ -1146,19 +1134,19 @@ $has_active_filters  = $active_filter_count > 0;
 						<div class="space-y-2.5 pt-2">
 							<div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-200 font-medium">
 								<span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+									<?php ltdh_icon( 'checkmark', 'w-3.5 h-3.5' ); ?>
 								</span>
 								<span>Rà soát bảng điểm & tư vấn miễn trừ tín chỉ</span>
 							</div>
 							<div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-200 font-medium">
 								<span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+									<?php ltdh_icon( 'checkmark', 'w-3.5 h-3.5' ); ?>
 								</span>
 								<span>Hỗ trợ chuẩn bị hồ sơ xét tuyển nhanh chóng</span>
 							</div>
 							<div class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-200 font-medium">
 								<span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+									<?php ltdh_icon( 'checkmark', 'w-3.5 h-3.5' ); ?>
 								</span>
 								<span>Cam kết bảo mật thông tin thí sinh 100%</span>
 							</div>
@@ -1171,7 +1159,7 @@ $has_active_filters  = $active_filter_count > 0;
 							$global_zalo    = function_exists( 'get_field' ) ? ( get_field( 'global_zalo_url', 'option' ) ?: 'https://zalo.me/0988991496' ) : 'https://zalo.me/0988991496';
 							?>
 							<a href="tel:<?php echo esc_attr( preg_replace( '/[^\d+]/', '', $global_hotline ) ); ?>" class="inline-flex items-center gap-1.5 hover:text-white transition-colors">
-								<svg class="w-4 h-4 text-brand-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+								<?php ltdh_icon( 'phone.fill', 'w-4 h-4 text-brand-accent shrink-0' ); ?>
 								<span>Hotline: <strong class="text-white"><?php echo esc_html( $global_hotline ); ?></strong></span>
 							</a>
 							<span class="text-white/20">|</span>

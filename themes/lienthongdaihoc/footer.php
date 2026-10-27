@@ -57,7 +57,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 						<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-blue-900/40 to-slate-800/60 border border-blue-500/30 hover:border-[#00a2f4] active:scale-[0.99] transition-all group">
 							<div class="flex items-center gap-3">
 								<div class="w-9 h-9 rounded-lg bg-[#00a2f4]/20 border border-[#00a2f4]/40 flex items-center justify-center text-[#00a2f4] shrink-0 group-hover:scale-110 transition-transform">
-									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+									<?php ltdh_icon( 'phone.fill', 'w-4 h-4' ); ?>
 								</div>
 								<div>
 									<span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Hotline Tư Vấn 24/7</span>
@@ -69,14 +69,14 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 
 						<ul class="space-y-2.5 text-xs">
 							<li class="flex items-start gap-2.5 p-2 rounded-lg bg-slate-800/20 border border-slate-800/40">
-								<svg class="w-4 h-4 text-[#00a2f4] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+								<?php ltdh_icon( 'location', 'w-4 h-4 text-[#00a2f4] shrink-0 mt-0.5' ); ?>
 								<div class="min-w-0">
 									<strong class="text-white block font-bold text-[11px] uppercase tracking-wider">Trụ sở Hà Nội</strong>
 									<span class="text-slate-400"><?php echo esc_html( $address ); ?></span>
 								</div>
 							</li>
 							<li class="flex items-start gap-2.5 p-2 rounded-lg bg-slate-800/20 border border-slate-800/40">
-								<svg class="w-4 h-4 text-[#00a2f4] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+								<?php ltdh_icon( 'envelope', 'w-4 h-4 text-[#00a2f4] shrink-0 mt-0.5' ); ?>
 								<div class="min-w-0">
 									<strong class="text-white block font-bold text-[11px] uppercase tracking-wider">Email Tuyển sinh</strong>
 									<!--email_off--><a href="mailto:<?php echo esc_attr( $email ); ?>" class="text-slate-400 hover:text-[#00a2f4] transition-colors truncate block"><?php echo esc_html( $email ); ?></a><!--/email_off-->
@@ -143,7 +143,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 						<a href="https://www.facebook.com/groups/lienthongdh" target="_blank" rel="noopener noreferrer" 
 						   class="bg-[#1877f2] hover:bg-blue-600 active:scale-[0.98] text-white text-xs font-bold py-2.5 rounded-lg transition-all text-center w-full shadow-sm flex items-center justify-center gap-1.5 min-h-[40px]">
 							<span>Tham gia nhóm ngay</span>
-							<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+							<?php ltdh_icon( 'arrow-right', 'w-3.5 h-3.5' ); ?>
 						</a>
 					</div>
 					<div class="mt-3 flex justify-center">
@@ -171,9 +171,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 <div class="hidden md:flex fixed bottom-4 left-4 z-40 flex-col gap-2.5 md:bottom-6 md:left-6">
 	<!-- Phone Hotline Float -->
 	<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" class="flex h-11 w-11 items-center justify-center rounded-full bg-[#FF9500] hover:bg-[#E08500] text-white shadow-[0_4px_16px_rgba(255,149,0,0.3)] transition-all hover:scale-105 active:scale-95" aria-label="Gọi ngay">
-		<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-		</svg>
+		<?php ltdh_icon( 'phone.fill', 'h-5 w-5' ); ?>
 	</a>
 
 	<!-- Zalo OA Float -->
@@ -218,9 +216,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 	   class="flex items-center justify-center h-10 w-10 bg-[#FF9500] hover:bg-[#E08500] active:scale-90 rounded-full shrink-0 transition-all text-white" 
 	   aria-label="Gọi hotline"
 	   title="Gọi hotline">
-		<svg class="w-4.5 h-4.5 fill-none stroke-current" stroke-width="2.2" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-		</svg>
+		<?php ltdh_icon( 'phone.fill', 'w-4.5 h-4.5' ); ?>
 	</a>
 </nav>
 
@@ -369,7 +365,7 @@ if ( is_singular( 'program' ) ) {
 			        onclick="window.ltdhCloseConsultationModal && window.ltdhCloseConsultationModal()" 
 			        class="p-2 -mr-1.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer shrink-0" 
 			        aria-label="Đóng popup">
-				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"></path></svg>
+				<?php ltdh_icon( 'xmark', 'w-5 h-5' ); ?>
 			</button>
 		</div>
 
