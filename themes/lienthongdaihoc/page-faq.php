@@ -62,7 +62,7 @@ if ( empty( $faq_items ) || ! is_array( $faq_items ) ) {
 				if ( empty( $q_text ) || empty( $a_text ) ) continue;
 				$idx++;
 			?>
-				<details class="bg-white border border-slate-200/80 rounded-2xl overflow-hidden group transition-all hover:border-slate-300 shadow-xs" <?php echo ( 1 === $idx ) ? 'open' : ''; ?>>
+				<details class="bg-white border border-slate-200/80 rounded-2xl overflow-hidden group transition-all hover:border-slate-300 shadow-xs" <?php echo ( 1 === $idx ) ? 'open' : ''; ?> id="faq-<?php echo esc_attr( $idx ); ?>">
 					<summary class="flex justify-between items-center font-bold text-slate-900 p-5 md:p-6 cursor-pointer list-none select-none text-base md:text-lg [&::-webkit-details-marker]:hidden gap-4 hover:bg-slate-50/60 transition-colors">
 						<span class="flex items-center gap-3 md:gap-4">
 							<span class="w-8 h-8 rounded-xl bg-blue-50 text-brand-primary font-black text-xs flex items-center justify-center shrink-0 border border-blue-100">
@@ -74,7 +74,7 @@ if ( empty( $faq_items ) || ! is_array( $faq_items ) ) {
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
 						</span>
 					</summary>
-					<div class="px-5 md:px-6 pb-6 pt-2 text-slate-600 text-sm md:text-base leading-relaxed border-t border-slate-100 bg-white">
+					<div id="faq-<?php echo esc_attr( $idx ); ?>-answer" class="px-5 md:px-6 pb-6 pt-2 text-slate-600 text-sm md:text-base leading-relaxed border-t border-slate-100 bg-white">
 						<div class="prose prose-slate max-w-none text-slate-600">
 							<?php echo wp_kses_post( wpautop( $a_text ) ); ?>
 						</div>

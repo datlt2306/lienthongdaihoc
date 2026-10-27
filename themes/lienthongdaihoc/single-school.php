@@ -1257,8 +1257,9 @@ $school_tabs[] = [
 						<div class="divide-y divide-slate-100">
 							<?php foreach ( $school_faqs as $f_idx => $faq_item ) : 
 								$is_first_open = ( 0 === $f_idx ) ? '' : '';
+								$faq_num       = $f_idx + 1;
 							?>
-								<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors">
+								<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors" id="faq-<?php echo esc_attr( $faq_num ); ?>">
 									<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-[15px] list-none select-none hover:text-[#0071E3] transition-colors">
 										<div class="flex items-start gap-2.5 min-w-0">
 											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold shrink-0 mt-0.5 group-open:bg-[#0071E3] group-open:text-white transition-colors">
@@ -1272,7 +1273,7 @@ $school_tabs[] = [
 											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 										</svg>
 									</summary>
-									<div class="mt-2.5 sm:mt-3 pl-8 sm:pl-8 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+									<div id="faq-<?php echo esc_attr( $faq_num ); ?>-answer" class="mt-2.5 sm:mt-3 pl-8 sm:pl-8 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
 										<?php echo wp_kses_post( $faq_item['answer'] ); ?>
 									</div>
 								</details>

@@ -22,6 +22,7 @@ $major_title         = $major_id ? get_the_title( $major_id ) : '';
 $school_logo_id      = $school_id ? ( get_field( 'logo', $school_id ) ?: get_post_thumbnail_id( $school_id ) ) : 0;
 $school_logo_url     = $school_logo_id ? ( is_numeric( $school_logo_id ) ? wp_get_attachment_image_url( (int) $school_logo_id, 'thumbnail' ) : ( is_array( $school_logo_id ) ? ( $school_logo_id['url'] ?? '' ) : (string) $school_logo_id ) ) : '';
 $initials            = $school_title ? ( function_exists( 'ltdh_get_initials' ) ? ltdh_get_initials( $school_title ) : 'ĐH' ) : 'ĐH';
+$mob_title           = function_exists( 'ltdh_get_program_banner_title' ) ? ltdh_get_program_banner_title( $program_id ) : get_the_title( $program_id );
 
 $tuition         = ltdh_get_program_tuition_display( $program_id );
 $duration        = function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $program_id ) : ( get_field( LTDH_META_DURATION, $program_id ) ?: '1.5 - 2 năm' );
@@ -1002,10 +1003,12 @@ $program_tabs[] = [
 						</div>
 
 						<div class="divide-y divide-slate-100" id="ltdh-program-faq-accordion">
-							<?php foreach ( $faqs as $index => $item ) : ?>
+							<?php foreach ( $faqs as $index => $item ) : 
+								$faq_num = $index + 1;
+							?>
 								<details class="group py-3.5 sm:py-4 transition-colors">
 									<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
-										<div class="flex items-start gap-2.5 sm:gap-3 min-w-0">
+										<div class="flex items-start gap-2.5 sm:gap-3 min-w-0" id="faq-<?php echo esc_attr( $faq_num ); ?>">
 											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white text-xs font-semibold shrink-0 mt-0.5 transition-colors">
 												Q
 											</span>
@@ -1017,7 +1020,7 @@ $program_tabs[] = [
 											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
 										</svg>
 									</summary>
-									<div class="mt-2.5 sm:mt-3 pl-8 sm:pl-9 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+									<div id="faq-<?php echo esc_attr( $faq_num ); ?>-answer" class="mt-2.5 sm:mt-3 pl-8 sm:pl-9 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
 										<?php echo strpos( $item['answer'], '<p' ) !== false ? wp_kses_post( $item['answer'] ) : wp_kses_post( wpautop( $item['answer'] ) ); ?>
 									</div>
 								</details>
