@@ -476,6 +476,8 @@ function ltdh_ajax_filter_programs() {
 			$card_headline    = function_exists( 'ltdh_format_program_card_headline' )
 				? ltdh_format_program_card_headline( get_the_title( $prog_id ), $school_code, $school_name, $clean_major_name )
 				: ( 'Liên thông ngành ' . $clean_major_name . ( $school_code ? ' - ' . $school_code : ( $school_name ? ' - ' . $school_name : '' ) ) );
+			$card_headline_mobile = preg_replace( '/^liên\s+thông\s+/iu', '', $card_headline );
+			$card_headline_mobile = mb_strtoupper( mb_substr( $card_headline_mobile, 0, 1, 'UTF-8' ), 'UTF-8' ) . mb_substr( $card_headline_mobile, 1, null, 'UTF-8' );
 			$admission_status    = function_exists( 'ltdh_get_program_admission_status' ) 
 				? ltdh_get_program_admission_status( $prog_id ) 
 				: ( get_post_meta( $prog_id, 'admission_status', true ) ?: 'tuyen-sinh' );
@@ -567,7 +569,10 @@ function ltdh_ajax_filter_programs() {
 						<!-- Program Name (Primary Hero Headline) -->
 						<div class="mb-1.5 sm:mb-2">
 							<h2 class="font-black text-slate-900 text-sm sm:text-base md:text-lg hover:text-brand-primary leading-snug line-clamp-2 min-h-[36px] sm:min-h-[44px] transition-colors">
-								<a href="<?php the_permalink(); ?>"><?php echo esc_html( $card_headline ); ?></a>
+								<a href="<?php the_permalink(); ?>">
+									<span class="sm:hidden"><?php echo esc_html( $card_headline_mobile ); ?></span>
+									<span class="hidden sm:inline"><?php echo esc_html( $card_headline ); ?></span>
+								</a>
 							</h2>
 						</div>
 
