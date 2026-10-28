@@ -1484,8 +1484,8 @@ function ltdh_get_optimized_image_url( string $url, $variant = false ): string {
 		return '';
 	}
 
-	// Preserve offloaded Cloudflare R2 / S3 / external CDN URLs
-	if ( strpos( $url, 'r2.dev' ) !== false || strpos( $url, 'cloudflarestorage.com' ) !== false || ( function_exists( 'advmo_get_provider_credential' ) && ( $cdn_domain = advmo_get_provider_credential( 'cloudflare_r2', 'domain' ) ) && strpos( $url, parse_url( $cdn_domain, PHP_URL_HOST ) ?: $cdn_domain ) !== false ) ) {
+	// Preserve offloaded ImageKit / Cloudflare R2 / S3 / external CDN URLs
+	if ( strpos( $url, 'ik.imagekit.io' ) !== false || strpos( $url, 'r2.dev' ) !== false || strpos( $url, 'cloudflarestorage.com' ) !== false || ( function_exists( 'advmo_get_provider_credential' ) && ( $cdn_domain = advmo_get_provider_credential( 'cloudflare_r2', 'domain' ) ) && strpos( $url, parse_url( $cdn_domain, PHP_URL_HOST ) ?: $cdn_domain ) !== false ) ) {
 		return $url;
 	}
 
@@ -1502,7 +1502,7 @@ function ltdh_get_optimized_image_url( string $url, $variant = false ): string {
 	$is_1400w  = ( '1400w' === $variant );
 
 	$theme_dir   = get_template_directory();
-	$theme_uri   = 'https://pub-f075baadfe3743948b6fe0a4828c9880.r2.dev/assets/images';
+	$theme_uri   = 'https://ik.imagekit.io/cdnplus/assets/images';
 
 	// 1. Check for specific variant in theme assets/images/
 	if ( $is_1400w && file_exists( $theme_dir . '/assets/images/' . $name_without_ext . '-1400w.webp' ) ) {
