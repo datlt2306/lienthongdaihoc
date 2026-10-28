@@ -249,7 +249,7 @@ $zalo    = ltdh_get_zalo_url();
 		<!-- OFF-CANVAS SEARCH DRAWER (SLIDES IN FROM LEFT ON MOBILE) -->
 		<div id="ltdh-home-filter-drawer-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[70] transition-opacity duration-300 opacity-0 pointer-events-none md:hidden touch-none" style="touch-action: none;" aria-hidden="true"></div>
 
-		<aside id="ltdh-home-filter-drawer" 
+		<div id="ltdh-home-filter-drawer" 
 		       class="fixed inset-y-0 left-0 w-[86%] max-w-[340px] bg-white shadow-2xl z-[80] transform -translate-x-full transition-transform duration-300 ease-out flex flex-col md:hidden"
 		       role="dialog" 
 		       aria-modal="true" 
@@ -288,7 +288,7 @@ $zalo    = ltdh_get_zalo_url();
 					<span>Tìm kiếm ngay</span>
 				</button>
 			</div>
-		</aside>
+		</div>
 
 		<script>
 		(function() {
