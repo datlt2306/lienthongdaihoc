@@ -92,7 +92,7 @@
 			<!-- Logo Section -->
 			<div class="site-branding flex items-center shrink-0">
 				<div class="hidden lg:block">
-					<?php ltdh_site_logo( 42 ); ?>
+					<?php ltdh_site_logo( 65 ); ?>
 				</div>
 				<div class="lg:hidden">
 					<?php ltdh_site_logo_mobile( 32 ); ?>
