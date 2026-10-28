@@ -169,7 +169,7 @@ function ltdh_customize_archive_queries( $query ) {
 		$query->set( 'order', 'ASC' );
 	}
 
-	if ( $query->is_post_type_archive( LTDH_CPT_MAJOR ) || $query->is_tax( LTDH_TAX_MAJOR_CAT ) ) {
+	if ( $query->is_post_type_archive( LTDH_CPT_MAJOR ) || $query->is_tax( LTDH_TAX_MAJOR_CAT ) || ( $query->get( 'post_type' ) === LTDH_CPT_MAJOR ) ) {
 		if ( ! empty( $_GET['nhom_nganh'] ) && ! $query->is_tax( LTDH_TAX_MAJOR_CAT ) ) {
 			$query->set( 'tax_query', [
 				[
@@ -178,6 +178,16 @@ function ltdh_customize_archive_queries( $query ) {
 					'terms'    => sanitize_text_field( $_GET['nhom_nganh'] ),
 				],
 			] );
+		}
+
+		if ( ! empty( $_GET['s'] ) && function_exists( 'ltdh_search_major_ids' ) ) {
+			$search_kw         = sanitize_text_field( wp_unslash( $_GET['s'] ) );
+			$matched_major_ids = ltdh_search_major_ids( $search_kw );
+			$query->set( 'post__in', ! empty( $matched_major_ids ) ? $matched_major_ids : [ 0 ] );
+			$query->set( 's', '' ); // Clear core s to avoid broad post_content LIKE matching
+			if ( empty( $_GET['sort'] ) ) {
+				$query->set( 'orderby', 'post__in' );
+			}
 		}
 
 		$sort = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
@@ -1225,7 +1235,12 @@ function ltdh_ajax_filter_majors() {
 	}
 
 	if ( ! empty( $search ) ) {
-		$args['s'] = $search;
+		if ( function_exists( 'ltdh_search_major_ids' ) ) {
+			$matched_major_ids = ltdh_search_major_ids( $search );
+			$args['post__in']  = ! empty( $matched_major_ids ) ? $matched_major_ids : [ 0 ];
+		} else {
+			$args['s'] = $search;
+		}
 	}
 
 	if ( 'title_asc' === $sort ) {
@@ -1237,6 +1252,8 @@ function ltdh_ajax_filter_majors() {
 	} elseif ( 'date_desc' === $sort ) {
 		$args['orderby'] = 'date';
 		$args['order']   = 'DESC';
+	} elseif ( ! empty( $search ) ) {
+		$args['orderby'] = 'post__in';
 	} else {
 		$args['orderby'] = 'menu_order title';
 		$args['order']   = 'ASC';

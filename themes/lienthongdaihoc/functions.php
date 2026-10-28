@@ -74,3 +74,8 @@ add_filter( 'ai1wm_exclude_content_from_export', function ( $exclude_filters ) {
 	return $exclude_filters;
 } );
 
+// Tăng giới hạn dung lượng upload lên 1GB cho WordPress & All-in-One WP Migration
+add_filter( 'upload_size_limit', function () {
+	return 1024 * 1024 * 1024; // 1 GB
+} );
+

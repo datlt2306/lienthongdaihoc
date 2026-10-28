@@ -41,14 +41,8 @@ function ltdh_filter_program_search_query( $args ) {
 			'post_status'    => 'publish',
 		] );
 
-		// 4. Query matching major IDs by keyword
-		$major_ids = get_posts( [
-			'post_type'      => LTDH_CPT_MAJOR,
-			's'              => $keyword,
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'post_status'    => 'publish',
-		] );
+		// 4. Query matching major IDs by keyword using targeted search
+		$major_ids = ltdh_search_major_ids( $keyword );
 
 		// 5. Query matching program IDs by keyword directly
 		$program_ids_direct = get_posts( [
@@ -119,13 +113,19 @@ function ltdh_filter_program_search_query( $args ) {
  * Expand search synonyms
  */
 function ltdh_expand_search_synonyms( $s ) {
-	$s_lower = mb_strtolower( trim( $s ), 'UTF-8' );
+	$s_lower = mb_strtolower( trim( (string) $s ), 'UTF-8' );
 
 	$synonyms = [
 		'cntt' => 'công nghệ thông tin',
+		'it'   => 'công nghệ thông tin',
 		'qtkd' => 'quản trị kinh doanh',
+		'tmdt' => 'thương mại điện tử',
 		'kdtm' => 'kinh doanh thương mại',
 		'nna'  => 'ngôn ngữ anh',
+		'kt'   => 'kế toán',
+		'ck'   => 'cơ khí',
+		'oto'  => 'ô tô',
+		'o to' => 'ô tô',
 	];
 
 	if ( isset( $synonyms[ $s_lower ] ) ) {
@@ -133,4 +133,88 @@ function ltdh_expand_search_synonyms( $s ) {
 	}
 
 	return $s;
+}
+
+/**
+ * Search major IDs by keyword with high precision.
+ * Matches against major post_title, post_name (slug), major_code (ACF meta), and synonyms.
+ * Excludes generic post_content to avoid false positives across all majors.
+ *
+ * @param string $keyword Search keyword
+ * @return int[] Array of matching post IDs
+ */
+function ltdh_search_major_ids( $keyword ) {
+	$raw_keyword = trim( (string) $keyword );
+	if ( '' === $raw_keyword ) {
+		return [];
+	}
+
+	$expanded = ltdh_expand_search_synonyms( $raw_keyword );
+	$clean_kw = sanitize_text_field( $expanded );
+	$slug_kw  = sanitize_title( $clean_kw );
+
+	$cache_key = 'ltdh_major_s_' . md5( mb_strtolower( $clean_kw, 'UTF-8' ) );
+	$cached    = get_transient( $cache_key );
+	if ( false !== $cached && is_array( $cached ) ) {
+		return $cached;
+	}
+
+	global $wpdb;
+
+	$cpt_major  = defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major';
+	$like_clean = '%' . $wpdb->esc_like( $clean_kw ) . '%';
+	$like_slug  = '%' . $wpdb->esc_like( $slug_kw ) . '%';
+
+	$sql = $wpdb->prepare(
+		"SELECT DISTINCT p.ID FROM {$wpdb->posts} p
+		 LEFT JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id AND pm.meta_key = 'major_code')
+		 WHERE p.post_type = %s
+		   AND p.post_status = 'publish'
+		   AND (
+			   p.post_title LIKE %s
+			   OR p.post_name LIKE %s
+			   OR pm.meta_value = %s
+		   )
+		 ORDER BY 
+		   CASE 
+			 WHEN p.post_title = %s THEN 1
+			 WHEN p.post_title LIKE %s THEN 2
+			 WHEN p.post_name = %s THEN 3
+			 ELSE 4
+		   END ASC,
+		   p.menu_order ASC,
+		   p.post_title ASC",
+		$cpt_major,
+		$like_clean,
+		$like_slug,
+		$clean_kw,
+		$clean_kw,
+		$clean_kw . '%',
+		$slug_kw
+	);
+
+	$ids = $wpdb->get_col( $sql );
+	$ids = ! empty( $ids ) ? array_map( 'intval', $ids ) : [];
+
+	// Fallback to all-words match if phrase returned empty and keyword has multiple words
+	if ( empty( $ids ) ) {
+		$words = array_filter( explode( ' ', $clean_kw ) );
+		if ( count( $words ) > 1 ) {
+			$where_parts = [];
+			$params      = [ $cpt_major ];
+			foreach ( $words as $w ) {
+				$w_slug        = sanitize_title( $w );
+				$where_parts[] = '(p.post_title LIKE %s OR p.post_name LIKE %s)';
+				$params[]      = '%' . $wpdb->esc_like( $w ) . '%';
+				$params[]      = '%' . $wpdb->esc_like( $w_slug ) . '%';
+			}
+			$sql_fallback = "SELECT DISTINCT p.ID FROM {$wpdb->posts} p WHERE p.post_type = %s AND p.post_status = 'publish' AND " . implode( ' AND ', $where_parts ) . ' ORDER BY p.menu_order ASC, p.post_title ASC';
+			$ids          = $wpdb->get_col( $wpdb->prepare( $sql_fallback, $params ) );
+			$ids          = ! empty( $ids ) ? array_map( 'intval', $ids ) : [];
+		}
+	}
+
+	set_transient( $cache_key, $ids, 15 * MINUTE_IN_SECONDS );
+
+	return $ids;
 }
