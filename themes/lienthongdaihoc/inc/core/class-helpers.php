@@ -1883,10 +1883,7 @@ function ltdh_sync_school_order( $post_id, $post = null, $update = null ) {
 		clean_post_cache( $post_id );
 	}
 
-	delete_transient( 'ltdh_archive_school_featured' );
-	delete_transient( 'ltdh_featured_schools_data_v11' );
-	delete_transient( 'ltdh_featured_schools_data_v10' );
-	delete_transient( 'ltdh_featured_schools_data' );
+	ltdh_flush_all_content_transients();
 }
 
 add_action( 'acf/save_post', function( $post_id ) {
@@ -1903,11 +1900,9 @@ add_action( 'acf/save_post', function( $post_id ) {
 				[ '%d' ]
 			);
 			clean_post_cache( $post_id );
-			delete_transient( 'ltdh_archive_school_featured' );
-			delete_transient( 'ltdh_featured_schools_data_v11' );
-			delete_transient( 'ltdh_featured_schools_data_v10' );
 		}
 	}
+	ltdh_flush_all_content_transients();
 }, 20 );
 
 add_filter( 'acf/load_value/name=order', function( $value, $post_id, $field ) {
@@ -2174,25 +2169,56 @@ function ltdh_get_cached_filter_options(): array {
 	return $data;
 }
 
-function ltdh_clear_transients_on_save($post_id) {
-	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-		return;
-	}
-	$post_type = get_post_type($post_id);
-	if (in_array($post_type, [LTDH_CPT_PROGRAM, LTDH_CPT_SCHOOL, LTDH_CPT_MAJOR], true)) {
-		delete_transient(LTDH_TRANSIENT_FEATURED_SCHOOLS);
-		delete_transient('ltdh_featured_schools_data');
-		delete_transient('ltdh_hot_majors_data');
-		delete_transient('ltdh_combinations_data');
-		delete_transient('ltdh_filter_options');
-		delete_transient('ltdh_archive_school_featured');
-		delete_transient('ltdh_training_type_counts');
-	}
-	if ('post' === $post_type) {
-		delete_transient('ltdh_homepage_news');
+/**
+ * Flush all content transients across the theme.
+ * Invalidates school cards, mega menus, search indices, and filter options.
+ */
+function ltdh_flush_all_content_transients() {
+	delete_transient( LTDH_TRANSIENT_FEATURED_SCHOOLS );
+	delete_transient( 'ltdh_featured_schools_data_v18' );
+	delete_transient( 'ltdh_featured_schools_data_v11' );
+	delete_transient( 'ltdh_featured_schools_data_v10' );
+	delete_transient( 'ltdh_featured_schools_data' );
+	delete_transient( 'ltdh_archive_school_featured_v2' );
+	delete_transient( 'ltdh_archive_school_featured' );
+	delete_transient( 'ltdh_mega_menu_majors_data' );
+	delete_transient( 'ltdh_hot_majors_data' );
+	delete_transient( 'ltdh_combinations_data' );
+	delete_transient( 'ltdh_filter_options' );
+	delete_transient( 'ltdh_training_type_counts' );
+	delete_transient( 'ltdh_homepage_news' );
+
+	global $wpdb;
+	if ( $wpdb && ! empty( $wpdb->options ) ) {
+		$wpdb->query(
+			"DELETE FROM {$wpdb->options} 
+			 WHERE option_name LIKE '_transient_ltdh_featured_%' 
+			    OR option_name LIKE '_transient_timeout_ltdh_featured_%'
+			    OR option_name LIKE '_transient_ltdh_archive_school_%'
+			    OR option_name LIKE '_transient_timeout_ltdh_archive_school_%'
+			    OR option_name LIKE '_transient_ltdh_major_s_%'
+			    OR option_name LIKE '_transient_timeout_ltdh_major_s_%'
+			    OR option_name LIKE '_transient_ltdh_search_%'
+			    OR option_name LIKE '_transient_timeout_ltdh_search_%'"
+		);
 	}
 }
-add_action('save_post', 'ltdh_clear_transients_on_save');
+
+function ltdh_clear_transients_on_save( $post_id ) {
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	$post_type = get_post_type( $post_id );
+	if ( in_array( $post_type, [ LTDH_CPT_PROGRAM, LTDH_CPT_SCHOOL, LTDH_CPT_MAJOR, 'post' ], true ) ) {
+		ltdh_flush_all_content_transients();
+	}
+}
+add_action( 'save_post', 'ltdh_clear_transients_on_save', 20 );
+add_action( 'deleted_post', 'ltdh_flush_all_content_transients', 20 );
+
+// Auto flush theme transients whenever LiteSpeed Cache is purged
+add_action( 'litespeed_purged_all', 'ltdh_flush_all_content_transients' );
+add_action( 'litespeed_purged_all_lscache', 'ltdh_flush_all_content_transients' );
 
 // ----------------------------------------------------
 
