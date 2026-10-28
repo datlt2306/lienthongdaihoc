@@ -67,8 +67,13 @@ class LTDH_Performance {
 		// 11. Cloudflare R2 Theme Asset Offloader (Rewrites all static theme assets to R2 CDN)
 		add_action( 'template_redirect', [ __CLASS__, 'start_r2_assets_buffer' ], 1 );
 
-		// 11. Async Non-Critical Styles (Eliminates Render-Blocking CSS)
+		// 12. Async Non-Critical Styles (Eliminates Render-Blocking CSS)
 		add_filter( 'style_loader_tag', [ __CLASS__, 'async_non_critical_styles' ], 10, 4 );
+
+		// 13. Dynamic ImageKit On-The-Fly Thumbnails (Fixes WP-Admin Media Library & image_downsize)
+		add_filter( 'wp_prepare_attachment_for_js', [ __CLASS__, 'filter_attachment_for_js' ], 99, 3 );
+		add_filter( 'image_downsize', [ __CLASS__, 'filter_image_downsize' ], 99, 3 );
+		add_filter( 'image_get_intermediate_size', [ __CLASS__, 'filter_image_intermediate_size' ], 99, 3 );
 	}
 
 	/**
@@ -325,21 +330,29 @@ class LTDH_Performance {
 	}
 
 	/**
-	 * 8. Automatically rewrite image attachment src to WebP if an optimized version exists.
+	 * 8. Automatically rewrite image attachment src to ImageKit CDN with dynamic transformations.
 	 */
 	public static function filter_attachment_image_src( $image, $attachment_id, $size, $icon ) {
-		if ( ! empty( $image[0] ) && function_exists( 'ltdh_get_optimized_image_url' ) ) {
-			$image[0] = ltdh_get_optimized_image_url( $image[0] );
+		if ( ! empty( $image[0] ) ) {
+			if ( function_exists( 'ltdh_get_optimized_image_url' ) ) {
+				$image[0] = ltdh_get_optimized_image_url( $image[0] );
+			}
+			$w = ! empty( $image[1] ) ? (int) $image[1] : 0;
+			$h = ! empty( $image[2] ) ? (int) $image[2] : 0;
+			$image[0] = self::normalize_imagekit_url( $image[0], $w, $h );
 		}
 		return $image;
 	}
 
 	/**
-	 * Automatically rewrite attachment URL to WebP if an optimized version exists.
+	 * Automatically rewrite attachment URL to ImageKit CDN with dynamic transformations.
 	 */
 	public static function filter_attachment_url( $url, $attachment_id ) {
-		if ( ! empty( $url ) && function_exists( 'ltdh_get_optimized_image_url' ) ) {
-			return ltdh_get_optimized_image_url( $url );
+		if ( ! empty( $url ) ) {
+			if ( function_exists( 'ltdh_get_optimized_image_url' ) ) {
+				$url = ltdh_get_optimized_image_url( $url );
+			}
+			return self::normalize_imagekit_url( $url );
 		}
 		return $url;
 	}
@@ -596,6 +609,163 @@ class LTDH_Performance {
 
 			return $html;
 		} );
+	}
+
+	/**
+	 * Convert any media URL (local, Cloudflare R2, or historical thumbnail) to ImageKit CDN URL with dynamic transformations.
+	 *
+	 * @param string $url URL to normalize.
+	 * @param int $fallback_w Optional fallback width.
+	 * @param int $fallback_h Optional fallback height.
+	 * @return string
+	 */
+	public static function normalize_imagekit_url( $url, $fallback_w = 0, $fallback_h = 0 ) {
+		if ( empty( $url ) || ! is_string( $url ) ) {
+			return $url;
+		}
+
+		$cdn_base = 'https://ik.imagekit.io/cdnplus/';
+		$r2_base  = 'https://pub-f075baadfe3743948b6fe0a4828c9880.r2.dev/';
+
+		// 1. Point R2 and direct uploads to ImageKit
+		$url = str_replace( $r2_base, $cdn_base, $url );
+		$url = preg_replace( '#https?://[^/]+/wp-content/uploads/#i', $cdn_base, $url );
+
+		// 2. If it's an ImageKit URL and has WordPress thumbnail pattern (e.g. -150x150.webp),
+		// strip the dimensions from the filename and add dynamic ImageKit transformation query:
+		if ( strpos( $url, $cdn_base ) !== false && preg_match( '#-([0-9]+)x([0-9]+)\.([a-zA-Z0-9]+)$#i', $url, $m ) ) {
+			$url = preg_replace( '#-([0-9]+)x([0-9]+)\.([a-zA-Z0-9]+)$#i', '.' . $m[3] . '?tr=w-' . $m[1] . ',h-' . $m[2], $url );
+		} elseif ( $fallback_w > 0 && $fallback_h > 0 && strpos( $url, $cdn_base ) !== false && strpos( $url, '?tr=' ) === false ) {
+			$url .= '?tr=w-' . $fallback_w . ',h-' . $fallback_h;
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Transform Media Library attachment JSON for JS so WP-Admin renders all thumbnails via ImageKit dynamically.
+	 *
+	 * @param array   $response   Attachment JS data.
+	 * @param WP_Post $attachment Attachment post object.
+	 * @param array   $meta       Attachment metadata.
+	 * @return array
+	 */
+	public static function filter_attachment_for_js( $response, $attachment, $meta ) {
+		if ( ! empty( $response['url'] ) ) {
+			$response['url'] = self::normalize_imagekit_url( $response['url'] );
+		}
+
+		if ( ! empty( $response['sizes'] ) && is_array( $response['sizes'] ) ) {
+			foreach ( $response['sizes'] as $sz_name => &$sz_data ) {
+				if ( ! empty( $sz_data['url'] ) ) {
+					$w = $sz_data['width'] ?? 0;
+					$h = $sz_data['height'] ?? 0;
+					$sz_data['url'] = self::normalize_imagekit_url( $sz_data['url'], $w, $h );
+				}
+			}
+			unset( $sz_data );
+		}
+
+		// Ensure thumbnail in Media Library grid is never empty or broken
+		if ( ! empty( $response['sizes']['thumbnail']['url'] ) ) {
+			$thumb_url = $response['sizes']['thumbnail']['url'];
+			$response['thumb'] = [
+				'src'    => $thumb_url,
+				'width'  => $response['sizes']['thumbnail']['width'] ?? 150,
+				'height' => $response['sizes']['thumbnail']['height'] ?? 150,
+			];
+		} elseif ( ! empty( $response['url'] ) ) {
+			$thumb_url = self::normalize_imagekit_url( $response['url'], 150, 150 );
+			$response['thumb'] = [
+				'src'    => $thumb_url,
+				'width'  => 150,
+				'height' => 150,
+			];
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Short-circuit image_downsize to serve dynamic ImageKit transformations for any requested size.
+	 *
+	 * @param bool|array   $downsize Whether to short-circuit the image downsize.
+	 * @param int          $id       Attachment ID.
+	 * @param string|int[] $size     Requested size name or [width, height].
+	 * @return array|bool
+	 */
+	public static function filter_image_downsize( $downsize, $id, $size ) {
+		if ( ! wp_attachment_is_image( $id ) ) {
+			return $downsize;
+		}
+
+		$img_url = wp_get_attachment_url( $id );
+		if ( empty( $img_url ) ) {
+			return $downsize;
+		}
+
+		$meta = wp_get_attachment_metadata( $id );
+		$orig_w = $meta['width'] ?? 0;
+		$orig_h = $meta['height'] ?? 0;
+
+		$clean_url = self::normalize_imagekit_url( $img_url );
+		$clean_url = preg_replace( '#\?tr=.*$#', '', $clean_url );
+
+		if ( 'full' === $size ) {
+			return [ $clean_url, $orig_w, $orig_h, false ];
+		}
+
+		$target_w = 0;
+		$target_h = 0;
+
+		if ( is_array( $size ) ) {
+			$target_w = (int) ( $size[0] ?? 0 );
+			$target_h = (int) ( $size[1] ?? 0 );
+		} elseif ( 'thumbnail' === $size ) {
+			$target_w = (int) get_option( 'thumbnail_size_w', 150 ) ?: 150;
+			$target_h = (int) get_option( 'thumbnail_size_h', 150 ) ?: 150;
+		} elseif ( 'medium' === $size ) {
+			$target_w = (int) get_option( 'medium_size_w', 300 ) ?: 300;
+			$target_h = (int) get_option( 'medium_size_h', 300 ) ?: 300;
+		} elseif ( 'large' === $size ) {
+			$target_w = (int) get_option( 'large_size_w', 1024 ) ?: 1024;
+			$target_h = (int) get_option( 'large_size_h', 1024 ) ?: 1024;
+		} else {
+			global $_wp_additional_image_sizes;
+			if ( ! empty( $_wp_additional_image_sizes[ $size ] ) ) {
+				$target_w = (int) ( $_wp_additional_image_sizes[ $size ]['width'] ?? 0 );
+				$target_h = (int) ( $_wp_additional_image_sizes[ $size ]['height'] ?? 0 );
+			}
+		}
+
+		if ( $target_w > 0 || $target_h > 0 ) {
+			$tr = [];
+			if ( $target_w > 0 ) {
+				$tr[] = 'w-' . $target_w;
+			}
+			if ( $target_h > 0 ) {
+				$tr[] = 'h-' . $target_h;
+			}
+			$resized_url = $clean_url . '?tr=' . implode( ',', $tr );
+			return [ $resized_url, $target_w ?: $orig_w, $target_h ?: $orig_h, true ];
+		}
+
+		return [ $clean_url, $orig_w, $orig_h, false ];
+	}
+
+	/**
+	 * Filter image_get_intermediate_size URL to ensure valid ImageKit delivery.
+	 *
+	 * @param array|bool   $data    Array of intermediate size data.
+	 * @param int          $post_id Attachment ID.
+	 * @param string|int[] $size    Size name.
+	 * @return array|bool
+	 */
+	public static function filter_image_intermediate_size( $data, $post_id, $size ) {
+		if ( ! empty( $data['url'] ) ) {
+			$data['url'] = self::normalize_imagekit_url( $data['url'], $data['width'] ?? 0, $data['height'] ?? 0 );
+		}
+		return $data;
 	}
 }
 
