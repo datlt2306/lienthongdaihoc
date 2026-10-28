@@ -585,6 +585,15 @@ class LTDH_Performance {
 				$html
 			);
 
+			// 4. Strip historical WordPress thumbnail sizes and transform via ImageKit dynamically:
+			// e.g. /image-300x180.webp -> /image.webp?tr=w-300,h-180
+			// This eliminates any dependency on cropped files on R2, allowing them to be safely purged!
+			$html = preg_replace(
+				'#(https://ik\.imagekit\.io/cdnplus/[^"\'\)\s?]+)-(\d+)x(\d+)\.([a-zA-Z0-9]+)#i',
+				'$1.$4?tr=w-$2,h-$3',
+				$html
+			);
+
 			return $html;
 		} );
 	}
