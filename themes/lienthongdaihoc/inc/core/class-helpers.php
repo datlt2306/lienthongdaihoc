@@ -1609,9 +1609,14 @@ function ltdh_site_logo(int $max_height = 48): void {
 		$orig_w = $logo_data['width'] ?: 200;
 		$orig_h = $logo_data['height'] ?: 60;
 		$calc_w = $orig_h > 0 ? round(($orig_w / $orig_h) * $max_height) : $orig_w;
+		$logo_url = $logo_data['url'];
+		if ( strpos( $logo_url, 'ik.imagekit.io' ) !== false || strpos( $logo_url, 'r2.dev' ) !== false ) {
+			$clean_logo = preg_replace( '#\?tr=.*$#', '', $logo_url );
+			$logo_url   = $clean_logo . '?tr=w-' . round( $calc_w * 2 ) . ',h-' . round( $max_height * 2 );
+		}
 	?>
 		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center" aria-label="<?php echo esc_attr($site_name); ?>">
-			<img src="<?php echo esc_url($logo_data['url']); ?>"
+			<img src="<?php echo esc_url($logo_url); ?>"
 				alt="<?php echo esc_attr($site_name); ?>"
 				width="<?php echo esc_attr($calc_w); ?>"
 				height="<?php echo esc_attr($max_height); ?>"
@@ -1642,9 +1647,14 @@ function ltdh_site_logo_mobile(int $max_height = 36): void {
 		$orig_w = $logo_data['width'] ?: 200;
 		$orig_h = $logo_data['height'] ?: 60;
 		$calc_w = $orig_h > 0 ? round(($orig_w / $orig_h) * $max_height) : $orig_w;
+		$logo_url = $logo_data['url'];
+		if ( strpos( $logo_url, 'ik.imagekit.io' ) !== false || strpos( $logo_url, 'r2.dev' ) !== false ) {
+			$clean_logo = preg_replace( '#\?tr=.*$#', '', $logo_url );
+			$logo_url   = $clean_logo . '?tr=w-' . round( $calc_w * 2 ) . ',h-' . round( $max_height * 2 );
+		}
 	?>
 		<a href="<?php echo esc_url(home_url('/')); ?>" class="flex items-center" aria-label="<?php echo esc_attr($site_name); ?>">
-			<img src="<?php echo esc_url($logo_data['url']); ?>"
+			<img src="<?php echo esc_url($logo_url); ?>"
 				alt="<?php echo esc_attr($site_name); ?>"
 				width="<?php echo esc_attr($calc_w); ?>"
 				height="<?php echo esc_attr($max_height); ?>"

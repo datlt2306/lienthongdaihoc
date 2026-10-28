@@ -147,7 +147,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 						</a>
 					</div>
 					<div class="mt-3 flex justify-center">
-						<a href="//www.dmca.com/Protection/Status.aspx?ID=3639cda6-dc5f-4f9a-ada9-7f14ca3a390d" title="DMCA.com Protection Status" class="dmca-badge"><img src="https://images.dmca.com/Badges/dmca_protected_sml_120d.png?ID=3639cda6-dc5f-4f9a-ada9-7f14ca3a390d" alt="DMCA.com Protection Status" /></a>
+						<a href="//www.dmca.com/Protection/Status.aspx?ID=3639cda6-dc5f-4f9a-ada9-7f14ca3a390d" title="DMCA.com Protection Status" class="dmca-badge" rel="noopener noreferrer" target="_blank"><img src="https://images.dmca.com/Badges/dmca_protected_sml_120d.png?ID=3639cda6-dc5f-4f9a-ada9-7f14ca3a390d" alt="DMCA.com Protection Status" width="120" height="28" loading="lazy" decoding="async" /></a>
 					</div>
 					<script src="https://images.dmca.com/Badges/DMCABadgeHelper.min.js"></script>
 

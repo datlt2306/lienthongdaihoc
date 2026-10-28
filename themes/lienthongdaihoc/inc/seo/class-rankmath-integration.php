@@ -714,7 +714,7 @@ add_filter( 'rank_math/frontend/canonical', 'ltdh_seo_enforce_canonical_url' );
 add_filter( 'rank_math/paper/canonical_url', 'ltdh_seo_enforce_canonical_url' );
 
 /**
- * Set noindex, follow on dynamic sorting and search filter combinations to prevent crawl bloat
+ * Set robots directives: index, follow on standard pages and noindex, follow on dynamic query parameters
  */
 function ltdh_seo_robots_filter( $robots ) {
 	if ( ! is_array( $robots ) ) {
@@ -723,10 +723,28 @@ function ltdh_seo_robots_filter( $robots ) {
 	if ( ! empty( $_GET['s'] ) || ! empty( $_GET['sort'] ) || ( ! empty( $_GET['truong'] ) && ! empty( $_GET['nganh'] ) ) ) {
 		$robots['index']  = 'noindex';
 		$robots['follow'] = 'follow';
+	} elseif ( is_front_page() || is_home() || is_singular() || is_archive() || is_tax() ) {
+		$robots['index']             = 'index';
+		$robots['follow']            = 'follow';
+		$robots['max-snippet']       = 'max-snippet:-1';
+		$robots['max-video-preview'] = 'max-video-preview:-1';
+		$robots['max-image-preview'] = 'max-image-preview:large';
 	}
 	return $robots;
 }
-add_filter( 'rank_math/frontend/robots', 'ltdh_seo_robots_filter' );
+add_filter( 'rank_math/frontend/robots', 'ltdh_seo_robots_filter', 999 );
+
+// Ensure WordPress core wp_robots does not output noindex on indexable pages
+add_filter( 'wp_robots', function( $robots ) {
+	if ( is_front_page() || is_home() || is_singular() || is_archive() || is_tax() ) {
+		if ( empty( $_GET['s'] ) && empty( $_GET['sort'] ) ) {
+			$robots['noindex']           = false;
+			$robots['nofollow']          = false;
+			$robots['max-image-preview'] = 'large';
+		}
+	}
+	return $robots;
+}, 999 );
 
 /**
  * Ensure Rank Math XML Sitemaps use flat URLs for school posts

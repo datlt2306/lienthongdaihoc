@@ -123,8 +123,9 @@ class LTDH_Performance {
 			}
 
 			$lcp_desktop = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $lcp_raw ) : $lcp_raw;
-			$lcp_1400    = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $lcp_raw, '1400w' ) : '';
-			$lcp_mobile  = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $lcp_raw, 'mobile' ) : '';
+			$clean_lcp   = preg_replace( '#\?tr=.*$#', '', $lcp_desktop );
+			$lcp_1400    = ( strpos( $lcp_desktop, 'ik.imagekit.io' ) !== false || strpos( $lcp_desktop, 'r2.dev' ) !== false ) ? $clean_lcp . '?tr=w-1400,h-584' : ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $lcp_raw, '1400w' ) : '' );
+			$lcp_mobile  = ( strpos( $lcp_desktop, 'ik.imagekit.io' ) !== false || strpos( $lcp_desktop, 'r2.dev' ) !== false ) ? $clean_lcp . '?tr=w-768,h-320' : ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $lcp_raw, 'mobile' ) : '' );
 
 			if ( ! empty( $lcp_desktop ) ) {
 				$srcset_entries = [];
@@ -134,10 +135,10 @@ class LTDH_Performance {
 				if ( ! empty( $lcp_1400 ) && $lcp_1400 !== $lcp_desktop ) {
 					$srcset_entries[] = esc_url( $lcp_1400 ) . ' 1400w';
 				}
-				$srcset_entries[] = esc_url( $lcp_desktop ) . ' 1942w';
+				$srcset_entries[] = esc_url( $clean_lcp ) . ' 1942w';
 				$srcset_str = implode( ', ', $srcset_entries );
 
-				$fallback_href = ! empty( $lcp_1400 ) ? $lcp_1400 : $lcp_desktop;
+				$fallback_href = ! empty( $lcp_mobile ) ? $lcp_mobile : ( ! empty( $lcp_1400 ) ? $lcp_1400 : $lcp_desktop );
 				echo '<link rel="preload" as="image" href="' . esc_url( $fallback_href ) . '" imagesrcset="' . $srcset_str . '" imagesizes="(max-width: 768px) 100vw, (max-width: 1440px) 1335px, 1942px" type="image/webp" fetchpriority="high">' . "\n";
 			}
 			return;

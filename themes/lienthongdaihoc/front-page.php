@@ -54,8 +54,9 @@ $zalo    = ltdh_get_zalo_url();
 				foreach ($hero_slides as $slide) : 
 					if (empty($slide['image'])) continue;
 					$slide_img_desktop = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'] ) : $slide['image'];
-					$slide_img_1400    = function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'], '1400w' ) : '';
-					$slide_img_mobile  = ! empty( $slide['image_mobile'] ) ? ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image_mobile'], true ) : $slide['image_mobile'] ) : ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'], true ) : '' );
+					$clean_slide_base  = preg_replace( '#\?tr=.*$#', '', $slide_img_desktop );
+					$slide_img_1400    = ! empty( $slide['image_1400'] ) ? $slide['image_1400'] : ( ( strpos( $slide_img_desktop, 'ik.imagekit.io' ) !== false || strpos( $slide_img_desktop, 'r2.dev' ) !== false ) ? $clean_slide_base . '?tr=w-1400,h-584' : ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'], '1400w' ) : '' ) );
+					$slide_img_mobile  = ! empty( $slide['image_mobile'] ) ? ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image_mobile'], true ) : $slide['image_mobile'] ) : ( ( strpos( $slide_img_desktop, 'ik.imagekit.io' ) !== false || strpos( $slide_img_desktop, 'r2.dev' ) !== false ) ? $clean_slide_base . '?tr=w-768,h-320' : ( function_exists( 'ltdh_get_optimized_image_url' ) ? ltdh_get_optimized_image_url( $slide['image'], true ) : '' ) );
 					$is_lcp            = ( 0 === $slide_idx );
 					$loading_attr      = $is_lcp ? 'loading="eager" fetchpriority="high" data-no-lazy="1"' : 'loading="lazy" fetchpriority="low"';
 					$hero_cls          = $is_lcp ? 'hero-banner hero-img skip-lazy no-lazy ' : '';
@@ -1616,3 +1617,5 @@ $zalo    = ltdh_get_zalo_url();
 
 <?php
 get_footer();
+
+
