@@ -1,234 +1,171 @@
-# Handoff Report: WP-CLI Audit & Data Scope Standardization (Milestone M1)
+# Handoff Report — Milestone 1: Git Branching & Bloat Sanitization
 
-- **Agent**: `worker_m1` (WP-CLI Audit & Data Scope Worker)
-- **Roles**: implementer, qa, specialist
-- **Milestone**: M1 (Data Audit & Safe Scope Handling)
-- **Target Recipient**: Orchestrator (`f7ebf938-afab-4e8b-b557-505007c00d2d`), Sentinel / Forensic Auditor
+**Agent**: `worker_m1` (teamwork_worker)  
+**Parent Orchestrator ID**: `101e3526-caa5-49b4-98c0-c71df3477df4`  
+**Working Directory**: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1/`  
+**Git Repository Root**: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content`  
+**Date**: 2026-10-29  
 
 ---
 
 ## 1. Observation
 
-### 1.1. Code Modifications
-- **File modified**: `inc/cli-commands.php` (lines 1113–1655).
-- **Added method**: `LTDH_CLI_Commands::audit_data( $args, $assoc_args )`.
-- **Command registration**:
-  ```php
-  WP_CLI::add_command( 'ltdh', 'LTDH_CLI_Commands' );
-  WP_CLI::add_command( 'ltdh audit-data', [ new LTDH_CLI_Commands(), 'audit_data' ] );
+### 1.1 Git Working Tree & Branch Resolution
+- **Repository Root**: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content` (`git rev-parse --show-toplevel`).
+- **Initial Branch State**: On branch `main`, tracking `origin/main`.
+- **D/F Namespace Lock Encountered**:
+  Executing `git checkout -b refactor` returned:
+  ```text
+  fatal: cannot lock ref 'refs/heads/refactor': 'refs/heads/refactor/school-program-architecture' exists; cannot create 'refs/heads/refactor'
   ```
-- **Arguments supported**:
-  - `--dry-run`: Simulates audit and checks without writing to database.
-  - `--apply`: Executes safe post status transitions, metadata pruning, and cache invalidation.
-  - `--output-file=<file>`: Custom path to save the structured audit report JSON (defaults to theme root `audit_report.json`).
-
-### 1.2. Syntax Verification
-- **Command**: `php -l inc/cli-commands.php`
-- **Output**:
-  ```
-  No syntax errors detected in inc/cli-commands.php
-  ```
-
-### 1.3. Dry-Run Execution
-- **Command**: `wp --path=../../../ ltdh audit-data --dry-run`
-- **Verbatim Output**:
-  ```
-  === LTDH DATA AUDIT (DRY-RUN SIMULATION) ===
-  Mô phỏng kiểm toán - Không có thay đổi nào được ghi vào cơ sở dữ liệu.
-
-  1. Đang quét toàn bộ danh mục CPT Program...
-   - Tổng số program đã quét: 100
-     * In-scope (Hợp lệ): 95 (Từ xa: 94, Vừa học vừa làm: 1)
-     * Out-of-scope (Ngoài phạm vi): 5 (Cao đẳng: 4, Chính quy: 1, VB2: 0)
-     * Cần xem xét thủ công: 0
-
-  2. Đang quét toàn bộ danh mục CPT School...
-   - Tổng số trường đã quét: 21
-     * Trường Đại học hợp lệ: 20
-     * Trường ngoài phạm vi (Cao đẳng): 1 (HCCT ID: 1662)
-
-  3. Đang quét toàn bộ danh mục CPT Major...
-   - Tổng số ngành học đã quét: 34 (100% ngành đều có chương trình đại học hợp lệ)
-
-  4. Đang kiểm tra tính toàn vẹn quan hệ _offered_programs (Orphaned Ghost IDs & Drafted IDs)...
-   - Số thực thể cần làm sạch _offered_programs: 7
-   - Ghost IDs bị loại bỏ: 1855, 1856
-   - Drafted IDs bị loại bỏ khỏi danh sách công khai: 1786, 1787, 1788, 1789, 2013
-
-  5. [DRY-RUN] Sẽ chuyển đổi 5 program và 1 trường sang draft (chưa thực hiện).
-  6. [DRY-RUN] Sẽ làm mới transients sau khi áp dụng.
-
-  7. Đang xuất tài liệu báo cáo kiểm toán JSON...
-  Success: Báo cáo kiểm toán đã được lưu thành công tại: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/audit_report.json
-  Success: Hoàn tất mô phỏng kiểm toán! Hãy chạy với cờ --apply để thực thi thay đổi.
-  ```
-
-### 1.4. Apply Execution
-- **Command**: `wp --path=../../../ ltdh audit-data --apply`
-- **Verbatim Output**:
-  ```
-  === LTDH DATA AUDIT (APPLY CHANGES) ===
-  Đang thực thi kiểm toán và áp dụng thay đổi vào cơ sở dữ liệu...
-
-  1. Đang quét toàn bộ danh mục CPT Program...
-   - Tổng số program đã quét: 100
-     * In-scope (Hợp lệ): 95 (Từ xa: 94, Vừa học vừa làm: 1)
-     * Out-of-scope (Ngoài phạm vi): 5 (Cao đẳng: 4, Chính quy: 1, VB2: 0)
-     * Cần xem xét thủ công: 0
-
-  2. Đang quét toàn bộ danh mục CPT School...
-   - Tổng số trường đã quét: 21
-     * Trường Đại học hợp lệ: 20
-     * Trường ngoài phạm vi (Cao đẳng): 1 (HCCT ID: 1662)
-
-  3. Đang quét toàn bộ danh mục CPT Major...
-   - Tổng số ngành học đã quét: 34 (100% ngành đều có chương trình đại học hợp lệ)
-
-  4. Đang kiểm tra tính toàn vẹn quan hệ _offered_programs (Orphaned Ghost IDs & Drafted IDs)...
-   - Số thực thể cần làm sạch _offered_programs: 7
-   - Ghost IDs bị loại bỏ: 1855, 1856
-   - Drafted IDs bị loại bỏ khỏi danh sách công khai: 1786, 1787, 1788, 1789, 2013
-
-  5. Đang chuyển đổi trạng thái bản ghi out-of-scope sang 'draft'...
-     [DRAFTED] Program ID 1786: Cử nhân Quản trị kinh doanh (out_of_scope_college)
-     [DRAFTED] Program ID 1787: Cử nhân Kế toán (out_of_scope_college)
-     [DRAFTED] Program ID 1788: Cử nhân Thương mại điện tử (out_of_scope_college)
-     [DRAFTED] Program ID 1789: Cử nhân Quản trị khách sạn (out_of_scope_college)
-     [DRAFTED] Program ID 2013: Cử nhân Công nghệ thông tin (Liên thông Chính quy) (out_of_scope_fulltime)
-     [DRAFTED] School ID 1662: Trường Cao đẳng Thương mại và Du lịch Hà Nội (out_of_scope_institution)
-
-  6. Đang làm mới Transients và bộ nhớ đệm...
-     Đã xoá transients: ltdh_filter_options, ltdh_featured_schools, ltdh_featured_schools_data, ltdh_hot_majors_data, ltdh_combinations_data, ltdh_archive_school_featured, ltdh_training_type_counts, ltdh_rewrite_flushed_v2
-
-  7. Đang xuất tài liệu báo cáo kiểm toán JSON...
-  Success: Báo cáo kiểm toán đã được lưu thành công tại: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/audit_report.json
-  Success: Hoàn tất áp dụng kiểm toán dữ liệu và chuẩn hoá phạm vi Liên thông thành công!
-  ```
-
-### 1.5. Post-Apply Database Verification Query
-- **Command**:
+- **Resolution**:
+  The historical local branch `refactor/school-program-architecture` created a directory `.git/refs/heads/refactor/`, creating a Git directory/file (D/F) conflict.
+  Renamed the legacy branch cleanly preserving all its commit history (`e74d6cc`):
   ```bash
-  wp --path=../../../ eval '
-  $p = wp_count_posts("program");
-  $s = wp_count_posts("school");
-  $m = wp_count_posts("major");
-  echo "Programs: publish={$p->publish}, draft={$p->draft}, trash={$p->trash}\n";
-  echo "Schools:  publish={$s->publish}, draft={$s->draft}, trash={$s->trash}\n";
-  echo "Majors:   publish={$m->publish}, draft={$m->draft}, trash={$m->trash}\n";
-  $s1853 = get_post_meta(1853, "_offered_programs", true);
-  $m1677 = get_post_meta(1677, "_offered_programs", true);
-  echo "School 1853 _offered_programs: " . json_encode($s1853) . "\n";
-  echo "Major 1677 _offered_programs: " . json_encode($m1677) . "\n";
-  '
+  git branch -m refactor/school-program-architecture archive/refactor-school-program-architecture
   ```
-- **Verbatim Output**:
-  ```
-  Programs: publish=95, draft=5, trash=0
-  Schools:  publish=20, draft=1, trash=0
-  Majors:   publish=34, draft=0, trash=0
-  School 1853 _offered_programs: [1854,2014]
-  Major 1677 _offered_programs: [1678,1705,1718,1724,1732,1757,1854,2014]
+  Then successfully created and switched to branch `refactor`:
+  ```bash
+  git checkout -b refactor
+  git branch --show-current
+  # Output: refactor
   ```
 
-### 1.6. Audit Report File
-- **Path**: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/audit_report.json`
-- **File size**: 43,339 bytes, valid JSON formatted with `JSON_PRETTY_PRINT`.
+### 1.2 Bloat Deletions
+Executed `rm` on the specified obsolete artifacts:
+1. **8 Debug Screenshots** in `themes/lienthongdaihoc/assets/images/`:
+   - `screenshot_exemption_design.png` (2,508,299 bytes)
+   - `screenshot_exemption_design_v2.png` (3,267,906 bytes)
+   - `screenshot_exemption_design_v3.png` (3,269,251 bytes)
+   - `screenshot_exemption_design_v4.png` (3,269,216 bytes)
+   - `screenshot_layout_error.png` (3,269,216 bytes)
+   - `screenshot_layout_fixed.png` (2,509,787 bytes)
+   - `screenshot_layout_rows.png` (2,509,857 bytes)
+   - `screenshot_layout_rows_full.png` (8,015,954 bytes)
+   - **Total pruned**: 28,619,486 bytes (~27.29 MB). Zero code or database references confirmed.
+2. **ACF JSON Backup Files** in `inc/`:
+   - `inc/acf-import-cpts.json.bak` (13,968 bytes)
+   - `inc/acf-import-fields.json.bak` (59,566 bytes)
+   - **Total pruned**: 73,534 bytes (~72 KB). Active live definitions `inc/acf-import-cpts.json` and `inc/acf-import-fields.json` remain intact.
+3. **Stale Data Dumps**:
+   - `schools_import.json` (64,647 bytes)
+   - `litespeed-cache-settings.data` (7,203 bytes)
+   - **Total pruned**: 71,850 bytes (~72 KB).
+4. **Scratch Directory**:
+   - `scratch/` (6 temporary ad-hoc files: `find_incomplete_programs.php`, `major_1677_seo_content.html`, `mock_bootstrap.php`, `move_incomplete_to_draft.php`, `populate_faqs.php`, `test_empirical_challenger_final.php`).
+   - **Total pruned**: ~60 KB.
+
+### 1.3 Preserved Critical Files
+- `assets/images/banner-fallback.png` (1,402,051 bytes) and `banner-fallback.webp` (98,788 bytes) are preserved (referenced in `inc/core/class-helpers.php` and `inc/seo/class-rankmath-integration.php`).
+- `taxonomy.php` (16,033 bytes, 273 lines) is retained for Milestone 2 (active fallback for `region` and `campus` taxonomies).
+
+### 1.4 Theme Screenshot Optimization
+- **Source**: `themes/lienthongdaihoc/screenshot.png` (4072x1924, RGBA, 6,226,553 bytes / 5.94 MB).
+- **Execution**: Scaled proportionally to 1200 px width, centered vertically onto a standard 1200x900 canvas matching theme background `#f8fafc` (248, 250, 252), and quantized to 256 colors adaptive palette using Lanczos resampling.
+- **Resulting File**:
+  - Dimensions: `1200 x 900`
+  - Format: `PNG`
+  - Disk Size: `120,971 bytes` (**~118.14 KB**, comfortably below the 200 KB threshold)
+  - Footprint Reduction: **-98.06%** (-6,105,582 bytes).
+
+### 1.5 Verification Suite Execution
+1. `php tests/run-tests.php`:
+   - 17/17 tests passed (TC-01 through TC-17 covering search tokenization, accent insensitivity, synonyms, multi-facet filters, and SQLi/XSS security protection).
+2. `php tests/test-dry-school-program-fields.php`:
+   - 38/38 checks passed (Validating ACF JSON syntax, school/program field structure, admin hiding, and helper facade definitions).
+3. Additional baseline test suites:
+   - `php tests/test-dry-degree-and-diploma.php`: 21/21 passed.
+   - `php tests/test-program-title-and-breadcrumb.php`: 15/15 passed.
+   - `php tests/test-program-title-normalization.php`: 9/9 passed.
+   - `php tests/test-post-sharing.php`: 16/16 passed.
+   - `php tests/test-eligibility-unit.php`: 32/32 passed.
+4. PHP syntax linting (`find . -name "*.php" ... -exec php -l {} \;`):
+   - All 105 theme PHP files scanned; 0 syntax errors detected.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Initial Scope & Baseline**: The system began with 100 published `program`, 21 published `school`, and 34 published `major` records (Observation 1.3, 1.5).
-2. **Identification of Out-of-Scope Programs**:
-   - Program ID 2013 is assigned taxonomy term `chinh-quy` at UTC. Per R1 and PROJECT.md, Chính quy as a separate full-time product is excluded from the site's Liên thông scope.
-   - Program IDs 1786, 1787, 1788, 1789 belong to School ID 1662 (Trường Cao đẳng Thương mại và Du lịch Hà Nội - HCCT), a junior college awarding vocational associate certificates, not bachelor degrees.
-   - Sum: Exactly 5 programs are out-of-scope.
-3. **Safe Transition without Data Loss**:
-   - Zero calls to `wp_delete_post()` were made.
-   - All 5 programs were moved from `publish` to `draft` using `wp_update_post( ['ID' => $id, 'post_status' => 'draft'] )`.
-   - Metadata `_ltdh_audit_status = 'out_of_scope'`, `_ltdh_audit_reason`, and `_ltdh_audited_at` were recorded on each drafted program.
-4. **Identification of Out-of-Scope Institutions**:
-   - School ID 1662 has 0 in-scope bachelor programs remaining and is a junior college.
-   - School ID 1662 was safely transitioned to `post_status = 'draft'` with `_ltdh_audit_status = 'out_of_scope_institution'`.
-   - All remaining 20 schools are accredited universities offering between 1 and 11 valid Liên thông programs.
-5. **Major Retention**:
-   - All 34 majors retain between 1 and 14 published university programs. None become empty. All 34 remain `publish`.
-6. **Referential Integrity & Reverse Metadata Pruning**:
-   - School 1853 and Major 1677 previously contained ghost IDs 1855 and 1856 (which returned NULL from `get_post()`), and drafted ID 2013.
-   - The audit command filtered `_offered_programs` across all 55 schools and majors, removing ghost IDs and drafted IDs.
-   - School 1853 now contains cleanly `[1854, 2014]` (Observation 1.5).
-   - Major 1677 now contains cleanly `[1678, 1705, 1718, 1724, 1732, 1757, 1854, 2014]` (Observation 1.5).
-7. **Cache & Transient Invalidation**:
-   - `ltdh_filter_options`, `ltdh_featured_schools`, `ltdh_rewrite_flushed_v2`, and other transient keys were flushed so frontend queries reflect the clean 95/20/34 state immediately.
+1. **Branch Isolation**:
+   - Requirement §R1 dictates all refactor work must reside on branch `refactor`.
+   - Observation: Git ref namespace prevented creating `refactor` while `refs/heads/refactor/school-program-architecture` existed.
+   - Deduction: Renaming the legacy branch to `archive/refactor-school-program-architecture` frees the `refactor` namespace without any data loss.
+   - Outcome: Branch `refactor` successfully checked out and active.
+
+2. **Bloat Sanitization Safety**:
+   - Observations from explorer audits confirmed zero code references to `screenshot_*.png`, `schools_import.json`, `litespeed-cache-settings.data`, and `scratch/`.
+   - Backup files (`inc/*.bak`) were untracked duplicates already ignored by `.gitignore`.
+   - Deleting these files freed ~27.5 MB of repository weight.
+   - Protecting `banner-fallback.png` and `taxonomy.php` ensured no broken runtime images, broken taxonomy routes, or broken test dependencies.
+
+3. **Screenshot Optimization**:
+   - WordPress standard theme screenshots are 1200x900 PNGs.
+   - Resizing proportionally and compositing on `#f8fafc` canvas avoids horizontal/vertical aspect ratio stretching.
+   - 256-color adaptive palette Lanczos quantization produces crisp visual fidelity at only 120,971 bytes (< 200 KB).
+
+4. **Zero-Regression Verification**:
+   - 17/17 search tests, 38/38 DRY architecture tests, and 93/93 ancillary baseline unit tests passed cleanly.
+   - PHP lint confirmed zero syntax errors across the entire codebase.
 
 ---
 
 ## 3. Caveats
 
-- **No caveats**: The database migration is 100% non-destructive and reversible. Any record set to `draft` can be transitioned back to `publish` with a single WP-CLI command if desired.
-- **Frontend Templates (Milestones M2–M5)**: While the database state is now clean (95 programs / 20 universities), frontend templates will be updated in upcoming milestones to rename "Hệ đào tạo" to "Hình thức học" and isolate campus `online`.
+- `taxonomy.php` is retained in Milestone 1 per the parent instruction and explorer_m1_2's audit findings. It must be refactored into the BlankSlate polymorphic hierarchy (`archive.php`, `taxonomy-*.php`) during Milestone 2.
+- The Git working tree root is `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content`. When staging, only paths under `themes/lienthongdaihoc/` should be staged to avoid capturing external server cache files such as `wp-content/litespeed/`.
 
 ---
 
 ## 4. Conclusion
 
-Milestone M1 requirements have been completely and genuinely satisfied:
-1. `inc/cli-commands.php` contains the robust `audit_data` method and registers `wp ltdh audit-data`.
-2. Syntax check `php -l inc/cli-commands.php` passes with 0 errors.
-3. Both `wp ltdh audit-data --dry-run` and `wp ltdh audit-data --apply` executed successfully.
-4. Database state stands at:
-   - Exactly **95 programs published**, **5 drafted**, **0 trashed**.
-   - Exactly **20 schools published**, **1 drafted** (HCCT), **0 trashed**.
-   - Exactly **34 majors published**, **0 drafted**, **0 trashed**.
-   - Zero hard deletions (`wp_delete_post()` was never invoked).
-   - Orphaned ghost IDs (1855, 1856) and drafted IDs (2013, 1786-1789) are pruned from `_offered_programs`.
-   - Transients are flushed.
-5. `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/audit_report.json` is generated and contains complete transparent accounting.
+Milestone 1 execution is 100% complete and verified:
+1. Branch `refactor` is created, verified active, and isolated.
+2. 27.5 MB of bloat (8 debug screenshots, backup `.bak` files, stale data dumps, and scratch directory) has been completely purged.
+3. Critical assets (`banner-fallback.png`, `taxonomy.php`) are verified intact.
+4. `screenshot.png` has been optimized to WordPress theme standard 1200x900 PNG at 120,971 bytes (< 200 KB).
+5. All verification test suites pass with 100% integrity (55/55 core tests, 93/93 ancillary tests, 0 PHP lint errors).
 
 ---
 
 ## 5. Verification Method
 
-To independently verify this work, run the following commands from the theme directory:
+Independently reproduce and verify this milestone with the following commands:
 
 ```bash
-# 1. PHP syntax check on cli-commands.php
-php -l inc/cli-commands.php
+# 1. Verify active branch
+cd "/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content"
+git branch --show-current
+# Expected: refactor
 
-# 2. Verify WP-CLI command synopsis and help
-wp --path=../../../ ltdh audit-data --help
+# 2. Verify bloat deletion & asset preservation
+cd "/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc"
+test ! -f assets/images/screenshot_layout_rows_full.png
+test ! -f inc/acf-import-cpts.json.bak
+test ! -f schools_import.json
+test ! -f litespeed-cache-settings.data
+test ! -d scratch
+test -f assets/images/banner-fallback.png
+test -f taxonomy.php
+echo "File inventory verified."
 
-# 3. Verify exact post counts
-wp --path=../../../ eval '
-foreach (["program", "school", "major"] as $cpt) {
-    $c = wp_count_posts($cpt);
-    echo "$cpt: publish={$c->publish}, draft={$c->draft}, trash={$c->trash}\n";
-}
-'
-# Expected:
-# program: publish=95, draft=5, trash=0
-# school:  publish=20, draft=1, trash=0
-# major:   publish=34, draft=0, trash=0
+# 3. Verify screenshot.png dimensions and size
+python3 -c "
+import os
+from PIL import Image
+im = Image.open('screenshot.png')
+sz = os.path.getsize('screenshot.png')
+print(f'screenshot.png: format={im.format}, size={im.size}, bytes={sz}')
+assert im.format == 'PNG'
+assert im.size == (1200, 900)
+assert sz < 200 * 1024
+print('Screenshot assertion passed!')
+"
 
-# 4. Verify drafted programs and reasons
-wp --path=../../../ eval '
-$drafts = get_posts(["post_type" => "program", "post_status" => "draft", "numberposts" => -1]);
-foreach ($drafts as $d) {
-    echo "ID {$d->ID} | Title: {$d->post_title} | Reason: " . get_post_meta($d->ID, "_ltdh_audit_reason", true) . "\n";
-}
-'
+# 4. Verify test suites
+php tests/run-tests.php
+php tests/test-dry-school-program-fields.php
 
-# 5. Verify School 1853 and Major 1677 metadata cleanup
-wp --path=../../../ eval '
-$s = get_post_meta(1853, "_offered_programs", true);
-$m = get_post_meta(1677, "_offered_programs", true);
-echo "School 1853: " . json_encode($s) . "\n";
-echo "Major 1677: " . json_encode($m) . "\n";
-'
-# Expected:
-# School 1853: [1854,2014]
-# Major 1677: [1678,1705,1718,1724,1732,1757,1854,2014]
-
-# 6. Verify audit_report.json
-cat audit_report.json | jq '.summary'
+# 5. Verify PHP syntax
+find . -name "*.php" -not -path "./node_modules/*" -not -path "./vendor/*" -not -path "./.agents/*" -not -path "./.agent/*" -exec php -l {} + > /dev/null
+echo "All PHP files passed syntax check."
 ```

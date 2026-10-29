@@ -1,65 +1,80 @@
-# BRIEFING — 2026-10-01T09:30:00Z
+# BRIEFING — 2026-10-29T07:00:00Z
 
 ## Mission
-Implement WP-CLI `wp ltdh audit-data` command in `inc/cli-commands.php`, execute data audit and safe scope isolation (Milestone M1), prune orphaned metadata, and generate `audit_report.json`.
+Execute Milestone 1: Git Branching & Bloat Sanitization for Liên Thông Đại Học WordPress theme BlankSlate refactoring.
 
 ## 🔒 My Identity
 - Archetype: implementer, qa, specialist
 - Roles: implementer, qa, specialist
-- Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1
-- Original parent: f7ebf938-afab-4e8b-b557-505007c00d2d
-- Milestone: M1 (Data Audit & Safe Scope Handling)
+- Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1/
+- Original parent: 101e3526-caa5-49b4-98c0-c71df3477df4
+- Milestone: Milestone 1: Git Branching & Bloat Sanitization
 
 ## 🔒 Key Constraints
-- DO NOT CHEAT: Genuine implementation, real database mutations, no hardcoded results or dummy facades.
-- Zero calls to `wp_delete_post()`. Absolutely NO hard deletion of any records.
-- Safe transition of 5 out-of-scope programs (ID 2013, 1786, 1787, 1788, 1789) and School 1662 (HCCT) to `draft`.
-- Set post meta `_ltdh_audit_status`, `_ltdh_audit_reason`, `_ltdh_audited_at`.
-- Prune orphaned IDs (1855, 1856) and drafted IDs from `_offered_programs` of all schools & majors (specifically 1853 and 1677).
-- Flush transients: `ltdh_filter_options`, `ltdh_featured_schools`, `ltdh_rewrite_flushed_v2`.
-- Emit complete structured log to `audit_report.json` in theme root.
-- Verify with WP-CLI queries.
+- DO NOT CHEAT: Genuine implementation, real state, no hardcoded results or dummy facades.
+- Create and switch to branch `refactor` in the git repository at `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content`. Verify active branch is `refactor`.
+- Delete bloat:
+  * 8 debug screenshots in assets/images/screenshot_*.png (-27.2 MB)
+  * backup files inc/acf-import-*.json.bak (-74 KB)
+  * stale data dumps schools_import.json, litespeed-cache-settings.data (-72 KB)
+  * scratch directory scratch/ (-60 KB)
+- Do NOT delete assets/images/banner-fallback.png (actively referenced by theme).
+- Retain taxonomy.php for Milestone 2 (active fallback for region & campus taxonomies).
+- Optimize screenshot.png to standard 1200x900 PNG < 200 KB via Python script.
+- Verify tests: `php tests/run-tests.php` (17/17 passed), `php tests/test-dry-school-program-fields.php` (38/38 passed), and PHP lint syntax check.
+- Stage ONLY files in `themes/lienthongdaihoc/` (avoid staging `wp-content/litespeed/`).
+- Commit staged theme changes cleanly on branch `refactor`.
 
 ## Current Parent
-- Conversation ID: f7ebf938-afab-4e8b-b557-505007c00d2d
-- Updated: 2026-10-01T09:30:00Z
+- Conversation ID: 101e3526-caa5-49b4-98c0-c71df3477df4
+- Updated: 2026-10-29T07:00:00Z
 
 ## Task Summary
-- **What to build**: WP-CLI command `wp ltdh audit-data [--dry-run] [--apply] [--output-file=<path>]` in `inc/cli-commands.php`.
+- **What to build**: Branch isolation (`refactor`), bloat sanitization (~27.5 MB pruned), screenshot optimization (< 200 KB), zero-regression verification, and clean commit.
 - **Success criteria**:
-  - Exactly 95 programs published, 5 drafted, 0 trashed. [MET]
-  - Exactly 20 schools published, 1 drafted (HCCT), 0 trashed. [MET]
-  - Exactly 34 majors published. [MET]
-  - `_offered_programs` on 1853 and 1677 no longer contain 1855 or 1856 or drafted IDs. [MET]
-  - `audit_report.json` exists, is valid JSON, contains comprehensive accounting. [MET]
-- **Interface contracts**: PROJECT.md § Data Audit Script Contract (M1).
-- **Code layout**: `inc/cli-commands.php`.
+  - Active branch is `refactor` [MET]
+  - 8 debug screenshots deleted from `assets/images/` [MET]
+  - `inc/acf-import-*.json.bak` deleted [MET]
+  - `schools_import.json`, `litespeed-cache-settings.data`, `scratch/` deleted [MET]
+  - `banner-fallback.png` and `taxonomy.php` intact [MET]
+  - `screenshot.png` is 1200x900 PNG < 200 KB (120,971 B) [MET]
+  - `php tests/run-tests.php` passes (17/17) [MET]
+  - `php tests/test-dry-school-program-fields.php` passes (38/38) [MET]
+  - PHP lint checks 0 errors (105 files checked) [MET]
+  - Clean git commit on `refactor` branch [IN PROGRESS]
+- **Interface contracts**: PROJECT.md
+- **Code layout**: PROJECT.md § Code Layout
 
 ## Key Decisions Made
-- Registered `wp ltdh audit-data` using `WP_CLI::add_command( 'ltdh audit-data', [ new LTDH_CLI_Commands(), 'audit_data' ] );` to support hyphenated WP-CLI standard command naming.
-- Zero calls to `wp_delete_post()`. Used `wp_update_post( ['ID' => $id, 'post_status' => 'draft'] )`.
-- Stored audit trail metadata: `_ltdh_audit_status`, `_ltdh_audit_reason`, `_ltdh_audited_at`.
-- Filtered `_offered_programs` across all 55 schools and majors, safely pruning ghost IDs 1855, 1856 and drafted programs 1786-1789, 2013.
-
-## Loaded Skills
-- **Source**: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/skills/php-wordpress/SKILL.md`
-- **Local copy**: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1/skills/SKILL.md`
-- **Core methodology**: WP-CLI command structure, WordPress sanitization/escaping, safe post status transitions, meta handling, transient cache invalidation.
-
-## Change Tracker
-- **Files modified**: `inc/cli-commands.php` (Implemented `audit_data` method and command registration)
-- **Build status**: `php -l inc/cli-commands.php` PASSED. `wp ltdh audit-data --dry-run` and `wp ltdh audit-data --apply` PASSED.
-- **Pending issues**: None.
-
-## Quality Status
-- **Build/test result**: All verification queries PASS.
-- **Lint status**: 0 PHP syntax errors.
-- **Tests added/modified**: WP-CLI command `wp ltdh audit-data` test runs (dry-run & apply).
+- Resolved Git ref namespace collision by renaming `refactor/school-program-architecture` to `archive/refactor-school-program-architecture`, enabling clean creation of branch `refactor`.
+- Retained `taxonomy.php` for Milestone 2 as active fallback template for region & campus taxonomies.
+- Preserved `banner-fallback.png` (referenced in `class-helpers.php` and `class-rankmath-integration.php`).
+- Optimized `screenshot.png` using PIL Lanczos with canvas centering to preserve aspect ratio, producing 120,971 bytes (~118 KB).
 
 ## Artifact Index
 - `.agents/teamwork/worker_m1/DISPATCH.md` — Assignment instructions
 - `.agents/teamwork/worker_m1/BRIEFING.md` — Working memory and status
 - `.agents/teamwork/worker_m1/progress.md` — Liveness and step tracking
-- `inc/cli-commands.php` — Implemented WP-CLI command
-- `audit_report.json` — Structured audit output
 - `.agents/teamwork/worker_m1/handoff.md` — Final handoff report
+- `screenshot.png` — Standard 1200x900 optimized theme preview
+
+## Change Tracker
+- **Files deleted**:
+  - `assets/images/screenshot_exemption_design*.png` (4 files)
+  - `assets/images/screenshot_layout_*.png` (4 files)
+  - `inc/acf-import-*.json.bak` (2 files)
+  - `schools_import.json`
+  - `litespeed-cache-settings.data`
+  - `scratch/` (6 files)
+- **Files modified**:
+  - `screenshot.png` (Optimized from 5.9 MB to 118 KB)
+- **Build status**: PASS
+- **Pending issues**: None
+
+## Quality Status
+- **Build/test result**: All suites PASS (17/17 search, 38/38 DRY architecture, 93/93 ancillary).
+- **Lint status**: 0 PHP syntax errors across all 105 theme PHP files.
+- **Tests added/modified**: Existing regression suites verified.
+
+## Loaded Skills
+- None requested for M1.
