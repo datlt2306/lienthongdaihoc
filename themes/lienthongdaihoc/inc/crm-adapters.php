@@ -123,6 +123,7 @@ function ltdh_sync_lead_to_crm( $lead ) {
 				'major'         => $major_name,
 				'training_type' => $lead->training_type,
 				'campus'        => $lead->campus,
+				'sales_partner' => $lead->sales_partner ?? '',
 				'referrer'      => $lead->referral_source,
 				'message'       => $lead->message ?? '',
 			];
@@ -159,6 +160,7 @@ function ltdh_sync_lead_to_crm( $lead ) {
 		'major'         => $major_name,
 		'training_type' => $lead->training_type,
 		'campus'        => $lead->campus,
+		'sales_partner' => $lead->sales_partner ?? '',
 		'referrer'      => $lead->referral_source,
 		'message'       => $lead->message ?? '',
 	];
@@ -313,6 +315,9 @@ function ltdh_sync_erpnext_adapter( $payload, $endpoint = '', $token = '' ) {
 	if ( ! empty( $payload['campus'] ) ) {
 		$note_lines[] = 'Cơ sở / Khu vực: ' . $payload['campus'];
 	}
+	if ( ! empty( $payload['sales_partner'] ) ) {
+		$note_lines[] = 'Người giới thiệu (Ref): ' . $payload['sales_partner'];
+	}
 	if ( ! empty( $payload['referrer'] ) ) {
 		$note_lines[] = 'Nguồn giới thiệu: ' . $payload['referrer'];
 	}
@@ -354,6 +359,7 @@ function ltdh_sync_erpnext_adapter( $payload, $endpoint = '', $token = '' ) {
 		'status'                => 'Lead',
 		'qualification_status'  => 'Unqualified',
 		'custom_trường_đăng_ký' => $target_school,
+		'custom_người_giới_thiệu' => ! empty( $payload['sales_partner'] ) ? $payload['sales_partner'] : '',
 	];
 
 	if ( ! empty( $notes ) ) {

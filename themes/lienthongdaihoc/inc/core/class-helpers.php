@@ -1376,6 +1376,7 @@ function ltdh_render_native_form(string $type = 'consultation', array $hidden_fi
 		<?php foreach ($hidden_fields as $name => $value) : ?>
 			<input type="hidden" name="<?php echo esc_attr($name); ?>" value="<?php echo esc_attr($value); ?>">
 		<?php endforeach; ?>
+		<?php if ( function_exists( 'ltdh_render_referral_hidden_input' ) ) { ltdh_render_referral_hidden_input(); } ?>
 
 		<div class="hidden" style="display:none !important;" aria-hidden="true">
 			<label for="<?php echo esc_attr( $prefix . '-hp' ); ?>">Website URL</label>

@@ -45,6 +45,7 @@ require_once __DIR__ . '/inc/relationship-hooks.php';
 // 5. Modules: Business Logic
 // ----------------------------------------------------
 require_once __DIR__ . '/inc/recaptcha.php';
+require_once __DIR__ . '/inc/referral-tracking.php';
 require_once __DIR__ . '/inc/lead-capture.php';
 require_once __DIR__ . '/inc/crm-adapters.php';
 require_once __DIR__ . '/inc/email-notifications.php';
@@ -78,4 +79,14 @@ add_filter( 'ai1wm_exclude_content_from_export', function ( $exclude_filters ) {
 add_filter( 'upload_size_limit', function () {
 	return 1024 * 1024 * 1024; // 1 GB
 } );
+
+// Cho phép REST API cho AIOWPS
+add_filter( 'aios_whitelisted_rest_routes', function ( $routes ) {
+	if ( ! is_array( $routes ) ) $routes = [];
+	$routes[] = 'wp';
+	$routes[] = 'ltdh';
+	return $routes;
+} );
+
+
 

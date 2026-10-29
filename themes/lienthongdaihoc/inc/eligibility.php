@@ -1775,7 +1775,14 @@ function ltdh_elig_admin_leads_page() {
 									<?php echo esc_html( $lead->campus ? ltdh_elig_get_campus_label( $lead->campus ) : '—' ); ?> / 
 									<?php echo esc_html( $lead->training_type ? ltdh_elig_get_training_label( $lead->training_type ) : '—' ); ?>
 								</td>
-								<td><?php echo $metadata_html; ?></td>
+								<td>
+									<?php echo $metadata_html; ?>
+									<?php if ( ! empty( $lead->sales_partner ) ) : ?>
+										<div style="margin-top: 5px;">
+											<span style="display: inline-block; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">🤝 Ref: <?php echo esc_html( $lead->sales_partner ); ?></span>
+										</div>
+									<?php endif; ?>
+								</td>
 								<td>
 									<span class="badge" style="padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; background: <?php echo $lead->sync_status === 'synced' ? '#d1e7dd' : '#f8d7da'; ?>; color: <?php echo $lead->sync_status === 'synced' ? '#0f5132' : '#842029'; ?>;">
 										<?php echo esc_html( strtoupper( $lead->sync_status ) ); ?>

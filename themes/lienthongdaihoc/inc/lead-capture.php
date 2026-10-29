@@ -48,6 +48,7 @@ function ltdh_create_leads_table() {
 		major_id bigint(20) DEFAULT 0,
 		training_type varchar(100) DEFAULT '',
 		campus varchar(100) DEFAULT '',
+		sales_partner varchar(100) DEFAULT '',
 		referral_source text DEFAULT '',
 		message text DEFAULT NULL,
 		sync_status varchar(50) DEFAULT 'pending',
@@ -74,6 +75,16 @@ function ltdh_check_leads_table_schema() {
 
 	if ( empty( $col_check ) ) {
 		$wpdb->query( "ALTER TABLE {$table_name} ADD COLUMN message text DEFAULT NULL AFTER referral_source" );
+	}
+
+	$col_partner = $wpdb->get_results( $wpdb->prepare(
+		"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = 'sales_partner'",
+		DB_NAME,
+		$table_name
+	) );
+
+	if ( empty( $col_partner ) ) {
+		$wpdb->query( "ALTER TABLE {$table_name} ADD COLUMN sales_partner varchar(100) DEFAULT '' AFTER campus" );
 	}
 }
 
@@ -175,9 +186,17 @@ function ltdh_insert_lead( array $data ): int {
 	$major_id        = isset( $data['major_id'] ) ? intval( $data['major_id'] ) : 0;
 	$training_type   = isset( $data['training_type'] ) ? sanitize_text_field( $data['training_type'] ) : '';
 	$campus          = isset( $data['campus'] ) ? sanitize_text_field( $data['campus'] ) : '';
+	$sales_partner   = ! empty( $data['sales_partner'] ) ? sanitize_text_field( $data['sales_partner'] ) : ( function_exists( 'ltdh_get_active_referral' ) ? ltdh_get_active_referral() : '' );
 	$referral_source = isset( $data['referral_source'] ) ? sanitize_text_field( $data['referral_source'] ) : '';
 	$message         = isset( $data['message'] ) ? sanitize_textarea_field( $data['message'] ) : '';
 	$is_group_reg    = ! empty( $data['is_group_reg'] );
+
+	if ( ! empty( $sales_partner ) ) {
+		$ref_tag = '[🤝 Người giới thiệu (Ref): ' . $sales_partner . ']';
+		if ( false === strpos( $message, $ref_tag ) ) {
+			$message = trim( $ref_tag . ( $message ? "\n" . $message : '' ) );
+		}
+	}
 
 	if ( $is_group_reg ) {
 		$group_tag = '[👥 ĐĂNG KÝ THEO NHÓM - HỌC BỔNG ĐỒNG HÀNH]';
@@ -219,6 +238,7 @@ function ltdh_insert_lead( array $data ): int {
 			'major_id'        => $major_id,
 			'training_type'   => $training_type,
 			'campus'          => $campus,
+			'sales_partner'   => $sales_partner,
 			'referral_source' => $referral_source,
 			'message'         => $message,
 			'sync_status'     => 'pending',
@@ -226,7 +246,7 @@ function ltdh_insert_lead( array $data ): int {
 			'error_message'   => '',
 			'created_at'      => current_time( 'mysql' ),
 		],
-		[ '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' ]
+		[ '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' ]
 	);
 
 	if ( $inserted ) {
@@ -242,6 +262,7 @@ function ltdh_insert_lead( array $data ): int {
 			'major_id'             => $major_id,
 			'training_type'        => $training_type,
 			'campus'               => $campus,
+			'sales_partner'        => $sales_partner,
 			'referral_source'      => $referral_source,
 			'message'              => $message,
 			'is_group_reg'         => $is_group_reg,
@@ -375,6 +396,9 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		} else {
 			$msg_text .= "🎁 <b>Hình thức:</b> 👤 Đăng ký cá nhân\n";
 		}
+		if ( ! empty( $data['sales_partner'] ) ) {
+			$msg_text .= "🤝 <b>Người giới thiệu (Ref):</b> <code>" . esc_html( $data['sales_partner'] ) . "</code>\n";
+		}
 		$msg_text .= "✉ <b>Email:</b> " . esc_html( $email ) . "\n";
 		$msg_text .= "🏫 <b>Trường đối tác:</b> " . esc_html( $school_title ) . "\n";
 		$msg_text .= "🎓 <b>Chuyên ngành:</b> " . esc_html( $major_title ) . "\n";
@@ -412,6 +436,9 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 			$msg_text .= "🎁 <b>Hình thức:</b> 👥 <b>ĐĂNG KÝ THEO NHÓM (Học bổng đồng hành)</b>\n";
 		} else {
 			$msg_text .= "🎁 <b>Hình thức:</b> 👤 Đăng ký cá nhân\n";
+		}
+		if ( ! empty( $data['sales_partner'] ) ) {
+			$msg_text .= "🤝 <b>Người giới thiệu (Ref):</b> <code>" . esc_html( $data['sales_partner'] ) . "</code>\n";
 		}
 		if ( ! empty( $email ) && $email !== 'N/A' ) {
 			$msg_text .= "✉ <b>Email:</b> " . esc_html( $email ) . "\n";
