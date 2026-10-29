@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 ?>
 
-<main id="primary" class="site-main py-16 bg-slate-50">
+<div id="primary" class="content-area site-main py-16 bg-slate-50">
 	<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 		
 		<div class="bg-white rounded-xl p-8 md:p-12 shadow-md border border-slate-200">
@@ -70,7 +70,7 @@ get_header();
 		</div>
 
 	</div>
-</main>
+</div><!-- #primary -->
 
 <?php
 get_footer();

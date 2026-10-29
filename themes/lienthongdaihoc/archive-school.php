@@ -14,7 +14,7 @@ get_header();
 $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card' ], true ) ? $_GET['view'] : ( wp_is_mobile() ? 'card' : 'list' );
 ?>
 
-<main id="primary" class="site-main bg-slate-50">
+<div id="primary" class="content-area site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
@@ -490,6 +490,6 @@ $view_mode = isset( $_GET['view'] ) && in_array( $_GET['view'], [ 'list', 'card'
 
 
 	</div>
-</main>
+</div><!-- #primary -->
 
 <?php get_footer(); ?>

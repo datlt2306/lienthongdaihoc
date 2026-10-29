@@ -28,7 +28,7 @@ $address = ltdh_get_address();
 	</div>
 </section>
 
-<main id="primary" class="site-main py-12 bg-slate-50">
+<div id="primary" class="content-area site-main py-12 bg-slate-50">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-20">
 		
 		<!-- MAIN CONTACT CARD (Matches Image Layout) -->
@@ -107,7 +107,7 @@ $address = ltdh_get_address();
 		</div>
 
 	</div>
-</main>
+</div><!-- #primary -->
 
 <?php
 get_footer();

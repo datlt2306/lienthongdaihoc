@@ -16,7 +16,7 @@ $taxonomy = $term->taxonomy;
 $is_base_archive = ! isset( $term->term_id );
 ?>
 
-<main id="primary" class="site-main bg-slate-50">
+<div id="primary" class="content-area site-main bg-slate-50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
@@ -266,7 +266,7 @@ $is_base_archive = ! isset( $term->term_id );
 		<?php endif; ?>
 
 	</div>
-</main>
+</div><!-- #primary -->
 
 <?php
 get_footer();

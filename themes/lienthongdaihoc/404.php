@@ -1,9 +1,6 @@
 <?php
 /**
- * 404 Error Page Template - Tuyển Sinh Liên Thông Đại Học
- *
- * Minimal single-screen design tailored for degree transfer & distance learning seekers:
- * clear messaging, search recovery, eligibility check, and no clutter.
+ * 404 Error Page Template (BlankSlate role="alert" Standard)
  *
  * @package lienthongdaihoc
  */
@@ -15,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 ?>
 
-<main id="primary" tabindex="-1" class="site-main min-h-[calc(100dvh-15rem)] bg-gradient-to-b from-blue-50/50 via-white to-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+<article id="post-0" class="post not-found min-h-[calc(100dvh-15rem)] bg-gradient-to-b from-blue-50/50 via-white to-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" role="alert">
 	<div class="w-full max-w-2xl mx-auto text-center space-y-6 sm:space-y-8">
 		
 		<!-- Status Badge -->
@@ -26,10 +23,9 @@ get_header();
 
 		<!-- Degree Motif & Big 404 -->
 		<div class="relative inline-block select-none">
-			<h1 class="text-8xl sm:text-9xl font-black font-display tracking-tight text-slate-900 leading-none">
+			<h1 class="entry-title text-8xl sm:text-9xl font-black font-display tracking-tight text-slate-900 leading-none" itemprop="name">
 				4<span class="text-brand-accent inline-block transition-transform hover:rotate-12 duration-300">0</span>4
 			</h1>
-			<!-- Graduation Cap Motif representing bachelor degree upgrade -->
 			<div class="absolute -top-3 right-3 sm:right-6 transform -rotate-12 pointer-events-none text-brand-primary drop-shadow-md">
 				<svg class="w-12 h-12 sm:w-16 sm:h-16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 					<path d="M11.7 2.1c.2-.1.4-.1.6 0l10 5a1 1 0 0 1 0 1.8l-10 5a1 1 0 0 1-.6 0l-10-5a1 1 0 0 1 0-1.8l10-5Z"/>
@@ -39,8 +35,8 @@ get_header();
 			</div>
 		</div>
 
-		<!-- Tailored Heading for College/University Transfer -->
-		<div class="space-y-3">
+		<!-- Explanatory Messaging -->
+		<div class="entry-content space-y-3" itemprop="mainContentOfPage">
 			<h2 class="text-2xl sm:text-3xl font-bold font-display text-slate-900 tracking-tight">
 				Lạc mất lộ trình liên thông rồi bạn ơi!
 			</h2>
@@ -76,53 +72,32 @@ get_header();
 			</form>
 		</div>
 
-		<!-- Key Action Buttons -->
+		<!-- Action Buttons -->
 		<div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-			<a
-				href="<?php echo esc_url( home_url( '/' ) ); ?>"
-				class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-brand-primary text-white font-bold text-sm shadow-md hover:bg-brand-darkBlue active:scale-95 transition-all cursor-pointer"
-			>
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-brand-primary text-white font-bold text-sm shadow-md hover:bg-brand-darkBlue active:scale-95 transition-all">
 				<svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
 				</svg>
 				Về trang chủ
 			</a>
-			<a
-				href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>"
-				class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-brand-accent text-white font-bold text-sm shadow-md hover:bg-[#e06e00] active:scale-95 transition-all cursor-pointer"
-			>
+			<a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-brand-accent text-white font-bold text-sm shadow-md hover:bg-[#e06e00] active:scale-95 transition-all">
 				<svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
 				</svg>
 				Kiểm tra điều kiện liên thông
 			</a>
-			<button
-				type="button"
-				onclick="window.history.length > 1 ? window.history.back() : window.location.href='<?php echo esc_url( home_url( '/' ) ); ?>'"
-				class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 hover:text-slate-900 active:scale-95 transition-all cursor-pointer shadow-2xs"
-			>
-				<svg class="w-4 h-4 mr-1.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
-				</svg>
-				Quay lại trang trước
-			</button>
 		</div>
 
-		<!-- Minimal Quick Links & Support Footnote -->
+		<!-- Support Footnote -->
 		<div class="pt-4 border-t border-slate-200/70 text-xs sm:text-sm text-slate-500 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-			<a href="<?php echo esc_url( home_url( '/nhom-nganh/' ) ); ?>" class="hover:text-brand-primary hover:underline transition-colors">
-				Nhóm ngành liên thông HOT
-			</a>
+			<a href="<?php echo esc_url( home_url( '/nhom-nganh/' ) ); ?>" class="hover:text-brand-primary hover:underline transition-colors">Nhóm ngành liên thông HOT</a>
 			<span class="text-slate-300">•</span>
-			<a href="<?php echo esc_url( home_url( '/truong-doi-tac/' ) ); ?>" class="hover:text-brand-primary hover:underline transition-colors">
-				Trường đại học đối tác
-			</a>
+			<a href="<?php echo esc_url( home_url( '/truong-doi-tac/' ) ); ?>" class="hover:text-brand-primary hover:underline transition-colors">Trường đại học đối tác</a>
 			<span class="text-slate-300">•</span>
 			<span>Hotline tư vấn: <a href="tel:0988991496" class="font-bold text-brand-accent hover:underline">0988 991 496</a></span>
 		</div>
-
 	</div>
-</main>
+</article>
 
 <?php
 get_footer();

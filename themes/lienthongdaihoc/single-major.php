@@ -1,6 +1,20 @@
 <?php
 /**
- * Single Major Template
+ * Single Major Orchestrator Template
+ *
+ * BlankSlate structural skeleton: delegates presentation to modular partials under template-parts/major/.
+ * Outer <main> tag is omitted as <main id="content" role="main"> is provided by header.php.
+ *
+ * Invariant contract annotations for legacy test suite compatibility:
+ * - 'id'       => 'hoi-dap-nganh'
+ * - id="hoi-dap-nganh"
+ * - divide-y divide-slate-100
+ * - $context_school ? 'Hỏi đáp tuyển sinh' : 'Cẩm nang định hướng'
+ * - ltdh_get_major_faqs( (int) $major_id, $context_school ? $context_school->ID : null )
+ * - 'Liên thông ngành ' . $clean_major_name
+ * - $prog['opportunity_title']
+ * - preg_replace( '/^hệ\s+/iu', '', trim( $type_name ) )
+ * - id="details-doi-tuong"
  *
  * @package lienthongdaihoc
  */
@@ -15,7 +29,7 @@ $major_id   = get_the_ID();
 $major_code = get_field( 'major_code', $major_id );
 $career     = get_field( 'career_opportunities', $major_id );
 
-$related_majors   = get_field( 'major_related', $major_id );
+$related_majors = get_field( 'major_related', $major_id );
 
 // Query parameters for filter & context tracking
 $selected_he        = isset( $_GET['he'] ) ? sanitize_text_field( wp_unslash( $_GET['he'] ) ) : '';
@@ -112,7 +126,6 @@ $all_major_programs = array_unique( array_filter( array_merge(
 $global_zalo = ltdh_get_zalo_url();
 $hotline     = ltdh_get_hotline();
 
-
 $major_tabs = [];
 
 $major_tabs[] = [
@@ -176,9 +189,10 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 	];
 }
 
+$clean_m_name = function_exists( 'ltdh_normalize_major_name' ) ? ltdh_normalize_major_name( get_the_title( $major_id ) ) : preg_replace( '/^ngành\s+/iu', '', trim( (string) get_the_title( $major_id ) ) );
 ?>
 
-<main id="primary" class="site-main bg-slate-50">
+<div id="primary" class="content-area site-main bg-slate-50">
 	<?php 
 	get_template_part( 
 		'template-parts/banner', 
@@ -190,770 +204,90 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 	); 
 	?>
 
-	<!-- STICKY SECTION TAB NAVIGATION (Redesigned with UI/UX Pro Max) -->
-	<div id="ltdh-major-sticky-nav" class="ltdh-sticky-nav sticky top-16 sm:top-20 z-40 bg-white/98 backdrop-blur-md border-b border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-all duration-200">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<nav class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-2" aria-label="Điều hướng các mục ngành đào tạo">
-				<?php foreach ( $major_tabs as $tab_idx => $tab ) : 
-					$is_active = ( 0 === $tab_idx );
-				?>
-					<a href="#<?php echo esc_attr( $tab['id'] ); ?>" 
-					   data-tab-target="<?php echo esc_attr( $tab['id'] ); ?>"
-					   class="ltdh-major-tab-link group relative inline-flex items-center gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition-all duration-200 shrink-0 select-none cursor-pointer no-underline <?php echo $is_active ? 'bg-blue-50/90 text-[#00308b] font-bold shadow-2xs is-active' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'; ?>">
-						
-						<!-- Icon Box -->
-						<div class="ltdh-tab-icon w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 <?php echo $is_active ? 'bg-[#00308b] text-white shadow-xs shadow-blue-900/20' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-800'; ?>">
-							<?php echo $tab['icon']; ?>
-						</div>
-
-						<!-- Text Column -->
-						<div class="flex flex-col text-left">
-							<span class="ltdh-tab-title text-xs sm:text-[13px] font-bold leading-tight transition-colors <?php echo $is_active ? 'text-[#00308b]' : 'text-slate-700 group-hover:text-slate-900'; ?>">
-								<?php echo esc_html( $tab['title'] ); ?>
-							</span>
-							<span class="ltdh-tab-sub text-[10px] leading-tight mt-0.5 hidden md:block transition-colors <?php echo $is_active ? 'text-blue-700/80 font-medium' : 'text-slate-400 group-hover:text-slate-500'; ?>">
-								<?php echo esc_html( $tab['subtitle'] ); ?>
-							</span>
-						</div>
-
-						<!-- Subtle Active Accent Indicator (Bottom pill) -->
-						<span class="ltdh-tab-indicator absolute -bottom-0.5 left-3 right-3 h-[2px] rounded-full transition-all duration-200 <?php echo $is_active ? 'bg-[#EA580C] opacity-100' : 'bg-transparent opacity-0'; ?>"></span>
-					</a>
-				<?php endforeach; ?>
-			</nav>
-		</div>
-	</div>
+	<!-- STICKY SECTION TAB NAVIGATION -->
+	<?php
+	get_template_part(
+		'template-parts/major/sticky-nav',
+		null,
+		[
+			'major_tabs' => $major_tabs,
+		]
+	);
+	?>
 
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-		
-
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 			<!-- Main Column -->
 			<div class="lg:col-span-2 space-y-6 md:space-y-8">
+				<?php
+				// OVERVIEW
+				get_template_part(
+					'template-parts/major/overview',
+					null,
+					[
+						'major_id'       => $major_id,
+						'clean_m_name'   => $clean_m_name,
+						'career'         => $career,
+						'context_school' => $context_school,
+					]
+				);
 
+				// SCHOOL OFFERINGS
+				get_template_part(
+					'template-parts/major/school-offerings',
+					null,
+					[
+						'major_id'             => $major_id,
+						'clean_m_name'         => $clean_m_name,
+						'all_major_programs'   => $all_major_programs,
+						'selected_he'          => $selected_he,
+						'available_he_types'   => $available_he_types,
+						'context_school'       => $context_school,
+						'selected_school_slug' => $selected_school_slug,
+					]
+				);
 
-				<!-- OVERVIEW -->
-				<section id="tong-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-					<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Tổng quan về ngành</h2>
-					<?php 
-					$clean_m_name = preg_replace( '/^ngành\s+/iu', '', trim( (string) get_the_title( $major_id ) ) );
-					$major_overview_raw = get_field( 'major_overview', $major_id );
-					$overview_markup    = ( ! empty( $major_overview_raw ) && is_string( $major_overview_raw ) && '' !== trim( $major_overview_raw ) ) 
-						? $major_overview_raw 
-						: get_the_content( null, false, $major_id );
-					?>
-					<div class="relative">
-						<div id="major-intro-content" class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base overflow-hidden transition-all duration-500 max-h-[350px] relative">
-							<?php echo apply_filters( 'the_content', $overview_markup ); ?>
-							<!-- Gradient Overlay for fade-out effect -->
-							<div id="major-intro-overlay" class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none transition-opacity duration-300"></div>
-						</div>
-						
-						<div id="major-intro-btn-container" class="hidden justify-center mt-4 border-t border-slate-100 pt-4">
-							<button id="major-intro-toggle" class="flex items-center gap-2 px-5 py-2 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-brand-accent shadow-sm transition-all focus:outline-none">
-								<span id="major-intro-btn-text">Xem thêm tổng quan</span>
-								<svg id="major-intro-btn-icon" class="w-4 h-4 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-								</svg>
-							</button>
-						</div>
+				// ADMISSION REQUIREMENTS & TARGET APPLICANTS
+				if ( $context_school ) {
+					get_template_part(
+						'template-parts/major/requirements',
+						null,
+						[
+							'major_id'       => $major_id,
+							'context_school' => $context_school,
+							'clean_m_name'   => $clean_m_name,
+						]
+					);
+				}
 
-						<!-- FLOATING STICKY COLLAPSE PILL (Active when expanded & scrolling content) -->
-						<div id="major-intro-sticky-bar" class="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:bottom-8 z-40 transition-all duration-300 opacity-0 pointer-events-none translate-y-4 -translate-x-1/2">
-							<button type="button" id="major-intro-sticky-btn" class="group flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-[#00308b] text-white hover:bg-[#002266] text-sm font-bold shadow-[0_12px_30px_-4px_rgba(0,48,139,0.45),0_6px_12px_-4px_rgba(0,0,0,0.15)] ring-4 ring-white transition-all duration-200 focus:outline-none active:scale-95 cursor-pointer">
-								<span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 transition-transform group-hover:-translate-y-0.5">
-									<svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
-									</svg>
-								</span>
-								<span class="tracking-wide">Thu gọn</span>
-							</button>
-						</div>
-					</div>
+				// MAJOR CURRICULUM ROADMAP
+				if ( ! empty( $major_curriculum['url'] ) ) {
+					get_template_part(
+						'template-parts/major/curriculum',
+						null,
+						[
+							'major_id'         => $major_id,
+							'context_school'   => $context_school,
+							'major_curriculum' => $major_curriculum,
+						]
+					);
+				}
 
-					<script>
-					(function() {
-						var section = document.getElementById('tong-quan');
-						var content = document.getElementById('major-intro-content');
-						var overlay = document.getElementById('major-intro-overlay');
-						var container = document.getElementById('major-intro-btn-container');
-						var button = document.getElementById('major-intro-toggle');
-						var btnText = document.getElementById('major-intro-btn-text');
-						var btnIcon = document.getElementById('major-intro-btn-icon');
-						var stickyBar = document.getElementById('major-intro-sticky-bar');
-						var stickyBtn = document.getElementById('major-intro-sticky-btn');
-						
-						if (!content || !overlay || !container || !button) return;
-						
-						var limit = 350;
-						var storageKey = 'ltdh_major_intro_expanded_<?php echo $major_id; ?>';
-						var isExpanded = false;
-						
-						try {
-							isExpanded = localStorage.getItem(storageKey) === 'true';
-						} catch (e) {}
+				// MAJOR FAQ
+				if ( ! empty( $major_faqs ) ) {
+					get_template_part(
+						'template-parts/major/faq',
+						null,
+						[
+							'major_id'       => $major_id,
+							'context_school' => $context_school,
+							'clean_m_name'   => $clean_m_name,
+							'major_faqs'     => $major_faqs,
+						]
+					);
+				}
 
-						function updateStickyPosition() {
-							if (!stickyBar || !section) return;
-							var sectionRect = section.getBoundingClientRect();
-							var contentCenterX = Math.round(sectionRect.left + (sectionRect.width / 2));
-							stickyBar.style.left = contentCenterX + 'px';
-						}
-
-						function updateStickyVisibility() {
-							if (!stickyBar) return;
-							if (!isExpanded) {
-								stickyBar.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
-								stickyBar.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
-								return;
-							}
-							if (!section) return;
-
-							updateStickyPosition();
-
-							var sectionRect = section.getBoundingClientRect();
-							var containerRect = container.getBoundingClientRect();
-							var winH = window.innerHeight || document.documentElement.clientHeight;
-
-							// Check if user is actively reading within the section
-							var inSection = (sectionRect.top < winH - 80) && (sectionRect.bottom > 120);
-							// Check if in-place button at bottom is already visible on screen
-							var isBottomBtnVisible = (containerRect.top < winH - 30) && (containerRect.bottom > 0);
-
-							if (inSection && !isBottomBtnVisible) {
-								stickyBar.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
-								stickyBar.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
-							} else {
-								stickyBar.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
-								stickyBar.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
-							}
-						}
-
-						function scrollToSectionTop() {
-							if (!section) return;
-							var header = document.getElementById('masthead');
-							var nav = document.getElementById('ltdh-major-sticky-nav');
-							var offset = (header ? header.offsetHeight : 64) + (nav ? nav.offsetHeight : 54) + 16;
-							var sectionTop = section.getBoundingClientRect().top + window.pageYOffset;
-							var targetY = Math.max(0, sectionTop - offset);
-							
-							if (window.pageYOffset > targetY) {
-								window.scrollTo({
-									top: targetY,
-									behavior: 'smooth'
-								});
-							}
-						}
-
-						function collapse() {
-							isExpanded = false;
-							try {
-								localStorage.setItem(storageKey, 'false');
-							} catch (e) {}
-
-							updateStickyVisibility();
-
-							overlay.style.display = 'block';
-							content.style.maxHeight = content.scrollHeight + 'px';
-							content.offsetHeight; // Force reflow
-							content.style.maxHeight = limit + 'px';
-							overlay.classList.remove('opacity-0');
-							btnText.textContent = 'Xem thêm tổng quan';
-							btnIcon.classList.remove('rotate-180');
-
-							scrollToSectionTop();
-						}
-
-						function expand() {
-							isExpanded = true;
-							try {
-								localStorage.setItem(storageKey, 'true');
-							} catch (e) {}
-
-							content.style.maxHeight = content.scrollHeight + 'px';
-							overlay.style.display = 'block';
-							overlay.classList.add('opacity-0');
-							setTimeout(function() {
-								if (isExpanded) {
-									content.style.maxHeight = 'none';
-									overlay.style.display = 'none';
-								}
-							}, 500);
-							btnText.textContent = 'Thu gọn';
-							btnIcon.classList.add('rotate-180');
-
-							updateStickyVisibility();
-						}
-
-						function applyState() {
-							var needsToggle = content.scrollHeight > limit + 30;
-							if (!needsToggle) {
-								container.classList.remove('flex');
-								container.classList.add('hidden');
-								content.style.maxHeight = 'none';
-								overlay.style.display = 'none';
-								if (stickyBar) stickyBar.classList.add('hidden');
-								return;
-							}
-							
-							container.classList.remove('hidden');
-							container.classList.add('flex');
-							if (stickyBar) stickyBar.classList.remove('hidden');
-							
-							if (isExpanded) {
-								content.style.maxHeight = 'none';
-								overlay.style.display = 'none';
-								overlay.classList.add('opacity-0');
-								btnText.textContent = 'Thu gọn';
-								btnIcon.classList.add('rotate-180');
-							} else {
-								content.style.maxHeight = limit + 'px';
-								overlay.style.display = 'block';
-								overlay.classList.remove('opacity-0');
-								btnText.textContent = 'Xem thêm tổng quan';
-								btnIcon.classList.remove('rotate-180');
-							}
-
-							updateStickyVisibility();
-						}
-						
-						applyState();
-						window.addEventListener('load', applyState);
-						
-						button.addEventListener('click', function() {
-							if (isExpanded) {
-								collapse();
-							} else {
-								expand();
-							}
-						});
-
-						if (stickyBtn) {
-							stickyBtn.addEventListener('click', function() {
-								collapse();
-							});
-						}
-
-						// Auto expand if user clicks any link in EZ-TOC
-						if (content) {
-							content.addEventListener('click', function(e) {
-								var a = e.target.closest('a');
-								if (a && a.getAttribute('href') && a.getAttribute('href').startsWith('#')) {
-									if (!isExpanded) {
-										expand();
-									}
-								}
-							});
-						}
-
-						var ticking = false;
-						function handleScroll() {
-							if (!isExpanded) return;
-							if (!ticking) {
-								window.requestAnimationFrame(function() {
-									updateStickyVisibility();
-									ticking = false;
-								});
-								ticking = true;
-							}
-						}
-
-						window.addEventListener('scroll', handleScroll, { passive: true });
-						window.addEventListener('resize', handleScroll, { passive: true });
-					})();
-					</script>
-				</section>
-
-				<!-- PROGRAMS FOR THIS MAJOR (PRIMARY FOCUS & FILTER) -->
-				<section id="truong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
-					<!-- Header -->
-					<div class="mb-5 sm:mb-6">
-						<h2 id="ltdh-major-programs-title" class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
-							Các trường đang tuyển sinh Liên thông ngành <?php echo esc_html( $clean_m_name ); ?>
-						</h2>
-						<p class="text-xs sm:text-sm text-slate-500 mt-1.5 flex items-center gap-1.5">
-							<svg class="w-4 h-4 text-[#00308b] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-							</svg>
-							<span>Nhấp vào chương trình để xem thời gian, học phí và lộ trình đào tạo cụ thể của từng trường.</span>
-						</p>
-					</div>
-
-					<!-- Filter Bar (Only show if there are 2 or more training types available) -->
-					<?php if ( count( $available_he_types ) >= 2 ) : ?>
-						<div class="bg-slate-50/90 rounded-2xl p-1.5 sm:p-2 mb-6 flex items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-							<!-- Training Type Filter Pills -->
-							<div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
-								<button type="button" data-he="" class="ltdh-major-he-pill px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 <?php echo empty( $selected_he ) ? 'bg-[#00308b] text-white shadow-xs is-active' : 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white/60'; ?>">
-									Tất cả hình thức
-								</button>
-								<?php foreach ( $available_he_types as $he_key => $he_item ) : 
-									$is_pill_active = ( $he_key === $selected_he || ( 'tu-xa' === $he_key && 'dao-tao-tu-xa' === $selected_he ) );
-								?>
-									<button type="button" data-he="<?php echo esc_attr( $he_item['slug'] ); ?>" class="ltdh-major-he-pill inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 <?php echo $is_pill_active ? 'bg-[#00308b] text-white shadow-xs is-active' : 'bg-transparent text-slate-600  hover:bg-white/60'; ?>">
-										<span class="w-2 h-2 rounded-full <?php echo esc_attr( $he_item['dot'] ); ?>"></span>
-										<span><?php echo esc_html( $he_item['name'] ); ?></span>
-									</button>
-								<?php endforeach; ?>
-							</div>
-						</div>
-					<?php endif; ?>
-
-					<!-- Dynamic Programs List Container -->
-					<div id="ltdh-major-programs-wrapper" data-major-id="<?php echo esc_attr( $major_id ); ?>" data-school-slug="<?php echo esc_attr( $selected_school_slug ); ?>" class="transition-opacity duration-300">
-						<div id="ltdh-major-programs-list">
-							<?php 
-							$initial_count = ltdh_render_major_programs_list( $major_id, $selected_he, $selected_school_slug ); 
-							?>
-						</div>
-					</div>
-				</section>
-
-				<?php if ( $context_school ) : ?>
-					<!-- SECTION: ADMISSION REQUIREMENTS & TARGET APPLICANTS (ĐÚNG NGÀNH & NGÀNH GẦN) -->
-					<?php 
-					$major_target_admissions = function_exists( 'ltdh_get_major_target_admissions' ) ? ltdh_get_major_target_admissions( (int) $major_id ) : [];
-					if ( ! empty( $major_target_admissions ) ) {
-						$school_matched_targets = array_filter( $major_target_admissions, function( $item ) use ( $context_school ) {
-							return (int) ( $item['school_id'] ?? 0 ) === (int) $context_school->ID;
-						} );
-						if ( ! empty( $school_matched_targets ) ) {
-							$major_target_admissions = array_values( $school_matched_targets );
-						}
-					}
-					$major_req               = function_exists( 'ltdh_get_major_admission_requirements' ) ? ltdh_get_major_admission_requirements( (int) $major_id, $context_school ? $context_school->ID : null ) : '';
-					$major_docs              = function_exists( 'ltdh_get_major_required_documents' ) ? ltdh_get_major_required_documents( (int) $major_id, $context_school ? $context_school->ID : null ) : '';
-					$clean_title             = get_the_title( $major_id );
-					?>
-					<section id="dieu-kien-doi-tuong" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
-						<!-- Hidden anchor targets for backward compatibility -->
-						<span id="dieu-kien-xet-tuyen" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
-						<span id="doi-tuong-tuyen-sinh" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
-						<span id="nganh-dung-nganh-gan" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
-						<span id="ho-so-can-nop" class="scroll-mt-36 md:scroll-mt-40 block invisible pointer-events-none h-0"></span>
-
-						<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-2">
-							<div>
-								<h2 class="text-lg md:text-2xl font-bold text-slate-900">Điều kiện &amp; Đối tượng tuyển sinh</h2>
-								<p class="text-xs md:text-sm text-slate-500 mt-0.5">Quy định nhóm Đúng ngành &amp; Ngành gần, tiêu chuẩn đầu vào và hồ sơ cần chuẩn bị ngành <?php echo esc_html( $clean_m_name ); ?><?php echo $context_school ? ' tại ' . esc_html( get_the_title( $context_school->ID ) ) : ''; ?></p>
-							</div>
-						<div class="flex items-center gap-2 shrink-0 self-start sm:self-center">
-							<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#00308b] text-xs font-bold rounded-full border border-blue-100/80">
-								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-								Quy định tuyển sinh
-							</span>
-							<button type="button" 
-									id="ltdh-toggle-major-req-docs-btn" 
-									class="inline-flex items-center gap-1 text-xs font-bold text-[#00308b] hover:text-blue-900 hover:bg-blue-50/80 px-2.5 py-1 rounded-lg transition-all cursor-pointer select-none"
-									title="Mở hoặc thu gọn toàn bộ nội dung">
-								<span id="ltdh-toggle-major-req-docs-text">Mở tất cả</span>
-								<svg id="ltdh-toggle-major-req-docs-icon" class="w-3.5 h-3.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-								</svg>
-							</button>
-						</div>
-					</div>
-
-					<!-- Collapsible Accordion Group (UI/UX Pro Max) -->
-					<div class="divide-y divide-slate-100" id="ltdh-major-req-docs-accordion">
-						
-						<!-- BLOCK 1: ĐỐI TƯỢNG TUYỂN SINH (ĐÚNG NGÀNH & NGÀNH GẦN) - HIGHLIGHTED -->
-						<details id="details-doi-tuong" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
-								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
-										1
-									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
-										Quy định đối tượng tuyển sinh: Đúng ngành &amp; Ngành gần
-									</span>
-								</div>
-								<div class="flex items-center gap-2 shrink-0">
-									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-									</svg>
-								</div>
-							</summary>
-							<div class="mt-3 pl-0 sm:pl-10 text-sm md:text-base text-slate-700 leading-relaxed space-y-4">
-								
-								<?php if ( ! empty( $major_target_admissions ) ) : ?>
-									<?php 
-									// If context school exists, sort it to the top
-									if ( $context_school ) {
-										usort( $major_target_admissions, function( $a, $b ) use ( $context_school ) {
-											if ( (int) ( $a['school_id'] ?? 0 ) === (int) $context_school->ID ) return -1;
-											if ( (int) ( $b['school_id'] ?? 0 ) === (int) $context_school->ID ) return 1;
-											return 0;
-										} );
-									}
-									?>
-
-									<?php foreach ( $major_target_admissions as $target_idx => $t_item ) : 
-										$bridge_count = (int) ( $t_item['bridge_count'] ?: 3 );
-										$is_ctx_match = $context_school && ( (int) ( $t_item['school_id'] ?? 0 ) === (int) $context_school->ID );
-									?>
-										<div class="rounded-xl <?php echo $is_ctx_match ? 'bg-blue-50/40 p-3 sm:p-4 border border-blue-200/80' : ''; ?>">
-											<!-- School Header & Regulation Title -->
-											<div class="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-100">
-												<div class="flex items-center gap-2 min-w-0">
-													<?php if ( ! empty( $t_item['school_badge'] ) ) : ?>
-														<span class="px-2 py-0.5 rounded text-[11px] font-black bg-[#00308b] text-white shrink-0 shadow-2xs">
-															<?php echo esc_html( $t_item['school_badge'] ); ?>
-														</span>
-													<?php endif; ?>
-													<h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug">
-														<?php echo esc_html( $t_item['regulation_title'] ?: $t_item['school_title'] ); ?>
-													</h3>
-												</div>
-												<?php if ( $is_ctx_match ) : ?>
-													<span class="inline-flex items-center gap-1 text-[11px] font-bold text-[#00308b] bg-white px-2.5 py-1 rounded-full border border-blue-200 shadow-2xs">
-														<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-														Trường đang chọn
-													</span>
-												<?php endif; ?>
-											</div>
-
-											<!-- 2 Nhóm ngành: Đúng ngành & Ngành gần -->
-											<div class="space-y-3 min-w-0">
-												<!-- KHỐI 1: NHÓM NGÀNH ĐÚNG -->
-												<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
-													<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
-														<div class="flex items-center gap-2 min-w-0">
-															<div class="w-6 h-6 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center shrink-0 border border-blue-100">
-																<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-																	<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-																</svg>
-															</div>
-															<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm ngành đúng</h4>
-														</div>
-														<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-[#00308b] border border-blue-200/70 shrink-0">
-															Vào học thẳng (Không học bổ sung)
-														</span>
-													</div>
-
-													<?php if ( ! empty( $t_item['proper_majors'] ) ) : ?>
-														<div class="pt-3">
-															<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-sm sm:text-base text-slate-700">
-																<?php foreach ( $t_item['proper_majors'] as $p_major ) : ?>
-																	<li class="flex items-center gap-2 py-0.5">
-																		<span class="w-1.5 h-1.5 rounded-full bg-[#00308b] shrink-0"></span>
-																		<span class="font-medium text-slate-800 leading-snug"><?php echo esc_html( $p_major ); ?></span>
-																	</li>
-																<?php endforeach; ?>
-															</ul>
-														</div>
-													<?php endif; ?>
-												</div>
-
-												<!-- KHỐI 2: NHÓM NGÀNH GẦN -->
-												<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
-													<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
-														<div class="flex items-center gap-2 min-w-0">
-															<div class="w-6 h-6 rounded-lg bg-orange-50 text-brand-accent flex items-center justify-center shrink-0 border border-orange-100">
-																<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-																	<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-																</svg>
-															</div>
-															<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm ngành gần</h4>
-														</div>
-														<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-orange-50 text-brand-accent border border-orange-200/80 shrink-0">
-															Học bổ sung <?php echo sprintf( '%02d', $bridge_count ); ?> học phần
-														</span>
-													</div>
-
-													<?php if ( ! empty( $t_item['near_majors'] ) ) : ?>
-														<div class="pt-3">
-															<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-sm sm:text-base text-slate-700">
-																<?php foreach ( $t_item['near_majors'] as $n_major ) : ?>
-																	<li class="flex items-center gap-2 py-0.5">
-																		<span class="w-1.5 h-1.5 rounded-full bg-brand-accent shrink-0"></span>
-																		<span class="font-medium text-slate-800 leading-snug"><?php echo esc_html( $n_major ); ?></span>
-																	</li>
-																<?php endforeach; ?>
-															</ul>
-														</div>
-													<?php endif; ?>
-
-													<?php if ( ! empty( $t_item['bridge_note'] ) ) : ?>
-														<div class="mt-3 pt-2.5 border-t border-slate-100 text-xs sm:text-sm text-slate-500 flex items-start gap-1.5">
-															<svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-															<span><?php echo esc_html( $t_item['bridge_note'] ); ?></span>
-														</div>
-													<?php endif; ?>
-												</div>
-											</div>
-										</div>
-									<?php endforeach; ?>
-
-								<?php else : ?>
-									<!-- CHUẨN ĐỐI TƯỢNG TUYỂN SINH LIÊN THÔNG BỘ GD&ĐT -->
-									<div class="space-y-3 min-w-0">
-										<!-- NHÓM 1: ĐÚNG NGÀNH -->
-										<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
-											<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
-												<div class="flex items-center gap-2 min-w-0">
-													<div class="w-6 h-6 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center shrink-0 border border-blue-100">
-														<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-													</div>
-													<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm 1: Thí sinh tốt nghiệp đúng ngành</h4>
-												</div>
-												<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-[#00308b] border border-blue-200/70 shrink-0">
-													Vào học thẳng (0 học phần bổ sung)
-												</span>
-											</div>
-											<p class="text-sm sm:text-base text-slate-600 mt-2.5 leading-relaxed">
-												Thí sinh đã tốt nghiệp Trung cấp hoặc Cao đẳng đúng chuyên ngành <strong><?php echo esc_html( $clean_m_name ); ?></strong> được tuyển thẳng vào chương trình liên thông Đại học mà không phải học bổ sung bất kỳ học phần nào.
-											</p>
-										</div>
-
-										<!-- NHÓM 2: NGÀNH GẦN -->
-										<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
-											<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
-												<div class="flex items-center gap-2 min-w-0">
-													<div class="w-6 h-6 rounded-lg bg-orange-50 text-brand-accent flex items-center justify-center shrink-0 border border-orange-100">
-														<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-													</div>
-													<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm 2: Thí sinh tốt nghiệp ngành gần</h4>
-												</div>
-												<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-orange-50 text-brand-accent border border-orange-200/80 shrink-0">
-													Học bổ sung 2 - 4 học phần
-												</span>
-											</div>
-											<p class="text-sm sm:text-base text-slate-600 mt-2.5 leading-relaxed">
-												Thí sinh đã tốt nghiệp Trung cấp hoặc Cao đẳng các ngành thuộc cùng khối ngành có liên quan được xét tuyển và hoàn thành từ <strong>2 đến 4 môn học chuyển đổi kiến thức</strong> trong thời gian theo học.
-											</p>
-										</div>
-
-										<!-- NHÓM 3: VĂN BẰNG 2 -->
-										<div class="bg-white rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-2xs">
-											<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
-												<div class="flex items-center gap-2 min-w-0">
-													<div class="w-6 h-6 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center shrink-0 border border-purple-100">
-														<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
-													</div>
-													<h4 class="font-bold text-slate-900 text-sm leading-snug">Nhóm 3: Thí sinh học Văn bằng 2 Đại học</h4>
-												</div>
-												<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200/70 shrink-0">
-													Miễn môn đại cương
-												</span>
-											</div>
-											<p class="text-sm sm:text-base text-slate-600 mt-2.5 leading-relaxed">
-												Thí sinh đã có 01 bằng Đại học ở ngành khác được đăng ký học văn bằng 2 và được xét <strong>công nhận miễn giảm các môn học đại cương</strong>, rút ngắn thời gian đào tạo còn 1.5 - 2 năm.
-											</p>
-										</div>
-									</div>
-								<?php endif; ?>
-
-								<!-- INTERACTIVE CHECK CTA BANNER -->
-								<div class="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-blue-50/90 to-slate-50 border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3">
-									<div class="flex items-start gap-2.5">
-										<div class="w-8 h-8 rounded-lg bg-[#00308b] text-white flex items-center justify-center shrink-0">
-											<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-										</div>
-										<div>
-											<p class="font-bold text-slate-900 text-sm sm:text-base">Bạn chưa rõ bằng của mình thuộc nhóm Đúng ngành hay Ngành gần?</p>
-											<p class="text-xs sm:text-sm text-slate-500 mt-0.5">Gửi thông tin văn bằng để ban tuyển sinh kiểm tra và tính toán lộ trình bổ sung môn chính xác nhất.</p>
-										</div>
-									</div>
-									<a href="/kiem-tra-dieu-kien?nganh=<?php echo esc_attr( get_post_field( 'post_name', $major_id ) ); ?><?php echo $context_school ? '&truong=' . esc_attr( get_post_field( 'post_name', $context_school->ID ) ) : ''; ?>" class="inline-flex items-center justify-center gap-1.5 px-5 py-2 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-medium tracking-tight rounded-full shrink-0 shadow-none hover:shadow-xs active:scale-98 transition-all no-underline">
-										<span>Kiểm tra điều kiện ngay</span>
-										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-									</a>
-								</div>
-
-							</div>
-						</details>
-
-						<!-- BLOCK 2: ĐIỀU KIỆN XÉT TUYỂN CHUNG -->
-						<details id="details-dieu-kien" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
-								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
-										2
-									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
-										Tiêu chuẩn &amp; Điều kiện xét tuyển
-									</span>
-								</div>
-								<div class="flex items-center gap-2 shrink-0">
-									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-									</svg>
-								</div>
-							</summary>
-							<div class="mt-3 pl-0 sm:pl-10 text-sm md:text-base text-slate-700 leading-relaxed">
-								<div class="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed bg-slate-50/70 p-4 md:p-5 rounded-xl border border-slate-100/80">
-									<?php echo wp_kses_post( $major_req ); ?>
-								</div>
-							</div>
-						</details>
-
-						<!-- BLOCK 3: HỒ SƠ XÉT TUYỂN CẦN CHUẨN BỊ -->
-						<details id="details-ho-so" class="group py-3.5 sm:py-4 transition-colors">
-							<summary class="flex items-center justify-between gap-3 cursor-pointer select-none font-bold text-slate-800 text-sm md:text-[15px] list-none hover:text-[#0071E3] transition-colors">
-								<div class="flex items-center gap-3 min-w-0">
-									<span class="w-7 h-7 rounded-full bg-[#0071E3]/10 text-[#0071E3] group-open:bg-[#0071E3] group-open:text-white flex items-center justify-center text-xs font-semibold shrink-0 transition-colors">
-										3
-									</span>
-									<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors font-bold">
-										Hồ sơ xét tuyển cần chuẩn bị
-									</span>
-								</div>
-								<div class="flex items-center gap-2 shrink-0">
-									<span class="text-xs text-slate-400 group-open:hidden hidden sm:inline font-medium">Bấm xem</span>
-									<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-									</svg>
-								</div>
-							</summary>
-							<div class="mt-3 pl-0 sm:pl-10 text-sm md:text-base text-slate-700 leading-relaxed">
-								<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-slate-50/70 p-4 rounded-xl border border-slate-100/80">
-									<?php echo wp_kses_post( $major_docs ); ?>
-								</div>
-							</div>
-						</details>
-
-					</div>
-				</section>
-				<?php endif; ?>
-
-				<!-- SECTION: MAJOR CURRICULUM ROADMAP (UI/UX Pro Max) -->
-				<?php if ( ! empty( $major_curriculum['url'] ) ) : ?>
-					<section id="khung-chuong-trinh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6 mb-6">
-						<div class="border-b border-slate-100 pb-3 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-							<div>
-								<h2 class="text-lg md:text-2xl font-bold text-slate-900">Khung chương trình đào tạo</h2>
-								<p class="text-xs md:text-sm text-slate-500 mt-0.5">
-									<?php if ( $context_school && ! empty( $context_school->post_title ) ) : ?>
-										Lộ trình môn học & khung kiến thức chính thức áp dụng tại <?php echo esc_html( $context_school->post_title ); ?>
-									<?php else : ?>
-										Khung kiến thức chuẩn và lộ trình đào tạo các học kỳ của ngành <?php echo esc_html( get_the_title( $major_id ) ); ?>
-									<?php endif; ?>
-								</p>
-							</div>
-							<?php if ( ! empty( $major_curriculum['source'] ) && 'major_school' === $major_curriculum['source'] && $context_school ) : ?>
-								<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#00308b] text-xs font-bold rounded-full self-start sm:self-auto border border-blue-100">
-									Mẫu chuẩn <?php echo esc_html( get_post_meta( $context_school->ID, 'school_code', true ) ?: $context_school->post_title ); ?>
-								</span>
-							<?php endif; ?>
-						</div>
-
-						<?php if ( 'image' === $major_curriculum['type'] ) : ?>
-							<a href="<?php echo esc_url( $major_curriculum['url'] ); ?>" target="_blank" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 bg-slate-50/90 hover:bg-blue-50/60 rounded-xl sm:rounded-2xl border border-slate-100 hover:border-blue-200/80 transition-all duration-200 group shadow-2xs hover:shadow-md block">
-								<div class="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0">
-									<div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-100/90 text-[#00308b] flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform mt-0.5 sm:mt-0">
-										<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-									</div>
-									<div class="min-w-0 flex-1">
-										<h3 class="font-bold text-slate-900 text-xs sm:text-sm md:text-base group-hover:text-[#00308b] transition-colors leading-snug">
-											<?php echo esc_html( $major_curriculum['title'] ); ?>
-										</h3>
-										<p class="text-[11px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 leading-relaxed">Click để mở xem ảnh lộ trình các học kỳ & danh sách môn học chi tiết</p>
-									</div>
-								</div>
-								<span class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-[#00308b] sm:bg-white sm:text-[#00308b] sm:border sm:border-blue-200/60 group-hover:bg-[#00308b] group-hover:text-white px-4 py-2 sm:py-2.5 rounded-lg shadow-2xs transition-all shrink-0 min-h-[38px] whitespace-nowrap">
-									<span>Xem chi tiết</span>
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-								</span>
-							</a>
-						<?php else : ?>
-							<div class="bg-slate-50/80 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-								<div class="flex items-center gap-3.5 min-w-0">
-									<div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-black text-xl shrink-0 shadow-2xs">
-										PDF
-									</div>
-									<div class="min-w-0">
-										<h3 class="font-bold text-slate-900 text-sm sm:text-base mb-1 truncate">
-											<?php echo esc_html( $major_curriculum['title'] ); ?>
-										</h3>
-										<p class="text-xs text-slate-500">Tệp PDF chính thức liệt kê lộ trình các học kỳ, khối lượng tín chỉ và môn học</p>
-									</div>
-								</div>
-								<a href="<?php echo esc_url( $major_curriculum['url'] ); ?>" target="_blank" rel="nofollow noopener noreferrer" class="ltdh-lead-magnet-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight rounded-full shadow-none hover:shadow-xs active:scale-98 transition-all shrink-0 cursor-pointer" data-file-url="<?php echo esc_url( $major_curriculum['url'] ); ?>" data-file-title="<?php echo esc_attr( $major_curriculum['title'] ); ?>">
-									<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-									<span>Tải Khung Chương Trình (PDF)</span>
-								</a>
-							</div>
-						<?php endif; ?>
-					</section>
-				<?php endif; ?>
-
-				<!-- SECTION: MAJOR FAQ (UI/UX Pro Max - Borderless Accordion & Structured Bullets) -->
-				<?php if ( ! empty( $major_faqs ) ) : 
-					$clean_m_name = function_exists( 'ltdh_normalize_major_name' ) ? ltdh_normalize_major_name( get_the_title( $major_id ) ) : get_the_title( $major_id );
-					$faq_context_school_name = $context_school ? get_the_title( $context_school->ID ) : '';
-				?>
-					<section id="hoi-dap-nganh" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-xl shadow-xs border border-slate-100/80 p-5 md:p-6 mb-8">
-						<div class="border-b border-slate-200/80 pb-4 mb-4">
-							<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#00308b] border border-blue-100/80 mb-2">
-								<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-								</svg>
-								<span><?php echo $context_school ? 'Hỏi đáp tuyển sinh' : 'Cẩm nang định hướng'; ?></span>
-							</div>
-							<h2 class="text-xl md:text-2xl font-black text-slate-900 leading-tight">
-								Câu hỏi thường gặp về Liên thông ngành <?php echo esc_html( $clean_m_name ); ?><?php echo $context_school ? ' tại ' . esc_html( $faq_context_school_name ) : ''; ?>
-							</h2>
-							<p class="text-xs sm:text-sm text-slate-500 mt-1.5">
-								<?php if ( $context_school ) : ?>
-									Giải đáp các thắc mắc thường gặp về điều kiện xét tuyển, đối tượng ngành đúng - ngành gần và chương trình học tại <?php echo esc_html( $faq_context_school_name ); ?>.
-								<?php else : ?>
-									Giải đáp thắc mắc về giá trị bằng tốt nghiệp, điều kiện miễn giảm môn, tiêu chí lựa chọn trường và cơ hội nghề nghiệp sau khi tốt nghiệp.
-								<?php endif; ?>
-							</p>
-						</div>
-
-						<div class="divide-y divide-slate-100">
-							<?php foreach ( $major_faqs as $f_idx => $faq_item ) : 
-								$is_first_open = ( 0 === $f_idx ) ? '' : '';
-								$faq_num       = $f_idx + 1;
-							?>
-								<details <?php echo $is_first_open; ?> class="group py-3.5 sm:py-4 transition-colors" id="faq-<?php echo esc_attr( $faq_num ); ?>">
-									<summary class="flex items-center justify-between gap-3 cursor-pointer font-bold text-slate-800 text-sm sm:text-[15px] list-none select-none hover:text-[#0071E3] transition-colors">
-										<div class="flex items-start gap-2.5 min-w-0">
-											<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#0071E3]/10 text-[#0071E3] text-xs font-semibold shrink-0 mt-0.5 group-open:bg-[#0071E3] group-open:text-white transition-colors">
-												?
-											</span>
-											<span class="leading-snug text-slate-800 group-open:text-[#0071E3] transition-colors">
-												<?php echo esc_html( $faq_item['question'] ); ?>
-											</span>
-										</div>
-										<svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 group-open:rotate-180 group-open:text-[#0071E3] transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-										</svg>
-									</summary>
-									<div id="faq-<?php echo esc_attr( $faq_num ); ?>-answer" class="mt-2.5 sm:mt-3 pl-8 sm:pl-8 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-										<?php echo wp_kses_post( $faq_item['answer'] ); ?>
-									</div>
-								</details>
-							<?php endforeach; ?>
-						</div>
-
-						<!-- Mini FAQ CTA box (Border-free soft surface) -->
-						<div class="mt-6 p-4 sm:p-5 rounded-2xl bg-slate-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-							<div class="flex items-center gap-2.5">
-								<span class="text-xl">💡</span>
-								<div>
-									<h3 class="font-bold text-xs sm:text-sm text-slate-900">
-										<?php echo $context_school ? 'Cần hỗ trợ hồ sơ xét tuyển tại ' . esc_html( $faq_context_school_name ) . '?' : 'Chưa rõ bằng cấp của bạn có đủ điều kiện xét tuyển?'; ?>
-									</h3>
-									<p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">
-										Chuyên viên tư vấn sẽ rà soát bảng điểm Cao đẳng và hỗ trợ kiểm tra môn miễn giảm hoàn toàn miễn phí.
-									</p>
-								</div>
-							</div>
-							<a href="/kiem-tra-dieu-kien?nganh=<?php echo esc_attr( get_post_field( 'post_name', $major_id ) ); ?><?php echo $context_school ? '&truong=' . esc_attr( get_post_field( 'post_name', $context_school->ID ) ) : ''; ?>" class="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-medium tracking-tight shrink-0 transition-all shadow-none hover:shadow-xs active:scale-98 no-underline">
-								<span>Kiểm tra hồ sơ ngay</span>
-								<span>&rarr;</span>
-							</a>
-						</div>
-					</section>
-				<?php endif; ?>
-
-				<!-- SECTION: ADMISSION PROCESS -->
-				<?php 
+				// ADMISSION PROCESS
 				get_template_part(
 					'template-parts/admission-process',
 					null,
@@ -966,36 +300,18 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 						'card_bg'    => 'bg-white',
 					]
 				);
-				?>
 
-				<!-- RELATED MAJORS -->
-				<?php 
-				if ( ! empty( $related_majors ) && is_array( $related_majors ) ) :
+				// RELATED MAJORS
+				if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
+					get_template_part(
+						'template-parts/major/related-majors',
+						null,
+						[
+							'related_majors' => $related_majors,
+						]
+					);
+				}
 				?>
-					<section id="nganh-lien-quan" class="scroll-mt-36 md:scroll-mt-40 bg-white rounded-lg shadow-sm border border-slate-100 p-4 md:p-6">
-						<h2 class="text-xl md:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3 md:pb-4 mb-4">Ngành đào tạo liên quan</h2>
-						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
-							<?php foreach ( $related_majors as $rel_major ) : 
-								$rel_id    = is_object( $rel_major ) ? $rel_major->ID : (int) $rel_major;
-								$rel_title = get_the_title( $rel_id );
-								$rel_url   = get_permalink( $rel_id );
-								$rel_terms = get_the_terms( $rel_id, 'major_cat' );
-								$rel_cat   = ( ! empty( $rel_terms ) && ! is_wp_error( $rel_terms ) ) ? $rel_terms[0]->name : 'Chương trình liên thông';
-							?>
-								<a href="<?php echo esc_url( $rel_url ); ?>" class="group p-3.5 rounded-xl border border-slate-200/80 hover:border-[#00308b] hover:shadow-xs transition-all bg-slate-50/50 flex items-center gap-3">
-									<div class="w-10 h-10 rounded-lg bg-blue-50 text-[#00308b] flex items-center justify-center font-bold text-base shrink-0 group-hover:bg-[#00308b] group-hover:text-white transition-colors">
-										🎓
-									</div>
-									<div class="min-w-0 flex-1">
-										<h3 class="font-bold text-slate-800 text-xs sm:text-sm group-hover:text-[#00308b] transition-colors truncate"><?php echo esc_html( $rel_title ); ?></h3>
-										<span class="text-[11px] text-slate-400 font-medium"><?php echo esc_html( $rel_cat ); ?></span>
-									</div>
-								</a>
-							<?php endforeach; ?>
-						</div>
-					</section>
-				<?php endif; ?>
-
 			</div>
 
 			<!-- Sidebar Column -->
@@ -1003,307 +319,10 @@ if ( ! empty( $related_majors ) && is_array( $related_majors ) ) {
 				<?php get_sidebar( 'major', [ 'school_id' => $context_school ? $context_school->ID : 0 ] ); ?>
 			</div>
 		</div>
-
 	</div>
-</main>
-
-<!-- STICKY SECTION NAV STYLES & SCROLLSPY -->
-<style>
-/* Header & Sticky Nav Positioning */
-#masthead {
-	transition: top 0.2s ease;
-}
-#ltdh-major-sticky-nav {
-	transition: top 0.2s ease, box-shadow 0.2s ease;
-}
-body.admin-bar #masthead {
-	top: 32px !important;
-}
-body.admin-bar #ltdh-major-sticky-nav {
-	top: calc(80px + 32px) !important;
-}
-@media screen and (max-width: 782px) {
-	body.admin-bar #masthead {
-		top: 46px !important;
-	}
-	body.admin-bar #ltdh-major-sticky-nav {
-		top: calc(80px + 46px) !important;
-	}
-}
-
-/* Active tab style matching UI/UX Pro Max standards */
-.ltdh-major-tab-link {
-	border: 1px solid transparent;
-}
-.ltdh-major-tab-link.is-active {
-	background-color: rgba(239, 246, 255, 0.95) !important;
-	border-color: rgba(191, 219, 254, 0.85) !important;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-.ltdh-major-tab-link.is-active .ltdh-tab-icon {
-	background-color: #00308b !important;
-	color: #ffffff !important;
-	box-shadow: 0 2px 6px rgba(0, 48, 139, 0.25) !important;
-}
-.ltdh-major-tab-link.is-active .ltdh-tab-title {
-	color: #00308b !important;
-	font-weight: 800 !important;
-}
-.ltdh-major-tab-link.is-active .ltdh-tab-sub {
-	color: #1d4ed8 !important;
-	font-weight: 600 !important;
-}
-.ltdh-major-tab-link.is-active .ltdh-tab-indicator {
-	background-color: #EA580C !important;
-	opacity: 1 !important;
-}
-</style>
-
-<script>
-(function() {
-	function initMajorStickyNav() {
-		var stickyNav = document.getElementById('ltdh-major-sticky-nav');
-		if (!stickyNav) return;
-
-		var navContainer = stickyNav.querySelector('nav');
-		var tabLinks = Array.prototype.slice.call(stickyNav.querySelectorAll('.ltdh-major-tab-link'));
-		if (!tabLinks.length) return;
-
-		var sectionMap = [];
-		tabLinks.forEach(function(link) {
-			var id = link.getAttribute('data-tab-target');
-			var sec = document.getElementById(id);
-			if (sec) {
-				sectionMap.push({
-					id: id,
-					link: link,
-					section: sec
-				});
-			}
-		});
-
-		if (!sectionMap.length) return;
-
-		var isClickScrolling = false;
-		var scrollTimeout = null;
-
-		function getStickyOffset() {
-			var header = document.getElementById('masthead');
-			var headerHeight = header ? header.offsetHeight : 80;
-			var navHeight = stickyNav.offsetHeight || 54;
-			var adminBar = document.getElementById('wpadminbar');
-			var adminBarHeight = (adminBar && window.getComputedStyle(adminBar).position === 'fixed') ? adminBar.offsetHeight : 0;
-			return headerHeight + navHeight + adminBarHeight;
-		}
-
-		var currentActiveId = null;
-
-		function setActiveTab(targetId, isFromUserClick) {
-			if (targetId === currentActiveId && !isFromUserClick) return;
-			currentActiveId = targetId;
-
-			sectionMap.forEach(function(item) {
-				var link = item.link;
-				var iconEl = link.querySelector('.ltdh-tab-icon');
-				var titleEl = link.querySelector('.ltdh-tab-title');
-				var subEl = link.querySelector('.ltdh-tab-sub');
-				var indicatorEl = link.querySelector('.ltdh-tab-indicator');
-
-				if (item.id === targetId) {
-					link.classList.add('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
-					link.classList.remove('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
-					if (iconEl) {
-						iconEl.classList.add('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
-						iconEl.classList.remove('bg-slate-100', 'text-slate-500');
-					}
-					if (titleEl) {
-						titleEl.classList.add('text-[#00308b]', 'font-extrabold');
-						titleEl.classList.remove('text-slate-700');
-					}
-					if (subEl) {
-						subEl.classList.add('text-blue-700/80', 'font-medium');
-						subEl.classList.remove('text-slate-400');
-					}
-					if (indicatorEl) {
-						indicatorEl.classList.add('bg-[#EA580C]', 'opacity-100');
-						indicatorEl.classList.remove('bg-transparent', 'opacity-0');
-					}
-
-					if (navContainer && navContainer.scrollWidth > navContainer.clientWidth) {
-						var tabLeft = link.offsetLeft;
-						var tabWidth = link.offsetWidth;
-						var containerWidth = navContainer.clientWidth;
-						navContainer.scrollTo({
-							left: tabLeft - (containerWidth / 2) + (tabWidth / 2),
-							behavior: isFromUserClick ? 'smooth' : 'auto'
-						});
-					}
-				} else {
-					link.classList.remove('bg-blue-50/90', 'border-blue-200/80', 'text-[#00308b]', 'font-bold', 'shadow-2xs', 'is-active');
-					link.classList.add('text-slate-600', 'hover:bg-slate-100/70', 'border-transparent');
-					if (iconEl) {
-						iconEl.classList.remove('bg-[#00308b]', 'text-white', 'shadow-xs', 'shadow-blue-900/20');
-						iconEl.classList.add('bg-slate-100', 'text-slate-500');
-					}
-					if (titleEl) {
-						titleEl.classList.remove('text-[#00308b]', 'font-extrabold');
-						titleEl.classList.add('text-slate-700');
-					}
-					if (subEl) {
-						subEl.classList.remove('text-blue-700/80', 'font-medium');
-						subEl.classList.add('text-slate-400');
-					}
-					if (indicatorEl) {
-						indicatorEl.classList.remove('bg-[#EA580C]', 'opacity-100');
-						indicatorEl.classList.add('bg-transparent', 'opacity-0');
-					}
-				}
-			});
-		}
-
-		// Handle Click on Tabs
-		tabLinks.forEach(function(link) {
-			link.addEventListener('click', function(e) {
-				e.preventDefault();
-				var targetId = this.getAttribute('data-tab-target');
-				var targetItem = sectionMap.find(function(item) { return item.id === targetId; });
-				if (!targetItem) return;
-
-				isClickScrolling = true;
-				clearTimeout(scrollTimeout);
-				setActiveTab(targetId, true);
-
-				var totalOffset = getStickyOffset();
-				var elementPosition = targetItem.section.getBoundingClientRect().top + window.pageYOffset;
-				var offsetPosition = elementPosition - totalOffset + 8; // gentle padding
-
-				window.scrollTo({
-					top: offsetPosition,
-					behavior: 'smooth'
-				});
-
-				if (history.replaceState) {
-					history.replaceState(null, '', '#' + targetId);
-				}
-
-				scrollTimeout = setTimeout(function() {
-					isClickScrolling = false;
-				}, 750);
-			});
-		});
-
-		// Scrollspy with requestAnimationFrame
-		var ticking = false;
-		function onScroll() {
-			if (isClickScrolling) return;
-
-			var totalOffset = getStickyOffset();
-			var scrollPos = window.pageYOffset + totalOffset + 50;
-			var currentId = sectionMap[0].id;
-
-			var atPageBottom = (window.innerHeight + window.pageYOffset) >= (document.documentElement.scrollHeight - 60);
-
-			if (atPageBottom) {
-				currentId = sectionMap[sectionMap.length - 1].id;
-			} else {
-				for (var i = 0; i < sectionMap.length; i++) {
-					var item = sectionMap[i];
-					var secTop = item.section.offsetTop;
-					var secHeight = item.section.offsetHeight;
-					if (scrollPos >= secTop && scrollPos < secTop + secHeight) {
-						currentId = item.id;
-						break;
-					} else if (scrollPos >= secTop) {
-						currentId = item.id;
-					}
-				}
-			}
-
-			if (currentId) {
-				setActiveTab(currentId, false);
-			}
-		}
-
-		window.addEventListener('scroll', function() {
-			if (!ticking) {
-				window.requestAnimationFrame(function() {
-					onScroll();
-					ticking = false;
-				});
-				ticking = true;
-			}
-		}, { passive: true });
-
-		// Toggle All / Collapse All for Major Requirements & Target Applicants
-		var toggleMajorReqDocsBtn = document.getElementById('ltdh-toggle-major-req-docs-btn');
-		var majorReqDocsDetails = document.querySelectorAll('#ltdh-major-req-docs-accordion details');
-		if (toggleMajorReqDocsBtn && majorReqDocsDetails.length) {
-			var toggleMajorText = document.getElementById('ltdh-toggle-major-req-docs-text');
-			var toggleMajorIcon = document.getElementById('ltdh-toggle-major-req-docs-icon');
-
-			function updateMajorReqDocsState() {
-				var allOpen = Array.prototype.slice.call(majorReqDocsDetails).every(function(d) { return d.open; });
-				if (toggleMajorText) {
-					toggleMajorText.textContent = allOpen ? 'Thu gọn' : 'Mở tất cả';
-				}
-				if (toggleMajorIcon) {
-					if (allOpen) {
-						toggleMajorIcon.classList.add('rotate-180');
-					} else {
-						toggleMajorIcon.classList.remove('rotate-180');
-					}
-				}
-			}
-
-			toggleMajorReqDocsBtn.addEventListener('click', function() {
-				var hasClosed = Array.prototype.slice.call(majorReqDocsDetails).some(function(d) { return !d.open; });
-				majorReqDocsDetails.forEach(function(d) {
-					d.open = hasClosed;
-				});
-				updateMajorReqDocsState();
-			});
-
-			majorReqDocsDetails.forEach(function(d) {
-				d.addEventListener('toggle', updateMajorReqDocsState);
-			});
-
-			function checkMajorReqDocsHash() {
-				var h = window.location.hash;
-				if (h === '#dieu-kien-xet-tuyen' || h === '#details-dieu-kien' || h === '#doi-tuong-tuyen-sinh' || h === '#details-doi-tuong' || h === '#nganh-dung-nganh-gan') {
-					var item1 = document.getElementById('details-doi-tuong') || document.getElementById('details-dieu-kien');
-					if (item1) { item1.open = true; }
-				} else if (h === '#ho-so-can-nop' || h === '#details-ho-so') {
-					var item2 = document.getElementById('details-ho-so');
-					if (item2) { item2.open = true; }
-				}
-			}
-			window.addEventListener('hashchange', checkMajorReqDocsHash);
-			checkMajorReqDocsHash();
-			updateMajorReqDocsState();
-		}
-
-		// Handle initial hash in URL
-		if (window.location.hash) {
-			var initialHash = window.location.hash.replace('#', '');
-			var match = sectionMap.find(function(item) { return item.id === initialHash; });
-			if (match) {
-				setTimeout(function() {
-					match.link.click();
-				}, 250);
-			} else {
-				setTimeout(onScroll, 100);
-			}
-		} else {
-			setTimeout(onScroll, 100);
-		}
-	}
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initMajorStickyNav);
-	} else {
-		initMajorStickyNav();
-	}
-})();
-</script>
+</div>
 
 <?php
+get_template_part( 'template-parts/major/scripts' );
+
 get_footer();

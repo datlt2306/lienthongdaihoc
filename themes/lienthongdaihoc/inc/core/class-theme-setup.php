@@ -14,7 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function ltdh_theme_setup() {
 	add_theme_support( 'title-tag' );
+	add_theme_support( 'automatic-feed-links' );
 	add_theme_support( 'post-thumbnails' );
+	add_theme_support( 'responsive-embeds' );
 	add_theme_support( 'html5', [
 		'search-form',
 		'comment-form',
@@ -46,6 +48,31 @@ function ltdh_theme_setup() {
 	} );
 }
 add_action( 'after_setup_theme', 'ltdh_theme_setup' );
+
+/**
+ * Injects BlankSlate Schema.org microdata type attribute on <html> element.
+ */
+function ltdh_schema_type() {
+	$schema = 'https://schema.org/';
+	if ( is_single() ) {
+		$type = 'Article';
+	} elseif ( is_author() ) {
+		$type = 'ProfilePage';
+	} elseif ( is_search() ) {
+		$type = 'SearchResultsPage';
+	} else {
+		$type = 'WebPage';
+	}
+	echo 'itemscope itemtype="' . esc_url( $schema . $type ) . '"';
+}
+
+/**
+ * Injects BlankSlate accessible skip-to-content link at top of <body>.
+ */
+function ltdh_skip_link() {
+	echo '<a href="#content" class="skip-link screen-reader-text sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#0071E3] focus:text-white focus:font-medium focus:rounded-full focus:shadow-xl focus:ring-2 focus:ring-white focus:outline-none transition-all duration-150">' . esc_html__( 'Chuyển đến nội dung chính', 'ltdh' ) . '</a>' . "\n";
+}
+add_action( 'wp_body_open', 'ltdh_skip_link', 5 );
 
 /**
  * Enqueue frontend styles and scripts.

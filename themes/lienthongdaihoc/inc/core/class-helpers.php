@@ -300,7 +300,7 @@ function ltdh_get_program_school_id( int $program_id ): int {
 	}
 	$school_id = intval( $school_id );
 
-	if ( $school_id > 0 && 'publish' === get_post_status( $school_id ) ) {
+	if ( $school_id > 0 && ( ! function_exists( 'get_post_status' ) || 'publish' === get_post_status( $school_id ) ) ) {
 		return $school_id;
 	}
 

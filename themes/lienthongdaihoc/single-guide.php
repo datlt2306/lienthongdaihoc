@@ -16,7 +16,7 @@ $hotline = ltdh_get_hotline();
 $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 ?>
 
-<main id="primary" class="site-main py-12 bg-slate-50">
+<div id="primary" class="content-area site-main py-12 bg-slate-50">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 		
 		<!-- Breadcrumbs -->
@@ -54,7 +54,7 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 		</div>
 
 	</div>
-</main>
+</div><!-- #primary -->
 
 <?php
 get_footer();

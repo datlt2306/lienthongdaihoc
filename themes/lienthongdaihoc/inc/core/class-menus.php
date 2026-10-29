@@ -1446,6 +1446,9 @@ function ltdh_get_major_count_by_cat( string $slug ): int {
  * Filter start_el to enrich mega menu elements on desktop.
  */
 function ltdh_mega_menu_nav_menu_start_el( $item_output, $item, $depth, $args ) {
+	if ( ! function_exists( 'ltdh_get_icon' ) && file_exists( __DIR__ . '/class-icons.php' ) ) {
+		require_once __DIR__ . '/class-icons.php';
+	}
 	$is_mobile  = isset( $args->menu_class ) && strpos( $args->menu_class, 'nav-mobile-menu' ) !== false;
 	$is_desktop = ( ( isset( $args->menu_class ) && strpos( $args->menu_class, 'nav-primary-menu' ) !== false ) || ( isset( $args->theme_location ) && $args->theme_location === 'primary-menu' ) ) && ! $is_mobile;
 	$classes    = (array) ( $item->classes ?? [] );
@@ -1475,7 +1478,7 @@ function ltdh_mega_menu_nav_menu_start_el( $item_output, $item, $depth, $args ) 
 			. '<span class="mega-cat-name">' . esc_html( $item->title ) . '</span>'
 			. ( $count > 0 ? '<span class="mega-cat-badge">' . $count . ' ngành</span>' : '' )
 			. '</span>'
-			. '<span class="mega-cat-arrow">' . ltdh_get_icon( 'chevron-right', 'w-3.5 h-3.5' ) . '</span>'
+			. '<span class="mega-cat-arrow">' . ( function_exists( 'ltdh_get_icon' ) ? ltdh_get_icon( 'chevron-right', 'w-3.5 h-3.5' ) : '' ) . '</span>'
 			. '</a>';
 	}
 
@@ -1492,7 +1495,7 @@ function ltdh_mega_menu_nav_menu_start_el( $item_output, $item, $depth, $args ) 
 	if ( $is_desktop && ( in_array( 'menu-item-cat-more', $classes, true ) || in_array( 'ltdh-cat-more-link', $classes, true ) ) && $depth === 2 ) {
 		return '<a href="' . esc_url( $item->url ) . '" class="mega-cat-more-link" title="' . esc_attr( $item->attr_title ?: ( 'Xem tất cả ' . $item->title ) ) . '">'
 			. '<span class="mega-cat-more-text">' . esc_html( $item->title ?: 'Xem tất cả' ) . '</span>'
-			. ltdh_get_icon( 'chevron-right', 'w-3.5 h-3.5 mega-cat-more-icon' )
+			. ( function_exists( 'ltdh_get_icon' ) ? ltdh_get_icon( 'chevron-right', 'w-3.5 h-3.5 mega-cat-more-icon' ) : '' )
 			. '</a>';
 	}
 
@@ -1505,7 +1508,7 @@ function ltdh_mega_menu_nav_menu_start_el( $item_output, $item, $depth, $args ) 
 			. '</div>'
 			. '<a href="' . esc_url( $item->url ) . '" class="mega-footer-btn">'
 			. '<span>' . esc_html( $cta_title ) . '</span>'
-			. ltdh_get_icon( 'arrow-right', 'w-3.5 h-3.5 ml-1.5' )
+			. ( function_exists( 'ltdh_get_icon' ) ? ltdh_get_icon( 'arrow-right', 'w-3.5 h-3.5 ml-1.5' ) : '' )
 			. '</a>'
 			. '</div>';
 	}

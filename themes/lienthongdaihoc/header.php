@@ -1,6 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <!DOCTYPE html>
-<html <?php language_attributes(); ?> class="overflow-x-clip">
+<html <?php language_attributes(); ?> <?php if ( function_exists( 'ltdh_schema_type' ) ) { ltdh_schema_type(); } ?> class="overflow-x-clip">
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,19 +49,6 @@
 				pointer-events: auto !important;
 			}
 		}
-		h1, h2, h3, h4, h5, h6,
-		h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
-		h1 strong, h2 strong, h3 strong, h4 strong, h5 strong, h6 strong,
-		h1 b, h2 b, h3 b, h4 b, h5 b, h6 b,
-		h1 .font-bold, h2 .font-bold, h3 .font-bold, h4 .font-bold, h5 .font-bold, h6 .font-bold,
-		h1 .font-extrabold, h2 .font-extrabold, h3 .font-extrabold, h4 .font-extrabold, h5 .font-extrabold, h6 .font-extrabold,
-		h1 .font-black, h2 .font-black, h3 .font-black, h4 .font-black, h5 .font-black, h6 .font-black {
-			font-weight: 600 !important;
-			letter-spacing: -0.022em;
-			color: #1D1D1F;
-		}
-		h1 { letter-spacing: -0.03em; }
-		.hero-banner { aspect-ratio: 1942 / 809; }
 	</style>
 
 	<?php
@@ -77,17 +64,13 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<a class="skip-link sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#0071E3] focus:text-white focus:font-medium focus:rounded-full focus:shadow-xl focus:ring-2 focus:ring-white focus:outline-none transition-all duration-150" href="#primary">
-	<?php esc_html_e( 'Chuyển đến nội dung chính', 'ltdh' ); ?>
-</a>
-
-<div id="page" class="site">
+<div id="wrapper" class="hfeed">
 	<?php
 	$header_hotline     = function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496';
 	$header_clean_phone = preg_replace( '/\D/', '', $header_hotline );
 	?>
 	<!-- HEADER NAVIGATION (Apple Cupertino Aesthetic: Frosted Glass Navbar & Floating Mobile Island) -->
-	<header id="masthead" class="site-header sticky top-0 z-[60] w-full pt-2 px-2.5 lg:pt-0 lg:px-0 lg:bg-white/80 lg:backdrop-blur-xl lg:border-b lg:border-black/[0.08] lg:shadow-xs pointer-events-none lg:pointer-events-auto transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:transform-none lg:opacity-100 translate-y-0 opacity-100">
+	<header id="masthead" class="site-header sticky top-0 z-[60] w-full pt-2 px-2.5 lg:pt-0 lg:px-0 lg:bg-white/80 lg:backdrop-blur-xl lg:border-b lg:border-black/[0.08] lg:shadow-xs pointer-events-none lg:pointer-events-auto transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:transform-none lg:opacity-100 translate-y-0 opacity-100" role="banner">
 		<div class="ltdh-header-island pointer-events-auto relative bg-white/85 backdrop-blur-xl border border-black/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.06)] rounded-full px-3.5 h-12 flex items-center justify-between gap-2.5 transition-all duration-300 lg:bg-transparent lg:backdrop-blur-none lg:border-0 lg:shadow-none lg:rounded-none lg:h-20 lg:max-w-7xl lg:mx-auto lg:px-6 lg:gap-6">
 			<!-- Logo Section -->
 			<div class="site-branding flex items-center shrink-0">
@@ -100,7 +83,7 @@
 			</div>
 
 			<!-- Desktop Menu System (Apple Cupertino Typography & Pill CTA) -->
-			<nav id="site-navigation" class="hidden lg:flex items-center gap-6 xl:gap-8 shrink-0">
+			<nav id="site-navigation" class="hidden lg:flex items-center gap-6 xl:gap-8 shrink-0" role="navigation" aria-label="<?php esc_attr_e( 'Menu chính', 'ltdh' ); ?>">
 				<?php
 				wp_nav_menu( [
 					'theme_location' => 'primary-menu',
@@ -229,3 +212,6 @@
 	<?php if ( ! is_front_page() ) : ?>
 		<?php ltdh_breadcrumb(); ?>
 	<?php endif; ?>
+
+	<div id="container">
+		<main id="content" class="site-main" role="main">

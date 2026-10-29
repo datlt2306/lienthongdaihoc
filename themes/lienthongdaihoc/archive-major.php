@@ -100,7 +100,7 @@ $active_filter_count = count( $active_filter_items );
 $has_active_filters  = $active_filter_count > 0;
 ?>
 
-<main id="primary" class="site-main bg-slate-50 min-h-screen">
+<div id="primary" class="content-area site-main bg-slate-50 min-h-screen">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-8 sm:py-6 md:py-8">
@@ -498,7 +498,7 @@ $has_active_filters  = $active_filter_count > 0;
 		</div>
 
 	</div>
-</main>
+</div><!-- #primary -->
 
 <?php
 get_footer();

@@ -49,7 +49,7 @@ if ( empty( $faq_items ) || ! is_array( $faq_items ) ) {
 
 <?php get_template_part( 'template-parts/banner' ); ?>
 
-<main id="primary" class="site-main py-12 md:py-16 bg-slate-50">
+<div id="primary" class="content-area site-main py-12 md:py-16 bg-slate-50">
 	<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
 		<!-- FAQ ACCORDION LIST -->
@@ -107,7 +107,7 @@ if ( empty( $faq_items ) || ! is_array( $faq_items ) ) {
 		</div>
 
 	</div>
-</main>
+</div><!-- #primary -->
 
 <?php
 get_footer();

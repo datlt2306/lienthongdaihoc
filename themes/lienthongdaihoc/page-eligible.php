@@ -23,7 +23,7 @@ if ( function_exists( 'ltdh_elig_get_check_results' ) ) {
 get_header();
 ?>
 
-<main id="primary" tabindex="-1" class="site-main min-h-screen bg-slate-50/50">
+<div id="primary" tabindex="-1" class="content-area site-main min-h-screen bg-slate-50/50">
 	<?php get_template_part( 'template-parts/banner' ); ?>
 
 	<!-- Checker Container -->
@@ -48,7 +48,7 @@ get_header();
 	<?php endif; ?>
 
 
-</main>
+</div><!-- #primary -->
 
 <?php
 get_footer();

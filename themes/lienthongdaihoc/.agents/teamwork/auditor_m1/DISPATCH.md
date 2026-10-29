@@ -1,23 +1,33 @@
-## 2026-10-01T09:30:22Z
-You are auditor_m1 (M1 Forensic Integrity Auditor).
-Read:
-- /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md (specifically ## 2026-10-01T09:08:12Z)
-- /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1/handoff.md
+# DISPATCH for auditor_m1
 
-Working directory:
-/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/auditor_m1/
+You are teamwork_auditor assigned to conduct forensic integrity audit for Milestone 1: Git Branching & Bloat Sanitization.
+Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/auditor_m1/
+ORIGINAL_REQUEST.md path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md
+PROJECT.md path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/PROJECT.md
+Worker handoff path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1/handoff.md
 
-Create your BRIEFING.md and progress.md in your working directory.
+## Forensic Audit Scope
+Verify whether Milestone 1 work product is authentic, genuine, and free from cheating, fabrications, or shortcuts:
+1. Verify git branch `refactor` genuinely exists and contains authentic commits.
+2. Verify that deleted files were genuinely deleted from repository and filesystem, without dummy replacements or broken references.
+3. Verify that `screenshot.png` is an authentic, rendered PNG image of the theme, not an empty or dummy stub.
+4. Verify that tests (`run-tests.php`, `test-dry-school-program-fields.php`) execute genuinely with 100% pass rate without hardcoding expected outcomes or mocking out actual logic.
+5. Provide your explicit verdict: CLEAN or INTEGRITY VIOLATION with detailed evidence in `handoff.md`.
+Report back when complete.
 
-Scope & Task:
-Perform forensic integrity audit on worker_m1's changes:
-1. Check git diff / file changes in `inc/cli-commands.php`. Are there any mock/facade implementations or hardcoded values? Does the command dynamically scan the database?
-2. Verify that NO data was hard-deleted (zero calls to `wp_delete_post()` or SQL `DELETE`).
-3. Verify that `audit_report.json` was generated organically by the command and not fabricated.
-4. Verify that the 5 drafted programs and 1 drafted school are authentically preserved in MySQL with status `draft`.
-5. Check if any integrity violations, cheating, or facades exist.
 
-Output binary verdict: `CLEAN` or `INTEGRITY VIOLATION` with full forensic evidence to:
-/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/auditor_m1/handoff.md
+## 2026-10-29T07:02:28Z
+You are teamwork_auditor assigned to conduct forensic integrity audit for Milestone 1: Git Branching & Bloat Sanitization.
+Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/auditor_m1/
+ORIGINAL_REQUEST.md path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md
+PROJECT.md path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/PROJECT.md
+Worker handoff path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1/handoff.md
 
-Send message when complete.
+Read DISPATCH.md in your working directory.
+Audit the work product for genuine implementation vs cheating/shortcuts:
+1. Verify git branch refactor genuinely exists and has authentic commits.
+2. Verify bloat files were genuinely deleted without dummy facade replacements.
+3. Verify screenshot.png is genuinely an authentic rendered image, 1200x900, < 200 KB.
+4. Verify tests execute genuinely with 100% pass rate.
+Issue an explicit verdict: CLEAN or INTEGRITY VIOLATION with full evidence in handoff.md.
+Send a message when finished.

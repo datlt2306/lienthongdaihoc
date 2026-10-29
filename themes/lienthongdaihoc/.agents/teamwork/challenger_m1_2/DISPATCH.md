@@ -1,22 +1,29 @@
-## 2026-10-01T09:30:22Z
-You are challenger_m1_2 (M1 Dry-Run & Edge Case Challenger).
-Read:
-- /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md (specifically ## 2026-10-01T09:08:12Z)
-- /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1/handoff.md
+# DISPATCH for challenger_m1_2
 
-Working directory:
-/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/challenger_m1_2/
+You are teamwork_challenger assigned to empirically challenge Milestone 1: Git Branching & Bloat Sanitization.
+Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/challenger_m1_2/
+ORIGINAL_REQUEST.md path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md
+PROJECT.md path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/PROJECT.md
+Worker handoff path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1/handoff.md
 
-Create your BRIEFING.md and progress.md in your working directory.
+## Objectives
+1. Check git commit history: Ensure commits are on branch `refactor` and no unwanted external files were committed.
+2. Check that no needed assets were deleted (e.g. `banner-fallback.png`, `banner-fallback.webp`).
+3. Check that theme remains operable and WordPress can load it cleanly (`wp theme status lienthongdaihoc` or `wp eval 'echo wp_get_theme()->get("Name");'`).
+4. Issue an explicit verdict (APPROVE or CHALLENGE_FAILED) in `handoff.md`.
+Report back when complete.
 
-Scope & Task:
-Test WP-CLI command resilience and idempotency.
-1. Run `wp ltdh audit-data --dry-run` and verify that it outputs cleanly and does NOT modify post statuses.
-2. Run `wp ltdh audit-data --apply` again (idempotency check) and verify that it handles already-drafted records gracefully without error or corruption.
-3. Verify that all 34 majors still have published programs (count > 0).
-4. Verify that School 1662 (HCCT) cannot be accessed as published, and that no programs from HCCT are published.
+## 2026-10-29T07:02:23Z
+You are teamwork_challenger assigned to empirically challenge Milestone 1: Git Branching & Bloat Sanitization.
+Working directory: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/challenger_m1_2/
+ORIGINAL_REQUEST.md path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/ORIGINAL_REQUEST.md
+PROJECT.md path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/PROJECT.md
+Worker handoff path: /Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/worker_m1/handoff.md
 
-Write your report and verdict (APPROVE or REQUEST_CHANGES) to:
-/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/challenger_m1_2/handoff.md
-
-Send message when complete.
+Read DISPATCH.md in your working directory.
+Empirically verify:
+1. Git commits on refactor branch.
+2. Verified preservation of banner-fallback.png and taxonomy.php.
+3. Theme operability via WordPress / WP-CLI.
+Issue an explicit verdict: APPROVE or CHALLENGE_FAILED in handoff.md.
+Send a message when finished.

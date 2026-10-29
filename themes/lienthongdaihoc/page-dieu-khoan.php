@@ -52,7 +52,7 @@ $company_name = function_exists( 'ltdh_get_company_name' ) ? ltdh_get_company_na
 </section>
 
 <!-- MAIN CONTENT WRAPPER -->
-<main id="primary" class="site-main py-12 bg-slate-50">
+<div id="primary" class="content-area site-main py-12 bg-slate-50">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 		<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
@@ -337,7 +337,7 @@ $company_name = function_exists( 'ltdh_get_company_name' ) ? ltdh_get_company_na
 
 		</div>
 	</div>
-</main>
+</div><!-- #primary -->
 
 <?php
 get_footer();

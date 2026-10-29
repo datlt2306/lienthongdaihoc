@@ -2,9 +2,6 @@
 /**
  * Default Page Template
  *
- * Fallback template for WordPress pages that don't have
- * a specific page-{slug}.php or page-{id}.php template.
- *
  * @package lienthongdaihoc
  */
 
@@ -13,38 +10,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 get_header();
+
+if ( have_posts() ) :
+	while ( have_posts() ) : the_post();
 ?>
-
-<main id="primary" class="site-main bg-slate-50">
-	<?php get_template_part( 'template-parts/banner' ); ?>
-
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-		<?php if ( is_active_sidebar( 'sidebar-page' ) ) : ?>
-			<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-				<div class="lg:col-span-3">
-					<?php while ( have_posts() ) : the_post(); ?>
-						<article id="post-<?php the_ID(); ?>" <?php post_class( 'bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8' ); ?>>
-							<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
-								<?php the_content(); ?>
-							</div>
-						</article>
-					<?php endwhile; ?>
-				</div>
-				<div class="lg:col-span-1">
-					<?php get_sidebar( 'page' ); ?>
-				</div>
+<article id="post-<?php the_ID(); ?>" <?php post_class( 'page-entry max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8' ); ?>>
+	<header class="header mb-6">
+		<h1 class="entry-title text-2xl sm:text-3xl font-extrabold text-slate-900" itemprop="headline"><?php the_title(); ?></h1>
+		<?php edit_post_link( __( 'Chỉnh sửa trang', 'ltdh' ), '<span class="edit-link text-xs text-blue-600 hover:underline">', '</span>' ); ?>
+	</header>
+	<div class="entry-content prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-white rounded-xl shadow-xs border border-slate-100 p-6 md:p-8" itemprop="mainContentOfPage">
+		<?php if ( has_post_thumbnail() ) : ?>
+			<div class="mb-6">
+				<?php the_post_thumbnail( 'full', [ 'itemprop' => 'image', 'class' => 'rounded-xl w-full h-auto' ] ); ?>
 			</div>
-		<?php else : ?>
-			<?php while ( have_posts() ) : the_post(); ?>
-				<article id="post-<?php the_ID(); ?>" <?php post_class( 'bg-white rounded-lg shadow-sm border border-slate-100 p-6 md:p-8' ); ?>>
-					<div class="prose prose-slate max-w-none text-slate-900 text-sm md:text-base">
-						<?php the_content(); ?>
-					</div>
-				</article>
-			<?php endwhile; ?>
 		<?php endif; ?>
+		<?php the_content(); ?>
+		<div class="entry-links mt-6 pt-4 border-t border-slate-100">
+			<?php wp_link_pages(); ?>
+		</div>
 	</div>
-</main>
+</article>
+<?php if ( comments_open() ) { comments_template( '', true ); } ?>
+<?php endwhile; endif; ?>
 
 <?php
 get_footer();

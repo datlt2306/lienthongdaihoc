@@ -1,118 +1,108 @@
-# Empirical Challenge Report: WP-CLI Resilience, Dry-Run & Edge Cases (Milestone M1)
+# Empirical Challenger Report — Milestone 1: Git Branching & Bloat Sanitization
 
-- **Agent**: `challenger_m1_2` (M1 Dry-Run & Edge Case Challenger)
-- **Roles**: critic, specialist
-- **Milestone**: M1 (Data Audit & Safe Scope Handling)
-- **Target Recipient**: Orchestrator (`f7ebf938-afab-4e8b-b557-505007c00d2d`)
-- **Verdict**: **APPROVE**
+**Agent**: `challenger_m1_2` (teamwork_challenger / critic)  
+**Parent Orchestrator ID**: `101e3526-caa5-49b4-98c0-c71df3477df4`  
+**Working Directory**: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc/.agents/teamwork/challenger_m1_2/`  
+**Verdict**: **APPROVE**  
+**Date**: 2026-10-29  
 
 ---
 
 ## 1. Observation
 
-Direct empirical observations were gathered by executing WP-CLI commands and WordPress Core queries in the theme environment (`/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc`):
-
-### 1.1. Dry-Run Verification (`wp ltdh audit-data --dry-run`)
-- **Command executed**:
-  ```bash
-  wp --path=../../../ ltdh audit-data --dry-run
+### 1.1 Git Working Tree, Branch & Commit Integrity
+- **Repository Root**: `/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content`
+- **Active Branch**: `git branch --show-current` outputs `refactor`.
+- **Merge Base**: `git merge-base main refactor` outputs `bb1ced1ad0aa9ddbe948f05f686f85d9828badf6` (identical to `main` and `origin/main`).
+- **Commit History**: Exactly 1 commit ahead of `main`:
+  ```text
+  e783aaa (HEAD -> refactor) feat(refactor): create refactor branch, optimize screenshot, and prune bloat
   ```
-- **Result**:
-  - Exit code: `0`
-  - Output header: `=== LTDH DATA AUDIT (DRY-RUN SIMULATION) ===`
-  - Total scanned: 100 programs (95 in-scope, 5 out-of-scope), 21 schools (20 university, 1 college HCCT), 34 majors.
-  - Entities needing metadata pruning: `0` (clean).
-  - Dry-run notice: `[DRY-RUN] Sẽ chuyển đổi 5 program và 1 trường sang draft (chưa thực hiện).`
-  - Output file written cleanly to `audit_report.json`.
-- **Database Status Before vs. After Dry-Run**:
-  ```
-  Programs: publish=95, draft=5, trash=0 (Identical before & after)
-  Schools:  publish=20, draft=1, trash=0 (Identical before & after)
-  Majors:   publish=34, draft=0, trash=0 (Identical before & after)
-  ```
-  Zero database mutations occurred during dry-run.
+- **Commit File Scope**: `git diff-tree --no-commit-id --name-only -r e783aaa` confirms all 17 modified/deleted files are strictly within `themes/lienthongdaihoc/`. Zero files outside the theme repository (e.g., `plugins/`, `uploads/`, `litespeed/`) were staged or committed.
+- **D/F Namespace Conflict**: Resolved cleanly by renaming `refactor/school-program-architecture` to `archive/refactor-school-program-architecture` (`e74d6cc`), preserving historical commits.
 
-### 1.2. Idempotency Verification (`wp ltdh audit-data --apply`)
-- **Command executed**:
-  ```bash
-  wp --path=../../../ ltdh audit-data --apply
-  ```
-- **Result**:
-  - Exit code: `0`
-  - Output header: `=== LTDH DATA AUDIT (APPLY CHANGES) ===`
-  - Handled already-drafted records (1786, 1787, 1788, 1789, 2013, 1662) gracefully:
-    ```
-    [DRAFTED] Program ID 1786: Cử nhân Quản trị kinh doanh (out_of_scope_college)
-    [DRAFTED] Program ID 1787: Cử nhân Kế toán (out_of_scope_college)
-    [DRAFTED] Program ID 1788: Cử nhân Thương mại điện tử (out_of_scope_college)
-    [DRAFTED] Program ID 1789: Cử nhân Quản trị khách sạn (out_of_scope_college)
-    [DRAFTED] Program ID 2013: Cử nhân Công nghệ thông tin (Liên thông Chính quy) (out_of_scope_fulltime)
-    [DRAFTED] School ID 1662: Trường Cao đẳng Thương mại và Du lịch Hà Nội (out_of_scope_institution)
-    ```
-  - Transients flushed: `ltdh_filter_options`, `ltdh_featured_schools`, `ltdh_featured_schools_data`, `ltdh_hot_majors_data`, `ltdh_combinations_data`, `ltdh_archive_school_featured`, `ltdh_training_type_counts`, `ltdh_rewrite_flushed_v2`.
-  - Database counts remained invariant:
-    ```
-    Programs: publish=95, draft=5, trash=0
-    Schools:  publish=20, draft=1, trash=0
-    Majors:   publish=34, draft=0, trash=0
-    ```
-  - Zero corruption, zero duplicate metadata, zero orphaned IDs.
+### 1.2 Preservation of Critical Assets
+- **`banner-fallback.png` & `banner-fallback.webp`**:
+  - `assets/images/banner-fallback.png`: 1,402,051 bytes, PNG image data, 1734 x 907, RGB. Verified present.
+  - `assets/images/banner-fallback.webp`: 98,788 bytes, WebP image, VP8 encoding, 1734 x 907. Verified present.
+  - References verified in:
+    - `inc/core/class-helpers.php` (lines 2503, 2811, 3063, 3089)
+    - `inc/seo/class-rankmath-integration.php` (lines 1624, 1627)
+    - `template-parts/cards/card-major.php` (line 25)
+  - WP-CLI execution verified:
+    - `ltdh_get_school_cover_url(0, "full")` returns `http://localhost:10028/wp-content/themes/lienthongdaihoc/assets/images/banner-fallback.webp`.
+    - `ltdh_seo_resolve_global_share_image()` returns `https://ik.imagekit.io/cdnplus/2026/10/banner-fallback-1.webp`.
+- **`taxonomy.php`**:
+  - `taxonomy.php`: 16,033 bytes, 273 lines, syntax valid (`php -l` clean).
+  - WP-CLI template resolution test: `get_taxonomy_template()` resolves directly to `taxonomy.php`. Preserving `taxonomy.php` prevents WordPress from falling back to `index.php` for `region` and `campus` taxonomies before Milestone 2 decomposition.
 
-### 1.3. Program Preservation Across All 34 Majors
-- **Script executed**: Queried all 34 published majors via both `_offered_programs` metadata and reverse `WP_Query` on `major_relationship`.
-- **Results**:
-  - Total published majors: `34`.
-  - Number of majors with 0 published programs: `0`.
-  - Program count range per major: between `1` and `14` published university programs.
-  - Key samples:
-    * Major 1671 (Quản trị kinh doanh): 14 published programs
-    * Major 1679 (Ngôn ngữ Anh): 12 published programs
-    * Major 1673 (Kế toán): 9 published programs
-    * Major 1677 (Công nghệ thông tin): 8 published programs
-    * Major 1694 (Luật kinh tế): 7 published programs
-    * Single-offering majors (e.g., 1794 Bảo hộ lao động, 1776 Bất động sản, 1778 Thú Y): exactly 1 valid university program each.
+### 1.3 Bloat Deletion Verification
+Direct filesystem inspection confirms deletion of all 14 target bloat files:
+- 8 debug screenshots in `assets/images/` (`screenshot_exemption_design*.png`, `screenshot_layout_*.png`): all `exists=False` (~27.29 MB reclaimed).
+- `schools_import.json`: `exists=False`.
+- `litespeed-cache-settings.data`: `exists=False`.
+- `inc/*.bak` (`acf-import-cpts.json.bak`, `acf-import-fields.json.bak`): `exists=False`.
+- `scratch/` directory: `exists=False`.
 
-### 1.4. Isolation & Inaccessibility of School 1662 (HCCT) and Its Offerings
-- **Entity**: School ID `1662` (Trường Cao đẳng Thương mại và Du lịch Hà Nội).
-  * `post_status`: `draft`
-  * `_ltdh_audit_status`: `out_of_scope_institution`
-  * `_ltdh_audit_reason`: "Cơ sở đào tạo bậc Cao đẳng (HCCT), không cấp bằng Cử nhân đại học."
-  * Public `WP_Query(['post_type' => 'school', 'p' => 1662])`: `post_count = 0`.
-  * Public HTTP request (`wp_remote_get('http://localhost:10028/truong-cao-dang-thuong-mai-va-du-lich-ha-noi/')`): returned **HTTP 404**.
-- **Child Programs of HCCT**:
-  * Program ID `1786` (Quản trị kinh doanh): `post_status = draft`, HTTP **404**.
-  * Program ID `1787` (Kế toán): `post_status = draft`, HTTP **404**.
-  * Program ID `1788` (Thương mại điện tử): `post_status = draft`, HTTP **404**.
-  * Program ID `1789` (Quản trị khách sạn): `post_status = draft`, HTTP **404**.
-  * Public `WP_Query` for programs with `school_relationship = 1662`: `post_count = 0`.
-- **Full-time Out-of-Scope Program 2013**:
-  * Program ID `2013` (CNTT Chính quy - UTC): `post_status = draft`, HTTP **404**.
+### 1.4 Theme Screenshot Optimization
+Empirically inspected `screenshot.png` with Python PIL:
+- Format: `PNG`
+- Color mode: `P` (256-color palette)
+- Dimensions: `1200 x 900`
+- Size on disk: `120,971 bytes` (~118.14 KB, well below the 200 KB threshold).
+- Visual aspect ratio: Proportional downscale centered vertically on `#f8fafc` canvas.
+
+### 1.5 Theme Operability via WordPress / WP-CLI
+- `wp theme status lienthongdaihoc`: Active, Version 2.0.0.
+- `wp eval 'echo wp_get_theme()->get("Name");'`: Liên Thông Đại Học.
+- Direct WP_Query tests:
+  - Front page (ID 23): Found 1 post.
+  - School CPT (ID 1853 UTC): Resolved title, slug, and cover URL cleanly.
+  - Program CPT (ID 3636): Resolved title cleanly.
+  - Major CPT (ID 3612): Resolved title cleanly.
+- HTTP rendering: `curl -s -i -H "User-Agent: Mozilla/5.0 (...)" http://localhost:10028/` returned `HTTP/1.1 200 OK` with full semantic HTML layout. (Note: Naked curls are filtered by AIOS firewall `aios_blocked_request_redirect_url` configured in `class-theme-setup.php:45`, returning expected 403 bot block).
+- PHP Lint: Scanned all 105 PHP files across theme; 0 syntax errors detected.
+- Automated Test Suite Execution:
+  - `php tests/run-tests.php`: 17/17 passed (TC-01 through TC-17).
+  - `php tests/test-dry-school-program-fields.php`: 38/38 passed.
+  - `php tests/test-dry-degree-and-diploma.php`: 21/21 passed.
+  - `php tests/test-program-title-and-breadcrumb.php`: 15/15 passed.
+  - `php tests/test-program-title-normalization.php`: 9/9 passed.
+  - `php tests/test-post-sharing.php`: 16/16 passed.
+  - `php tests/test-eligibility-unit.php`: 32/32 passed.
+  - `php tests/test-program-sharing.php`: 21/21 passed.
+  - Total core passed assertions: 169 passed, 0 failed.
 
 ---
 
 ## 2. Logic Chain
 
-1. **Dry-Run Safety**:
-   - The `--dry-run` branch in `LTDH_CLI_Commands::audit_data` sets `$mode = 'dry-run'` and flags `$is_apply = false`.
-   - Condition guards prevent any calls to `wp_update_post()`, `update_post_meta()`, or `delete_transient()`.
-   - Empirical counts confirmed that database state is 100% unchanged before and after `--dry-run` (Observation 1.1).
-2. **Apply Idempotency**:
-   - Repeated execution of `wp ltdh audit-data --apply` updates post statuses to `draft` without inserting duplicate records or modifying already-valid posts.
-   - The metadata cleaner filters `_offered_programs` to retain only published, existing program IDs. Since all ghost and drafted IDs were already purged, 0 entities required metadata pruning during the second run.
-   - Post counts and relationship arrays remained stable (Observation 1.2).
-3. **Completeness of Major Coverage**:
-   - None of the 5 drafted programs were sole offerings for any major (HCCT offerings in Business Admin, Accounting, E-commerce, and Hospitality are all well-represented across remaining universities like TMU, HAUI, DNU, etc.).
-   - As observed in 1.3, all 34 majors retain active, accredited university Liên thông programs.
-4. **Zero Frontend Scope Leakage for HCCT**:
-   - WordPress Core automatically suppresses `draft` posts from public queries (`WP_Query`), frontend archives, search results, and single template routing for non-authenticated visitors.
-   - Confirmed empirically via `wp_remote_get`: anonymous HTTP requests to HCCT and its 4 programs return HTTP 404 (Observation 1.4).
+1. **Git Isolation Verification**:
+   - The requirement (§R1) dictates all refactoring work must reside on branch `refactor`.
+   - Inspection of `git branch -a`, `git rev-parse`, and `git merge-base` establishes that `refactor` originates from `main` (`bb1ced1`), is currently checked out, and holds commit `e783aaa`.
+   - Inspection of `git diff-tree` confirms zero unwanted external files were captured.
+
+2. **Asset Preservation Safety**:
+   - Deleting needed theme assets would produce 404 images and broken social previews.
+   - Code tracing in `class-helpers.php` and `class-rankmath-integration.php` confirmed that `banner-fallback.png` and `banner-fallback.webp` are required fallbacks.
+   - WP-CLI execution verified that helper methods actively return these fallback paths when thumbnails are missing.
+   - `get_taxonomy_template()` verified that `taxonomy.php` is active for `region` and `campus`. Retaining it until M2 eliminates any route breakage.
+
+3. **Bloat Purge Safety**:
+   - Codebase search verified zero references to the deleted screenshot images, scratch scripts, or `.bak` files.
+   - Filesystem verification confirmed the removal of ~27.5 MB of dead weight.
+
+4. **Operability & Non-Regression**:
+   - Execution of WP-CLI commands and HTTP requests proved WordPress loads and renders the theme cleanly.
+   - 169 unit test assertions across 8 test suites passed with 100% integrity, confirming zero regressions.
 
 ---
 
 ## 3. Caveats
 
-- **No caveats regarding M1 backend data integrity**: The database state is verified, resilient, idempotent, and reversible.
-- **Frontend Template Scope (M2–M5)**: Renaming of frontend taxonomy labels (from "Hệ đào tạo" to "Hình thức học") and query template refactoring are slated for subsequent milestones.
+- **AIOS Firewall on Naked Curls**: Naked `curl` requests without a browser `User-Agent` trigger the AIOS security firewall (`class-theme-setup.php:45`), returning 403. Browser requests and curl with standard browser `User-Agent` return `HTTP/1.1 200 OK`.
+- **Legacy Test Suite Outdated String**: `tests/test-specialization-and-collision.php` contains a stale class assertion (`w-4 h-4 shrink-0 text-[#00308b]`) written prior to the Apple icon overhaul (`79011e0`). This is a pre-existing test assertion mismatch, unrelated to M1.
+- **Taxonomy Polymorphism Deferred to M2**: As planned in `PROJECT.md`, `taxonomy.php` will be decomposed into BlankSlate archive templates (`archive.php`, `taxonomy-region.php`) during Milestone 2.
 
 ---
 
@@ -120,57 +110,57 @@ Direct empirical observations were gathered by executing WP-CLI commands and Wor
 
 **Verdict: APPROVE**
 
-The WP-CLI audit-data command and data scope modifications implemented by `worker_m1` satisfy all empirical challenge criteria:
-1. `wp ltdh audit-data --dry-run` executes cleanly, exits with code 0, and produces zero database mutations.
-2. `wp ltdh audit-data --apply` is strictly idempotent, handles re-execution gracefully, and produces zero corruption.
-3. 100% of the 34 majors (34/34) retain active published programs (ranging from 1 to 14 programs per major).
-4. School ID 1662 (HCCT) and all associated programs (1786–1789) are drafted, excluded from public queries, and return HTTP 404 to anonymous requests.
+Milestone 1 satisfies all requirements:
+1. Branch `refactor` is active and isolated, 1 commit ahead of `main`.
+2. All 17 modified/deleted files in commit `e783aaa` are strictly scoped to the theme.
+3. ~27.5 MB of bloat has been safely purged with zero broken references.
+4. Critical fallbacks (`banner-fallback.png`, `banner-fallback.webp`) and `taxonomy.php` are intact and operational.
+5. `screenshot.png` is optimized to standard 1200x900 PNG at 120,971 bytes (<200 KB).
+6. WordPress theme status is Active (v2.0.0), 0 PHP syntax errors, and 169/169 core unit tests pass.
+
+The codebase is ready for Milestone 2 (BlankSlate Structural Skeleton & Templates).
 
 ---
 
 ## 5. Verification Method
 
-To reproduce and verify these findings independently, execute:
+To independently reproduce this verification:
 
 ```bash
-# 1. Run dry-run simulation and check exit code
-wp --path=../../../ ltdh audit-data --dry-run
+# 1. Verify git branch and commit scope
+cd "/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content"
+git branch --show-current
+# Expected: refactor
+git log -n 1 --oneline
+# Expected: e783aaa feat(refactor): create refactor branch, optimize screenshot, and prune bloat
 
-# 2. Check post status counts
-wp --path=../../../ eval '
-foreach (["program", "school", "major"] as $cpt) {
-    $c = wp_count_posts($cpt);
-    echo "$cpt: publish={$c->publish}, draft={$c->draft}, trash={$c->trash}\n";
-}
-'
+# 2. Verify asset preservation & bloat purge
+cd "/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc"
+test -f assets/images/banner-fallback.png && test -f assets/images/banner-fallback.webp && test -f taxonomy.php
+test ! -f assets/images/screenshot_layout_rows_full.png
+test ! -f schools_import.json
+test ! -d scratch
+echo "Filesystem assertions passed."
 
-# 3. Re-run apply (idempotency check)
-wp --path=../../../ ltdh audit-data --apply
+# 3. Verify screenshot.png dimensions and size
+python3 -c "
+import os; from PIL import Image
+im = Image.open('screenshot.png')
+sz = os.path.getsize('screenshot.png')
+assert im.format == 'PNG' and im.size == (1200, 900) and sz < 200 * 1024
+print(f'Screenshot valid: {im.size}, {sz} bytes')
+"
 
-# 4. Verify all 34 majors have published programs
-wp --path=../../../ eval '
-$majors = get_posts(["post_type" => "major", "numberposts" => -1]);
-$empty = 0;
-foreach ($majors as $m) {
-    $p = get_posts(["post_type" => "program", "post_status" => "publish", "meta_query" => [["key" => "major_relationship", "value" => $m->ID]]]);
-    if (count($p) === 0) { $empty++; }
-}
-echo "Empty majors: $empty / " . count($majors) . "\n";
-'
+# 4. Verify theme operability via WP-CLI
+cd "/Users/ken/Local Sites/lienthongdaihoc/app/public"
+wp theme status lienthongdaihoc
+wp eval 'echo "Active Theme: " . wp_get_theme()->get("Name") . "\n";'
 
-# 5. Verify HCCT and program URLs return 404
-wp --path=../../../ eval '
-$urls = [
-    get_permalink(1662),
-    get_permalink(1786),
-    get_permalink(1787),
-    get_permalink(1788),
-    get_permalink(1789),
-    get_permalink(2013),
-];
-foreach ($urls as $url) {
-    $code = wp_remote_retrieve_response_code(wp_remote_get($url));
-    echo "$url -> HTTP $code\n";
-}
-'
+# 5. Verify core test suites and PHP syntax
+cd "/Users/ken/Local Sites/lienthongdaihoc/app/public/wp-content/themes/lienthongdaihoc"
+php tests/run-tests.php
+php tests/test-dry-school-program-fields.php
+php tests/test-dry-degree-and-diploma.php
+php tests/test-eligibility-unit.php
+find . -name "*.php" -not -path "./node_modules/*" -not -path "./vendor/*" -not -path "./.agents/*" -not -path "./.agent/*" -exec php -l {} + | grep -v "No syntax errors detected" || echo "All PHP files clean (0 syntax errors)."
 ```
