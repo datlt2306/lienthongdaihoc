@@ -17,6 +17,9 @@ $school_id  = (int) get_field( 'school_relationship', $program_id );
 	<?php
 	if ( is_active_sidebar( 'sidebar-program' ) ) :
 		dynamic_sidebar( 'sidebar-program' );
+	elseif ( is_active_sidebar( 'sidebar-school' ) ) :
+		// Kế thừa widget từ Trường nếu Chương trình chưa setup
+		dynamic_sidebar( 'sidebar-school' );
 	else :
 		ltdh_render_default_program_sidebar( $program_id, $school_id );
 	endif;

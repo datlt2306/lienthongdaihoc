@@ -20,6 +20,9 @@ backups/
 debug.log
 *.log
 
+# LiteSpeed Cache
+litespeed/
+
 # Binaries
 wp-cli.phar
 

@@ -732,7 +732,7 @@ function ltdh_dynamic_menu_submenu_injection($sorted_menu_items, $args) {
 			if ( ! $has_saved_training_children ) {
 				$item->classes[] = 'menu-item-has-children';
 
-				$allowed_training_types = ['chinh-quy', 'dao-tao-tu-xa', 'tu-xa', 'vua-hoc-vua-lam'];
+				$allowed_training_types = ['tu-xa', 'vua-hoc-vua-lam'];
 				$types = get_terms([
 					'taxonomy'   => LTDH_TAX_TRAINING_TYPE,
 					'slug'       => $allowed_training_types,

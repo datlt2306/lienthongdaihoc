@@ -329,7 +329,7 @@ function ltdh_elig_validate_input( $input ) {
 	}
 
 	if ( ! empty( $input['training_type'] ) && ! in_array( $input['training_type'], $valid_training, true ) ) {
-		return new WP_Error( 'invalid_training', 'Hình thức đào tạo không hợp lệ.' );
+		return new WP_Error( 'invalid_training', 'Hình thức học không hợp lệ.' );
 	}
 
 	if ( ! empty( $input['campus'] ) && ! in_array( $input['campus'], $valid_campus, true ) ) {

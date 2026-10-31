@@ -35,6 +35,9 @@ if ( ! $school_id ) {
 			ltdh_render_school_info_card( $school_id );
 		endif;
 		dynamic_sidebar( 'sidebar-major' );
+	elseif ( $school_id && is_active_sidebar( 'sidebar-school' ) ) :
+		// Kế thừa widget từ Trường nếu Ngành xem trong ngữ cảnh trường và chưa setup
+		dynamic_sidebar( 'sidebar-school' );
 	else :
 		ltdh_render_default_major_sidebar( $major_id, $school_id );
 	endif;
