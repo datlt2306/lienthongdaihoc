@@ -1299,18 +1299,6 @@ class LTDH_School_Helpers {
 				),
 			],
 			[
-				'question' => sprintf( 'Học phí đào tạo Liên thông tại %s được tính và thu như thế nào?', $school_name ),
-				'answer'   => sprintf(
-					'<p class="mb-2">Chính sách thu học phí đào tạo Liên thông tại <strong>%s</strong> được thực hiện minh bạch theo các nguyên tắc:</p>' .
-					'<ul class="space-y-2 my-2.5 list-none pl-0">' .
-					'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">1</span><span><strong>Tính theo tín chỉ thực tế:</strong> Học phí thu theo số tín chỉ sinh viên đăng ký học trong từng học kỳ theo đúng quy định của Nhà nước.</span></li>' .
-					'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">2</span><span><strong>Chia đợt đóng linh hoạt:</strong> Đóng học phí theo từng học kỳ, giúp giảm tải tối đa áp lực tài chính cho người học.</span></li>' .
-					'<li class="flex items-start gap-2.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">3</span><span><strong>Không phát sinh phụ phí:</strong> Mọi chi phí đào tạo được thông báo công khai ngay từ đầu khóa và cam kết không phát sinh các khoản phụ phí bất hợp lý.</span></li>' .
-					'</ul>',
-					$school_name
-				),
-			],
-			[
 				'question' => sprintf( 'Hồ sơ đăng ký xét tuyển Liên thông vào %s gồm những giấy tờ gì và nộp ở đâu?', $school_name ),
 				'answer'   => sprintf(
 					'<p class="mb-2">Hồ sơ đăng ký xét tuyển Liên thông vào <strong>%s</strong> gồm các giấy tờ cơ bản sau:</p>' .
