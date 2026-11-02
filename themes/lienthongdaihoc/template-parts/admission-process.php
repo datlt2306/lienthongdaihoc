@@ -25,7 +25,7 @@ $args = isset( $args ) && is_array( $args ) ? wp_parse_args( $args, $defaults ) 
 
 // Determine grid column layout based on page context or explicit argument
 $columns = ! empty( $args['columns'] ) ? intval( $args['columns'] ) : ( is_singular( [ 'program', 'school', 'major' ] ) ? 2 : 4 );
-$grid_class = ( 2 === $columns ) ? 'grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5';
+$grid_class = ( 2 === $columns ) ? 'sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5' : 'sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5';
 
 $steps = [
 	[
@@ -63,7 +63,7 @@ $steps = [
 ];
 ?>
 
-<section id="<?php echo esc_attr( $args['section_id'] ); ?>" class="scroll-mt-36 md:scroll-mt-40 <?php echo esc_attr( $args['card_bg'] ); ?> rounded-2xl shadow-sm border border-slate-100 p-3.5 sm:p-4 md:p-6 transition-all">
+<section id="<?php echo esc_attr( $args['section_id'] ); ?>" class="scroll-mt-36 md:scroll-mt-40 <?php echo esc_attr( $args['card_bg'] ); ?> rounded-2xl shadow-sm border border-slate-100 p-3.5 sm:p-5 md:p-6 transition-all" aria-label="Quy trình tuyển sinh và nhập học">
 	<!-- Section Header -->
 	<div class="border-b border-slate-100 pb-3 sm:pb-4 mb-3.5 sm:mb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-3">
 		<div>
@@ -73,18 +73,29 @@ $steps = [
 			<h2 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 leading-tight">
 				<?php echo esc_html( $args['title'] ); ?>
 			</h2>
-			<p class="text-sm md:text-base text-slate-500 mt-1 max-w-2xl leading-relaxed">
+			<p class="text-xs sm:text-sm md:text-base text-slate-500 mt-1 max-w-2xl leading-relaxed">
 				<?php echo esc_html( $args['subtitle'] ); ?>
 			</p>
 		</div>
+
+		<!-- Mobile Carousel Cue / Step counter -->
+		<div class="flex items-center gap-2 self-start sm:self-auto shrink-0">
+			<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600">
+				<span>4 bước tinh gọn</span>
+			</span>
+			<span class="sm:hidden text-[11px] text-slate-400 font-medium inline-flex items-center gap-0.5">
+				<span>Vuốt ngang</span>
+				<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+			</span>
+		</div>
 	</div>
 
-	<!-- STEPS GRID CONTAINER (1 COL ON MOBILE, 2 COLS ON SM+) -->
-	<div class="grid <?php echo esc_attr( $grid_class ); ?> relative">
+	<!-- STEPS CONTAINER (Mobile Carousel + Desktop Grid) -->
+	<div class="flex sm:grid overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory sm:snap-none gap-3 sm:gap-4 md:gap-5 pb-2 sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-3.5 px-3.5 sm:mx-0 sm:px-0 <?php echo esc_attr( $grid_class ); ?> items-stretch relative">
 		<?php foreach ( $steps as $index => $step_item ) : 
 			$is_last = ( $index === count( $steps ) - 1 );
 		?>
-			<div class="group relative flex flex-col justify-between bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-3.5 sm:p-4 transition-all duration-200 border border-slate-100/80 hover:border-blue-200/60 shadow-2xs hover:shadow-xs">
+			<div class="group relative flex flex-col justify-between bg-slate-50/70 hover:bg-blue-50/30 rounded-xl p-3.5 sm:p-4 transition-all duration-200 border border-slate-100/80 hover:border-blue-200/60 shadow-2xs hover:shadow-xs shrink-0 w-[82%] sm:w-auto snap-start sm:snap-none select-none">
 				
 				<!-- Top Content -->
 				<div>
@@ -100,38 +111,48 @@ $steps = [
 								<?php echo esc_html( $step_item['title'] ); ?>
 							</h3>
 						</div>
-
 					</div>
 
 					<!-- Step Description -->
-					<p class="text-sm sm:text-base text-slate-600 leading-relaxed font-normal mt-1 sm:mt-1.5">
+					<p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal mt-1 sm:mt-1.5 line-clamp-3 sm:line-clamp-none">
 						<?php echo esc_html( $step_item['desc'] ); ?>
 					</p>
+				</div>
+
+				<!-- Step Progress Meta Strip -->
+				<div class="mt-3 pt-2 sm:pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+					<span class="flex items-center gap-1 text-slate-500">
+						<span class="w-1.5 h-1.5 rounded-full bg-[#00308b]"></span>
+						<span>Bước <?php echo ( $index + 1 ); ?> / 4</span>
+					</span>
 				</div>
 
 				<!-- Top Accent Line (Brand Primary) -->
 				<div class="absolute top-0 left-3 right-3 sm:left-4 sm:right-4 h-[2px] rounded-t-full bg-[#00308b] opacity-0 group-hover:opacity-100 transition-opacity"></div>
 			</div>
 		<?php endforeach; ?>
+		<!-- Carousel Right Edge Spacer for Mobile -->
+		<div class="sm:hidden shrink-0 w-1" aria-hidden="true"></div>
 	</div>
 
 	<!-- Bottom Action Bar -->
 	<?php if ( $args['show_cta'] ) : ?>
-		<div class="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-blue-50/60 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-blue-100/60">
+		<div class="mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 bg-blue-50/60 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-blue-100/60">
 			<div class="flex items-center gap-2.5 sm:gap-3 text-left">
-				<div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#00308b] text-white flex items-center justify-center shrink-0 shadow-2xs">
-					<svg class="w-4.5 h-4.5 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+				<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[#00308b] text-white flex items-center justify-center shrink-0 shadow-2xs">
+					<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
 				</div>
 				<div class="min-w-0">
-					<p class="font-bold text-slate-900 text-sm sm:text-base mb-0.5 leading-snug">Kiểm tra điều kiện & dự kiến số tín chỉ miễn giảm?</p>
-					<p class="text-xs sm:text-sm text-slate-500 leading-normal">Chuyên viên tư vấn sẽ liên hệ hướng dẫn lộ trình miễn phí.</p>
+					<p class="font-bold text-slate-900 text-xs sm:text-base leading-snug">Kiểm tra điều kiện & dự kiến số tín chỉ miễn giảm?</p>
+					<p class="text-[11px] sm:text-sm text-slate-500 leading-normal truncate sm:whitespace-normal">Chuyên viên tư vấn sẽ liên hệ hướng dẫn lộ trình miễn phí.</p>
 				</div>
 			</div>
 			
-			<a href="<?php echo esc_url( $args['cta_link'] ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-6 py-2.5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-medium tracking-tight rounded-full shadow-none hover:shadow-xs active:scale-98 transition-all shrink-0 cursor-pointer min-h-[40px] whitespace-nowrap">
+			<a href="<?php echo esc_url( $args['cta_link'] ); ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 sm:px-6 py-2 sm:py-2.5 bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-semibold tracking-tight rounded-full shadow-none hover:shadow-xs active:scale-98 transition-all shrink-0 cursor-pointer min-h-[38px] sm:min-h-[40px] whitespace-nowrap">
 				<span><?php echo esc_html( $args['cta_text'] ); ?></span>
 				<?php ltdh_icon( 'arrow-right', 'w-3.5 h-3.5' ); ?>
 			</a>
 		</div>
 	<?php endif; ?>
+</section>
 </section>

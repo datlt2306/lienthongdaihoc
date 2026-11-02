@@ -2688,4 +2688,148 @@ class LTDH_Program_Helpers {
 			],
 		];
 	}
+
+	/**
+	 * Get sibling training programs for the same major at the same school.
+	 * Allows students to switch between different training modes (e.g. Từ xa, Vừa học vừa làm, Chính quy).
+	 *
+	 * @param int $program_id
+	 * @return array
+	 */
+	public static function get_sibling_training_programs( int $program_id ): array {
+		if ( ! $program_id ) {
+			return [];
+		}
+
+		$school_id = self::get_school_id( $program_id );
+		$major_id  = self::get_major_id( $program_id );
+
+		if ( ! $school_id || ! $major_id ) {
+			return [];
+		}
+
+		$cpt            = defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program';
+		$school_rel_key = defined( 'LTDH_META_SCHOOL_REL' ) ? LTDH_META_SCHOOL_REL : 'school_relationship';
+		$major_rel_key  = defined( 'LTDH_META_MAJOR_REL' ) ? LTDH_META_MAJOR_REL : 'major_relationship';
+
+		$query = new WP_Query( [
+			'post_type'      => $cpt,
+			'post_status'    => 'publish',
+			'posts_per_page' => 10,
+			'no_found_rows'  => true,
+			'meta_query'     => [
+				'relation' => 'AND',
+				[
+					'key'     => $school_rel_key,
+					'value'   => $school_id,
+					'compare' => '=',
+				],
+				[
+					'key'     => $major_rel_key,
+					'value'   => $major_id,
+					'compare' => '=',
+				],
+			],
+		] );
+
+		if ( empty( $query->posts ) || count( $query->posts ) <= 1 ) {
+			return [];
+		}
+
+		$results = [];
+		$tax_tt  = defined( 'LTDH_TAX_TRAINING_TYPE' ) ? LTDH_TAX_TRAINING_TYPE : 'training_type';
+
+		foreach ( $query->posts as $post_obj ) {
+			$pid    = $post_obj->ID;
+			$terms  = wp_get_post_terms( $pid, $tax_tt );
+			$t_term = ! empty( $terms ) && ! is_wp_error( $terms ) ? $terms[0] : null;
+			$t_slug = $t_term ? $t_term->slug : '';
+			$t_name = $t_term ? $t_term->name : 'Hệ khác';
+
+			// Format clean training type name
+			$clean_type = preg_replace( '/^hệ\s+/iu', '', trim( (string) $t_name ) );
+
+			$learning_details = function_exists( 'ltdh_get_program_learning_details' ) 
+				? ltdh_get_program_learning_details( $pid ) 
+				: self::get_learning_details( $pid );
+
+			$tuition_display = function_exists( 'ltdh_get_program_tuition_display' )
+				? ltdh_get_program_tuition_display( $pid )
+				: self::get_tuition_display( $pid );
+
+			$duration_display = function_exists( 'ltdh_get_program_duration' )
+				? ltdh_get_program_duration( $pid )
+				: ( get_field( 'duration', $pid ) ?: '1.5 - 2 năm' );
+
+			$deadline_display = function_exists( 'ltdh_get_program_admission_deadline_display' )
+				? ltdh_get_program_admission_deadline_display( $pid )
+				: self::get_admission_deadline_display( $pid );
+
+			$admission_status = function_exists( 'ltdh_get_program_admission_status' )
+				? ltdh_get_program_admission_status( $pid )
+				: self::get_admission_status( $pid );
+
+			if ( 'tam-ngung' === $admission_status || false !== stripos( $deadline_display, 'hết chỉ tiêu' ) ) {
+				$status_code  = 'tam-ngung';
+				$status_label = 'Hết chỉ tiêu';
+				$status_color = 'slate';
+			} elseif ( 'sap-mo' === $admission_status ) {
+				$status_code  = 'sap-mo';
+				$status_label = 'Sắp mở';
+				$status_color = 'amber';
+			} else {
+				$status_code  = 'tuyen-sinh';
+				$status_label = 'Đang nhận hồ sơ';
+				$status_color = 'emerald';
+			}
+
+			// Mode characteristics & highlights
+			$icon          = 'mortarboard';
+			$highlight     = 'Chương trình chuẩn theo quy định của Bộ GD&ĐT';
+			$schedule_text = $learning_details['mode'] ?? 'Linh hoạt';
+
+			if ( false !== strpos( $t_slug, 'tu-xa' ) ) {
+				$icon          = 'computer-desktop';
+				$highlight     = 'Học trực tuyến 100%, tự chủ thời gian & địa điểm, không cần đến giảng đường';
+				$schedule_text = '100% Online (LMS & bài giảng số)';
+			} elseif ( false !== strpos( $t_slug, 'vua-hoc-vua-lam' ) ) {
+				$icon          = 'calendar';
+				$highlight     = 'Học ngoài giờ hành chính, phù hợp người đang đi làm có thể sắp xếp học cuối tuần';
+				$schedule_text = 'Buổi tối hoặc Thứ 7 & Chủ nhật';
+			} elseif ( false !== strpos( $t_slug, 'chinh-quy' ) ) {
+				$icon          = 'academic-cap';
+				$highlight     = 'Học tập trung ban ngày tại cơ sở chính, trải nghiệm trọn vẹn môi trường đại học';
+				$schedule_text = 'Tập trung ban ngày theo thời khóa biểu';
+			}
+
+			$results[] = [
+				'id'               => $pid,
+				'title'            => get_the_title( $pid ),
+				'permalink'        => get_permalink( $pid ),
+				'is_current'       => ( $pid === $program_id ),
+				'type_name'        => $clean_type,
+				'type_slug'        => $t_slug,
+				'tuition'          => $tuition_display ?: 'Liên hệ',
+				'duration'         => $duration_display ?: 'Khoảng 2 năm',
+				'schedule'         => $schedule_text,
+				'campus'           => $learning_details['campus'] ?? 'Toàn quốc',
+				'deadline'         => $deadline_display,
+				'admission_status' => $status_code,
+				'status_label'     => $status_label,
+				'status_color'     => $status_color,
+				'highlight'        => $highlight,
+				'icon'             => $icon,
+			];
+		}
+
+		// Sort: Keep standard order (Từ xa, Vừa học vừa làm, Chính quy)
+		usort( $results, function( $a, $b ) {
+			$order_map = [ 'dao-tao-tu-xa' => 1, 'tu-xa' => 1, 'vua-hoc-vua-lam' => 2, 'chinh-quy' => 3 ];
+			$pos_a     = $order_map[ $a['type_slug'] ] ?? 99;
+			$pos_b     = $order_map[ $b['type_slug'] ] ?? 99;
+			return $pos_a <=> $pos_b;
+		} );
+
+		return $results;
+	}
 }

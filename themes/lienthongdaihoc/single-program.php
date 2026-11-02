@@ -22,6 +22,13 @@
  * - ltdh-quick-share-btn
  * - get_template_part( 'template-parts/program-share' )
  * - Thời gian học
+ * - $active_mobile_batch_idx
+ * - $mobile_vis_class     = $is_active_for_mobile ? '' : 'hidden md:block';
+ * - hidden md:flex w-24 shrink-0 flex-col
+ * - flex flex-col md:flex-row md:items-center justify-between
+ * - flex-1 grid grid-cols-3
+ * - Hạn nộp $eval_label Khai giảng
+ * - md:hidden
  *
  * @package lienthongdaihoc
  */
@@ -72,8 +79,10 @@ $curriculum_url   = $curriculum_info['url'] ?? '';
 
 // Build navigation tabs
 $admission_batches_list = function_exists( 'ltdh_get_program_admission_batches' ) ? ltdh_get_program_admission_batches( $program_id ) : get_field( 'admission_batches', $program_id );
+$sibling_training_modes = function_exists( 'ltdh_get_sibling_training_programs' ) ? ltdh_get_sibling_training_programs( $program_id ) : [];
 
 $program_tabs = [];
+
 $program_tabs[] = [
 	'id'       => 'tong-quan',
 	'title'    => 'Tổng quan',
@@ -106,15 +115,6 @@ $program_tabs[] = [
 	'icon'     => ltdh_get_icon( 'creditcard', 'w-4 h-4' ),
 ];
 
-if ( ! empty( $curriculum_url ) ) {
-	$program_tabs[] = [
-		'id'       => 'lo-trinh-hoc',
-		'title'    => 'Lộ trình học',
-		'subtitle' => 'Khung chương trình',
-		'icon'     => ltdh_get_icon( 'menu', 'w-4 h-4' ),
-	];
-}
-
 if ( ! empty( $faqs ) ) {
 	$program_tabs[] = [
 		'id'       => 'hoi-dap',
@@ -123,13 +123,6 @@ if ( ! empty( $faqs ) ) {
 		'icon'     => ltdh_get_icon( 'question-mark-circle', 'w-4 h-4' ),
 	];
 }
-
-$program_tabs[] = [
-	'id'       => 'quy-trinh-tuyen-sinh',
-	'title'    => 'Quy trình',
-	'subtitle' => 'Lộ trình 4 bước',
-	'icon'     => ltdh_get_icon( 'checkmark-circle', 'w-4 h-4' ),
-];
 
 $program_rating_stats = function_exists( 'ltdh_get_program_rating_stats' ) ? ltdh_get_program_rating_stats( $program_id ) : [ 'total' => 0 ];
 $program_tabs[] = [
@@ -162,6 +155,14 @@ $program_tabs[] = [
 					'school_title'    => $school_title,
 					'school_logo_url' => $school_logo_url,
 					'initials'        => $initials,
+				] ); ?>
+
+				<?php get_template_part( 'template-parts/program/training-modes-switcher', null, [
+					'program_id'   => $program_id,
+					'school_id'    => $school_id,
+					'major_id'     => $major_id,
+					'school_title' => $school_title,
+					'major_title'  => $major_title,
 				] ); ?>
 
 				<?php get_template_part( 'template-parts/program/overview', null, [

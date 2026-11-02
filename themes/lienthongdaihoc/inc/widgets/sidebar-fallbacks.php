@@ -211,6 +211,71 @@ function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
 	}
 	?>
 
+	<!-- SIBLING TRAINING MODES WIDGET (Desktop Only >= 1024px) -->
+	<?php
+	$sidebar_sibling_modes = function_exists( 'ltdh_get_sibling_training_programs' ) ? ltdh_get_sibling_training_programs( $program_id ) : [];
+	if ( ! empty( $sidebar_sibling_modes ) && count( $sidebar_sibling_modes ) > 1 ) :
+	?>
+		<div class="hidden lg:block bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4">
+			<div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-100">
+				<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Hệ đào tạo khác cùng ngành</h4>
+				<span class="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full"><?php echo count( $sidebar_sibling_modes ); ?> hệ</span>
+			</div>
+			<div class="space-y-2">
+				<?php foreach ( $sidebar_sibling_modes as $s_item ) : 
+					$is_s_curr   = ! empty( $s_item['is_current'] );
+					$s_slug      = $s_item['type_slug'];
+					$s_status    = $s_item['admission_status'] ?? 'tuyen-sinh';
+					$s_is_closed = ( 'tam-ngung' === $s_status );
+				?>
+					<?php if ( $is_s_curr ) : ?>
+						<div class="p-2.5 rounded-xl bg-blue-50/70 border-2 border-[#00308b] flex items-center justify-between text-xs select-none">
+							<div class="font-bold text-[#00308b] flex items-center gap-2">
+								<span class="w-6 h-6 rounded-md bg-[#00308b] text-white flex items-center justify-center shrink-0">
+									<?php if ( false !== strpos( $s_slug, 'tu-xa' ) ) : ?>
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+									<?php elseif ( false !== strpos( $s_slug, 'vua-hoc-vua-lam' ) ) : ?>
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+									<?php else : ?>
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5"/></svg>
+									<?php endif; ?>
+								</span>
+								<span><?php echo esc_html( $s_item['type_name'] ); ?></span>
+							</div>
+							<span class="text-[10px] font-bold text-white bg-[#00308b] px-2 py-0.5 rounded-full">Đang xem</span>
+						</div>
+					<?php else : ?>
+						<a href="<?php echo esc_url( $s_item['permalink'] ); ?>" class="group p-2.5 rounded-xl bg-slate-50/70 hover:bg-white border border-slate-200/80 hover:border-[#00308b] flex items-center justify-between text-xs transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs">
+							<div class="flex items-center gap-2 min-w-0">
+								<span class="w-6 h-6 rounded-md bg-slate-200/70 group-hover:bg-blue-50 text-slate-600 group-hover:text-[#00308b] flex items-center justify-center shrink-0 transition-colors">
+									<?php if ( false !== strpos( $s_slug, 'tu-xa' ) ) : ?>
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+									<?php elseif ( false !== strpos( $s_slug, 'vua-hoc-vua-lam' ) ) : ?>
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+									<?php else : ?>
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5"/></svg>
+									<?php endif; ?>
+								</span>
+								<div class="min-w-0">
+									<div class="flex items-center gap-1.5">
+										<span class="font-semibold text-slate-800 group-hover:text-[#00308b] transition-colors truncate"><?php echo esc_html( $s_item['type_name'] ); ?></span>
+										<?php if ( $s_is_closed ) : ?>
+											<span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0" title="Hết chỉ tiêu"></span>
+										<?php else : ?>
+											<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" title="Đang nhận hồ sơ"></span>
+										<?php endif; ?>
+									</div>
+									<span class="text-[11px] text-slate-500 block truncate"><?php echo esc_html( $s_item['tuition'] ); ?></span>
+								</div>
+							</div>
+							<svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#00308b] group-hover:translate-x-0.5 transition-all shrink-0 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+						</a>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	<?php endif; ?>
+
 	<!-- CONSULTATION FORM -->
 	<section id="register" class="hidden lg:block scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
 		<h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Đăng ký tư vấn miễn phí</h3>

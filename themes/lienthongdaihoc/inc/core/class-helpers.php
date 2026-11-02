@@ -853,6 +853,16 @@ function ltdh_get_program_learning_details( int $program_id ): array {
 }
 
 /**
+ * 52b. Get sibling training programs for the same major at the same school.
+ */
+function ltdh_get_sibling_training_programs( int $program_id ): array {
+	if ( class_exists( 'LTDH_Program_Helpers' ) ) {
+		return LTDH_Program_Helpers::get_sibling_training_programs( $program_id );
+	}
+	return [];
+}
+
+/**
  * 53. Format a program object or ID into a clean label for CF7 dropdowns.
  */
 function ltdh_format_program_select_label( $program ): string {

@@ -58,7 +58,22 @@ $prog_fee_name     = $tuition ?: 'Theo thông báo tuyển sinh';
 		</div>
 	<?php endif; ?>
 
-	<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
+	<div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-3.5 py-4 border-t border-slate-100">
+		<!-- Hàng 1, Cột 1: Hình thức học -->
+		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
+			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Hình thức học</span>
+			<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
+			<?php 
+			$sib_count = function_exists( 'ltdh_get_sibling_training_programs' ) ? count( ltdh_get_sibling_training_programs( $program_id ) ) : 0;
+			if ( $sib_count > 1 ) : ?>
+				<a href="#he-dao-tao-khac" class="mt-1 text-[11px] font-semibold text-[#00308b] hover:underline inline-flex items-center gap-0.5">
+					<span>Đổi hệ khác (<?php echo (int) $sib_count; ?> hệ)</span>
+					<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+				</a>
+			<?php endif; ?>
+		</div>
+
+		<!-- Hàng 1, Cột 2: Học phí -->
 		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Học phí</span>
 			<span class="font-bold text-[#00308b] text-sm sm:text-base leading-snug">
@@ -70,24 +85,16 @@ $prog_fee_name     = $tuition ?: 'Theo thông báo tuyển sinh';
 				?>
 			</span>
 		</div>
+
+		<!-- Hàng 1, Cột 3: Thời gian học -->
 		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Thời gian học</span>
 			<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $duration ?: '1.5 - 2 năm' ); ?></span>
 		</div>
+
+		<!-- Hàng 2, Cột 1: Cơ sở đào tạo -->
 		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Danh hiệu văn bằng</span>
-			<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $degree_val ); ?></span>
-		</div>
-		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Căn cứ pháp lý</span>
-			<span class="font-bold text-emerald-700 text-sm sm:text-base leading-snug">Thông tư 27/2019/TT-BGDĐT</span>
-		</div>
-		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Hình thức học</span>
-			<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $learning_details['mode'] ); ?></span>
-		</div>
-		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Cơ sở học</span>
+			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Cơ sở đào tạo</span>
 			<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php 
 				$display_campus = $learning_details['campus'] ?? '';
 				if ( empty( $display_campus ) || 'online' === strtolower( trim( $display_campus ) ) ) {
@@ -96,14 +103,16 @@ $prog_fee_name     = $tuition ?: 'Theo thông báo tuyển sinh';
 				echo esc_html( $display_campus ); 
 			?></span>
 		</div>
-		<?php if ( $quota ) : ?>
-			<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-				<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
-				<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $quota ); ?> chỉ tiêu</span>
-			</div>
-		<?php endif; ?>
+
+		<!-- Hàng 2, Cột 2: Chỉ tiêu -->
 		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
-			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Hạn hồ sơ</span>
+			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
+			<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $quota ? ( $quota . ' chỉ tiêu' ) : 'Theo đề án' ); ?></span>
+		</div>
+
+		<!-- Hàng 2, Cột 3: Hạn nộp hồ sơ -->
+		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
+			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Hạn nộp hồ sơ</span>
 			<span class="font-bold text-[#EA580C] text-sm sm:text-base leading-snug"><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></span>
 		</div>
 	</div>
