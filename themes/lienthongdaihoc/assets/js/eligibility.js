@@ -21,6 +21,7 @@
 		initForm();
 		initNavigation();
 		initResultsActions();
+		initFileUpload();
 		initShareAndCopy();
 		initUrlAndInitialResults();
 	}
@@ -373,7 +374,35 @@
 	}
 
 	function initFileUpload() {
-		// Document uploads removed per specification - kept for backwards compatibility
+		var degreeInput = document.getElementById('degree-file-input');
+		var degreeLabel = document.getElementById('degree-file-label');
+		if (degreeInput && degreeLabel && degreeInput.dataset.bound !== 'true') {
+			degreeInput.dataset.bound = 'true';
+			degreeInput.addEventListener('change', function () {
+				if (degreeInput.files && degreeInput.files.length > 0) {
+					degreeLabel.textContent = 'Đã chọn: ' + degreeInput.files[0].name;
+					degreeLabel.style.color = '#10b981';
+				} else {
+					degreeLabel.textContent = 'Tải ảnh hoặc PDF bằng cấp lên';
+					degreeLabel.style.color = '';
+				}
+			});
+		}
+
+		var transInput = document.getElementById('transcript-file-input');
+		var transLabel = document.getElementById('transcript-file-label');
+		if (transInput && transLabel && transInput.dataset.bound !== 'true') {
+			transInput.dataset.bound = 'true';
+			transInput.addEventListener('change', function () {
+				if (transInput.files && transInput.files.length > 0) {
+					transLabel.textContent = 'Đã chọn: ' + transInput.files[0].name;
+					transLabel.style.color = '#10b981';
+				} else {
+					transLabel.textContent = 'Tải ảnh hoặc PDF bảng điểm lên';
+					transLabel.style.color = '';
+				}
+			});
+		}
 	}
 
 	// ----------------------------------------------------
@@ -647,6 +676,7 @@
 
 		// Lead form submission & Card verification triggers
 		initLeadForm();
+		initFileUpload();
 		initCardVerifyListeners();
 	}
 
