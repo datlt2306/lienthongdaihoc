@@ -24,3 +24,5 @@ jobs:
               bash scripts/db-import.sh database.sql
             fi
             docker-compose restart wordpress
+            docker exec -u www-data -w /var/www/html lienthongdaihoc_wordpress php /var/www/html/wp-cli.phar cache flush || true
+            docker exec -u www-data -w /var/www/html lienthongdaihoc_wordpress php /var/www/html/wp-cli.phar litespeed-purge all || true
