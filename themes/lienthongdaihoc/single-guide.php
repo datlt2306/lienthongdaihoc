@@ -44,6 +44,12 @@ $global_zalo = get_field( 'global_zalo_url', 'options' ) ?: 'https://zalo.me';
 					<!-- Share Component -->
 					<?php get_template_part( 'template-parts/post-share' ); ?>
 				</article>
+
+				<?php
+				if ( comments_open() || get_comments_number() ) :
+					comments_template();
+				endif;
+				?>
 			</div>
 
 			<!-- Sidebar Column -->

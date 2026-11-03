@@ -121,6 +121,7 @@ class LTDH_UI_Helpers {
 			'program'      => 'cf7_program_form_id',
 			'evaluation'   => 'cf7_evaluation_form_id',
 			'eligibility'  => 'cf7_evaluation_form_id',
+			'comment'      => 'cf7_comment_form_id',
 		];
 
 		$form_id    = '';
@@ -147,6 +148,7 @@ class LTDH_UI_Helpers {
 				'program'      => [ 'form-tu-van', 'form-chuong-trinh', 'consultation-form' ],
 				'evaluation'   => [ 'form-tham-dinh-ho-so', 'form-tham-dinh', 'tham-dinh', 'evaluation-form' ],
 				'eligibility'  => [ 'form-tham-dinh-ho-so', 'form-tham-dinh', 'tham-dinh', 'evaluation-form' ],
+				'comment'      => [ 'form-binh-luan', 'binh-luan', 'comment-form', 'form-comment' ],
 			];
 			$candidates = $slugs[ $context ] ?? [ 'form-tu-van', 'form-lien-he' ];
 			foreach ( $candidates as $candidate_slug ) {
@@ -158,8 +160,8 @@ class LTDH_UI_Helpers {
 			}
 		}
 
-		// 4. Fallback to cf7_default_form_id if not evaluation/contact
-		if ( empty( $form_id ) && ! in_array( $context, [ 'evaluation', 'eligibility' ], true ) ) {
+		// 4. Fallback to cf7_default_form_id if not evaluation/contact/comment
+		if ( empty( $form_id ) && ! in_array( $context, [ 'evaluation', 'eligibility', 'comment' ], true ) ) {
 			if ( function_exists( 'get_field' ) ) {
 				$form_id = get_field( 'cf7_default_form_id', 'options' );
 			}
@@ -230,6 +232,173 @@ class LTDH_UI_Helpers {
 		}
 		$GLOBALS['ltdh_cf7_context_hidden_fields'] = [];
 		self::render_native_form( 'contact', $context_hidden_fields );
+	}
+
+	/**
+	 * Get smart avatar HTML for comments.
+	 * Ban Quản Trị LTDH / Admin gets official verified badge.
+	 * Guests get deterministic vibrant initial avatar based on name.
+	 *
+	 * @param \WP_Comment|int $comment Comment object or ID.
+	 * @param int             $size Avatar size.
+	 * @return string HTML string.
+	 */
+	public static function get_comment_avatar_html( $comment, int $size = 40 ): string {
+		if ( is_numeric( $comment ) ) {
+			$comment = get_comment( $comment );
+		}
+		if ( ! $comment instanceof \WP_Comment ) {
+			return '';
+		}
+
+		$is_admin = false;
+		if ( ! empty( $comment->user_id ) ) {
+			$user = get_userdata( $comment->user_id );
+			if ( $user && ( in_array( 'administrator', (array) $user->roles, true ) || in_array( 'editor', (array) $user->roles, true ) ) ) {
+				$is_admin = true;
+			}
+		}
+		if ( ! $is_admin && ( stripos( $comment->comment_author, 'Ban Quản Trị' ) !== false || stripos( $comment->comment_author, 'Admin' ) !== false ) ) {
+			$is_admin = true;
+		}
+
+		if ( $is_admin ) {
+			return '<div class="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#0071E3] to-[#004bb0] text-white flex items-center justify-center font-black text-xs tracking-wider shadow-xs shrink-0 select-none">
+				<span>LTDH</span>
+				<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-bold" title="' . esc_attr__( 'Đã xác thực', 'ltdh' ) . '">✓</span>
+			</div>';
+		}
+
+		$author_name = trim( (string) $comment->comment_author );
+		if ( '' === $author_name ) {
+			$author_name = 'K';
+		}
+		$initial = mb_strtoupper( mb_substr( $author_name, 0, 1 ) );
+
+		$colors = [
+			'bg-blue-600',
+			'bg-emerald-600',
+			'bg-indigo-600',
+			'bg-violet-600',
+			'bg-amber-600',
+			'bg-rose-600',
+			'bg-teal-600',
+		];
+		$idx      = abs( (int) crc32( $author_name ) ) % count( $colors );
+		$bg_class = $colors[ $idx ];
+
+		return '<div class="w-10 h-10 rounded-full ' . esc_attr( $bg_class ) . ' text-white flex items-center justify-center font-bold text-sm shadow-2xs shrink-0 select-none">
+			' . esc_html( $initial ) . '
+		</div>';
+	}
+
+	/**
+	 * Get avatar HTML for currently logged in user.
+	 *
+	 * @param \WP_User $user WP_User object.
+	 * @param int      $size Size in px.
+	 * @return string HTML string.
+	 */
+	public static function get_user_avatar_html( $user, int $size = 36 ): string {
+		if ( ! $user instanceof \WP_User || ! $user->exists() ) {
+			return '<div class="w-9 h-9 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xs shrink-0 select-none">?</div>';
+		}
+
+		$is_admin = in_array( 'administrator', (array) $user->roles, true ) || in_array( 'editor', (array) $user->roles, true ) || stripos( $user->display_name, 'Ban Quản Trị' ) !== false;
+		if ( $is_admin ) {
+			return '<div class="relative w-9 h-9 rounded-full bg-gradient-to-br from-[#0071E3] to-[#004bb0] text-white flex items-center justify-center font-black text-xs tracking-wider shadow-xs shrink-0 select-none">
+				<span>LTDH</span>
+				<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-bold" title="' . esc_attr__( 'Đã xác thực', 'ltdh' ) . '">✓</span>
+			</div>';
+		}
+
+		$name    = trim( (string) $user->display_name );
+		if ( '' === $name ) {
+			$name = 'U';
+		}
+		$initial = mb_strtoupper( mb_substr( $name, 0, 1 ) );
+		$colors  = [ 'bg-blue-600', 'bg-emerald-600', 'bg-indigo-600', 'bg-violet-600', 'bg-amber-600', 'bg-rose-600', 'bg-teal-600' ];
+		$idx     = abs( (int) crc32( $name ) ) % count( $colors );
+
+		return '<div class="w-9 h-9 rounded-full ' . esc_attr( $colors[ $idx ] ) . ' text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0 select-none">' . esc_html( $initial ) . '</div>';
+	}
+
+	/**
+	 * Render the comment form using Contact Form 7 with fallback to native comment_form.
+	 *
+	 * @param int $post_id Post ID to comment on.
+	 */
+	public static function render_comment_form( int $post_id = 0 ): void {
+		if ( ! $post_id ) {
+			$post_id = get_the_ID();
+		}
+
+		$shortcode = self::get_form_shortcode( 'comment' );
+		if ( ! empty( $shortcode ) ) {
+			$GLOBALS['ltdh_cf7_context_hidden_fields'] = [
+				'comment_post_id' => $post_id,
+				'is_comment_form' => '1',
+			];
+			echo $shortcode; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$GLOBALS['ltdh_cf7_context_hidden_fields'] = [];
+			return;
+		}
+
+		$commenter     = wp_get_current_commenter();
+		$consent       = empty( $commenter['comment_author_email'] ) ? '' : ' checked="checked"';
+		$user          = wp_get_current_user();
+		$user_identity = $user->exists() ? $user->display_name : '';
+
+		$fields = [
+			'author'  => '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div class="comment-form-author">
+				<label for="author" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">' . esc_html__( 'Họ và tên *', 'ltdh' ) . '</label>
+				<input id="author" name="author" type="text" value="' . esc_attr( $commenter['comment_author'] ) . '" size="30" maxlength="245" required autocomplete="name" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none transition-all bg-white" placeholder="' . esc_attr__( 'Nhập họ và tên của bạn', 'ltdh' ) . '" />
+			</div>',
+			'email'   => '<div class="comment-form-email">
+				<label for="email" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">' . esc_html__( 'Địa chỉ Email *', 'ltdh' ) . '</label>
+				<input id="email" name="email" type="email" value="' . esc_attr( $commenter['comment_author_email'] ) . '" size="30" maxlength="100" required autocomplete="email" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none transition-all bg-white" placeholder="email@example.com" />
+			</div></div>',
+			'cookies' => '<div class="comment-form-cookies-consent flex items-center gap-2 pt-1">
+				<input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes"' . $consent . ' class="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary cursor-pointer" />
+				<label for="wp-comment-cookies-consent" class="text-xs text-slate-500 cursor-pointer select-none">' . esc_html__( 'Lưu tên và email trong trình duyệt cho lần bình luận kế tiếp.', 'ltdh' ) . '</label>
+			</div>',
+		];
+
+		// Logged in display with user avatar and role indicator
+		$logged_in_html = '';
+		if ( $user->exists() ) {
+			$user_avatar = self::get_user_avatar_html( $user, 36 );
+			$is_admin    = in_array( 'administrator', (array) $user->roles, true ) || in_array( 'editor', (array) $user->roles, true ) || stripos( $user->display_name, 'Ban Quản Trị' ) !== false;
+			$role_badge  = $is_admin ? '<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#0071E3] text-white">Quản trị viên</span>' : '';
+
+			$logged_in_html = '<div class="logged-in-as flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 mb-3">' .
+				$user_avatar .
+				'<div class="min-w-0 flex-1 leading-tight"><div class="flex items-center gap-1.5 mb-0.5"><strong class="text-xs sm:text-sm font-bold text-slate-800 truncate">' . esc_html( $user_identity ) . '</strong> ' . $role_badge . '</div><p class="text-[11px] text-slate-400">' . sprintf( __( 'Đang bình luận với tư cách thành viên. <a href="%s" class="text-[#0071E3] hover:underline font-semibold ml-1">Đăng xuất?</a>', 'ltdh' ), esc_url( wp_logout_url( apply_filters( 'the_permalink', get_permalink( $post_id ), $post_id ) ) ) ) . '</p></div>' .
+			'</div>';
+		}
+
+		// Fallback: WordPress standard styled comment form
+		comment_form( [
+			'title_reply'          => __( 'Để lại bình luận của bạn', 'ltdh' ),
+			'title_reply_to'       => __( 'Trả lời bình luận của %s', 'ltdh' ),
+			'title_reply_before'   => '<h3 id="reply-title" class="comment-reply-title font-display font-extrabold text-base sm:text-lg text-slate-900 mb-1 flex items-center gap-2"><span>💬</span> ',
+			'title_reply_after'    => '</h3>',
+			'cancel_reply_link'    => __( '✕ Hủy trả lời', 'ltdh' ),
+			'cancel_reply_before'  => ' <small class="text-xs text-rose-500 font-semibold ml-2 hover:underline cursor-pointer">',
+			'cancel_reply_after'   => '</small>',
+			'class_form'           => 'comment-form space-y-4 pt-1',
+			'comment_notes_before' => '<p class="comment-notes text-xs text-slate-400 mb-2">' . __( 'Địa chỉ email của bạn sẽ được bảo mật. Các trường bắt buộc được đánh dấu *', 'ltdh' ) . '</p>',
+			'logged_in_as'         => $logged_in_html,
+			'comment_field'        => '<div class="comment-form-comment">
+				<label for="comment" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">' . esc_html__( 'Nội dung bình luận *', 'ltdh' ) . '</label>
+				<textarea id="comment" name="comment" cols="45" rows="4" maxlength="65525" required class="w-full bg-slate-50/70 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-[#0071E3] rounded-2xl p-4 text-sm text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-[#0071E3]/20 focus:outline-none transition-all resize-y min-h-[96px] leading-relaxed" placeholder="' . esc_attr__( 'Nhập câu hỏi, thắc mắc hoặc thảo luận về bài viết...', 'ltdh' ) . '"></textarea>
+			</div>',
+			'fields'               => $fields,
+			'submit_button'        => '<button name="%1$s" type="submit" id="%2$s" class="%3$s">%4$s</button>',
+			'submit_field'         => '<div class="form-submit pt-1 flex items-center justify-between gap-4">%1$s %2$s</div>',
+			'class_submit'         => 'inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-[#0071E3] hover:bg-[#0077ED] active:scale-95 text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow transition-all cursor-pointer',
+			'label_submit'         => __( 'Gửi bình luận ngay', 'ltdh' ),
+		] );
 	}
 
 	/**

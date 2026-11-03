@@ -591,6 +591,11 @@ add_action( 'wpcf7_before_send_mail', 'ltdh_capture_cf7_lead', 10, 3 );
 function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 	$posted_data = $submission->get_posted_data();
 
+	// Bỏ qua nếu đây là form bình luận bài viết (xử lý riêng qua ltdh_capture_cf7_comment)
+	if ( ! empty( $posted_data['is_comment_form'] ) || ! empty( $posted_data['cf7_is_comment_form'] ) ) {
+		return;
+	}
+
 	// 1. Invisible Honeypot check
 	$hp_val = $posted_data['hp_website'] ?? $posted_data['website_url_hp'] ?? '';
 	if ( ! empty( $hp_val ) ) {
@@ -791,6 +796,120 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 }
 
 // ----------------------------------------------------
+// 4b. CF7 Post Comment Interceptor
+// ----------------------------------------------------
+add_action( 'wpcf7_before_send_mail', 'ltdh_capture_cf7_comment', 10, 3 );
+
+/**
+ * Handle Contact Form 7 submissions designated as post comments.
+ * Automatically inserts submitted comment into WordPress core comments (pending moderation).
+ *
+ * @param WPCF7_ContactForm $contact_form
+ * @param bool              $abort
+ * @param WPCF7_Submission  $submission
+ */
+function ltdh_capture_cf7_comment( $contact_form, &$abort, $submission ) {
+	$posted_data = $submission->get_posted_data();
+
+	// Chỉ xử lý form có cờ is_comment_form
+	if ( empty( $posted_data['is_comment_form'] ) && empty( $posted_data['cf7_is_comment_form'] ) ) {
+		return;
+	}
+
+	// 1. Kiểm tra Honeypot
+	$hp_val = $posted_data['hp_website'] ?? $posted_data['website_url_hp'] ?? '';
+	if ( ! empty( $hp_val ) ) {
+		$abort = true;
+		return;
+	}
+
+	// 2. Trích xuất thông tin người gửi
+	$name_val = is_array( $posted_data['your-name'] ?? '' ) ? reset( $posted_data['your-name'] ) : ( $posted_data['your-name'] ?? '' );
+	if ( empty( $name_val ) ) {
+		$name_val = is_array( $posted_data['cf_name'] ?? '' ) ? reset( $posted_data['cf_name'] ) : ( $posted_data['cf_name'] ?? '' );
+	}
+	$email_val = is_array( $posted_data['your-email'] ?? '' ) ? reset( $posted_data['your-email'] ) : ( $posted_data['your-email'] ?? '' );
+	if ( empty( $email_val ) ) {
+		$email_val = is_array( $posted_data['cf_email'] ?? '' ) ? reset( $posted_data['cf_email'] ) : ( $posted_data['cf_email'] ?? '' );
+	}
+	$comment_val = is_array( $posted_data['your-comment'] ?? '' ) ? reset( $posted_data['your-comment'] ) : ( $posted_data['your-comment'] ?? '' );
+	if ( empty( $comment_val ) ) {
+		$comment_val = is_array( $posted_data['your-message'] ?? '' ) ? reset( $posted_data['your-message'] ) : ( $posted_data['your-message'] ?? '' );
+	}
+
+	$author_name    = sanitize_text_field( $name_val );
+	$author_email   = sanitize_email( $email_val );
+	$comment_text   = sanitize_textarea_field( $comment_val );
+
+	if ( empty( $author_name ) || empty( $comment_text ) ) {
+		$abort = true;
+		return;
+	}
+
+	// 3. Chống spam bình luận (chặn Cyrillic và link spam nếu muốn bảo mật cao)
+	if ( preg_match( '/[\p{Cyrillic}]/u', $author_name ) || preg_match( '/[\p{Cyrillic}]/u', $comment_text ) ) {
+		$abort = true;
+		return;
+	}
+
+	// 4. Xác định Post ID của bài viết được bình luận
+	$post_id = 0;
+	if ( ! empty( $posted_data['comment_post_id'] ) ) {
+		$post_id = absint( is_array( $posted_data['comment_post_id'] ) ? reset( $posted_data['comment_post_id'] ) : $posted_data['comment_post_id'] );
+	}
+	if ( ! $post_id ) {
+		$ref_url = wp_get_referer();
+		if ( $ref_url ) {
+			$post_id = url_to_postid( $ref_url );
+		}
+	}
+	if ( ! $post_id ) {
+		$post_id = get_the_ID();
+	}
+
+	$parent_id = 0;
+	if ( ! empty( $posted_data['comment_parent'] ) ) {
+		$parent_id = absint( is_array( $posted_data['comment_parent'] ) ? reset( $posted_data['comment_parent'] ) : $posted_data['comment_parent'] );
+	}
+
+	$user_ip    = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+	$user_agent = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ?? '' ) );
+
+	// 5. Thêm bình luận vào hệ thống WordPress core (Bảng wp_comments)
+	$commentdata = [
+		'comment_post_ID'      => $post_id,
+		'comment_author'       => $author_name,
+		'comment_author_email' => $author_email,
+		'comment_content'      => $comment_text,
+		'comment_parent'       => $parent_id,
+		'comment_author_IP'    => $user_ip,
+		'comment_agent'        => $user_agent,
+		'comment_type'         => 'comment',
+		'comment_date'         => current_time( 'mysql' ),
+		'comment_approved'     => 0, // Trạng thái: Chờ duyệt (Pending) trong WP Admin > Bình luận
+	];
+
+	$inserted_comment_id = wp_insert_comment( $commentdata );
+
+	if ( ! is_wp_error( $inserted_comment_id ) && $inserted_comment_id > 0 ) {
+		// Bỏ qua gửi email của CF7 vì đây là bình luận bài viết
+		add_filter( 'wpcf7_skip_mail', '__return_true' );
+	} else {
+		error_log( '[LTDH CF7 Comment Alert] Failed to insert comment into WP Comments for post: ' . $post_id );
+	}
+}
+
+// Tùy chỉnh thông điệp phản hồi cho form comment trong CF7
+add_filter( 'wpcf7_feedback_response', function( $response, $result ) {
+	if ( isset( $_POST['is_comment_form'] ) || isset( $_POST['cf7_is_comment_form'] ) ) {
+		if ( 'mail_sent' === ( $result['status'] ?? '' ) ) {
+			$response['message'] = esc_html__( 'Cảm ơn bạn! Bình luận của bạn đã được gửi thành công và đang chờ ban quản trị phê duyệt trước khi hiển thị.', 'ltdh' );
+		}
+	}
+	return $response;
+}, 10, 2 );
+
+// ----------------------------------------------------
 // 5. Native Form Submission Handler
 // ----------------------------------------------------
 add_action( 'template_redirect', 'ltdh_handle_native_form_submit' );
@@ -836,13 +955,14 @@ function ltdh_handle_native_form_submit() {
 		}
 	}
 
-	$name    = sanitize_text_field( wp_unslash( $_POST['your-name'] ) );
-	$phone   = sanitize_text_field( wp_unslash( $_POST['your-phone'] ) );
-	$email   = isset( $_POST['your-email'] ) ? sanitize_email( wp_unslash( $_POST['your-email'] ) ) : '';
-	$message = isset( $_POST['your-message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['your-message'] ) ) : '';
+	$name       = sanitize_text_field( wp_unslash( $_POST['your-name'] ) );
+	$phone      = sanitize_text_field( wp_unslash( $_POST['your-phone'] ) );
+	$email      = isset( $_POST['your-email'] ) ? sanitize_email( wp_unslash( $_POST['your-email'] ) ) : '';
+	$message    = isset( $_POST['your-message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['your-message'] ) ) : '';
+	$hp_website = isset( $_POST['hp_website'] ) ? sanitize_text_field( wp_unslash( $_POST['hp_website'] ) ) : '';
 
 	// 3. Kiểm tra spam & honeypot
-	if ( function_exists( 'ltdh_is_spam_submission' ) && ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $message ] ) ) {
+	if ( function_exists( 'ltdh_is_spam_submission' ) && ltdh_is_spam_submission( [ 'name' => $name, 'phone' => $phone, 'email' => $email, 'message' => $message, 'hp_website' => $hp_website ] ) ) {
 		wp_die(
 			esc_html__( 'Yêu cầu của bạn bị chặn do nghi ngờ spam. Vui lòng liên hệ hotline.', 'lienthongdaihoc' ),
 			esc_html__( 'Spam Blocked', 'lienthongdaihoc' ),

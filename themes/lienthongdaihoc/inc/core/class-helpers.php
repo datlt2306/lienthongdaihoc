@@ -656,6 +656,27 @@ function ltdh_render_contact_form( array $context_hidden_fields = [] ): void {
 }
 
 /**
+ * 28b. Render the Comment form (CF7 or native fallback).
+ */
+function ltdh_render_comment_form( int $post_id = 0 ): void {
+	LTDH_UI_Helpers::render_comment_form( $post_id );
+}
+
+/**
+ * 28c. Get smart avatar HTML for comments.
+ */
+function ltdh_get_comment_avatar_html( $comment, int $size = 40 ): string {
+	return LTDH_UI_Helpers::get_comment_avatar_html( $comment, $size );
+}
+
+/**
+ * 28d. Get smart avatar HTML for a user.
+ */
+function ltdh_get_user_avatar_html( $user, int $size = 36 ): string {
+	return LTDH_UI_Helpers::get_user_avatar_html( $user, $size );
+}
+
+/**
  * 29. Render a native, beautiful HTML form (CF7 fallback) with honeypot & nonce.
  * Forensic requirement: ltdh_render_recaptcha_field( 'native_lead' )
  */
