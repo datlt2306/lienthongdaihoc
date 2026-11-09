@@ -195,11 +195,11 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 	</a>
 </div>
 
-<!-- FLOATING DYNAMIC ISLAND MOBILE CTA BAR (CUPERTINO FROSTED GLASS) -->
+<!-- FLOATING DYNAMIC ISLAND MOBILE CTA BAR (CUPERTINO FROSTED GLASS - LIGHT) -->
 <nav id="ltdh-global-mobile-bar" 
      aria-label="Thanh liên hệ nhanh"
-     class="fixed inset-x-3.5 max-w-md mx-auto z-40 bg-[#1D1D1F]/90 backdrop-blur-2xl border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-1.5 rounded-full flex items-center justify-between gap-2 md:hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform translate-y-0 opacity-100 will-change-transform"
-     style="bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));">
+     class="fixed inset-x-3.5 max-w-md mx-auto z-40 bg-white/85 backdrop-blur-2xl border border-black/[0.08] shadow-[0_10px_35px_-5px_rgba(0,0,0,0.15),0_2px_8px_rgba(0,0,0,0.06)] p-1.5 rounded-full flex items-center justify-between gap-2 md:hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform translate-y-0 opacity-100 will-change-transform"
+     style="bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); -webkit-backdrop-filter: blur(24px) saturate(180%);">
 	
 	<!-- Zalo Button (Left Circle) -->
 	<a href="<?php echo esc_url( $zalo ); ?>" 
