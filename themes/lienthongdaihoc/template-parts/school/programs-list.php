@@ -354,39 +354,44 @@ $offered_program_ids = isset( $args['offered_program_ids'] ) ? $args['offered_pr
 					<div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
 						<div>
 							<?php if ( ! empty( $major['cat_name'] ) ) : ?>
-								<span class="text-[11px] font-bold uppercase tracking-wider text-[#00308b] mb-1 block">
+								<span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#0071E3] mb-1.5 block">
 									<?php echo esc_html( $major['cat_name'] ); ?>
 								</span>
 							<?php endif; ?>
 
-							<!-- Major Name -->
-							<h3 class="font-extrabold text-slate-900 text-base sm:text-lg group-hover:text-[#00308b] transition-colors leading-snug mb-1">
+							<!-- Major Name (Unified height baseline) -->
+							<h3 class="font-extrabold text-slate-900 text-base sm:text-lg group-hover:text-[#0071E3] transition-colors leading-snug line-clamp-2 min-h-[44px] mb-1.5">
 								<a href="<?php echo esc_url( $major_link ?: $primary_link ); ?>">
 									Ngành <?php echo esc_html( $major['name'] ); ?>
 								</a>
 							</h3>
 
-							<?php 
-							$is_real_spec = ! empty( $first_prog['specialization'] )
-								&& mb_strtolower( trim( $first_prog['specialization'] ), 'UTF-8' ) !== mb_strtolower( trim( $major['name'] ), 'UTF-8' )
-								&& mb_strtolower( trim( $first_prog['specialization'] ), 'UTF-8' ) !== mb_strtolower( trim( preg_replace( '/^ngành\s+/iu', '', $major['name'] ) ), 'UTF-8' );
-							if ( $is_real_spec ) : ?>
-								<p class="text-xs sm:text-sm text-slate-500 font-medium mb-2 flex items-center gap-1.5">
-									<span class="w-1.5 h-1.5 rounded-full bg-[#00308b]"></span>
-									<span>Chuyên ngành: <strong class="text-slate-800 font-semibold"><?php echo esc_html( $first_prog['specialization'] ); ?></strong></span>
-								</p>
-							<?php endif; ?>
+							<!-- Specialization Row (Guarantees bullet never wraps to 2nd line, preserves card rhythm) -->
+							<div class="min-h-[22px] mb-2.5 flex items-center">
+								<?php 
+								$is_real_spec = ! empty( $first_prog['specialization'] )
+									&& mb_strtolower( trim( $first_prog['specialization'] ), 'UTF-8' ) !== mb_strtolower( trim( $major['name'] ), 'UTF-8' )
+									&& mb_strtolower( trim( $first_prog['specialization'] ), 'UTF-8' ) !== mb_strtolower( trim( preg_replace( '/^ngành\s+/iu', '', $major['name'] ) ), 'UTF-8' );
+								if ( $is_real_spec ) : ?>
+									<p class="text-xs text-slate-600 font-medium flex items-center gap-1.5 leading-snug truncate">
+										<span class="w-1.5 h-1.5 rounded-full bg-[#0071E3] shrink-0"></span>
+										<span class="truncate">Chuyên ngành: <strong class="text-slate-800 font-semibold"><?php echo esc_html( $first_prog['specialization'] ); ?></strong></span>
+									</p>
+								<?php else : ?>
+									<span class="text-[11px] text-slate-400 font-medium">Chương trình chuẩn theo quy định Bộ GD&ĐT</span>
+								<?php endif; ?>
+							</div>
 
-							<!-- Highlights Info Row -->
-							<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-slate-500 mb-3.5">
-								<span class="inline-flex items-center gap-1 font-medium">
+							<!-- Highlights Info Row (Refined Micro-Meta Typography) -->
+							<div class="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] sm:text-xs text-slate-500 font-medium mb-3 pt-2.5 border-t border-slate-100">
+								<span class="inline-flex items-center gap-1">
 									<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
 									</svg>
 									<span><?php echo esc_html( ( $first_prog && ! empty( $first_prog['duration'] ) ) ? $first_prog['duration'] : '1.5 - 2 năm' ); ?></span>
 								</span>
-								<span class="text-slate-300">•</span>
-								<span class="inline-flex items-center gap-1 text-slate-600 font-medium">
+								<span class="text-slate-300 select-none">•</span>
+								<span class="inline-flex items-center gap-1 text-slate-600">
 									<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z" />
 									</svg>
@@ -396,93 +401,53 @@ $offered_program_ids = isset( $args['offered_program_ids'] ) ? $args['offered_pr
 						</div>
 
 						<!-- Programs Selector Tray (Dedicated Action Area) -->
-						<div class="pt-3 border-t border-slate-100 mt-auto">
-							<div class="text-xs font-semibold text-slate-500 flex items-center gap-1.5 mb-2">
-								<svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-								</svg>
-								<span>Hệ đào tạo tuyển sinh:</span>
+						<div class="pt-2.5 border-t border-slate-100 mt-auto">
+							<div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between mb-2 select-none">
+								<span class="flex items-center gap-1">
+									<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+									</svg>
+									<span>Hệ đào tạo tuyển sinh</span>
+								</span>
+								<span class="text-[10px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded-md">
+									<?php echo esc_html( $programs_count ); ?> hình thức
+								</span>
 							</div>
 
-							<?php 
-							$he_list          = array_filter( array_column( $major['programs'], 'he' ) );
-							$he_counts        = array_count_values( $he_list );
-							$has_duplicate_he = ! empty( $he_counts ) && max( $he_counts ) > 1;
-							?>
-							<?php if ( $programs_count === 1 && $first_prog ) : 
-								$prog      = $first_prog;
-								$raw_type  = $prog['type_name'] ?: 'Đào tạo từ xa';
-								$label     = ( 0 !== stripos( $raw_type, 'hệ' ) ) ? 'Hệ ' . $raw_type : $raw_type;
-								$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
+							<!-- Action Buttons: Clean Stack of Full-Width Interactive Pills -->
+							<div class="flex flex-col gap-1.5">
+								<?php foreach ( $major['programs'] as $prog ) : 
+									$raw_type  = $prog['type_name'] ?: 'Xem chương trình';
+									$label     = ( 0 !== stripos( $raw_type, 'hệ' ) ) ? 'Hệ ' . $raw_type : $raw_type;
+									$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
 
-								$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
-								$btn_style = 'bg-blue-50 hover:bg-[#00308b] text-[#00308b] hover:text-white border border-blue-200/80 hover:border-transparent rounded-full';
+									$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
+									$btn_style = 'bg-slate-50 hover:bg-[#00308b] text-slate-700 hover:text-white border border-slate-200/90 hover:border-transparent';
 
-								if ( false !== strpos( $t_lower, 'từ xa' ) ) {
-									$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
-									$btn_style = 'bg-[#0071E3]/10 hover:bg-[#0071E3] text-[#0071E3] hover:text-white border border-[#0071E3]/20 hover:border-transparent rounded-full';
-								} elseif ( false !== strpos( $t_lower, 'vừa học vừa làm' ) || false !== strpos( $t_lower, 'vừa làm vừa học' ) || false !== strpos( $t_lower, 'vhvl' ) ) {
-									$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-									$btn_style = 'bg-[#FF9500]/10 hover:bg-[#FF9500] text-[#D97706] hover:text-white border border-[#FF9500]/25 hover:border-transparent rounded-full';
-								}
-							?>
-								<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
-								   class="group/btn w-full py-2.5 px-3.5 rounded-full text-xs sm:text-sm font-semibold border transition-all flex items-center justify-between no-underline shadow-none hover:shadow-xs active:scale-[0.99] <?php echo esc_attr( $btn_style ); ?>"
-								   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
-									<span class="flex items-center gap-2 min-w-0 mr-2">
-										<?php echo $icon_svg; ?>
-										<span class="truncate"><?php echo esc_html( $label ); ?></span>
-									</span>
-									<span class="inline-flex items-center gap-1 text-xs opacity-80 group-hover/btn:opacity-100 shrink-0 ml-auto whitespace-nowrap">
-										<span>Xem tuyển sinh</span>
-										<svg class="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-										</svg>
-									</span>
-								</a>
-							<?php else : ?>
-								<!-- 2 or more systems/programs: Grid of action tiles -->
-								<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-									<?php foreach ( $major['programs'] as $prog ) : 
-										$raw_type  = $prog['type_name'] ?: 'Xem chương trình';
-										$label     = ( 0 !== stripos( $raw_type, 'hệ' ) ) ? 'Hệ ' . $raw_type : $raw_type;
-										$t_lower   = mb_strtolower( $raw_type, 'UTF-8' );
-										$spec_name = ! empty( $prog['specialization'] ) ? $prog['specialization'] : '';
-
-										$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5" /></svg>';
-										$btn_style = 'bg-slate-100 hover:bg-[#00308b] text-slate-700 hover:text-white border border-slate-200/80 hover:border-transparent rounded-full';
-
-										if ( false !== strpos( $t_lower, 'từ xa' ) ) {
-											$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
-											$btn_style = 'bg-[#0071E3]/10 hover:bg-[#0071E3] text-[#0071E3] hover:text-white border border-[#0071E3]/20 hover:border-transparent rounded-full';
-										} elseif ( false !== strpos( $t_lower, 'vừa học vừa làm' ) || false !== strpos( $t_lower, 'vừa làm vừa học' ) || false !== strpos( $t_lower, 'vhvl' ) ) {
-											$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#00308b] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-											$btn_style = 'bg-[#FF9500]/10 hover:bg-[#FF9500] text-[#D97706] hover:text-white border border-[#FF9500]/25 hover:border-transparent rounded-full';
-										}
-
-										$prog_real_spec = ! empty( $spec_name )
-											&& mb_strtolower( trim( $spec_name ), 'UTF-8' ) !== mb_strtolower( trim( $major['name'] ), 'UTF-8' )
-											&& mb_strtolower( trim( $spec_name ), 'UTF-8' ) !== mb_strtolower( trim( preg_replace( '/^ngành\s+/iu', '', $major['name'] ) ), 'UTF-8' );
-									?>
-										<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
-										   class="group/btn py-2 px-3.5 rounded-full text-xs font-semibold border transition-all flex items-center justify-between no-underline shadow-none hover:shadow-xs active:scale-[0.98] <?php echo esc_attr( $btn_style ); ?>"
-										   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
-											<span class="flex items-center gap-1.5 min-w-0 mr-1.5">
-												<?php echo $icon_svg; ?>
-												<?php if ( $prog_real_spec && ( $has_duplicate_he || count( $major['programs'] ) > 1 ) ) : ?>
-													<span class="truncate font-extrabold"><?php echo esc_html( $spec_name ); ?></span>
-													<span class="text-[10px] font-medium opacity-80 shrink-0 px-1.5 py-0.5 rounded bg-black/5"><?php echo esc_html( $prog['type_name'] ?: 'Từ xa' ); ?></span>
-												<?php else : ?>
-													<span class="truncate"><?php echo esc_html( $label ); ?></span>
-												<?php endif; ?>
-											</span>
-											<svg class="w-3.5 h-3.5 opacity-60 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all shrink-0 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									if ( false !== strpos( $t_lower, 'từ xa' ) ) {
+										$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#0071E3] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+										$btn_style = 'bg-blue-50/70 hover:bg-[#0071E3] text-[#0071E3] hover:text-white border border-blue-200/70 hover:border-transparent';
+									} elseif ( false !== strpos( $t_lower, 'vừa học vừa làm' ) || false !== strpos( $t_lower, 'vừa làm vừa học' ) || false !== strpos( $t_lower, 'vhvl' ) ) {
+										$icon_svg  = '<svg class="w-4 h-4 shrink-0 text-[#D97706] group-hover/btn:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+										$btn_style = 'bg-amber-50/70 hover:bg-[#FF9500] text-[#D97706] hover:text-white border border-amber-200/70 hover:border-transparent';
+									}
+								?>
+									<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
+									   class="group/btn w-full py-2.5 px-3.5 rounded-full text-xs font-semibold border transition-all flex items-center justify-between no-underline shadow-none hover:shadow-xs active:scale-[0.99] <?php echo esc_attr( $btn_style ); ?>"
+									   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
+										<span class="flex items-center gap-2 min-w-0 mr-2">
+											<?php echo $icon_svg; ?>
+											<span class="truncate font-bold"><?php echo esc_html( $label ); ?></span>
+										</span>
+										<span class="inline-flex items-center gap-1 text-[11px] font-medium opacity-80 group-hover/btn:opacity-100 shrink-0 ml-auto whitespace-nowrap">
+											<span>Xem tuyển sinh</span>
+											<svg class="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
 												<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
 											</svg>
-										</a>
-									<?php endforeach; ?>
-								</div>
-							<?php endif; ?>
+										</span>
+									</a>
+								<?php endforeach; ?>
+							</div>
 						</div>
 					</div>
 				</div>
