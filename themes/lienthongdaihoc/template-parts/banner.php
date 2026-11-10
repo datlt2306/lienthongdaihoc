@@ -622,19 +622,16 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 	<?php endif; ?>
 <?php else : ?>
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 sm:pb-3">
-		<!-- GRAND HERO BANNER (CONTAINERIZED, SOFT SCRIM OVERLAY, BOTTOM-ANCHORED CONTENT) -->
+		<!-- GRAND HERO BANNER (CONTAINERIZED, FLOATING GLASS CARD, BRIGHT NATURAL BACKGROUND) -->
 		<section class="relative bg-slate-100 border border-slate-200/90 rounded-2xl sm:rounded-3xl overflow-hidden mb-6 shadow-lg min-h-[320px] sm:min-h-[380px] md:min-h-[440px] lg:min-h-[530px] flex flex-col justify-end">
 			<?php if ( ! empty( $banner_image ) ) : ?>
 				<?php if ( ! empty( $banner_link ) ) : ?><a href="<?php echo esc_url( $banner_link ); ?>" class="absolute inset-0 z-0 block cursor-pointer group/bg" title="<?php echo esc_attr( $banner_title ); ?>"><?php endif; ?>
-				<!-- Background Banner Image (Bright, natural display) -->
+				<!-- Background Banner Image (100% Bright, untouched vibrant display) -->
 				<img src="<?php echo esc_url( $banner_image ); ?>" 
 				     class="hero-banner skip-lazy no-lazy absolute inset-0 w-full h-full object-cover object-center pointer-events-none group-hover/bg:scale-[1.01] transition-transform duration-300" 
 				     alt="<?php echo esc_attr( $banner_title ); ?>" 
 				     loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
 				<?php if ( ! empty( $banner_link ) ) : ?></a><?php endif; ?>
-				
-				<!-- Ultra-Soft Scrim Gradient: Upper 60% is 100% clear & bright; bottom has gentle fade only for text contrast -->
-				<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 via-35% to-transparent pointer-events-none"></div>
 			<?php else : ?>
 				<!-- Ambient Fallback Background -->
 				<div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#00308b] to-slate-800 z-0 pointer-events-none"></div>
@@ -643,100 +640,102 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 			<!-- Subtle Ambient Top Accent Line -->
 			<div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#00308b] via-blue-500 to-amber-500 z-10"></div>
 
-			<!-- Main Brand Info Content (Anchored to Bottom of Grand Banner) -->
-			<div class="relative z-10 p-5 sm:p-7 md:p-8 lg:p-10 flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
-				<!-- School Logo Container (Only displayed when official logo is present) -->
-				<?php if ( ! empty( $banner_logo_url ) ) : ?>
-					<div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl sm:rounded-3xl bg-white p-2 sm:p-2.5 shadow-2xl ring-4 ring-white/15 flex items-center justify-center shrink-0 overflow-hidden">
-						<img src="<?php echo esc_url( $banner_logo_url ); ?>" alt="<?php echo esc_attr( $banner_logo_alt ?: $banner_title ); ?>" class="max-w-full max-h-full object-contain">
-					</div>
-				<?php endif; ?>
-
-				<!-- Title & Meta Details -->
-				<div class="min-w-0 flex-1">
-					<!-- School / Program / Major Title -->
-					<h1 class="font-black text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight tracking-tight drop-shadow-md">
-						<?php echo esc_html( $banner_title ); ?>
-					</h1>
-
-					<!-- Subtitle -->
-					<?php if ( ! empty( $banner_subtitle ) ) : ?>
-						<p class="hidden md:block text-white text-xs sm:text-sm md:text-base font-medium max-w-3xl mt-1.5 sm:mt-2 leading-relaxed line-clamp-2 sm:line-clamp-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
-							<?php echo esc_html( $banner_subtitle ); ?>
-						</p>
-					<?php endif; ?>
-
-					<!-- Address & Website Metadata (matching the school banner style) -->
-					<?php if ( ! empty( $banner_address ) || ! empty( $banner_website ) ) : ?>
-						<div class="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
-							<?php if ( ! empty( $banner_address ) ) : ?>
-								<div class="inline-flex items-center gap-1.5">
-									<svg class="w-4 h-4 text-blue-300 shrink-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-									</svg>
-									<span><?php echo esc_html( $banner_address ); ?></span>
-									<?php if ( ! empty( $banner_map_url ) ) : ?>
-										<a href="<?php echo esc_url( $banner_map_url ); ?>" target="_blank" rel="noopener noreferrer" class="text-blue-200 font-bold hover:text-white hover:underline cursor-pointer transition-colors">(Bản đồ)</a>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
-
-							<?php if ( ! empty( $banner_website ) ) : ?>
-								<div class="inline-flex items-center gap-1.5">
-									<svg class="w-4 h-4 text-blue-300 shrink-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-									</svg>
-									<a href="<?php echo esc_url( $banner_website ); ?>" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center text-blue-200 font-semibold hover:text-white hover:underline cursor-pointer transition-colors">
-										<span><?php echo esc_html( preg_replace( '#^https?://#i', '', rtrim( $banner_website, '/' ) ) ); ?></span>
-										<svg class="w-3.5 h-3.5 text-blue-300 group-hover:text-white transition-colors ml-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-										</svg>
-									</a>
-								</div>
-							<?php endif; ?>
+			<!-- Main Brand Info Content (Anchored inside Floating Glassmorphism Card at Bottom-Left) -->
+			<div class="relative z-10 p-3.5 sm:p-5 md:p-6 lg:p-8 flex items-end pointer-events-none">
+				<div class="pointer-events-auto w-full sm:w-auto sm:max-w-2xl lg:max-w-3xl rounded-2xl sm:rounded-3xl bg-[#0a1628]/60 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.28)] p-4 sm:p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+					<!-- School Logo Container (Only displayed when official logo is present) -->
+					<?php if ( ! empty( $banner_logo_url ) ) : ?>
+						<div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl bg-white p-1.5 sm:p-2 shadow-xl ring-2 ring-white/25 flex items-center justify-center shrink-0 overflow-hidden">
+							<img src="<?php echo esc_url( $banner_logo_url ); ?>" alt="<?php echo esc_attr( $banner_logo_alt ?: $banner_title ); ?>" class="max-w-full max-h-full object-contain">
 						</div>
 					<?php endif; ?>
 
-					<!-- Verification Row for Programs -->
-					<?php if ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) : ?>
-						<div class="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
-							<span class="inline-flex items-center gap-1.5 text-emerald-300 font-semibold">
-								<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white text-[9px] font-black shrink-0">✓</span>
-								<span>Thông tin tuyển sinh đã được xác minh</span>
-							</span>
-							<?php if ( ! empty( $banner_verif['last_verified_at'] ) ) : ?>
-								<span class="text-slate-300">• <?php echo esc_html( $banner_verif['last_verified_at'] ); ?></span>
-							<?php endif; ?>
-							<?php if ( ! empty( $banner_verif['source_url'] ) ) : ?>
-								<span class="text-slate-400">•</span>
-								<a href="<?php echo esc_url( $banner_verif['source_url'] ); ?>" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-1 text-blue-200 hover:text-white underline underline-offset-2 transition-colors font-medium">
-									<span><?php echo esc_html( $source_label ); ?></span>
-									<svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-								</a>
-							<?php endif; ?>
-						</div>
-					<?php endif; ?>
+					<!-- Title & Meta Details -->
+					<div class="min-w-0 flex-1">
+						<!-- School / Program / Major Title -->
+						<h1 class="font-black text-white text-xl sm:text-2xl md:text-3xl leading-tight tracking-tight drop-shadow-sm">
+							<?php echo esc_html( $banner_title ); ?>
+						</h1>
 
-					<!-- Post Reading Metadata -->
-					<?php if ( is_singular( 'post' ) ) : ?>
-						<div class="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
-							<span class="inline-flex items-center gap-1.5">
-								<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
-							<span><?php echo get_the_date( 'd/m/Y' ); ?></span>
-						</span>
-						<span class="inline-flex items-center gap-1.5">
-							<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
-							<span><?php echo esc_html( $post_reading_time ); ?> phút đọc</span>
-						</span>
-						<?php if ( get_the_author() ) : ?>
-						<span class="inline-flex items-center gap-1.5">
-							<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
-							<span><?php the_author(); ?></span>
-						</span>
+						<!-- Subtitle -->
+						<?php if ( ! empty( $banner_subtitle ) ) : ?>
+							<p class="hidden md:block text-slate-100 text-xs sm:text-sm md:text-[15px] font-medium mt-1.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
+								<?php echo esc_html( $banner_subtitle ); ?>
+							</p>
 						<?php endif; ?>
-					</div>
-				<?php endif; ?>
+
+						<!-- Address & Website Metadata (matching the school banner style) -->
+						<?php if ( ! empty( $banner_address ) || ! empty( $banner_website ) ) : ?>
+							<div class="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100">
+								<?php if ( ! empty( $banner_address ) ) : ?>
+									<div class="inline-flex items-center gap-1.5">
+										<svg class="w-4 h-4 text-blue-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+										</svg>
+										<span><?php echo esc_html( $banner_address ); ?></span>
+										<?php if ( ! empty( $banner_map_url ) ) : ?>
+											<a href="<?php echo esc_url( $banner_map_url ); ?>" target="_blank" rel="noopener noreferrer" class="text-blue-200 font-bold hover:text-white hover:underline cursor-pointer transition-colors">(Bản đồ)</a>
+										<?php endif; ?>
+									</div>
+								<?php endif; ?>
+
+								<?php if ( ! empty( $banner_website ) ) : ?>
+									<div class="inline-flex items-center gap-1.5">
+										<svg class="w-4 h-4 text-blue-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+										</svg>
+										<a href="<?php echo esc_url( $banner_website ); ?>" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center text-blue-200 font-semibold hover:text-white hover:underline cursor-pointer transition-colors">
+											<span><?php echo esc_html( preg_replace( '#^https?://#i', '', rtrim( $banner_website, '/' ) ) ); ?></span>
+											<svg class="w-3.5 h-3.5 text-blue-300 group-hover:text-white transition-colors ml-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+											</svg>
+										</a>
+									</div>
+								<?php endif; ?>
+							</div>
+						<?php endif; ?>
+
+						<!-- Verification Row for Programs -->
+						<?php if ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) : ?>
+							<div class="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-100">
+								<span class="inline-flex items-center gap-1.5 text-emerald-300 font-semibold">
+									<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white text-[9px] font-black shrink-0">✓</span>
+									<span>Thông tin tuyển sinh đã được xác minh</span>
+								</span>
+								<?php if ( ! empty( $banner_verif['last_verified_at'] ) ) : ?>
+									<span class="text-slate-300">• <?php echo esc_html( $banner_verif['last_verified_at'] ); ?></span>
+								<?php endif; ?>
+								<?php if ( ! empty( $banner_verif['source_url'] ) ) : ?>
+									<span class="text-slate-400">•</span>
+									<a href="<?php echo esc_url( $banner_verif['source_url'] ); ?>" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-1 text-blue-200 hover:text-white underline underline-offset-2 transition-colors font-medium">
+										<span><?php echo esc_html( $source_label ); ?></span>
+										<svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+									</a>
+								<?php endif; ?>
+							</div>
+						<?php endif; ?>
+
+						<!-- Post Reading Metadata -->
+						<?php if ( is_singular( 'post' ) ) : ?>
+							<div class="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100">
+								<span class="inline-flex items-center gap-1.5">
+									<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+								<span><?php echo get_the_date( 'd/m/Y' ); ?></span>
+							</span>
+							<span class="inline-flex items-center gap-1.5">
+								<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+								<span><?php echo esc_html( $post_reading_time ); ?> phút đọc</span>
+							</span>
+							<?php if ( get_the_author() ) : ?>
+							<span class="inline-flex items-center gap-1.5">
+								<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+								<span><?php the_author(); ?></span>
+							</span>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+				</div>
 			</div>
 		</div>
 	</section>
