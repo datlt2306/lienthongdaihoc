@@ -977,13 +977,12 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 						Hệ đào tạo tuyển sinh:
 					</span>
 
-					<div class="flex items-center flex-wrap gap-2">
+					<div class="flex items-center flex-wrap sm:flex-nowrap gap-2 sm:justify-end">
 						<?php 
 						$rendered_training_types = [];
 						foreach ( $sorted_programs as $prog ) : 
-							$spec_name       = ! empty( $prog['specialization'] ) ? $prog['specialization'] : '';
 							$type_key        = ! empty( $prog['he'] ) ? $prog['he'] : ( ! empty( $prog['type_name'] ) ? sanitize_title( $prog['type_name'] ) : 'default' );
-							$prog_unique_key = $spec_name ? ( $type_key . '_' . sanitize_title( $spec_name ) ) : $type_key;
+							$prog_unique_key = $type_key;
 
 							if ( isset( $rendered_training_types[ $prog_unique_key ] ) ) {
 								continue;
@@ -1006,18 +1005,15 @@ function ltdh_render_major_programs_list( $major_id, $selected_he = '', $selecte
 
 							$raw_label     = $prog['type_name'] ? $prog['type_name'] : 'Xem chương trình';
 							$display_label = ( 0 !== stripos( $raw_label, 'hệ' ) ) ? 'Hệ ' . $raw_label : $raw_label;
-							if ( $spec_name && mb_strtolower( $spec_name, 'UTF-8' ) !== mb_strtolower( $prog['major_name'] ?? '', 'UTF-8' ) ) {
-								$display_label = $spec_name . ' (' . $display_label . ')';
-							}
 						?>
 							<?php if ( 'tam-ngung' === $prog['status'] ) : ?>
-								<span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed">
+								<span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed whitespace-nowrap">
 									<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
 									<span><?php echo esc_html( $display_label ); ?> (Tạm ngưng)</span>
 								</span>
 							<?php else : ?>
 								<a href="<?php echo esc_url( $prog['permalink'] ); ?>" 
-								   class="group/btn inline-flex items-center gap-2 px-3.5 py-1.5 sm:py-2 rounded-full text-xs font-semibold transition-all border shadow-none hover:shadow-xs no-underline active:scale-[0.98] <?php echo esc_attr( $btn_style ); ?>" 
+								   class="group/btn inline-flex items-center gap-2 px-3.5 py-1.5 sm:py-2 rounded-full text-xs font-semibold transition-all border shadow-none hover:shadow-xs no-underline active:scale-[0.98] whitespace-nowrap <?php echo esc_attr( $btn_style ); ?>" 
 								   title="<?php echo esc_attr( $prog['opportunity_title'] ); ?>">
 									<?php echo $icon_svg; ?>
 									<span><?php echo esc_html( $display_label ); ?></span>
