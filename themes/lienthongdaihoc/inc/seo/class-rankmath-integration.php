@@ -1859,5 +1859,177 @@ add_filter( 'rank_math/opengraph/facebook/og_locale', function() {
 	return 'vi_VN';
 }, 99 );
 
+// ----------------------------------------------------
+// 10. Curated llms.txt Content
+// ----------------------------------------------------
+
+/**
+ * Get curated llms.txt content.
+ */
+function ltdh_get_curated_llms_txt_content(): string {
+	$custom = get_option( 'ltdh_llms_txt_content' );
+	if ( ! empty( $custom ) ) {
+		return trim( (string) $custom );
+	}
+
+	return ltdh_get_default_llms_txt_content();
+}
+
+/**
+ * Default curated llms.txt Markdown content.
+ */
+function ltdh_get_default_llms_txt_content(): string {
+	return <<<MARKDOWN
+# Liên Thông Đại Học
+
+> Liên Thông Đại Học (lienthongdaihoc.com) là website cung cấp thông tin tuyển sinh và đào tạo đại học tại Việt Nam. Website tập trung vào liên thông đại học, văn bằng 2, các hình thức đào tạo chính quy, vừa học vừa làm và từ xa; đồng thời tổng hợp thông tin về trường đối tác, ngành học, chương trình đào tạo và hướng dẫn tuyển sinh. Nội dung giúp người học tìm hiểu điều kiện đăng ký, hồ sơ, thời gian học và lựa chọn chương trình phù hợp.
+
+## Trang chính
+
+- [Trang chủ](https://lienthongdaihoc.com/): Tổng quan website và các thông tin tuyển sinh.
+- [Trường đối tác](https://lienthongdaihoc.com/truong-doi-tac/): Danh sách các trường đại học được giới thiệu.
+- [Nhóm ngành](https://lienthongdaihoc.com/nhom-nganh/): Danh mục ngành học theo nhóm lĩnh vực.
+- [Hình thức đào tạo](https://lienthongdaihoc.com/hinh-thuc-dao-tao/): Thông tin về các hình thức đào tạo.
+- [Chương trình đào tạo](https://lienthongdaihoc.com/chuong-trinh/): Danh mục chương trình liên thông theo ngành, trường và hình thức học.
+- [Cẩm nang tuyển sinh](https://lienthongdaihoc.com/cam-nang/): Bài viết hướng dẫn về điều kiện và thủ tục tuyển sinh.
+- [Hướng dẫn tuyển sinh](https://lienthongdaihoc.com/tin-tuc/huong-dan-tuyen-sinh/): Nội dung hướng dẫn người học tìm hiểu và đăng ký tuyển sinh.
+- [Kiểm tra điều kiện tuyển sinh](https://lienthongdaihoc.com/kiem-tra-dieu-kien/): Công cụ tham khảo điều kiện đăng ký.
+- [Câu hỏi thường gặp](https://lienthongdaihoc.com/cau-hoi-thuong-gap/): Giải đáp các thắc mắc về tuyển sinh và đào tạo.
+
+## Trường đại học đối tác
+
+- [Trường Đại học Điện lực](https://lienthongdaihoc.com/truong-dai-hoc-dien-luc/): Thông tin trường và các chương trình đào tạo.
+- [Đại học Thái Nguyên](https://lienthongdaihoc.com/truong-dai-hoc-thai-nguyen/): Thông tin trường và chương trình đào tạo.
+- [Trường Đại học Hòa Bình](https://lienthongdaihoc.com/truong-dai-hoc-hoa-binh/): Thông tin trường và các lĩnh vực đào tạo.
+- [Trường Đại học Thương mại](https://lienthongdaihoc.com/truong-dai-hoc-thuong-mai/): Thông tin trường và các ngành kinh tế, kinh doanh, quản lý.
+- [Trường Đại học Giao thông vận tải](https://lienthongdaihoc.com/truong-dai-hoc-giao-thong-van-tai/): Thông tin trường và các chương trình đào tạo.
+- [Trường Đại học Intracom](https://lienthongdaihoc.com/truong-dai-hoc-intracom/): Thông tin trường và các chương trình đào tạo.
+
+## Ngành học tiêu biểu
+
+- [Công nghệ thông tin](https://lienthongdaihoc.com/nganh-cong-nghe-thong-tin/): Ngành Công nghệ thông tin.
+- [Công nghệ kỹ thuật điện, điện tử](https://lienthongdaihoc.com/nganh-cong-nghe-ky-thuat-dien-dien-tu/): Ngành Công nghệ kỹ thuật điện, điện tử.
+- [Công nghệ kỹ thuật điều khiển và tự động hóa](https://lienthongdaihoc.com/nganh-cong-nghe-ky-thuat-dieu-khien-va-tu-dong-hoa/): Ngành điều khiển và tự động hóa.
+- [Công nghệ kỹ thuật ô tô](https://lienthongdaihoc.com/nganh-cong-nghe-ky-thuat-o-to/): Ngành Công nghệ kỹ thuật ô tô.
+- [Kỹ thuật cơ khí](https://lienthongdaihoc.com/nganh-ky-thuat-co-khi/): Ngành Kỹ thuật cơ khí.
+- [Kế toán](https://lienthongdaihoc.com/nganh-ke-toan/): Ngành Kế toán.
+- [Quản trị kinh doanh](https://lienthongdaihoc.com/nganh-quan-tri-kinh-doanh/): Ngành Quản trị kinh doanh.
+- [Marketing](https://lienthongdaihoc.com/nganh-marketing/): Ngành Marketing.
+- [Luật kinh tế](https://lienthongdaihoc.com/nganh-luat-kinh-te/): Ngành Luật kinh tế.
+- [Logistics](https://lienthongdaihoc.com/nganh-logistics/): Ngành Logistics.
+- [Thương mại điện tử](https://lienthongdaihoc.com/nganh-thuong-mai-dien-tu/): Ngành Thương mại điện tử.
+- [Kỹ thuật ô tô](https://lienthongdaihoc.com/nganh-ky-thuat-o-to/): Ngành Kỹ thuật ô tô.
+- [Thiết kế đồ họa](https://lienthongdaihoc.com/nganh-thiet-ke-do-hoa/): Ngành Thiết kế đồ họa.
+
+## Chương trình đào tạo
+
+### Liên thông chính quy
+
+- [Quản trị kinh doanh – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-quan-tri-kinh-doanh-chinh-quy-dai-hoc-giao-thong-van-tai/)
+- [Logistics – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-logistics-chinh-quy-dai-hoc-giao-thong-van-tai/)
+- [Kỹ thuật ô tô – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-ky-thuat-o-to-chinh-quy-dai-hoc-giao-thong-van-tai/)
+- [Kỹ thuật cơ khí – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-ky-thuat-co-khi-chinh-quy-dai-hoc-giao-thong-van-tai/)
+- [Điều khiển và tự động hóa – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-ky-thuat-dieu-khien-va-tu-dong-hoa-chinh-quy-dai-hoc-giao-thong-van-tai/)
+- [Kỹ thuật cơ điện tử – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-ky-thuat-co-dien-tu-chinh-quy-dai-hoc-giao-thong-van-tai/)
+- [Công nghệ thông tin – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-cong-nghe-thong-tin-chinh-quy-utc/)
+
+### Vừa học vừa làm
+
+- [Kỹ thuật cơ điện tử – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-ky-thuat-co-dien-tu-vua-hoc-vua-lam-dai-hoc-giao-thong-van-tai/)
+- [Kỹ thuật cơ khí – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-ky-thuat-co-khi-vua-hoc-vua-lam-dai-hoc-giao-thong-van-tai/)
+- [Điều khiển và tự động hóa – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-ky-thuat-dieu-khien-va-tu-dong-hoa-vua-hoc-vua-lam-dai-hoc-giao-thong-van-tai/)
+- [Quản trị kinh doanh – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-quan-tri-kinh-doanh-vua-hoc-vua-lam-dai-hoc-giao-thong-van-tai/)
+- [Logistics – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-logistics-vua-hoc-vua-lam-dai-hoc-giao-thong-van-tai/)
+- [Kỹ thuật ô tô – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-ky-thuat-o-to-vua-hoc-vua-lam-dai-hoc-giao-thong-van-tai/)
+- [Công nghệ kỹ thuật điện, điện tử – Đại học Điện lực](https://lienthongdaihoc.com/lien-thong-cong-nghe-ky-thuat-dien-dien-tu-vua-hoc-vua-lam-dai-hoc-dien-luc/)
+- [Điều khiển và tự động hóa – Đại học Điện lực](https://lienthongdaihoc.com/lien-thong-cong-nghe-ky-thuat-dieu-khien-va-tu-dong-hoa-vua-hoc-vua-lam-dai-hoc-dien-luc/)
+- [Công nghệ kỹ thuật ô tô – Đại học Điện lực](https://lienthongdaihoc.com/lien-thong-cong-nghe-ky-thuat-o-to-vua-hoc-vua-lam-dai-hoc-dien-luc/)
+- [Công nghệ thông tin – Đại học Điện lực](https://lienthongdaihoc.com/lien-thong-cong-nghe-thong-tin-vua-hoc-vua-lam-dai-hoc-dien-luc/)
+- [Thương mại điện tử – Đại học Điện lực](https://lienthongdaihoc.com/lien-thong-thuong-mai-dien-tu-vua-hoc-vua-lam-dai-hoc-dien-luc/)
+- [Công nghệ thông tin – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-cong-nghe-thong-tin-vua-hoc-vua-lam-utc/)
+
+### Đào tạo từ xa
+
+- [Công nghệ thông tin – Đại học Giao thông vận tải](https://lienthongdaihoc.com/lien-thong-cong-nghe-thong-tin-tu-xa-utc/)
+- [Luật kinh tế – Đại học Thái Nguyên](https://lienthongdaihoc.com/lien-thong-luat-kinh-te-dao-tao-tu-xa-dai-hoc-thai-nguyen/)
+- [Thương mại điện tử – Đại học Thái Nguyên](https://lienthongdaihoc.com/lien-thong-thuong-mai-dien-tu-dao-tao-tu-xa-dai-hoc-thai-nguyen/)
+- [Quản trị kinh doanh – Đại học Thái Nguyên](https://lienthongdaihoc.com/lien-thong-quan-tri-kinh-doanh-dao-tao-tu-xa-dai-hoc-thai-nguyen/)
+- [Luật kinh tế – Đại học Thương mại](https://lienthongdaihoc.com/lien-thong-luat-kinh-te-dao-tao-tu-xa-dai-hoc-thuong-mai/)
+- [Logistics – Đại học Thương mại](https://lienthongdaihoc.com/lien-thong-logistics-dao-tao-tu-xa-dai-hoc-thuong-mai/)
+- [Marketing – Đại học Thương mại](https://lienthongdaihoc.com/lien-thong-marketing-dao-tao-tu-xa-dai-hoc-thuong-mai/)
+- [Quản trị kinh doanh – Đại học Thương mại](https://lienthongdaihoc.com/lien-thong-quan-tri-kinh-doanh-dao-tao-tu-xa-dai-hoc-thuong-mai/)
+- [Thương mại điện tử – Đại học Thương mại](https://lienthongdaihoc.com/lien-thong-thuong-mai-dien-tu-dao-tao-tu-xa-dai-hoc-thuong-mai/)
+- [Công nghệ thông tin – Đại học Điện lực](https://lienthongdaihoc.com/lien-thong-cong-nghe-thong-tin-vua-hoc-vua-lam-dai-hoc-dien-luc/)
+
+## Cẩm nang và tin tức tuyển sinh
+
+- [Tin tức](https://lienthongdaihoc.com/tin-tuc/): Tin tuyển sinh và thông tin giáo dục.
+- [Hướng dẫn tuyển sinh](https://lienthongdaihoc.com/tin-tuc/huong-dan-tuyen-sinh/): Hướng dẫn và thông tin hỗ trợ đăng ký tuyển sinh.
+- [Liên thông Cao đẳng lên Đại học cần điều kiện gì?](https://lienthongdaihoc.com/huong-dan/lien-thong-cao-dang-len-dai-hoc-can-dieu-kien-gi/): Điều kiện và quy trình đăng ký liên thông.
+- [Văn bằng 2 là gì? Ai nên học?](https://lienthongdaihoc.com/huong-dan/van-bang-2-la-gi-ai-nen-hoc/): Tổng quan về chương trình văn bằng 2.
+- [Quy định miễn giảm tín chỉ khi học liên thông đại học](https://lienthongdaihoc.com/huong-dan/quy-dinh-mien-giam-tin-chi-khi-hoc-lien-thong-dai-hoc/): Thông tin tham khảo về miễn giảm học phần.
+
+## Liên hệ
+
+- Website: https://lienthongdaihoc.com/
+- Thương hiệu: Liên Thông Đại Học
+- Hotline: 0988 991 496
+- Email: hotro@lienthongdaihoc.com
+- Địa chỉ được công bố: Tầng 2 – Khu Hiệu bộ, 306B Kim Mã, phường Giảng Võ, Hà Nội.
+- [Trang liên hệ](https://lienthongdaihoc.com/lien-he/): Kênh liên hệ và tư vấn.
+
+## Sitemap
+
+- [XML Sitemap](https://lienthongdaihoc.com/sitemap_index.xml): Danh sách sitemap của website.
+MARKDOWN;
+}
+
+/**
+ * Hook into Rank Math llms_txt before output to serve curated content cleanly.
+ */
+add_action( 'rank_math/llms_txt/before_output', function() {
+	if ( ! headers_sent() ) {
+		header( 'Content-Type: text/plain; charset=utf-8' );
+		header( 'X-Robots-Tag: noindex, nofollow', true );
+	}
+	status_header( 200 );
+	echo ltdh_get_curated_llms_txt_content() . "\n";
+	exit;
+}, 1 );
+
+/**
+ * Auto-sync Rank Math options and update option version.
+ */
+function ltdh_sync_llms_txt_settings() {
+	$version = '20261115_v3';
+	if ( get_option( 'ltdh_llms_txt_sync_version' ) === $version ) {
+		return;
+	}
+
+	$modules = get_option( 'rank_math_modules', [] );
+	if ( ! is_array( $modules ) ) {
+		$modules = [];
+	}
+	if ( ! in_array( 'llms-txt', $modules, true ) ) {
+		$modules[] = 'llms-txt';
+		update_option( 'rank_math_modules', $modules );
+	}
+
+	update_option( 'ltdh_llms_txt_content', ltdh_get_default_llms_txt_content() );
+
+	$general = get_option( 'rank-math-options-general', [] );
+	if ( ! is_array( $general ) ) {
+		$general = [];
+	}
+	$general['llms_post_types'] = [];
+	$general['llms_taxonomies'] = [];
+	$general['llms_summary']    = 'Liên Thông Đại Học (lienthongdaihoc.com) là website cung cấp thông tin tuyển sinh và đào tạo đại học tại Việt Nam. Website tập trung vào liên thông đại học, văn bằng 2, các hình thức đào tạo chính quy, vừa học vừa làm và từ xa; đồng thời tổng hợp thông tin về trường đối tác, ngành học, chương trình đào tạo và hướng dẫn tuyển sinh. Nội dung giúp người học tìm hiểu điều kiện đăng ký, hồ sơ, thời gian học và lựa chọn chương trình phù hợp.';
+	update_option( 'rank-math-options-general', $general );
+
+	update_option( 'ltdh_llms_txt_sync_version', $version );
+	flush_rewrite_rules( false );
+}
+add_action( 'init', 'ltdh_sync_llms_txt_settings', 20 );
+
 
 
