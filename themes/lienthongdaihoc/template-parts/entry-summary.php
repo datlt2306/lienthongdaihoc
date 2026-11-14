@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php the_post_thumbnail( 'medium', [ 'class' => 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300' ] ); ?>
 		</a>
 	<?php endif; ?>
-	<div itemprop="description" class="text-sm text-slate-600 line-clamp-2 leading-relaxed">
+	<div class="text-sm text-slate-600 line-clamp-2 leading-relaxed">
 		<?php the_excerpt(); ?>
 	</div>
 	<?php if ( is_search() ) : ?>

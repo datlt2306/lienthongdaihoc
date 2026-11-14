@@ -16,13 +16,13 @@ if ( have_posts() ) :
 ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class( 'page-entry max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8' ); ?>>
 	<header class="header mb-6">
-		<h1 class="entry-title text-2xl sm:text-3xl font-extrabold text-slate-900" itemprop="headline"><?php the_title(); ?></h1>
+		<h1 class="entry-title text-2xl sm:text-3xl font-extrabold text-slate-900"><?php the_title(); ?></h1>
 		<?php edit_post_link( __( 'Chỉnh sửa trang', 'ltdh' ), '<span class="edit-link text-xs text-blue-600 hover:underline">', '</span>' ); ?>
 	</header>
-	<div class="entry-content prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-white rounded-xl shadow-xs border border-slate-100 p-6 md:p-8" itemprop="mainContentOfPage">
+	<div class="entry-content prose prose-slate max-w-none text-slate-900 text-sm md:text-base bg-white rounded-xl shadow-xs border border-slate-100 p-6 md:p-8">
 		<?php if ( has_post_thumbnail() ) : ?>
 			<div class="mb-6">
-				<?php the_post_thumbnail( 'full', [ 'itemprop' => 'image', 'class' => 'rounded-xl w-full h-auto' ] ); ?>
+				<?php the_post_thumbnail( 'full', [ 'class' => 'rounded-xl w-full h-auto' ] ); ?>
 			</div>
 		<?php endif; ?>
 		<?php the_content(); ?>

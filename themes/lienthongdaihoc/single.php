@@ -60,7 +60,7 @@ $author_bio  = get_the_author_meta( 'description' ) ?: 'Đội ngũ biên tập 
 			<div class="lg:col-span-8 space-y-8 min-w-0">
 
 				<?php if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
-					<article id="post-<?php the_ID(); ?>" <?php post_class( 'bg-white rounded-2xl shadow-xs border border-slate-200/80 p-5 sm:p-7 md:p-10 overflow-hidden' ); ?> itemscope itemtype="https://schema.org/Article">
+					<article id="post-<?php the_ID(); ?>" <?php post_class( 'bg-white rounded-2xl shadow-xs border border-slate-200/80 p-5 sm:p-7 md:p-10 overflow-hidden' ); ?>>
 						
 						<!-- Article Header -->
 						<header class="entry-header mb-6 pb-6 border-b border-slate-100">
@@ -85,18 +85,18 @@ $author_bio  = get_the_author_meta( 'description' ) ?: 'Đội ngũ biên tập 
 							</div>
 
 							<!-- Title -->
-							<h1 class="entry-title font-display font-black text-2xl sm:text-3xl md:text-4xl text-slate-900 leading-tight tracking-tight mb-4" itemprop="headline">
+							<h1 class="entry-title font-display font-black text-2xl sm:text-3xl md:text-4xl text-slate-900 leading-tight tracking-tight mb-4">
 								<?php the_title(); ?>
 							</h1>
 
 							<!-- Meta Bar -->
 							<div class="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs sm:text-sm text-slate-500">
 								<!-- Author Info -->
-								<div class="flex items-center gap-2" itemprop="author" itemscope itemtype="https://schema.org/Person">
+								<div class="flex items-center gap-2">
 									<div class="w-7 h-7 rounded-full bg-blue-100 text-brand-primary flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden select-none">
 										<?php echo esc_html( mb_substr( $author_name, 0, 1 ) ); ?>
 									</div>
-									<span class="font-bold text-slate-700" itemprop="name"><?php echo esc_html( $author_name ); ?></span>
+									<span class="font-bold text-slate-700"><?php echo esc_html( $author_name ); ?></span>
 								</div>
 
 								<span class="text-slate-300">•</span>
@@ -104,12 +104,9 @@ $author_bio  = get_the_author_meta( 'description' ) ?: 'Đội ngũ biên tập 
 								<!-- Publish Date -->
 								<div class="flex items-center gap-1.5 text-slate-500">
 									<?php ltdh_icon( 'calendar', 'w-4 h-4 text-slate-400 shrink-0' ); ?>
-									<time class="entry-date font-medium" datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>" itemprop="datePublished">
+									<time class="entry-date font-medium" datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>">
 										<?php echo esc_html( get_the_date( 'd/m/Y' ) ); ?>
 									</time>
-									<?php if ( get_the_date() !== get_the_modified_date() ) : ?>
-										<meta itemprop="dateModified" content="<?php echo esc_attr( get_the_modified_date( 'c' ) ); ?>">
-									<?php endif; ?>
 								</div>
 
 								<span class="text-slate-300">•</span>
@@ -129,7 +126,7 @@ $author_bio  = get_the_author_meta( 'description' ) ?: 'Đội ngũ biên tập 
 
 						<!-- Article Excerpt / Lead Intro -->
 						<?php if ( has_excerpt() ) : ?>
-							<div class="p-4 sm:p-5 rounded-xl bg-slate-50/90 border-l-4 border-brand-primary text-slate-700 text-sm sm:text-base font-medium leading-relaxed mb-6" itemprop="description">
+							<div class="p-4 sm:p-5 rounded-xl bg-slate-50/90 border-l-4 border-brand-primary text-slate-700 text-sm sm:text-base font-medium leading-relaxed mb-6">
 								<?php the_excerpt(); ?>
 							</div>
 						<?php endif; ?>
@@ -138,9 +135,8 @@ $author_bio  = get_the_author_meta( 'description' ) ?: 'Đội ngũ biên tập 
 						<?php if ( has_post_thumbnail() ) : ?>
 							<figure class="mb-8 rounded-xl overflow-hidden border border-slate-100 shadow-2xs">
 								<?php the_post_thumbnail( 'full', [
-									'class'    => 'w-full h-auto object-cover max-h-[500px]',
-									'itemprop' => 'image',
-									'loading'  => 'eager',
+									'class'   => 'w-full h-auto object-cover max-h-[500px]',
+									'loading' => 'eager',
 								] ); ?>
 								<?php if ( get_the_post_thumbnail_caption() ) : ?>
 									<figcaption class="text-center text-xs text-slate-400 py-2.5 px-4 bg-slate-50 border-t border-slate-100 italic">
@@ -151,7 +147,7 @@ $author_bio  = get_the_author_meta( 'description' ) ?: 'Đội ngũ biên tập 
 						<?php endif; ?>
 
 						<!-- Article Body Content -->
-						<div class="entry-content prose prose-slate max-w-none text-slate-700 text-base leading-relaxed prose-headings:font-display prose-headings:font-extrabold prose-headings:text-slate-900 prose-headings:tracking-tight prose-a:text-brand-primary hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-xs prose-strong:text-slate-900 prose-table:overflow-x-auto" itemprop="articleBody">
+						<div class="entry-content prose prose-slate max-w-none text-slate-700 text-base leading-relaxed prose-headings:font-display prose-headings:font-extrabold prose-headings:text-slate-900 prose-headings:tracking-tight prose-a:text-brand-primary hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-xs prose-strong:text-slate-900 prose-table:overflow-x-auto">
 							<?php the_content(); ?>
 						</div>
 

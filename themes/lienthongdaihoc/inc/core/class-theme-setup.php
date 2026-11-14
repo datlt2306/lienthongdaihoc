@@ -50,22 +50,10 @@ function ltdh_theme_setup() {
 add_action( 'after_setup_theme', 'ltdh_theme_setup' );
 
 /**
- * Injects BlankSlate Schema.org microdata type attribute on <html> element.
+ * BlankSlate Schema.org microdata type attribute on <html> element (Disabled: Rank Math JSON-LD is used exclusively).
  */
 function ltdh_schema_type() {
-	$schema = 'https://schema.org/';
-	if ( is_singular( 'post' ) ) {
-		$type = 'Article';
-	} elseif ( is_author() ) {
-		$type = 'ProfilePage';
-	} elseif ( is_search() ) {
-		$type = 'SearchResultsPage';
-	} elseif ( is_singular( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) ) {
-		$type = 'AboutPage';
-	} else {
-		$type = 'WebPage';
-	}
-	echo 'itemscope itemtype="' . esc_url( $schema . $type ) . '"';
+	// Intentionally empty to avoid duplicate Microdata entities conflicting with Rank Math JSON-LD.
 }
 
 /**

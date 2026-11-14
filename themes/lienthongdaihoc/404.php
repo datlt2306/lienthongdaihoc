@@ -23,7 +23,7 @@ get_header();
 
 		<!-- Degree Motif & Big 404 -->
 		<div class="relative inline-block select-none">
-			<h1 class="entry-title text-8xl sm:text-9xl font-black font-display tracking-tight text-slate-900 leading-none" itemprop="name">
+			<h1 class="entry-title text-8xl sm:text-9xl font-black font-display tracking-tight text-slate-900 leading-none">
 				4<span class="text-brand-accent inline-block transition-transform hover:rotate-12 duration-300">0</span>4
 			</h1>
 			<div class="absolute -top-3 right-3 sm:right-6 transform -rotate-12 pointer-events-none text-brand-primary drop-shadow-md">
@@ -36,7 +36,7 @@ get_header();
 		</div>
 
 		<!-- Explanatory Messaging -->
-		<div class="entry-content space-y-3" itemprop="mainContentOfPage">
+		<div class="entry-content space-y-3">
 			<h2 class="text-2xl sm:text-3xl font-bold font-display text-slate-900 tracking-tight">
 				Lạc mất lộ trình liên thông rồi bạn ơi!
 			</h2>
