@@ -53,9 +53,46 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 		'text' => 'Giải đáp thắc mắc tuyển sinh',
 	];
 	$banner_image    = get_field( 'page_banner' ) ?: '';
+	if ( is_array( $banner_image ) ) {
+		$banner_image = $banner_image['url'] ?? '';
+	} elseif ( is_numeric( $banner_image ) ) {
+		$banner_image = wp_get_attachment_image_url( (int) $banner_image, 'full' ) ?: '';
+	}
+} elseif ( is_page( 'truong-doi-tac' ) || preg_match( '#^/truong-doi-tac(?:/page/\d+)?/?$#i', $request_path ) || is_post_type_archive( 'school' ) ) {
+	$banner_title    = 'Trường Đại học Đối tác';
+	$banner_subtitle = ( function_exists( 'get_field' ) && get_field( 'page_banner_subtitle' ) )
+		? get_field( 'page_banner_subtitle' )
+		: 'Hệ thống các trường đại học uy tín hàng đầu Việt Nam tuyển sinh liên thông chính quy, vừa học vừa làm & từ xa';
+	$banner_eyebrow  = [
+		'text' => 'Mạng lưới đại học đối tác ' . date( 'Y' ),
+	];
+	if ( function_exists( 'get_field' ) && get_field( 'page_banner' ) ) {
+		$raw_img = get_field( 'page_banner' );
+		$banner_image = is_array( $raw_img ) ? ( $raw_img['url'] ?? '' ) : ( is_numeric( $raw_img ) ? wp_get_attachment_image_url( (int) $raw_img, 'full' ) : (string) $raw_img );
+	}
+} elseif ( is_page( 'nhom-nganh' ) || preg_match( '#^/(?:nhom-nganh|nganh-hoc)(?:/page/\d+)?/?$#i', $request_path ) || is_post_type_archive( 'major' ) ) {
+	$banner_title    = 'Nhóm Ngành Đào Tạo';
+	$banner_subtitle = ( function_exists( 'get_field' ) && get_field( 'page_banner_subtitle' ) )
+		? get_field( 'page_banner_subtitle' )
+		: 'Khám phá các nhóm ngành đào tạo đa dạng với cơ hội nghề nghiệp rộng mở';
+	$banner_eyebrow  = [
+		'text' => 'Danh mục ngành đào tạo ' . date( 'Y' ),
+	];
+	if ( function_exists( 'get_field' ) && get_field( 'page_banner' ) ) {
+		$raw_img = get_field( 'page_banner' );
+		$banner_image = is_array( $raw_img ) ? ( $raw_img['url'] ?? '' ) : ( is_numeric( $raw_img ) ? wp_get_attachment_image_url( (int) $raw_img, 'full' ) : (string) $raw_img );
+	}
 } elseif ( is_page() ) {
 	// Pages: ACF banner field → featured image → default
 	$banner_image    = get_field( 'page_banner' ) ?: '';
+	if ( is_array( $banner_image ) ) {
+		$banner_image = $banner_image['url'] ?? '';
+	} elseif ( is_numeric( $banner_image ) ) {
+		$banner_image = wp_get_attachment_image_url( (int) $banner_image, 'full' ) ?: '';
+	}
+	if ( empty( $banner_image ) ) {
+		$banner_image = get_the_post_thumbnail_url( get_the_ID(), 'full' ) ?: '';
+	}
 	$banner_subtitle = get_field( 'page_banner_subtitle' ) ?: '';
 	$banner_title    = get_the_title();
 } elseif ( is_singular( 'school' ) ) {
@@ -334,6 +371,24 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 		'text' => 'Chuyên mục tin tức',
 		'url'  => home_url( '/tin-tuc/' ),
 	];
+
+	// Inherit banner image from the news / posts page
+	$posts_page_id = (int) get_option( 'page_for_posts' );
+	if ( ! $posts_page_id ) {
+		$posts_page = get_page_by_path( 'tin-tuc' );
+		if ( $posts_page ) {
+			$posts_page_id = (int) $posts_page->ID;
+		}
+	}
+	if ( $posts_page_id > 0 ) {
+		$raw_img = function_exists( 'get_field' ) ? get_field( 'page_banner', $posts_page_id ) : get_post_meta( $posts_page_id, 'page_banner', true );
+		if ( empty( $raw_img ) ) {
+			$raw_img = get_the_post_thumbnail_url( $posts_page_id, 'full' );
+		}
+		if ( ! empty( $raw_img ) ) {
+			$banner_image = is_array( $raw_img ) ? ( $raw_img['url'] ?? '' ) : ( is_numeric( $raw_img ) ? wp_get_attachment_image_url( (int) $raw_img, 'full' ) : (string) $raw_img );
+		}
+	}
 } elseif ( is_tag() ) {
 	$banner_title    = 'Chủ đề: ' . single_tag_title( '', false );
 	$banner_subtitle = 'Tổng hợp các bài viết liên quan đến chủ đề ' . single_tag_title( '', false );
@@ -341,12 +396,89 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 		'text' => 'Thẻ bài viết',
 		'url'  => home_url( '/tin-tuc/' ),
 	];
+
+	// Inherit banner image from the news / posts page
+	$posts_page_id = (int) get_option( 'page_for_posts' );
+	if ( ! $posts_page_id ) {
+		$posts_page = get_page_by_path( 'tin-tuc' );
+		if ( $posts_page ) {
+			$posts_page_id = (int) $posts_page->ID;
+		}
+	}
+	if ( $posts_page_id > 0 ) {
+		$raw_img = function_exists( 'get_field' ) ? get_field( 'page_banner', $posts_page_id ) : get_post_meta( $posts_page_id, 'page_banner', true );
+		if ( empty( $raw_img ) ) {
+			$raw_img = get_the_post_thumbnail_url( $posts_page_id, 'full' );
+		}
+		if ( ! empty( $raw_img ) ) {
+			$banner_image = is_array( $raw_img ) ? ( $raw_img['url'] ?? '' ) : ( is_numeric( $raw_img ) ? wp_get_attachment_image_url( (int) $raw_img, 'full' ) : (string) $raw_img );
+		}
+	}
 } elseif ( is_home() ) {
 	$banner_title    = 'Cẩm Nang Tuyển Sinh & Tin Tức';
 	$banner_subtitle = 'Cập nhật nhanh nhất và chính xác các quy chế thi, đề án tuyển sinh, học bổng từ các trường đại học đối tác.';
 	$banner_eyebrow  = [
 		'text' => 'Bản tin giáo dục & tuyển sinh ' . date( 'Y' ),
 	];
+
+	// Resolve Posts Page ID (Settings > Reading or slug /tin-tuc/ or queried object)
+	$posts_page_id = (int) get_option( 'page_for_posts' );
+	if ( ! $posts_page_id ) {
+		$posts_page = get_page_by_path( 'tin-tuc' );
+		if ( $posts_page ) {
+			$posts_page_id = (int) $posts_page->ID;
+		}
+	}
+	if ( ! $posts_page_id ) {
+		$posts_page_id = (int) get_queried_object_id();
+	}
+
+	if ( $posts_page_id > 0 ) {
+		// 1. Banner Image: ACF page_banner -> Featured Image -> First slide image
+		$raw_page_banner = function_exists( 'get_field' ) ? get_field( 'page_banner', $posts_page_id ) : get_post_meta( $posts_page_id, 'page_banner', true );
+		if ( empty( $raw_page_banner ) ) {
+			$raw_page_banner = get_the_post_thumbnail_url( $posts_page_id, 'full' );
+		}
+		if ( empty( $raw_page_banner ) && function_exists( 'get_field' ) ) {
+			$slides = get_field( 'banner_slides', $posts_page_id ) ?: get_field( 'hero_slides', $posts_page_id ) ?: get_field( 'slides', $posts_page_id );
+			if ( ! empty( $slides ) && is_array( $slides ) && ! empty( $slides[0]['image'] ) ) {
+				$raw_page_banner = $slides[0]['image'];
+			}
+		}
+
+		if ( ! empty( $raw_page_banner ) ) {
+			if ( is_array( $raw_page_banner ) ) {
+				$banner_image = $raw_page_banner['url'] ?? '';
+			} elseif ( is_numeric( $raw_page_banner ) ) {
+				$banner_image = wp_get_attachment_image_url( (int) $raw_page_banner, 'full' ) ?: '';
+			} else {
+				$banner_image = (string) $raw_page_banner;
+			}
+		}
+
+		// 2. Custom Subtitle if entered on the page
+		$custom_sub = function_exists( 'get_field' ) ? get_field( 'page_banner_subtitle', $posts_page_id ) : get_post_meta( $posts_page_id, 'page_banner_subtitle', true );
+		if ( ! empty( $custom_sub ) ) {
+			$banner_subtitle = $custom_sub;
+		}
+
+		// 3. Custom Banner Link
+		$custom_link = function_exists( 'get_field' ) ? get_field( 'page_banner_link', $posts_page_id ) : get_post_meta( $posts_page_id, 'page_banner_link', true );
+		if ( ! empty( $custom_link ) ) {
+			$banner_link = $custom_link;
+		} else {
+			$school_ref = function_exists( 'get_field' ) ? get_field( 'page_banner_school', $posts_page_id ) : get_post_meta( $posts_page_id, 'page_banner_school', true );
+			if ( is_array( $school_ref ) ) {
+				$school_ref = reset( $school_ref );
+			}
+			if ( is_object( $school_ref ) ) {
+				$school_ref = $school_ref->ID;
+			}
+			if ( ! empty( $school_ref ) && is_numeric( $school_ref ) ) {
+				$banner_link = get_permalink( (int) $school_ref ) ?: '';
+			}
+		}
+	}
 } elseif ( is_singular( 'post' ) ) {
 	$post_id         = get_the_ID();
 	$banner_title    = get_the_title( $post_id );
@@ -411,74 +543,26 @@ if ( preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/page/\d+)?/?$#i', $requ
 // Strict zero-fallback policy: Only use explicit images/slides provided in ACF or post thumbnails.
 
 // -------------------------------------------------------------------------
-// Pure Banner & Hidden H1 Detection: Pages and Hub Archives
-// Applicable to: /truong-doi-tac/, /nhom-nganh/, /hinh-thuc-dao-tao/, and standard Pages
+// Banner Image & Verification Meta Resolution
 // -------------------------------------------------------------------------
-$is_pure_banner_page = false;
-$hub_slug            = '';
-$hub_slides          = [];
-
-if ( ! is_singular( 'school' ) && ! is_singular( 'major' ) && ! is_singular( 'program' ) && ! is_singular( 'post' ) ) {
-	if ( is_post_type_archive( 'school' ) || preg_match( '#^/truong-doi-tac(?:/page/\d+)?/?$#i', $request_path ) || ( is_page() && 'truong-doi-tac' === get_post_field( 'post_name', get_the_ID() ) ) ) {
-		$is_pure_banner_page = true;
-		$hub_slug            = 'truong-doi-tac';
-	} elseif ( is_post_type_archive( 'major' ) || is_tax( 'major_cat' ) || preg_match( '#^/(?:nhom-nganh|nganh-hoc)(?:/.*)?$#i', $request_path ) || ( is_page() && in_array( get_post_field( 'post_name', get_the_ID() ), [ 'nhom-nganh', 'nganh-hoc' ], true ) ) ) {
-		$is_pure_banner_page = true;
-		$hub_slug            = 'nhom-nganh';
-	} elseif ( is_post_type_archive( 'program' ) || is_tax( 'training_type' ) || preg_match( '#^/(?:hinh-thuc-dao-tao|he-dao-tao)(?:/.*)?$#i', $request_path ) || ( is_page() && in_array( get_post_field( 'post_name', get_the_ID() ), [ 'hinh-thuc-dao-tao', 'he-dao-tao' ], true ) ) ) {
-		$is_pure_banner_page = true;
-		$hub_slug            = 'hinh-thuc-dao-tao';
-	} elseif ( is_page() ) {
-		$is_pure_banner_page = true;
-		$hub_slug            = (string) get_post_field( 'post_name', get_the_ID() );
+if ( empty( $banner_image ) ) {
+	$page_img = function_exists( 'get_field' ) ? get_field( 'page_banner' ) : '';
+	if ( empty( $page_img ) && is_page() ) {
+		$page_img = get_the_post_thumbnail_url( get_the_ID(), 'full' );
 	}
-}
-
-if ( $is_pure_banner_page ) {
-	$page_obj = ! empty( $hub_slug ) ? get_page_by_path( $hub_slug ) : ( is_page() ? get_post() : null );
-	$page_id  = $page_obj ? $page_obj->ID : ( is_page() ? get_the_ID() : 0 );
-
-	if ( $page_id && function_exists( 'get_field' ) ) {
-		$hub_slides = get_field( 'banner_slides', $page_id ) 
-			?: get_field( 'hero_slides', $page_id ) 
-			?: get_field( 'slides', $page_id ) 
-			?: [];
-
-		if ( empty( $hub_slides ) ) {
-			$page_img = get_field( 'page_banner', $page_id ) ?: get_the_post_thumbnail_url( $page_id, 'full' );
-			if ( is_array( $page_img ) ) {
-				$page_img = $page_img['url'] ?? '';
-			}
-			if ( ! empty( $page_img ) ) {
-				$banner_image = $page_img;
-			}
-		}
-
-		// Resolve banner link: Custom link OR Selected School link
-		$custom_link       = get_field( 'page_banner_link', $page_id ) ?: ( get_post_meta( $page_id, 'page_banner_link', true ) ?: '' );
-		$banner_school_raw = get_field( 'page_banner_school', $page_id ) ?: ( get_post_meta( $page_id, 'page_banner_school', true ) ?: 0 );
-		if ( is_array( $banner_school_raw ) ) {
-			$banner_school_raw = ! empty( $banner_school_raw ) ? reset( $banner_school_raw ) : 0;
-		}
-		if ( is_object( $banner_school_raw ) ) {
-			$banner_school_raw = $banner_school_raw->ID;
-		}
-		$banner_school_id = intval( $banner_school_raw );
-
-		if ( ! empty( $custom_link ) ) {
-			$banner_link = $custom_link;
-		} elseif ( $banner_school_id > 0 ) {
-			$banner_link = get_permalink( $banner_school_id ) ?: '';
-		}
+	if ( is_array( $page_img ) ) {
+		$page_img = $page_img['url'] ?? '';
+	} elseif ( is_numeric( $page_img ) ) {
+		$page_img = wp_get_attachment_image_url( (int) $page_img, 'full' ) ?: '';
 	}
-	// Strictly NO default image fallback if user has not uploaded any image or slides
+	if ( ! empty( $page_img ) ) {
+		$banner_image = $page_img;
+	}
 }
 
 if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url' ) ) {
 	$banner_image = ltdh_get_optimized_image_url( $banner_image );
 }
-
-$has_banner_content = ( ! empty( $hub_slides ) && count( $hub_slides ) > 0 ) || ! empty( $banner_image );
 
 $banner_verif = ( is_singular( 'program' ) && function_exists( 'ltdh_get_program_verification' ) ) 
 	? ltdh_get_program_verification( get_the_ID() ) 
@@ -486,241 +570,189 @@ $banner_verif = ( is_singular( 'program' ) && function_exists( 'ltdh_get_program
 $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source_title'] : 'Nguồn chính thức';
 ?>
 
-<?php if ( $is_pure_banner_page ) : ?>
-	<!-- Semantic H1 for Screen Readers & SEO without Visual Text Display (Always rendered for page SEO) -->
-	<h1 class="sr-only"><?php echo esc_html( $banner_title ); ?></h1>
+<!-- ============================================================== -->
+<!-- FULL-WIDTH GRADIENT HERO BANNER (CLASSIC BRAND BLUE STRIP)     -->
+<!-- ============================================================== -->
+<section class="relative w-full bg-gradient-to-tr from-[#0E2038] via-[#0F284E] to-brand-primary text-white py-8 sm:py-10 md:py-14 overflow-hidden shadow-sm">
+	<?php if ( ! empty( $banner_image ) ) : ?>
+		<!-- Subtle Banner Background Image with Gradient Overlay -->
+		<div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+			<img src="<?php echo esc_url( $banner_image ); ?>" 
+			     class="hero-banner skip-lazy no-lazy w-full h-full object-cover object-center scale-105 opacity-15 blur-[1px]" 
+			     alt="<?php echo esc_attr( $banner_title ); ?>" 
+			     loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
+			<div class="absolute inset-0 bg-gradient-to-r from-[#0E2038]/95 via-[#0F284E]/90 to-brand-primary/85"></div>
+		</div>
+	<?php endif; ?>
 
-	<?php if ( $has_banner_content ) : ?>
-		<!-- ============================================================== -->
-		<!-- PURE IMAGE HERO BANNER (CONTAINERIZED, ZERO OVERLAY TEXT, SWIPER-READY) -->
-		<!-- ============================================================== -->
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-			<div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border border-slate-200/90 bg-[#f8fafc]">
-				<?php if ( ! empty( $hub_slides ) && count( $hub_slides ) > 1 ) : ?>
-					<!-- SwiperJS Hero Slider (Performance-Optimized: LCP Eager, Lazy Non-Active, Zero CLS) -->
-					<div class="swiper hero-swiper w-full min-h-[180px] sm:min-h-[280px] md:min-h-[380px] max-h-[700px]">
-						<div class="swiper-wrapper">
-							<?php 
-							$s_idx = 0;
-							foreach ( $hub_slides as $slide ) : 
-								$s_desktop = '';
-								if ( ! empty( $slide['image'] ) ) {
-									if ( is_array( $slide['image'] ) ) {
-										$s_desktop = $slide['image']['url'] ?? '';
-									} elseif ( is_numeric( $slide['image'] ) ) {
-										$s_desktop = wp_get_attachment_image_url( (int) $slide['image'], 'full' ) ?: '';
-									} else {
-										$s_desktop = (string) $slide['image'];
-									}
-								}
-								if ( empty( $s_desktop ) ) continue;
-								if ( function_exists( 'ltdh_get_optimized_image_url' ) ) {
-									$s_desktop = ltdh_get_optimized_image_url( $s_desktop );
-								}
+	<!-- Ambient Modern Background: Soft Aura Glow & Subtle Fine Grid (Clean, Eye-friendly, High-legibility) -->
+	<div class="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none" aria-hidden="true">
+		<!-- Fine Blueprint Grid Pattern (Subtle 4% opacity, zero glare) -->
+		<svg class="absolute inset-0 w-full h-full opacity-[0.04]" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+			<defs>
+				<pattern id="ltdh-fine-grid" width="36" height="36" patternUnits="userSpaceOnUse">
+					<path d="M 36 0 L 0 0 0 36" fill="none" stroke="#ffffff" stroke-width="1"/>
+				</pattern>
+				<radialGradient id="ltdh-grid-mask-grad" cx="50%" cy="50%" r="55%">
+					<stop offset="0%" stop-color="#ffffff" stop-opacity="0.2"/>
+					<stop offset="60%" stop-color="#ffffff" stop-opacity="0.8"/>
+					<stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
+				</radialGradient>
+				<mask id="ltdh-grid-mask">
+					<rect width="100%" height="100%" fill="url(#ltdh-grid-mask-grad)"/>
+				</mask>
+			</defs>
+			<rect width="100%" height="100%" fill="url(#ltdh-fine-grid)" mask="url(#ltdh-grid-mask)"/>
+		</svg>
 
-								$s_mobile = '';
-								if ( ! empty( $slide['image_mobile'] ) ) {
-									if ( is_array( $slide['image_mobile'] ) ) {
-										$s_mobile = $slide['image_mobile']['url'] ?? '';
-									} elseif ( is_numeric( $slide['image_mobile'] ) ) {
-										$s_mobile = wp_get_attachment_image_url( (int) $slide['image_mobile'], 'full' ) ?: '';
-									} else {
-										$s_mobile = (string) $slide['image_mobile'];
-									}
-									if ( function_exists( 'ltdh_get_optimized_image_url' ) ) {
-										$s_mobile = ltdh_get_optimized_image_url( $s_mobile );
-									}
-								}
-								$s_link = $slide['link'] ?? '';
-								if ( empty( $s_link ) && ! empty( $slide['school'] ) ) {
-									$sl_school_id = is_object( $slide['school'] ) ? $slide['school']->ID : intval( is_array( $slide['school'] ) ? reset( $slide['school'] ) : $slide['school'] );
-									if ( $sl_school_id > 0 ) {
-										$s_link = get_permalink( $sl_school_id ) ?: '';
-									}
-								}
-								$s_alt    = ! empty( $slide['title'] ) ? $slide['title'] : $banner_title;
-								$is_lcp   = ( 0 === $s_idx );
-								$loading  = $is_lcp ? 'loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1"' : 'loading="lazy" fetchpriority="low" decoding="async"';
-								$hero_cls = $is_lcp ? 'hero-banner hero-img skip-lazy no-lazy ' : '';
-							?>
-								<div class="swiper-slide w-full">
-									<?php if ( ! empty( $s_link ) ) : ?><a href="<?php echo esc_url( $s_link ); ?>" class="block w-full h-full"><?php endif; ?>
-									<div class="relative w-full h-auto min-h-[180px] sm:min-h-[280px] md:min-h-[380px] max-h-[700px] overflow-hidden bg-[#f8fafc]">
-										<picture class="relative z-10 block w-full h-auto aspect-[1942/809]" style="aspect-ratio: 1942/809;">
-											<?php if ( ! empty( $s_mobile ) && $s_mobile !== $s_desktop ) : ?>
-												<source media="(max-width: 768px)" srcset="<?php echo esc_url( $s_mobile ); ?>">
-											<?php endif; ?>
-											<img src="<?php echo esc_url( $s_desktop ); ?>" alt="<?php echo esc_attr( $s_alt ); ?>" width="1942" height="809" class="<?php echo $hero_cls; ?>w-full h-auto aspect-[1942/809] object-cover object-center pointer-events-none" style="aspect-ratio: 1942/809;" <?php echo $loading; ?>>
-										</picture>
-									</div>
-									<?php if ( ! empty( $s_link ) ) : ?></a><?php endif; ?>
-								</div>
-							<?php 
-								$s_idx++;
-							endforeach; 
-							?>
-						</div>
-						<!-- Swiper Pagination -->
-						<div class="swiper-pagination"></div>
-						<!-- Swiper Navigation Arrows -->
-						<div class="swiper-button-next !text-white after:!text-base bg-black/30 hover:bg-black/50 !w-8 md:!w-10 !h-8 md:!h-10 rounded-full transition-all flex items-center justify-center"></div>
-						<div class="swiper-button-prev !text-white after:!text-base bg-black/30 hover:bg-black/50 !w-8 md:!w-10 !h-8 md:!h-10 rounded-full transition-all flex items-center justify-center"></div>
+		<!-- Elegant Ambient Glow Orbs (Soft Diffusion, Pure Depth) -->
+		<div class="absolute -right-24 -top-24 w-96 h-96 bg-sky-400/15 rounded-full blur-3xl pointer-events-none"></div>
+		<div class="absolute right-1/4 -bottom-32 w-80 h-80 bg-brand-primary/25 rounded-full blur-3xl pointer-events-none"></div>
+		<div class="absolute -left-20 -bottom-20 w-72 h-72 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+		<!-- Subtle Right-side Academic Geometric Concentric Rings (Only 5% opacity, non-intrusive) -->
+		<svg class="absolute -right-16 top-1/2 -translate-y-1/2 w-[480px] h-[480px] opacity-[0.05] pointer-events-none hidden md:block" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<circle cx="200" cy="200" r="185" stroke="#ffffff" stroke-width="1" stroke-dasharray="4 6" />
+			<circle cx="200" cy="200" r="145" stroke="#ffffff" stroke-width="1" />
+			<circle cx="200" cy="200" r="105" stroke="#ffffff" stroke-width="1" stroke-dasharray="2 4" />
+			<circle cx="200" cy="200" r="65" stroke="#ffffff" stroke-width="1" />
+		</svg>
+	</div>
+
+	<!-- Subtle Top Accent Line -->
+	<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00308b] via-blue-400 to-amber-400 z-10"></div>
+
+		<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+			<!-- Eyebrow Badges Row -->
+			<?php if ( is_singular( 'post' ) ) : ?>
+				<?php if ( ! empty( $post_cat ) || ! empty( $school_name ) ) : ?>
+					<div class="flex flex-wrap items-center gap-2 mb-2.5 sm:mb-3.5">
+						<?php if ( ! empty( $post_cat ) ) : ?>
+							<a href="<?php echo esc_url( get_category_link( $post_cat->term_id ) ); ?>" 
+							   class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs sm:text-sm uppercase tracking-wider backdrop-blur-md border border-white/20 transition-all duration-200 no-underline shadow-xs">
+								<span><?php echo esc_html( $post_cat->name ); ?></span>
+							</a>
+						<?php endif; ?>
+						<?php if ( ! empty( $school_name ) && ! empty( $school_url ) ) : ?>
+							<a href="<?php echo esc_url( $school_url ); ?>" 
+							   class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white/95 font-medium text-xs sm:text-sm backdrop-blur-md border border-white/15 transition-all duration-200 no-underline shadow-xs">
+								<svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9z"/></svg>
+								<span><?php echo esc_html( $school_name ); ?></span>
+							</a>
+						<?php endif; ?>
 					</div>
-					<style>
-						.hero-swiper { position: relative; overflow: hidden; list-style: none; padding: 0; z-index: 1; display: block; }
-						.hero-swiper .swiper-wrapper { position: relative; width: 100%; height: 100%; z-index: 1; display: flex; transition-property: transform; box-sizing: content-box; }
-						.hero-swiper .swiper-slide { flex-shrink: 0; width: 100%; height: 100%; position: relative; transition-property: transform; display: block; }
-						.hero-swiper .swiper-pagination-bullet-active { background: #f5bf23 !important; width: 24px; border-radius: 4px; }
-						.hero-swiper .swiper-pagination-bullet { transition: all 0.3s ease; }
-						.hero-swiper .swiper-button-next, .hero-swiper .swiper-button-prev { opacity: 0; margin-top: -16px; transition: all 0.3s ease; }
-						.hero-swiper:hover .swiper-button-next, .hero-swiper:hover .swiper-button-prev { opacity: 1; }
-						.hero-swiper .swiper-button-next { right: 20px; }
-						.hero-swiper .swiper-button-prev { left: 20px; }
-					</style>
-				<?php else : ?>
-					<!-- Static High-Performance Single Banner Image (Zero CLS, Instant LCP) -->
-					<?php 
-					$single_img = '';
-					if ( ! empty( $hub_slides[0]['image'] ) ) {
-						$raw = $hub_slides[0]['image'];
-						$single_img = is_array( $raw ) ? ( $raw['url'] ?? '' ) : ( is_numeric( $raw ) ? wp_get_attachment_image_url( (int) $raw, 'full' ) : (string) $raw );
-					}
-					if ( empty( $single_img ) ) {
-						$single_img = ! empty( $banner_image ) ? $banner_image : '';
-					}
-					if ( function_exists( 'ltdh_get_optimized_image_url' ) && ! empty( $single_img ) ) {
-						$single_img = ltdh_get_optimized_image_url( $single_img );
-					}
-					$single_link = ! empty( $banner_link ) ? $banner_link : '';
-					if ( empty( $single_link ) && ! empty( $hub_slides[0] ) ) {
-						$first_slide = $hub_slides[0];
-						$single_link = ! empty( $first_slide['link'] ) ? $first_slide['link'] : '';
-						if ( empty( $single_link ) && ! empty( $first_slide['school'] ) ) {
-							$f_school_id = is_object( $first_slide['school'] ) ? $first_slide['school']->ID : intval( is_array( $first_slide['school'] ) ? reset( $first_slide['school'] ) : $first_slide['school'] );
-							if ( $f_school_id > 0 ) {
-								$single_link = get_permalink( $f_school_id ) ?: '';
-							}
-						}
-					}
-					?>
-					<?php if ( ! empty( $single_img ) ) : ?>
-						<div class="relative w-full h-auto min-h-[180px] sm:min-h-[280px] md:min-h-[380px] max-h-[700px] overflow-hidden bg-[#f8fafc]">
-							<?php if ( ! empty( $single_link ) ) : ?>
-								<a href="<?php echo esc_url( $single_link ); ?>" class="block w-full h-full cursor-pointer group" title="<?php echo esc_attr( $banner_title ); ?>">
+				<?php endif; ?>
+			<?php elseif ( ! empty( $banner_eyebrow ) || ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) ) : ?>
+				<div class="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-2.5 sm:mb-3.5">
+					<?php if ( ! empty( $banner_eyebrow ) ) : ?>
+						<?php if ( ! empty( $banner_eyebrow['url'] ) ) : ?>
+							<a href="<?php echo esc_url( $banner_eyebrow['url'] ); ?>" 
+							   title="<?php echo esc_attr( $banner_eyebrow['text'] ); ?>"
+							   class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md transition-all duration-200 no-underline shadow-xs hover:border-white/30 group">
+								<svg class="w-3.5 h-3.5 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
+								<span class="truncate max-w-[210px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
+								<span class="text-white/60 group-hover:text-white transition-colors text-xs font-normal shrink-0">→</span>
+							</a>
+						<?php else : ?>
+							<span class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 text-white/95 border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur-md shadow-xs">
+								<svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.45 9L12 4.34 20.55 9 12 13.66 3.45 9zM5 12.2v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1zm4 0v5.8c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-5.8l-2 1z"/></svg>
+								<span class="truncate max-w-[210px] sm:max-w-md"><?php echo esc_html( $banner_eyebrow['text'] ); ?></span>
+							</span>
+						<?php endif; ?>
+					<?php endif; ?>
+
+					<?php if ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) : ?>
+						<!-- Verified Pill -->
+						<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-semibold backdrop-blur-xs select-none">
+							<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white text-[9px] font-black shrink-0">✓</span>
+							<span>Thông tin đã xác minh</span>
+							<?php if ( ! empty( $banner_verif['source_url'] ) ) : ?>
+								<a href="<?php echo esc_url( $banner_verif['source_url'] ); ?>" target="_blank" rel="noopener noreferrer nofollow" class="text-emerald-200 hover:text-white underline inline-flex items-center ml-0.5" title="<?php echo esc_attr( $source_label ); ?>">
+									<svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+								</a>
 							<?php endif; ?>
-							<picture class="relative z-10 block w-full h-auto aspect-[1942/809]" style="aspect-ratio: 1942/809;">
-								<img src="<?php echo esc_url( $single_img ); ?>" alt="<?php echo esc_attr( $banner_title ); ?>" width="1942" height="809" class="hero-banner hero-img skip-lazy no-lazy w-full h-auto aspect-[1942/809] object-cover object-center pointer-events-none group-hover:scale-[1.01] transition-transform duration-300" style="aspect-ratio: 1942/809;" loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
-							</picture>
-							<?php if ( ! empty( $single_link ) ) : ?>
+						</span>
+					<?php endif; ?>
+				</div>
+			<?php endif; ?>
+
+			<div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+				<!-- Brand Logo Container (Only displayed when official logo is present) -->
+				<?php if ( ! empty( $banner_logo_url ) ) : ?>
+					<div class="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-2xl bg-white p-2 shadow-xl ring-2 ring-white/20 shrink-0 flex items-center justify-center overflow-hidden">
+						<img src="<?php echo esc_url( $banner_logo_url ); ?>" alt="<?php echo esc_attr( $banner_logo_alt ?: $banner_title ); ?>" class="max-w-full max-h-full object-contain">
+					</div>
+				<?php endif; ?>
+
+				<!-- Title & Description Details -->
+				<div class="min-w-0 flex-1">
+					<h1 class="font-black text-white text-2xl sm:text-3xl md:text-4xl leading-tight tracking-tight drop-shadow-sm">
+						<?php echo esc_html( $banner_title ); ?>
+					</h1>
+
+					<?php if ( ! empty( $banner_subtitle ) ) : ?>
+						<p class="text-blue-100/95 text-xs sm:text-sm md:text-base font-normal max-w-3xl mt-2 leading-relaxed">
+							<?php echo esc_html( $banner_subtitle ); ?>
+						</p>
+					<?php endif; ?>
+
+					<!-- Address & Website Metadata for School -->
+					<?php if ( ! empty( $banner_address ) || ! empty( $banner_website ) ) : ?>
+						<div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100">
+							<?php if ( ! empty( $banner_address ) ) : ?>
+								<div class="inline-flex items-center gap-1.5">
+									<svg class="w-4 h-4 text-blue-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+										<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+									</svg>
+									<span><?php echo esc_html( $banner_address ); ?></span>
+									<?php if ( ! empty( $banner_map_url ) ) : ?>
+										<a href="<?php echo esc_url( $banner_map_url ); ?>" target="_blank" rel="noopener noreferrer" class="text-blue-200 font-bold hover:text-white hover:underline cursor-pointer transition-colors">(Bản đồ)</a>
+									<?php endif; ?>
+								</div>
+							<?php endif; ?>
+
+							<?php if ( ! empty( $banner_website ) ) : ?>
+								<div class="inline-flex items-center gap-1.5">
+									<svg class="w-4 h-4 text-blue-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+									</svg>
+									<a href="<?php echo esc_url( $banner_website ); ?>" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center text-blue-200 font-semibold hover:text-white hover:underline cursor-pointer transition-colors">
+										<span><?php echo esc_html( preg_replace( '#^https?://#i', '', rtrim( $banner_website, '/' ) ) ); ?></span>
+										<svg class="w-3.5 h-3.5 text-blue-300 group-hover:text-white transition-colors ml-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+										</svg>
+									</a>
+								</div>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+
+					<!-- Verification Details for Program (Full line) -->
+					<?php if ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) : ?>
+						<div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-blue-100/90">
+							<span class="inline-flex items-center gap-1.5 text-emerald-300 font-semibold">
+								<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white text-[9px] font-black shrink-0">✓</span>
+								<span>Thông tin tuyển sinh đã được xác minh</span>
+							</span>
+							<?php if ( ! empty( $banner_verif['last_verified_at'] ) ) : ?>
+								<span class="text-blue-200/80">• <?php echo esc_html( $banner_verif['last_verified_at'] ); ?></span>
+							<?php endif; ?>
+							<?php if ( ! empty( $banner_verif['source_url'] ) ) : ?>
+								<span class="text-blue-200/60">•</span>
+								<a href="<?php echo esc_url( $banner_verif['source_url'] ); ?>" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-1 text-blue-200 hover:text-white underline underline-offset-2 transition-colors font-medium">
+									<span><?php echo esc_html( $source_label ); ?></span>
+									<svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
 								</a>
 							<?php endif; ?>
 						</div>
 					<?php endif; ?>
-				<?php endif; ?>
-			</div>
-		</div>
-	<?php endif; ?>
-<?php else : ?>
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 sm:pb-3">
-		<!-- GRAND HERO BANNER (CONTAINERIZED, FLOATING GLASS CARD, BRIGHT NATURAL BACKGROUND) -->
-		<section class="relative bg-slate-100 border border-slate-200/90 rounded-2xl sm:rounded-3xl overflow-hidden mb-6 shadow-lg min-h-[320px] sm:min-h-[380px] md:min-h-[440px] lg:min-h-[530px] flex flex-col justify-end">
-			<?php if ( ! empty( $banner_image ) ) : ?>
-				<?php if ( ! empty( $banner_link ) ) : ?><a href="<?php echo esc_url( $banner_link ); ?>" class="absolute inset-0 z-0 block cursor-pointer group/bg" title="<?php echo esc_attr( $banner_title ); ?>"><?php endif; ?>
-				<!-- Background Banner Image (100% Bright, untouched vibrant display) -->
-				<img src="<?php echo esc_url( $banner_image ); ?>" 
-				     class="hero-banner skip-lazy no-lazy absolute inset-0 w-full h-full object-cover object-center pointer-events-none group-hover/bg:scale-[1.01] transition-transform duration-300" 
-				     alt="<?php echo esc_attr( $banner_title ); ?>" 
-				     loading="eager" fetchpriority="high" decoding="async" data-no-lazy="1">
-				<?php if ( ! empty( $banner_link ) ) : ?></a><?php endif; ?>
-			<?php else : ?>
-				<!-- Ambient Fallback Background -->
-				<div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#00308b] to-slate-800 z-0 pointer-events-none"></div>
-			<?php endif; ?>
 
-			<!-- Subtle Ambient Top Accent Line -->
-			<div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#00308b] via-blue-500 to-amber-500 z-10"></div>
-
-			<!-- Main Brand Info Content (Anchored inside Floating Glassmorphism Card at Bottom-Left) -->
-			<div class="relative z-10 p-3.5 sm:p-5 md:p-6 lg:p-8 flex items-end pointer-events-none">
-				<div class="pointer-events-auto w-full sm:w-auto sm:max-w-2xl lg:max-w-3xl rounded-2xl sm:rounded-3xl bg-[#0a1628]/60 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.28)] p-4 sm:p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
-					<!-- School Logo Container (Only displayed when official logo is present) -->
-					<?php if ( ! empty( $banner_logo_url ) ) : ?>
-						<div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl bg-white p-1.5 sm:p-2 shadow-xl ring-2 ring-white/25 flex items-center justify-center shrink-0 overflow-hidden">
-							<img src="<?php echo esc_url( $banner_logo_url ); ?>" alt="<?php echo esc_attr( $banner_logo_alt ?: $banner_title ); ?>" class="max-w-full max-h-full object-contain">
-						</div>
-					<?php endif; ?>
-
-					<!-- Title & Meta Details -->
-					<div class="min-w-0 flex-1">
-						<!-- School / Program / Major Title -->
-						<h1 class="font-black text-white text-xl sm:text-2xl md:text-3xl leading-tight tracking-tight drop-shadow-sm">
-							<?php echo esc_html( $banner_title ); ?>
-						</h1>
-
-						<!-- Subtitle -->
-						<?php if ( ! empty( $banner_subtitle ) ) : ?>
-							<p class="hidden md:block text-slate-100 text-xs sm:text-sm md:text-[15px] font-medium mt-1.5 leading-relaxed line-clamp-2 sm:line-clamp-none">
-								<?php echo esc_html( $banner_subtitle ); ?>
-							</p>
-						<?php endif; ?>
-
-						<!-- Address & Website Metadata (matching the school banner style) -->
-						<?php if ( ! empty( $banner_address ) || ! empty( $banner_website ) ) : ?>
-							<div class="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100">
-								<?php if ( ! empty( $banner_address ) ) : ?>
-									<div class="inline-flex items-center gap-1.5">
-										<svg class="w-4 h-4 text-blue-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-											<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-										</svg>
-										<span><?php echo esc_html( $banner_address ); ?></span>
-										<?php if ( ! empty( $banner_map_url ) ) : ?>
-											<a href="<?php echo esc_url( $banner_map_url ); ?>" target="_blank" rel="noopener noreferrer" class="text-blue-200 font-bold hover:text-white hover:underline cursor-pointer transition-colors">(Bản đồ)</a>
-										<?php endif; ?>
-									</div>
-								<?php endif; ?>
-
-								<?php if ( ! empty( $banner_website ) ) : ?>
-									<div class="inline-flex items-center gap-1.5">
-										<svg class="w-4 h-4 text-blue-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-											<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-										</svg>
-										<a href="<?php echo esc_url( $banner_website ); ?>" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center text-blue-200 font-semibold hover:text-white hover:underline cursor-pointer transition-colors">
-											<span><?php echo esc_html( preg_replace( '#^https?://#i', '', rtrim( $banner_website, '/' ) ) ); ?></span>
-											<svg class="w-3.5 h-3.5 text-blue-300 group-hover:text-white transition-colors ml-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-												<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-											</svg>
-										</a>
-									</div>
-								<?php endif; ?>
-							</div>
-						<?php endif; ?>
-
-						<!-- Verification Row for Programs -->
-						<?php if ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) : ?>
-							<div class="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-100">
-								<span class="inline-flex items-center gap-1.5 text-emerald-300 font-semibold">
-									<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white text-[9px] font-black shrink-0">✓</span>
-									<span>Thông tin tuyển sinh đã được xác minh</span>
-								</span>
-								<?php if ( ! empty( $banner_verif['last_verified_at'] ) ) : ?>
-									<span class="text-slate-300">• <?php echo esc_html( $banner_verif['last_verified_at'] ); ?></span>
-								<?php endif; ?>
-								<?php if ( ! empty( $banner_verif['source_url'] ) ) : ?>
-									<span class="text-slate-400">•</span>
-									<a href="<?php echo esc_url( $banner_verif['source_url'] ); ?>" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-1 text-blue-200 hover:text-white underline underline-offset-2 transition-colors font-medium">
-										<span><?php echo esc_html( $source_label ); ?></span>
-										<svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-									</a>
-								<?php endif; ?>
-							</div>
-						<?php endif; ?>
-
-						<!-- Post Reading Metadata -->
-						<?php if ( is_singular( 'post' ) ) : ?>
-							<div class="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100">
-								<span class="inline-flex items-center gap-1.5">
-									<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+					<!-- Post Reading Metadata -->
+					<?php if ( is_singular( 'post' ) ) : ?>
+						<div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100">
+							<span class="inline-flex items-center gap-1.5">
+								<svg class="w-3.5 h-3.5 text-blue-300 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
 								<span><?php echo get_the_date( 'd/m/Y' ); ?></span>
 							</span>
 							<span class="inline-flex items-center gap-1.5">
@@ -739,5 +771,3 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 			</div>
 		</div>
 	</section>
-</div>
-<?php endif; ?>

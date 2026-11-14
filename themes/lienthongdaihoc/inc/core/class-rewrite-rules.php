@@ -58,8 +58,37 @@ function ltdh_register_program_rewrite() {
 
 	add_rewrite_rule( '^nganh-([^/]+)/?$', 'index.php?post_type=' . ( defined( 'LTDH_CPT_MAJOR' ) ? LTDH_CPT_MAJOR : 'major' ) . '&name=$matches[1]', 'top' );
 	add_rewrite_rule( '([^/]+)/?$', 'index.php?program=$matches[1]', 'top' );
+
+	// Ensure llms.txt takes top precedence over generic slug matching
+	add_rewrite_rule( '^llms\.txt$', 'index.php?llms_txt=1', 'top' );
 }
 add_action( 'init', 'ltdh_register_program_rewrite' );
+
+/**
+ * Register public query vars for llms.txt.
+ */
+add_filter( 'query_vars', function( $vars ) {
+	$vars[] = 'llms_txt';
+	return $vars;
+} );
+
+/**
+ * Prevent WordPress from sending 404 status header on /llms.txt
+ */
+add_filter( 'pre_handle_404', function( $pre, $wp_query ) {
+	if ( intval( get_query_var( 'llms_txt' ) ) === 1 || ( isset( $_SERVER['REQUEST_URI'] ) && preg_match( '#^/llms\.txt(\?|$)#', $_SERVER['REQUEST_URI'] ) ) ) {
+		status_header( 200 );
+		if ( is_object( $wp_query ) ) {
+			$wp_query->is_404 = false;
+		}
+		return true;
+	}
+	return $pre;
+}, 10, 2 );
+
+add_action( 'rank_math/llms_txt/before_output', function() {
+	status_header( 200 );
+} );
 
 /**
  * Filter request to fix CPT archive pagination when parsed as single post with slug 'page',
@@ -97,6 +126,15 @@ function ltdh_fix_cpt_archive_pagination_request( $query_vars ) {
  */
 function ltdh_program_request_guard( $query_vars ) {
 	if ( empty( $query_vars['program'] ) ) {
+		return $query_vars;
+	}
+
+	// Bypass special files like llms.txt, robots.txt, sitemaps so they are never hijacked into pagename
+	if ( 'llms.txt' === $query_vars['program'] || preg_match( '/\.(txt|xml|json|ico)$/i', $query_vars['program'] ) ) {
+		if ( 'llms.txt' === $query_vars['program'] ) {
+			$query_vars['llms_txt'] = 1;
+		}
+		unset( $query_vars['program'] );
 		return $query_vars;
 	}
 

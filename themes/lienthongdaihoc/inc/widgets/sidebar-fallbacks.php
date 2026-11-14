@@ -40,24 +40,29 @@ function ltdh_render_default_blog_sidebar() {
 	}
 	?>
 	<!-- Sidebar Category Card -->
-	<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-		<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">📂 Chuyên mục cẩm nang</h3>
-		<ul class="space-y-1">
+	<div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs">
+		<h3 class="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">
+			<svg class="w-4 h-4 text-[#00308b] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+			</svg>
+			<span>Chuyên mục cẩm nang</span>
+		</h3>
+		<ul class="space-y-1.5">
 			<li>
 				<a href="<?php echo esc_url( home_url( '/tin-tuc/' ) ); ?>" 
-				   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-all <?php echo empty( $active_cat_slug ) ? 'bg-slate-50 text-brand-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
+				   class="flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 <?php echo empty( $active_cat_slug ) ? 'bg-blue-50 text-[#00308b] shadow-2xs font-extrabold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
 					<span>Tất cả tin tức</span>
-					<span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500"><?php echo esc_html( wp_count_posts( 'post' )->publish ); ?></span>
+					<span class="text-xs px-2 py-0.5 rounded-full <?php echo empty( $active_cat_slug ) ? 'bg-blue-200/60 text-[#00308b]' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( wp_count_posts( 'post' )->publish ); ?></span>
 				</a>
 			</li>
 			<?php foreach ( $blog_cats as $bcat ) :
 				$is_active_cat = ( $active_cat_slug === $bcat->slug );
 			?>
 				<li>
-					<a href="<?php echo esc_url( home_url( '/tin-tuc/?danh-muc=' . $bcat->slug ) ); ?>" 
-					   class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-all <?php echo $is_active_cat ? 'bg-slate-50 text-brand-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
+					<a href="<?php echo esc_url( get_category_link( $bcat->term_id ) ); ?>" 
+					   class="flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 <?php echo $is_active_cat ? 'bg-blue-50 text-[#00308b] shadow-2xs font-extrabold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'; ?> min-h-[40px]">
 						<span><?php echo esc_html( $bcat->name ); ?></span>
-						<span class="text-xs px-2 py-0.5 rounded-full <?php echo $is_active_cat ? 'bg-blue-50 text-brand-primary' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $bcat->count ); ?></span>
+						<span class="text-xs px-2 py-0.5 rounded-full <?php echo $is_active_cat ? 'bg-blue-200/60 text-[#00308b]' : 'bg-slate-100 text-slate-500'; ?>"><?php echo esc_html( $bcat->count ); ?></span>
 					</a>
 				</li>
 			<?php endforeach; ?>
@@ -65,21 +70,31 @@ function ltdh_render_default_blog_sidebar() {
 	</div>
 
 	<!-- Featured Posts / Recent Widget -->
-	<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-		<h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">🔥 Tin xem nhiều nhất</h3>
+	<div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs">
+		<h3 class="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wider mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">
+			<svg class="w-4 h-4 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+				<path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.527.82-1.14 2.062-1.39 3.013-.243.92-.383 1.842-.423 2.766a4.502 4.502 0 01-1.31-1.258 1 1 0 00-1.636 1.053c.488.758 1.13 1.542 1.895 2.247C9.37 11.464 10 12.44 10 13.5a3.5 3.5 0 01-7 0c0-.825.283-1.603.8-2.228a1 1 0 00-1.536-1.282A5.5 5.5 0 001 13.5 5.5 5.5 0 006.5 19h7a5.5 5.5 0 005.5-5.5c0-2.317-1.442-4.48-3.355-6.248a12.87 12.87 0 00-3.25-2.699z" clip-rule="evenodd" />
+			</svg>
+			<span>Tin xem nhiều nhất</span>
+		</h3>
 		<ul class="space-y-4">
 			<?php foreach ( $recent_posts as $rp ) :
 				$rp_thumb = function_exists( 'ltdh_get_post_thumbnail_url' ) ? ltdh_get_post_thumbnail_url( $rp->ID, 'thumbnail' ) : ( get_the_post_thumbnail_url( $rp->ID, 'thumbnail' ) ?: ltdh_get_fallback_image( 'post' ) );
 			?>
-				<li class="flex items-start gap-3">
-					<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-100 block">
-						<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-full h-full object-cover" loading="lazy">
+				<li class="flex items-start gap-3 group">
+					<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="w-14 h-14 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-100 block relative">
+						<img src="<?php echo esc_url( $rp_thumb ); ?>" alt="<?php echo esc_attr( $rp->post_title ); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
 					</a>
-					<div class="min-w-0">
-						<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-sm font-bold text-slate-800 hover:text-brand-primary leading-snug block line-clamp-2 transition-all">
+					<div class="min-w-0 flex-1">
+						<a href="<?php echo esc_url( get_permalink( $rp->ID ) ); ?>" class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-[#00308b] leading-snug block line-clamp-2 transition-colors">
 							<?php echo esc_html( $rp->post_title ); ?>
 						</a>
-						<time class="text-xs text-slate-400 mt-0.5 block"><?php echo get_the_date( 'd/m/Y', $rp->ID ); ?></time>
+						<div class="flex items-center gap-1.5 text-[11px] text-slate-400 mt-1">
+							<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+							</svg>
+							<time><?php echo get_the_date( 'd/m/Y', $rp->ID ); ?></time>
+						</div>
 					</div>
 				</li>
 			<?php endforeach; ?>
@@ -87,14 +102,20 @@ function ltdh_render_default_blog_sidebar() {
 	</div>
 
 	<!-- Premium CTA Consultation Sidebar Card -->
-	<div class="relative bg-gradient-to-tr from-[#0E2038] to-brand-primary rounded-xl p-6 text-center text-white shadow-lg overflow-hidden">
-		<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 16px 16px;"></div>
-		<div class="text-3xl mb-2">💡</div>
-		<h3 class="font-extrabold text-base mb-1.5 leading-tight">Bạn chưa chọn được lộ trình học?</h3>
-		<p class="text-blue-100 text-sm mb-4 leading-relaxed">Để lại thông tin, ban tư vấn sẽ giải đáp lộ trình liên thông hoàn toàn miễn phí cho bạn.</p>
+	<div class="relative bg-gradient-to-tr from-[#0a1628] via-[#00308b] to-[#0052cc] rounded-2xl p-6 text-center text-white shadow-lg overflow-hidden border border-white/10">
+		<div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center mx-auto mb-3 shadow-inner">
+			<svg class="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+			</svg>
+		</div>
+		<h3 class="font-black text-base sm:text-lg mb-1.5 leading-snug tracking-tight">Bạn chưa chọn được lộ trình học?</h3>
+		<p class="text-blue-100 text-xs sm:text-sm mb-5 leading-relaxed">Để lại thông tin, ban tuyển sinh sẽ hướng dẫn đối chiếu điều kiện và miễn giảm tín chỉ hoàn toàn miễn phí.</p>
 		<a href="<?php echo esc_url( home_url( '/kiem-tra-dieu-kien/' ) ); ?>" 
-		   class="block w-full bg-brand-accent text-white font-extrabold text-sm py-3 rounded-lg hover:bg-[#e06e00] transition-all shadow-md shadow-brand-accent/20 min-h-[44px] flex items-center justify-center">
-			KIỂM TRA ĐIỀU KIỆN NGAY
+		   class="block w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm py-3 px-4 rounded-xl transition-all shadow-md shadow-amber-500/25 min-h-[44px] flex items-center justify-center gap-2">
+			<span>KIỂM TRA ĐIỀU KIỆN NGAY</span>
+			<svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+			</svg>
 		</a>
 	</div>
 	<?php

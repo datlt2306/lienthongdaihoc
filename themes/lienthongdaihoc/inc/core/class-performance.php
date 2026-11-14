@@ -27,6 +27,9 @@ class LTDH_Performance {
 	 * Initialize all performance hooks.
 	 */
 	public static function init() {
+		// 0. Cache Bypass on Query String (?v=1)
+		add_action( 'init', [ __CLASS__, 'handle_cache_bypass' ], 1 );
+
 		// 1. Resource Hints: Preconnect & DNS Prefetch
 		add_filter( 'wp_resource_hints', [ __CLASS__, 'resource_hints' ], 10, 2 );
 
@@ -312,11 +315,36 @@ class LTDH_Performance {
 	}
 
 	/**
+	 * 0. Bypass all caching mechanisms when query param ?v=1 is present.
+	 */
+	public static function handle_cache_bypass() {
+		if ( isset( $_GET['v'] ) && '1' === (string) $_GET['v'] ) {
+			// 1. Vô hiệu hoá LiteSpeed Cache
+			do_action( 'litespeed_disable_all' );
+
+			// 2. Chuẩn WordPress: ngăn mọi plugin cache khác lưu trang
+			if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+				define( 'DONOTCACHEPAGE', true );
+			}
+
+			// 3. Trình duyệt không lưu cache
+			nocache_headers();
+		}
+	}
+
+	/**
 	 * 7. Security and Performance HTTP Response Headers.
 	 */
 	public static function send_performance_headers() {
 		if ( headers_sent() ) {
 			return;
+		}
+
+		if ( isset( $_GET['v'] ) && '1' === (string) $_GET['v'] ) {
+			header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+			header( 'Pragma: no-cache' );
+			header( 'Expires: Wed, 11 Jan 1984 05:00:00 GMT' );
+			header( 'X-LTDH-Cache-Bypass: active' );
 		}
 
 		header( 'X-Content-Type-Options: nosniff' );
