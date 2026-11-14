@@ -942,10 +942,14 @@ function ltdh_get_program_review_schema_ld( int $program_id ): ?array {
 
 	if ( ! empty( $school_name ) ) {
 		$schema['provider'] = [
-			'@type'  => 'CollegeOrUniversity',
-			'name'   => $school_name,
-			'sameAs' => get_permalink( $school_id ),
+			'@type' => 'CollegeOrUniversity',
+			'name'  => $school_name,
+			'url'   => $school_id ? get_permalink( $school_id ) : home_url( '/' ),
 		];
+		$school_website = ( $school_id && function_exists( 'get_field' ) ) ? get_field( 'website', $school_id ) : '';
+		if ( ! empty( $school_website ) && filter_var( $school_website, FILTER_VALIDATE_URL ) ) {
+			$schema['provider']['sameAs'] = [ $school_website ];
+		}
 	}
 
 	// Top published reviews for Google Rich Snippets

@@ -54,12 +54,14 @@ add_action( 'after_setup_theme', 'ltdh_theme_setup' );
  */
 function ltdh_schema_type() {
 	$schema = 'https://schema.org/';
-	if ( is_single() ) {
+	if ( is_singular( 'post' ) ) {
 		$type = 'Article';
 	} elseif ( is_author() ) {
 		$type = 'ProfilePage';
 	} elseif ( is_search() ) {
 		$type = 'SearchResultsPage';
+	} elseif ( is_singular( defined( 'LTDH_CPT_SCHOOL' ) ? LTDH_CPT_SCHOOL : 'school' ) ) {
+		$type = 'AboutPage';
 	} else {
 		$type = 'WebPage';
 	}

@@ -242,13 +242,18 @@ $program_tabs[] = [
 <?php get_template_part( 'template-parts/program/scripts' ); ?>
 
 <?php
-$review_schema = function_exists( 'ltdh_get_program_review_schema_ld' ) ? ltdh_get_program_review_schema_ld( $program_id ) : null;
-if ( $review_schema ) :
+// Output standalone review schema only when Rank Math is inactive (Rank Math embeds reviews directly into Course schema)
+if ( ! class_exists( 'RankMath' ) ) :
+	$review_schema = function_exists( 'ltdh_get_program_review_schema_ld' ) ? ltdh_get_program_review_schema_ld( $program_id ) : null;
+	if ( $review_schema ) :
+	?>
+		<script type="application/ld+json">
+			<?php echo wp_json_encode( $review_schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ); ?>
+		</script>
+	<?php
+	endif;
+endif;
 ?>
-	<script type="application/ld+json">
-		<?php echo wp_json_encode( $review_schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ); ?>
-	</script>
-<?php endif; ?>
 
 <?php
 get_footer();

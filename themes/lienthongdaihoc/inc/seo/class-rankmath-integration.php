@@ -875,8 +875,17 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			$offers_data['priceCurrency'] = 'VND';
 		}
 
-		$course_mode  = $clean_type ?: ( $training_type ?: 'Liên thông Đại học' );
-		$provider_url = $school_id ? ( get_field( 'website', $school_id ) ?: get_permalink( $school_id ) ) : home_url( '/' );
+		$course_mode     = $clean_type ?: ( $training_type ?: 'Liên thông Đại học' );
+		$provider_url    = $school_id ? get_permalink( $school_id ) : home_url( '/' );
+		$school_website  = $school_id && function_exists( 'get_field' ) ? get_field( 'website', $school_id ) : '';
+		$provider_schema = [
+			'@type' => 'CollegeOrUniversity',
+			'name'  => $school,
+			'url'   => $provider_url,
+		];
+		if ( ! empty( $school_website ) && filter_var( $school_website, FILTER_VALIDATE_URL ) ) {
+			$provider_schema['sameAs'] = [ $school_website ];
+		}
 
 		// Course Schema (with hasCourseInstance and offers for rich snippet eligibility)
 		// Injected only if user has not defined a custom Course schema in Rank Math Schema Builder
@@ -885,11 +894,7 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				'@type'                        => 'Course',
 				'name'                         => $schema_program_name,
 				'description'                  => get_the_excerpt( $program_id ) ?: ( 'Chương trình tuyển sinh Liên thông Đại học ngành ' . $clean_major ),
-				'provider'                     => [
-					'@type' => 'CollegeOrUniversity',
-					'name'  => $school,
-					'url'   => $provider_url,
-				],
+				'provider'                     => $provider_schema,
 				'educationalCredentialAwarded' => 'Bằng Cử nhân / Bằng Kỹ sư',
 				'hasCourseInstance'            => [
 					'@type'          => 'CourseInstance',
@@ -900,6 +905,65 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			if ( $offers_data ) {
 				$data['ltdh_course']['offers'] = $offers_data;
 			}
+
+			// Merge reviews and aggregate rating into Course schema if available
+			if ( function_exists( 'ltdh_get_program_review_stats' ) ) {
+				$stats = ltdh_get_program_review_stats( $program_id );
+				if ( ! empty( $stats['total'] ) && $stats['total'] > 0 ) {
+					$data['ltdh_course']['aggregateRating'] = [
+						'@type'       => 'AggregateRating',
+						'ratingValue' => (string) $stats['average'],
+						'reviewCount' => (string) $stats['total'],
+						'bestRating'  => '5',
+						'worstRating' => '1',
+					];
+
+					$recent_reviews = get_posts( [
+						'post_type'      => 'program_review',
+						'post_status'    => 'publish',
+						'posts_per_page' => 5,
+						'meta_query'     => [
+							[
+								'key'     => '_review_program_id',
+								'value'   => $program_id,
+								'compare' => '=',
+								'type'    => 'NUMERIC',
+							],
+						],
+						'orderby'        => 'date',
+						'order'          => 'DESC',
+					] );
+
+					if ( ! empty( $recent_reviews ) ) {
+						$review_items = [];
+						foreach ( $recent_reviews as $r_post ) {
+							$author_name = get_post_meta( $r_post->ID, '_review_author_name', true ) ?: 'Học viên ẩn danh';
+							$r_rating    = (int) get_post_meta( $r_post->ID, '_review_rating', true ) ?: 5;
+							$r_date      = get_the_date( 'Y-m-d', $r_post->ID );
+							$r_content   = wp_strip_all_tags( $r_post->post_content );
+
+							$review_items[] = [
+								'@type'         => 'Review',
+								'author'        => [
+									'@type' => 'Person',
+									'name'  => function_exists( 'ltdh_mask_student_name' ) ? ltdh_mask_student_name( $author_name ) : $author_name,
+								],
+								'datePublished' => $r_date,
+								'reviewBody'    => $r_content,
+								'reviewRating'  => [
+									'@type'       => 'Rating',
+									'ratingValue' => (string) $r_rating,
+									'bestRating'  => '5',
+									'worstRating' => '1',
+								],
+							];
+						}
+						if ( ! empty( $review_items ) ) {
+							$data['ltdh_course']['review'] = $review_items;
+						}
+					}
+				}
+			}
 		}
 
 		// Schema EducationalOccupationalProgram chuẩn hóa cho Liên thông Đại học
@@ -909,11 +973,7 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				'@type'                        => 'EducationalOccupationalProgram',
 				'name'                         => $schema_program_name,
 				'description'                  => get_the_excerpt( $program_id ) ?: ( 'Chương trình tuyển sinh Liên thông Đại học ngành ' . $clean_major . ' chuẩn Bộ GD&ĐT.' ),
-				'provider'                     => [
-					'@type' => 'CollegeOrUniversity',
-					'name'  => $school,
-					'url'   => $provider_url,
-				],
+				'provider'                     => $provider_schema,
 				'educationalProgramMode'       => $course_mode,
 				'programPrerequisites'         => 'Tốt nghiệp trình độ Trung cấp hoặc Cao đẳng theo quy chế tuyển sinh hiện hành của Bộ GD&ĐT',
 				'educationalCredentialAwarded' => 'Bằng Cử nhân / Bằng Kỹ sư',
@@ -956,13 +1016,13 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 			$official_website = get_field( 'website', $school_id );
 			$school_permalink = get_permalink( $school_id );
 			$school_title     = get_the_title( $school_id );
-			$univ_id          = $official_website ? ( rtrim( $official_website, '/' ) . '/#organization' ) : ( $school_permalink . '#organization' );
+			$univ_id          = $school_permalink . '#organization';
 
 			$data['ltdh_university'] = [
 				'@type' => 'CollegeOrUniversity',
 				'@id'   => $univ_id,
 				'name'  => $school_title,
-				'url'   => $official_website ?: $school_permalink,
+				'url'   => $school_permalink,
 			];
 
 			$address_val = get_field( 'address', $school_id );
@@ -983,7 +1043,7 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 				$data['ltdh_university']['image'] = $school_logo;
 			}
 
-			if ( ! empty( $official_website ) ) {
+			if ( ! empty( $official_website ) && filter_var( $official_website, FILTER_VALIDATE_URL ) ) {
 				$data['ltdh_university']['sameAs'] = [ $official_website ];
 			}
 
@@ -1203,7 +1263,8 @@ function ltdh_seo_inject_custom_schema( $data, $json_ld ) {
 	// 6. Clean all HTML entities (&amp;, &#039;, etc.) across all strings
 	return ltdh_seo_clean_schema_strings( $data );
 }
-add_filter( 'rank_math/json_ld', 'ltdh_seo_inject_custom_schema', 99, 2 );
+// DISABLED: Schema generation is strictly controlled via Rank Math SEO Admin UI. Code injection disabled.
+// add_filter( 'rank_math/json_ld', 'ltdh_seo_inject_custom_schema', 99, 2 );
 
 /**
  * Filter Rank Math's default schema language so entities like Article / BlogPosting use vi-VN.
@@ -1561,25 +1622,32 @@ function ltdh_seo_compare_schema( $data, $json_ld ) {
 	}
 
 	foreach ( $items as $index => $item ) {
-		$school_name = $item['school'] ? $item['school']['title'] : 'Đối tác';
-		$school_url  = $item['school'] && $item['school']['website'] ? $item['school']['website'] : home_url( '/' );
+		$school_name    = $item['school'] ? $item['school']['title'] : 'Đối tác';
+		$school_url     = $item['school'] && ! empty( $item['school']['permalink'] ) ? $item['school']['permalink'] : ( $item['school'] && ! empty( $item['school']['website'] ) ? $item['school']['website'] : home_url( '/' ) );
+		$school_same_as = $item['school'] && ! empty( $item['school']['website'] ) ? $item['school']['website'] : '';
+
+		$provider_entry = [
+			'@type' => 'CollegeOrUniversity',
+			'name'  => $school_name,
+			'url'   => $school_url,
+		];
+		if ( ! empty( $school_same_as ) && filter_var( $school_same_as, FILTER_VALIDATE_URL ) ) {
+			$provider_entry['sameAs'] = [ $school_same_as ];
+		}
 
 		$data[ 'ltdh_compare_course_' . $index ] = [
 			'@context'    => 'https://schema.org',
 			'@type'       => 'Course',
 			'name'        => $item['title'],
 			'description' => $item['excerpt'] ?: 'Chương trình đào tạo đại học.',
-			'provider'    => [
-				'@type' => 'CollegeOrUniversity',
-				'name'  => $school_name,
-				'url'   => $school_url,
-			],
+			'provider'    => $provider_entry,
 		];
 	}
 
 	return $data;
 }
-add_filter( 'rank_math/json_ld', 'ltdh_seo_compare_schema', 99, 2 );
+// DISABLED: Comparison schema is strictly controlled via Rank Math SEO Admin UI. Code injection disabled.
+// add_filter( 'rank_math/json_ld', 'ltdh_seo_compare_schema', 99, 2 );
 
 // ----------------------------------------------------
 // 7. Open Graph & Social Share Image
