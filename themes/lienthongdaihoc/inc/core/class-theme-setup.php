@@ -50,6 +50,26 @@ function ltdh_theme_setup() {
 add_action( 'after_setup_theme', 'ltdh_theme_setup' );
 
 /**
+ * Tắt tính năng "Block fake Googlebots" của AIOS vì trang web chạy sau Cloudflare proxy.
+ * IP từ Cloudflare gửi về origin khiến AIOS nhận diện nhầm Googlebot / Google Search Console thành fake bot và trả về 403 Forbidden trên Sitemap & URLs.
+ */
+function ltdh_disable_aios_fake_googlebots_block() {
+	if ( class_exists( 'AIOS_Firewall_Resource' ) ) {
+		$firewall_config = \AIOS_Firewall_Resource::request( \AIOS_Firewall_Resource::CONFIG );
+		if ( $firewall_config && $firewall_config->get_value( 'aiowps_block_fake_googlebots' ) ) {
+			$firewall_config->set_value( 'aiowps_block_fake_googlebots', false );
+		}
+	}
+
+	global $aio_wp_security;
+	if ( isset( $aio_wp_security->configs ) && '1' === (string) $aio_wp_security->configs->get_value( 'aiowps_block_fake_googlebots' ) ) {
+		$aio_wp_security->configs->set_value( 'aiowps_block_fake_googlebots', '' );
+		$aio_wp_security->configs->save_config();
+	}
+}
+add_action( 'init', 'ltdh_disable_aios_fake_googlebots_block', 1 );
+
+/**
  * BlankSlate Schema.org microdata type attribute on <html> element (Disabled: Rank Math JSON-LD is used exclusively).
  */
 function ltdh_schema_type() {
