@@ -77,9 +77,6 @@ class LTDH_Performance {
 		add_filter( 'wp_prepare_attachment_for_js', [ __CLASS__, 'filter_attachment_for_js' ], 99, 3 );
 		add_filter( 'image_downsize', [ __CLASS__, 'filter_image_downsize' ], 99, 3 );
 		add_filter( 'image_get_intermediate_size', [ __CLASS__, 'filter_image_intermediate_size' ], 99, 3 );
-
-		// 14. Auto-sync LiteSpeed Cache Combine Settings (Crawl Budget Optimization)
-		add_action( 'init', [ __CLASS__, 'sync_litespeed_combine' ], 20 );
 	}
 
 	/**
@@ -799,32 +796,6 @@ class LTDH_Performance {
 			$data['url'] = self::normalize_imagekit_url( $data['url'], $data['width'] ?? 0, $data['height'] ?? 0 );
 		}
 		return $data;
-	}
-
-	/**
-	 * Auto-sync LiteSpeed Cache optimization settings (Combine CSS & JS)
-	 * to minimize crawler resource requests and conserve crawl budget.
-	 */
-	public static function sync_litespeed_combine() {
-		if ( ! defined( 'LSCWP_V' ) ) {
-			return;
-		}
-
-		if ( get_option( 'ltdh_litespeed_combine_synced' ) === '20261115_v1' ) {
-			return;
-		}
-
-		if ( class_exists( '\LiteSpeed\Admin_Settings' ) ) {
-			\LiteSpeed\Admin_Settings::get_instance()->save( [
-				'optm-css_comb' => 1,
-				'optm-js_comb'  => 1,
-			] );
-		} else {
-			update_option( 'litespeed.conf.optm-css_comb', 1 );
-			update_option( 'litespeed.conf.optm-js_comb', 1 );
-		}
-
-		update_option( 'ltdh_litespeed_combine_synced', '20261115_v1' );
 	}
 }
 
