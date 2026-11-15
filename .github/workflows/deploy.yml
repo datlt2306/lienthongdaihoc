@@ -25,5 +25,7 @@ jobs:
             fi
             docker-compose restart wordpress
             docker exec -u www-data -w /var/www/html lienthongdaihoc_wordpress php /var/www/html/wp-cli.phar eval 'if(class_exists("AIOS_Firewall_Resource")){$fc=\AIOS_Firewall_Resource::request(\AIOS_Firewall_Resource::CONFIG);if($fc){$fc->set_value("aiowps_block_fake_googlebots",false);}}global $aio_wp_security;if(isset($aio_wp_security->configs)){$aio_wp_security->configs->set_value("aiowps_block_fake_googlebots","");$aio_wp_security->configs->save_config();}' || true
+            docker exec -u www-data -w /var/www/html lienthongdaihoc_wordpress php /var/www/html/wp-cli.phar litespeed-option set optm-css_comb true || true
+            docker exec -u www-data -w /var/www/html lienthongdaihoc_wordpress php /var/www/html/wp-cli.phar litespeed-option set optm-js_comb true || true
             docker exec -u www-data -w /var/www/html lienthongdaihoc_wordpress php /var/www/html/wp-cli.phar cache flush || true
             docker exec -u www-data -w /var/www/html lienthongdaihoc_wordpress php /var/www/html/wp-cli.phar litespeed-purge all || true
