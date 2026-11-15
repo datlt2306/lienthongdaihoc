@@ -2100,10 +2100,14 @@ function ltdh_sync_llms_txt_settings() {
 add_action( 'init', 'ltdh_sync_llms_txt_settings', 20 );
 
 /**
- * Custom robots.txt directives
+ * Custom robots.txt directives to maximize crawl budget for HTML & images
+ * by disallowing unnecessary REST API endpoints, feeds, search and admin queries.
  */
 function ltdh_custom_robots_txt( $output = '', $public = 1 ) {
-	return "User-agent: *\nDisallow: /wp-content/uploads/wc-logs/\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: https://lienthongdaihoc.com/sitemap_index.xml\n";
+	if ( ! headers_sent() ) {
+		header( 'Content-Type: text/plain; charset=utf-8' );
+	}
+	return "User-agent: *\nDisallow: /wp-admin/\nDisallow: /wp-json/\nDisallow: */feed/\nDisallow: */trackback/\nDisallow: /*?s=*\nDisallow: /*?*filter=*\n\nSitemap: https://lienthongdaihoc.com/sitemap_index.xml\n";
 }
 add_filter( 'robots_txt', 'ltdh_custom_robots_txt', 9999, 2 );
 add_filter( 'rank_math/robots_txt', 'ltdh_custom_robots_txt', 9999 );
