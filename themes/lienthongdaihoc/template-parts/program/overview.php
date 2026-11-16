@@ -15,6 +15,7 @@ $major_id     = isset( $args['major_id'] ) ? (int) $args['major_id'] : (int) get
 $school_title = isset( $args['school_title'] ) ? $args['school_title'] : ( $school_id ? get_the_title( $school_id ) : '' );
 $major_title  = isset( $args['major_title'] ) ? $args['major_title'] : ( $major_id ? get_the_title( $major_id ) : '' );
 $tuition      = isset( $args['tuition'] ) ? $args['tuition'] : ltdh_get_program_tuition_display( $program_id );
+$initial_tuition = isset( $args['initial_tuition'] ) ? $args['initial_tuition'] : ( function_exists( 'ltdh_get_program_initial_tuition' ) ? ltdh_get_program_initial_tuition( $program_id ) : ( get_field( 'initial_tuition', $program_id ) ?: ( $school_id ? get_field( 'default_initial_tuition', $school_id ) : '' ) ) );
 $duration     = isset( $args['duration'] ) ? $args['duration'] : ( function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $program_id ) : ( get_field( LTDH_META_DURATION, $program_id ) ?: '1.5 - 2 năm' ) );
 $quota        = isset( $args['quota'] ) ? $args['quota'] : get_field( 'quota', $program_id );
 $enrollment   = isset( $args['enrollment'] ) ? $args['enrollment'] : ltdh_get_program_admission_deadline_display( $program_id );
@@ -84,6 +85,13 @@ $prog_fee_name     = $tuition ?: 'Theo thông báo tuyển sinh';
 				}
 				?>
 			</span>
+			<?php if ( ! empty( $initial_tuition ) ) : 
+				$init_info = function_exists( 'ltdh_format_initial_tuition' ) ? ltdh_format_initial_tuition( $initial_tuition ) : [ 'display' => esc_html( $initial_tuition ) ];
+			?>
+				<span class="text-[10px] sm:text-[11px] text-slate-500 font-medium block mt-1">
+					Tạm thu kỳ 1: <strong class="text-[#00308b]"><?php echo esc_html( $init_info['display'] ?? $initial_tuition ); ?></strong>
+				</span>
+			<?php endif; ?>
 		</div>
 
 		<!-- Hàng 1, Cột 3: Thời gian học -->
@@ -128,6 +136,11 @@ $prog_fee_name     = $tuition ?: 'Theo thông báo tuyển sinh';
 				<tr><th>Đối tượng đầu vào</th><td>Trung cấp / Cao đẳng</td></tr>
 				<tr><th>Thời gian đào tạo</th><td><?php echo esc_html( $prog_dur_name ); ?></td></tr>
 				<tr><th>Mức học phí</th><td><?php echo esc_html( $prog_fee_name ); ?></td></tr>
+				<?php if ( ! empty( $initial_tuition ) ) : 
+					$init_info = function_exists( 'ltdh_format_initial_tuition' ) ? ltdh_format_initial_tuition( $initial_tuition ) : [ 'display' => esc_html( $initial_tuition ) ];
+				?>
+					<tr><th>Tạm thu học phí kỳ 1</th><td><?php echo esc_html( $init_info['display'] ?? $initial_tuition ); ?></td></tr>
+				<?php endif; ?>
 				<tr><th>Danh hiệu văn bằng</th><td><?php echo esc_html( $degree_val ); ?></td></tr>
 				<tr><th>Hạn nộp hồ sơ</th><td><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></td></tr>
 			</tbody>

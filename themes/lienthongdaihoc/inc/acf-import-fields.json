@@ -216,6 +216,14 @@
         "placeholder": "Ví dụ: 300.000 đ/hồ sơ"
       },
       {
+        "key": "field_school_default_initial_tuition",
+        "label": "Tạm thu học phí kỳ 1 mặc định",
+        "name": "default_initial_tuition",
+        "type": "text",
+        "instructions": "Mức tạm thu học phí kỳ 1 khi làm thủ tục nhập học của trường (VD: 9.000.000 đ). Các chương trình thuộc trường để trống sẽ tự động kế thừa (chuẩn DRY).",
+        "placeholder": "Ví dụ: 9.000.000 đ"
+      },
+      {
         "key": "field_school_tuition_increase_roadmap",
         "label": "Lộ trình tăng học phí / Ghi chú học phí",
         "name": "tuition_increase_roadmap",
@@ -1035,6 +1043,14 @@
         "type": "text",
         "instructions": "Nhập mức lệ phí tính trên 1 bộ hồ sơ xét tuyển (Ví dụ: 200.000 đ hoặc Miễn phí). Để trống nếu trường không thu lệ phí.",
         "placeholder": "Ví dụ: 200.000 đ / hồ sơ hoặc Miễn phí (Để trống nếu không thu)"
+      },
+      {
+        "key": "field_program_initial_tuition",
+        "label": "Tạm thu học phí kỳ 1",
+        "name": "initial_tuition",
+        "type": "text",
+        "instructions": "Mức tạm thu học phí kỳ đầu tiên khi nhập học (VD: 9.000.000 đ). Để trống hệ thống sẽ tự động kế thừa từ Trường đào tạo (chuẩn DRY).",
+        "placeholder": "Ví dụ: 9.000.000 đ"
       },
       {
         "key": "field_program_duration",

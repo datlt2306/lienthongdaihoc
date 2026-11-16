@@ -1040,6 +1040,20 @@ function ltdh_get_program_target_admission( int $program_id ): ?array {
 }
 
 /**
+ * 74. Lấy mức tạm thu học phí kỳ 1 của chương trình (có kế thừa từ trường).
+ */
+function ltdh_get_program_initial_tuition( int $program_id ): string {
+	return LTDH_Pricing_Helpers::get_initial_tuition( $program_id );
+}
+
+/**
+ * 75. Định dạng mức tạm thu học phí kỳ 1.
+ */
+function ltdh_format_initial_tuition( $tuition ): array {
+	return LTDH_Pricing_Helpers::format_initial_tuition( $tuition );
+}
+
+/**
  * 74. Lấy ID ngành học liên kết với chương trình.
  */
 function ltdh_get_program_major_id( int $program_id ): int {

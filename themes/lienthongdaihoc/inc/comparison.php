@@ -237,6 +237,7 @@ function ltdh_compare_resolve_program( $program_id ) {
 		'learning_mode'         => $learning_details['mode'],
 		'tuition_fee'           => $tuition_str,
 		'tuition_numeric'       => ltdh_compare_parse_tuition( $tuition_str ),
+		'initial_tuition'       => function_exists( 'ltdh_get_program_initial_tuition' ) ? ltdh_get_program_initial_tuition( $program_id ) : '',
 		'admission_fee'         => get_field( 'admission_fee', $program_id ) ?: get_post_meta( $program_id, 'admission_fee', true ) ?: '',
 		'duration'              => $duration_str,
 		'duration_numeric'      => ltdh_compare_parse_duration( $duration_str ),

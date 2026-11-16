@@ -446,6 +446,17 @@ function ltdh_register_school_default_admissions_acf_fields() {
 		'placeholder'  => 'Ví dụ: 300.000 đ/hồ sơ',
 	] );
 
+	// 1.2.1 Default Initial Tuition (Tạm thu học phí kỳ 1 mặc định)
+	acf_add_local_field( [
+		'key'          => 'field_school_default_initial_tuition',
+		'label'        => 'Tạm thu học phí kỳ 1 mặc định',
+		'name'         => 'default_initial_tuition',
+		'type'         => 'text',
+		'parent'       => 'group_school_details',
+		'instructions' => 'Mức tạm thu học phí kỳ 1 khi làm thủ tục nhập học của trường (VD: 9.000.000 đ). Các chương trình thuộc trường để trống sẽ tự động kế thừa (chuẩn DRY).',
+		'placeholder'  => 'Ví dụ: 9.000.000 đ',
+	] );
+
 	// 1.3 Tuition Increase Roadmap (Lộ trình tăng học phí / Ghi chú học phí)
 	acf_add_local_field( [
 		'key'          => 'field_school_tuition_increase_roadmap',
@@ -1288,6 +1299,9 @@ function ltdh_ensure_program_acf_meta_keys() {
 			}
 			if ( ! get_post_meta( $pid, '_admission_fee', true ) ) {
 				update_post_meta( $pid, '_admission_fee', 'field_program_admission_fee' );
+			}
+			if ( ! get_post_meta( $pid, '_initial_tuition', true ) ) {
+				update_post_meta( $pid, '_initial_tuition', 'field_program_initial_tuition' );
 			}
 			if ( ! get_post_meta( $pid, '_contact_info', true ) ) {
 				update_post_meta( $pid, '_contact_info', 'field_program_contact_info' );

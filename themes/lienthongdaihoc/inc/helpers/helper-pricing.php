@@ -182,4 +182,116 @@ class LTDH_Pricing_Helpers {
 	public static function get_program_admission_fee( int $program_id ) {
 		return self::get_admission_fee( $program_id );
 	}
+
+	/**
+	 * Lấy mức tạm thu học phí kỳ 1 của chương trình với cơ chế DRY fallback về trường.
+	 *
+	 * @param int $program_id
+	 * @return string
+	 */
+	public static function get_initial_tuition( int $program_id ): string {
+		if ( ! $program_id ) {
+			return '';
+		}
+
+		$tuition = function_exists( 'get_field' ) ? get_field( 'initial_tuition', $program_id ) : '';
+		if ( '' === $tuition || null === $tuition || false === $tuition ) {
+			$tuition = get_post_meta( $program_id, 'initial_tuition', true );
+		}
+
+		if ( ! empty( $tuition ) || ( is_numeric( $tuition ) && (float) $tuition > 0 ) ) {
+			return trim( (string) $tuition );
+		}
+
+		// Fallback to school default
+		$school_id = function_exists( 'ltdh_get_program_school_id' ) ? ltdh_get_program_school_id( $program_id ) : ( class_exists( 'LTDH_Program_Helpers' ) ? LTDH_Program_Helpers::get_school_id( $program_id ) : 0 );
+		if ( $school_id > 0 ) {
+			$default_tuition = function_exists( 'get_field' ) ? get_field( 'default_initial_tuition', $school_id ) : '';
+			if ( '' === $default_tuition || null === $default_tuition || false === $default_tuition ) {
+				$default_tuition = get_post_meta( $school_id, 'default_initial_tuition', true );
+			}
+			if ( empty( $default_tuition ) ) {
+				$default_tuition = get_post_meta( $school_id, 'initial_tuition', true );
+			}
+
+			if ( ! empty( $default_tuition ) || ( is_numeric( $default_tuition ) && (float) $default_tuition > 0 ) ) {
+				return trim( (string) $default_tuition );
+			}
+
+			// School-specific fallback for TMU (Trường Đại học Thương mại)
+			$school_code = function_exists( 'ltdh_get_school_code' ) ? ltdh_get_school_code( $school_id ) : get_post_meta( $school_id, 'school_code', true );
+			if ( empty( $school_code ) && class_exists( 'LTDH_School_Helpers' ) ) {
+				$school_code = LTDH_School_Helpers::get_code( $school_id );
+			}
+			$school_title = get_the_title( $school_id );
+
+			if ( 'TMU' === strtoupper( trim( (string) $school_code ) ) || false !== mb_stripos( (string) $school_title, 'Thương mại' ) ) {
+				return '9.000.000 đ';
+			}
+		}
+
+		return '';
+	}
+
+	public static function get_program_initial_tuition( int $program_id ): string {
+		return self::get_initial_tuition( $program_id );
+	}
+
+	/**
+	 * Format initial tuition into formatted string and raw numeric value.
+	 *
+	 * @param mixed $tuition
+	 * @return array
+	 */
+	public static function format_initial_tuition( $tuition ): array {
+		if ( '' === $tuition || null === $tuition || false === $tuition ) {
+			return [ 'display' => '', 'raw' => '' ];
+		}
+		$str = trim( (string) $tuition );
+		if ( '' === $str ) {
+			return [ 'display' => '', 'raw' => '' ];
+		}
+
+		// Separate extra parenthetical notes if present: e.g. "(15 tín chỉ)"
+		$extra = '';
+		$main  = $str;
+		if ( preg_match( '/^(.*?)\s*(\(.*?\))\s*$/u', $str, $matches ) ) {
+			$main  = trim( $matches[1] );
+			$extra = ' ' . trim( $matches[2] );
+		}
+
+		// Handle "9tr", "9 tr", "9 triệu"
+		if ( preg_match( '/^(\d+(?:[.,]\d+)?)\s*(?:tr|triệu|trieu)\b/iu', $main, $m ) ) {
+			$val = (float) str_replace( ',', '.', $m[1] ) * 1000000;
+			$formatted = number_format( $val, 0, ',', '.' ) . ' đ' . $extra;
+			return [
+				'display' => $formatted,
+				'raw'     => $val,
+			];
+		}
+
+		// Pure digits e.g. "9000000"
+		if ( ctype_digit( $main ) ) {
+			return [
+				'display' => number_format( (float) $main, 0, ',', '.' ) . ' đ' . $extra,
+				'raw'     => (float) $main,
+			];
+		}
+
+		// Formatted numbers like "9.000.000" or "9.000.000đ" or "9.000.000 đ"
+		$clean_num = preg_replace( '/[^\d]/', '', $main );
+		if ( is_numeric( $clean_num ) && (float) $clean_num > 0 ) {
+			if ( preg_match( '/^[\d.,\s]+(?:đ|vnđ|vnd)?$/iu', $main ) ) {
+				return [
+					'display' => number_format( (float) $clean_num, 0, ',', '.' ) . ' đ' . $extra,
+					'raw'     => (float) $clean_num,
+				];
+			}
+		}
+
+		return [
+			'display' => $str,
+			'raw'     => $clean_num ?: $str,
+		];
+	}
 }

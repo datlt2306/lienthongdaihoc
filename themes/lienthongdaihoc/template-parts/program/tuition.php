@@ -16,6 +16,7 @@ $tuition         = isset( $args['tuition'] ) ? $args['tuition'] : ltdh_get_progr
 $duration        = isset( $args['duration'] ) ? $args['duration'] : ( function_exists( 'ltdh_get_program_duration' ) ? ltdh_get_program_duration( $program_id ) : ( get_field( LTDH_META_DURATION, $program_id ) ?: '1.5 - 2 năm' ) );
 $tuition_year    = get_field( 'tuition_academic_year', $program_id );
 $admission_fee   = function_exists( 'ltdh_get_program_admission_fee' ) ? ltdh_get_program_admission_fee( $program_id ) : ( get_field( 'admission_fee', $program_id ) ?: get_post_meta( $program_id, 'admission_fee', true ) );
+$initial_tuition = isset( $args['initial_tuition'] ) ? $args['initial_tuition'] : ( function_exists( 'ltdh_get_program_initial_tuition' ) ? ltdh_get_program_initial_tuition( $program_id ) : ( get_field( 'initial_tuition', $program_id ) ?: ( $school_id ? get_field( 'default_initial_tuition', $school_id ) : '' ) ) );
 
 $exemptions_data = function_exists( 'ltdh_get_program_exemptions' ) ? ltdh_get_program_exemptions( $program_id ) : [ 'title' => '', 'intro' => '', 'items' => [], 'inherited' => false ];
 $exemption_title = ! empty( $exemptions_data['title'] ) ? $exemptions_data['title'] : 'Quy định miễn môn & Chuyển đổi tín chỉ';
@@ -51,14 +52,34 @@ $increase_roadmap = function_exists( 'ltdh_get_program_tuition_roadmap' )
 			</div>
 
 			<?php 
-			if ( ! empty( $admission_fee ) || ( is_numeric( $admission_fee ) && (int) $admission_fee === 0 ) ) : 
-				$fee_info = function_exists( 'ltdh_format_admission_fee' ) ? ltdh_format_admission_fee( $admission_fee ) : [ 'display' => esc_html( $admission_fee ) . ' / hồ sơ', 'is_free' => false ];
+			$has_fee = ( ! empty( $admission_fee ) || ( is_numeric( $admission_fee ) && (int) $admission_fee === 0 ) );
+			$has_init = ! empty( $initial_tuition );
+			if ( $has_fee || $has_init ) : 
 			?>
-				<div class="mt-2.5 pt-2 border-t border-blue-100/60 flex flex-wrap items-center justify-between text-[10px] sm:text-xs gap-1">
-					<span class="text-slate-500">Lệ phí xét:</span>
-					<span class="font-bold <?php echo ! empty( $fee_info['is_free'] ) ? 'text-emerald-600' : 'text-slate-800'; ?>">
-						<?php echo esc_html( $fee_info['display'] ); ?>
-					</span>
+				<div class="mt-2.5 pt-2 border-t border-blue-100/60 space-y-1.5">
+					<?php 
+					if ( $has_fee ) : 
+						$fee_info = function_exists( 'ltdh_format_admission_fee' ) ? ltdh_format_admission_fee( $admission_fee ) : [ 'display' => esc_html( $admission_fee ) . ' / hồ sơ', 'is_free' => false ];
+					?>
+						<div class="flex flex-wrap items-center justify-between text-[10px] sm:text-xs gap-1">
+							<span class="text-slate-500">Lệ phí xét:</span>
+							<span class="font-bold <?php echo ! empty( $fee_info['is_free'] ) ? 'text-emerald-600' : 'text-slate-800'; ?>">
+								<?php echo esc_html( $fee_info['display'] ); ?>
+							</span>
+						</div>
+					<?php endif; ?>
+
+					<?php 
+					if ( $has_init ) : 
+						$init_info = function_exists( 'ltdh_format_initial_tuition' ) ? ltdh_format_initial_tuition( $initial_tuition ) : [ 'display' => esc_html( $initial_tuition ) ];
+					?>
+						<div class="flex flex-wrap items-center justify-between text-[10px] sm:text-xs gap-1">
+							<span class="text-slate-600 font-medium">Tạm thu kỳ 1:</span>
+							<span class="font-black text-[#00308b]">
+								<?php echo esc_html( $init_info['display'] ?? $initial_tuition ); ?>
+							</span>
+						</div>
+					<?php endif; ?>
 				</div>
 			<?php endif; ?>
 		</div>
@@ -82,6 +103,14 @@ $increase_roadmap = function_exists( 'ltdh_get_program_tuition_roadmap' )
 
 	<!-- Ghi chú & Lộ trình học phí (Gọn gàng, loại bỏ các khối border lồng nhau) -->
 	<div class="mt-3 bg-slate-50/70 rounded-xl p-3 sm:p-3.5 space-y-1.5 text-xs text-slate-600 leading-relaxed">
+		<?php if ( ! empty( $initial_tuition ) ) : 
+			$init_info = function_exists( 'ltdh_format_initial_tuition' ) ? ltdh_format_initial_tuition( $initial_tuition ) : [ 'display' => esc_html( $initial_tuition ) ];
+		?>
+			<p class="flex items-start gap-1.5">
+				<span class="text-emerald-600 shrink-0">💳</span>
+				<span><strong class="text-slate-800">Tạm thu học phí kỳ 1:</strong> <span class="font-bold text-[#00308b]"><?php echo esc_html( $init_info['display'] ?? $initial_tuition ); ?></span> (Mức tạm thu đầu vào áp dụng khi học viên hoàn tất thủ tục nhập học kỳ đầu tiên).</span>
+			</p>
+		<?php endif; ?>
 		<?php if ( $increase_roadmap ) : ?>
 			<p class="flex items-start gap-1.5">
 				<span class="text-blue-600 shrink-0">💡</span>

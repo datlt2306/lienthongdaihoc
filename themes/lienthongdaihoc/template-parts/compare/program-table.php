@@ -105,6 +105,18 @@ $col_width = $count <= 2 ? 'w-[300px]' : ( $count === 3 ? 'w-[260px]' : 'w-[220p
 					'render' => function( $item ) { return esc_html( $item['tuition_fee'] ?: 'Chưa cập nhật' ); }
 				],
 				[
+					'label' => 'Tạm thu kỳ 1',
+					'key' => 'initial_tuition',
+					'render' => function( $item ) {
+						$init = ! empty( $item['initial_tuition'] ) ? trim( (string) $item['initial_tuition'] ) : '';
+						if ( empty( $init ) ) {
+							return '<span class="text-slate-400 text-xs">Theo thông báo</span>';
+						}
+						$info = function_exists( 'ltdh_format_initial_tuition' ) ? ltdh_format_initial_tuition( $init ) : [ 'display' => esc_html( $init ) ];
+						return '<span class="font-bold text-[#00308b] text-xs">' . esc_html( $info['display'] ?? $init ) . '</span>';
+					}
+				],
+				[
 					'label' => 'Lệ phí xét tuyển',
 					'key' => 'admission_fee',
 					'render' => function( $item ) {

@@ -14,6 +14,7 @@ $zalo_val    = isset( $zalo ) ? $zalo : ( function_exists( 'ltdh_compare_get_zal
 $sections = [
 	'Học phí & Thời gian' => [
 		['label' => 'Học phí', 'key' => 'tuition_fee', 'highlight' => 'tuition_fee'],
+		['label' => 'Tạm thu kỳ 1', 'key' => 'initial_tuition'],
 		['label' => 'Thời gian', 'key' => 'duration', 'highlight' => 'duration'],
 		['label' => 'Hạn tuyển sinh', 'key' => 'enrollment_period', 'highlight' => 'enrollment_period'],
 	],
@@ -117,6 +118,14 @@ $sections = [
 								// Resolve value
 								if ( $attr['key'] === 'major' ) {
 									$value = $item['major'] ? esc_html( $item['major']['title'] ) : '<span class="text-slate-300 italic text-xs">Chưa cập nhật</span>';
+								} elseif ( $attr['key'] === 'initial_tuition' ) {
+									$val = $item['initial_tuition'] ?? '';
+									if ( empty( $val ) ) {
+										$value = '<span class="text-slate-400 text-xs">Theo thông báo</span>';
+									} else {
+										$init_info = function_exists( 'ltdh_format_initial_tuition' ) ? ltdh_format_initial_tuition( $val ) : [ 'display' => esc_html( $val ) ];
+										$value = '<span class="font-bold text-[#00308b]">' . esc_html( $init_info['display'] ?? $val ) . '</span>';
+									}
 								} elseif ( in_array( $attr['key'], [ 'admission_requirements', 'required_documents', 'target_students', 'diploma_value', 'advantages', 'disadvantages' ], true ) ) {
 									$val = $item[ $attr['key'] ] ?? '';
 									$value = ltdh_compare_format_checklist( $val );

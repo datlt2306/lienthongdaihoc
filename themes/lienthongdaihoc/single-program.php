@@ -59,6 +59,7 @@ $documents       = function_exists( 'ltdh_get_program_required_documents' ) ? lt
 $enrollment      = ltdh_get_program_admission_deadline_display( $program_id );
 $quota           = get_field( 'quota', $program_id );
 $admission_fee   = function_exists( 'ltdh_get_program_admission_fee' ) ? ltdh_get_program_admission_fee( $program_id ) : ( get_field( 'admission_fee', $program_id ) ?: get_post_meta( $program_id, 'admission_fee', true ) );
+$initial_tuition = function_exists( 'ltdh_get_program_initial_tuition' ) ? ltdh_get_program_initial_tuition( $program_id ) : ( get_field( 'initial_tuition', $program_id ) ?: ( $school_id ? get_field( 'default_initial_tuition', $school_id ) : '' ) );
 
 $exemptions_data = function_exists( 'ltdh_get_program_exemptions' ) ? ltdh_get_program_exemptions( $program_id ) : [ 'title' => '', 'intro' => '', 'items' => [], 'inherited' => false ];
 $increase_roadmap = function_exists( 'ltdh_get_program_tuition_roadmap' ) ? ltdh_get_program_tuition_roadmap( $program_id ) : ( get_field( 'tuition_increase_roadmap', $program_id ) ?: ( $school_id ? get_field( 'tuition_increase_roadmap', $school_id ) : '' ) );
@@ -166,16 +167,17 @@ $program_tabs[] = [
 				] ); ?>
 
 				<?php get_template_part( 'template-parts/program/overview', null, [
-					'program_id'   => $program_id,
-					'school_id'    => $school_id,
-					'major_id'     => $major_id,
-					'school_title' => $school_title,
-					'major_title'  => $major_title,
-					'tuition'      => $tuition,
-					'duration'     => $duration,
-					'quota'        => $quota,
-					'enrollment'   => $enrollment,
-					'benefits'     => $benefits,
+					'program_id'      => $program_id,
+					'school_id'       => $school_id,
+					'major_id'        => $major_id,
+					'school_title'    => $school_title,
+					'major_title'     => $major_title,
+					'tuition'         => $tuition,
+					'initial_tuition' => $initial_tuition,
+					'duration'        => $duration,
+					'quota'           => $quota,
+					'enrollment'      => $enrollment,
+					'benefits'        => $benefits,
 				] ); ?>
 
 				<?php get_template_part( 'template-parts/program/admission-batches', null, [
@@ -193,10 +195,11 @@ $program_tabs[] = [
 				] ); ?>
 
 				<?php get_template_part( 'template-parts/program/tuition', null, [
-					'program_id' => $program_id,
-					'school_id'  => $school_id,
-					'tuition'    => $tuition,
-					'duration'   => $duration,
+					'program_id'      => $program_id,
+					'school_id'       => $school_id,
+					'tuition'         => $tuition,
+					'initial_tuition' => $initial_tuition,
+					'duration'        => $duration,
 				] ); ?>
 
 				<?php get_template_part( 'template-parts/program/curriculum', null, [
