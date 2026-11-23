@@ -45,22 +45,15 @@ $comments_number = get_comments_number();
 
 					$is_reply = $depth > 1 || (int) $comment->comment_parent > 0;
 
-					// Check if author is Administrator or Editor (Ban Quản Trị)
+					// Check if author is an authenticated Administrator or Editor (Ban Quản Trị)
 					$is_author_admin = false;
-					if ( ! empty( $comment->user_id ) ) {
-						$comment_user = get_userdata( $comment->user_id );
-						if ( $comment_user && ( in_array( 'administrator', (array) $comment_user->roles, true ) || in_array( 'editor', (array) $comment_user->roles, true ) ) ) {
-							$is_author_admin = true;
-						}
-					}
-					if ( ! $is_author_admin && ( stripos( $comment->comment_author, 'Ban Quản Trị' ) !== false || stripos( $comment->comment_author, 'Admin' ) !== false ) ) {
+					if ( ! empty( $comment->user_id ) && user_can( (int) $comment->user_id, 'moderate_comments' ) ) {
 						$is_author_admin = true;
 					}
 
 					$is_current_user_admin = current_user_can( 'moderate_comments' ) || current_user_can( 'manage_options' );
 					$comment_id            = (int) get_comment_ID();
 					$author_name           = get_comment_author();
-					$author_js             = esc_js( $author_name );
 
 					// Classes for top-level vs child/reply comment
 					$item_classes = 'comment-item transition-all ';
@@ -131,14 +124,18 @@ $comments_number = get_comments_number();
 									<div class="comment-actions mt-2.5 flex items-center gap-2">
 										<?php if ( $is_current_user_admin ) : ?>
 											<button type="button"
-													onclick="window.ltdhQuickReply(<?php echo (int) $comment_id; ?>, '<?php echo $author_js; ?>', true)"
-													class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0071E3] text-xs font-bold transition-all cursor-pointer">
+													data-comment-id="<?php echo (int) $comment_id; ?>"
+													data-author-name="<?php echo esc_attr( $author_name ); ?>"
+													data-is-admin="1"
+													class="ltdh-quick-reply-btn inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0071E3] text-xs font-bold transition-all cursor-pointer">
 												<span>⚡ Trả lời nhanh</span>
 											</button>
 										<?php else : ?>
 											<button type="button"
-													onclick="window.ltdhQuickReply(<?php echo (int) $comment_id; ?>, '<?php echo $author_js; ?>', false)"
-													class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-semibold transition-all cursor-pointer">
+													data-comment-id="<?php echo (int) $comment_id; ?>"
+													data-author-name="<?php echo esc_attr( $author_name ); ?>"
+													data-is-admin="0"
+													class="ltdh-quick-reply-btn inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-semibold transition-all cursor-pointer">
 												<span>💬 Trả lời</span>
 											</button>
 										<?php endif; ?>
@@ -215,15 +212,35 @@ $comments_number = get_comments_number();
 			oldNotice.remove();
 		}
 
-		// Create contextual reply notice banner
+		// Create contextual reply notice banner using DOM textContent (XSS-safe)
+		var safeAuthor = String(authorName || '').trim();
 		var notice = document.createElement('div');
 		notice.id = 'ltdh-reply-notice';
 		notice.className = 'flex items-center justify-between p-3 mb-3 bg-blue-50 border border-blue-200/80 rounded-xl text-xs text-blue-900 animate-in fade-in duration-200';
-		notice.innerHTML = '<span class="flex items-center gap-1.5 font-semibold">' +
-			'<span>' + (isAdmin ? '⚡ Phản hồi nhanh cho:' : '💬 Đang trả lời:') + '</span>' +
-			'<strong class="text-brand-primary">@' + authorName + '</strong>' +
-			'</span>' +
-			'<button type="button" onclick="window.ltdhCancelReply()" class="text-xs text-slate-500 hover:text-rose-600 font-bold px-2 py-0.5 rounded hover:bg-white transition-all cursor-pointer">✕ Hủy</button>';
+
+		var labelWrap = document.createElement('span');
+		labelWrap.className = 'flex items-center gap-1.5 font-semibold';
+
+		var prefixSpan = document.createElement('span');
+		prefixSpan.textContent = isAdmin ? '⚡ Phản hồi nhanh cho:' : '💬 Đang trả lời:';
+
+		var authorStrong = document.createElement('strong');
+		authorStrong.className = 'text-brand-primary';
+		authorStrong.textContent = '@' + safeAuthor;
+
+		labelWrap.appendChild(prefixSpan);
+		labelWrap.appendChild(authorStrong);
+
+		var cancelBtn = document.createElement('button');
+		cancelBtn.type = 'button';
+		cancelBtn.className = 'text-xs text-slate-500 hover:text-rose-600 font-bold px-2 py-0.5 rounded hover:bg-white transition-all cursor-pointer';
+		cancelBtn.textContent = '✕ Hủy';
+		cancelBtn.addEventListener('click', function() {
+			window.ltdhCancelReply();
+		});
+
+		notice.appendChild(labelWrap);
+		notice.appendChild(cancelBtn);
 
 		var form = respond.querySelector('form');
 		if (form) {
@@ -233,13 +250,26 @@ $comments_number = get_comments_number();
 		// Focus and update placeholder
 		if (commentField) {
 			commentField.placeholder = isAdmin
-				? 'Nhập phản hồi chính thức từ Ban Quản Trị LTDH cho @' + authorName + '...'
-				: 'Nhập câu trả lời của bạn cho @' + authorName + '...';
+				? 'Nhập phản hồi chính thức từ Ban Quản Trị LTDH cho @' + safeAuthor + '...'
+				: 'Nhập câu trả lời của bạn cho @' + safeAuthor + '...';
 			commentField.focus();
 		}
 
 		respond.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 	};
+
+	document.addEventListener('click', function(e) {
+		var btn = e.target && e.target.closest ? e.target.closest('.ltdh-quick-reply-btn') : null;
+		if (!btn) {
+			return;
+		}
+		var cid = parseInt(btn.getAttribute('data-comment-id') || '0', 10);
+		var author = btn.getAttribute('data-author-name') || '';
+		var isAdmin = btn.getAttribute('data-is-admin') === '1';
+		if (cid > 0) {
+			window.ltdhQuickReply(cid, author, isAdmin);
+		}
+	});
 
 	window.ltdhCancelReply = function() {
 		var respond = document.getElementById('respond');

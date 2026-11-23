@@ -265,16 +265,7 @@ class LTDH_Program_Helpers {
 			$upload_dir = wp_upload_dir();
 			if ( ! empty( $upload_dir['baseurl'] ) && str_starts_with( $url, $upload_dir['baseurl'] ) ) {
 				$rel        = substr( $url, strlen( $upload_dir['baseurl'] ) );
-				$check_path = $upload_dir['basedir'] . $rel;
-				if ( file_exists( $check_path ) ) {
-					$local_path = $check_path;
-				}
-			} elseif ( function_exists( 'content_url' ) && defined( 'WP_CONTENT_DIR' ) && str_starts_with( $url, content_url() ) ) {
-				$rel        = substr( $url, strlen( content_url() ) );
-				$check_path = WP_CONTENT_DIR . $rel;
-				if ( file_exists( $check_path ) ) {
-					$local_path = $check_path;
-				}
+				$local_path = self::resolve_safe_upload_path( $upload_dir['basedir'] . $rel, $upload_dir['basedir'] );
 			}
 		}
 
@@ -287,6 +278,36 @@ class LTDH_Program_Helpers {
 			'local_path'    => $local_path,
 			'is_drive'      => $is_drive,
 		];
+	}
+
+	/**
+	 * Verify that a candidate local path resolves strictly inside wp-content/uploads
+	 * and has a safe admission document extension (prevents Path Traversal).
+	 */
+	private static function resolve_safe_upload_path( string $candidate, string $uploads_basedir ): string {
+		if ( '' === $candidate || '' === $uploads_basedir ) {
+			return '';
+		}
+		$real_base = realpath( $uploads_basedir );
+		$real_file = realpath( $candidate );
+		if ( false === $real_base || false === $real_file || ! is_file( $real_file ) || ! is_readable( $real_file ) ) {
+			return '';
+		}
+		$normalized_base = wp_normalize_path( trailingslashit( $real_base ) );
+		$normalized_file = wp_normalize_path( $real_file );
+		if ( ! str_starts_with( $normalized_file, $normalized_base ) ) {
+			return '';
+		}
+		// Never package internal ephemeral uploads
+		if ( str_contains( $normalized_file, '/ltdh-ephemeral/' ) ) {
+			return '';
+		}
+		$allowed_exts = [ 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'webp', 'zip' ];
+		$ext          = strtolower( pathinfo( $real_file, PATHINFO_EXTENSION ) );
+		if ( ! in_array( $ext, $allowed_exts, true ) ) {
+			return '';
+		}
+		return $real_file;
 	}
 
 	/**
@@ -346,10 +367,16 @@ class LTDH_Program_Helpers {
 				continue;
 			}
 
+			$allowed_exts = [ 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'webp' ];
+			$ext          = strtolower( preg_replace( '/[^a-z0-9]/i', '', (string) $ext ) );
+			if ( ! in_array( $ext, $allowed_exts, true ) ) {
+				$ext = 'pdf';
+			}
+
 			// Tạo tên file an toàn bên trong file ZIP từ tiêu đề biểu mẫu
 			$sanitized_base = sanitize_file_name( remove_accents( $doc_label ) );
 			if ( empty( $sanitized_base ) ) {
-				$sanitized_base = pathinfo( $doc['filename'] ?: 'bieu-mau', PATHINFO_FILENAME ) ?: 'bieu-mau';
+				$sanitized_base = sanitize_file_name( pathinfo( $doc['filename'] ?: 'bieu-mau', PATHINFO_FILENAME ) ) ?: 'bieu-mau';
 			}
 			$entry_name = $sanitized_base . '.' . $ext;
 
@@ -361,40 +388,37 @@ class LTDH_Program_Helpers {
 			}
 			$used_names[ strtolower( $entry_name ) ] = true;
 
-			// 1. Nếu có local_path từ attachment/wp-content
-			if ( ! empty( $local_path ) && file_exists( $local_path ) ) {
-				if ( $zip->addFile( $local_path, $entry_name ) ) {
+			// 1. Nếu có local_path đã qua kiểm chứng nằm trong uploads
+			$safe_local = ! empty( $local_path ) ? self::resolve_safe_upload_path( $local_path, $upload_dir['basedir'] ) : '';
+			if ( ! empty( $safe_local ) ) {
+				if ( $zip->addFile( $safe_local, $entry_name ) ) {
 					$added_count++;
 					continue;
 				}
 			}
 
-			// 2. Thử dò đường dẫn cục bộ nếu URL thuộc site này
+			// 2. Thử dò đường dẫn cục bộ nếu URL thuộc thư mục uploads của site này
 			$check_path = '';
 			if ( str_starts_with( $doc_url, $upload_dir['baseurl'] ) ) {
-				$rel       = substr( $doc_url, strlen( $upload_dir['baseurl'] ) );
-				$candidate = $upload_dir['basedir'] . $rel;
-				if ( file_exists( $candidate ) ) {
-					$check_path = $candidate;
-				}
-			} elseif ( function_exists( 'content_url' ) && defined( 'WP_CONTENT_DIR' ) && str_starts_with( $doc_url, content_url() ) ) {
-				$rel       = substr( $doc_url, strlen( content_url() ) );
-				$candidate = WP_CONTENT_DIR . $rel;
-				if ( file_exists( $candidate ) ) {
-					$check_path = $candidate;
-				}
+				$rel        = substr( $doc_url, strlen( $upload_dir['baseurl'] ) );
+				$check_path = self::resolve_safe_upload_path( $upload_dir['basedir'] . $rel, $upload_dir['basedir'] );
 			}
 
-			if ( ! empty( $check_path ) && file_exists( $check_path ) ) {
+			if ( ! empty( $check_path ) ) {
 				if ( $zip->addFile( $check_path, $entry_name ) ) {
 					$added_count++;
 					continue;
 				}
 			}
 
-			// 3. Nếu là file remote bên ngoài
-			if ( function_exists( 'wp_remote_get' ) ) {
-				$response = wp_remote_get( $doc_url, [ 'timeout' => 5, 'sslverify' => false ] );
+			// 3. Nếu là file remote bên ngoài (chống SSRF bằng wp_safe_remote_get + bật sslverify)
+			if ( function_exists( 'wp_safe_remote_get' ) ) {
+				$response = wp_safe_remote_get( $doc_url, [
+					'timeout'             => 5,
+					'sslverify'           => true,
+					'redirection'         => 2,
+					'limit_response_size' => 10 * 1024 * 1024,
+				] );
 				if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
 					$body = wp_remote_retrieve_body( $response );
 					if ( ! empty( $body ) ) {

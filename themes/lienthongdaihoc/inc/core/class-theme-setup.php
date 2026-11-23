@@ -190,8 +190,38 @@ function ltdh_allow_webp_upload_check( $data, $file, $filename, $mimes ) {
 	$filetype = wp_check_filetype( $filename, $mimes );
 	$ext      = $filetype['ext'];
 	if ( 'webp' === $ext ) {
-		$data['ext']  = 'webp';
-		$data['type'] = 'image/webp';
+		$is_valid_webp = false;
+		if ( ! empty( $file ) && is_readable( $file ) && filesize( $file ) >= 12 ) {
+			// Verify RIFF....WEBP binary container signature
+			$fp = @fopen( $file, 'rb' );
+			if ( $fp ) {
+				$header = fread( $fp, 12 );
+				fclose( $fp );
+				if ( strlen( $header ) === 12 && 'RIFF' === substr( $header, 0, 4 ) && 'WEBP' === substr( $header, 8, 4 ) ) {
+					$is_valid_webp = true;
+				}
+			}
+			// Secondary MIME check via fileinfo when available
+			if ( $is_valid_webp && function_exists( 'finfo_open' ) ) {
+				$finfo = finfo_open( FILEINFO_MIME_TYPE );
+				if ( $finfo ) {
+					$real_mime = finfo_file( $finfo, $file );
+					finfo_close( $finfo );
+					if ( 'image/webp' !== $real_mime ) {
+						$is_valid_webp = false;
+					}
+				}
+			}
+		}
+
+		if ( $is_valid_webp ) {
+			$data['ext']  = 'webp';
+			$data['type'] = 'image/webp';
+		} else {
+			$data['ext']             = false;
+			$data['type']            = false;
+			$data['proper_filename'] = false;
+		}
 	}
 	return $data;
 }

@@ -69,23 +69,41 @@ require_once __DIR__ . '/inc/easy-table-of-contents.php';
 // ----------------------------------------------------
 require_once __DIR__ . '/inc/cli-commands.php';
 
-// Exclude .git directory from All-in-One WP Migration export to prevent size ballooning
+// Exclude .git and non-public dev/test directories from All-in-One WP Migration export
 add_filter( 'ai1wm_exclude_content_from_export', function ( $exclude_filters ) {
 	$exclude_filters[] = '.git';
+	$exclude_filters[] = 'themes/lienthongdaihoc/.agent';
+	$exclude_filters[] = 'themes/lienthongdaihoc/.agents';
+	$exclude_filters[] = 'themes/lienthongdaihoc/tests';
+	$exclude_filters[] = 'themes/lienthongdaihoc/scripts';
+	$exclude_filters[] = 'themes/lienthongdaihoc/node_modules';
 	return $exclude_filters;
 } );
 
-// Tăng giới hạn dung lượng upload lên 1GB cho WordPress & All-in-One WP Migration
-add_filter( 'upload_size_limit', function () {
-	return 1024 * 1024 * 1024; // 1 GB
+// Chỉ mở giới hạn dung lượng upload 1GB cho Quản trị viên (phục vụ All-in-One WP Migration)
+add_filter( 'upload_size_limit', function ( $size ) {
+	if ( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
+		return 1024 * 1024 * 1024; // 1 GB
+	}
+	return $size;
 } );
 
-// Cho phép REST API cho AIOWPS
+// Chỉ cho phép namespace REST API tùy chỉnh ltdh đi qua tường lửa AIOS (không mở trắng toàn bộ 'wp')
 add_filter( 'aios_whitelisted_rest_routes', function ( $routes ) {
-	if ( ! is_array( $routes ) ) $routes = [];
-	$routes[] = 'wp';
+	if ( ! is_array( $routes ) ) {
+		$routes = [];
+	}
 	$routes[] = 'ltdh';
-	return $routes;
+	return array_values( array_unique( $routes ) );
+} );
+
+// Chặn khách ẩn danh dò danh sách tài khoản quản trị qua /wp-json/wp/v2/users
+add_filter( 'rest_endpoints', function ( $endpoints ) {
+	if ( ! is_user_logged_in() || ! current_user_can( 'list_users' ) ) {
+		unset( $endpoints['/wp/v2/users'] );
+		unset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] );
+	}
+	return $endpoints;
 } );
 
 

@@ -106,6 +106,9 @@ if ( is_singular( 'program' ) ) {
 (function() {
 	function openConsultationModal(e) {
 		if (e && e.preventDefault) e.preventDefault();
+		if (window.ltdhCloseConditionCheckerModal) {
+			window.ltdhCloseConditionCheckerModal();
+		}
 		var modal = document.getElementById('ltdh-consultation-modal');
 		if (modal) {
 			modal.classList.remove('hidden');

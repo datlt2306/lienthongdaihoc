@@ -316,10 +316,10 @@ class LTDH_Performance {
 	}
 
 	/**
-	 * 0. Bypass all caching mechanisms when query param ?v=1 is present.
+	 * 0. Bypass all caching mechanisms when query param ?v=1 is present (Editors/Admins only).
 	 */
 	public static function handle_cache_bypass() {
-		if ( isset( $_GET['v'] ) && '1' === (string) $_GET['v'] ) {
+		if ( isset( $_GET['v'] ) && '1' === (string) $_GET['v'] && is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
 			// 1. Vô hiệu hoá LiteSpeed Cache
 			do_action( 'litespeed_disable_all' );
 
@@ -341,7 +341,7 @@ class LTDH_Performance {
 			return;
 		}
 
-		if ( isset( $_GET['v'] ) && '1' === (string) $_GET['v'] ) {
+		if ( isset( $_GET['v'] ) && '1' === (string) $_GET['v'] && is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
 			header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
 			header( 'Pragma: no-cache' );
 			header( 'Expires: Wed, 11 Jan 1984 05:00:00 GMT' );
@@ -350,11 +350,11 @@ class LTDH_Performance {
 
 		header( 'X-Content-Type-Options: nosniff' );
 		header( 'X-Frame-Options: SAMEORIGIN' );
-		header( 'X-XSS-Protection: 1; mode=block' );
+		header( "Content-Security-Policy: frame-ancestors 'self'; base-uri 'self'; object-src 'none'" );
 		header( 'Referrer-Policy: strict-origin-when-cross-origin' );
 		header( 'Permissions-Policy: camera=(), microphone=(), geolocation=()' );
 
-		if ( is_ssl() || ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && 'https' === $_SERVER['HTTP_X_FORWARDED_PROTO'] ) ) {
+		if ( is_ssl() ) {
 			header( 'Strict-Transport-Security: max-age=31536000; includeSubDomains' );
 		}
 	}

@@ -908,28 +908,25 @@ $has_active_filters  = $active_filter_count > 0;
 
 			<!-- Fallback JSON-LD Schema (Rendered for Google Rich Snippets if Rank Math hasn't output it) -->
 			<?php if ( ! function_exists( 'rank_math' ) || ! class_exists( 'RankMath' ) ) : ?>
-				<script type="application/ld+json">
-				{
-					"@context": "https://schema.org",
-					"@type": "FAQPage",
-					"mainEntity": [
-						<?php
-						$faq_json = [];
-						foreach ( $training_type_faqs as $item ) {
-							$faq_json[] = json_encode( [
-								'@type'          => 'Question',
-								'name'           => $item['question'],
-								'acceptedAnswer' => [
-									'@type' => 'Answer',
-									'text'  => wp_strip_all_tags( $item['answer'] ),
-								],
-							], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-						}
-						echo implode( ",\n\t\t\t\t\t\t", $faq_json );
-						?>
-					]
+				<?php
+				$faq_entities = [];
+				foreach ( $training_type_faqs as $item ) {
+					$faq_entities[] = [
+						'@type'          => 'Question',
+						'name'           => wp_strip_all_tags( (string) ( $item['question'] ?? '' ) ),
+						'acceptedAnswer' => [
+							'@type' => 'Answer',
+							'text'  => wp_strip_all_tags( (string) ( $item['answer'] ?? '' ) ),
+						],
+					];
 				}
-				</script>
+				$faq_schema = [
+					'@context'   => 'https://schema.org',
+					'@type'      => 'FAQPage',
+					'mainEntity' => $faq_entities,
+				];
+				?>
+				<script type="application/ld+json"><?php echo wp_json_encode( $faq_schema, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?></script>
 			<?php endif; ?>
 		<?php endif; ?>
 

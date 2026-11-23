@@ -26,20 +26,35 @@ if ( ! $school_id ) {
 		}
 	}
 }
+
+$has_dynamic_checker = (
+	( is_active_sidebar( 'sidebar-major' ) && function_exists( 'ltdh_sidebar_has_condition_checker' ) && ltdh_sidebar_has_condition_checker( 'sidebar-major' ) ) ||
+	( ! is_active_sidebar( 'sidebar-major' ) && $school_id && is_active_sidebar( 'sidebar-school' ) && function_exists( 'ltdh_sidebar_has_condition_checker' ) && ltdh_sidebar_has_condition_checker( 'sidebar-school' ) )
+);
 ?>
 
 <aside id="major-sidebar" class="widget-area space-y-4 lg:space-y-6" role="complementary" aria-label="<?php esc_attr_e( 'Thanh bên ngành đào tạo', 'ltdh' ); ?>">
 	<?php
+	if ( $school_id && function_exists( 'ltdh_render_school_info_card' ) ) :
+		ltdh_render_school_info_card( $school_id );
+	endif;
+
+	// 1. Luôn gắn mặc định Widget Kiểm tra điều kiện ở thanh bên ngành đào tạo
+	if ( ! $has_dynamic_checker ) {
+		get_template_part( 'template-parts/widgets/condition-checker', null, [
+			'mode'      => 'compact',
+			'major_id'  => $major_id,
+			'school_id' => $school_id,
+		] );
+	}
+
 	if ( is_active_sidebar( 'sidebar-major' ) ) :
-		if ( $school_id && function_exists( 'ltdh_render_school_info_card' ) ) :
-			ltdh_render_school_info_card( $school_id );
-		endif;
 		dynamic_sidebar( 'sidebar-major' );
 	elseif ( $school_id && is_active_sidebar( 'sidebar-school' ) ) :
 		// Kế thừa widget từ Trường nếu Ngành xem trong ngữ cảnh trường và chưa setup
 		dynamic_sidebar( 'sidebar-school' );
 	else :
-		ltdh_render_default_major_sidebar( $major_id, $school_id );
+		ltdh_render_default_major_sidebar( $major_id, $school_id, true );
 	endif;
 	?>
 </aside>

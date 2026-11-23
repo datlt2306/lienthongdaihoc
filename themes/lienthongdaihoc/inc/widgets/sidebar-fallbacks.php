@@ -215,7 +215,7 @@ if ( ! function_exists( 'ltdh_render_school_info_card' ) ) {
  * @param int $program_id
  * @param int $school_id
  */
-function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
+function ltdh_render_default_program_sidebar( $program_id, $school_id = 0, $skip_checker = false ) {
 	$global_zalo     = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me';
 	$program_hotline = ( $school_id ? ( get_post_meta( $school_id, 'hotline', true ) ?: get_field( 'hotline', $school_id ) ) : '' ) ?: ( function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496' );
 	$major_id        = 0;
@@ -294,6 +294,18 @@ function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
 					<?php endif; ?>
 				<?php endforeach; ?>
 			</div>
+		</div>
+	<?php endif; ?>
+
+	<!-- CONDITION CHECKER WIDGET (Compact Mode) -->
+	<?php if ( ! $skip_checker ) : ?>
+		<div>
+			<?php
+			get_template_part( 'template-parts/widgets/condition-checker', null, [
+				'mode'       => 'compact',
+				'program_id' => $program_id,
+			] );
+			?>
 		</div>
 	<?php endif; ?>
 
@@ -475,7 +487,7 @@ function ltdh_render_default_program_sidebar( $program_id, $school_id = 0 ) {
  *
  * @param int $school_id
  */
-function ltdh_render_default_school_sidebar( $school_id ) {
+function ltdh_render_default_school_sidebar( $school_id, $skip_checker = false ) {
 	$global_zalo = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me';
 	$hotline     = ( get_post_meta( $school_id, 'hotline', true ) ?: get_field( 'hotline', $school_id ) ) ?: ( function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496' );
 	$school_title = get_the_title( $school_id );
@@ -499,6 +511,18 @@ function ltdh_render_default_school_sidebar( $school_id ) {
 	}
 	$initials = mb_strtoupper( $initials );
 	?>
+
+	<!-- Condition Checker Widget (Compact Mode) -->
+	<?php if ( ! $skip_checker ) : ?>
+		<div>
+			<?php
+			get_template_part( 'template-parts/widgets/condition-checker', null, [
+				'mode'      => 'compact',
+				'school_id' => $school_id,
+			] );
+			?>
+		</div>
+	<?php endif; ?>
 
 	<!-- Consultation Form -->
 	<section id="register" class="hidden lg:block scroll-mt-36 md:scroll-mt-40 bg-white rounded-2xl lg:rounded-lg shadow-sm border border-slate-100 lg:border-slate-200 p-4.5 lg:p-6 relative overflow-hidden">
@@ -642,7 +666,7 @@ function ltdh_render_default_school_sidebar( $school_id ) {
  * @param int $major_id
  * @param int $school_id
  */
-function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
+function ltdh_render_default_major_sidebar( $major_id, $school_id = 0, $skip_checker = false ) {
 	$global_zalo = function_exists( 'ltdh_get_zalo_url' ) ? ltdh_get_zalo_url() : 'https://zalo.me';
 	$hotline     = function_exists( 'ltdh_get_hotline' ) ? ltdh_get_hotline() : '0988 991 496';
 	$major_title = get_the_title( $major_id );
@@ -670,6 +694,19 @@ function ltdh_render_default_major_sidebar( $major_id, $school_id = 0 ) {
 	<!-- SCHOOL INFO CARD (When navigating from school) -->
 	<?php if ( $context_school ) : ?>
 		<?php ltdh_render_school_info_card( $school_id ); ?>
+	<?php endif; ?>
+
+	<!-- Condition Checker Widget (Compact Mode) -->
+	<?php if ( ! $skip_checker ) : ?>
+		<div>
+			<?php
+			get_template_part( 'template-parts/widgets/condition-checker', null, [
+				'mode'      => 'compact',
+				'major_id'  => $major_id,
+				'school_id' => $school_id,
+			] );
+			?>
+		</div>
 	<?php endif; ?>
 
 	<!-- Consultation Form -->

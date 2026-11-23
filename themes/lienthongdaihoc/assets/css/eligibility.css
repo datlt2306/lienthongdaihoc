@@ -551,3 +551,241 @@
 	border-color: #EF4444 !important;
 	box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;
 }
+
+
+/* ----------------------------------------------------
+   Decision Tree Status Banners & Circular 2026-2027 Badges
+   ---------------------------------------------------- */
+.elig-decision-card {
+	transition: all 0.3s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.elig-decision-card.status-eligible {
+	background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+	border: 1.5px solid #10B981;
+	box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08);
+}
+.elig-decision-card.status-eligible .decision-icon-badge {
+	background: #10B981;
+	color: #FFFFFF;
+}
+.elig-decision-card.status-eligible .decision-title {
+	color: #065F46;
+}
+
+.elig-decision-card.status-warning-urgent {
+	background: linear-gradient(135deg, #FFFBEB 0%, #FFFDF5 100%);
+	border: 1px solid #FCD34D;
+	box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+}
+.elig-decision-card.status-warning-urgent .decision-icon-badge {
+	background: #F59E0B;
+	color: #FFFFFF;
+}
+.elig-decision-card.status-warning-urgent .decision-title {
+	color: #92400E;
+}
+
+.elig-decision-card.status-not-eligible,
+.elig-decision-card.status-not_eligible,
+.elig-decision-card.status-not_eligible_2027,
+.elig-decision-card.status-not-eligible-2027 {
+	background: linear-gradient(135deg, #FFF1F2 0%, #FFF8F8 100%);
+	border: 1.5px solid #FDA4AF;
+	box-shadow: 0 4px 16px rgba(244, 63, 94, 0.08);
+}
+.elig-decision-card.status-not-eligible .decision-icon-badge,
+.elig-decision-card.status-not_eligible .decision-icon-badge,
+.elig-decision-card.status-not_eligible_2027 .decision-icon-badge,
+.elig-decision-card.status-not-eligible-2027 .decision-icon-badge {
+	background: #F43F5E;
+	color: #FFFFFF;
+}
+.elig-decision-card.status-not-eligible .decision-title,
+.elig-decision-card.status-not_eligible .decision-title,
+.elig-decision-card.status-not_eligible_2027 .decision-title,
+.elig-decision-card.status-not-eligible-2027 .decision-title {
+	color: #9F1239;
+}
+
+/* Status Badges */
+.elig-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.35rem 0.85rem;
+	border-radius: 9999px;
+	font-size: 0.75rem;
+	font-weight: 800;
+	letter-spacing: 0.025em;
+	text-transform: uppercase;
+}
+.elig-badge-eligible {
+	background: #D1FAE5;
+	color: #065F46;
+	border: 1px solid #A7F3D0;
+}
+.elig-badge-urgent {
+	background: #FEF3C7;
+	color: #92400E;
+	border: 1px solid #FDE68A;
+	animation: pulseSlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.elig-badge-not-eligible,
+.elig-badge-not_eligible,
+.elig-badge-not_eligible_2027,
+.elig-badge-not-eligible-2027 {
+	background: #FFE4E6;
+	color: #9F1239;
+	border: 1px solid #FECDD3;
+}
+
+@keyframes pulseSlow {
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50% { opacity: 0.92; transform: scale(1.02); }
+}
+
+.elig-remedy-box {
+	background: #FFFFFF;
+	border: 1px solid #BFDBFE;
+	border-radius: 0.75rem;
+	padding: 0.75rem;
+	margin-top: 0.75rem;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.elig-legal-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	background: rgba(255, 255, 255, 0.7);
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	padding: 0.2rem 0.6rem;
+	border-radius: 0.5rem;
+	font-size: 0.7rem;
+	font-weight: 700;
+	color: #475569;
+}
+
+/* ----------------------------------------------------
+ * Compact Condition Checker Widget Styles
+ * ---------------------------------------------------- */
+.ltdh-condition-checker-compact {
+	background: #FFFFFF;
+	border: 1px solid #E2E8F0;
+	border-radius: 1rem;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+	overflow: hidden;
+	transition: all 0.25s ease-in-out;
+}
+.ltdh-condition-checker-compact:hover {
+	border-color: #CBD5E1;
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+}
+
+.compact-widget-header {
+	background: linear-gradient(135deg, #00308B 0%, #001F5C 100%);
+	color: #FFFFFF;
+	padding: 1.25rem 1.25rem 1rem 1.25rem;
+	position: relative;
+}
+
+.compact-step-pills {
+	display: flex;
+	gap: 0.5rem;
+	margin-top: 0.75rem;
+}
+.compact-step-pill {
+	flex: 1;
+	height: 4px;
+	border-radius: 9999px;
+	background: rgba(255, 255, 255, 0.25);
+	transition: all 0.3s ease;
+}
+.compact-step-pill.is-active {
+	background: #38BDF8;
+}
+.compact-step-pill.is-done {
+	background: #10B981;
+}
+
+.compact-form-body {
+	padding: 1.25rem;
+}
+
+.compact-input-label {
+	display: block;
+	font-size: 0.8125rem;
+	font-weight: 700;
+	color: #1E293B;
+	margin-bottom: 0.375rem;
+}
+
+.compact-field-wrap {
+	margin-bottom: 1rem;
+}
+
+.compact-radio-card {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+	padding: 0.625rem 0.75rem;
+	background: #F8FAFC;
+	border: 1.5px solid #E2E8F0;
+	border-radius: 0.625rem;
+	cursor: pointer;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: #334155;
+	transition: all 0.15s ease-in-out;
+	user-select: none;
+}
+.compact-radio-card:hover {
+	background: #F1F5F9;
+	border-color: #94A3B8;
+}
+.compact-radio-card.is-selected,
+.compact-radio-card input:checked + span,
+input[type="radio"]:checked + .compact-radio-card {
+	background: #EFF6FF;
+	border-color: #00308B;
+	color: #00308B;
+}
+
+.compact-conflict-box {
+	background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+	border: 1px solid #FCD34D;
+	border-radius: 0.75rem;
+	padding: 0.875rem;
+	box-shadow: 0 2px 4px rgba(245, 158, 11, 0.06);
+}
+.compact-conflict-box.type-urgent {
+	background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
+	border-color: #FDA4AF;
+	box-shadow: 0 2px 4px rgba(244, 63, 94, 0.06);
+}
+
+.compact-lead-form {
+	background: #F8FAFC;
+	border: 1px solid #E2E8F0;
+	border-radius: 0.75rem;
+	padding: 0.875rem 1rem;
+	margin-bottom: 0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.compact-context-tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.25rem 0.65rem;
+	background: rgba(255, 255, 255, 0.15);
+	backdrop-filter: blur(4px);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	border-radius: 9999px;
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: #E2E8F0;
+}

@@ -89,16 +89,203 @@ function ltdh_check_leads_table_schema() {
 }
 
 /**
+ * Determine whether an IP belongs to official Cloudflare IPv4/IPv6 proxy ranges.
+ */
+if ( ! function_exists( 'ltdh_ip_in_cidr' ) ) {
+	function ltdh_ip_in_cidr( string $ip, string $cidr ): bool {
+		if ( false === strpos( $cidr, '/' ) ) {
+			return $ip === $cidr;
+		}
+		list( $subnet, $bits ) = explode( '/', $cidr, 2 );
+		$bits    = (int) $bits;
+		$ip_bin  = @inet_pton( $ip );
+		$sub_bin = @inet_pton( $subnet );
+		if ( false === $ip_bin || false === $sub_bin || strlen( $ip_bin ) !== strlen( $sub_bin ) ) {
+			return false;
+		}
+		$max_bits = strlen( $ip_bin ) * 8;
+		if ( $bits < 0 || $bits > $max_bits ) {
+			return false;
+		}
+		$bytes = intdiv( $bits, 8 );
+		$rem   = $bits % 8;
+		if ( $bytes > 0 && substr( $ip_bin, 0, $bytes ) !== substr( $sub_bin, 0, $bytes ) ) {
+			return false;
+		}
+		if ( $rem > 0 ) {
+			$mask = ( 0xFF << ( 8 - $rem ) ) & 0xFF;
+			if ( ( ord( $ip_bin[ $bytes ] ) & $mask ) !== ( ord( $sub_bin[ $bytes ] ) & $mask ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+}
+
+if ( ! function_exists( 'ltdh_is_cloudflare_ip' ) ) {
+	function ltdh_is_cloudflare_ip( string $ip ): bool {
+		$cf_cidrs = [
+			'173.245.48.0/20', '103.21.244.0/22', '103.22.200.0/22', '103.31.4.0/22',
+			'141.101.64.0/18', '108.162.192.0/18', '190.93.240.0/20', '188.114.96.0/20',
+			'197.234.240.0/22', '198.41.128.0/17', '162.158.0.0/15', '104.16.0.0/13',
+			'104.24.0.0/14', '172.64.0.0/13', '131.0.72.0/22',
+			'2400:cb00::/32', '2606:4700::/32', '2803:f800::/32', '2405:b500::/32',
+			'2405:8100::/32', '2a06:98c0::/29', '2c0f:f248::/32',
+		];
+		foreach ( $cf_cidrs as $cidr ) {
+			if ( ltdh_ip_in_cidr( $ip, $cidr ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
+if ( ! function_exists( 'ltdh_get_client_ip' ) ) {
+	function ltdh_get_client_ip(): string {
+		$remote_addr = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+		if ( ! empty( $remote_addr ) && ltdh_is_cloudflare_ip( $remote_addr ) && ! empty( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
+			$cf_ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ) );
+			if ( filter_var( $cf_ip, FILTER_VALIDATE_IP ) ) {
+				return $cf_ip;
+			}
+		}
+		return filter_var( $remote_addr, FILTER_VALIDATE_IP ) ? $remote_addr : '';
+	}
+}
+
+if ( ! function_exists( 'ltdh_is_local_dev_site' ) ) {
+	function ltdh_is_local_dev_site(): bool {
+		if ( function_exists( 'wp_get_environment_type' ) && 'local' === wp_get_environment_type() ) {
+			return true;
+		}
+		$host = strtolower( (string) parse_url( home_url(), PHP_URL_HOST ) );
+		return in_array( $host, [ 'localhost', '127.0.0.1' ], true ) || str_ends_with( $host, '.local' );
+	}
+}
+
+if ( ! function_exists( 'ltdh_cleanup_ephemeral_files' ) ) {
+	function ltdh_cleanup_ephemeral_files( array $paths ): void {
+		foreach ( $paths as $path ) {
+			if ( is_string( $path ) && '' !== $path && file_exists( $path ) && is_file( $path ) ) {
+				@unlink( $path );
+			}
+		}
+	}
+}
+
+if ( ! function_exists( 'ltdh_handle_ephemeral_document_upload' ) ) {
+	/**
+	 * Store an uploaded verification document in a protected non-public directory
+	 * after strict binary signature validation, for immediate ephemeral Telegram forwarding.
+	 *
+	 * @param array $file $_FILES entry.
+	 * @return array|\WP_Error ['file' => string] on success, WP_Error on failure.
+	 */
+	function ltdh_handle_ephemeral_document_upload( array $file ) {
+		$max_file_size = 5 * 1024 * 1024;
+		if ( ! empty( $file['error'] ) && UPLOAD_ERR_OK !== (int) $file['error'] ) {
+			return new \WP_Error( 'upload_err', 'Tải tệp lên thất bại.' );
+		}
+		if ( empty( $file['tmp_name'] ) || ! is_readable( $file['tmp_name'] ) ) {
+			return new \WP_Error( 'invalid_tmp', 'Tệp tải lên không hợp lệ.' );
+		}
+		if ( PHP_SAPI !== 'cli' && ! is_uploaded_file( $file['tmp_name'] ) ) {
+			return new \WP_Error( 'not_uploaded', 'Nguồn tệp tải lên không hợp lệ.' );
+		}
+		$size = (int) ( $file['size'] ?? filesize( $file['tmp_name'] ) );
+		if ( $size <= 0 || $size > $max_file_size ) {
+			return new \WP_Error( 'file_too_large', 'Dung lượng tệp vượt quá giới hạn 5MB cho phép.' );
+		}
+
+		$fp = @fopen( $file['tmp_name'], 'rb' );
+		if ( ! $fp ) {
+			return new \WP_Error( 'read_err', 'Không thể đọc tệp tải lên.' );
+		}
+		$header = fread( $fp, 12 );
+		fclose( $fp );
+
+		$orig_ext  = strtolower( pathinfo( (string) ( $file['name'] ?? '' ), PATHINFO_EXTENSION ) );
+		$valid_ext = '';
+		$expected_mime = '';
+
+		if ( 'pdf' === $orig_ext && str_starts_with( $header, '%PDF-' ) ) {
+			$valid_ext     = 'pdf';
+			$expected_mime = 'application/pdf';
+		} elseif ( 'png' === $orig_ext && str_starts_with( $header, "\x89PNG\r\n\x1a\n" ) ) {
+			$valid_ext     = 'png';
+			$expected_mime = 'image/png';
+		} elseif ( in_array( $orig_ext, [ 'jpg', 'jpeg', 'jpe' ], true ) && str_starts_with( $header, "\xFF\xD8\xFF" ) ) {
+			$valid_ext     = 'jpg';
+			$expected_mime = 'image/jpeg';
+		} elseif ( 'webp' === $orig_ext && strlen( $header ) >= 12 && 'RIFF' === substr( $header, 0, 4 ) && 'WEBP' === substr( $header, 8, 4 ) ) {
+			$valid_ext     = 'webp';
+			$expected_mime = 'image/webp';
+		} else {
+			return new \WP_Error( 'bad_signature', 'Định dạng tệp không hợp lệ (chỉ hỗ trợ JPG, PNG, WEBP, PDF chuẩn).' );
+		}
+
+		if ( function_exists( 'finfo_open' ) ) {
+			$finfo = finfo_open( FILEINFO_MIME_TYPE );
+			if ( $finfo ) {
+				$detected_mime = finfo_file( $finfo, $file['tmp_name'] );
+				finfo_close( $finfo );
+				if ( $detected_mime !== $expected_mime ) {
+					return new \WP_Error( 'mime_mismatch', 'Nội dung tệp không khớp với định dạng khai báo.' );
+				}
+			}
+		}
+
+		$upload_dir = wp_upload_dir();
+		if ( empty( $upload_dir['basedir'] ) ) {
+			return new \WP_Error( 'upload_dir_err', 'Không thể khởi tạo thư mục lưu tạm.' );
+		}
+		$ephemeral_dir = trailingslashit( $upload_dir['basedir'] ) . 'ltdh-ephemeral';
+		if ( ! file_exists( $ephemeral_dir ) ) {
+			wp_mkdir_p( $ephemeral_dir );
+		}
+		$htaccess_path = $ephemeral_dir . '/.htaccess';
+		if ( ! file_exists( $htaccess_path ) ) {
+			@file_put_contents( $htaccess_path, "<IfModule mod_authz_core.c>\n\tRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n\tOrder deny,allow\n\tDeny from all\n</IfModule>\n" );
+		}
+		$index_path = $ephemeral_dir . '/index.php';
+		if ( ! file_exists( $index_path ) ) {
+			@file_put_contents( $index_path, "<?php\n// Silence is golden.\n" );
+		}
+
+		$dest_filename = 'doc-' . bin2hex( random_bytes( 16 ) ) . '.' . $valid_ext;
+		$dest_path     = $ephemeral_dir . '/' . $dest_filename;
+
+		$moved = ( PHP_SAPI === 'cli' )
+			? @copy( $file['tmp_name'], $dest_path )
+			: @move_uploaded_file( $file['tmp_name'], $dest_path );
+
+		if ( ! $moved || ! file_exists( $dest_path ) ) {
+			return new \WP_Error( 'move_failed', 'Không thể xử lý tệp tải lên.' );
+		}
+		@chmod( $dest_path, 0600 );
+
+		return [ 'file' => $dest_path ];
+	}
+}
+
+/**
  * Check if current IP address has exceeded the rate limit (10 submissions per 10 minutes).
  */
 function ltdh_is_ip_rate_limited(): bool {
-	// Whitelist administrators and authenticated testers
+	if ( PHP_SAPI === 'cli' || defined( 'WP_CLI' ) ) {
+		return false;
+	}
+	// Whitelist administrators and authenticated editors
 	if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
 		return false;
 	}
 
-	$ip = $_SERVER['REMOTE_ADDR'] ?? '';
-	if ( empty( $ip ) || $ip === '127.0.0.1' || $ip === '::1' || strpos( $ip, '127.0.0.' ) === 0 || strpos( $ip, '192.168.' ) === 0 || strpos( $ip, '10.' ) === 0 || strpos( $ip, '172.' ) === 0 ) {
+	$ip = ltdh_get_client_ip();
+	if ( empty( $ip ) ) {
+		return false;
+	}
+	if ( ltdh_is_local_dev_site() && ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
 		return false;
 	}
 	$transient_key = 'ltdh_rl_' . md5( $ip );
@@ -110,12 +297,18 @@ function ltdh_is_ip_rate_limited(): bool {
  * Increment the submission counter for current IP.
  */
 function ltdh_increment_ip_rate_limit(): void {
+	if ( PHP_SAPI === 'cli' || defined( 'WP_CLI' ) ) {
+		return;
+	}
 	if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
 		return;
 	}
 
-	$ip = $_SERVER['REMOTE_ADDR'] ?? '';
-	if ( empty( $ip ) || $ip === '127.0.0.1' || $ip === '::1' || strpos( $ip, '127.0.0.' ) === 0 || strpos( $ip, '192.168.' ) === 0 || strpos( $ip, '10.' ) === 0 || strpos( $ip, '172.' ) === 0 ) {
+	$ip = ltdh_get_client_ip();
+	if ( empty( $ip ) ) {
+		return;
+	}
+	if ( ltdh_is_local_dev_site() && ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
 		return;
 	}
 	$transient_key = 'ltdh_rl_' . md5( $ip );
@@ -172,11 +365,16 @@ function ltdh_is_spam_submission( array $data ): bool {
 // 2. Centralized Lead Insertion Function
 // ----------------------------------------------------
 function ltdh_insert_lead( array $data ): int {
-	if ( ltdh_is_spam_submission( $data ) ) {
-		return 0;
-	}
-	global $wpdb;
-	$table_name = $wpdb->prefix . LTDH_TABLE_LEADS;
+	$ephemeral_files = [
+		$data['degree_file_path'] ?? '',
+		$data['transcript_file_path'] ?? '',
+	];
+	try {
+		if ( ltdh_is_spam_submission( $data ) ) {
+			return 0;
+		}
+		global $wpdb;
+		$table_name = $wpdb->prefix . LTDH_TABLE_LEADS;
 
 	$name            = isset( $data['name'] ) ? sanitize_text_field( $data['name'] ) : '';
 	$phone           = isset( $data['phone'] ) ? sanitize_text_field( $data['phone'] ) : '';
@@ -316,12 +514,20 @@ function ltdh_insert_lead( array $data ): int {
 	}
 
 	return 0;
+	} finally {
+		ltdh_cleanup_ephemeral_files( $ephemeral_files );
+	}
 }
 
 // ----------------------------------------------------
 // 3. Telegram Notification Handler
 // ----------------------------------------------------
 function ltdh_trigger_telegram_notification( array $data ): void {
+	$ephemeral_files = [
+		$data['degree_file_path'] ?? '',
+		$data['transcript_file_path'] ?? '',
+	];
+	try {
 	$bot_token = defined( 'LTDH_TELEGRAM_BOT_TOKEN' ) ? LTDH_TELEGRAM_BOT_TOKEN : '';
 	$chat_id   = defined( 'LTDH_TELEGRAM_CHAT_ID' ) ? LTDH_TELEGRAM_CHAT_ID : '';
 
@@ -368,7 +574,7 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 	$is_group = ! empty( $data['is_group_reg'] );
 
 	if ( $is_eligibility ) {
-		// Full Detail notification for Eligibility Checker
+		// Full Detail notification for Eligibility Checker (2026–2027 Regulations)
 		$training_type = ! empty( $data['training_type'] ) ? $data['training_type'] : 'N/A';
 		$campus        = ! empty( $data['campus'] ) ? $data['campus'] : 'N/A';
 		
@@ -381,12 +587,39 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		if ( ! empty( $data['major_id'] ) ) {
 			$major_title = get_the_title( $data['major_id'] );
 		}
-		$referral = $data['referral_source'];
+		$referral = $data['referral_source'] ?? '';
 
-		if ( $is_group ) {
-			$msg_text  = "🚨 <b>ĐÁNH GIÁ ĐIỀU KIỆN - ĐĂNG KÝ THEO NHÓM!</b> 👥\n\n";
+		// Parse decision parameters from referral source
+		$ref_query = parse_url( $referral, PHP_URL_QUERY );
+		$ref_params = [];
+		if ( $ref_query ) {
+			parse_str( $ref_query, $ref_params );
+		}
+		$decision_status = $ref_params['decision_status'] ?? '';
+		$education_level = $ref_params['education_level'] ?? '';
+		$thpt_status     = $ref_params['thpt_status'] ?? '';
+		$months_grad     = $ref_params['months_since_grad'] ?? '';
+		$grad_grade      = $ref_params['grad_grade'] ?? '';
+		$major_relation  = $ref_params['major_relation'] ?? '';
+		$time_pref       = $ref_params['time_preference'] ?? '';
+		$suit_types      = $ref_params['suit_types'] ?? '';
+
+		if ( 'warning_urgent' === $decision_status ) {
+			$msg_text = "🟡 <b>[ĐỦ ĐIỀU KIỆN CÓ LƯU Ý] HỒ SƠ CẦN HƯỚNG DẪN</b> ⏳\n\n";
+		} elseif ( in_array( $decision_status, [ 'not_eligible', 'not_eligible_2027' ], true ) ) {
+			$msg_text = "🔴 <b>[CHƯA ĐỦ ĐIỀU KIỆN] HỒ SƠ THEO QUY CHẾ MỚI</b> ⚠️\n\n";
+		} elseif ( $is_group ) {
+			$msg_text = "🚨 <b>ĐÁNH GIÁ ĐIỀU KIỆN - ĐĂNG KÝ THEO NHÓM!</b> 👥\n\n";
 		} else {
-			$msg_text  = "🔔 <b>ĐÁNH GIÁ ĐIỀU KIỆN TUYỂN SINH MỚI</b> 🔔\n\n";
+			$msg_text = "🟢 <b>[ĐỦ ĐIỀU KIỆN] HỒ SƠ ĐÁNH GIÁ LIÊN THÔNG MỚI</b> 🎓\n\n";
+		}
+
+		if ( 'warning_urgent' === $decision_status ) {
+			$msg_text .= "⚡ <b>Trạng thái:</b> 🟡 <b>ĐỦ ĐIỀU KIỆN CÓ LƯU Ý</b> (Cần thẩm định điểm sàn / môn bổ sung)\n";
+		} elseif ( in_array( $decision_status, [ 'not_eligible', 'not_eligible_2027' ], true ) ) {
+			$msg_text .= "⚡ <b>Trạng thái:</b> 🔴 <b>CHƯA ĐỦ ĐIỀU KIỆN</b> (Theo quy chế mới của Bộ GD&ĐT)\n";
+		} elseif ( 'eligible' === $decision_status ) {
+			$msg_text .= "⚡ <b>Trạng thái:</b> 🟢 <b>ĐỦ ĐIỀU KIỆN XÉT TUYỂN</b>\n";
 		}
 
 		$msg_text .= "👤 <b>Họ và tên:</b> " . esc_html( $name ) . "\n";
@@ -400,8 +633,32 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 			$msg_text .= "🤝 <b>Người giới thiệu (Ref):</b> <code>" . esc_html( $data['sales_partner'] ) . "</code>\n";
 		}
 		$msg_text .= "✉ <b>Email:</b> " . esc_html( $email ) . "\n";
-		$msg_text .= "🏫 <b>Trường đối tác:</b> " . esc_html( $school_title ) . "\n";
-		$msg_text .= "🎓 <b>Chuyên ngành:</b> " . esc_html( $major_title ) . "\n";
+
+		// Detailed Profile Breakdown
+		if ( $education_level && function_exists( 'ltdh_elig_get_education_label' ) ) {
+			$msg_text .= "🎓 <b>Trình độ hiện có:</b> " . esc_html( ltdh_elig_get_education_label( $education_level ) ) . "\n";
+		}
+		if ( $thpt_status && function_exists( 'ltdh_elig_get_thpt_status_label' ) ) {
+			$msg_text .= "📜 <b>Tình trạng THPT:</b> " . esc_html( ltdh_elig_get_thpt_status_label( $thpt_status ) ) . "\n";
+		}
+		if ( $months_grad !== '' && is_numeric( $months_grad ) ) {
+			$msg_text .= "⏱️ <b>Thời gian tốt nghiệp:</b> " . intval( $months_grad ) . " tháng\n";
+		}
+		if ( $grad_grade && function_exists( 'ltdh_elig_get_graduation_grade_label' ) ) {
+			$msg_text .= "📊 <b>Học lực tốt nghiệp:</b> " . esc_html( ltdh_elig_get_graduation_grade_label( $grad_grade ) ) . "\n";
+		}
+		if ( $major_relation && function_exists( 'ltdh_elig_get_major_relation_label' ) ) {
+			$msg_text .= "🔄 <b>Liên quan ngành:</b> " . esc_html( ltdh_elig_get_major_relation_label( $major_relation ) ) . "\n";
+		}
+		if ( $time_pref && function_exists( 'ltdh_elig_get_time_preference_label' ) ) {
+			$msg_text .= "⏰ <b>Quỹ thời gian:</b> " . esc_html( ltdh_elig_get_time_preference_label( $time_pref ) ) . "\n";
+		}
+		if ( $suit_types ) {
+			$msg_text .= "💡 <b>Hệ đề xuất (TT 56):</b> <code>" . esc_html( $suit_types ) . "</code>\n";
+		}
+
+		$msg_text .= "🏫 <b>Trường quan tâm:</b> " . esc_html( $school_title ) . "\n";
+		$msg_text .= "🎯 <b>Chuyên ngành:</b> " . esc_html( $major_title ) . "\n";
 		if ( $training_type !== 'N/A' ) {
 			$msg_text .= "🏷 <b>Hệ học:</b> " . esc_html( $training_type ) . "\n";
 		}
@@ -409,13 +666,18 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 			$msg_text .= "📍 <b>Cơ sở:</b> " . esc_html( $campus ) . "\n";
 		}
 		if ( ! empty( $message ) ) {
-			$msg_text .= "💬 <b>Nội dung yêu cầu:</b> " . esc_html( $message ) . "\n";
+			$msg_text .= "💬 <b>Ghi chú hồ sơ:</b> " . esc_html( $message ) . "\n";
 		}
 		if ( ! empty( $degree_link ) ) {
 			$msg_text .= "📎 <b>Ảnh bằng cấp:</b> " . esc_url( $degree_link ) . "\n";
 		}
 		if ( ! empty( $transcript_link ) ) {
 			$msg_text .= "📊 <b>Ảnh/link bảng điểm:</b> " . esc_url( $transcript_link ) . "\n";
+		}
+		if ( 'warning_urgent' === $decision_status ) {
+			$msg_text .= "👉 <i>Telesale Action: Liên hệ hướng dẫn thủ tục thẩm định điểm sàn và môn bổ sung!</i>\n";
+		} elseif ( in_array( $decision_status, [ 'not_eligible', 'not_eligible_2027' ], true ) ) {
+			$msg_text .= "👉 <i>Telesale Action: Hướng dẫn lộ trình hoàn thiện văn hóa THPT hoặc ngành học phù hợp!</i>\n";
 		}
 	} else {
 		// Notification for Free & Program Consultation forms
@@ -529,6 +791,9 @@ function ltdh_trigger_telegram_notification( array $data ): void {
 		}
 		// Unlink file from local disk immediately after transmission
 		@unlink( $data['transcript_file_path'] );
+	}
+	} finally {
+		ltdh_cleanup_ephemeral_files( $ephemeral_files );
 	}
 }
 
@@ -655,10 +920,10 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 		return;
 	}
 
-	// Verify Google reCAPTCHA if provided in CF7 submission
+	// Verify Google reCAPTCHA (Fail-Closed when enabled)
 	if ( function_exists( 'ltdh_is_recaptcha_enabled' ) && ltdh_is_recaptcha_enabled() ) {
 		$recaptcha_token = isset( $posted_data['g-recaptcha-response'] ) ? sanitize_text_field( $posted_data['g-recaptcha-response'] ) : '';
-		if ( ! empty( $recaptcha_token ) && ! ltdh_verify_recaptcha( $recaptcha_token, 'cf7' ) ) {
+		if ( ! ltdh_verify_recaptcha( $recaptcha_token, 'cf7' ) ) {
 			$abort = true;
 			return;
 		}
@@ -738,12 +1003,18 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 
 	$referral_source = isset( $posted_data['referral_source'] ) ? esc_url_raw( $posted_data['referral_source'] ) : '';
 
-	// Resolve check_id and enrich referral source if coming from eligibility check
-	$check_id = isset( $posted_data['elig_check_id'] ) ? absint( is_array( $posted_data['elig_check_id'] ) ? reset( $posted_data['elig_check_id'] ) : $posted_data['elig_check_id'] ) : 0;
-	if ( $check_id > 0 ) {
+	// Resolve check_id or share_token and enrich referral source if coming from eligibility check
+	$raw_check_ref = isset( $posted_data['elig_check_id'] ) ? sanitize_text_field( is_array( $posted_data['elig_check_id'] ) ? reset( $posted_data['elig_check_id'] ) : $posted_data['elig_check_id'] ) : '';
+	$check_row     = null;
+	if ( '' !== $raw_check_ref ) {
 		global $wpdb;
-		$check_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ltdh_eligibility_checks WHERE id = %d", $check_id ) );
-		if ( $check_row ) {
+		if ( ctype_digit( $raw_check_ref ) && (int) $raw_check_ref > 0 ) {
+			$check_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ltdh_eligibility_checks WHERE id = %d", (int) $raw_check_ref ) );
+		} elseif ( preg_match( '/^[a-zA-Z0-9]{24,64}$/', $raw_check_ref ) ) {
+			$check_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ltdh_eligibility_checks WHERE session_token = %s", $raw_check_ref ) );
+		}
+	}
+	if ( $check_row ) {
 			if ( empty( $campus ) && ! empty( $check_row->input_campus ) ) {
 				$campus = $check_row->input_campus;
 			}
@@ -757,7 +1028,6 @@ function ltdh_capture_cf7_lead( $contact_form, &$abort, $submission ) {
 				'&desired_major=' . urlencode( (string) $check_row->input_desired_major ) . 
 				'&birth_year=' . urlencode( (string) ( $graduation ?: $check_row->input_graduation ) ) . 
 				'&verification_required=' . $is_verification_required;
-		}
 	}
 
 	if ( empty( $referral_source ) ) {
@@ -816,11 +1086,18 @@ function ltdh_capture_cf7_comment( $contact_form, &$abort, $submission ) {
 		return;
 	}
 
-	// 1. Kiểm tra Honeypot
+	// 1. Kiểm tra Honeypot, Rate Limit & reCAPTCHA
 	$hp_val = $posted_data['hp_website'] ?? $posted_data['website_url_hp'] ?? '';
-	if ( ! empty( $hp_val ) ) {
+	if ( ! empty( $hp_val ) || ltdh_is_ip_rate_limited() ) {
 		$abort = true;
 		return;
+	}
+	if ( function_exists( 'ltdh_is_recaptcha_enabled' ) && ltdh_is_recaptcha_enabled() ) {
+		$recaptcha_token = isset( $posted_data['g-recaptcha-response'] ) ? sanitize_text_field( $posted_data['g-recaptcha-response'] ) : '';
+		if ( ! ltdh_verify_recaptcha( $recaptcha_token, 'cf7' ) ) {
+			$abort = true;
+			return;
+		}
 	}
 
 	// 2. Trích xuất thông tin người gửi
@@ -892,6 +1169,7 @@ function ltdh_capture_cf7_comment( $contact_form, &$abort, $submission ) {
 	$inserted_comment_id = wp_insert_comment( $commentdata );
 
 	if ( ! is_wp_error( $inserted_comment_id ) && $inserted_comment_id > 0 ) {
+		ltdh_increment_ip_rate_limit();
 		// Bỏ qua gửi email của CF7 vì đây là bình luận bài viết
 		add_filter( 'wpcf7_skip_mail', '__return_true' );
 	} else {
@@ -1043,6 +1321,26 @@ function ltdh_handle_lead_magnet_download() {
 		wp_send_json_error( [ 'message' => 'Vui lòng cung cấp đầy đủ họ tên và số điện thoại.' ] );
 	}
 
+	// Validate download URL against trusted hosts (prevents arbitrary Open Redirect / Phishing URL injection)
+	$safe_doc_url = '';
+	if ( ! empty( $doc_url ) ) {
+		$scheme   = strtolower( (string) parse_url( $doc_url, PHP_URL_SCHEME ) );
+		$doc_host = strtolower( (string) parse_url( $doc_url, PHP_URL_HOST ) );
+		$own_host = strtolower( (string) parse_url( home_url(), PHP_URL_HOST ) );
+		$trusted  = array_filter( [ $own_host, 'drive.google.com', 'docs.google.com', 'ik.imagekit.io' ] );
+		if ( in_array( $scheme, [ 'http', 'https' ], true ) && '' !== $doc_host ) {
+			if ( in_array( $doc_host, $trusted, true ) || str_ends_with( $doc_host, '.r2.dev' ) ) {
+				$safe_doc_url = $doc_url;
+			}
+		}
+	}
+	if ( '' === $safe_doc_url && $program_id > 0 ) {
+		$meta_form_url = esc_url_raw( (string) get_post_meta( $program_id, 'admission_form_file', true ) );
+		if ( ! empty( $meta_form_url ) ) {
+			$safe_doc_url = $meta_form_url;
+		}
+	}
+
 	$referral_source = 'lead_magnet: ' . $doc_title;
 	if ( ! empty( $_SERVER['HTTP_REFERER'] ) ) {
 		$referral_source .= ' (' . esc_url_raw( $_SERVER['HTTP_REFERER'] ) . ')';
@@ -1061,8 +1359,9 @@ function ltdh_handle_lead_magnet_download() {
 
 	if ( $lead_id ) {
 		wp_send_json_success( [
-			'message'  => 'Cảm ơn bạn! Đang mở tài liệu tuyển sinh.',
-			'file_url' => $doc_url,
+			'message'      => 'Cảm ơn bạn! Đang mở tài liệu tuyển sinh.',
+			'file_url'     => $safe_doc_url,
+			'download_url' => $safe_doc_url,
 		] );
 	}
 

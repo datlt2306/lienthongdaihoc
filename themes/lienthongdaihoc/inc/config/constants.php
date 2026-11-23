@@ -107,7 +107,7 @@ if ( ! defined( 'LTDH_ERPNEXT_ENDPOINT' ) ) {
 	define( 'LTDH_ERPNEXT_ENDPOINT', 'http://localhost:8080/api/resource/Lead' );
 }
 if ( ! defined( 'LTDH_ERPNEXT_TOKEN' ) ) {
-	define( 'LTDH_ERPNEXT_TOKEN', '45d010c5e85cfb8:adb49e4e04a729f' );
+	define( 'LTDH_ERPNEXT_TOKEN', '' );
 }
 if ( ! defined( 'LTDH_ERPNEXT_COMPANY' ) ) {
 	define( 'LTDH_ERPNEXT_COMPANY', 'Liên thông giao thông vận tải' );

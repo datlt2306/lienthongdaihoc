@@ -28,24 +28,12 @@ get_header();
 
 	<!-- Checker Container -->
 	<div id="eligibility-app" class="max-w-4xl mx-auto px-4 py-8 md:py-12" data-elig-root>
-
-		<!-- Wizard Form -->
-		<div id="elig-wizard" class="elig-wizard<?php echo $shared_check ? ' hidden' : ''; ?>">
-			<?php get_template_part( 'template-parts/eligibility/wizard' ); ?>
-		</div>
-
-		<!-- Results (shown immediately if shared link, else hidden initially) -->
-		<div id="elig-results" class="elig-results<?php echo $shared_check ? '' : ' hidden'; ?>">
-			<?php get_template_part( 'template-parts/eligibility/results' ); ?>
-		</div>
-
+		<?php
+		get_template_part( 'template-parts/widgets/condition-checker', null, [
+			'mode' => 'full',
+		] );
+		?>
 	</div>
-
-	<?php if ( $shared_check ) : ?>
-		<script>
-			window.ltdh_initial_results = <?php echo wp_json_encode( $shared_check ); ?>;
-		</script>
-	<?php endif; ?>
 
 
 </div><!-- #primary -->

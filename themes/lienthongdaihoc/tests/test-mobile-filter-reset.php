@@ -1,4 +1,11 @@
 <?php
+// Security: Block direct HTTP execution — CLI / WP-CLI only.
+if ( PHP_SAPI !== 'cli' && ! defined( 'WP_CLI' ) ) {
+	http_response_code( 403 );
+	header( 'Content-Type: text/plain; charset=utf-8' );
+	exit( 'Forbidden: CLI execution only.' );
+}
+
 /**
  * Test Suite: Mobile Filter Reset on Program and Major Archive Pages
  */

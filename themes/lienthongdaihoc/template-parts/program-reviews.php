@@ -568,6 +568,7 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 (function() {
 	var ajaxUrl = (typeof ltdh_ajax !== 'undefined' && ltdh_ajax.ajax_url) ? ltdh_ajax.ajax_url : '/wp-admin/admin-ajax.php';
 	var programId = <?php echo (int) $program_id; ?>;
+	var reviewNonce = '<?php echo esc_js( wp_create_nonce( 'ltdh_review_nonce' ) ); ?>';
 	var currentFilter = { star: 'all', has_images: 0, status: '', tag: '', page: 1 };
 	var compressedFiles = []; // Array of { blob, name }
 
@@ -1042,7 +1043,7 @@ $nonce = wp_create_nonce( 'ltdh_review_nonce' );
 							}
 						} catch(e) {}
 					};
-					xhr.send('action=ltdh_like_program_review&review_id=' + encodeURIComponent(revId));
+					xhr.send('action=ltdh_like_program_review&review_id=' + encodeURIComponent(revId) + '&nonce=' + encodeURIComponent(reviewNonce));
 				});
 			});
 		}

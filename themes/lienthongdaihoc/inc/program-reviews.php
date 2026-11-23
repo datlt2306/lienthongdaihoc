@@ -423,13 +423,11 @@ function ltdh_handle_submit_program_review() {
 		] );
 	}
 
-	// 3. reCAPTCHA check if enabled in theme
+	// 3. reCAPTCHA check if enabled in theme (Fail-Closed: empty or invalid token is rejected)
 	if ( function_exists( 'ltdh_is_recaptcha_enabled' ) && ltdh_is_recaptcha_enabled() ) {
-		$recaptcha_token = sanitize_text_field( $_POST['g-recaptcha-response'] ?? $_POST['recaptcha_token'] ?? '' );
-		if ( ! empty( $recaptcha_token ) && function_exists( 'ltdh_verify_recaptcha' ) ) {
-			if ( ! ltdh_verify_recaptcha( $recaptcha_token, 'program_review' ) ) {
-				wp_send_json_error( [ 'message' => 'Xác thực an toàn không hợp lệ. Vui lòng thử lại.' ] );
-			}
+		$recaptcha_token = sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ?? $_POST['recaptcha_token'] ?? '' ) );
+		if ( ! function_exists( 'ltdh_verify_recaptcha' ) || ! ltdh_verify_recaptcha( $recaptcha_token, 'program_review' ) ) {
+			wp_send_json_error( [ 'message' => 'Xác thực an toàn không hợp lệ. Vui lòng thử lại.' ] );
 		}
 	}
 
@@ -574,14 +572,20 @@ function ltdh_handle_submit_program_review() {
 	set_transient( $rate_key, 1, HOUR_IN_SECONDS );
 
 	// Set 1-year cookie to remember user already submitted for this program
-	setcookie( $cookie_key, '1', time() + ( 86400 * 365 ), COOKIEPATH ?: '/', COOKIE_DOMAIN );
+	setcookie( $cookie_key, '1', [
+		'expires'  => time() + ( 86400 * 365 ),
+		'path'     => COOKIEPATH ?: '/',
+		'domain'   => COOKIE_DOMAIN,
+		'secure'   => is_ssl(),
+		'httponly' => true,
+		'samesite' => 'Lax',
+	] );
 
 	// Trigger rating stats and schema recalculation
 	ltdh_recalculate_program_rating_stats( $program_id );
 
 	wp_send_json_success( [
-		'message'     => 'Cảm ơn bạn! Đánh giá đã được gửi thành công. Ban Tuyển Sinh sẽ kiểm duyệt và hiển thị lên chương trình sớm nhất.',
-		'is_verified' => $is_verified,
+		'message' => 'Cảm ơn bạn! Đánh giá đã được gửi thành công. Ban Tuyển Sinh sẽ kiểm duyệt và hiển thị lên chương trình sớm nhất.',
 	] );
 }
 
@@ -691,8 +695,13 @@ add_action( 'wp_ajax_ltdh_like_program_review', 'ltdh_handle_like_program_review
 add_action( 'wp_ajax_nopriv_ltdh_like_program_review', 'ltdh_handle_like_program_review' );
 
 function ltdh_handle_like_program_review() {
+	$nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
+	if ( ! wp_verify_nonce( $nonce, 'ltdh_review_nonce' ) ) {
+		wp_send_json_error( [ 'message' => 'Phiên làm việc không hợp lệ. Vui lòng tải lại trang.' ], 403 );
+	}
+
 	$review_id = isset( $_POST['review_id'] ) ? (int) $_POST['review_id'] : 0;
-	if ( ! $review_id || get_post_type( $review_id ) !== 'program_review' ) {
+	if ( ! $review_id || get_post_type( $review_id ) !== 'program_review' || get_post_status( $review_id ) !== 'publish' ) {
 		wp_send_json_error( [ 'message' => 'Đánh giá không hợp lệ.' ] );
 	}
 
@@ -701,12 +710,33 @@ function ltdh_handle_like_program_review() {
 		wp_send_json_error( [ 'message' => 'Bạn đã thích đánh giá này rồi.' ] );
 	}
 
+	$client_ip     = function_exists( 'ltdh_get_client_ip' ) ? ltdh_get_client_ip() : sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' );
+	$ip_review_key = 'ltdh_like_rev_' . md5( $client_ip . '_' . $review_id );
+	if ( get_transient( $ip_review_key ) ) {
+		wp_send_json_error( [ 'message' => 'Bạn đã thích đánh giá này rồi.' ] );
+	}
+
+	$burst_key   = 'ltdh_like_burst_' . md5( $client_ip );
+	$burst_count = (int) get_transient( $burst_key );
+	if ( $burst_count >= 15 ) {
+		wp_send_json_error( [ 'message' => 'Thao tác quá nhanh. Vui lòng thử lại sau ít phút.' ], 429 );
+	}
+	set_transient( $burst_key, $burst_count + 1, 5 * MINUTE_IN_SECONDS );
+	set_transient( $ip_review_key, 1, DAY_IN_SECONDS );
+
 	$count = (int) get_post_meta( $review_id, '_review_helpful_count', true );
 	$count++;
 	update_post_meta( $review_id, '_review_helpful_count', $count );
 
-	// Set cookie for 30 days
-	setcookie( $cookie_name, '1', time() + ( 86400 * 30 ), COOKIEPATH ?: '/', COOKIE_DOMAIN );
+	// Set cookie for 30 days with secure flags
+	setcookie( $cookie_name, '1', [
+		'expires'  => time() + ( 86400 * 30 ),
+		'path'     => COOKIEPATH ?: '/',
+		'domain'   => COOKIE_DOMAIN,
+		'secure'   => is_ssl(),
+		'httponly' => true,
+		'samesite' => 'Lax',
+	] );
 
 	wp_send_json_success( [ 'count' => $count ] );
 }

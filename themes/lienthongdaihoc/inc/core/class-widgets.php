@@ -34,6 +34,7 @@ require_once dirname( __DIR__ ) . '/widgets/class-widget-consultation-form.php';
 require_once dirname( __DIR__ ) . '/widgets/class-widget-zalo-community.php';
 require_once dirname( __DIR__ ) . '/widgets/class-widget-school-info.php';
 require_once dirname( __DIR__ ) . '/widgets/class-widget-advisor-banner.php';
+require_once dirname( __DIR__ ) . '/widgets/class-widget-condition-checker.php';
 
 /**
  * Register Widget Areas (Sidebars) & Custom Widgets.
@@ -114,6 +115,7 @@ function ltdh_widgets_init() {
 	register_widget( 'LTDH_Widget_Zalo_Community' );
 	register_widget( 'LTDH_Widget_School_Info' );
 	register_widget( 'LTDH_Widget_Advisor_Banner' );
+	register_widget( 'LTDH_Widget_Condition_Checker' );
 }
 add_action( 'widgets_init', 'ltdh_widgets_init' );
 
@@ -127,6 +129,7 @@ function ltdh_filter_widget_display_classes( $params ) {
 
 	$widget_id = $params[0]['widget_id'] ?? '';
 	$seamless_widgets = [
+		'ltdh_condition_checker',
 		'ltdh_advisor_banner',
 		'media_image',
 		'ltdh_cta',

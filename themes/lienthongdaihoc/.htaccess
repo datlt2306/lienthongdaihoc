@@ -1,0 +1,10 @@
+# Deny direct HTTP access to internal/dev files in theme root
+<FilesMatch "^(\.|litespeed-cache-settings\.data|schools_import\.json|package(-lock)?\.json|composer\.(json|lock)|PROJECT\.md|README\.md)$">
+	<IfModule mod_authz_core.c>
+		Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order deny,allow
+		Deny from all
+	</IfModule>
+</FilesMatch>

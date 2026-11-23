@@ -1,4 +1,11 @@
 <?php
+// Security: Block direct HTTP execution — CLI / WP-CLI only.
+if ( PHP_SAPI !== 'cli' && ! defined( 'WP_CLI' ) ) {
+	http_response_code( 403 );
+	header( 'Content-Type: text/plain; charset=utf-8' );
+	exit( 'Forbidden: CLI execution only.' );
+}
+
 /**
  * Deep On-Page SEO Audit Script
  * Inspects all 10 on-page pillars: Metadata, Hierarchy, Content Quality,

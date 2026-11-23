@@ -366,15 +366,30 @@ function ltdh_sync_erpnext_adapter( $payload, $endpoint = '', $token = '' ) {
 		$body_data['notes'] = $notes;
 	}
 
-	$response = wp_remote_post( $endpoint, [
-		'headers'            => [
+	$endpoint_host = strtolower( (string) parse_url( $endpoint, PHP_URL_HOST ) );
+	$site_host     = strtolower( (string) parse_url( home_url(), PHP_URL_HOST ) );
+	$is_local_env  = ( function_exists( 'wp_get_environment_type' ) && 'local' === wp_get_environment_type() )
+		|| in_array( $site_host, [ 'localhost', '127.0.0.1' ], true )
+		|| str_ends_with( $site_host, '.local' );
+
+	$allow_local_loopback = $is_local_env && in_array( $endpoint_host, [ 'localhost', '127.0.0.1' ], true );
+
+	$req_args = [
+		'headers'   => [
 			'Content-Type'  => 'application/json',
 			'Authorization' => 'token ' . $token,
 		],
-		'body'               => wp_json_encode( $body_data ),
-		'timeout'            => 15,
-		'reject_unsafe_urls' => false,
-	] );
+		'body'      => wp_json_encode( $body_data ),
+		'timeout'   => 15,
+		'sslverify' => true,
+	];
+
+	if ( $allow_local_loopback ) {
+		$req_args['reject_unsafe_urls'] = false;
+		$response                       = wp_remote_post( $endpoint, $req_args );
+	} else {
+		$response = wp_safe_remote_post( $endpoint, $req_args );
+	}
 
 	if ( is_wp_error( $response ) ) {
 		return $response;

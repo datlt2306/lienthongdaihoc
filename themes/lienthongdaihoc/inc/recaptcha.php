@@ -181,6 +181,18 @@ function ltdh_verify_recaptcha( string $token = '', string $expected_action = ''
 		return false;
 	}
 
+	// Verify hostname matches current site to block cross-domain token replay
+	if ( ! empty( $body['hostname'] ) ) {
+		$expected_host = strtolower( (string) parse_url( home_url(), PHP_URL_HOST ) );
+		$actual_host   = strtolower( (string) $body['hostname'] );
+		$local_hosts   = [ 'localhost', '127.0.0.1' ];
+		$is_local_site = in_array( $expected_host, $local_hosts, true ) || str_ends_with( $expected_host, '.local' );
+		if ( '' !== $expected_host && $actual_host !== $expected_host && ! ( $is_local_site && in_array( $actual_host, array_merge( $local_hosts, [ $expected_host ] ), true ) ) ) {
+			error_log( sprintf( 'reCAPTCHA hostname mismatch: expected %s, got %s', $expected_host, $actual_host ) );
+			return false;
+		}
+	}
+
 	$version = ltdh_get_recaptcha_version();
 	if ( 'v3' === $version ) {
 		$score     = isset( $body['score'] ) ? (float) $body['score'] : 0.0;
@@ -191,10 +203,11 @@ function ltdh_verify_recaptcha( string $token = '', string $expected_action = ''
 			return false;
 		}
 
-		if ( ! empty( $expected_action ) && ! empty( $body['action'] ) ) {
-			if ( $body['action'] !== $expected_action ) {
-				error_log( sprintf( 'reCAPTCHA v3 action mismatch: expected %s, got %s', $expected_action, $body['action'] ) );
-				// We log action mismatch but allow if score is solid unless strict enforcement
+		if ( ! empty( $expected_action ) ) {
+			$actual_action = isset( $body['action'] ) ? (string) $body['action'] : '';
+			if ( $actual_action !== $expected_action ) {
+				error_log( sprintf( 'reCAPTCHA v3 action mismatch: expected %s, got %s', $expected_action, $actual_action ) );
+				return false;
 			}
 		}
 	}

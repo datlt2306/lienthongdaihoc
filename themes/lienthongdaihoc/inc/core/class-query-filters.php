@@ -326,7 +326,7 @@ add_action( 'wp_ajax_nopriv_ltdh_filter_programs', 'ltdh_ajax_filter_programs' )
 function ltdh_ajax_filter_programs() {
 	$paged = isset( $_POST['paged'] ) ? max( 1, intval( $_POST['paged'] ) ) : 1;
 	$limit = isset( $_POST['limit'] ) ? intval( $_POST['limit'] ) : 12;
-	if ( ! in_array( $limit, [ 10, 12, 20, 24, 30, 36, 48, 50, 100, -1 ], true ) ) {
+	if ( ! in_array( $limit, [ 10, 12, 20, 24, 30, 36, 48, 50 ], true ) ) {
 		$limit = 12;
 	}
 

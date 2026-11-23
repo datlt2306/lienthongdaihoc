@@ -235,3 +235,22 @@ function ltdh_detect_current_program_id() {
 
 	return 0;
 }
+
+/**
+ * Helper: Check whether a given sidebar area contains the Condition Checker widget.
+ *
+ * @param string $sidebar_id
+ * @return bool
+ */
+function ltdh_sidebar_has_condition_checker( $sidebar_id ) {
+	$sidebars_widgets = wp_get_sidebars_widgets();
+	if ( empty( $sidebars_widgets[ $sidebar_id ] ) || ! is_array( $sidebars_widgets[ $sidebar_id ] ) ) {
+		return false;
+	}
+	foreach ( $sidebars_widgets[ $sidebar_id ] as $widget_id ) {
+		if ( false !== strpos( $widget_id, 'ltdh_condition_checker' ) ) {
+			return true;
+		}
+	}
+	return false;
+}

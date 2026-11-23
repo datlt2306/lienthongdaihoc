@@ -211,20 +211,33 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 		<span class="font-display font-bold text-xs tracking-tight">Za</span>
 	</a>
 
-	<!-- Register Consultation Button (Center Pill) -->
-	<?php
-	$register_link = '#register';
-	if ( is_front_page() || is_home() ) {
-		$register_link = '#register-section';
-	} elseif ( ! is_singular( [ 'major', 'program', 'school' ] ) ) {
-		$register_link = home_url( '/lien-he/' );
-	}
-	?>
-	<a href="<?php echo esc_url( $register_link ); ?>" 
-	   class="js-open-consultation-modal flex-1 flex items-center justify-center gap-2 bg-[#0071E3] hover:bg-[#0077ED] active:scale-[0.97] text-white font-medium text-xs sm:text-sm h-10 px-4 rounded-full shadow-none transition-all min-w-0"
-	   aria-haspopup="dialog">
-		<span class="truncate font-display font-medium">Đăng ký tư vấn ngay</span>
-	</a>
+	<!-- Center Action Button (Dynamic: Condition Checker on Program/School/Major pages, Consultation on others) -->
+	<?php if ( is_singular( [ 'program', 'school', 'major' ] ) ) : ?>
+		<button type="button" 
+		        onclick="if(window.ltdhOpenConditionCheckerModal){window.ltdhOpenConditionCheckerModal(event);}else{var m=document.getElementById('ltdh-condition-checker-modal');if(m){m.classList.remove('hidden');m.classList.add('flex');}}"
+		        class="js-open-condition-checker-modal flex-1 flex items-center justify-center gap-1.5 bg-[#0071E3] hover:bg-[#0077ED] active:scale-[0.97] text-white font-medium text-xs sm:text-sm h-10 px-3.5 rounded-full shadow-none transition-all min-w-0 cursor-pointer" 
+		        aria-haspopup="dialog"
+		        aria-label="Kiểm tra điều kiện tuyển sinh">
+			<svg class="w-4 h-4 shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+			</svg>
+			<span class="truncate font-display font-semibold">Kiểm tra điều kiện ngay</span>
+		</button>
+	<?php else : ?>
+		<?php
+		$register_link = '#register';
+		if ( is_front_page() || is_home() ) {
+			$register_link = '#register-section';
+		} elseif ( ! is_singular( [ 'major', 'program', 'school' ] ) ) {
+			$register_link = home_url( '/lien-he/' );
+		}
+		?>
+		<a href="<?php echo esc_url( $register_link ); ?>" 
+		   class="js-open-consultation-modal flex-1 flex items-center justify-center gap-2 bg-[#0071E3] hover:bg-[#0077ED] active:scale-[0.97] text-white font-medium text-xs sm:text-sm h-10 px-4 rounded-full shadow-none transition-all min-w-0"
+		   aria-haspopup="dialog">
+			<span class="truncate font-display font-medium">Đăng ký tư vấn ngay</span>
+		</a>
+	<?php endif; ?>
 
 	<!-- Hotline Call Button (Right Circle) -->
 	<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" 
@@ -305,6 +318,7 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 <?php
 get_template_part( 'template-parts/modal-admissions' );
 get_template_part( 'template-parts/modal-compare' );
+get_template_part( 'template-parts/modal-condition-checker' );
 ?>
 <?php wp_footer(); ?>
 </body>

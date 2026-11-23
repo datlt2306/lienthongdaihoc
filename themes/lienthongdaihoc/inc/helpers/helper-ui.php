@@ -251,16 +251,7 @@ class LTDH_UI_Helpers {
 			return '';
 		}
 
-		$is_admin = false;
-		if ( ! empty( $comment->user_id ) ) {
-			$user = get_userdata( $comment->user_id );
-			if ( $user && ( in_array( 'administrator', (array) $user->roles, true ) || in_array( 'editor', (array) $user->roles, true ) ) ) {
-				$is_admin = true;
-			}
-		}
-		if ( ! $is_admin && ( stripos( $comment->comment_author, 'Ban Quản Trị' ) !== false || stripos( $comment->comment_author, 'Admin' ) !== false ) ) {
-			$is_admin = true;
-		}
+		$is_admin = ! empty( $comment->user_id ) && user_can( (int) $comment->user_id, 'moderate_comments' );
 
 		if ( $is_admin ) {
 			return '<div class="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#0071E3] to-[#004bb0] text-white flex items-center justify-center font-black text-xs tracking-wider shadow-xs shrink-0 select-none">
@@ -304,7 +295,7 @@ class LTDH_UI_Helpers {
 			return '<div class="w-9 h-9 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xs shrink-0 select-none">?</div>';
 		}
 
-		$is_admin = in_array( 'administrator', (array) $user->roles, true ) || in_array( 'editor', (array) $user->roles, true ) || stripos( $user->display_name, 'Ban Quản Trị' ) !== false;
+		$is_admin = user_can( $user, 'moderate_comments' );
 		if ( $is_admin ) {
 			return '<div class="relative w-9 h-9 rounded-full bg-gradient-to-br from-[#0071E3] to-[#004bb0] text-white flex items-center justify-center font-black text-xs tracking-wider shadow-xs shrink-0 select-none">
 				<span>LTDH</span>
@@ -368,7 +359,7 @@ class LTDH_UI_Helpers {
 		$logged_in_html = '';
 		if ( $user->exists() ) {
 			$user_avatar = self::get_user_avatar_html( $user, 36 );
-			$is_admin    = in_array( 'administrator', (array) $user->roles, true ) || in_array( 'editor', (array) $user->roles, true ) || stripos( $user->display_name, 'Ban Quản Trị' ) !== false;
+			$is_admin    = user_can( $user, 'moderate_comments' );
 			$role_badge  = $is_admin ? '<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#0071E3] text-white">Quản trị viên</span>' : '';
 
 			$logged_in_html = '<div class="logged-in-as flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 mb-3">' .

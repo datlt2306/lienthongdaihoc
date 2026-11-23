@@ -25,10 +25,9 @@ build/
 # ==========================================
 scratch/
 audit_report.json
-.agent
-.agent/*
-.agents/*
-.agents/teamwork/
+.agent/
+.agents/
+litespeed-cache-settings.data
 *.md
 !README.md
 *.tmp

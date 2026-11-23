@@ -146,11 +146,12 @@ window.ltdhSubmitLeadMagnet = async function(e) {
 			sessionStorage.setItem('ltdh_lead_magnet_unlocked', '1');
 			window.ltdhCloseLeadMagnetModal();
 
-			// Automatically trigger download or open file in new window
-			if (targetUrl) {
-				const win = window.open(targetUrl, '_blank');
-				if (!win || win.closed || typeof win.closed === 'undefined') {
-					window.location.href = targetUrl;
+			// Automatically trigger download or open validated file URL in new window
+			const resolvedUrl = (data.data && data.data.download_url) ? data.data.download_url : targetUrl;
+			if (resolvedUrl && /^https?:\/\//i.test(resolvedUrl)) {
+				const win = window.open(resolvedUrl, '_blank', 'noopener,noreferrer');
+				if (!win) {
+					window.location.assign(resolvedUrl);
 				}
 			}
 		} else {
