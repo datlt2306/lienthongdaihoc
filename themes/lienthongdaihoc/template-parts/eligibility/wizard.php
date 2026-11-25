@@ -108,18 +108,16 @@ $months = range( 1, 12 );
 					<div>
 						<label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tháng tốt nghiệp</label>
 						<select name="grad_month" id="field-grad-month" class="elig-select">
-							<option value="6">Tháng 6 (Phổ biến)</option>
 							<?php foreach ( $months as $m ) : ?>
-								<option value="<?php echo esc_attr( $m ); ?>"><?php echo esc_html( 'Tháng ' . $m ); ?></option>
+								<option value="<?php echo esc_attr( $m ); ?>" <?php selected( $m, 6 ); ?>><?php echo esc_html( 'Tháng ' . $m ); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</div>
 					<div>
 						<label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Năm tốt nghiệp *</label>
 						<select name="grad_year" id="field-grad-year" class="elig-select" required>
-							<option value="2024" selected>2024</option>
 							<?php foreach ( $years as $y ) : ?>
-								<option value="<?php echo esc_attr( $y ); ?>"><?php echo esc_html( $y ); ?></option>
+								<option value="<?php echo esc_attr( $y ); ?>" <?php selected( $y, 2024 ); ?>><?php echo esc_html( $y ); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</div>

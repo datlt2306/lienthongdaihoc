@@ -193,7 +193,6 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 				<div class="grid grid-cols-2 gap-2">
 					<div>
 						<select name="compact_grad_month" class="w-full text-xs rounded-lg border-slate-300 py-1.5 px-2 bg-white text-slate-800">
-							<option value="">Tháng tốt nghiệp</option>
 							<?php for ( $m = 1; $m <= 12; $m++ ) : ?>
 								<option value="<?php echo $m; ?>" <?php selected( $m, 6 ); ?>>Tháng <?php echo $m; ?></option>
 							<?php endfor; ?>
