@@ -1337,6 +1337,38 @@ class LTDH_Program_Helpers {
 	}
 
 	/**
+	 * Lấy trạng thái hiển thị chỉ tiêu tuyển sinh của chương trình đào tạo.
+	 * Chuẩn hóa: Chỉ cần hiển thị 'Đang tuyển sinh' hoặc 'Ngừng tuyển sinh' (không cần con số cụ thể).
+	 *
+	 * @param int $program_id
+	 * @return string 'Đang tuyển sinh' | 'Ngừng tuyển sinh'
+	 */
+	public static function get_quota_display( int $program_id ): string {
+		$quota = function_exists( 'get_field' ) ? get_field( 'quota', $program_id ) : get_post_meta( $program_id, 'quota', true );
+		if ( empty( $quota ) ) {
+			$quota = get_post_meta( $program_id, 'quota', true );
+		}
+
+		$status = self::get_admission_status( $program_id );
+
+		if ( 'ngung-tuyen' === $quota || 'ngung-tuyen-sinh' === $quota || 'tam-ngung' === $status ) {
+			return 'Ngừng tuyển sinh';
+		}
+
+		return 'Đang tuyển sinh';
+	}
+
+	/**
+	 * Kiểm tra xem chương trình có đang mở chỉ tiêu tuyển sinh hay không.
+	 *
+	 * @param int $program_id
+	 * @return bool
+	 */
+	public static function is_quota_open( int $program_id ): bool {
+		return 'Ngừng tuyển sinh' !== self::get_quota_display( $program_id );
+	}
+
+	/**
 	 * Get dynamic admission deadline display based on batches or enrollment_period.
 	 *
 	 * @param int $program_id

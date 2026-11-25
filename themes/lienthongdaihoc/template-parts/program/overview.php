@@ -115,7 +115,25 @@ $prog_fee_name     = $tuition ?: 'Theo thông báo tuyển sinh';
 		<!-- Hàng 2, Cột 2: Chỉ tiêu -->
 		<div class="bg-slate-50/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-center">
 			<span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Chỉ tiêu</span>
-			<span class="font-bold text-slate-800 text-sm sm:text-base leading-snug"><?php echo esc_html( $quota ? ( $quota . ' chỉ tiêu' ) : 'Theo đề án' ); ?></span>
+			<?php 
+			$quota_display = function_exists( 'ltdh_get_program_quota_display' ) 
+				? ltdh_get_program_quota_display( $program_id ) 
+				: ( ( 'tam-ngung' === ( $learning_details['admission_status'] ?? '' ) || 'ngung-tuyen' === $quota ) ? 'Ngừng tuyển sinh' : 'Đang tuyển sinh' );
+			$is_quota_closed = ( 'Ngừng tuyển sinh' === $quota_display );
+			if ( $is_quota_closed ) : ?>
+				<span class="font-bold text-red-600 text-sm sm:text-base leading-snug inline-flex items-center gap-1.5">
+					<span class="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+					<span>Ngừng tuyển sinh</span>
+				</span>
+			<?php else : ?>
+				<span class="font-bold text-emerald-700 text-sm sm:text-base leading-snug inline-flex items-center gap-1.5">
+					<span class="relative flex h-2 w-2 shrink-0">
+						<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+						<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+					</span>
+					<span>Đang tuyển sinh</span>
+				</span>
+			<?php endif; ?>
 		</div>
 
 		<!-- Hàng 2, Cột 3: Hạn nộp hồ sơ -->
@@ -142,6 +160,7 @@ $prog_fee_name     = $tuition ?: 'Theo thông báo tuyển sinh';
 					<tr><th>Tạm thu học phí kỳ 1</th><td><?php echo esc_html( $init_info['display'] ?? $initial_tuition ); ?></td></tr>
 				<?php endif; ?>
 				<tr><th>Danh hiệu văn bằng</th><td><?php echo esc_html( $degree_val ); ?></td></tr>
+				<tr><th>Chỉ tiêu tuyển sinh</th><td><?php echo esc_html( $quota_display ); ?></td></tr>
 				<tr><th>Hạn nộp hồ sơ</th><td><?php echo esc_html( $enrollment ?: 'Đang nhận hồ sơ' ); ?></td></tr>
 			</tbody>
 		</table>

@@ -126,7 +126,7 @@ $grid_cols  = ( $mode_count === 2 ) ? 'sm:grid-cols-2' : 'lg:grid-cols-3';
 								<?php if ( $is_closed ) : ?>
 									<span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500">
 										<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-										<span>Hết chỉ tiêu</span>
+										<span>Ngừng tuyển sinh</span>
 									</span>
 								<?php elseif ( $is_upcoming ) : ?>
 									<span class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700">
@@ -176,7 +176,7 @@ $grid_cols  = ( $mode_count === 2 ) ? 'sm:grid-cols-2' : 'lg:grid-cols-3';
 							<?php if ( $is_closed ) : ?>
 								<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-500 border border-slate-200/80 shrink-0">
 									<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-									<span>Hết chỉ tiêu</span>
+									<span>Ngừng tuyển sinh</span>
 								</span>
 							<?php elseif ( $is_upcoming ) : ?>
 								<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200/60 shrink-0">

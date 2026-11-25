@@ -866,8 +866,25 @@
         "key": "field_program_quota",
         "label": "Chỉ tiêu tuyển sinh",
         "name": "quota",
-        "type": "number",
-        "placeholder": "Ví dụ: 50"
+        "type": "radio",
+        "instructions": "Chỉ tiêu tuyển sinh cho ngành và hệ này (chỉ cần chọn Đang tuyển sinh hoặc Ngừng tuyển sinh, không cần nhập con số cụ thể).",
+        "required": 0,
+        "conditional_logic": 0,
+        "wrapper": {
+          "width": "",
+          "class": "",
+          "id": ""
+        },
+        "choices": {
+          "dang-tuyen": "Đang tuyển sinh",
+          "ngung-tuyen": "Ngừng tuyển sinh"
+        },
+        "default_value": "dang-tuyen",
+        "allow_null": 0,
+        "other_choice": 0,
+        "save_other_choice": 0,
+        "layout": "horizontal",
+        "return_format": "value"
       },
       {
         "key": "field_program_period",

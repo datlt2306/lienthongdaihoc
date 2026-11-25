@@ -253,6 +253,34 @@ add_action( 'init', function() {
 }, 99 );
 
 /**
+ * One-time migration for program quota field after deploy.
+ * Converts legacy numeric quota to 'dang-tuyen' or 'ngung-tuyen'.
+ */
+add_action( 'init', function() {
+	if ( ! get_option( 'ltdh_migrated_program_quota_v1' ) ) {
+		$programs = get_posts( [
+			'post_type'      => defined( 'LTDH_CPT_PROGRAM' ) ? LTDH_CPT_PROGRAM : 'program',
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+		] );
+		if ( ! empty( $programs ) ) {
+			foreach ( $programs as $pid ) {
+				$cur_quota = get_post_meta( $pid, 'quota', true );
+				$status    = get_post_meta( $pid, 'admission_status', true );
+				if ( 'tam-ngung' === $status ) {
+					update_post_meta( $pid, 'quota', 'ngung-tuyen' );
+				} elseif ( empty( $cur_quota ) || is_numeric( $cur_quota ) || ! in_array( $cur_quota, [ 'dang-tuyen', 'ngung-tuyen' ], true ) ) {
+					update_post_meta( $pid, 'quota', 'dang-tuyen' );
+				}
+			}
+		}
+		update_option( 'ltdh_migrated_program_quota_v1', time() );
+	}
+}, 100 );
+
+/**
  * Let WordPress Customizer handle logo and favicon natively.
  * ACF fields (global_logo, global_favicon) are kept only as fallback
  * when Customizer values are not set.

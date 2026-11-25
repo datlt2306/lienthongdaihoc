@@ -211,6 +211,14 @@ class LTDH_Helpers {
 		return LTDH_Program_Helpers::get_admission_status( $program_id );
 	}
 
+	public static function get_program_quota_display( int $program_id ): string {
+		return LTDH_Program_Helpers::get_quota_display( $program_id );
+	}
+
+	public static function is_program_quota_open( int $program_id ): bool {
+		return LTDH_Program_Helpers::is_quota_open( $program_id );
+	}
+
 	public static function get_program_admission_deadline_display( int $program_id ): string {
 		return LTDH_Program_Helpers::get_admission_deadline_display( $program_id );
 	}
@@ -986,6 +994,20 @@ function ltdh_get_program_tuition_display( int $program_id, bool $include_year =
  */
 function ltdh_get_program_admission_status( int $program_id ): string {
 	return LTDH_Program_Helpers::get_admission_status( $program_id );
+}
+
+/**
+ * 67b. Lấy trạng thái chỉ tiêu tuyển sinh ('Đang tuyển sinh' hoặc 'Ngừng tuyển sinh').
+ */
+function ltdh_get_program_quota_display( int $program_id ): string {
+	return LTDH_Program_Helpers::get_quota_display( $program_id );
+}
+
+/**
+ * 67c. Kiểm tra chương trình còn nhận chỉ tiêu hay không.
+ */
+function ltdh_is_program_quota_open( int $program_id ): bool {
+	return LTDH_Program_Helpers::is_quota_open( $program_id );
 }
 
 /**

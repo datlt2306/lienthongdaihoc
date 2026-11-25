@@ -85,6 +85,22 @@ function ltdh_register_program_specialization_acf_fields() {
 			'width' => '50',
 		],
 	] );
+
+	acf_add_local_field( [
+		'key'           => 'field_program_quota',
+		'label'         => 'Chỉ tiêu tuyển sinh',
+		'name'          => 'quota',
+		'type'          => 'radio',
+		'parent'        => 'group_program_details',
+		'instructions'  => 'Chỉ tiêu tuyển sinh cho ngành và hệ này (chỉ cần chọn Đang tuyển sinh hoặc Ngừng tuyển sinh, không cần nhập con số cụ thể).',
+		'choices'       => [
+			'dang-tuyen'  => 'Đang tuyển sinh',
+			'ngung-tuyen' => 'Ngừng tuyển sinh',
+		],
+		'default_value' => 'dang-tuyen',
+		'layout'        => 'horizontal',
+		'return_format' => 'value',
+	] );
 }
 
 /**
@@ -1905,7 +1921,9 @@ function ltdh_sync_program_admission_status_batches( $post_id ) {
 		return;
 	}
 
-	$batches = get_field( 'admission_batches', $post_id );
+	$quota_val = get_post_meta( $post_id, 'quota', true );
+	$batches   = get_field( 'admission_batches', $post_id );
+
 	if ( is_array( $batches ) && ! empty( $batches ) ) {
 		$has_open     = false;
 		$has_upcoming = false;
@@ -1924,31 +1942,57 @@ function ltdh_sync_program_admission_status_batches( $post_id ) {
 
 		if ( $all_closed ) {
 			update_post_meta( $post_id, 'admission_status', 'tam-ngung' );
+			update_post_meta( $post_id, 'quota', 'ngung-tuyen' );
 			$cur_period = get_post_meta( $post_id, 'enrollment_period', true );
 			if ( empty( $cur_period ) || in_array( trim( $cur_period ), [ 'Đang nhận hồ sơ', 'Tuyển sinh theo đợt' ], true ) ) {
 				update_post_meta( $post_id, 'enrollment_period', 'Đã hết chỉ tiêu tuyển sinh' );
 			}
 		} elseif ( $has_open ) {
-			update_post_meta( $post_id, 'admission_status', 'tuyen-sinh' );
-			$cur_period = get_post_meta( $post_id, 'enrollment_period', true );
-			if ( 'Đã hết chỉ tiêu tuyển sinh' === trim( (string) $cur_period ) ) {
-				update_post_meta( $post_id, 'enrollment_period', 'Đang nhận hồ sơ' );
+			if ( 'ngung-tuyen' === $quota_val ) {
+				update_post_meta( $post_id, 'admission_status', 'tam-ngung' );
+			} else {
+				update_post_meta( $post_id, 'admission_status', 'tuyen-sinh' );
+				update_post_meta( $post_id, 'quota', 'dang-tuyen' );
+				$cur_period = get_post_meta( $post_id, 'enrollment_period', true );
+				if ( 'Đã hết chỉ tiêu tuyển sinh' === trim( (string) $cur_period ) ) {
+					update_post_meta( $post_id, 'enrollment_period', 'Đang nhận hồ sơ' );
+				}
 			}
 		} elseif ( $has_upcoming ) {
-			update_post_meta( $post_id, 'admission_status', 'sap-mo' );
+			if ( 'ngung-tuyen' === $quota_val ) {
+				update_post_meta( $post_id, 'admission_status', 'tam-ngung' );
+			} else {
+				update_post_meta( $post_id, 'admission_status', 'sap-mo' );
+				update_post_meta( $post_id, 'quota', 'dang-tuyen' );
+			}
 		}
 	} else {
-		$status = get_post_meta( $post_id, 'admission_status', true );
-		if ( empty( $status ) ) {
-			update_post_meta( $post_id, 'admission_status', 'tuyen-sinh' );
+		// Đồng bộ 2 chiều giữa trường Chỉ tiêu (quota) và Trạng thái tuyển sinh (admission_status)
+		if ( 'ngung-tuyen' === $quota_val || 'ngung-tuyen-sinh' === $quota_val ) {
+			update_post_meta( $post_id, 'admission_status', 'tam-ngung' );
+			$cur_period = get_post_meta( $post_id, 'enrollment_period', true );
+			if ( empty( $cur_period ) || in_array( trim( $cur_period ), [ 'Đang nhận hồ sơ', 'Tuyển sinh theo đợt' ], true ) ) {
+				update_post_meta( $post_id, 'enrollment_period', 'Đã hết chỉ tiêu tuyển sinh' );
+			}
+		} else {
+			$status = get_post_meta( $post_id, 'admission_status', true );
+			if ( 'tam-ngung' === $status && 'dang-tuyen' === $quota_val ) {
+				update_post_meta( $post_id, 'admission_status', 'tuyen-sinh' );
+				$cur_period = get_post_meta( $post_id, 'enrollment_period', true );
+				if ( 'Đã hết chỉ tiêu tuyển sinh' === trim( (string) $cur_period ) ) {
+					update_post_meta( $post_id, 'enrollment_period', 'Đang nhận hồ sơ' );
+				}
+			} elseif ( empty( $status ) ) {
+				update_post_meta( $post_id, 'admission_status', 'tuyen-sinh' );
+			}
+			if ( empty( $quota_val ) ) {
+				update_post_meta( $post_id, 'quota', 'dang-tuyen' );
+			}
 		}
 	}
 }
 
 // ----------------------------------------------------
-// Admin Columns & Filter for Program CPT
-// ----------------------------------------------------
-
 // Admin Columns & Filter for Program CPT
 // ----------------------------------------------------
 
@@ -1971,6 +2015,7 @@ function ltdh_add_program_admin_columns( $columns ) {
 			$new_columns['program_school']        = 'Trường đối tác';
 			$new_columns['program_major']         = 'Chuyên ngành';
 			$new_columns['program_training_type'] = 'Hình thức học';
+			$new_columns['program_quota_status']  = 'Chỉ tiêu';
 			$new_columns['verification_status']   = 'Xác minh';
 			$new_columns['data_completeness']     = 'Chuẩn P0';
 		}
@@ -2041,6 +2086,15 @@ function ltdh_render_program_admin_columns( $column, $post_id ) {
 			}
 		} else {
 			echo '<span style="color:#94a3b8;">—</span>';
+		}
+	} elseif ( 'program_quota_status' === $column ) {
+		$quota_display = function_exists( 'ltdh_get_program_quota_display' ) 
+			? ltdh_get_program_quota_display( $post_id ) 
+			: 'Đang tuyển sinh';
+		if ( 'Ngừng tuyển sinh' === $quota_display ) {
+			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:600;font-size:11px;">● Ngừng tuyển</span>';
+		} else {
+			echo '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:600;font-size:11px;">● Đang tuyển</span>';
 		}
 	} elseif ( 'program_tuition' === $column ) {
 		$fee = function_exists( 'ltdh_get_program_tuition_display' ) ? ltdh_get_program_tuition_display( $post_id ) : ( get_field( 'tuition_fee', $post_id ) ?: '' );
