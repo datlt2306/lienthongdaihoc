@@ -126,18 +126,19 @@
 
 					if (edu === 'cao-dang' && thpt === 'chua-co-giay-van-hoa-thpt') {
 						if (diff >= 24) {
-							monthsBadge.innerHTML = '<span class="text-emerald-700 font-bold">✓ Đã tốt nghiệp ' + diff + ' tháng (≥ 24 tháng: ĐỦ ĐIỀU KIỆN)</span>';
-							monthsBadge.className = 'text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit';
+							monthsBadge.innerHTML = '<svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><span>Đã tốt nghiệp ' + diff + ' tháng · Đạt chuẩn ≥ 24 tháng</span>';
+							monthsBadge.className = 'inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full shadow-2xs whitespace-nowrap';
 						} else {
-							monthsBadge.innerHTML = '<span class="text-rose-700 font-bold">⚠️ Mới tốt nghiệp ' + diff + ' tháng (&lt; 24 tháng: CHƯA ĐỦ ĐIỀU KIỆN)</span>';
-							monthsBadge.className = 'text-[11px] font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded border border-rose-300 w-fit';
+							monthsBadge.innerHTML = '<svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg><span>Mới tốt nghiệp ' + diff + ' tháng · Chưa đủ 24 tháng</span>';
+							monthsBadge.className = 'inline-flex items-center gap-1.5 text-xs font-semibold text-rose-800 bg-rose-50 border border-rose-200/80 px-2.5 py-1 rounded-full shadow-2xs whitespace-nowrap';
 						}
 					} else {
-						monthsBadge.textContent = 'Thời gian từ tốt nghiệp: ~' + diff + ' tháng';
-						monthsBadge.className = 'text-[11px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200 w-fit';
+						monthsBadge.innerHTML = '<svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Thời gian từ tốt nghiệp: ~' + diff + ' tháng</span>';
+						monthsBadge.className = 'inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full shadow-2xs whitespace-nowrap';
 					}
 				} else {
-					monthsBadge.textContent = '';
+					monthsBadge.innerHTML = '';
+					monthsBadge.className = 'hidden';
 				}
 			}
 		}
@@ -1528,19 +1529,19 @@
 
 					if (edu === 'cao-dang' && thpt === 'chua-co-giay-van-hoa-thpt') {
 						if (months >= 24) {
-							monthBadge.innerHTML = '<span class="inline-flex items-center gap-1"><svg class="w-3 h-3 text-emerald-600 inline" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><span>Đã ' + months + ' tháng (≥ 24 tháng)</span></span>';
-							monthBadge.className = 'text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded';
+							monthBadge.innerHTML = '<span class="inline-flex items-center gap-1"><svg class="w-3 h-3 text-emerald-600 inline shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg><span>Đã ' + months + ' tháng (≥ 24 tháng)</span></span>';
+							monthBadge.className = 'text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded whitespace-nowrap shrink-0';
 						} else {
-							monthBadge.innerHTML = '<span class="inline-flex items-center gap-1"><svg class="w-3 h-3 text-amber-600 inline" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg><span>Mới ' + months + ' tháng (&lt; 24 tháng)</span></span>';
-							monthBadge.className = 'text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded';
+							monthBadge.innerHTML = '<span class="inline-flex items-center gap-1"><svg class="w-3 h-3 text-amber-600 inline shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg><span>Mới ' + months + ' tháng (&lt; 24 tháng)</span></span>';
+							monthBadge.className = 'text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded whitespace-nowrap shrink-0';
 						}
 					} else {
 						monthBadge.textContent = '~' + months + ' tháng';
-						monthBadge.className = 'text-[10px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded';
+						monthBadge.className = 'text-[10px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded whitespace-nowrap shrink-0';
 					}
 				} else if (monthBadge) {
 					monthBadge.textContent = 'Tính mốc 24 tháng';
-					monthBadge.className = 'text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded';
+					monthBadge.className = 'text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded whitespace-nowrap shrink-0';
 				}
 			}
 

@@ -96,13 +96,15 @@ $months = range( 1, 12 );
 			</div>
 
 			<!-- Trường 3: Thời điểm được công nhận tốt nghiệp (Tháng/Năm) -->
-			<div id="field-graduation-date-wrap" class="p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-2 transition-all duration-300">
-				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-					<label class="block text-xs sm:text-sm font-bold text-slate-800">
-						Thời điểm được công nhận tốt nghiệp (Tháng/Năm cấp bằng)
-						<span id="grad-required-indicator" class="text-rose-500 font-black hidden">* (Bắt buộc)</span>
+			<div id="field-graduation-date-wrap" class="p-4 sm:p-5 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-3 transition-all duration-300">
+				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+					<label class="text-xs sm:text-sm font-bold text-slate-800 leading-snug">
+						Thời điểm công nhận tốt nghiệp (Tháng / Năm)
+						<span id="grad-required-indicator" class="inline-block text-rose-500 font-bold text-xs whitespace-nowrap ml-1 hidden">* (Bắt buộc)</span>
 					</label>
-					<span id="grad-months-badge" class="text-[11px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200 w-fit"></span>
+					<div class="shrink-0 flex items-center">
+						<span id="grad-months-badge" class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border shadow-2xs whitespace-nowrap hidden"></span>
+					</div>
 				</div>
 				<div class="grid grid-cols-2 gap-3 sm:gap-4 max-w-md">
 					<div>

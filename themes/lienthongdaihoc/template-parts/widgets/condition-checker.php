@@ -182,11 +182,11 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 
 			<!-- 3. Thời điểm tốt nghiệp (Tháng/Năm) - Bắt buộc khi Cao đẳng chưa có THPT -->
 			<div class="compact-field-wrap hidden" data-branch="grad-date">
-				<div class="flex items-center justify-between mb-1">
+				<div class="flex items-center justify-between mb-1 gap-2">
 					<label class="compact-input-label mb-0">
-						3. Thời điểm cấp bằng tốt nghiệp <span class="text-rose-500 font-bold">*</span>
+						3. Thời điểm cấp bằng tốt nghiệp <span class="text-rose-500 font-bold whitespace-nowrap">*</span>
 					</label>
-					<span class="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded" data-month-calc-badge>
+					<span class="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded whitespace-nowrap shrink-0" data-month-calc-badge>
 						Tính mốc 24 tháng
 					</span>
 				</div>
