@@ -71,7 +71,7 @@ $years = range( $current_year, $current_year - 25 );
 	<div id="elig-remedy-box" class="hidden elig-remedy-box my-4 p-4 rounded-xl text-xs sm:text-sm leading-relaxed">
 		<div class="flex items-center gap-2 font-bold text-slate-900 mb-1.5">
 			<span class="text-base">💡</span>
-			<span class="uppercase tracking-wider">Giải pháp khắc phục & Hướng dẫn lộ trình:</span>
+			<span class="uppercase">Giải pháp khắc phục & Hướng dẫn lộ trình:</span>
 		</div>
 		<div id="elig-remedy-content" class="text-slate-700 pl-6"></div>
 	</div>
@@ -82,7 +82,7 @@ $years = range( $current_year, $current_year - 25 );
 		<div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1">
 			<div class="flex items-center gap-1.5 font-bold text-slate-800">
 				<span>⏰</span>
-				<span class="uppercase tracking-wider text-[11px]">Hệ đào tạo tương thích (TT 56/2026):</span>
+				<span class="uppercase text-[11px]">Hệ đào tạo tương thích (TT 56/2026):</span>
 			</div>
 			<p id="elig-time-filter-note" class="text-[11px] text-slate-600 m-0 leading-normal">
 				Theo Điều 5 Thông tư 56/2026/TT-BGDĐT, hệ Chính quy bắt buộc học trực tiếp trong giờ hành chính &gt;50% chương trình.
@@ -93,7 +93,7 @@ $years = range( $current_year, $current_year - 25 );
 		<div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1">
 			<div class="flex items-center gap-1.5 font-bold text-slate-800">
 				<span>📑</span>
-				<span class="uppercase tracking-wider text-[11px]">Miễn trừ tín chỉ & Học phí (TT 52 & 56):</span>
+				<span class="uppercasetext-[11px]">Miễn trừ tín chỉ & Học phí (TT 52 & 56):</span>
 			</div>
 			<p id="elig-credit-transfer-note" class="text-[11px] text-slate-600 m-0 leading-normal">
 				Tất cả các hệ đào tạo đều học chung khung chương trình chuẩn, đơn giá học phí tương đương và được Hội đồng nhà trường xét miễn trừ môn học theo bảng điểm gốc.
@@ -103,7 +103,7 @@ $years = range( $current_year, $current_year - 25 );
 
 	<!-- Candidate Profile Tags Integrated -->
 	<div id="elig-input-summary" class="pt-3 border-t border-slate-100">
-		<div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Hồ sơ đã đối chiếu:</div>
+		<div class="text-[11px] font-bold uppercase text-slate-400 mb-2">Hồ sơ đã đối chiếu:</div>
 		<div id="elig-summary-tags" class="flex flex-wrap items-center gap-2"></div>
 	</div>
 </div>
@@ -120,7 +120,7 @@ $years = range( $current_year, $current_year - 25 );
 <div id="elig-programs-heading" class="flex items-center justify-between gap-3 mb-3 px-1">
 	<div class="flex items-center gap-2">
 		<span class="w-6 h-6 rounded-lg bg-[#00308b] text-white text-xs font-black inline-flex items-center justify-center shrink-0 shadow-2xs">1</span>
-		<h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-700 m-0">
+		<h3 class="text-xs sm:text-sm font-extrabold uppercase text-slate-700 m-0">
 			Danh sách chương trình đối chiếu phù hợp
 		</h3>
 	</div>
@@ -142,7 +142,7 @@ $years = range( $current_year, $current_year - 25 );
 <!-- Alternatives (Smart Recommendations) -->
 <div id="elig-alternatives-section" class="elig-alternatives hidden mt-8 bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-6 shadow-xs">
 	<div class="mb-4">
-		<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#00308b] text-[11px] font-extrabold uppercase tracking-wider mb-1.5 border border-blue-100">
+		<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#00308b] text-[11px] font-extrabold uppercase mb-1.5 border border-blue-100">
 			<span>Phương án đề xuất bổ sung</span>
 		</div>
 		<h3 class="font-black text-slate-900 text-base sm:text-lg flex items-center gap-2 m-0">
@@ -161,7 +161,7 @@ $years = range( $current_year, $current_year - 25 );
 		<div class="w-full border-t border-slate-200"></div>
 	</div>
 	<div class="relative flex justify-center">
-		<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider border border-slate-200/80 shadow-2xs">
+		<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 text-slate-600 text-xs font-bold uppercase border border-slate-200/80 shadow-2xs">
 			<span class="w-5 h-5 rounded-full bg-[#00308b] text-white text-[11px] font-bold flex items-center justify-center shrink-0">2</span>
 			<span>Bước tiếp theo: Đăng ký thẩm định chi tiết & miễn giảm môn</span>
 			<svg class="w-4 h-4 text-[#00308b]" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
@@ -178,7 +178,7 @@ $years = range( $current_year, $current_year - 25 );
 	<div class="bg-[#00308b] text-white p-5 sm:p-6 md:p-7 relative">
 		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 			<div>
-				<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-xs text-white text-[11px] font-extrabold uppercase tracking-wider mb-2 border border-white/20">
+				<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-xs text-white text-[11px] font-extrabold uppercase mb-2 border border-white/20">
 					<span>✍️ Form đăng ký xét tuyển 1:1</span>
 				</div>
 				<h2 class="text-xl sm:text-2xl font-black leading-tight m-0" style="color: #ffffff !important;">
@@ -204,7 +204,7 @@ $years = range( $current_year, $current_year - 25 );
 					🎓
 				</div>
 				<div class="min-w-0">
-					<span class="text-[11px] font-bold uppercase tracking-wider text-blue-700 block">Bạn đang nộp thẩm định cho chương trình:</span>
+					<span class="text-[11px] font-bold uppercase  text-blue-700 block">Bạn đang nộp thẩm định cho chương trình:</span>
 					<strong id="elig-selected-program-title" class="text-sm sm:text-base font-extrabold text-slate-900 block truncate">
 						Đang chọn chương trình...
 					</strong>
@@ -277,7 +277,7 @@ $years = range( $current_year, $current_year - 25 );
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<!-- Degree upload -->
 					<div class="space-y-1.5">
-						<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+						<label class="block text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
 							<span>🎓</span> 1. Bằng tốt nghiệp (TC / CĐ / THN)
 						</label>
 						<div class="border border-dashed border-slate-300 hover:border-[#00308b] rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-blue-50/30 group" onclick="document.getElementById('degree-file-input').click()">
@@ -292,7 +292,7 @@ $years = range( $current_year, $current_year - 25 );
 
 					<!-- Transcript upload -->
 					<div class="space-y-1.5">
-						<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+						<label class="block text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
 							<span>📊</span> 2. Bảng điểm tốt nghiệp
 						</label>
 						<div class="border border-dashed border-slate-300 hover:border-[#00308b] rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-blue-50/30 group" onclick="document.getElementById('transcript-file-input').click()">
