@@ -38,9 +38,12 @@ $footer_file = dirname( __DIR__ ) . '/footer.php';
 $footer_content = file_get_contents( $footer_file );
 
 assert_test( false !== strpos( $footer_content, 'ltdh-global-mobile-bar' ), 'Thanh sticky footer mobile ltdh-global-mobile-bar tồn tại trong footer.php' );
-assert_test( false !== strpos( $footer_content, 'is_singular' ), 'Có điều kiện rẽ nhánh is_singular cho thanh mobile bar' );
-assert_test( false !== strpos( $footer_content, 'js-open-condition-checker-modal' ), 'Nút trung tâm trên trang program kích hoạt js-open-condition-checker-modal' );
-assert_test( false !== strpos( $footer_content, 'Kiểm tra điều kiện ngay' ), 'Nhãn nút trung tâm trên program hiển thị rõ "Kiểm tra điều kiện ngay"' );
+assert_test( false !== strpos( $footer_content, 'js-open-condition-checker-modal' ), 'Thanh mobile bar tích hợp nút Kiểm tra điều kiện (js-open-condition-checker-modal)' );
+assert_test( false !== strpos( $footer_content, 'Kiểm tra điều kiện' ), 'Nhãn nút Kiểm tra điều kiện có mặt trong thanh mobile bar' );
+assert_test( false !== strpos( $footer_content, 'js-open-consultation-modal' ), 'Thanh mobile bar tích hợp đồng thời nút Đăng ký tư vấn (js-open-consultation-modal)' );
+assert_test( false !== strpos( $footer_content, 'Đăng ký tư vấn' ), 'Nhãn nút Đăng ký tư vấn có mặt trong thanh mobile bar' );
+assert_test( false !== strpos( $footer_content, 'Nhắn tin Zalo' ), 'Thanh mobile bar có nút Zalo trực tiếp' );
+assert_test( false !== strpos( $footer_content, 'tel:' ), 'Thanh mobile bar có nút Gọi điện trực tiếp' );
 assert_test( false !== strpos( $footer_content, 'modal-condition-checker' ), 'footer.php đã nhúng template-parts/modal-condition-checker' );
 
 echo "\n===================================================================\n";

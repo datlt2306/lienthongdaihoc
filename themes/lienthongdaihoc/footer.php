@@ -198,50 +198,48 @@ $email     = function_exists( 'ltdh_get_email' ) ? ltdh_get_email() : 'tuvan@lie
 <!-- FLOATING DYNAMIC ISLAND MOBILE CTA BAR (CUPERTINO FROSTED GLASS - LIGHT) -->
 <nav id="ltdh-global-mobile-bar" 
      aria-label="Thanh liên hệ nhanh"
-     class="fixed inset-x-3.5 max-w-md mx-auto z-40 bg-white/85 backdrop-blur-2xl border border-black/[0.08] shadow-[0_10px_35px_-5px_rgba(0,0,0,0.15),0_2px_8px_rgba(0,0,0,0.06)] p-1.5 rounded-full flex items-center justify-between gap-2 md:hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform translate-y-0 opacity-100 will-change-transform"
+     class="fixed inset-x-2.5 sm:inset-x-3.5 max-w-md mx-auto z-40 bg-white/90 backdrop-blur-2xl border border-black/[0.08] shadow-[0_10px_35px_-5px_rgba(0,0,0,0.15),0_2px_8px_rgba(0,0,0,0.06)] p-1.5 rounded-full flex items-center justify-between gap-1.5 md:hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform translate-y-0 opacity-100 will-change-transform"
      style="bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); -webkit-backdrop-filter: blur(24px) saturate(180%);">
 	
-	<!-- Zalo Button (Left Circle) -->
+	<!-- 1. Zalo Button (Left Circle) -->
 	<a href="<?php echo esc_url( $zalo ); ?>" 
 	   target="_blank" 
 	   rel="noopener noreferrer" 
-	   class="flex items-center justify-center h-10 w-10 bg-[#0071E3] hover:bg-[#0077ED] active:scale-90 rounded-full shrink-0 transition-all text-white" 
+	   class="flex items-center justify-center h-10 w-10 bg-[#0071E3] hover:bg-[#0077ED] active:scale-90 rounded-full shrink-0 transition-all text-white cursor-pointer" 
 	   aria-label="Nhắn tin Zalo"
 	   title="Nhắn tin Zalo">
 		<span class="font-display font-bold text-xs tracking-tight">Za</span>
 	</a>
 
-	<!-- Center Action Button (Dynamic: Condition Checker on Program/School/Major pages, Consultation on others) -->
-	<?php if ( is_singular( [ 'program', 'school', 'major' ] ) ) : ?>
-		<button type="button" 
-		        onclick="if(window.ltdhOpenConditionCheckerModal){window.ltdhOpenConditionCheckerModal(event);}else{var m=document.getElementById('ltdh-condition-checker-modal');if(m){m.classList.remove('hidden');m.classList.add('flex');}}"
-		        class="js-open-condition-checker-modal flex-1 flex items-center justify-center gap-1.5 bg-[#0071E3] hover:bg-[#0077ED] active:scale-[0.97] text-white font-medium text-xs sm:text-sm h-10 px-3.5 rounded-full shadow-none transition-all min-w-0 cursor-pointer" 
-		        aria-haspopup="dialog"
-		        aria-label="Kiểm tra điều kiện tuyển sinh">
-			<svg class="w-4 h-4 shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-			</svg>
-			<span class="truncate font-display font-semibold">Kiểm tra điều kiện ngay</span>
-		</button>
-	<?php else : ?>
-		<?php
-		$register_link = '#register';
-		if ( is_front_page() || is_home() ) {
-			$register_link = '#register-section';
-		} elseif ( ! is_singular( [ 'major', 'program', 'school' ] ) ) {
-			$register_link = home_url( '/lien-he/' );
-		}
-		?>
-		<a href="<?php echo esc_url( $register_link ); ?>" 
-		   class="js-open-consultation-modal flex-1 flex items-center justify-center gap-2 bg-[#0071E3] hover:bg-[#0077ED] active:scale-[0.97] text-white font-medium text-xs sm:text-sm h-10 px-4 rounded-full shadow-none transition-all min-w-0"
-		   aria-haspopup="dialog">
-			<span class="truncate font-display font-medium">Đăng ký tư vấn ngay</span>
-		</a>
-	<?php endif; ?>
+	<!-- 2. Condition Checker Button (Center-Left Pill) -->
+	<button type="button" 
+	        onclick="if(window.ltdhOpenConditionCheckerModal){window.ltdhOpenConditionCheckerModal(event);}else{var m=document.getElementById('ltdh-condition-checker-modal');if(m){m.classList.remove('hidden');m.classList.add('flex');}}"
+	        class="js-open-condition-checker-modal flex-1 flex items-center justify-center gap-1 bg-emerald-700 hover:bg-emerald-800 active:scale-[0.97] text-white font-semibold text-[11px] sm:text-xs h-10 px-2 sm:px-3 rounded-full shadow-none transition-all min-w-0 cursor-pointer" 
+	        aria-haspopup="dialog"
+	        aria-label="Kiểm tra điều kiện tuyển sinh">
+		<svg class="w-3.5 h-3.5 shrink-0 text-white hidden min-[375px]:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+			<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+		</svg>
+		<span class="truncate font-display font-semibold min-[420px]:hidden">Kiểm tra ĐK</span>
+		<span class="truncate font-display font-semibold hidden min-[420px]:inline">Kiểm tra điều kiện</span>
+	</button>
 
-	<!-- Hotline Call Button (Right Circle) -->
+	<!-- 3. Consultation Registration Button (Center-Right Pill) -->
+	<button type="button" 
+	        onclick="if(window.ltdhOpenConsultationModal){window.ltdhOpenConsultationModal(event);}else{var m=document.getElementById('ltdh-consultation-modal');if(m){m.classList.remove('hidden');m.classList.add('flex');}}"
+	        class="js-open-consultation-modal flex-1 flex items-center justify-center gap-1 bg-[#0071E3] hover:bg-[#0077ED] active:scale-[0.97] text-white font-semibold text-[11px] sm:text-xs h-10 px-2 sm:px-3 rounded-full shadow-none transition-all min-w-0 cursor-pointer"
+	        aria-haspopup="dialog"
+	        aria-label="Đăng ký tư vấn tuyển sinh">
+		<svg class="w-3.5 h-3.5 shrink-0 text-white hidden min-[375px]:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+			<path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+		</svg>
+		<span class="truncate font-display font-semibold min-[390px]:hidden">Tư vấn ngay</span>
+		<span class="truncate font-display font-semibold hidden min-[390px]:inline">Đăng ký tư vấn</span>
+	</button>
+
+	<!-- 4. Hotline Call Button (Right Circle) -->
 	<a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $hotline ) ); ?>" 
-	   class="flex items-center justify-center h-10 w-10 bg-[#FF9500] hover:bg-[#E08500] active:scale-90 rounded-full shrink-0 transition-all text-white" 
+	   class="flex items-center justify-center h-10 w-10 bg-[#FF9500] hover:bg-[#E08500] active:scale-90 rounded-full shrink-0 transition-all text-white cursor-pointer" 
 	   aria-label="Gọi hotline"
 	   title="Gọi hotline">
 		<?php ltdh_icon( 'phone.fill', 'w-4.5 h-4.5' ); ?>
