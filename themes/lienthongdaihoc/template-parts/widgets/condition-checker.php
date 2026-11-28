@@ -151,7 +151,7 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 				<label class="compact-input-label">
 					1. Trình độ / Văn bằng hiện có <span class="text-rose-500">*</span>
 				</label>
-				<select class="w-full text-xs sm:text-sm rounded-lg border-slate-300 bg-white py-2 px-3 text-slate-800 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]" 
+				<select class="w-full text-xs sm:text-sm rounded-lg border border-slate-300 bg-white py-2 px-3 text-slate-800 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]" 
 				        name="compact_education" required>
 					<option value="" disabled selected>-- Chọn trình độ hiện có --</option>
 					<option value="cao-dang">Cao đẳng</option>
@@ -181,33 +181,33 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 			</div>
 
 			<!-- 3. Thời điểm cấp bằng tốt nghiệp Cao đẳng (Tháng/Năm) - Bắt buộc khi Cao đẳng chưa có THPT -->
-			<div class="compact-field-wrap hidden" data-branch="grad-date">
-				<div class="flex items-center justify-between mb-1 gap-2">
-					<label class="compact-input-label mb-0">
-						3. Thời điểm cấp bằng tốt nghiệp Cao đẳng <span class="text-rose-500 font-bold whitespace-nowrap">*</span>
-					</label>
-					<span class="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded whitespace-nowrap shrink-0" data-month-calc-badge>
-						Tính mốc 24 tháng
-					</span>
-				</div>
-				<div class="grid grid-cols-2 gap-2">
-					<div>
-						<select name="compact_grad_month" class="w-full text-xs rounded-lg border-slate-300 py-1.5 px-2 bg-white text-slate-800">
+			<div class="compact-field-wrap hidden rounded-xl bg-slate-50/80 border border-slate-200 p-3" data-branch="grad-date">
+				<label class="compact-input-label mb-1.5 leading-snug">
+					3. Thời điểm cấp bằng tốt nghiệp Cao đẳng <span class="text-rose-500 font-bold whitespace-nowrap">*</span>
+				</label>
+				<div class="grid grid-cols-12 gap-2">
+					<div class="col-span-5">
+						<select name="compact_grad_month" class="w-full text-xs rounded-lg border border-slate-300 py-2 px-2.5 bg-white text-slate-800 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
 							<?php for ( $m = 1; $m <= 12; $m++ ) : ?>
 								<option value="<?php echo $m; ?>" <?php selected( $m, 6 ); ?>>Tháng <?php echo $m; ?></option>
 							<?php endfor; ?>
 						</select>
 					</div>
-					<div>
+					<div class="col-span-7">
 						<input type="number" 
 						       name="compact_grad_year" 
-						       placeholder="Năm cấp bằng CĐ (VD: 2024)" 
+						       placeholder="Năm (VD: 2024)" 
 						       min="1990" 
 						       max="<?php echo esc_attr( current_time( 'Y' ) ); ?>" 
-						       class="w-full text-xs rounded-lg border-slate-300 py-1.5 px-2 bg-white text-slate-800 focus:border-[#00308b]">
+						       class="w-full text-xs rounded-lg border border-slate-300 py-2 px-2.5 bg-white text-slate-800 placeholder-slate-400 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
 					</div>
 				</div>
-				<p class="text-[11px] text-slate-500 mt-1">Nhập thời điểm cấp bằng <strong>Cao đẳng</strong> để tính mốc ≥ 24 tháng theo quy chế tuyển sinh.</p>
+				<div class="mt-2 flex flex-wrap items-center justify-between gap-1.5">
+					<p class="text-[11px] text-slate-500 leading-snug m-0">Căn cứ tính mốc ≥ 24 tháng của bằng <strong>Cao đẳng</strong>.</p>
+					<span class="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-md whitespace-nowrap shrink-0" data-month-calc-badge>
+						Tính mốc 24 tháng
+					</span>
+				</div>
 			</div>
 
 			<!-- Next Step Button -->
@@ -228,7 +228,7 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 				<label class="compact-input-label">
 					4. Xếp loại tốt nghiệp / Học lực <span class="text-rose-500">*</span>
 				</label>
-				<select name="compact_grad_grade" class="w-full text-xs sm:text-sm rounded-lg border-slate-300 bg-white py-2 px-3 text-slate-800">
+				<select name="compact_grad_grade" class="w-full text-xs sm:text-sm rounded-lg border border-slate-300 bg-white py-2 px-3 text-slate-800 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
 					<option value="kha" selected>Khá</option>
 					<option value="xuat-sac-gioi">Xuất sắc / Giỏi</option>
 					<option value="trung-binh">Trung bình khá / Trung bình</option>
@@ -240,7 +240,7 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 				<label class="compact-input-label">
 					5. Mức độ liên quan ngành đã tốt nghiệp &amp; ngành muốn học <span class="text-rose-500">*</span>
 				</label>
-				<select name="compact_major_relation" class="w-full text-xs sm:text-sm rounded-lg border-slate-300 bg-white py-2 px-3 text-slate-800">
+				<select name="compact_major_relation" class="w-full text-xs sm:text-sm rounded-lg border border-slate-300 bg-white py-2 px-3 text-slate-800 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
 					<option value="dung-nganh" selected>Đúng ngành / Cùng nhóm ngành</option>
 					<option value="nganh-gan">Ngành gần (liên quan)</option>
 					<option value="trai-nganh">Khác nhóm ngành (Trái ngành)</option>
@@ -362,7 +362,7 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 						       name="cf_name" 
 						       placeholder="Họ và tên của bạn *" 
 						       required 
-						       class="w-full text-xs rounded-lg border-slate-300 py-2 px-3 bg-white text-slate-800 placeholder-slate-400 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
+						       class="w-full text-xs rounded-lg border border-slate-300 py-2 px-3 bg-white text-slate-800 placeholder-slate-400 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
 					</div>
 					<div>
 						<input type="tel" 
@@ -370,13 +370,13 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 						       placeholder="Số điện thoại / Zalo *" 
 						       required 
 						       pattern="[0-9]{10,11}" 
-						       class="w-full text-xs rounded-lg border-slate-300 py-2 px-3 bg-white text-slate-800 placeholder-slate-400 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
+						       class="w-full text-xs rounded-lg border border-slate-300 py-2 px-3 bg-white text-slate-800 placeholder-slate-400 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
 					</div>
 					<div>
 						<input type="email" 
 						       name="cf_email" 
 						       placeholder="Email nhận thông báo (tùy chọn)" 
-						       class="w-full text-xs rounded-lg border-slate-300 py-2 px-3 bg-white text-slate-800 placeholder-slate-400 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
+						       class="w-full text-xs rounded-lg border border-slate-300 py-2 px-3 bg-white text-slate-800 placeholder-slate-400 shadow-2xs focus:border-[#00308b] focus:ring-1 focus:ring-[#00308b]">
 					</div>
 
 					<label class="flex items-center gap-2 text-[11px] text-slate-600 cursor-pointer pt-0.5 select-none">

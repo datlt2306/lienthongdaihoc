@@ -727,6 +727,24 @@
 	margin-bottom: 1rem;
 }
 
+.ltdh-condition-checker-compact select,
+.ltdh-condition-checker-compact input[type="number"],
+.ltdh-condition-checker-compact input[type="text"],
+.ltdh-condition-checker-compact input[type="tel"],
+.ltdh-condition-checker-compact input[type="email"] {
+	border: 1px solid #CBD5E1;
+	background-color: #FFFFFF;
+}
+.ltdh-condition-checker-compact select:focus,
+.ltdh-condition-checker-compact input[type="number"]:focus,
+.ltdh-condition-checker-compact input[type="text"]:focus,
+.ltdh-condition-checker-compact input[type="tel"]:focus,
+.ltdh-condition-checker-compact input[type="email"]:focus {
+	outline: none;
+	border-color: #00308B;
+	box-shadow: 0 0 0 2px rgba(0, 48, 139, 0.12);
+}
+
 .compact-radio-card {
 	display: flex;
 	align-items: center;
