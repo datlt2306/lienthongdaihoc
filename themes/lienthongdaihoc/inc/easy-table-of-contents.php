@@ -244,6 +244,25 @@ function ltdh_eztoc_filter_individual_option( $value, $key, $default ) {
 }
 
 /**
+ * Loại bỏ shortcode [ez-toc] chèn thủ công trong nội dung (post_content / ACF)
+ * để plugin luôn tự động chèn một khối "Xem nhanh" duy nhất ở ngay đầu nội dung (position = top),
+ * đồng thời tránh việc wpautop bọc thẻ <p> làm giãn chiều cao thanh tiêu đề.
+ */
+add_filter( 'acf_the_content', 'ltdh_eztoc_strip_manual_shortcode', 5 );
+add_filter( 'the_content', 'ltdh_eztoc_strip_manual_shortcode', 5 );
+function ltdh_eztoc_strip_manual_shortcode( $content ) {
+	if ( empty( $content ) || ! is_string( $content ) ) {
+		return $content;
+	}
+
+	if ( false === stripos( $content, '[ez-toc' ) ) {
+		return $content;
+	}
+
+	return preg_replace( '/<p>\s*\[ez-toc(?:\s+[^\]]*)?\]\s*<\/p>|\[ez-toc(?:\s+[^\]]*)?\]/i', '', $content );
+}
+
+/**
  * Tự động xóa transient đồng bộ khi quản trị viên cập nhật cài đặt trong WP Admin
  * để thiết lập mới nhất được nạp ngay lập tức.
  */
