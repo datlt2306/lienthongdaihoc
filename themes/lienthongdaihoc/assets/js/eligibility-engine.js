@@ -267,7 +267,8 @@
 		);
 
 		// Conflict 1: Trang Chính quy nhưng học viên chọn học ngoài giờ / Online 100% (Điều 5 TT 56/2026)
-		if (systemSlug === 'chinh-quy' && (timePref === 'ngoai-gio-cuoi-tuan' || timePref === 'online-100')) {
+		// Only recommend switching modality when the candidate is actually eligible
+		if (decision.decision_status !== 'not_eligible' && decision.decision_status !== 'not_eligible_2027' && systemSlug === 'chinh-quy' && (timePref === 'ngoai-gio-cuoi-tuan' || timePref === 'online-100')) {
 			var suggestedLink = '';
 			var suggestedName = '';
 

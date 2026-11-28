@@ -38,7 +38,7 @@ $zalo_share_url   = 'https://sp.zalo.me/plugins/share?url=' . rawurlencode( $soc
 	<!-- PROMINENT SHARE BUTTON (Eye-catching brand styling with gradient & shadow) -->
 	<button type="button"
 	        id="ltdh-quick-share-btn"
-	        class="ltdh-quick-share-btn ltdh-program-share-toggle-btn rounded-full group inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EA580C] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all duration-200 cursor-pointer shrink-0 self-start sm:self-auto cursor-pointer select-none"
+	        class="ltdh-quick-share-btn ltdh-program-share-toggle-btn rounded-full group inline-flex items-center justify-center w-10 h-10 p-0 sm:w-auto sm:h-auto sm:gap-2 sm:px-4 sm:py-2.5 bg-[#EA580C] hover:bg-[#c2410c] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all duration-200 cursor-pointer shrink-0 select-none"
 	        data-has-dropdown="true"
 	        data-url="<?php echo esc_url( $program_url ); ?>"
 	        data-title="<?php echo esc_attr( $clean_title ); ?>"
@@ -46,12 +46,13 @@ $zalo_share_url   = 'https://sp.zalo.me/plugins/share?url=' . rawurlencode( $soc
 	        aria-expanded="false"
 	        aria-haspopup="true"
 	        aria-controls="ltdh-share-dropdown-menu"
+	        aria-label="Chia sẻ chương trình đào tạo này"
 	        title="Chia sẻ chương trình đào tạo này">
-		<span class="w-5 h-5 rounded-md bg-white/20 flex items-center justify-center shrink-0 text-white shadow-2xs">
-			<?php ltdh_icon( 'share', 'w-3.5 h-3.5' ); ?>
+		<span class="flex items-center justify-center shrink-0 text-white sm:w-5 sm:h-5 sm:rounded-md sm:bg-white/20 sm:shadow-2xs">
+			<?php ltdh_icon( 'share', 'w-4 h-4 sm:w-3.5 sm:h-3.5' ); ?>
 		</span>
-		<span class="tracking-wide">Chia sẻ</span>
-		<?php ltdh_icon( 'chevron-down', 'w-3.5 h-3.5 text-white/80 transition-transform duration-200 group-aria-expanded:rotate-180' ); ?>
+		<span class="hidden sm:inline tracking-wide">Chia sẻ</span>
+		<?php ltdh_icon( 'chevron-down', 'hidden sm:block w-3.5 h-3.5 text-white/80 transition-transform duration-200 group-aria-expanded:rotate-180' ); ?>
 	</button>
 
 	<!-- DROPDOWN POPOVER MENU -->

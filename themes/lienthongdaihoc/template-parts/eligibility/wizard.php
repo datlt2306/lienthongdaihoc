@@ -99,7 +99,7 @@ $months = range( 1, 12 );
 			<div id="field-graduation-date-wrap" class="p-4 sm:p-5 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-3 transition-all duration-300">
 				<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
 					<label class="text-xs sm:text-sm font-bold text-slate-800 leading-snug">
-						Thời điểm công nhận tốt nghiệp (Tháng / Năm)
+						Thời điểm cấp bằng / công nhận tốt nghiệp (Cao đẳng / Trung cấp)
 						<span id="grad-required-indicator" class="inline-block text-rose-500 font-bold text-xs whitespace-nowrap ml-1 hidden">* (Bắt buộc)</span>
 					</label>
 					<div class="shrink-0 flex items-center">

@@ -93,7 +93,7 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 ?>
 
 <div id="<?php echo esc_attr( $unique_suffix ); ?>" 
-     class="ltdh-condition-checker-compact not-prose my-6 <?php echo esc_attr( $wrapper_class ); ?>" 
+     class="ltdh-condition-checker-compact not-prose <?php echo esc_attr( $wrapper_class ); ?>" 
      data-checker-widget 
      data-checker-mode="compact" 
      data-page-context="<?php echo esc_attr( wp_json_encode( $page_context ) ); ?>">
@@ -180,11 +180,11 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 				</div>
 			</div>
 
-			<!-- 3. Thời điểm tốt nghiệp (Tháng/Năm) - Bắt buộc khi Cao đẳng chưa có THPT -->
+			<!-- 3. Thời điểm cấp bằng tốt nghiệp Cao đẳng (Tháng/Năm) - Bắt buộc khi Cao đẳng chưa có THPT -->
 			<div class="compact-field-wrap hidden" data-branch="grad-date">
 				<div class="flex items-center justify-between mb-1 gap-2">
 					<label class="compact-input-label mb-0">
-						3. Thời điểm cấp bằng tốt nghiệp <span class="text-rose-500 font-bold whitespace-nowrap">*</span>
+						3. Thời điểm cấp bằng tốt nghiệp Cao đẳng <span class="text-rose-500 font-bold whitespace-nowrap">*</span>
 					</label>
 					<span class="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded whitespace-nowrap shrink-0" data-month-calc-badge>
 						Tính mốc 24 tháng
@@ -201,13 +201,13 @@ $widget_subtitle = $custom_subtitle ?: 'Đối chiếu 100% Thông tư 06, 95, 5
 					<div>
 						<input type="number" 
 						       name="compact_grad_year" 
-						       placeholder="Năm (ví dụ 2024)" 
+						       placeholder="Năm cấp bằng CĐ (VD: 2024)" 
 						       min="1990" 
 						       max="<?php echo esc_attr( current_time( 'Y' ) ); ?>" 
 						       class="w-full text-xs rounded-lg border-slate-300 py-1.5 px-2 bg-white text-slate-800 focus:border-[#00308b]">
 					</div>
 				</div>
-				<p class="text-[11px] text-slate-500 mt-1">Căn cứ tính mốc ≥ 24 tháng theo quy chế tuyển sinh.</p>
+				<p class="text-[11px] text-slate-500 mt-1">Nhập thời điểm cấp bằng <strong>Cao đẳng</strong> để tính mốc ≥ 24 tháng theo quy chế tuyển sinh.</p>
 			</div>
 
 			<!-- Next Step Button -->

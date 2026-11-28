@@ -301,7 +301,8 @@ function ltdh_elig_finalize_decision( array $decision, array $input ): array {
 		);
 
 		// Context Conflict 1: Trang Chính quy nhưng học viên chọn học ngoài giờ / Online 100% (Điều 5 TT 56/2026)
-		if ( 'chinh-quy' === $ctx_system_slug && ( 'ngoai-gio-cuoi-tuan' === $time_preference || 'online-100' === $time_preference ) ) {
+		// Only recommend switching modality when the candidate is actually eligible
+		if ( ! in_array( $decision['decision_status'] ?? '', [ 'not_eligible', 'not_eligible_2027' ], true ) && 'chinh-quy' === $ctx_system_slug && ( 'ngoai-gio-cuoi-tuan' === $time_preference || 'online-100' === $time_preference ) ) {
 			$suggested_link = '';
 			$suggested_name = '';
 			foreach ( $ctx_siblings as $sib ) {

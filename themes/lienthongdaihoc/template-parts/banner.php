@@ -567,13 +567,14 @@ if ( ! empty( $banner_image ) && function_exists( 'ltdh_get_optimized_image_url'
 $banner_verif = ( is_singular( 'program' ) && function_exists( 'ltdh_get_program_verification' ) ) 
 	? ltdh_get_program_verification( get_the_ID() ) 
 	: null;
-$source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source_title'] : 'Nguồn chính thức';
+$source_label    = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source_title'] : 'Nguồn chính thức';
+$is_program_hero = is_singular( 'program' );
 ?>
 
 <!-- ============================================================== -->
 <!-- FULL-WIDTH GRADIENT HERO BANNER (CLASSIC BRAND BLUE STRIP)     -->
 <!-- ============================================================== -->
-<section class="relative w-full bg-gradient-to-tr from-[#0E2038] via-[#0F284E] to-brand-primary text-white py-8 sm:py-10 md:py-14 overflow-hidden shadow-sm">
+<section class="relative w-full bg-gradient-to-tr from-[#0E2038] via-[#0F284E] to-brand-primary text-white <?php echo $is_program_hero ? 'py-5 sm:py-10 md:py-14' : 'py-8 sm:py-10 md:py-14'; ?> overflow-hidden shadow-sm">
 	<?php if ( ! empty( $banner_image ) ) : ?>
 		<!-- Subtle Banner Background Image with Gradient Overlay -->
 		<div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -643,7 +644,7 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 					</div>
 				<?php endif; ?>
 			<?php elseif ( ! empty( $banner_eyebrow ) || ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) ) : ?>
-				<div class="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-2.5 sm:mb-3.5">
+				<div class="flex flex-wrap items-center gap-2 sm:gap-2.5 <?php echo $is_program_hero ? 'mb-2 sm:mb-3.5' : 'mb-2.5 sm:mb-3.5'; ?>">
 					<?php if ( ! empty( $banner_eyebrow ) ) : ?>
 						<?php if ( ! empty( $banner_eyebrow['url'] ) ) : ?>
 							<a href="<?php echo esc_url( $banner_eyebrow['url'] ); ?>" 
@@ -663,9 +664,10 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 
 					<?php if ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) : ?>
 						<!-- Verified Pill -->
-						<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-semibold backdrop-blur-xs select-none">
+						<span class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs font-semibold backdrop-blur-xs select-none">
 							<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white text-[9px] font-black shrink-0">✓</span>
-							<span>Thông tin đã xác minh</span>
+							<span class="sm:hidden">Đã xác minh</span>
+							<span class="hidden sm:inline">Thông tin đã xác minh</span>
 							<?php if ( ! empty( $banner_verif['source_url'] ) ) : ?>
 								<a href="<?php echo esc_url( $banner_verif['source_url'] ); ?>" target="_blank" rel="noopener noreferrer nofollow" class="text-emerald-200 hover:text-white underline inline-flex items-center ml-0.5" title="<?php echo esc_attr( $source_label ); ?>">
 									<svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -676,29 +678,29 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 				</div>
 			<?php endif; ?>
 
-			<div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-				<!-- Brand Logo Container (Only displayed when official logo is present) -->
+			<div class="flex flex-col sm:flex-row sm:items-center <?php echo $is_program_hero ? 'gap-0 sm:gap-6' : 'gap-4 sm:gap-6'; ?>">
+				<!-- Brand Logo Container (Only displayed when official logo is present; hidden on mobile program hero to save above-the-fold space) -->
 				<?php if ( ! empty( $banner_logo_url ) ) : ?>
-					<div class="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-2xl bg-white p-2 shadow-xl ring-2 ring-white/20 shrink-0 flex items-center justify-center overflow-hidden">
+					<div class="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-2xl bg-white p-2 shadow-xl ring-2 ring-white/20 shrink-0 <?php echo $is_program_hero ? 'hidden sm:flex' : 'flex'; ?> items-center justify-center overflow-hidden">
 						<img src="<?php echo esc_url( $banner_logo_url ); ?>" alt="<?php echo esc_attr( $banner_logo_alt ?: $banner_title ); ?>" class="max-w-full max-h-full object-contain">
 					</div>
 				<?php endif; ?>
 
 				<!-- Title & Description Details -->
 				<div class="min-w-0 flex-1">
-					<h1 class="font-black text-white text-2xl sm:text-3xl md:text-4xl leading-tight tracking-tight drop-shadow-sm">
+					<h1 class="font-black text-white <?php echo $is_program_hero ? 'text-xl sm:text-3xl md:text-4xl leading-snug sm:leading-tight' : 'text-2xl sm:text-3xl md:text-4xl leading-tight'; ?> tracking-tight drop-shadow-sm">
 						<?php echo esc_html( $banner_title ); ?>
 					</h1>
 
 					<?php if ( ! empty( $banner_subtitle ) ) : ?>
-						<p class="text-blue-100/95 text-xs sm:text-sm md:text-base font-normal max-w-3xl mt-2 leading-relaxed">
+						<p class="<?php echo $is_program_hero ? 'hidden sm:block ' : ''; ?>text-blue-100/95 text-xs sm:text-sm md:text-base font-normal max-w-3xl mt-2 leading-relaxed">
 							<?php echo esc_html( $banner_subtitle ); ?>
 						</p>
 					<?php endif; ?>
 
 					<!-- Address & Website Metadata for School -->
 					<?php if ( ! empty( $banner_address ) || ! empty( $banner_website ) ) : ?>
-						<div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100">
+						<div class="mt-3 <?php echo $is_program_hero ? 'hidden sm:flex' : 'flex'; ?> flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-100">
 							<?php if ( ! empty( $banner_address ) ) : ?>
 								<div class="inline-flex items-center gap-1.5">
 									<svg class="w-4 h-4 text-blue-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -728,9 +730,9 @@ $source_label = ! empty( $banner_verif['source_title'] ) ? $banner_verif['source
 						</div>
 					<?php endif; ?>
 
-					<!-- Verification Details for Program (Full line) -->
+					<!-- Verification Details for Program (Full line, desktop/tablet only; mobile uses compact eyebrow pill) -->
 					<?php if ( is_singular( 'program' ) && ! empty( $banner_verif['is_verified'] ) ) : ?>
-						<div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-blue-100/90">
+						<div class="mt-3 hidden sm:flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-blue-100/90">
 							<span class="inline-flex items-center gap-1.5 text-emerald-300 font-semibold">
 								<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white text-[9px] font-black shrink-0">✓</span>
 								<span>Thông tin tuyển sinh đã được xác minh</span>

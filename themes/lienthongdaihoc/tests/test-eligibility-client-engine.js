@@ -167,7 +167,35 @@ it('Context Conflict 2: UTC + student without THPT -> Does NOT suggest other sch
 	assert.strictEqual(res.context_conflict, null);
 });
 
-// 9. Education Labels: only Cao đẳng and Trung cấp (no suffixes)
+// 9. Context Conflict suppressed when not_eligible
+it('Context Conflict: Chính quy program + not_eligible -> does NOT attach schedule_mismatch recommendation', () => {
+	const context = {
+		program_id: 101,
+		school_title: 'ĐH Giao thông Vận tải',
+		training_type_slug: 'chinh-quy',
+		sibling_programs: [
+			{
+				permalink: '/lien-thong-cong-nghe-thong-tin-tu-xa-utc/',
+				type_name: 'Đào tạo từ xa',
+				type_slug: 'tu-xa'
+			}
+		]
+	};
+	const res = Engine.evaluateDecisionTree({
+		education: 'cao-dang',
+		thpt_status: 'chua-co-giay-van-hoa-thpt',
+		grad_month: 6,
+		grad_year: 2026, // 5 months < 24
+		graduation_grade: 'kha',
+		major_relation: 'dung-nganh',
+		study_time_preference: 'online-100'
+	}, context);
+
+	assert.strictEqual(res.decision_status, 'not_eligible');
+	assert.strictEqual(res.context_conflict, null);
+});
+
+// 10. Education Labels: only Cao đẳng and Trung cấp (no suffixes)
 it('Education labels: only returns Cao đẳng and Trung cấp without suffixes', () => {
 	assert.strictEqual(Engine.getEducationLabel('cao-dang'), 'Cao đẳng');
 	assert.strictEqual(Engine.getEducationLabel('trung-cap'), 'Trung cấp');

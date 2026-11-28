@@ -551,7 +551,7 @@
 		// 3. Năm tốt nghiệp (Đặc biệt bắt buộc khi Cao đẳng + Chưa có bằng THPT)
 		if (eduVal === 'cao-dang' && thptSelect && thptSelect.value === 'chua-co-giay-van-hoa-thpt') {
 			if (!gradYearEl || !gradYearEl.value) {
-				showError('#field-grad-year', 'Trường hợp Cao đẳng chưa có bằng THPT bắt buộc phải nhập năm tốt nghiệp để đối chiếu mốc 24 tháng.');
+				showError('#field-grad-year', 'Trường hợp Cao đẳng chưa có bằng THPT bắt buộc phải nhập năm cấp bằng Cao đẳng để đối chiếu mốc 24 tháng.');
 				isValid = false;
 			}
 		}
@@ -1489,6 +1489,69 @@
 			var conflictBtnText = widget.querySelector('[data-conflict-btn-text]');
 
 			var leadForm = widget.querySelector('[data-compact-lead-form]');
+			var nextBtn  = widget.querySelector('[data-action="next-step"]');
+			var nextBtnLabel = nextBtn ? nextBtn.querySelector('span') : null;
+			var defaultNextBtnText = nextBtnLabel ? nextBtnLabel.textContent : 'Tiếp tục: Học lực & Quỹ thời gian';
+
+			function collectCompactInput(includeStep2) {
+				var eduVal = eduSelect ? eduSelect.value : '';
+				var thptRadio = widget.querySelector('input[name="compact_thpt_status"]:checked');
+				var thptVal = (eduVal === 'trung-cap' || eduVal === 'cao-dang') ? (thptRadio ? thptRadio.value : '') : '';
+				var mVal = gradMonth ? gradMonth.value : '6';
+				var yVal = gradYear ? gradYear.value : '';
+				var gradeVal = includeStep2 && gradeSelect ? gradeSelect.value : '';
+				var relationVal = includeStep2 && relationSelect ? relationSelect.value : '';
+				var timeRadio = includeStep2 ? widget.querySelector('input[name="compact_time_pref"]:checked') : null;
+				var timeVal = timeRadio ? timeRadio.value : '';
+
+				return {
+					education: eduVal,
+					thpt_status: thptVal,
+					grad_month: mVal,
+					grad_year: yVal,
+					graduation: yVal,
+					graduation_grade: gradeVal || 'kha',
+					major_relation: relationVal || 'dung-nganh',
+					study_time_preference: timeVal || 'online-100',
+					step2_completed: !!includeStep2
+				};
+			}
+
+			function evaluateCompactDecision(evalInput) {
+				var engine = window.LtdhEligibilityEngine;
+				if (engine && engine.evaluateDecisionTree) {
+					return engine.evaluateDecisionTree(evalInput, pageContext);
+				}
+				return {
+					decision_status: 'eligible',
+					badge_text: 'Đủ điều kiện xét tuyển',
+					decision_title: 'Hồ sơ đủ điều kiện tuyển sinh',
+					decision_summary: 'Hồ sơ đáp ứng tiêu chuẩn tuyển sinh liên thông đại học.',
+					priority_level: 'standard'
+				};
+			}
+
+			function isEarlyNotEligibleAtStep1() {
+				var edu = eduSelect ? eduSelect.value : '';
+				var thptRadio = widget.querySelector('input[name="compact_thpt_status"]:checked');
+				var thpt = thptRadio ? thptRadio.value : '';
+
+				if (thpt !== 'chua-co-giay-van-hoa-thpt') {
+					return false;
+				}
+				if (edu === 'trung-cap') {
+					return true;
+				}
+				if (edu === 'cao-dang') {
+					var y = gradYear ? parseInt(gradYear.value, 10) : 0;
+					if (!y || y < 1990) {
+						return false;
+					}
+					var earlyDecision = evaluateCompactDecision(collectCompactInput(false));
+					return earlyDecision.decision_status === 'not_eligible' || earlyDecision.decision_status === 'not_eligible_2027';
+				}
+				return false;
+			}
 
 			function updateBranching() {
 				var edu = eduSelect ? eduSelect.value : '';
@@ -1542,6 +1605,13 @@
 				} else if (monthBadge) {
 					monthBadge.textContent = 'Tính mốc 24 tháng';
 					monthBadge.className = 'text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded whitespace-nowrap shrink-0';
+				}
+
+				// Update Step 1 CTA label when early disqualification will skip Step 2
+				if (nextBtnLabel) {
+					nextBtnLabel.textContent = isEarlyNotEligibleAtStep1()
+						? 'Kiểm tra điều kiện ngay'
+						: defaultNextBtnText;
 				}
 			}
 
@@ -1601,8 +1671,107 @@
 				}
 			}
 
-			// Step 1 -> Step 2
-			var nextBtn = widget.querySelector('[data-action="next-step"]');
+			function renderCompactDecision(decision, evalInput) {
+				var status = decision.decision_status || 'eligible';
+				var normalizedStatus = status.replace(/_/g, '-');
+
+				// Update Result Card
+				if (resultCard) {
+					resultCard.classList.remove('status-eligible', 'status-warning-urgent', 'status-not-eligible', 'status-not_eligible', 'status-not_eligible_2027', 'status-not-eligible-2027');
+					resultCard.classList.add('status-' + normalizedStatus);
+					resultCard.classList.add('status-' + status);
+				}
+
+				if (resultIcon) {
+					var iconSvg = '';
+					if (status === 'eligible') {
+						iconSvg = '<svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
+						resultIcon.className = 'decision-icon-badge w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-2xs bg-emerald-600';
+					} else if (status === 'warning_urgent') {
+						iconSvg = '<svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>';
+						resultIcon.className = 'decision-icon-badge w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-2xs bg-amber-500';
+					} else {
+						iconSvg = '<svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+						resultIcon.className = 'decision-icon-badge w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-2xs bg-rose-600';
+					}
+					resultIcon.innerHTML = iconSvg;
+				}
+
+				if (resultBadge) {
+					resultBadge.className = 'elig-badge text-[10px]';
+					if (status === 'eligible') {
+						resultBadge.classList.add('elig-badge-eligible');
+					} else if (status === 'warning_urgent') {
+						resultBadge.classList.add('elig-badge-urgent');
+					} else {
+						resultBadge.classList.add('elig-badge-not-eligible');
+					}
+					resultBadge.textContent = decision.status_label || decision.badge_text || 'Kết quả đối chiếu';
+				}
+
+				if (resultUrgentBadge) {
+					resultUrgentBadge.classList.add('hidden');
+				}
+
+				if (resultTitle) {
+					resultTitle.textContent = decision.decision_title || 'Kết quả đối chiếu hồ sơ';
+				}
+
+				if (resultSummary) {
+					var rawSum = decision.decision_summary || '';
+					resultSummary.innerHTML = '<div class="p-3 rounded-xl bg-white/95 border border-slate-200/90 text-xs text-slate-800 leading-relaxed font-normal shadow-2xs">' + rawSum + '</div>';
+				}
+
+				if (remedyWrap) {
+					remedyWrap.classList.add('hidden');
+				}
+
+				// Update Context Conflict Alert Box
+				if (conflictBox) {
+					if (decision.context_conflict) {
+						conflictBox.classList.remove('hidden');
+						if (conflictTitle) conflictTitle.textContent = decision.context_conflict.title || 'Lưu ý quan trọng:';
+						if (conflictMessage) conflictMessage.innerHTML = decision.context_conflict.message || '';
+						if (conflictBtn) {
+							conflictBtn.setAttribute('href', decision.context_conflict.action_url || '#');
+							if (decision.context_conflict.action_url && decision.context_conflict.action_url.indexOf('http') === 0) {
+								conflictBtn.setAttribute('target', '_blank');
+								conflictBtn.setAttribute('rel', 'noopener');
+							} else {
+								conflictBtn.removeAttribute('target');
+								conflictBtn.removeAttribute('rel');
+							}
+						}
+						if (conflictBtnText) conflictBtnText.textContent = decision.context_conflict.action_text || 'Xem chi tiết';
+					} else {
+						conflictBox.classList.add('hidden');
+					}
+				}
+
+				// Populate Lead Form Hidden Fields
+				if (leadForm) {
+					var setVal = function (name, val) {
+						var f = leadForm.querySelector('input[name="' + name + '"]');
+						if (f) f.value = val;
+					};
+					var hasStep2 = !!evalInput.step2_completed;
+					setVal('cf_education', evalInput.education);
+					setVal('cf_thpt_status', evalInput.thpt_status);
+					setVal('cf_grad_month', evalInput.grad_month);
+					setVal('cf_grad_year', evalInput.grad_year);
+					setVal('cf_months_since_grad', decision.months_since_grad || 0);
+					setVal('cf_grad_grade', hasStep2 ? evalInput.graduation_grade : '');
+					setVal('cf_major_relation', hasStep2 ? evalInput.major_relation : '');
+					setVal('cf_time_pref', hasStep2 ? evalInput.study_time_preference : '');
+					setVal('cf_decision_status', decision.decision_status || '');
+					setVal('cf_priority_level', decision.priority_level || 'standard');
+					setVal('cf_suitable_training_types', (status === 'not_eligible' || status === 'not_eligible_2027') ? '' : (decision.suitable_training_types || []).join(', '));
+				}
+
+				goToStep(3);
+			}
+
+			// Step 1 -> Step 2 (or directly to Step 3 on early disqualification)
 			if (nextBtn) {
 				nextBtn.addEventListener('click', function () {
 					var edu = eduSelect ? eduSelect.value : '';
@@ -1612,8 +1781,9 @@
 						return;
 					}
 
+					var thptChecked = null;
 					if (edu === 'trung-cap' || edu === 'cao-dang') {
-						var thptChecked = widget.querySelector('input[name="compact_thpt_status"]:checked');
+						thptChecked = widget.querySelector('input[name="compact_thpt_status"]:checked');
 						if (!thptChecked) {
 							alert('Vui lòng chọn tình trạng bằng tốt nghiệp THPT.');
 							return;
@@ -1622,10 +1792,20 @@
 						if (edu === 'cao-dang' && thptChecked.value === 'chua-co-giay-van-hoa-thpt') {
 							var y = gradYear ? parseInt(gradYear.value, 10) : 0;
 							if (!y || y < 1990) {
-								alert('Trường hợp Cao đẳng chưa có bằng THPT bắt buộc phải nhập năm tốt nghiệp để đối chiếu mốc 24 tháng theo quy chế.');
+								alert('Trường hợp Cao đẳng chưa có bằng THPT bắt buộc phải nhập năm cấp bằng Cao đẳng để đối chiếu mốc 24 tháng theo quy chế.');
 								if (gradYear) gradYear.focus();
 								return;
 							}
+						}
+					}
+
+					// Skip Step 2 when Step 1 already concludes not_eligible (e.g. chưa có bằng THPT & chưa đủ 24 tháng / Trung cấp)
+					if (thptChecked && thptChecked.value === 'chua-co-giay-van-hoa-thpt') {
+						var step1Input = collectCompactInput(false);
+						var earlyDecision = evaluateCompactDecision(step1Input);
+						if (earlyDecision.decision_status === 'not_eligible' || earlyDecision.decision_status === 'not_eligible_2027') {
+							renderCompactDecision(earlyDecision, step1Input);
+							return;
 						}
 					}
 
@@ -1645,134 +1825,9 @@
 			var evalBtn = widget.querySelector('[data-action="evaluate-now"]');
 			if (evalBtn) {
 				evalBtn.addEventListener('click', function () {
-					var eduVal = eduSelect ? eduSelect.value : '';
-					var thptRadio = widget.querySelector('input[name="compact_thpt_status"]:checked');
-					var thptVal = (eduVal === 'trung-cap' || eduVal === 'cao-dang') ? (thptRadio ? thptRadio.value : '') : '';
-					var mVal = gradMonth ? gradMonth.value : '6';
-					var yVal = gradYear ? gradYear.value : '';
-					var gradeVal = gradeSelect ? gradeSelect.value : 'kha';
-					var relationVal = relationSelect ? relationSelect.value : 'dung-nganh';
-					var timeRadio = widget.querySelector('input[name="compact_time_pref"]:checked');
-					var timeVal = timeRadio ? timeRadio.value : 'online-100';
-
-					var evalInput = {
-						education: eduVal,
-						thpt_status: thptVal,
-						grad_month: mVal,
-						grad_year: yVal,
-						graduation: yVal,
-						graduation_grade: gradeVal,
-						major_relation: relationVal,
-						study_time_preference: timeVal
-					};
-
-					var engine = window.LtdhEligibilityEngine;
-					var decision = (engine && engine.evaluateDecisionTree)
-						? engine.evaluateDecisionTree(evalInput, pageContext)
-						: {
-							decision_status: 'eligible',
-							badge_text: 'Đủ điều kiện xét tuyển',
-							decision_title: 'Hồ sơ đủ điều kiện tuyển sinh',
-							decision_summary: 'Hồ sơ đáp ứng tiêu chuẩn tuyển sinh liên thông đại học.',
-							priority_level: 'standard'
-						};
-
-					var status = decision.decision_status || 'eligible';
-					var normalizedStatus = status.replace(/_/g, '-');
-
-					// Update Result Card
-					if (resultCard) {
-						resultCard.classList.remove('status-eligible', 'status-warning-urgent', 'status-not-eligible', 'status-not_eligible', 'status-not_eligible_2027', 'status-not-eligible-2027');
-						resultCard.classList.add('status-' + normalizedStatus);
-						resultCard.classList.add('status-' + status);
-					}
-
-					if (resultIcon) {
-						var iconSvg = '';
-						if (status === 'eligible') {
-							iconSvg = '<svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
-							resultIcon.className = 'decision-icon-badge w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-2xs bg-emerald-600';
-						} else if (status === 'warning_urgent') {
-							iconSvg = '<svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>';
-							resultIcon.className = 'decision-icon-badge w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-2xs bg-amber-500';
-						} else {
-							iconSvg = '<svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-							resultIcon.className = 'decision-icon-badge w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow-2xs bg-rose-600';
-						}
-						resultIcon.innerHTML = iconSvg;
-					}
-
-					if (resultBadge) {
-						resultBadge.className = 'elig-badge text-[10px]';
-						if (status === 'eligible') {
-							resultBadge.classList.add('elig-badge-eligible');
-						} else if (status === 'warning_urgent') {
-							resultBadge.classList.add('elig-badge-urgent');
-						} else {
-							resultBadge.classList.add('elig-badge-not-eligible');
-						}
-						resultBadge.textContent = decision.status_label || decision.badge_text || 'Kết quả đối chiếu';
-					}
-
-					if (resultUrgentBadge) {
-						resultUrgentBadge.classList.add('hidden');
-					}
-
-					if (resultTitle) {
-						resultTitle.textContent = decision.decision_title || 'Kết quả đối chiếu hồ sơ';
-					}
-
-					if (resultSummary) {
-						var rawSum = decision.decision_summary || '';
-						resultSummary.innerHTML = '<div class="p-3 rounded-xl bg-white/95 border border-slate-200/90 text-xs text-slate-800 leading-relaxed font-normal shadow-2xs">' + rawSum + '</div>';
-					}
-
-					if (remedyWrap) {
-						remedyWrap.classList.add('hidden');
-					}
-
-					// Update Context Conflict Alert Box
-					if (conflictBox) {
-						if (decision.context_conflict) {
-							conflictBox.classList.remove('hidden');
-							if (conflictTitle) conflictTitle.textContent = decision.context_conflict.title || 'Lưu ý quan trọng:';
-							if (conflictMessage) conflictMessage.innerHTML = decision.context_conflict.message || '';
-							if (conflictBtn) {
-								conflictBtn.setAttribute('href', decision.context_conflict.action_url || '#');
-								if (decision.context_conflict.action_url && decision.context_conflict.action_url.indexOf('http') === 0) {
-									conflictBtn.setAttribute('target', '_blank');
-									conflictBtn.setAttribute('rel', 'noopener');
-								} else {
-									conflictBtn.removeAttribute('target');
-									conflictBtn.removeAttribute('rel');
-								}
-							}
-							if (conflictBtnText) conflictBtnText.textContent = decision.context_conflict.action_text || 'Xem chi tiết';
-						} else {
-							conflictBox.classList.add('hidden');
-						}
-					}
-
-					// Populate Lead Form Hidden Fields
-					if (leadForm) {
-						var setVal = function (name, val) {
-							var f = leadForm.querySelector('input[name="' + name + '"]');
-							if (f) f.value = val;
-						};
-						setVal('cf_education', evalInput.education);
-						setVal('cf_thpt_status', evalInput.thpt_status);
-						setVal('cf_grad_month', evalInput.grad_month);
-						setVal('cf_grad_year', evalInput.grad_year);
-						setVal('cf_months_since_grad', decision.months_since_grad || 0);
-						setVal('cf_grad_grade', evalInput.graduation_grade);
-						setVal('cf_major_relation', evalInput.major_relation);
-						setVal('cf_time_pref', evalInput.study_time_preference);
-						setVal('cf_decision_status', decision.decision_status || '');
-						setVal('cf_priority_level', decision.priority_level || 'standard');
-						setVal('cf_suitable_training_types', (decision.suitable_training_types || []).join(', '));
-					}
-
-					goToStep(3);
+					var evalInput = collectCompactInput(true);
+					var decision = evaluateCompactDecision(evalInput);
+					renderCompactDecision(decision, evalInput);
 				});
 			}
 

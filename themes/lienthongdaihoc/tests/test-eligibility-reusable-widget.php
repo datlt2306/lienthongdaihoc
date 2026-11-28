@@ -321,6 +321,11 @@ ReusableWidgetTestSuite::assert(
 );
 
 ReusableWidgetTestSuite::assert(
+	strpos( $output_compact, 'Thời điểm cấp bằng tốt nghiệp Cao đẳng' ) !== false,
+	'Mục 3 ghi rõ Thời điểm cấp bằng tốt nghiệp Cao đẳng để tránh nhầm với bằng THPT'
+);
+
+ReusableWidgetTestSuite::assert(
 	strpos( $output_compact, 'data-conflict-box' ) !== false,
 	'Khung data-conflict-box có mặt sẵn để đón nhận cảnh báo điều hướng'
 );
@@ -451,6 +456,38 @@ ReusableWidgetTestSuite::assert(
 ReusableWidgetTestSuite::assert(
 	strpos( $elig_js_code, "status.replace(/_/g, '-')" ) !== false,
 	'eligibility.js chuẩn hóa trạng thái not_eligible sang not-eligible'
+);
+
+// ----------------------------------------------------
+// TEST 8: KHÔNG HIỆN CONTEXT CONFLICT KHI CHƯA ĐỦ ĐIỀU KIỆN & NHẢY THẲNG STEP 3 Ở STEP 1
+// ----------------------------------------------------
+ReusableWidgetTestSuite::suite( 'Early Disqualification (Step 1 -> Step 3) & No Schedule Conflict When Not Eligible' );
+
+$cq_not_elig_input = [
+	'education'             => 'cao-dang',
+	'thpt_status'           => 'chua-co-giay-van-hoa-thpt',
+	'grad_month'            => 6,
+	'grad_year'             => 2026,
+	'graduation_grade'      => 'kha',
+	'major_relation'        => 'dung-nganh',
+	'study_time_preference' => 'online-100',
+	'context'               => $cq_context,
+];
+$cq_not_elig_decision = ltdh_elig_evaluate_decision_tree( $cq_not_elig_input );
+
+ReusableWidgetTestSuite::assert(
+	$cq_not_elig_decision['decision_status'] === 'not_eligible',
+	'Cao đẳng chưa có bằng THPT và tốt nghiệp < 24 tháng trả về not_eligible'
+);
+
+ReusableWidgetTestSuite::assert(
+	empty( $cq_not_elig_decision['context_conflict'] ),
+	'Không gắn cảnh báo chuyển hệ Chính quy -> Từ xa khi thí sinh chưa đủ điều kiện'
+);
+
+ReusableWidgetTestSuite::assert(
+	strpos( $elig_js_code, 'isEarlyNotEligibleAtStep1' ) !== false && strpos( $elig_js_code, 'renderCompactDecision' ) !== false,
+	'eligibility.js có logic kiểm tra loại sớm tại Step 1 và nhảy thẳng sang Step 3'
 );
 
 // SUMMARY

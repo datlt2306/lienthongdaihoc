@@ -5,7 +5,7 @@
  * File cấu hình tích hợp và tự động kích hoạt Easy Table of Contents cho toàn bộ
  * bài viết (post), cẩm nang (guide), ngành học (major) và các loại bài viết khác.
  * 
- * - Mặc định tự động sinh Mục lục khi bài viết có từ 2 tiêu đề (H2, H3) trở lên.
+ * - Mặc định tự động sinh Mục lục khi bài viết có từ 2 tiêu đề H2 trở lên (chỉ hiển thị 1 cấp).
  * - Tác giả không cần phải chèn thủ công shortcode [ez-toc].
  * - Giao diện trong suốt chuẩn theme (Transparent), đồng bộ với thiết kế Tailwind CSS.
  * - Tự động cuộn mượt (Smooth Scroll) có bù trừ chiều cao sticky header (offset 120px).
@@ -29,15 +29,15 @@ function ltdh_eztoc_get_default_config(): array {
 		'auto_insert_post_types'     => [ 'post', 'major', 'guide', 'page', 'school', 'program' ],
 
 		// Vị trí và điều kiện hiển thị
-		'position'                   => 'before',     // Tự động chèn ngay trước thẻ Heading đầu tiên
+		'position'                   => 'top',        // Tự động chèn ngay ở đầu nội dung (sau tiêu đề)
 		'start'                      => 2,            // Tự động sinh khi bài viết có từ 2 tiêu đề trở lên
-		'heading_levels'             => [ '2', '3' ], // Chỉ quét các đề mục H2 và H3 (tránh loãng mục lục)
+		'heading_levels'             => [ '2' ],      // Chỉ hiển thị 1 cấp tiêu đề (H2)
 
 		// Tiêu đề khối mục lục
 		'show_heading_text'          => 1,
-		'heading_text'               => 'Mục lục bài viết',
+		'heading_text'               => 'Xem nhanh',
 		'heading_text_tag'           => 'p',
-		'show_hierarchy'             => 1,            // Phân cấp thụt lề H3 dưới H2
+		'show_hierarchy'             => 0,            // Tắt phân cấp nhiều tầng (chỉ hiển thị 1 cấp)
 		'counter'                    => 'none',       // Tắt bộ đếm mặc định của plugin để dùng CSS theme
 
 		// Tính năng tương tác (Thu gọn / Mở rộng / Cuộn mượt)
@@ -67,7 +67,7 @@ function ltdh_eztoc_sync_database_settings(): void {
 		return;
 	}
 
-	$cache_key = 'ltdh_eztoc_config_synced_v2';
+	$cache_key = 'ltdh_eztoc_config_synced_v4';
 	if ( get_transient( $cache_key ) ) {
 		return;
 	}
@@ -93,7 +93,7 @@ function ltdh_eztoc_sync_database_settings(): void {
 		}
 	}
 
-	// 2. Ép buộc cấu hình mặc định là đóng (thu gọn) theo yêu cầu
+	// 2. Ép buộc cấu hình mặc định là đóng (thu gọn), tiêu đề "Xem nhanh" và đặt ngay đầu nội dung
 	if ( empty( $current_opt['visibility_hide_by_default'] ) ) {
 		$current_opt['visibility_hide_by_default'] = 1;
 		$updated                                   = true;
@@ -106,6 +106,22 @@ function ltdh_eztoc_sync_database_settings(): void {
 		$current_opt['css_container_class'] = trim( ( $current_opt['css_container_class'] ?? '' ) . ' toc_close' );
 		$updated                            = true;
 	}
+	if ( ( $current_opt['heading_text'] ?? '' ) !== $defaults['heading_text'] ) {
+		$current_opt['heading_text'] = $defaults['heading_text'];
+		$updated                     = true;
+	}
+	if ( ( $current_opt['position'] ?? '' ) !== $defaults['position'] ) {
+		$current_opt['position'] = $defaults['position'];
+		$updated                 = true;
+	}
+	if ( ( $current_opt['heading_levels'] ?? [] ) !== $defaults['heading_levels'] ) {
+		$current_opt['heading_levels'] = $defaults['heading_levels'];
+		$updated                       = true;
+	}
+	if ( ! isset( $current_opt['show_hierarchy'] ) || (int) $current_opt['show_hierarchy'] !== 0 ) {
+		$current_opt['show_hierarchy'] = 0;
+		$updated                       = true;
+	}
 
 	// 3. Đảm bảo các thông số trải nghiệm quan trọng luôn chuẩn
 	$critical_keys = [
@@ -115,7 +131,6 @@ function ltdh_eztoc_sync_database_settings(): void {
 		'show_heading_text',
 		'heading_text',
 		'heading_text_tag',
-		'show_hierarchy',
 		'counter',
 		'visibility',
 		'smooth_scroll',
@@ -159,9 +174,10 @@ function ltdh_eztoc_filter_runtime_options( $options ) {
 		$options[ $pt_key ] = array_values( array_unique( array_merge( $existing, $defaults[ $pt_key ] ) ) );
 	}
 
-	if ( empty( $options['heading_text'] ) ) {
-		$options['heading_text'] = $defaults['heading_text'];
-	}
+	$options['heading_text']   = $defaults['heading_text'];
+	$options['position']       = $defaults['position'];
+	$options['heading_levels'] = $defaults['heading_levels'];
+	$options['show_hierarchy'] = $defaults['show_hierarchy'];
 
 	if ( empty( $options['theme'] ) ) {
 		$options['theme'] = $defaults['theme'];
@@ -206,19 +222,22 @@ function ltdh_eztoc_filter_individual_option( $value, $key, $default ) {
 			return ! empty( $value ) ? (int) $value : $defaults['smooth_scroll_offset'];
 
 		case 'heading_text':
-			return ! empty( $value ) ? $value : $defaults['heading_text'];
+			return $defaults['heading_text'];
 
 		case 'theme':
 			return ! empty( $value ) ? $value : $defaults['theme'];
 
 		case 'position':
-			return ! empty( $value ) ? $value : $defaults['position'];
+			return $defaults['position'];
 
 		case 'start':
 			return ! empty( $value ) ? (int) $value : $defaults['start'];
 
 		case 'heading_levels':
-			return ( is_array( $value ) && ! empty( $value ) ) ? $value : $defaults['heading_levels'];
+			return $defaults['heading_levels'];
+
+		case 'show_hierarchy':
+			return $defaults['show_hierarchy'];
 	}
 
 	return $value;
@@ -229,5 +248,5 @@ function ltdh_eztoc_filter_individual_option( $value, $key, $default ) {
  * để thiết lập mới nhất được nạp ngay lập tức.
  */
 add_action( 'update_option_ez-toc-settings', function () {
-	delete_transient( 'ltdh_eztoc_config_synced_v1' );
+	delete_transient( 'ltdh_eztoc_config_synced_v4' );
 } );
